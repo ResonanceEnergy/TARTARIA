@@ -293,22 +293,31 @@ Full details: `09_DEVELOPMENT_ROADMAP.md`
 | `01_LORE_BIBLE.md` | Origins, cosmology, timeline, factions, artifacts, prophecies |
 | `02_AETHER_ENERGY_SYSTEM.md` | Full energy mechanics: 3-6-9 bands, tuning, overloads, uses |
 | `03_CAMPAIGN_13_MOONS.md` | 13 storylines in lunar order with crossovers & symmetry |
-| `04_ARCHITECTURE_WORLD.md` | Zones, buildings, trains, airships, fountains, bell towers |
-| `05_NPC_DIALOGUE_BIBLE.md` | Character profiles, dialogue trees, banter collections |
-| `06_TECHNICAL_FRAMEWORK.md` | Unity 6 iOS architecture, RAM optimization, performance |
-| `07_GAMEPLAY_UX.md` | Controls, session flow, progression, combat, giant mode |
-| `08_MONETIZATION_LIVEOPS.md` | F2P model, events, economy balancing, live-ops calendar |
-| `09_DEVELOPMENT_ROADMAP.md` | Phases, milestones, budget, team, risk mitigation |
 | `03A_MAIN_STORYLINE_REWRITE.md` | Full vivid rewritten storyline — Prologue through Acts 1-5, Epilogue |
 | `03B_EXPANSION_PACKS.md` | 10 expansion DLC storylines with interconnection web |
-| `03C_MOON_MECHANICS_DETAILED.md` | Granular mechanics for Moons 1-4, structured outlines for 5-13 |
+| `03C_MOON_MECHANICS_DETAILED.md` | Granular mechanics for all 13 Moons + Day Out of Time |
+| `04_ARCHITECTURE_GUIDE.md` | Zones, buildings, trains, airships, fountains, bell towers |
+| `05_CHARACTERS_DIALOGUE.md` | Character profiles, dialogue trees, banter collections |
+| `06_COMBAT_PROGRESSION.md` | Combat systems, skill trees, resonance weapons |
+| `07_MOBILE_UX.md` | Touch controls, session flow, HUD, accessibility |
+| `08_MONETIZATION.md` | F2P model, events, economy balancing, live-ops calendar |
+| `09_TECHNICAL_SPEC.md` | Unity 6 iOS architecture, RAM optimization, performance |
+| `10_ROADMAP.md` | Phases, milestones, budget, team, risk mitigation |
 | `11_SCRIPTED_CLIMAXES.md` | Beat-by-beat playable climax scripts (Star Fort Siege, Orphan Train Escort) |
 | `12_VIVID_VISUALS.md` | Enhanced atmospheric visual direction for 7 key moments |
 | `13_MINI_GAMES.md` | 6 detailed interactive mini-games with progression & scoring |
 | `14_HAPTIC_FEEDBACK.md` | Complete haptic design bible — 20+ subsystems with Hz/ms specifications |
+| `15_MVP_BUILD_SPEC.md` | MVP build specification, scope definition, gate criteria |
+| `16_PLAYTHROUGH_PROTOTYPES.md` | 10 playtest scenarios, demo priority, trailer beats |
+| `17_DAY_OUT_OF_TIME.md` | Post-Moon 13 festival design, companion performances, live-ops |
+| `18_PRINCESS_ANASTASIA.md` | Complete Princess Anastasia character bible — 112 dialogue lines |
+| `19_ECONOMY_BALANCE.md` | Resource taxonomy, crafting, reward curves, balance testing |
+| `20_QUEST_DATABASE.md` | Complete quest catalog — 184 quests across 13 Moons |
 | `appendices/A_GLOSSARY.md` | Tartarian terms, in-game vocabulary |
 | `appendices/B_ASSET_REFERENCE.md` | Art direction, visual reference boards |
 | `appendices/C_AUDIO_DESIGN.md` | Soundtrack design, cymatic audio, voice acting |
+| `appendices/D_CONTROLS.md` | Touch control reference, gestures, accessibility remaps |
+| `appendices/E_METRICS.md` | KPI tracking, analytics dashboards, performance budgets |
 
 ---
 
