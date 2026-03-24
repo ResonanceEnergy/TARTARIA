@@ -313,6 +313,16 @@ Full details: `09_DEVELOPMENT_ROADMAP.md`
 | `18_PRINCESS_ANASTASIA.md` | Complete Princess Anastasia character bible — 112 dialogue lines |
 | `19_ECONOMY_BALANCE.md` | Resource taxonomy, crafting, reward curves, balance testing |
 | `20_QUEST_DATABASE.md` | Complete quest catalog — 184 quests across 13 Moons |
+| `21_PLAYER_PERSONAS.md` | Target audience archetypes, TAM/SAM, feature priority matrix |
+| `22_DIALOGUE_BRANCHING.md` | Choice architecture, consequence tracking, 4-tier taxonomy |
+| `23_LOCALIZATION.md` | Multi-language pipeline, 3 tiers, cultural adaptation |
+| `24_ACCESSIBILITY.md` | WCAG 2.1 AA compliance, motor/visual/auditory/cognitive |
+| `25_SAVE_SYSTEM.md` | Offline-first persistence, cloud sync, conflict resolution |
+| `26_LEVEL_DESIGN.md` | Zone layout, traversal systems, POI density, encounter pacing |
+| `27_TUTORIAL_ONBOARDING.md` | First 30 minutes beat-by-beat, teaching philosophy |
+| `28_ACHIEVEMENTS.md` | 52 achievements, seasonal challenges, Game Center integration |
+| `29_PRODUCTION_PIPELINE.md` | Art/audio/animation pipeline, outsource specs, CI/CD |
+| `30_MARKETING_POSITIONING.md` | Competitive landscape, brand identity, launch strategy |
 | `appendices/A_GLOSSARY.md` | Tartarian terms, in-game vocabulary |
 | `appendices/B_ASSET_REFERENCE.md` | Art direction, visual reference boards |
 | `appendices/C_AUDIO_DESIGN.md` | Soundtrack design, cymatic audio, voice acting |
