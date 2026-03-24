@@ -30,23 +30,34 @@ docs/
 ├── 01_LORE_BIBLE.md              # Tartarian history, cosmology, factions
 ├── 02_AETHER_ENERGY_SYSTEM.md    # Full energy mechanics deep dive
 ├── 03_CAMPAIGN_13_MOONS.md       # 13 Moon chronological storylines
-├── 04_ARCHITECTURE_WORLD.md      # Zones, buildings, sacred geometry
-├── 05_NPC_DIALOGUE_BIBLE.md      # Characters, banter, dialogue trees
-├── 06_TECHNICAL_FRAMEWORK.md     # Unity 6 iOS architecture & optimization
-├── 07_GAMEPLAY_UX.md             # Controls, session flow, progression
-├── 08_MONETIZATION_LIVEOPS.md    # F2P model, events, economy
-├── 09_DEVELOPMENT_ROADMAP.md     # Phases, budget, timeline
 ├── 03A_MAIN_STORYLINE_REWRITE.md # Vivid rewritten main storyline (Prologue–Epilogue)
 ├── 03B_EXPANSION_PACKS.md        # 10 expansion DLC storylines
-├── 03C_MOON_MECHANICS_DETAILED.md # Granular Moon 1-4 mechanics + 5-13 outlines
+├── 03C_MOON_MECHANICS_DETAILED.md # Granular Moon 1–13 mechanics & spectacles
+├── 04_ARCHITECTURE_GUIDE.md      # Zones, buildings, sacred geometry
+├── 05_CHARACTERS_DIALOGUE.md     # Characters, banter, dialogue trees
+├── 06_COMBAT_PROGRESSION.md      # Combat systems & skill progression
+├── 07_MOBILE_UX.md               # Touch controls, session flow, UX
+├── 08_MONETIZATION.md            # F2P model, events, economy
+├── 09_TECHNICAL_SPEC.md          # Unity 6 iOS architecture & optimization
+├── 10_ROADMAP.md                 # Phases, budget, timeline
 ├── 11_SCRIPTED_CLIMAXES.md       # Beat-by-beat climax scripts
 ├── 12_VIVID_VISUALS.md           # Key visual moments & cinematography
 ├── 13_MINI_GAMES.md              # 6 interactive mini-games
 ├── 14_HAPTIC_FEEDBACK.md         # Complete haptic design bible
-└── appendices/
-    ├── A_GLOSSARY.md             # Tartarian terms & concepts
-    ├── B_ASSET_REFERENCE.md      # Art direction & visual guides
-    └── C_AUDIO_DESIGN.md         # Cymatic soundtrack & voice design
+├── 15_MVP_BUILD_SPEC.md          # MVP build specification & scope
+├── 16_PLAYTHROUGH_PROTOTYPES.md  # 10 playtest scenarios & prototypes
+├── 17_DAY_OUT_OF_TIME.md         # Post-Moon 13 festival & live-ops event
+├── 18_PRINCESS_ANASTASIA.md      # Princess Anastasia character bible
+├── 19_ECONOMY_BALANCE.md         # Resource systems, crafting & balance
+├── 20_QUEST_DATABASE.md          # Complete quest catalog (184 quests)
+├── appendices/
+│   ├── A_GLOSSARY.md             # Tartarian terms & concepts
+│   ├── B_ASSET_REFERENCE.md      # Art direction & visual guides
+│   ├── C_AUDIO_DESIGN.md         # Cymatic soundtrack & voice design
+│   ├── D_CONTROLS.md             # Touch control reference & gestures
+│   └── E_METRICS.md              # KPI, analytics & performance budgets
+└── dlc/
+    └── (10 expansion DLC detail files)
 ```
 
 ## Tech Stack
