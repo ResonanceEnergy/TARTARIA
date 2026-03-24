@@ -50,6 +50,16 @@ docs/
 ├── 18_PRINCESS_ANASTASIA.md      # Princess Anastasia character bible
 ├── 19_ECONOMY_BALANCE.md         # Resource systems, crafting & balance
 ├── 20_QUEST_DATABASE.md          # Complete quest catalog (184 quests)
+├── 21_PLAYER_PERSONAS.md         # Target audience archetypes & feature priority
+├── 22_DIALOGUE_BRANCHING.md      # Choice architecture & consequence tracking
+├── 23_LOCALIZATION.md            # Multi-language pipeline & cultural adaptation
+├── 24_ACCESSIBILITY.md           # WCAG 2.1 AA compliance & inclusive design
+├── 25_SAVE_SYSTEM.md             # Persistence, cloud sync & offline-first design
+├── 26_LEVEL_DESIGN.md            # Zone layout, traversal & encounter pacing
+├── 27_TUTORIAL_ONBOARDING.md     # First-session script & teaching systems
+├── 28_ACHIEVEMENTS.md            # Achievement taxonomy, rewards & Game Center
+├── 29_PRODUCTION_PIPELINE.md     # Art/audio pipeline, outsource & tool chain
+├── 30_MARKETING_POSITIONING.md   # Competitive landscape & launch strategy
 ├── appendices/
 │   ├── A_GLOSSARY.md             # Tartarian terms & concepts
 │   ├── B_ASSET_REFERENCE.md      # Art direction & visual guides
