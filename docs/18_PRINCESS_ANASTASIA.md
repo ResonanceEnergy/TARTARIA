@@ -35,10 +35,10 @@
 9. [The Golden Mote Easter Egg](#9-the-golden-mote-easter-egg)
 10. [The 10-Second Solidification](#10-the-10-second-solidification)
 11. [Voice Direction](#11-voice-direction)
-12. [Animation & VFX Guide](#12-animation--vfx-guide)
+12. [Animation & VFX Guide](#12-animation-vfx-guide)
 13. [ECS Implementation](#13-ecs-implementation)
 14. [Accessibility Considerations](#14-accessibility-considerations)
-15. [DLC & Live-Ops Extensions](#15-dlc--live-ops-extensions)
+15. [DLC & Live-Ops Extensions](#15-dlc-live-ops-extensions)
 
 ---
 
@@ -882,7 +882,7 @@ Each of the 10 DLC zones can include additional Anastasia lines (drawing from th
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** All listed in header  
 **Total Word Count Target:** ~600 lines (character bible scope)  
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

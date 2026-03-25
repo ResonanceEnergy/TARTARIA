@@ -21,13 +21,13 @@
 
 1. [Onboarding Philosophy](#1-onboarding-philosophy)
 2. [Teaching Framework](#2-teaching-framework)
-3. [First 30 Minutes — Beat-by-Beat](#3-first-30-minutes--beat-by-beat)
+3. [First 30 Minutes — Beat-by-Beat](#3-first-30-minutes-beat-by-beat)
 4. [System Introduction Schedule](#4-system-introduction-schedule)
-5. [Failure Recovery & Safety Nets](#5-failure-recovery--safety-nets)
+5. [Failure Recovery & Safety Nets](#5-failure-recovery-safety-nets)
 6. [Contextual Hint System](#6-contextual-hint-system)
 7. [Returning Player Re-Onboarding](#7-returning-player-re-onboarding)
 8. [Accessibility Teaching](#8-accessibility-teaching)
-9. [Metrics & Optimization](#9-metrics--optimization)
+9. [Metrics & Optimization](#9-metrics-optimization)
 
 ---
 
@@ -306,9 +306,11 @@ End of tutorial sequence.
 | 1 | Basic combat (single frequency) | Corruption Patch | 1 button |
 | 1 | Building restoration | Great Dome | Swipe gesture |
 | 1 | Basic building placement | Builder's Terrace | 1 building, snap grid |
+| 2 | Resonance scanning (tap-hold reveal) | Buried structure near dome | Hold to reveal hidden architecture |
 | 3 | Dodge mechanic | Second combat zone | Visual telegraph → swipe |
 | 5 | Level up + skill tree | First level-up event | Choose 1 of 2 skills |
 | 7 | Combo attacks | Multi-enemy encounter | Chain 2–3 hits |
+| 8 | Mini-game: Harmonic Rock Cutting | Building material quest | Trace frequency lines to cut stone |
 | 10 | Inventory management | Resource cache discovery | View items, equip cosmetic |
 | 14 | Companion affinity (choices) | Milo story beat | First companion choice |
 | 20 | Quest journal | Third quest acquired | Navigate quest list |
@@ -320,10 +322,15 @@ End of tutorial sequence.
 |---|---|---|
 | 29 | Ley line glide traversal | First ley line node |
 | 31 | Second companion (Lirael) | Story introduction |
+| 33 | Dissonance Detection (Lens tool) | Crystal Veil corruption zone — Lirael demonstrates the lens |
 | 35 | Advanced combat (3+ frequencies) | Crystal Veil enemies |
+| 38 | Corruption Purge (3-stage: identify/isolate/purify) | First dissonance crystal node |
 | 40 | Lore codex | Dense lore zone |
+| 42 | Micro-Giant Mode (shrink into fractal interiors) | Corrupted dome interior — Milo triggers size shift |
+| 44 | Mini-game: Micro-Giant Fractal Purge | Inside corrupted dome — purge parasites at micro scale |
 | 45 | Aether band differentiation | Etheric band nodes |
-| 50 | Second mini-game type | Crystal Veil station |
+| 50 | Mini-game: Bell Tower Synchronization | Crystal Veil bell tower — ring sequence to purify zone |
+| 53 | Charged harmonic burst (hold + release combat) | Elite enemy encounter |
 | 56 | Companion switching | Two companions available |
 
 ### Moon 3 (Days 57–84): Mastery
@@ -331,9 +338,12 @@ End of tutorial sequence.
 | Day | System Introduced | Context |
 |---|---|---|
 | 57 | Golden ratio tuning (advanced building) | Ironhold architecture |
-| 60 | Third companion (Korath) | Story introduction |
+| 60 | Spectral Echo Adoption (orphan echo system) | First orphan echo encounter — narrative choice |
+| 63 | Service Buff Multiplier | Adopted echo provides passive zone buff |
 | 65 | Skill tree branching | Enough points for choice |
+| 68 | Mini-game: Resonance Rail Alignment | Ironhold rail junction — align frequency to reactivate track |
 | 70 | Economy management (trading) | NPC merchant |
+| 73 | Cymatic ability (draw pattern combat) | New combat ability unlock — trace sigil pattern |
 | 80 | Star fort construction | Ironhold quest |
 
 ### Moon 4+ : All Remaining
@@ -547,6 +557,6 @@ When a game update introduces a new system:
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

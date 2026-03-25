@@ -65,7 +65,12 @@ docs/
 │   ├── B_ASSET_REFERENCE.md      # Art direction & visual guides
 │   ├── C_AUDIO_DESIGN.md         # Cymatic soundtrack & voice design
 │   ├── D_CONTROLS.md             # Touch control reference & gestures
-│   └── E_METRICS.md              # KPI, analytics & performance budgets
+│   ├── E_METRICS.md              # KPI, analytics & performance budgets
+│   ├── F_MOON_INDEX.md           # Moon-by-Moon quick reference
+│   ├── G_NPC_INDEX.md            # NPC directory & dialogue hooks
+│   ├── H_MECHANIC_INDEX.md       # Core mechanic cross-reference
+│   ├── I_DLC_INDEX.md            # DLC dependency & unlock map
+│   └── J_ENEMY_INDEX.md          # Enemy bestiary & encounter data
 └── dlc/
     └── (10 expansion DLC detail files)
 ```
@@ -80,9 +85,9 @@ docs/
 
 ## Status
 
-**Phase:** Pre-Production / Game Design Documentation  
-**Version:** 0.1.0  
-**Date:** March 23, 2026
+**Phase:** Pre-Production / Game Design Documentation (FINAL REVIEW)  
+**Version:** 0.2.0  
+**Date:** March 25, 2026
 
 ---
 

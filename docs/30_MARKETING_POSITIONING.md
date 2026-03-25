@@ -9,7 +9,7 @@
 - [10_ROADMAP.md](10_ROADMAP.md) — Launch timeline, budget, team
 - [21_PLAYER_PERSONAS.md](21_PLAYER_PERSONAS.md) — 5 player archetypes, TAM/SAM
 - [08_MONETIZATION.md](08_MONETIZATION.md) — Revenue model, pricing tiers
-- [12_DLC_ROADMAP.md](12_DLC_ROADMAP.md) — Post-launch content calendar
+- [03B_EXPANSION_PACKS.md](03B_EXPANSION_PACKS.md) — Post-launch content calendar
 - [23_LOCALIZATION.md](23_LOCALIZATION.md) — Language tiers, launch markets
 - [24_ACCESSIBILITY.md](24_ACCESSIBILITY.md) — Accessibility as marketing differentiator
 
@@ -20,14 +20,14 @@
 1. [Positioning Statement](#1-positioning-statement)
 2. [Competitive Landscape](#2-competitive-landscape)
 3. [Unique Value Proposition](#3-unique-value-proposition)
-4. [Target Markets & Audience Segments](#4-target-markets--audience-segments)
+4. [Target Markets & Audience Segments](#4-target-markets-audience-segments)
 5. [Brand Identity](#5-brand-identity)
 6. [Launch Strategy](#6-launch-strategy)
-7. [Content Marketing & Community](#7-content-marketing--community)
-8. [Influencer & Press Strategy](#8-influencer--press-strategy)
+7. [Content Marketing & Community](#7-content-marketing-community)
+8. [Influencer & Press Strategy](#8-influencer-press-strategy)
 9. [App Store Optimization (ASO)](#9-app-store-optimization-aso)
 10. [Seasonal Campaign Calendar](#10-seasonal-campaign-calendar)
-11. [Revenue & Growth Projections](#11-revenue--growth-projections)
+11. [Revenue & Growth Projections](#11-revenue-growth-projections)
 12. [Budget Allocation](#12-budget-allocation)
 
 ---
@@ -333,7 +333,7 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md):
 
 ## 10. Seasonal Campaign Calendar
 
-Aligned with [12_DLC_ROADMAP.md](12_DLC_ROADMAP.md) seasonal content:
+Aligned with [03B_EXPANSION_PACKS.md](03B_EXPANSION_PACKS.md) seasonal content:
 
 | Season | Theme | Marketing Focus | In-Game Event |
 |---|---|---|---|
@@ -418,6 +418,6 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md) $2M+ Year 1 target:
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

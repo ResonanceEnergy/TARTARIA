@@ -23,10 +23,10 @@
 4. [Companion Relationship Model](#4-companion-relationship-model)
 5. [Major Choice Points by Moon](#5-major-choice-points-by-moon)
 6. [Dialogue Node Specification](#6-dialogue-node-specification)
-7. [Branching Flowcharts — Key Sequences](#7-branching-flowcharts--key-sequences)
+7. [Branching Flowcharts — Key Sequences](#7-branching-flowcharts-key-sequences)
 8. [Ending Variants](#8-ending-variants)
-9. [Replay & Recovery Design](#9-replay--recovery-design)
-10. [Implementation & Data Format](#10-implementation--data-format)
+9. [Replay & Recovery Design](#9-replay-recovery-design)
+10. [Implementation & Data Format](#10-implementation-data-format)
 11. [QA Testing Matrix](#11-qa-testing-matrix)
 
 ---
@@ -76,7 +76,7 @@ These are the major narrative forks. Each permanently alters a zone, a companion
 |---|---|---|---|---|
 | W1 | Moon 2 | **The Cassian Dilemma** | Accept Cassian's help to reach the buried archive | Reject Cassian — find the archive alone |
 | W2 | Moon 4 | **Star Fort Allegiance** | Connect the Star Fort to the Resistance grid | Connect the Star Fort to the Council of Echoes |
-| W3 | Moon 6 | **Korath's Sacrifice** | Allow Korath to channel the Requiem (he survives, weakened) | Attempt the Requiem yourself (Korath dies, you gain new ability) |
+| W3 | Moon 7 | **Korath's Sacrifice** | Allow Korath to channel the Requiem (he survives, weakened) | Attempt the Requiem yourself (Korath dies, you gain new ability) |
 | W4 | Moon 9 | **The Ley Line Split** | Route the continental ley line through the White City (trade power) | Route through the Orphan Colony (humanitarian power) |
 | W5 | Moon 11 | **Zereth's Revelation** | Trust Zereth's claim about the true timeline | Reject Zereth — restore the original timeline |
 | W6 | Moon 13 | **The Cosmic Reconciliation** | Forgive the Dissonant One | Seal the Dissonant One permanently |
@@ -333,7 +333,7 @@ If the player doesn't act within the timeout window (context-dependent, 10–30 
                         └─────────────────────────────────────┘
 ```
 
-### 7.2 Korath's Sacrifice (W3 — Moon 6)
+### 7.2 Korath's Sacrifice (W3 — Moon 7)
 
 ```
 [CYMATIC REQUIEM SEQUENCE]
@@ -522,6 +522,6 @@ Every dialogue node must be verified in all target languages for:
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

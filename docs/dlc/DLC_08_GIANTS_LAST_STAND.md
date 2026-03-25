@@ -17,6 +17,22 @@
 
 ---
 
+## Table of Contents
+
+1. [Story Synopsis](#story-synopsis)
+2. [Main Quest Chain](#main-quest-chain)
+3. [Side Quests](#side-quests)
+4. [New Zone: Giant Stasis Vaults](#new-zone-giant-stasis-vaults)
+5. [Core Mechanic: Awaken / Recruit Living Giants](#core-mechanic-awaken-recruit-living-giants)
+6. [New Enemies](#new-enemies)
+7. [Boss: Maelix (Untuned)](#boss-maelix-untuned)
+8. [Lore Discoveries](#lore-discoveries)
+9. [Companion Reactions](#companion-reactions)
+10. [Rewards & Gear](#rewards-gear)
+11. [DLC Network Integration](#dlc-network-integration)
+
+---
+
 ## Story Synopsis
 
 Korath has been an echo — a consciousness preserved in resonance fields — since the beginning. Powerful. Wise. Incorporeal. But echoes fade. And Korath is fading faster than any other because he's been pouring his remaining energy into the restoration grid. He estimates he has two Moons left before he dissipates entirely.
@@ -265,3 +281,9 @@ Korath's sealed message (Side Quest D) reveals the final piece: he didn't just c
 ---
 
 *In the deepest vault, a giant knelt. Not in defeat. In gratitude. Because someone came.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

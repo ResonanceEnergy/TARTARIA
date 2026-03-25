@@ -30,7 +30,7 @@
 8. [New NPCs](#new-npcs)
 9. [Lore Discoveries](#lore-discoveries)
 10. [Companion Reactions](#companion-reactions)
-11. [Rewards & Gear](#rewards--gear)
+11. [Rewards & Gear](#rewards-gear)
 12. [Cosmic Tie: Pavilion Resonance Cycles](#cosmic-tie-pavilion-resonance-cycles)
 
 ---
@@ -358,3 +358,9 @@ Reads the pavilion inscriptions with increasing recognition — she VISITED thes
 
 *They said the White City was a dream. Dreams don't have foundations.*
 *Dig deeper. The plaster was always the lie.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

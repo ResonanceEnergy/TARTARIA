@@ -17,13 +17,19 @@
 ## Table of Contents
 
 1. [Visual Direction Philosophy](#visual-direction-philosophy)
-2. [Moon 1 — Magnetic Moon: The Dome Awakening](#moon-1--magnetic-moon-the-dome-awakening)
-3. [Moon 2 — Lunar Moon: Fractal Corruption Purge](#moon-2--lunar-moon-fractal-corruption-purge)
-4. [Moon 3 — Electric Moon: The Orphan Train](#moon-3--electric-moon-the-orphan-train)
-5. [Moon 4 — Self-Existing Moon: Star Fort Siege](#moon-4--self-existing-moon-star-fort-siege)
-6. [Moon 6 — Rhythmic Moon: Pipe Organ Requiem](#moon-6--rhythmic-moon-pipe-organ-requiem)
-7. [Moon 12 — Crystal Moon: Planetary Bell-Tower Ring](#moon-12--crystal-moon-planetary-bell-tower-ring)
-8. [Moon 13 — Cosmic Moon: True Timeline Convergence](#moon-13--cosmic-moon-true-timeline-convergence)
+2. [Moon 1 — Magnetic Moon: The Dome Awakening](#moon-1-magnetic-moon-the-dome-awakening)
+3. [Moon 2 — Lunar Moon: Fractal Corruption Purge](#moon-2-lunar-moon-fractal-corruption-purge)
+4. [Moon 3 — Electric Moon: The Orphan Train](#moon-3-electric-moon-the-orphan-train)
+5. [Moon 4 — Self-Existing Moon: Star Fort Siege](#moon-4-self-existing-moon-star-fort-siege)
+6. [Moon 5 — Overtone Moon: The Intercontinental Bridge](#moon-5-overtone-moon-the-intercontinental-bridge)
+7. [Moon 6 — Rhythmic Moon: Pipe Organ Requiem](#moon-6-rhythmic-moon-pipe-organ-requiem)
+8. [Moon 7 — Resonant Moon: Giant's Awakening](#moon-7-resonant-moon-giants-awakening)
+9. [Moon 8 — Galactic Moon: The Armada Launches](#moon-8-galactic-moon-the-armada-launches)
+10. [Moon 9 — Solar Moon: The Ley Line Prophecy](#moon-9-solar-moon-the-ley-line-prophecy)
+11. [Moon 10 — Planetary Moon: The Continental Train](#moon-10-planetary-moon-the-continental-train)
+12. [Moon 11 — Spectral Moon: The Veil Between Worlds](#moon-11-spectral-moon-the-veil-between-worlds)
+13. [Moon 12 — Crystal Moon: Planetary Bell-Tower Ring](#moon-12-crystal-moon-planetary-bell-tower-ring)
+14. [Moon 13 — Cosmic Moon: True Timeline Convergence](#moon-13-cosmic-moon-true-timeline-convergence)
 
 ---
 
@@ -35,6 +41,24 @@
 - **Particle density = emotional intensity:** More particles = more wonder/danger
 - **Color language:** Gold = harmony/truth, Violet = cosmic power, Crimson = corruption, Silver = spectral memory
 - **Architecture breathes:** Restored buildings are alive — they swell, pulse, and respond to resonance events
+
+### Moon Color Palette Quick Reference
+
+| Moon | Dominant Palette | Accent | Time of Day | Mood |
+|------|-----------------|--------|-------------|------|
+| **1 — Magnetic** | Amber gold, dust brown | Blue-white 3-Band glow | Golden hour / twilight | Discovery, awe |
+| **2 — Lunar** | Deep emerald, crystal blue | Black-green corruption, white purge | Green moonlight | Tension, purification |
+| **3 — Electric** | Cold blue-gray, silver | Ghost-white, amber lamplight | Rainy midnight | Sorrow, revelation |
+| **4 — Self-Existing** | Steel blue, moat turquoise | Fire and flood light | Twilight siege | Defiance, sacrifice |
+| **5 — Overtone** | White marble, pearl | Opalescent auroras, gold leaf | Pre-dawn to sunrise | Wonder, rediscovery |
+| **6 — Rhythmic** | Deep cathedral burgundy | Stained-glass chromatics, gold Aether | Candlelit interior | Reverence, catharsis |
+| **7 — Resonant** | Amber-stone, ancient gold | Violet giant aura, green moss | Dusk, underground warm | Awakening, grief |
+| **8 — Galactic** | Sky blue, cloud white | Brass and copper, aurora trails | Sunrise over clouds | Scale, freedom |
+| **9 — Solar** | Deep indigo, midnight blue | Solar gold flares, prophecy silver | Midnight + solar flare | Mystery, revelation |
+| **10 — Planetary** | Warm honey, burnished copper | Rail-steel silver, landscape greens | Golden hour in motion | Journey, connection |
+| **11 — Spectral** | Ethereal blue-white, mist | Aquifer turquoise, veil shimmer | Perpetual twilight | Liminality, transcendence |
+| **12 — Crystal** | Crystalline clear, bell-gold | Sound-wave ripple colors | Dawn across timezones | Synchronization, triumph |
+| **13 — Cosmic** | All palettes converging | Pure white-gold transcendence | Eternal golden hour | Resolution, rebirth |
 
 ---
 
@@ -166,6 +190,46 @@
 
 ---
 
+## Moon 5 — Overtone Moon: The Intercontinental Bridge
+
+*Where harmony multiplies beyond what any single structure can hold.*
+
+### The White City at Dawn
+
+**Camera:** Aerial sweep across the White City Exposition Grounds at golden hour. Five Beaux-Arts pavilions rise from excavated mud — fluted Corinthian columns catching first light, domes crowned with resonance crystals that scatter prismatic reflections across the courtyards below. Between the pavilions, golden threads of overtone energy pulse rhythmically — the network made visible.
+
+**Detail shots:**
+- Pavilion facades: ornamental carvings of grapevines, celestial charts, and golden-ratio spirals. The stone is warm cream with copper-green veining, iridescent where Aether flows through structural meridians.
+- Grand Basin: 20-foot fountain columns spray ionized mist that catches dawn light. Miniature auroras form and dissolve in the spray — rose, amber, pale violet — cycling in 3-6-9 rhythm.
+- Grid Amplification Network: golden conduit lines traced between pavilion anchor points. Where conduits intersect, floating geometric shapes rotate slowly — pentagons, hexagrams, dodecahedra made of captured light. At night these shapes illuminate the entire district.
+- Overtone threads: visible harmonic connections between structures pulse in sync. When the player tunes a building, the threads brighten in golden cascade — each connected structure responding in harmonic sympathy.
+
+### The Spire Ignition
+
+**The moment:** The White City's central spire receives the Echohaven fragment from Moon 1. Camera holds on the player's hand placing the final piece. A beat of silence.
+
+**Ignition sequence:**
+- The spire base glows — warm gold crawling upward through the crystal lattice like liquid sunrise
+- At the apex: a golden beam erupts vertically, punching through scattered clouds and leaving a circular hole ringed with orange vapor
+- The beam splits into five threads, arcing outward in golden parabolas toward the horizon — each thread follows a ley line trajectory
+- Camera tracks the brightest thread: it crosses open ocean, a spray of light skipping across wave crests, each contact point leaving a brief golden ripple
+- Landfall: the thread strikes an unseen star fort on a distant continent. The fort ignites — visible at the horizon as a new golden star
+
+### The Aurora Bridge
+
+**Duration:** 15 seconds — the defining visual of Moon 5.
+- Between the White City spire and the distant star fort, a ribbon of aurora light materializes — golden at center, fading to amber and rose at the edges
+- The ribbon is not static — it breathes, swelling and thinning like a living bridge, with visible harmonic wave patterns rolling along its length
+- Below the ribbon, ley lines across the world map surge with new power. Camera pulls to orbital view: the global grid jumps from ~30% to ~45%, golden veins spreading visibly across dark continents
+- All five pavilion domes pulse in unison — a visual heartbeat transmitted through the network. Fountains across the White City erupt higher, mist auroras intensifying from pastel to vivid
+
+**Companion reactions (intercut with the bridge forming):**
+- Milo frozen mid-step, mouth open, cynicism completely absent
+- Lirael's spectral form weeping tears of golden light — she remembers this. She remembers bridge-building.
+- Thorne's static-laced voice from the radio, barely audible over the resonance: "I see your lights. Coming in."
+
+---
+
 ## Moon 6 — Rhythmic Moon: Pipe Organ Requiem
 
 *When music becomes visible, audible, and tangible simultaneously.*
@@ -202,6 +266,170 @@
 **Aftermath:** Rain continues gently. Cathedral pipes hum at a sustain level. Inside: the cymatic mandala has contracted to a softball-sized golden orb hovering above the console — the requiem's resonance captured in permanent form. It pulses with the ambient harmonic.
 
 The cathedral itself has changed: stone surfaces now show faint luminescent veins — the Aether pathways activated by the full performance. They'll glow forever, breathing slowly, a heartbeat in stone.
+
+---
+
+## Moon 7 — Resonant Moon: Giant's Awakening
+
+*The earth remembers its oldest children.*
+
+### The Graveyard at Dusk
+
+**Camera:** Ground-level tracking shot through the Giant's Graveyard. Massive megalith pillars — 30 meters tall, rough-hewn from a single block each — stand at irregular intervals across a plain of amber grass. The setting sun backlights each pillar, casting shadows longer than city blocks. Between the megaliths: scattered bones, not human-scale. Femurs the length of telephone poles. A skull half-buried in earth, its jaw open, wildflowers growing from the eye sockets.
+
+**Detail shots:**
+- Megalith surfaces: hand-carved glyphs at giant-scale, each character the size of a doorway. The glyphs tell stories — battles, celebrations, sky-gazing. Where sunlight catches the carved grooves, golden Aether residue glimmers.
+- Ground textures: the earth is compressed differently here. Ancient giant footprints, fossilized, create shallow basins that collect rainwater. The water in these basins vibrates at a low frequency — visible concentric waves even when the air is still.
+- Bone details: the preserved bones have crystalline inclusions — veins of rose quartz and smoky citrine running through ivory. They're beautiful and tragic — remnants of beings who were part-mineral, part-living architecture.
+
+### Korath's Manifestation
+
+**The moment:** Player activates a resonance scan at the largest megalith. The scan returns not data but a vibration — a bass frequency so deep the screen distorts. From the megalith: Korath.
+
+**Korath's Echo form:** 20 meters tall. Semi-transparent silver-gold, like moonlight in fog. His silhouette is massive but gentle — broad shoulders, hands that could cradle cathedrals. His face carries deep-carved lines of grief and patience. His eyes — the only fully opaque feature — glow warm amber, the color of old sunlight. When he speaks, the megaliths vibrate sympathetically — fine dust rises from every surface in the graveyard.
+
+**Scale reference:** Korath's hand, resting on a megalith, dwarfs the player entirely. When he kneels to speak, his knee alone is taller than a doorframe. The camera adjusts dynamically — low angle when he stands (emphasizing scale), eye-level when he kneels (emphasizing intimacy).
+
+### The Megalith Circle Activation
+
+**Climax visual:** All megaliths move. Not violently — slowly, deliberately, as if remembering where they belong. The earth groans. Stone scrapes stone. Ancient alignment markers glow as each pillar slides to its correct position.
+
+**The formation:** 12 megaliths form a perfect circle. At center: a holographic projection ignites — the giant civilization in its glory. Crystal spires built for beings 20 meters tall. Fountains that arced across valleys. Bell towers rung by hands the size of wagons. The projection is warm amber-gold, detailed enough to see individual giants walking, laughing, building.
+
+**Duration:** The projection holds for 30 seconds. Every companion watches in silence. Then it fades. The megaliths remain in formation — a monument reassembled after centuries of scattered grief.
+
+---
+
+## Moon 8 — Galactic Moon: The Armada Launches
+
+*The sky becomes a highway.*
+
+### The Dock at Sunrise
+
+**Camera:** Wide establishing shot. The airship dock is built on a cliff edge — precision-cut stone platform extending into open air, anti-grav stabilizers humming at its edges, a pure-water moat feeding the repulsion field. Behind the dock: the restored landscape — domes, spires, ley lines glowing faintly in dawn haze. Ahead: nothing but sky, streaked with the last violet of retreating night.
+
+**Detail shots:**
+- Dock surface: stone inlaid with copper and crystal conduit patterns — the landing array. Each conduit traces a golden-spiral path. When a ship approaches, the spirals pulse in sequence, guiding it to berth.
+- The moat: impossibly clear water flowing in precise channels. Beneath the surface, anti-grav Aether currents create visible standing waves — miniature aurora reflections dancing on the dock's underside.
+- Thorne's ship: moored at Berth 1. A fully restored resonance airship — elongated crystal hull with golden structural ribs, mercury-orb engine nacelles on each flank pulsing with silver-white energy, observation gondola beneath with floor-to-ceiling crystal panes. The hull itself is semi-transparent — internal Aether flows visible as golden circulatory threads.
+
+### Thorne's Arrival
+
+**The moment:** Static on the radio becomes a voice. Then: a shape through the dawn haze. Thorne's flagship — the *Skyward Vigil* — descends through a low cloud bank. The ship is twice the size the player expected. Its mercury engines leave trails of silver-gold vapor that take minutes to dissipate, hanging in the air like calligraphy.
+
+**Landing sequence:**
+- Dock array activates: golden spirals pulsing in cascade as the ship's resonance field intersects the landing field
+- Water moat erupts — controlled fountain jets that form a cradle of anti-grav suspension, catching the ship's keel
+- Hull settles with a deep harmonic tone — the dock and ship singing the same note
+- Gangplank extends: crystal, translucent, with visible Aether flowing through its structure like golden veins
+- Thorne descends. He's massive — giant-scale, matching Korath's echo in stature but corporeal. Silver-streaked beard. Eyes that have seen two centuries of lonely sky.
+
+### The Fleet Launch
+
+**Climax visual:** Three dormant airships in the fleet hangar reactivate simultaneously. Their hulls glow from dormant grey to warm gold as Aether floods their systems. Mercury engines ignite — silver-white flares that cast sharp shadows across the dock.
+
+**The launch:**
+- All four ships lift simultaneously. The dock fountains roar upward, pushing the fleet skyward on columns of ionized water.
+- Camera tracks from below: four golden silhouettes rising against a coral-pink sunrise. Engine trails braid together, forming a golden helix.
+- Orbital camera: the fleet banks in formation, casting shadows that sweep across the landscape below — dome, spire, star fort all briefly darkened as the armada passes overhead.
+- Below: NPCs look up. Children wave. Bell towers ring in salute.
+- The fleet's combined resonance field is visible — a golden dome of energy encompassing all four ships, trailing a luminous wake that takes 10 seconds to fade.
+
+---
+
+## Moon 9 — Solar Moon: The Ley Line Prophecy
+
+*Where all lines converge, truth becomes inescapable.*
+
+### The Nexus at Midnight
+
+**Camera:** Slow descent through darkness. No moon visible — the 13th Moon is below the horizon, saving its appearance for Moon 13. The only light sources: seven ley lines converging from seven directions, each a different shade of gold — pale champagne, deep amber, warm honey, cooling brass, bright solar, rich bronze, and white-gold. Where they meet: the Nexus. A natural stone amphitheater carved by millennia of Aether pressure into perfect sacred geometry.
+
+**Detail shots:**
+- Ley line surfaces: visible as flowing golden rivers of light, 3 meters wide, hovering just above ground level. The energy flows at different speeds — some languid, some rushing — creating visible interference patterns where streams approach the convergence.
+- Nexus floor: polished by Aether to a mirror finish. The converging lines reflect upward, projecting their golden patterns onto the amphitheater walls. The effect is a cathedral of light with no ceiling — walls painted by seven golden searchlights intersecting in real-time geometric patterns.
+- Prophecy Wall: a 30-meter curved stone face at the amphitheater's rear, every inch covered in carved text and diagrams. The carvings predate everything else in the game — sharp, deliberate, large-scale. Certain passages glow brighter as specific ley lines pulse — the wall is coded to the grid.
+
+### The Solar Flare
+
+**The moment:** All seven ley lines reach harmonic alignment simultaneously. The convergence point erupts.
+
+**Sequence:**
+- The seven golden streams merge into a single column of pure white-gold light — 5 meters in diameter, rising vertically from the Nexus floor
+- The column punches upward through the night sky, parting clouds in a perfect circle. Stars visible through the gap shift color — blueshift, then golden, as the column's frequency floods the upper atmosphere
+- At the column's apex (visible from ground as a distant point of intense light): a solar flare. Not from the sun — from the column itself. Golden fire fans outward in a corona, illuminating the landscape below in warm daylight for 10 seconds
+- Camera: ground-level reveal during the false sunrise. Every structure in range casts sharp golden shadows. The landscape is momentarily more beautiful than it's ever been — the world as it was under the pre-Flood golden sky
+
+**Aftermath:** The column dissipates. Night returns, but not fully — a golden haze persists at the horizon, like a forever-sunset. The Nexus floor retains the light in its polished stone, glowing softly for the remainder of the Moon. Ley lines pulse 50% brighter permanently.
+
+### Zereth's Silhouette
+
+**Visual beat:** During the solar flare, for exactly 3 frames (almost subliminal): a figure visible in the column's base. Tall. Robed. Not threatening — contemplative. Hands raised as if adjusting something. Zereth — the first visual confirmation that he is connected to the ley lines, not merely disrupting them. Players who pause or screenshot catch it. Most will feel it without consciously seeing it.
+
+---
+
+## Moon 10 — Planetary Moon: The Continental Train
+
+*The rails sing, and the world remembers how to breathe.*
+
+### The Station at Golden Hour
+
+**Camera:** Wide shot of New Chicago Central Station — the largest structure the player has built from scratch. Copper-inlaid stone platforms catch late afternoon light, turning the entire station into a warm bronze sculpture. Crystal canopies above each platform scatter prismatic rainbows across waiting passengers. Giant-scale AND human-scale seating side by side — Korath's echo fits perfectly in the oversized benches.
+
+**Detail shots:**
+- Platform tiles: alternating warm sandstone and polished obsidian, laid in golden-ratio spirals that expand outward from each platform center. Where the 432 Hz rail hum meets the tile pattern, visible resonance waves create shimmering moiré effects on the surface.
+- Crystal canopies: grown from pure resonance crystal — not manufactured, cultivated. Internal fractures scatter light into spectral bands that shift with the sun's angle. At sunset: the canopies project fire-opal patterns on every surface.
+- The train: a fully restored resonance locomotive at Platform 1. Crystal hull glowing warm gold, mercury-orb engine humming, observation cars with floor-to-ceiling windows reflecting the sunset. The engine's heartbeat is visible — a soft golden pulse every 3 seconds, synced to the station's grid.
+
+### The Journey Montage
+
+**Duration:** 60-second compressed sequence as the train crosses all restored zones.
+
+**Visual rhythm:** Each zone passage = 5 seconds. Camera alternates between interior (companions reacting, children pressing faces to glass) and exterior (landscape transforming).
+
+- **Cathedral Zone:** The dome visible through morning mist. Organ pipes catch light — brief musical phrase from Veritas carries across the distance. Windows steam with warm interior vs. cool exterior.
+- **Star Fort Zone:** The fort's bastions glow at their tips. Central bell tower rings once — the sound wave is visible as a golden ripple expanding across the landscape.
+- **White City Zone:** Pavilion domes flash as the train passes. Fountain mist creates a rainbow tunnel that the train glides through — droplets beading on the crystal hull in golden trails.
+- **Giant's Graveyard:** Megaliths in formation. Korath's echo stands among them, one hand raised in greeting. The train is tiny against his silhouette.
+- **Airship Dock Zone:** Thorne's fleet visible overhead, matching the train's trajectory. Engine trails weave above while rail golden-light streaks below — parallel golden threads crossing the landscape.
+
+**Interior cuts between zones:** Companions in warm light. Milo on the train roof, wind in his fox fur, genuinely smiling. Lirael touching the window, light passing through her spectral hand. Children singing softly — the 432 Hz lullaby. Thorne in the oversized caboose, eyes closed, at peace.
+
+### Arrival
+
+**The final frame:** Orbital camera. The complete continental rail network glows golden — a web of light connecting every zone, every station. The grid percentage climbs visibly past 85%. The planet is more gold than dark now. One shot, no cuts, held for 10 seconds. The world is healing.
+
+---
+
+## Moon 11 — Spectral Moon: The Veil Between Worlds
+
+*Two realities breathe in the same space.*
+
+### The Veil Threshold
+
+**Camera:** First-person approach toward the Veil — a region where physical reality becomes semi-transparent. The transition is gradual: first, colors desaturate by 20%. Then buildings develop a double-image — their current restored state overlaid by a ghostly second version: either their pre-Flood glory (amber-gold, pristine) or their destroyed state (grey, collapsed). The two images flicker in and out of phase.
+
+**Detail shots:**
+- Ground textures: the earth shows two layers simultaneously — current grass/stone AND the original pre-Flood surface (polished marble, inlaid crystal walkways) visible beneath, like looking through ice at a frozen landscape below.
+- Air: visible particles. Not dust — fragments of time. Tiny shards of light that drift directionlessly, each one containing a frame of memory: a child's laugh, a bell's ring, a giant's footstep. Touch one and it plays its memory for 1 second.
+- Sound: audio has reverb that shouldn't exist — every sound echoes in a second timeline. A companion's voice arrives twice, 0.2 seconds apart, the echo slightly different in tone (younger? older? from another life?)
+
+### Timeline Overlay
+
+**The core visual mechanic:** As the player moves deeper into the Veil zone, the two timelines become equally visible. Walking through a ruined archway: the restored version and the pre-Flood version occupy the same space, rendered at 50% opacity each. Turning the head shifts the balance — look left for destruction, right for glory. The player exists at the intersection.
+
+**Key visual moments:**
+- A fountain runs in both timelines — current version: modest restoration. Pre-Flood version: 10× grander, three tiers, crystal basin, golden water arcing in sacred-geometry patterns. Both visible simultaneously, overlapping.
+- NPCs: spectral echoes of pre-Flood citizens walk through the same streets as current NPCs. They don't interact — they're memories — but sometimes a pre-Flood echo pauses at the exact spot where a current NPC stands, as if sensing a presence across centuries.
+- Companions: Lirael's double-image resolves — her spectral form and her pre-Flood self briefly align. For one frame: she's fully physical, wearing white with silver embroidery, eyes Wedgwood blue. Then the Veil shifts and she's spectral again.
+
+### The Veil Stabilization
+
+**Climax visual:** Player activates the Veil equilibrium node. Both timelines lock into coherent overlay — no more flickering.
+
+**The result:** The zone becomes permanently dual-layered. Architecture shows its full history: every building displays its current state at 70% opacity, with its greatest historical state at 30%. The effect is ethereal — a district where every structure is crowned by a golden ghost of its former self. The sky holds both a twilight current-sky and a golden pre-Flood sky, the two bleeding together at the seams like watercolors meeting on wet paper.
+
+**Companion reaction:** Veritas speaks for the first time without musical metaphor: "This is truth. Not one version or another. All of it. All at once. The beauty and the wound."
 
 ---
 
@@ -312,3 +540,9 @@ All three endings feature a final shot: the camera rises to orbital view. The pl
 - [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — VFX budgets & Metal 3 pipeline
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic accompaniment for every visual
 - [11_SCRIPTED_CLIMAXES.md](11_SCRIPTED_CLIMAXES.md) — Playable sequences that use these visuals
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

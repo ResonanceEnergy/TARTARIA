@@ -7,15 +7,15 @@
 ## Table of Contents
 
 1. [High-Level Vision](#1-high-level-vision)
-2. [Core Fantasy & Pillars](#2-core-fantasy--pillars)
-3. [Genre & Influences](#3-genre--influences)
-4. [World & Setting](#4-world--setting)
+2. [Core Fantasy & Pillars](#2-core-fantasy-pillars)
+3. [Genre & Influences](#3-genre-influences)
+4. [World & Setting](#4-world-setting)
 5. [Core Gameplay Loop](#5-core-gameplay-loop)
 6. [Key Mechanics Summary](#6-key-mechanics-summary)
 7. [Campaign Structure](#7-campaign-structure)
-8. [Characters & Factions](#8-characters--factions)
-9. [Art Direction & Audio](#9-art-direction--audio)
-10. [Platform & Technical Requirements](#10-platform--technical-requirements)
+8. [Characters & Factions](#8-characters-factions)
+9. [Art Direction & Audio](#9-art-direction-audio)
+10. [Platform & Technical Requirements](#10-platform-technical-requirements)
 11. [Monetization Model](#11-monetization-model)
 12. [Development Overview](#12-development-overview)
 13. [Document Cross-References](#13-document-cross-references)
@@ -146,16 +146,16 @@ Every session (5–15 minutes) follows this addictive, rewarding cycle:
 | System | Core Document | Summary |
 |---|---|---|
 | **Aether Energy** | `02_AETHER_ENERGY_SYSTEM.md` | 3-6-9 harmonic bands, resonance coefficient, harvesting, storage, distribution, overloads |
-| **Sacred Geometry Building** | `04_ARCHITECTURE_WORLD.md` | Golden-ratio snap, Tartarian templates, domes/spires/forts/fountains/organs |
-| **Giant Mode** | `07_GAMEPLAY_UX.md` | Toggle avatar size, precision rock cutting, mega-construction, golem wrestling |
+| **Sacred Geometry Building** | `04_ARCHITECTURE_GUIDE.md` | Golden-ratio snap, Tartarian templates, domes/spires/forts/fountains/organs |
+| **Giant Mode** | `07_MOBILE_UX.md` | Toggle avatar size, precision rock cutting, mega-construction, golem wrestling |
 | **Cymatic Tuning** | `02_AETHER_ENERGY_SYSTEM.md` | Organ/crystal mini-games, 3-6-9 rhythm puzzles, frequency alignment |
-| **Airship & Train Travel** | `04_ARCHITECTURE_WORLD.md` | Anti-grav flight, megalith transport, resonance rail network |
+| **Airship & Train Travel** | `04_ARCHITECTURE_GUIDE.md` | Anti-grav flight, megalith transport, resonance rail network |
 | **13-Moon Calendar** | `03_CAMPAIGN_13_MOONS.md` | Lunar phases affect buffs/events, 17-hour day windows |
-| **Bell Tower Network** | `04_ARCHITECTURE_WORLD.md` | Planetary scalar wave broadcast, continental healing |
-| **Pure Water Fountains** | `04_ARCHITECTURE_WORLD.md` | Negative-ion healing, conductive moats, ionized mist auroras |
-| **Combat & Progression** | `07_GAMEPLAY_UX.md` | Resonance weapons, skill trees, adaptive difficulty |
-| **AI NPCs** | `05_NPC_DIALOGUE_BIBLE.md` | Persistent memory, procedural quests, reputation/faction system |
-| **Multiplayer** | `07_GAMEPLAY_UX.md` | Co-op portals, shared restorations, wonder servers |
+| **Bell Tower Network** | `04_ARCHITECTURE_GUIDE.md` | Planetary scalar wave broadcast, continental healing |
+| **Pure Water Fountains** | `04_ARCHITECTURE_GUIDE.md` | Negative-ion healing, conductive moats, ionized mist auroras |
+| **Combat & Progression** | `06_COMBAT_PROGRESSION.md` | Resonance weapons, skill trees, adaptive difficulty |
+| **AI NPCs** | `05_CHARACTERS_DIALOGUE.md` | Persistent memory, procedural quests, reputation/faction system |
+| **Multiplayer** | `07_MOBILE_UX.md` | Co-op portals, shared restorations, wonder servers |
 
 ---
 
@@ -211,7 +211,7 @@ Full details: `03_CAMPAIGN_13_MOONS.md`
 | **Mud Flood Sentinels** | Wild | Corrupted guardian golems — once protectors, now hostile |
 | **The Dissonant One** | Secret Boss | Fallen giant who may have triggered the cataclysm |
 
-Full details: `05_NPC_DIALOGUE_BIBLE.md`
+Full details: `05_CHARACTERS_DIALOGUE.md`
 
 ---
 
@@ -328,6 +328,11 @@ Full details: `09_DEVELOPMENT_ROADMAP.md`
 | `appendices/C_AUDIO_DESIGN.md` | Soundtrack design, cymatic audio, voice acting |
 | `appendices/D_CONTROLS.md` | Touch control reference, gestures, accessibility remaps |
 | `appendices/E_METRICS.md` | KPI tracking, analytics dashboards, performance budgets |
+| `appendices/F_MOON_INDEX.md` | Moon-to-Document cross-reference map |
+| `appendices/G_NPC_INDEX.md` | Character & companion cross-reference index |
+| `appendices/H_MECHANIC_INDEX.md` | Gameplay systems cross-reference index |
+| `appendices/I_DLC_INDEX.md` | DLC-to-Campaign integration index |
+| `appendices/J_ENEMY_INDEX.md` | Enemy bestiary & frequency combat data |
 
 ---
 
@@ -336,6 +341,6 @@ Full details: `09_DEVELOPMENT_ROADMAP.md`
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Author:** Nathan / Resonance Energy  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026

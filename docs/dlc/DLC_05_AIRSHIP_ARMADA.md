@@ -17,6 +17,23 @@
 
 ---
 
+## Table of Contents
+
+1. [Story Synopsis](#story-synopsis)
+2. [Main Quest Chain](#main-quest-chain)
+3. [Side Quests](#side-quests)
+4. [New Zone: Floating Sky Isles & Crashed Armada](#new-zone-floating-sky-isles-crashed-armada)
+5. [Core Mechanic: Airship Piloting & Harmonic Rock Lifting](#core-mechanic-airship-piloting-harmonic-rock-lifting)
+6. [New Enemies](#new-enemies)
+7. [Boss: The Carrier — *Morning Star*](#boss-the-carrier-morning-star)
+8. [New NPCs](#new-npcs)
+9. [Lore Discoveries](#lore-discoveries)
+10. [Companion Reactions](#companion-reactions)
+11. [Rewards & Gear](#rewards-gear)
+12. [DLC Network Integration](#dlc-network-integration)
+
+---
+
 ## Story Synopsis
 
 Captain Thorne — the phantom radio voice who has guided the player since Moon 1 — broadcasts his final, desperate transmission: he's alive, trapped on a floating sky isle above the Atlantic, aboard the flagship of the Tartarian Airship Armada. The fleet was caught mid-flight during the Mud Flood, suspended in resonance stasis 10,000 feet above the cloud line. The dissonance is failing — the ships are falling. One by one. And when they hit the ground, whatever Reset force preserved the world's amnesia will be destroyed by the impact — not gently. Catastrophically.
@@ -279,3 +296,9 @@ The Armada was headed to an orbital resonance station — a structure in low Ear
 ---
 
 *Twelve golden ships descended through the clouds. On the ground, a world that had forgotten them looked up and remembered what it felt like to hope.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

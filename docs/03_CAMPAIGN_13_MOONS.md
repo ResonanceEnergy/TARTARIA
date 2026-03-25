@@ -7,10 +7,10 @@
 ## Table of Contents
 
 1. [Campaign Architecture](#1-campaign-architecture)
-2. [Structural Symmetry & Asymmetry](#2-structural-symmetry--asymmetry)
+2. [Structural Symmetry & Asymmetry](#2-structural-symmetry-asymmetry)
 3. [Crossover Web](#3-crossover-web)
 4. [Prologue: The First Note Beneath the Mud](#4-prologue-the-first-note-beneath-the-mud)
-5. [Moon 1–13: Full Chapter Breakdowns](#5-moon-1-13-full-chapter-breakdowns)
+5. [Moon 1–13: Full Chapter Breakdowns](#5-moon-113-full-chapter-breakdowns)
 6. [Epilogue: Day Out of Time](#6-epilogue-day-out-of-time)
 7. [Ending Variants](#7-ending-variants)
 8. [Post-Game: Golden Age Sandbox](#8-post-game-golden-age-sandbox)
@@ -224,7 +224,7 @@ Cassian's first betrayal seed: Excavated diary fragment in his handwriting — h
 #### Discovery (Days 1–5)
 A spectral train materializes on dormant rails near your restored zone — translucent, humming sadly. Aboard: ghost children in Victorian clothing. Orphans. The Dissonant Orphan Train.
 
-Lirael approaches it trembling. "I remember this train. I was on it. We sang to keep the mud away… but the song broke."
+Lirael approaches it trembling. "I remember this train. I was on it." *(beat)* "We sang to keep the mud away… but the song broke."
 
 #### Restoration (Days 6–12)
 Reactivate first resonance rail segment: precision rock cutting (giant mode) to shape new rail ties, then lay them along the ley-line path. Rails hum when correctly aligned.
@@ -804,6 +804,6 @@ The question "Who truly triggered the Mud Flood?" weaves through all 13 Moons:
 
 ---
 
-**Document Status:** DRAFT  
-**Cross-References:** `01_LORE_BIBLE.md`, `02_AETHER_ENERGY_SYSTEM.md`, `05_NPC_DIALOGUE_BIBLE.md`, `03A_MAIN_STORYLINE_REWRITE.md` (vivid storyline), `03C_MOON_MECHANICS_DETAILED.md` (granular Moon mechanics), `11_SCRIPTED_CLIMAXES.md` (playable climax scripts), `12_VIVID_VISUALS.md` (atmospheric visuals), `14_HAPTIC_FEEDBACK.md` (haptic design)  
-**Last Updated:** March 23, 2026
+**Document Status:** FINAL  
+**Cross-References:** `01_LORE_BIBLE.md`, `02_AETHER_ENERGY_SYSTEM.md`, `05_CHARACTERS_DIALOGUE.md`, `03A_MAIN_STORYLINE_REWRITE.md` (vivid storyline), `03C_MOON_MECHANICS_DETAILED.md` (granular Moon mechanics), `11_SCRIPTED_CLIMAXES.md` (playable climax scripts), `12_VIVID_VISUALS.md` (atmospheric visuals), `14_HAPTIC_FEEDBACK.md` (haptic design)  
+**Last Updated:** March 25, 2026

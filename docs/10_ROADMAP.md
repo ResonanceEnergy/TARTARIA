@@ -9,12 +9,13 @@
 2. [Phase Overview](#2-phase-overview)
 3. [Phase 1: Foundation (Months 1–3)](#3-phase-1-foundation-months-13)
 4. [Phase 2: MVP Build (Months 4–6)](#4-phase-2-mvp-build-months-46)
-5. [Phase 3: Polish & Soft Launch (Months 7–9)](#5-phase-3-polish--soft-launch-months-79)
+5. [Phase 3: Polish & Soft Launch (Months 7–9)](#5-phase-3-polish-soft-launch-months-79)
 6. [Phase 4: Full Launch (Months 10–12)](#6-phase-4-full-launch-months-1012)
-7. [Phase 5: Live-Ops & Expansion (Months 13–24)](#7-phase-5-live-ops--expansion-months-1324)
+7. [Phase 5: Live-Ops & Expansion (Months 13–24)](#7-phase-5-live-ops-expansion-months-1324)
 8. [Team Structure](#8-team-structure)
 9. [Risk Assessment](#9-risk-assessment)
 10. [Decision Gates](#10-decision-gates)
+11. [Summary: Key Dates](#summary-key-dates)
 
 ---
 
@@ -219,18 +220,30 @@ Gate:   ■           ■           ■     ■     ■           ■
 
 | Month | Content Drop |
 |---|---|
-| 13 | Moon 4 (Self-Existing) + Zone 4 |
-| 14 | Moon 5 (Overtone) + Zone 5 |
-| 15 | Moon 6 (Rhythmic) + World's Fair #2 + **DLC 1: The Crimson Meridian** |
-| 16 | Moon 7 (Resonant) + Zone 6 |
-| 17 | Moon 8 (Galactic) + Zone 7 |
-| 18 | Moon 9 (Solar) + World's Fair #3 + **DLC 2: Architects of the Infinite** |
+| 13 | Moon 4 (Self-Existing) + Zone 4 + **DLC 4: Star Fort Rebellion** ($6.99) |
+| 14 | Moon 5 (Overtone) + Zone 5 + **DLC 2: Whispers of the White City** ($6.99) |
+| 15 | Moon 6 (Rhythmic) + World's Fair #2 + **DLC 6: Cymatic Requiem** ($6.99) |
+| 16 | Moon 7 (Resonant) + Zone 6 + **DLC 8: Giant's Last Stand** ($9.99) |
+| 17 | Moon 8 (Galactic) + Zone 7 + **DLC 5: The Airship Armada** ($9.99) |
+| 18 | Moon 9 (Solar) + World's Fair #3 + **DLC 9: The Ley Line Prophecy** ($6.99) |
 | 19 | Moon 10 (Planetary) + Zone 8–9 |
 | 20 | Moon 11 (Spectral) + Zone 10 |
-| 21 | Moon 12 (Crystal) + World's Fair #4 + **DLC 3: The Aether War** |
-| 22 | Moon 13 (Cosmic) + Zone 11–12 + Endgame |
-| 23 | Post-game sandbox + Golden Age free-build mode |
+| 21 | Moon 12 (Crystal) + World's Fair #4 |
+| 22 | Moon 13 (Cosmic) + Zone 11–12 + Endgame + **DLC 10: True Timeline Divergence** ($12.99) |
+| 23 | Post-game sandbox + Golden Age free-build mode + Anastasia Golden Mote epilogue |
 | 24 | **Day Out of Time** expansion + Year 2 roadmap announcement |
+
+**Launch-Window DLCs (available from Phases 2–4, Moons 1–3):**
+
+| DLC | Integrated Moon | Unlock Trigger | Price |
+|---|---|---|---|
+| **DLC 1: The Buried Beacon** | Moon 1 (Magnetic) | After first cathedral restoration | $4.99 |
+| **DLC 7: The Parasite Within** | Moon 2 (Lunar) | First corruption purge | $6.99 |
+| **DLC 3: The Dissonant Orphan Train** | Moon 3 (Electric) | First train station reactivation | $6.99 |
+
+> These 3 DLCs are purchasable from soft launch onward, providing early revenue and extending the MVP's replayability.
+
+**Full DLC Portfolio:** 10 expansions totaling $78.89 at full price ($4.99–$12.99 range). See [I_DLC_INDEX.md](appendices/I_DLC_INDEX.md) for dependency map.
 
 ### Live-Ops Rhythm
 
@@ -240,7 +253,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 | **Weekly** | Milo's Market + Lirael's Recital |
 | **Bi-weekly** | Thorne's Expedition |
 | **Monthly** | Community Build + new Moon battle pass |
-| **Quarterly** | World's Fair (flagship event) |
+| **Quarterly** | World's Fair (flagship event — submission & voting, see [08_MONETIZATION.md](08_MONETIZATION.md) § 7.2.1) |
 | **Per DLC** | Major expansion with new zones, companions, mechanics |
 
 **Exit Criteria (GATE 6 — Expansion Decision):**
@@ -361,6 +374,6 @@ Each gate requires sign-off on:
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `00_MASTER_GDD.md`, `08_MONETIZATION.md`, `09_TECHNICAL_SPEC.md`  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026

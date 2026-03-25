@@ -18,16 +18,16 @@
 ## Table of Contents
 
 1. [Localization Philosophy](#1-localization-philosophy)
-2. [Language Tiers & Market Priority](#2-language-tiers--market-priority)
+2. [Language Tiers & Market Priority](#2-language-tiers-market-priority)
 3. [Text Pipeline](#3-text-pipeline)
 4. [Cultural Adaptation Guidelines](#4-cultural-adaptation-guidelines)
 5. [Old Tartarian Conlang Handling](#5-old-tartarian-conlang-handling)
 6. [Voice-Over Strategy](#6-voice-over-strategy)
-7. [UI & Font Requirements](#7-ui--font-requirements)
+7. [UI & Font Requirements](#7-ui-font-requirements)
 8. [Asset Bundle Architecture](#8-asset-bundle-architecture)
 9. [Regional Content Considerations](#9-regional-content-considerations)
-10. [Budget & Timeline](#10-budget--timeline)
-11. [QA & Validation](#11-qa--validation)
+10. [Budget & Timeline](#10-budget-timeline)
+11. [QA & Validation](#11-qa-validation)
 12. [Post-Launch Language Expansion](#12-post-launch-language-expansion)
 
 ---
@@ -471,6 +471,6 @@ Week 6:   Addressable asset bundle build + deployment
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

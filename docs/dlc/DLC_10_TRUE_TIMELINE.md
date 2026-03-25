@@ -18,6 +18,22 @@
 
 ---
 
+## Table of Contents
+
+1. [Story Synopsis](#story-synopsis)
+2. [Main Quest Chain](#main-quest-chain)
+3. [Side Quests](#side-quests)
+4. [New Zone: Echo Realms & Orbital Station](#new-zone-echo-realms-orbital-station)
+5. [Core Mechanic: God-Mode Creative Tools](#core-mechanic-god-mode-creative-tools)
+6. [New Enemies](#new-enemies)
+7. [Boss: The Harmonic Dialogue (Zereth)](#boss-the-harmonic-dialogue-zereth)
+8. [Lore Discoveries](#lore-discoveries)
+9. [Companion Reactions](#companion-reactions)
+10. [Rewards & Gear](#rewards-gear)
+11. [DLC Network Integration](#dlc-network-integration)
+
+---
+
 ## Story Synopsis
 
 The truth.
@@ -324,3 +340,9 @@ If ALL DLCs completed, all Prophecy Stones activated, all side quests done, and 
 ---
 
 *In the end, the truth was simpler than anyone imagined: a being who loved the world so much he buried it to save it, and a being who loved the world so much they dug it back up. That was the whole story. That was enough.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

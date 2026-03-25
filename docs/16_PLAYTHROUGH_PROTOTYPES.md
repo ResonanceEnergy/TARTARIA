@@ -17,17 +17,17 @@
 ## Table of Contents
 
 1. [Prototype Design Philosophy](#1-prototype-design-philosophy)
-2. [Prototype 1 — First Touch (Core Loop)](#2-prototype-1--first-touch-core-loop)
-3. [Prototype 2 — Building Bliss (Construction)](#3-prototype-2--building-bliss-construction)
-4. [Prototype 3 — Harmonic Combat](#4-prototype-3--harmonic-combat)
-5. [Prototype 4 — Companion Chemistry](#5-prototype-4--companion-chemistry)
-6. [Prototype 5 — Anastasia Integration](#6-prototype-5--anastasia-integration)
-7. [Prototype 6 — Giant Mode & Scale](#7-prototype-6--giant-mode--scale)
-8. [Prototype 7 — Full Moon Cycle (Moon 1)](#8-prototype-7--full-moon-cycle-moon-1)
-9. [Prototype 8 — Economy Stress Test](#9-prototype-8--economy-stress-test)
-10. [Prototype 9 — Onboarding Flow](#10-prototype-9--onboarding-flow)
-11. [Prototype 10 — Vertical Slice (Gate 1)](#11-prototype-10--vertical-slice-gate-1)
-12. [Demo Priority & Trailer Beats](#12-demo-priority--trailer-beats)
+2. [Prototype 1 — First Touch (Core Loop)](#2-prototype-1-first-touch-core-loop)
+3. [Prototype 2 — Building Bliss (Construction)](#3-prototype-2-building-bliss-construction)
+4. [Prototype 3 — Harmonic Combat](#4-prototype-3-harmonic-combat)
+5. [Prototype 4 — Companion Chemistry](#5-prototype-4-companion-chemistry)
+6. [Prototype 5 — Anastasia Integration](#6-prototype-5-anastasia-integration)
+7. [Prototype 6 — Giant Mode & Scale](#7-prototype-6-giant-mode-scale)
+8. [Prototype 7 — Full Moon Cycle (Moon 1)](#8-prototype-7-full-moon-cycle-moon-1)
+9. [Prototype 8 — Economy Stress Test](#9-prototype-8-economy-stress-test)
+10. [Prototype 9 — Onboarding Flow](#10-prototype-9-onboarding-flow)
+11. [Prototype 10 — Vertical Slice (Gate 1)](#11-prototype-10-vertical-slice-gate-1)
+12. [Demo Priority & Trailer Beats](#12-demo-priority-trailer-beats)
 13. [Technical Requirements](#13-technical-requirements)
 14. [Tester Feedback Template](#14-tester-feedback-template)
 
@@ -377,7 +377,7 @@ After the session, ask: "How is this combat different from other mobile games?"
 | Aether | 100/session (15 min) | 80/building | Always 1+ session ahead |
 | Resonance Crystals (premium) | 5/day (login) + 10/Moon climax | 50/cosmetic item | 1 cosmetic per Moon (free) |
 | Building Materials | 3–5/excavation | 5–10/building | Never bottlenecked for >1 session |
-| Skill Points | 2/level (linear) | 1/node | All 4 trees reachable by Moon 13 (free) |
+| Skill Crystals | 1–3/level (tiered) | 1/node | Master 2 trees + invest in 2 others (free) |
 
 ### Fail Conditions
 - Free player hits a wall where progress requires spending → pay-to-win detected
@@ -588,6 +588,6 @@ SESSION:   [Duration in minutes]
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `00_MASTER_GDD.md`, `15_MVP_BUILD_SPEC.md`, `10_ROADMAP.md`, `07_MOBILE_UX.md`  
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

@@ -8,6 +8,35 @@
 
 ---
 
+## Table of Contents
+
+1. [A](#a)
+2. [B](#b)
+3. [C](#c)
+4. [D](#d)
+5. [E](#e)
+6. [F](#f)
+7. [G](#g)
+8. [H](#h)
+9. [I](#i)
+10. [K](#k)
+11. [L](#l)
+12. [M](#m)
+13. [N](#n)
+14. [O](#o)
+15. [P](#p)
+16. [Q](#q)
+17. [R](#r)
+18. [S](#s)
+19. [T](#t)
+20. [U](#u)
+21. [V](#v)
+22. [W](#w)
+23. [Z](#z)
+24. [Summary Statistics](#summary-statistics)
+
+---
+
 ## A
 
 | Term | Category | Description |

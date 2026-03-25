@@ -9,15 +9,15 @@
 1. [Cosmological Foundation](#1-cosmological-foundation)
 2. [The Hyperborean Origin](#2-the-hyperborean-origin)
 3. [The People of the Empire](#3-the-people-of-the-empire)
-4. [Aether Cosmology & The Divine 3-6-9 Code](#4-aether-cosmology--the-divine-3-6-9-code)
-5. [Technology & Sacred Architecture](#5-technology--sacred-architecture)
-6. [The 13-Moon Calendar & 17-Hour Day](#6-the-13-moon-calendar--17-hour-day)
-7. [Golden Age Society & Culture](#7-golden-age-society--culture)
+4. [Aether Cosmology & The Divine 3-6-9 Code](#4-aether-cosmology-the-divine-3-6-9-code)
+5. [Technology & Sacred Architecture](#5-technology-sacred-architecture)
+6. [The 13-Moon Calendar & 17-Hour Day](#6-the-13-moon-calendar-17-hour-day)
+7. [Golden Age Society & Culture](#7-golden-age-society-culture)
 8. [The Mud Flood Cataclysm](#8-the-mud-flood-cataclysm)
-9. [The Great Reset & The Parasite Cabal](#9-the-great-reset--the-parasite-cabal)
+9. [The Great Reset & The Parasite Cabal](#9-the-great-reset-the-parasite-cabal)
 10. [The Suppression of Evidence](#10-the-suppression-of-evidence)
-11. [Artifacts, Legends & Prophecies](#11-artifacts-legends--prophecies)
-12. [The Dissonant One — The Central Mystery](#12-the-dissonant-one--the-central-mystery)
+11. [Artifacts, Legends & Prophecies](#11-artifacts-legends-prophecies)
+12. [The Dissonant One — The Central Mystery](#12-the-dissonant-one-the-central-mystery)
 13. [Lore Integration Map](#13-lore-integration-map)
 
 ---
@@ -406,6 +406,6 @@ Every lore element feeds directly into gameplay:
 
 ---
 
-**Document Status:** DRAFT  
-**Cross-References:** `02_AETHER_ENERGY_SYSTEM.md`, `03_CAMPAIGN_13_MOONS.md`, `04_ARCHITECTURE_WORLD.md`, `05_NPC_DIALOGUE_BIBLE.md`  
-**Last Updated:** March 23, 2026
+**Document Status:** FINAL  
+**Cross-References:** `02_AETHER_ENERGY_SYSTEM.md`, `03_CAMPAIGN_13_MOONS.md`, `04_ARCHITECTURE_GUIDE.md`, `05_CHARACTERS_DIALOGUE.md`  
+**Last Updated:** March 25, 2026

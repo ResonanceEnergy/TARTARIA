@@ -10,17 +10,17 @@
 2. [Core Aether Concepts](#2-core-aether-concepts)
 3. [The Three Harmonic Bands (3-6-9)](#3-the-three-harmonic-bands-3-6-9)
 4. [Resonance Coefficient Formula](#4-resonance-coefficient-formula)
-5. [Harvesting & Alignment Loop](#5-harvesting--alignment-loop)
+5. [Harvesting & Alignment Loop](#5-harvesting-alignment-loop)
 6. [Tuning Mini-Games](#6-tuning-mini-games)
-7. [Energy Storage & Distribution](#7-energy-storage--distribution)
-8. [Practical Uses & Buffs Table](#8-practical-uses--buffs-table)
-9. [Multi-Building Synergy & Clustering](#9-multi-building-synergy--clustering)
+7. [Energy Storage & Distribution](#7-energy-storage-distribution)
+8. [Practical Uses & Buffs Table](#8-practical-uses-buffs-table)
+9. [Multi-Building Synergy & Clustering](#9-multi-building-synergy-clustering)
 10. [Overload Mechanics](#10-overload-mechanics)
-11. [Corruption & Dissonance](#11-corruption--dissonance)
+11. [Corruption & Dissonance](#11-corruption-dissonance)
 12. [13-Moon Calendar Modifiers](#12-13-moon-calendar-modifiers)
 13. [17-Hour Day Cycle Effects](#13-17-hour-day-cycle-effects)
 14. [Giant Mode Energy Costs](#14-giant-mode-energy-costs)
-15. [Progression & Endgame Power Scaling](#15-progression--endgame-power-scaling)
+15. [Progression & Endgame Power Scaling](#15-progression-endgame-power-scaling)
 16. [Economy Balancing Targets](#16-economy-balancing-targets)
 
 ---
@@ -257,6 +257,23 @@ Combined energy from all zones feeds a master pool:
   - 75%: Floating garden platforms spawn
   - 100%: True Timeline convergence accessible (endgame)
 
+### Ley-Line Node Network Reference
+
+| Node Type | Role | Aether Function | Unlock Moon | Key Stat |
+|---|---|---|---|---|
+| **Dome** | Generator | Produces base AE from tuning | Moon 1 | Output scales with RS (0→100%) |
+| **Spire** | Collector | Gathers ambient atmospheric Aether | Moon 1 | +20% zone collection radius |
+| **Star Fort** | Router | Routes power across long distances | Moon 3 | +15% per chained fort |
+| **Cathedral** | Amplifier | Boosts all buildings in zone range 50% | Moon 4 | 5 aligned = healing vortex |
+| **Bell Tower** | Broadcaster | Periodic AE pulse to all connected nodes | Moon 5 | Peal radius scales with RS |
+| **Fountain** | Purifier | Cleanses corruption; restores node health | Moon 2 | Removes black sludge + dissonance |
+| **Aether Battery** | Storage | Stores surplus for on-demand use | Moon 1 | Capacity scales with building RS |
+| **Resonance Rail** | Conduit | High-speed AE transport between regions | Moon 6 | 2× throughput vs ley line |
+| **Organ Chamber** | Catalyst | Triggers overload events when played | Moon 4 | Multi-organ = chain catalyst |
+| **Floating Garden** | Overflow | Absorbs overload surplus into biome | Moon 7 | Anti-grav at 75%+ Global Pool |
+
+**Network Flow:** Spires → Domes (generate) → Batteries (store) → Star Forts (route) → Cathedrals (amplify) → Global Pool
+
 ---
 
 ## 8. Practical Uses & Buffs Table
@@ -459,6 +476,6 @@ The Hidden Hour (17th) lasts ~3.5 real-time minutes — a precious window that v
 
 ---
 
-**Document Status:** DRAFT  
-**Cross-References:** `01_LORE_BIBLE.md` (sections 4–5), `04_ARCHITECTURE_WORLD.md`, `07_GAMEPLAY_UX.md`  
-**Last Updated:** March 23, 2026
+**Document Status:** FINAL  
+**Cross-References:** `01_LORE_BIBLE.md` (sections 4–5), `04_ARCHITECTURE_GUIDE.md`, `07_MOBILE_UX.md`  
+**Last Updated:** March 25, 2026

@@ -18,11 +18,20 @@
 ## Table of Contents
 
 1. [Moon Mechanics Overview](#moon-mechanics-overview)
-2. [Moon 1 — Magnetic Moon: Awakening](#moon-1--magnetic-moon-awakening)
-3. [Moon 2 — Lunar Moon: Shadow & Purge](#moon-2--lunar-moon-shadow--purge)
-4. [Moon 3 — Electric Moon: Compassion & Rails](#moon-3--electric-moon-compassion--rails)
-5. [Moon 4 — Self-Existing Moon: Precision & Fortification](#moon-4--self-existing-moon-precision--fortification)
-6. [Moons 5–13 — Structured Outlines](#moons-513--structured-outlines)
+2. [Moon 1 — Magnetic Moon: Awakening](#moon-1-magnetic-moon-awakening)
+3. [Moon 2 — Lunar Moon: Shadow & Purge](#moon-2-lunar-moon-shadow-purge)
+4. [Moon 3 — Electric Moon: Compassion & Rails](#moon-3-electric-moon-compassion-rails)
+5. [Moon 4 — Self-Existing Moon: Precision & Fortification](#moon-4-self-existing-moon-precision-fortification)
+6. [Moon 5 — Overtone Moon: Amplification & Harmony](#moon-5-overtone-moon-amplification-harmony)
+7. [Moon 6 — Rhythmic Moon: The Pipe Organ Requiem](#moon-6-rhythmic-moon-the-pipe-organ-requiem)
+8. [Moon 7 — Resonant Moon: Giant's Awakening](#moon-7-resonant-moon-giants-awakening)
+9. [Moon 8 — Galactic Moon: The Airship Armada](#moon-8-galactic-moon-the-airship-armada)
+10. [Moon 9 — Solar Moon: The Ley Line Prophecy](#moon-9-solar-moon-the-ley-line-prophecy)
+11. [Moon 10 — Planetary Moon: The Living Grid](#moon-10-planetary-moon-the-living-grid)
+12. [Moon 11 — Spectral Moon: Veil Between Worlds](#moon-11-spectral-moon-veil-between-worlds)
+13. [Moon 12 — Crystal Moon: Planetary Bell-Tower Ring](#moon-12-crystal-moon-planetary-bell-tower-ring)
+14. [Moon 13 — Cosmic Moon: True Timeline Convergence](#moon-13-cosmic-moon-true-timeline-convergence)
+15. [Day Out of Time (Post-Moon 13)](#day-out-of-time-post-moon-13)
 
 ---
 
@@ -1266,3 +1275,9 @@ The **Day Out of Time** (July 25 in Tartarian reckoning) — the day between the
 - [12_VIVID_VISUALS.md](12_VIVID_VISUALS.md) — Atmospheric visual direction
 - [13_MINI_GAMES.md](13_MINI_GAMES.md) — Mini-game design details
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Moon-specific haptic profiles
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

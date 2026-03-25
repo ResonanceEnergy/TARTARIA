@@ -23,7 +23,7 @@
 6. [Instrument Design: The Tartarian Orchestra](#6-instrument-design-the-tartarian-orchestra)
 7. [Combat Audio](#7-combat-audio)
 8. [Moon-Specific Audio Profiles](#8-moon-specific-audio-profiles)
-9. [Cinematic Audio & Spectacles](#9-cinematic-audio--spectacles)
+9. [Cinematic Audio & Spectacles](#9-cinematic-audio-spectacles)
 10. [Voice Acting Direction](#10-voice-acting-direction)
 11. ["Old Tartarian" Constructed Language](#11-old-tartarian-constructed-language)
 12. [Audio-Haptic Synchronization Map](#12-audio-haptic-synchronization-map)
@@ -586,6 +586,6 @@ Audio and haptic systems share a synchronization bus that ensures every felt vib
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `14_HAPTIC_FEEDBACK.md`, `13_MINI_GAMES.md`, `03C_MOON_MECHANICS_DETAILED.md`, `B_ASSET_REFERENCE.md`  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026

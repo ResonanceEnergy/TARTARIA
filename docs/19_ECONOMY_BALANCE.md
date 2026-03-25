@@ -20,18 +20,19 @@
 
 1. [Economy Design Philosophy](#1-economy-design-philosophy)
 2. [Resource Taxonomy](#2-resource-taxonomy)
-3. [Aether — The Core Resource](#3-aether--the-core-resource)
+3. [Aether — The Core Resource](#3-aether-the-core-resource)
 4. [Building Materials](#4-building-materials)
 5. [Resonance Score (RS) Economy](#5-resonance-score-rs-economy)
-6. [Skill Points & Progression](#6-skill-points--progression)
+6. [Skill Crystals & Progression](#6-skill-crystals-progression)
 7. [Crafting System](#7-crafting-system)
 8. [Reward Curves](#8-reward-curves)
-9. [Session Pacing & Resource Flow](#9-session-pacing--resource-flow)
+9. [Session Pacing & Resource Flow](#9-session-pacing-resource-flow)
 10. [Moon-by-Moon Progression Targets](#10-moon-by-moon-progression-targets)
 11. [Premium Currency (Resonance Crystals)](#11-premium-currency-resonance-crystals)
 12. [Anti-Inflation Sinks](#12-anti-inflation-sinks)
 13. [Balance Testing Framework](#13-balance-testing-framework)
 14. [Tuning Levers](#14-tuning-levers)
+15. [Cross-Document Reconciliation Checklist](#15-cross-document-reconciliation-checklist)
 
 ---
 
@@ -65,7 +66,7 @@ Every 15-minute session should end with the player having:
 |---|---|---|---|---|
 | **Aether (AE)** | Golden swirl | Excavation, tuning, restoration, ley-line harvest | Building construction, ability use, upgrades | Per-zone reservoir + personal reserve |
 | **Building Materials (BM)** | Stone block | Excavation, quarrying, combat drops | Building placement, structural upgrades | Inventory (stackable) |
-| **Skill Points (SP)** | Crystal star | Level-up (linear), Moon-end climax bonus | Skill tree nodes | Cumulative (never lost) |
+| **Skill Crystals (SC)** | Crystal star | Level-up, Moon-end climax bonus, achievements, discoveries | Skill tree nodes | Cumulative (never lost) |
 | **Resonance Score (RS)** | Golden wave | Building quality, zone restoration | Unlocks (enemies, features, zones), global progress | Per-zone + planetary aggregate |
 
 ### Secondary Resources
@@ -225,40 +226,41 @@ Where $W_i$ is the zone weight (later zones have higher weights to reflect diffi
 
 ---
 
-## 6. Skill Points & Progression
+## 6. Skill Crystals & Progression
 
 ### Skill Trees
 
-Four trees, each representing a core pillar:
+Four trees, each with 20 nodes (5 tiers of 4), representing a core pillar:
 
-| Tree | Pillar | Nodes | Max Level |
+| Tree | Pillar | Nodes | Capstone |
 |---|---|---|---|
-| **Resonance** | Restoration | 15 | Unlock all by Moon 10 (free play) |
-| **Architecture** | Building | 15 | Unlock all by Moon 11 (free play) |
-| **Harmony** | Combat | 15 | Unlock all by Moon 12 (free play) |
-| **Insight** | Exploration | 15 | Unlock all by Moon 13 (free play) |
+| **Resonator** | Frequency Mastery | 20 | First Resonator (auto-match frequencies) |
+| **Architect** | Building & Defense | 20 | Cosmic Architect (combat construction) |
+| **Guardian** | Giant Mode & Physical | 20 | Titan Awakened (30 ft, 180s, flight) |
+| **Historian** | Lore, Echoes & Time | 20 | Eternal Maven (summon Golden Age moments) |
 
-### SP Earn Rate
+### SC Earn Rate
 
-| Source | SP Earned | Frequency |
+| Source | SC Earned | Frequency |
 |---|---|---|
-| Level-up | 2 | Per level (linear XP curve) |
-| Moon-end climax | 3 | Per Moon (13 total) |
-| Achievement | 1 | Per achievement (varied) |
-| Hidden discovery | 1 | Rare exploration rewards |
+| Level-up (1–10) | 1 per level | 10 cumulative |
+| Level-up (11–20) | 2 per level | 30 cumulative |
+| Level-up (21–30) | 2 per level | 50 cumulative |
+| Level-up (31–40) | 3 per level | 80 cumulative |
+| Level-up (41–50 max) | 3 per level | 95 cumulative |
 
-### SP Budget
+### SC Budget
 
-| Moon | Cumulative SP Available | Nodes Unlockable | Trees Accessible |
-|---|---|---|---|
-| 1 | ~8 | 6–8 | 1 tree deep or 2 trees shallow |
-| 4 | ~25 | 20–25 | 2 trees deep |
-| 7 | ~42 | 35–42 | 3 trees deep or all 4 moderate |
-| 10 | ~55 | 50–55 | All 4 trees substantial |
-| 13 | ~68+ | 60–68 | All 4 trees complete (with exploration bonus) |
+| Moon | Approx Level | Cumulative SC | Nodes Unlockable | Trees Accessible |
+|---|---|---|---|---|
+| 1 | ~5 | ~5 | 4–5 | 1 tree shallow |
+| 4 | ~15 | ~20 | 15–20 | 1 tree deep or 2 shallow |
+| 7 | ~25 | ~40 | 35–40 | 2 trees deep or all 4 moderate |
+| 10 | ~35 | ~65 | 55–65 | 2 trees mastered + 2 substantial |
+| 13 (max 50) | 50 | 95 | 80 (all) | All 4 trees fully unlockable |
 
 ### Balance Constraint
-A free player who completes all 13 Moons and explores thoroughly should have enough SP to unlock all 60 nodes across all 4 trees. No skill is pay-gated.
+At max level (50), a free player earns 95 SC total — enough to unlock all 80 nodes across all 4 trees. However, reaching level 50 requires thorough exploration and completionist play. A typical free player completing the main campaign will earn ~65–75 SC, enough to **master 2 trees fully (40 nodes) and invest deeply in 2 others**. This encourages specialization and build diversity while ensuring no skill is pay-gated.
 
 ---
 
@@ -330,8 +332,8 @@ The game uses a **Variable Ratio + Fixed Interval** hybrid:
 |---|---|---|
 | **Fixed Interval** | Aether (ley-line passive) | Predictable drip every few seconds while in zone |
 | **Variable Ratio** | Building Materials | Random 2–4 per excavation based on location quality |
-| **Fixed Ratio** | Skill Points | 2 per level, always |
-| **Burst** | Moon-end rewards | Large dump at climax — AE, SP, BM, cosmetics |
+| **Fixed Ratio** | Skill Crystals | 1–3 per level (increasing with tier) |
+| **Burst** | Moon-end rewards | Large dump at climax — AE, SC, BM, cosmetics |
 | **Discovery** | Echo Memories | First-time NPC/lore interactions |
 
 ### Pacing Targets
@@ -425,7 +427,7 @@ NPC INTERACTION ─────→ Echo Memories ──────→ COMPANION
 |---|---|---|---|
 | Aether | ~45,000 AE | ~35,000 AE | ~10,000 AE (sandbox building) |
 | Building Materials | ~1,500 BM | ~1,200 BM | ~300 BM |
-| Skill Points | ~70 SP | 60 SP (all trees) | ~10 SP |
+| Skill Crystals | 95 SC (max) | 80 SC (all 4 trees) | ~15 SC |
 | Harmonic Fragments | ~800 HF | ~600 HF (key recipes) | ~200 HF |
 | Echo Memories | ~200 EM | ~150 EM | ~50 EM |
 
@@ -488,7 +490,7 @@ A free player earning all available RC completes the campaign with enough RC to 
 |---|---|---|---|
 | Average AE reserve | 100–250 | >500 (inflation) or <30 (starvation) | >1000 or 0 |
 | BM accumulation rate | Net +2–5/session | Net >15/session (unused) | Net negative (deficit) |
-| SP unused | 0–5 (well-spent) | >15 (hoarding) | N/A |
+| SC unused | 0–5 (well-spent) | >15 (hoarding) | N/A |
 | RC unused (free) | 0–100 (shopping) | >500 (nothing desirable) | N/A |
 
 ---
@@ -564,6 +566,78 @@ These values can be adjusted via server config without app update:
 
 ---
 
-**Document Status:** DRAFT  
+## 15. Cross-Document Reconciliation Checklist
+
+This section tracks economy values that appear in multiple documents. When any value changes here, update all linked documents.
+
+### Aether Values Cross-Reference
+
+| Value | This Doc (§) | Also Appears In | Status |
+|---|---|---|---|
+| AE per session (80–200 by Moon) | §10 | [15_MVP_BUILD_SPEC](15_MVP_BUILD_SPEC.md) §Vertical Slice, [02_AETHER_ENERGY_SYSTEM](02_AETHER_ENERGY_SYSTEM.md) §Generation | ✅ Aligned |
+| RS thresholds (per zone restoration %) | §5 | [02_AETHER_ENERGY_SYSTEM](02_AETHER_ENERGY_SYSTEM.md) §RS Meter | ✅ Aligned |
+| Skill Crystals (95 SC at max level, 80 nodes) | §6 | [06_COMBAT_PROGRESSION](06_COMBAT_PROGRESSION.md) §Skill Trees, §Progression Economy | ✅ Aligned |
+| Premium currency daily grant (5 RC) | §14 | [08_MONETIZATION](08_MONETIZATION.md) §IAP | ✅ Aligned |
+| Building Material costs | §4 | [04_ARCHITECTURE_GUIDE](04_ARCHITECTURE_GUIDE.md) §Restoration | ⚠️ Verify per-Moon |
+| DLC reward injection amounts | §8 | Each DLC doc reward section | ⚠️ Verify per-DLC |
+
+### Progression Flow (Mermaid)
+
+```mermaid
+graph LR
+    A[Explore Zone] --> B[Collect Aether]
+    A --> C[Find Materials]
+    B --> D[Restore Architecture]
+    C --> D
+    D --> E[RS Increases]
+    E --> F[Unlock New Abilities]
+    E --> G[Unlock New Zones]
+    F --> H[Combat Efficiency ↑]
+    H --> B
+    G --> A
+    D --> I[Visual Restoration]
+    I --> J[Emotional Reward]
+
+    K[Combat Encounters] --> L[AE + HF Drops]
+    L --> B
+    K --> M[XP → Level Up]
+    M --> N[Skill Crystals]
+    N --> F
+
+    O[Mini-Games] --> P[AE + BM Bonus]
+    P --> D
+    O --> Q[RS Bonus]
+    Q --> E
+
+    R[Quests] --> S[AE + EM + Narrative]
+    S --> B
+    S --> T[Companion Loyalty]
+    T --> U[Companion Abilities]
+    U --> H
+```
+
+### DLC Economy Impact Estimates
+
+Each DLC injects additional AE, materials, and gear into an economy balanced for the base campaign (~45,000 AE earned over 70–78 hrs). DLC rewards must not trivialize later Moons.
+
+| DLC | Moon | Playtime | Est. AE Injection | New Sinks | Net Economy Impact |
+|---|---|---|---|---|---|
+| 1. Buried Beacon | M1 | 6–8 hr | ~3,000 AE | Beacon upgrades, cathedral tuning | Neutral — early-game, high sink |
+| 2. White City | M5 | 8–10 hr | ~5,000 AE | White City restoration, ice-dome materials | Slight surplus — monitor mid-game inflation |
+| 3. Orphan Train | M3 | 7–9 hr | ~3,500 AE | Orphan home construction, rail repairs | Neutral — high material cost |
+| 4. Star Fort | M4 | 8–10 hr | ~4,500 AE | Fort upgrades, wall reinforcement | Neutral — fort construction is expensive |
+| 5. Airship Armada | M8 | 10–14 hr | ~7,000 AE | Fleet maintenance, cannon upgrades | ⚠️ High injection — throttle via fuel costs |
+| 6. Cymatic Requiem | M6 | 8–12 hr | ~5,000 AE | Organ tuning, vault restoration | Neutral — high mini-game integration |
+| 7. Parasite Within | M2 | 6–8 hr | ~3,000 AE | Purification rituals, antidote materials | Neutral — corruption is a drain |
+| 8. Giant's Last Stand | M7 | 10–12 hr | ~6,500 AE | Giant-scale construction, siege weapons | ⚠️ Watch for mid-late inflation |
+| 9. Ley Line Prophecy | M9 | 8–10 hr | ~5,500 AE | Node upgrades, prophecy stone crafting | Moderate — high sink if nodes are expensive |
+| 10. True Timeline | M13 | 12–16 hr | ~8,000 AE | Timeline divergence costs, endgame gear | Neutral — post-campaign endgame sinks |
+| **Total** | | **83–111 hr** | **~51,000 AE** | | **All 10 DLCs roughly double lifetime AE** |
+
+**Design Rule:** DLC AE injection must never exceed the base campaign total (~45K). Monitor via server-side tunables (§14). If DLC players accumulate >1.5× expected AE for their Moon, reduce DLC reward multipliers.
+
+---
+
+**Document Status:** FINAL  
 **Cross-References:** `08_MONETIZATION.md`, `06_COMBAT_PROGRESSION.md`, `15_MVP_BUILD_SPEC.md`, `03C_MOON_MECHANICS_DETAILED.md`  
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

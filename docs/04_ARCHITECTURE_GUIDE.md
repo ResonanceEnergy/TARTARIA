@@ -504,6 +504,6 @@ Buildings interact with terrain:
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `02_AETHER_ENERGY_SYSTEM.md`, `03_CAMPAIGN_13_MOONS.md`, `06_COMBAT_PROGRESSION.md`  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026

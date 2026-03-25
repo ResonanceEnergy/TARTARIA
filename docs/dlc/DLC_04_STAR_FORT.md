@@ -17,6 +17,20 @@
 
 ---
 
+## Table of Contents
+
+1. [Story Synopsis](#story-synopsis)
+2. [Main Quest Chain](#main-quest-chain)
+3. [Side Quests](#side-quests)
+4. [New Zone: Ley-Line Bastion Clusters](#new-zone-ley-line-bastion-clusters)
+5. [Core Mechanic: Moat-Filling Resonance Puzzles](#core-mechanic-moat-filling-resonance-puzzles)
+6. [New Enemies](#new-enemies)
+7. [Boss: The Possessed Fort](#boss-the-possessed-fort)
+8. [Lore Discoveries](#lore-discoveries)
+9. [Rewards & Gear](#rewards-gear)
+
+---
+
 ## Story Synopsis
 
 A sentient golem — the most powerful Mud Flood remnant yet encountered — has possessed a star fort at the nexus of three ley-line intersections. It refuses tuning, refusing the player's resonance, because it remembers what it was: a guardian giant named Eryx, corrupted beyond recognition, imprisoned inside the stone he once shaped. Inside Eryx's fractured core lies a final memory: the exact moment resonance was inverted, turning protection into imprisonment — the truth of how the Flood corrupted the guardians from defenders into weapons.
@@ -190,3 +204,9 @@ Korath mentions only three beings knew Eryx's heart frequency: Korath himself, Z
 ---
 
 *The fort stood for centuries as a prison. Today it stands as proof that even stone can be forgiven.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

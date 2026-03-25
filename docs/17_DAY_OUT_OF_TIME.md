@@ -19,17 +19,17 @@
 
 1. [Design Philosophy](#1-design-philosophy)
 2. [Narrative Context](#2-narrative-context)
-3. [Event Trigger & Unlock Conditions](#3-event-trigger--unlock-conditions)
+3. [Event Trigger & Unlock Conditions](#3-event-trigger-unlock-conditions)
 4. [Festival Zones](#4-festival-zones)
 5. [Festival Systems](#5-festival-systems)
 6. [Companion Performances](#6-companion-performances)
-7. [Princess Anastasia — The Moment of Solidity](#7-princess-anastasia--the-moment-of-solidity)
+7. [Princess Anastasia — The Moment of Solidity](#7-princess-anastasia-the-moment-of-solidity)
 8. [Festival Mechanics](#8-festival-mechanics)
 9. [Sandbox Mode](#9-sandbox-mode)
-10. [Challenge Modes & Competitions](#10-challenge-modes--competitions)
-11. [Festival Economy & Rewards](#11-festival-economy--rewards)
-12. [Live-Ops & Annual Recurrence](#12-live-ops--annual-recurrence)
-13. [Audio & Haptic Design](#13-audio--haptic-design)
+10. [Challenge Modes & Competitions](#10-challenge-modes-competitions)
+11. [Festival Economy & Rewards](#11-festival-economy-rewards)
+12. [Live-Ops & Annual Recurrence](#12-live-ops-annual-recurrence)
+13. [Audio & Haptic Design](#13-audio-haptic-design)
 14. [Technical Implementation](#14-technical-implementation)
 15. [Emotional Arc](#15-emotional-arc)
 
@@ -554,6 +554,6 @@ Just the world, restored, together.
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `03C_MOON_MECHANICS_DETAILED.md`, `08_MONETIZATION.md`, `11_SCRIPTED_CLIMAXES.md`, `14_HAPTIC_FEEDBACK.md`, `18_PRINCESS_ANASTASIA.md`  
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026
