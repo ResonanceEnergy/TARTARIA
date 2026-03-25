@@ -1,6 +1,6 @@
-# TARTARIA WORLD OF WONDER: Aether Awakening
+# TARTARIA WORLD OF WONDER — Aether Awakening
 ## Master Game Design Document (GDD)
-### Version 0.1.0 — March 23, 2026
+### Version 1.0.0 — March 25, 2026
 
 ---
 

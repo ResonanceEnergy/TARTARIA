@@ -523,7 +523,7 @@ The cathedral itself has changed: stone surfaces now show faint luminescent vein
 
 **Depending on choice:**
 - **Golden Age:** The crack closes. Current world begins transforming — slow, permanent shift toward the Golden Age state. Credits roll over a montage of the world rebuilding itself.
-- **Eternal Silence:** The crack closes. Player must fight to prevent this timeline from consumingthe current one. (Leads to the final boss: Dissonant One.)
+- **Eternal Silence:** The crack closes. Player must fight to prevent this timeline from consuming the current one. (Leads to the final boss: Dissonant One.)
 - **Dual Echo:** The crack remains open. Player gains the ability to shift between timelines at will. Post-game sandbox with both worlds accessible.
 
 All three endings feature a final shot: the camera rises to orbital view. The planet, in whichever state the player chose, fills the frame. And in every version, one thing remains constant — a single golden pulse, barely visible, from the first cathedral the player ever restored. The heartbeat that started everything.
