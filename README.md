@@ -1,4 +1,4 @@
-# TARTARIA WORLD OF WONDER: Aether Awakening
+# TARTARIA WORLD OF WONDER — Aether Awakening
 
 > *Tune the World. Light the Ley Lines. Reclaim the Golden Age.*
 

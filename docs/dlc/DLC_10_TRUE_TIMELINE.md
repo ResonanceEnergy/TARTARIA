@@ -177,7 +177,7 @@ A sandbox mode accessible from Station Aeon: experience the game world without t
 | The Gallery | Observation deck — Earth visible below | Contemplative space, Zereth's telescope |
 | The Archive | Crystal lattice library — all Tartarian history | Resonance playback stations |
 | Zereth's Chamber | Private quarters — 300 years of solitude | Journal, letters, the controls |
-| The Core | Station's resonance engine — mirrorss the planetary one | Final choice location |
+| The Core | Station's resonance engine — mirrors the planetary one | Final choice location |
 | Genesis Wing | Colonization prep (damaged) | Side Quest B |
 | Archive Wing | Pre-Tartarian records (damaged) | Side Quest B |
 
