@@ -17,26 +17,27 @@
 ## Table of Contents
 
 1. [Quest Design Philosophy](#quest-design-philosophy)
-2. [Quest Types & Structure](#quest-types--structure)
+2. [Quest Types & Structure](#quest-types-structure)
 3. [Quest Reward Reference](#quest-reward-reference)
-4. [Moon 1 — Magnetic Moon Quests](#moon-1--magnetic-moon-quests)
-5. [Moon 2 — Lunar Moon Quests](#moon-2--lunar-moon-quests)
-6. [Moon 3 — Electric Moon Quests](#moon-3--electric-moon-quests)
-7. [Moon 4 — Self-Existing Moon Quests](#moon-4--self-existing-moon-quests)
-8. [Moon 5 — Overtone Moon Quests](#moon-5--overtone-moon-quests)
-9. [Moon 6 — Rhythmic Moon Quests](#moon-6--rhythmic-moon-quests)
-10. [Moon 7 — Resonant Moon Quests](#moon-7--resonant-moon-quests)
-11. [Moon 8 — Galactic Moon Quests](#moon-8--galactic-moon-quests)
-12. [Moon 9 — Solar Moon Quests](#moon-9--solar-moon-quests)
-13. [Moon 10 — Planetary Moon Quests](#moon-10--planetary-moon-quests)
-14. [Moon 11 — Spectral Moon Quests](#moon-11--spectral-moon-quests)
-15. [Moon 12 — Crystal Moon Quests](#moon-12--crystal-moon-quests)
-16. [Moon 13 — Cosmic Moon Quests](#moon-13--cosmic-moon-quests)
+4. [Moon 1 — Magnetic Moon Quests](#moon-1-magnetic-moon-quests)
+5. [Moon 2 — Lunar Moon Quests](#moon-2-lunar-moon-quests)
+6. [Moon 3 — Electric Moon Quests](#moon-3-electric-moon-quests)
+7. [Moon 4 — Self-Existing Moon Quests](#moon-4-self-existing-moon-quests)
+8. [Moon 5 — Overtone Moon Quests](#moon-5-overtone-moon-quests)
+9. [Moon 6 — Rhythmic Moon Quests](#moon-6-rhythmic-moon-quests)
+10. [Moon 7 — Resonant Moon Quests](#moon-7-resonant-moon-quests)
+11. [Moon 8 — Galactic Moon Quests](#moon-8-galactic-moon-quests)
+12. [Moon 9 — Solar Moon Quests](#moon-9-solar-moon-quests)
+13. [Moon 10 — Planetary Moon Quests](#moon-10-planetary-moon-quests)
+14. [Moon 11 — Spectral Moon Quests](#moon-11-spectral-moon-quests)
+15. [Moon 12 — Crystal Moon Quests](#moon-12-crystal-moon-quests)
+16. [Moon 13 — Cosmic Moon Quests](#moon-13-cosmic-moon-quests)
 17. [Recurring Daily Tasks](#recurring-daily-tasks)
 18. [Companion Quest Chains](#companion-quest-chains)
 19. [Anastasia Hidden Quest Line](#anastasia-hidden-quest-line)
-20. [Post-Campaign & Day Out of Time](#post-campaign--day-out-of-time)
-21. [Quest Completion Statistics](#quest-completion-statistics)
+20. [Ending Variant Quest Triggers](#ending-variant-quest-triggers)
+21. [Post-Campaign & Day Out of Time](#post-campaign-day-out-of-time)
+22. [Quest Completion Statistics](#quest-completion-statistics)
 
 ---
 
@@ -86,7 +87,7 @@ LOCKED → AVAILABLE → ACCEPTED → IN_PROGRESS → COMPLETE → REWARDED
 
 Standard reward tiers (see [19_ECONOMY_BALANCE.md](19_ECONOMY_BALANCE.md) for full economy):
 
-| Tier | AE (Aether) | BM (Materials) | SP (Skill Points) | RS (Resonance) | RC (Premium) |
+| Tier | AE (Aether) | BM (Materials) | SC (Skill Crystals) | RS (Resonance) | RC (Premium) |
 |---|---|---|---|---|---|
 | **Minor** (Daily) | 50-100 | 10-20 | 0-1 | +1-2% zone | 0 |
 | **Standard** (Side) | 150-300 | 30-60 | 1-2 | +3-5% zone | 0-5 |
@@ -603,6 +604,30 @@ Princess Anastasia's quest chain is entirely triggered by Golden Mote discovery 
 
 ---
 
+## Ending Variant Quest Triggers
+
+The campaign resolves into one of four endings based on cumulative player choices, quest completions, and companion trust levels. Each ending is triggered by specific conditions evaluated at the Moon 13 Convergence (quest M13-MS05).
+
+| Ending | Trigger Conditions | Key Quest Dependencies | Narrative Outcome |
+|---|---|---|---|
+| **Harmony** | Global grid ≥ 90% + all 13 bells rung + Zereth confrontation resolved peacefully (M13-MS03 "Harmonize" choice) | M13-MS03 (peace), M13-SQ03 (Zereth relationship 5+), all Moon climax events completed | Full Golden Age restoration; Mud Flood reversed; Zereth healed. Joyful sandbox with god-mode tools. |
+| **Echo** | Global grid 60–89% OR chose "Preserve Both" at Convergence OR Zereth relationship 3–4 | M13-MS04 (dual-timeline choice), M13-SQ01 (companion reflections reveal dual possibility) | Dual timeline maintained; player switches between restored and fallen realities. Philosophical sandbox. |
+| **Reset** | Global grid < 60% OR chose "Seize Power" at Convergence OR Zereth relationship ≤ 2 | M13-MS03 (force choice), missed 3+ Moon climax events | Controlled grid; power without wonder. Dark sandbox with advanced combat but faded beauty. |
+| **The True Name** (Hidden) | All 13 Golden Motes collected + all lore entries complete + Harmony conditions met + M13-HQ01 triggered | M13-HQ01, M13-HQ02, Anastasia chain (13 motes), full Codex | The world speaks the player's name. Anastasia solidifies permanently. Ultimate hidden ending with unique cutscene and narration. |
+
+**Evaluation Order:** The True Name is checked first (supercedes Harmony). Then Harmony → Echo → Reset as fallback.
+
+**Post-Ending Flags:**
+
+| Flag | Set By | Effect |
+|---|---|---|
+| `ending_harmony` | Harmony or True Name path | Unlocks god-mode creative tools in sandbox |
+| `ending_echo` | Echo path | Unlocks dual-timeline toggle in sandbox |
+| `ending_reset` | Reset path | Unlocks advanced combat arenas in sandbox |
+| `ending_true_name` | True Name path | Unlocks Anastasia as permanent companion + Crown Cosmetic + unique title "The Named One" |
+
+---
+
 ## Post-Campaign & Day Out of Time
 
 After Moon 13 completion, the following become available:
@@ -652,3 +677,9 @@ After Moon 13 completion, the following become available:
 ---
 
 *Every dome tuned, every bell rung, every child saved — the quest log tells the story of a world being remembered into existence.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

@@ -5,16 +5,16 @@
 
 ## Table of Contents
 
-1. [Engine & Platform](#1-engine--platform)
+1. [Engine & Platform](#1-engine-platform)
 2. [Rendering Pipeline](#2-rendering-pipeline)
-3. [Memory & Performance Budgets](#3-memory--performance-budgets)
+3. [Memory & Performance Budgets](#3-memory-performance-budgets)
 4. [DOTS/ECS Architecture](#4-dotsecs-architecture)
 5. [Asset Pipeline](#5-asset-pipeline)
 6. [Audio Architecture](#6-audio-architecture)
-7. [Networking & Backend](#7-networking--backend)
+7. [Networking & Backend](#7-networking-backend)
 8. [iPhone-Specific Optimizations](#8-iphone-specific-optimizations)
 9. [Save System](#9-save-system)
-10. [Build & Deployment](#10-build--deployment)
+10. [Build & Deployment](#10-build-deployment)
 
 ---
 
@@ -640,6 +640,6 @@ No build passes CI without meeting these thresholds:
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `00_MASTER_GDD.md`, `07_MOBILE_UX.md`, `06_COMBAT_PROGRESSION.md`  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026

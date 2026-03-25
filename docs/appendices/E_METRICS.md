@@ -174,7 +174,7 @@
 | **Aether Earn Rate** | AE earned per session | 200-500 (Moon 1-4), 400-800 (Moon 5-9), 600-1200 (Moon 10-13) | ±40% from target |
 | **Aether Spend Rate** | AE spent per session | 60-80% of earn rate | < 40% (hoarding) or > 100% (deficit) |
 | **Material Stockpile** | Avg BM held per player per Moon | 1.5-3× current build cost | > 10× (nothing to spend on) |
-| **Skill Point Velocity** | SP earned per Moon | 15-25 | < 10 (stunted progression) |
+| **Skill Crystal Velocity** | SC earned per Moon | 15-25 | < 10 (stunted progression) |
 | **Premium Currency Balance** | Avg RC held by free players | 50-150 | > 500 (nothing worth buying) |
 
 ### Inflation/Deflation Indicators
@@ -416,3 +416,9 @@
 ---
 
 *The grid has metrics too — every ley line carries a signal, every dome hums a frequency. We measure so we can tune.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

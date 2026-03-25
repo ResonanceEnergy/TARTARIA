@@ -19,12 +19,12 @@
 ## Table of Contents
 
 1. [Prologue: The First Note Beneath the Mud](#prologue-the-first-note-beneath-the-mud)
-2. [Act 1 — Whispers Beneath the Mud](#act-1--whispers-beneath-the-mud)
-3. [Act 2 — The Sky Remembers Its Children](#act-2--the-sky-remembers-its-children)
-4. [Act 3 — Rails of the Dissonant Song](#act-3--rails-of-the-dissonant-song)
-5. [Act 4 — The Last Giant's Symphony](#act-4--the-last-giants-symphony)
-6. [Act 5 — Cosmic Convergence](#act-5--cosmic-convergence)
-7. [Epilogue — The Song Resumes](#epilogue--the-song-resumes)
+2. [Act 1 — Whispers Beneath the Mud](#act-1-whispers-beneath-the-mud)
+3. [Act 2 — The Sky Remembers Its Children](#act-2-the-sky-remembers-its-children)
+4. [Act 3 — Rails of the Dissonant Song](#act-3-rails-of-the-dissonant-song)
+5. [Act 4 — The Last Giant's Symphony](#act-4-the-last-giants-symphony)
+6. [Act 5 — Cosmic Convergence](#act-5-cosmic-convergence)
+7. [Epilogue — The Song Resumes](#epilogue-the-song-resumes)
 8. [Narrative Design Principles](#narrative-design-principles)
 
 ---
@@ -112,7 +112,7 @@ Here the mystery of the **Dissonant One** intensifies: A fallen giant who may ha
 
 **Cassian**, your once-trusted Echo companion, reveals his betrayal inside a corrupted cathedral pipe organ:
 
-> *"Free energy was too pure. Too uncontrollable. The Reset offered order."*
+> *"Free energy sounds noble until you realize it makes kings obsolete. The Reset offered order."*
 
 ### Wonder & Heartbreak Collide
 You purge the organ with a **full symphony performance** while pure water fountains overflow with ionized mist. The cathedral cries silver tears as dissonance evaporates — then sings again in radiant 432 Hz harmony. The rails outside hum in sympathy, carriages glowing with renewed life.
@@ -120,9 +120,9 @@ You purge the organ with a **full symphony performance** while pure water founta
 ---
 
 ## Act 4 — The Last Giant's Symphony
-*Star Forts & Bell Towers | Moons 9–11 | Wonder Threshold: Korath's Sacrifice*
+*Star Forts & Bell Towers | Moons 7–11 | Wonder Threshold: Korath's Sacrifice*
 
-You descend into the deepest mud layers and awaken **Korath the Builder** — the ancient giant. His voice rumbles like distant bells:
+During Moon 7 you descend into the deepest mud layers and awaken **Korath the Builder** — the ancient giant. His voice rumbles like distant bells:
 
 > *"We cut stone not with force, but with listening. The cosmos already knew every shape."*
 
@@ -208,3 +208,9 @@ Every act, every session, every visual spectacle, every line of dialogue, every 
 - [03B_EXPANSION_PACKS.md](03B_EXPANSION_PACKS.md) — 10 DLC storyline expansions
 - [05_CHARACTERS_DIALOGUE.md](05_CHARACTERS_DIALOGUE.md) — Complete NPC profiles & dialogue bible
 - [12_VIVID_VISUALS.md](12_VIVID_VISUALS.md) — Enhanced atmospheric descriptions per act
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

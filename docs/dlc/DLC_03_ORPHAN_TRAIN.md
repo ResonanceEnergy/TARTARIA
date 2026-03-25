@@ -28,8 +28,9 @@
 7. [Boss: The Severance Engine](#boss-the-severance-engine)
 8. [New NPCs](#new-npcs)
 9. [Lore Discoveries](#lore-discoveries)
-10. [Rewards & Gear](#rewards--gear)
-11. [Cosmic Tie](#cosmic-tie)
+10. [Companion Reactions](#companion-reactions)
+11. [Rewards & Gear](#rewards-gear)
+12. [Cosmic Tie](#cosmic-tie)
 
 ---
 
@@ -278,6 +279,30 @@ The Severance Engine was not built by the Cabal. It was a CONVERTED Tartarian lo
 
 ---
 
+## Companion Reactions
+
+### Milo
+The Orphan Train hits Milo harder than any discovery so far. His street-kid past mirrors the separated children. He cycles from anger ("They packaged kids like cargo") to quiet resolve.
+
+> **Milo (kneeling by a child's abandoned suitcase):** "I grew up alone too. Told myself that's just how it is. But it's not 'just how it is.' Someone MADE it that way. Someone decided these families didn't get to be families anymore. That's not fate. That's theft."
+
+### Lirael
+Lirael's spectral nature gives her a unique connection to the ghost children — she can hear them singing before anyone else can. Her reaction shifts from academic interest to maternal protectiveness.
+
+> **Lirael (humming along with spectral children):** "They taught them the songs as lullabies. The parents knew — they KNEW they might never see them again. So they hid the maps in melodies. Every note is a mother saying 'find your way home.'"
+
+### Thorne (Remote)
+Thorne monitors via radio from his airship, providing tactical support. The scale of the rail network stuns him — he discovers his own fleet's navigation charts were derived from the same frequency maps the children carry.
+
+> **Thorne (crackling over radio):** "My grandfather's star charts — they match these rail frequencies exactly. The sky routes and the rail routes… they're the same network, just different altitudes. These children were carrying the blueprint for everything."
+
+### Korath's Echo
+Korath's echo resonates powerfully near the Severance Engine — the dissonance technology that powered it was built from corrupted giant-song. His grief is palpable. The children's lullabies are fragments of songs his people once sang.
+
+> **Korath (echo, vibrating through the rails):** "Those melodies… they are ours. Broken into pieces small enough for small hands to carry. The giants sang the world into shape. The children kept the pieces alive. We are not so different."
+
+---
+
 ## Rewards & Gear
 
 ### Equipment
@@ -325,3 +350,9 @@ The Severance Engine was not built by the Cabal. It was a CONVERTED Tartarian lo
 
 *The train stops here. The children are home.*
 *And the song they carry will outlast every silence ever built.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

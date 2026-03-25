@@ -9,11 +9,12 @@
 2. [Main Cast Profiles](#2-main-cast-profiles)
 3. [Companion Dialogue Systems](#3-companion-dialogue-systems)
 4. [NPC Banter Library](#4-npc-banter-library)
-5. [Echo NPCs & Spectral Voices](#5-echo-npcs--spectral-voices)
+5. [Echo NPCs & Spectral Voices](#5-echo-npcs-spectral-voices)
 6. [Antagonist Dialogue](#6-antagonist-dialogue)
 7. [Environmental Dialogue (Aether Whispers)](#7-environmental-dialogue-aether-whispers)
-8. [Dialogue Triggers & Contextual Lines](#8-dialogue-triggers--contextual-lines)
+8. [Dialogue Triggers & Contextual Lines](#8-dialogue-triggers-contextual-lines)
 9. [Voice Direction Notes](#9-voice-direction-notes)
+10. [Voice Consistency Audit Notes](#10-voice-consistency-audit-notes)
 
 ---
 
@@ -78,7 +79,7 @@ Wonder ─────── Humor ─────── Tenderness ────
 | 5 | Genuinely angry at White City demolition | First sincere outburst |
 | 7 | Witness to Korath's sacrifice | Goes silent for first time |
 | 10 | Continental train ride pride | "Maybe I'm a builder, not a seller" |
-| 13 | Standing clean, tears, transformed | "To forgetting less" |
+| 13 | Standing clean, tears, transformed | "To forgetting less, and remembering more" |
 
 **Signature Phrases:**
 - "Genuine Tartarian [X]! Only slightly cursed!"
@@ -141,7 +142,7 @@ Wonder ─────── Humor ─────── Tenderness ────
 - "This bucket flies like it's still offended we dug it out of the mud"
 - "I've seen horizons you haven't built yet"
 - *When the player builds something grand:* "Now THAT'S worth landing for"
-- *Mid-combat:* "Hold tight, spark. We're about to remind these parasites what small feels like"
+- *Mid-combat:* "Hold tight, spark. We're about to remind these parasites what it feels like to be small"
 - *Quiet moment:* "The old world had a word for this: Kairos. The moment when everything aligns and the universe exhales"
 
 ---
@@ -200,7 +201,7 @@ Wonder ─────── Humor ─────── Tenderness ────
 |---|---|
 | 2 | "Oh, you don't trust me? Smart. Most people aren't." |
 | 5 | *Caught studying your blueprints.* "Just admiring the craftsmanship." |
-| 7 (Confrontation) | "Free energy makes kings obsolete. I chose order. What did you choose?" |
+| 7 (Confrontation) | "Free energy sounds noble until you realize it makes kings obsolete. What did you choose?" |
 | 7 (If purged) | "You'll remember this mercy was offered." *Fades into dissonance.* |
 
 ---
@@ -257,7 +258,7 @@ When companions are near each other, they converse:
 
 **Lirael + Korath (Moon 7):**
 > **Lirael:** "You're big. Were all the builders big?"  
-> **Korath:** "We were tall. The children were the builders. We just… reached the high parts."  
+> **Korath:** "We were tall. The children were the builders." *(pause)* "We just… reached the high parts."  
 > **Lirael:** *giggles* "I want to reach the high parts."
 
 **Milo + Korath:**
@@ -304,7 +305,7 @@ When player completes major building achievements:
 **During Excavation:**
 - "Careful! That's either a priceless artifact or a really old boot. Fifty-fifty."
 - "I once sold a 'genuine Tartarian teacup' that turned out to be a toilet. Made six hundred quid."
-- "If we find gold, I get thirty percent. Non-negotiable. …Okay, twenty. Fifteen?"
+- "If we find gold, I get thirty percent. Non-negotiable." *(beat)* "…Okay, twenty. Fifteen?"
 
 **During Combat:**
 - "Is this the part where we run? It feels like the running part."
@@ -555,6 +556,44 @@ Companions track major player choices and reference them:
 
 ---
 
-**Document Status:** DRAFT  
-**Cross-References:** `03_CAMPAIGN_13_MOONS.md`, `01_LORE_BIBLE.md`  
-**Last Updated:** March 23, 2026
+## 10. Voice Consistency Audit Notes
+
+*Cross-document audit performed across docs 03, 03A, 05, and 22.*
+
+### 10.1 Overall Verdict
+
+**All 6 companions + Zereth pass voice-consistency checks.** Across ~135 lines in 4 documents, zero hard out-of-character violations were found. Every character's lines satisfy Core Rule #2 ("Swap a Milo line into Thorne's mouth and it should feel immediately wrong").
+
+### 10.2 Canonical Phrasing — Lock-Down List
+
+Where minor wording variants exist across docs, the **canonical version** is listed below. Writers should match these exactly.
+
+| Character | Canonical Line | Source |
+|---|---|---|
+| Milo (Moon 13 toast) | "To forgetting less, and remembering more." | 03 Moon 13 |
+| Thorne (combat) | "Hold tight, spark. We're about to remind these parasites what it feels like to be small." | 03 Moon 8 |
+| Cassian (core thesis) | "Free energy sounds noble until you realize it makes kings obsolete." | 03 Moon 7 |
+
+### 10.3 Arc-Justified Exceptions
+
+| Character | Line | Note |
+|---|---|---|
+| Lirael (Moon 12) | "No. People like *remembering*. They just forgot how." | More assertive than her typical half-question voice. Permitted — represents her late-game arc of "growing solid." |
+
+### 10.4 Dialogue Count by Character
+
+| Character | Doc 05 | Doc 03 | Doc 03A | Doc 22 | Total |
+|---|---|---|---|---|---|
+| Elara | 0 | 0 | 0 | 0 | 0 (silent — correct) |
+| Milo | ~25 | ~10 | ~3 | ~3 | ~41 |
+| Lirael | ~18 | ~7 | ~2 | ~1 | ~28 |
+| Korath | ~12 | ~8 | ~2 | 0 | ~22 |
+| Thorne | ~14 | ~8 | ~1 | ~1 | ~24 |
+| Cassian | ~8 | ~3 | ~1 | 0 | ~12 |
+| Zereth | ~5 | ~3 | 0 | 0 | ~8 |
+
+---
+
+**Document Status:** FINAL  
+**Cross-References:** `03_CAMPAIGN_13_MOONS.md`, `03A_MAIN_STORYLINE_REWRITE.md`, `22_DIALOGUE_BRANCHING.md`, `01_LORE_BIBLE.md`  
+**Last Updated:** March 25, 2026

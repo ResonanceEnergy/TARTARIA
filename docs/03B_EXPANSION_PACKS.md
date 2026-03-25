@@ -28,6 +28,7 @@
 10. [Expansion Pack 8: Giant's Last Stand](#expansion-pack-8-giants-last-stand)
 11. [Expansion Pack 9: The Ley Line Prophecy](#expansion-pack-9-the-ley-line-prophecy)
 12. [Expansion Pack 10: True Timeline Divergence](#expansion-pack-10-true-timeline-divergence)
+13. [DLC Interconnection Web](#dlc-interconnection-web)
 
 ---
 
@@ -50,12 +51,12 @@ Designed for **live-ops rollout**: seasonal releases tied to real lunar cycles f
 | 2 | Whispers of the White City | Moon 5 (Overtone) | At 30% global grid resonance |
 | 3 | The Dissonant Orphan Train | Moon 3 (Electric) | First train station reactivation |
 | 4 | Star Fort Rebellion | Moon 4 (Self-Existing) | First star fort connection |
-| 5 | The Airship Armada | Moon 8 (Galactic) | At 50% grid resonance |
-| 6 | Cymatic Requiem | Moon 6 (Rhythmic) | First pipe organ restoration |
-| 7 | The Parasite Within | Moon 2 (Lunar) | First dissonance corruption event |
-| 8 | Giant's Last Stand | Moon 7 (Resonant) | Deepest mud layer excavation |
-| 9 | The Ley Line Prophecy | Moon 9 (Solar) | At 80% grid resonance |
-| 10 | True Timeline Divergence | Moon 13 (Cosmic) | 100% grid + final node connection |
+| 5 | The Airship Armada | Moon 8 (Galactic) | First continental bridge connection + 50% grid resonance |
+| 6 | Cymatic Requiem | Moon 6 (Rhythmic) | First cymatic alignment |
+| 7 | The Parasite Within | Moon 2 (Lunar) | First corruption purge |
+| 8 | Giant's Last Stand | Moon 7 (Resonant) | Korath's sacrifice quest |
+| 9 | The Ley Line Prophecy | Moon 9 (Solar) | At 75% continental grid coverage |
+| 10 | True Timeline Divergence | Moon 13 (Cosmic) | Moon 13 completion + all 12 Prophecy Stones activated |
 
 ---
 
@@ -141,7 +142,7 @@ Alignment during full 13th moon purifies the golem permanently. Star fort networ
 
 ## Expansion Pack 5: The Airship Armada
 
-**Unlock Trigger:** 50% grid resonance
+**Unlock Trigger:** First continental bridge connection + 50% grid resonance
 **New Zone Type:** Floating Sky Isles (anti-grav platforms)
 **Core Mechanic:** Airship piloting + harmonic rock lifting/transport
 
@@ -161,7 +162,7 @@ Night flights under auroras show ley lines as golden rivers below. The airship h
 
 ## Expansion Pack 6: Cymatic Requiem
 
-**Unlock Trigger:** First massive pipe organ restoration
+**Unlock Trigger:** First cymatic alignment
 **New Zone Type:** Sunken Cathedral Sanctums
 **Core Mechanic:** Full symphony conduction mini-game with pipe organ + fountains
 
@@ -181,7 +182,7 @@ Requiem strongest on 13th moon new phase. Cathedral organ performances during 17
 
 ## Expansion Pack 7: The Parasite Within
 
-**Unlock Trigger:** First dissonance corruption event
+**Unlock Trigger:** First corruption purge
 **New Zone Type:** Fractal Inner Architecture (micro-giant mode)
 **Core Mechanic:** Hunt infiltrators inside corrupted domes
 
@@ -201,7 +202,7 @@ Corruption spreads faster outside 17-hour "harmony windows." During the waning c
 
 ## Expansion Pack 8: Giant's Last Stand
 
-**Unlock Trigger:** Deepest mud layer excavation
+**Unlock Trigger:** Korath's sacrifice quest
 **New Zone Type:** Giant Stasis Vaults
 **Core Mechanic:** Thaw & recruit living giants (permanent party buffs)
 
@@ -221,7 +222,7 @@ Sacrifice timed to 13-Moon peak. Korath's resonance lingers in every bell tower,
 
 ## Expansion Pack 9: The Ley Line Prophecy
 
-**Unlock Trigger:** 80% grid resonance
+**Unlock Trigger:** 75% continental grid coverage
 **New Zone Type:** Prophecy Node Chain (continent-spanning)
 **Core Mechanic:** Collect 12 prophecy stones + moral choice branches
 
@@ -241,7 +242,7 @@ Final stone only appears during rare 13-Moon / 17-Hour convergence. Each stone, 
 
 ## Expansion Pack 10: True Timeline Divergence
 
-**Unlock Trigger:** 100% grid + final node connection
+**Unlock Trigger:** Moon 13 completion + all 12 Prophecy Stones activated
 **New Zone Type:** Echo Realms (parallel timeline instances)
 **Core Mechanic:** God-mode creative tools in post-game sandbox
 
@@ -289,3 +290,9 @@ Every expansion adds **new layers of wonder** (cosmic spectacles, living archite
 - [03A_MAIN_STORYLINE_REWRITE.md](03A_MAIN_STORYLINE_REWRITE.md) — Core storyline
 - [10_ROADMAP.md](10_ROADMAP.md) — DLC release schedule in live-ops phases
 - [08_MONETIZATION.md](08_MONETIZATION.md) — DLC pricing strategy
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

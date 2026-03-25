@@ -23,6 +23,7 @@
 5. [Bell Tower Synchronization](#4-bell-tower-synchronization)
 6. [Resonance Rail Alignment](#5-resonance-rail-alignment)
 7. [Micro-Giant Fractal Purge](#6-micro-giant-fractal-purge)
+8. [Mini-Game Integration Map](#mini-game-integration-map)
 
 ---
 
@@ -346,3 +347,9 @@ The fractal interior is the most visually unique space in the game:
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic profiles for each mini-game
 - [07_MOBILE_UX.md](07_MOBILE_UX.md) — Touch control standards
 - [11_SCRIPTED_CLIMAXES.md](11_SCRIPTED_CLIMAXES.md) — Climaxes using these mechanics
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

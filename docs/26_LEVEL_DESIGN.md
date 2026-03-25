@@ -25,10 +25,10 @@
 4. [Traversal Systems](#4-traversal-systems)
 5. [Point of Interest (POI) Design](#5-point-of-interest-poi-design)
 6. [Encounter Pacing](#6-encounter-pacing)
-7. [Verticality & Layer Design](#7-verticality--layer-design)
+7. [Verticality & Layer Design](#7-verticality-layer-design)
 8. [Secret Placement Rules](#8-secret-placement-rules)
-9. [Social & Gathering Spaces](#9-social--gathering-spaces)
-10. [Streaming & Technical Constraints](#10-streaming--technical-constraints)
+9. [Social & Gathering Spaces](#9-social-gathering-spaces)
+10. [Streaming & Technical Constraints](#10-streaming-technical-constraints)
 11. [MVP Zone: Echohaven Deep Dive](#11-mvp-zone-echohaven-deep-dive)
 
 ---
@@ -313,6 +313,32 @@ Every zone has three conceptual layers representing Tartaria's temporal arc:
 4. **No permanently missable secrets.** Moon Replay allows revisiting all zones with all companions.
 5. **Reward proportional to difficulty.** Hard-to-find secrets give rare cosmetics. Easy-to-find give resources.
 
+### 8.3 Hidden Flower Patch Locations
+
+Aether-bloom flower patches are scattered off the golden route in every zone. Each patch glows faintly at night and triggers a companion comment. Discovering all patches across every zone unlocks the **H04 Flower Child** achievement (see [28_ACHIEVEMENTS.md](28_ACHIEVEMENTS.md)).
+
+| Zone | Patch Name | Location Hint | Flowers |
+|---|---|---|---|
+| **Echohaven** | Dome Garden | Behind the Great Dome waterfall, ground-level alcove | Golden Aether Lilies (×6) |
+| **Murmuring Hollows** | Whispering Bloom | Inside the hollow of the Ancient Library Tree's roots | Violet Resonance Ferns (×4) |
+| **Crystal Veil** | Prismatic Meadow | Refracted light alcove behind the Grand Crystal Organ | Rainbow Quartz Blossoms (×5) |
+| **Ironhold Reach** | Rust Garden | Overgrown courtyard inside the Star Fort inner wall | Iron Rose Vines (×8) |
+| **Skyfire Plateau** | Cloud Petals | Floating soil pocket at the plateau's eastern cliff edge | Sky Orchids (×3) |
+| **Sunken Gardens** | Submerged Bloom | Underwater grotto below the Fountain of Resonance | Aqua Lilies (×6) |
+| **Ashen Spine** | Ember Flowers | Volcanic vent with unexpected moist soil, northeast ridge | Cinder Poppies (×4) |
+| **Veilstorm Coast** | Storm Roses | Sheltered tidal cave, accessible at low tide only | Salt Roses (×5) |
+| **Clockwork Undercity** | Gear Garden | Abandoned greenhouse in the clocktower's basement level | Brass-Stem Daisies (×7) |
+| **Starseed Plains** | Starfield Bloom | Center of the Antenna Array Field, grows between pylons | Starlight Asters (×10) |
+| **Frozen Resonance** | Ice Blossoms | Thermal vent inside the Ice Dome, heated pocket | Crystal Snowdrops (×4) |
+| **Shattered Prism** | Reality Flowers | Where three biome fragments overlap — flowers shift color | Prism Petals (×6) |
+| **The Cosmic Threshold** | Convergence Garden | Hidden behind the Grand Nexus, only visible from above | Aether Lotuses (×13) |
+
+**Design Notes:**
+- Patches are placed 100–200m off the golden route, requiring intentional exploration
+- Each patch has a unique ambient particle effect (pollen glow matching its zone's color palette)
+- Companion comments trigger within 30m: Lirael hums near flowers, Milo tries to appraise them, Korath remembers giant-tended gardens
+- Flower patches regenerate every 7 in-game days — players can revisit for the ambient experience
+
 ---
 
 ## 9. Social & Gathering Spaces
@@ -450,6 +476,6 @@ Per [15_MVP_BUILD_SPEC.md](15_MVP_BUILD_SPEC.md):
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

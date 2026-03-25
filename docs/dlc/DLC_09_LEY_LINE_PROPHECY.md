@@ -17,6 +17,22 @@
 
 ---
 
+## Table of Contents
+
+1. [Story Synopsis](#story-synopsis)
+2. [Main Quest Chain](#main-quest-chain)
+3. [Side Quests](#side-quests)
+4. [New Zone: Prophecy Node Chain](#new-zone-prophecy-node-chain)
+5. [Core Mechanic: Moral Choice Branches](#core-mechanic-moral-choice-branches)
+6. [New Enemies](#new-enemies)
+7. [Boss: The Antarctic Guardian](#boss-the-antarctic-guardian)
+8. [Lore Discoveries](#lore-discoveries)
+9. [Companion Reactions](#companion-reactions)
+10. [Rewards & Gear](#rewards-gear)
+11. [DLC Network Integration](#dlc-network-integration)
+
+---
+
 ## Story Synopsis
 
 The resonance grid is nearing critical mass. As more ley-lines activate, the grid begins producing patterns — not noise, but INFORMATION. Encoded in the resonance field's interference patterns is a prophecy: 12 Prophecy Stones, scattered at specific ley-line intersections, each containing a fragment of a message left by the original grid architects. The prophecy describes a moment when the grid reaches perfect alignment — and for exactly three minutes, the Golden Age returns. Not a memory. Not an echo. The actual city, the actual sky, the actual air of pre-Flood Tartaria materializes.
@@ -274,3 +290,9 @@ If the player manages to approach The Watcher closely enough at ANY stone (diffi
 ---
 
 *For three minutes, the world remembered what it was. Then the three minutes ended. But the memory — this time — stayed.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

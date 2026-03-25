@@ -18,13 +18,13 @@
 ## Table of Contents
 
 1. [Production Philosophy](#1-production-philosophy)
-2. [Team Structure & Roles](#2-team-structure--roles)
+2. [Team Structure & Roles](#2-team-structure-roles)
 3. [Art Asset Pipeline](#3-art-asset-pipeline)
 4. [Animation Pipeline](#4-animation-pipeline)
 5. [Audio Pipeline](#5-audio-pipeline)
 6. [Outsource Contractor Management](#6-outsource-contractor-management)
-7. [Version Control & Asset Management](#7-version-control--asset-management)
-8. [Review & Approval Process](#8-review--approval-process)
+7. [Version Control & Asset Management](#7-version-control-asset-management)
+8. [Review & Approval Process](#8-review-approval-process)
 9. [Tool Chain](#9-tool-chain)
 10. [Quality Gates](#10-quality-gates)
 11. [Risk Management](#11-risk-management)
@@ -550,6 +550,6 @@ Per [10_ROADMAP.md](10_ROADMAP.md), each phase has gate criteria:
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

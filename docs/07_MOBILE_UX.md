@@ -8,9 +8,9 @@
 1. [UX Philosophy](#1-ux-philosophy)
 2. [Session Design](#2-session-design)
 3. [Touch Control Scheme](#3-touch-control-scheme)
-4. [HUD & Interface Layout](#4-hud--interface-layout)
+4. [HUD & Interface Layout](#4-hud-interface-layout)
 5. [Onboarding Flow](#5-onboarding-flow)
-6. [Daily & Weekly Engagement Loops](#6-daily--weekly-engagement-loops)
+6. [Daily & Weekly Engagement Loops](#6-daily-weekly-engagement-loops)
 7. [Notification Strategy](#7-notification-strategy)
 8. [Accessibility](#8-accessibility)
 9. [Performance UX](#9-performance-ux)
@@ -478,6 +478,6 @@ Players should WANT to open notifications because they're written in-character a
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `00_MASTER_GDD.md`, `06_COMBAT_PROGRESSION.md`, `09_TECHNICAL_SPEC.md`  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026

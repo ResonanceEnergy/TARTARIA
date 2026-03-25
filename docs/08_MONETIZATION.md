@@ -225,6 +225,36 @@ The most ambitious recurring event — mirrors the historical World's Fairs that
 
 **Revenue:** Fair-exclusive bundle ($14.99) + individual cosmetics + battle pass continuation
 
+### 7.2.1 World's Fair — Submission & Voting Mechanic
+
+**Entry Flow:**
+
+| Step | Player Action | System Response |
+|------|--------------|-----------------|
+| 1 | Open Build Mode during Fair event window | Fair overlay activates; "Submit Pavilion" button appears |
+| 2 | Place structures on a dedicated 8×8 Fair plot | Auto-saves locally; RS cost capped at 500 RS max |
+| 3 | Tap "Submit Pavilion" | Build snapshot + metadata uploaded; entry appears in Exhibition Hall |
+| 4 | Browse Exhibition Hall gallery | Scroll pavilion cards (builder name, screenshot, RS spent, aether style) |
+| 5 | Tap heart icon to vote (1 vote/day, 7-day window) | Vote tallied server-side; leaderboard updates hourly |
+| 6 | Event closes → top 10 displayed on Fair Stage | Winners receive tiered cosmetics; all participants get a bronze rosette |
+
+**Voting Rules:**
+- Players cannot vote for their own submission
+- Each account gets 1 vote per day for 7 days (7 total)
+- Votes are anonymous; only aggregate counts shown
+- Ties broken by earliest submission timestamp
+
+**Reward Tiers:**
+
+| Rank | Reward |
+|------|--------|
+| 1st Place | Legendary "Grand Pavilion" title + Golden Fair Crown + 2,000 RS |
+| 2nd–3rd | Epic "Master Builder" badge + Silver Fair Crown + 1,000 RS |
+| 4th–10th | Rare "Fair Artisan" frame + 500 RS |
+| All Participants | Common "Fair Goer" rosette pin + 100 RS |
+
+**Quest Trigger:** Quest FAIR-01 "A Grand Exhibition" auto-activates on Fair event start — objective: submit at least 1 pavilion. Completion grants 200 RS + Fair-exclusive aether tint.
+
 ### 7.3 Live-Ops Calendar (Sample Month)
 
 ```
@@ -357,6 +387,6 @@ Track monthly:
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `00_MASTER_GDD.md`, `07_MOBILE_UX.md`, `10_ROADMAP.md`  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026

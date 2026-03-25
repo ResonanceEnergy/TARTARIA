@@ -19,16 +19,17 @@
 
 1. [Design Philosophy](#1-design-philosophy)
 2. [Save Data Schema](#2-save-data-schema)
-3. [Auto-Save & Checkpoint System](#3-auto-save--checkpoint-system)
+3. [Auto-Save & Checkpoint System](#3-auto-save-checkpoint-system)
 4. [Local Persistence Layer](#4-local-persistence-layer)
 5. [Cloud Sync Architecture](#5-cloud-sync-architecture)
 6. [Offline-First Design](#6-offline-first-design)
 7. [Conflict Resolution](#7-conflict-resolution)
-8. [Data Migration & Versioning](#8-data-migration--versioning)
-9. [Integrity & Anti-Fraud](#9-integrity--anti-fraud)
+8. [Data Migration & Versioning](#8-data-migration-versioning)
+9. [Integrity & Anti-Fraud](#9-integrity-anti-fraud)
 10. [Storage Budget](#10-storage-budget)
 11. [Disaster Recovery](#11-disaster-recovery)
 12. [ECS Integration](#12-ecs-integration)
+13. [Edge Cases & Known Risk Scenarios](#13-edge-cases-known-risk-scenarios)
 
 ---
 
@@ -705,10 +706,39 @@ struct SaveBlock : ISharedComponentData {
 
 ---
 
+## 13. Edge Cases & Known Risk Scenarios
+
+### DLC Save State Interactions
+| Scenario | Behavior | Risk |
+|---|---|---|
+| Player purchases DLC mid-Moon | DLC content activates at next zone transition checkpoint | LOW — no save corruption |
+| Player refunds DLC after saving DLC progress | DLC data quarantined in save (not deleted) — restored if re-purchased | MEDIUM — test quarantine logic |
+| DLC 10 requires DLC 9 door choice | If DLC 9 save data missing, prompt player to replay DLC 9 | MEDIUM — dependency chain |
+| Player starts DLC 8 giant choice, then abandons mid-quest | Partial choice state → revert to pre-DLC-8 checkpoint on next load | LOW |
+
+### Branching Narrative State
+| Scenario | Behavior |
+|---|---|
+| Cassian fork at Moon 7 — player force-quits during choice UI | Auto-save fires before choice UI appears; resume replays choice scene |
+| DLC 9 door choice (Seal/Open/Walk Through) midway through 3-min materialization | Materialization is unpausable; if app kills, save captures progress percentage; resume replays from last 30s mark |
+| Player completes Moon 13 ending A then replays for ending B | New Game+ save slot preserves original ending A completion flag; both endings tracked independently |
+| Companion loyalty changes from dialogue — player exits before confirmation | Loyalty delta written only on dialogue node completion, not mid-node |
+
+### Platform-Specific Edge Cases
+| Scenario | Behavior |
+|---|---|
+| iOS Low Power Mode active | Reduce auto-save frequency from every 30s to every 60s; disable cloud push |
+| iCloud account signed out mid-sync | Local save always authoritative; queue cloud push for next sign-in |
+| Device storage full (cannot write) | Keep last valid save in memory; show non-blocking warning; retry on space freed |
+| App update changes save schema | Migration runs on first load; `SaveSchemaVersion` field triggers sequential v1→v2→v3 migrations |
+| Time zone change (travel / DST) | All timestamps stored as UTC epoch; 17th Hour Alignment calculated server-side |
+
+---
+
 *What is saved cannot be truly lost. What is lost can always be rebuilt. That's the Tartarian way.*
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

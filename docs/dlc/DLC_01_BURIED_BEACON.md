@@ -31,7 +31,7 @@
 8. [New NPCs](#new-npcs)
 9. [Lore Discoveries](#lore-discoveries)
 10. [Companion Reactions](#companion-reactions)
-11. [Rewards & Gear](#rewards--gear)
+11. [Rewards & Gear](#rewards-gear)
 12. [Cosmic Tie: 13-Moon Phase Synchronization](#cosmic-tie-13-moon-phase-synchronization)
 
 ---
@@ -349,3 +349,9 @@ The Buried Beacon DLC establishes the foundational mechanic (Giant-Mode Burst) a
 
 *The bones hum. The mercury flows. The line continues.*
 *Beneath the mud, the first beacon waits for you.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

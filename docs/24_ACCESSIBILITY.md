@@ -23,7 +23,7 @@
 4. [Motor Accessibility](#4-motor-accessibility)
 5. [Auditory Accessibility](#5-auditory-accessibility)
 6. [Cognitive Accessibility](#6-cognitive-accessibility)
-7. [Vestibular & Photosensitivity](#7-vestibular--photosensitivity)
+7. [Vestibular & Photosensitivity](#7-vestibular-photosensitivity)
 8. [iOS Platform Integration](#8-ios-platform-integration)
 9. [Testing Checklist](#9-testing-checklist)
 10. [Budget Impact Assessment](#10-budget-impact-assessment)
@@ -487,6 +487,6 @@ Settings (⚙️)
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

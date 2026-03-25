@@ -19,19 +19,19 @@
 ## Table of Contents
 
 1. [Scripted Climax Design Philosophy](#scripted-climax-design-philosophy)
-2. [Moon 1 — The Dome Awakening](#moon-1--the-dome-awakening)
-3. [Moon 2 — The Fractal Corruption Purge](#moon-2--the-fractal-corruption-purge)
-4. [Moon 3 — The Orphan Train Escort](#moon-3--the-orphan-train-escort)
-5. [Moon 4 — The Star Fort Siege](#moon-4--the-star-fort-siege)
-6. [Moon 5 — The Intercontinental Connection](#moon-5--the-intercontinental-connection)
-7. [Moon 6 — The Cymatic Requiem](#moon-6--the-cymatic-requiem)
-8. [Moon 7 — Korath's Sacrifice](#moon-7--koraths-sacrifice)
-9. [Moon 8 — The Armada Flyover](#moon-8--the-armada-flyover)
-10. [Moon 9 — The Floating Aurora City](#moon-9--the-floating-aurora-city)
-11. [Moon 10 — The Continental Train Journey](#moon-10--the-continental-train-journey)
-12. [Moon 11 — Planetary Fountain Activation](#moon-11--planetary-fountain-activation)
-13. [Moon 12 — The Planetary Bell-Tower Ring](#moon-12--the-planetary-bell-tower-ring)
-14. [Moon 13 — True Timeline Convergence](#moon-13--true-timeline-convergence)
+2. [Moon 1 — The Dome Awakening](#moon-1-the-dome-awakening)
+3. [Moon 2 — The Fractal Corruption Purge](#moon-2-the-fractal-corruption-purge)
+4. [Moon 3 — The Orphan Train Escort](#moon-3-the-orphan-train-escort)
+5. [Moon 4 — The Star Fort Siege](#moon-4-the-star-fort-siege)
+6. [Moon 5 — The Intercontinental Connection](#moon-5-the-intercontinental-connection)
+7. [Moon 6 — The Cymatic Requiem](#moon-6-the-cymatic-requiem)
+8. [Moon 7 — Korath's Sacrifice](#moon-7-koraths-sacrifice)
+9. [Moon 8 — The Armada Flyover](#moon-8-the-armada-flyover)
+10. [Moon 9 — The Floating Aurora City](#moon-9-the-floating-aurora-city)
+11. [Moon 10 — The Continental Train Journey](#moon-10-the-continental-train-journey)
+12. [Moon 11 — Planetary Fountain Activation](#moon-11-planetary-fountain-activation)
+13. [Moon 12 — The Planetary Bell-Tower Ring](#moon-12-the-planetary-bell-tower-ring)
+14. [Moon 13 — True Timeline Convergence](#moon-13-true-timeline-convergence)
 
 ---
 
@@ -1878,3 +1878,9 @@ Each zone passage includes a combat encounter and an emotional moment:
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic escalation profiles
 - [03C_MOON_MECHANICS_DETAILED.md](03C_MOON_MECHANICS_DETAILED.md) — Supporting mechanics
 - [appendices/C_AUDIO_DESIGN.md](appendices/C_AUDIO_DESIGN.md) — Audio design specification
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

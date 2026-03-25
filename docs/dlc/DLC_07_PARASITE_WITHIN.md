@@ -17,6 +17,22 @@
 
 ---
 
+## Table of Contents
+
+1. [Story Synopsis](#story-synopsis)
+2. [Main Quest Chain](#main-quest-chain)
+3. [Side Quests](#side-quests)
+4. [New Zone: Fractal Inner Architecture](#new-zone-fractal-inner-architecture)
+5. [Core Mechanic: Micro-Giant Mode](#core-mechanic-micro-giant-mode)
+6. [New Enemies](#new-enemies)
+7. [Boss: The Parasite (Cassian's Shadow)](#boss-the-parasite-cassians-shadow)
+8. [Lore Discoveries](#lore-discoveries)
+9. [Companion Reactions](#companion-reactions)
+10. [Rewards & Gear](#rewards-gear)
+11. [DLC Network Integration](#dlc-network-integration)
+
+---
+
 ## Story Synopsis
 
 Companion Cassian — the skeptic, the doubter, the one who questions every resonance discovery — has been deteriorating. His cynicism was protective at first. Now it's consuming him. The corruption didn't enter Cassian from outside. It grew from his certainty that none of this matters, that the world cannot be restored, that hope is a drug for the weak. That belief has crystallized into a literal parasite — a fractal dissonance entity growing inside his consciousness, feeding on doubt, excreting despair.
@@ -259,3 +275,9 @@ Cassian's internal confrontation reveals the cure for dormant parasite seeds: ge
 ---
 
 *The hardest battle is not against the enemy outside. It's against the voice inside that says "why bother." Today, Cassian answered that voice. Not with certainty. With courage.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

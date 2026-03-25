@@ -26,8 +26,9 @@
 5. [Challenge Modifiers](#5-challenge-modifiers)
 6. [Seasonal Rotating Achievements](#6-seasonal-rotating-achievements)
 7. [Reward Structure](#7-reward-structure)
-8. [Backend & Storage](#8-backend--storage)
+8. [Backend & Storage](#8-backend-storage)
 9. [Apple Game Center Integration](#9-apple-game-center-integration)
+10. [Design Gaps — Open Items](#10-design-gaps-open-items)
 
 ---
 
@@ -154,13 +155,22 @@
 | # | Name | Criteria | Tier | Reward |
 |---|---|---|---|---|
 | K01 | **Moonrise** | Complete Moon 1 | — | 100 AE |
-| K02 | **Quarter Moon** | Complete Moon 4 | Bronze | 300 AE |
-| K03 | **Half Moon** | Complete Moon 7 | Silver | 750 AE, Moon cosmetic |
-| K04 | **Full Moon** | Complete Moon 13 (any ending) | Gold | 3,000 AE + ending-specific cosmetic |
-| K05 | **Best Friends Forever** | Max loyalty with any companion | Silver | Companion friendship frame |
-| K06 | **The Complete Circle** | Max loyalty with ALL 5 companions (across replays) | Gold | Group portrait cosmetic |
-| K07 | **Every Path Walked** | See all 4 ending variants (across replays) | Gold | "Eternal Wanderer" title |
-| K08 | **Speedrunner's Dream** | Complete Moon 1–13 in under 15 hours | Gold | Speedrun timer cosmetic |
+| K02 | **Cistern Song** | Complete Moon 2 | — | 150 AE |
+| K03 | **Orphan's Train** | Complete Moon 3 | Bronze | 200 AE |
+| K04 | **Quarter Moon** | Complete Moon 4 | Bronze | 300 AE |
+| K05 | **Bridge Builder** | Complete Moon 5 | Bronze | 350 AE |
+| K06 | **Requiem Played** | Complete Moon 6 | Silver | 500 AE |
+| K07 | **Half Moon** | Complete Moon 7 | Silver | 750 AE, Moon cosmetic |
+| K08 | **Armada Aloft** | Complete Moon 8 | Silver | 800 AE |
+| K09 | **Solar Flare** | Complete Moon 9 | Silver | 900 AE |
+| K10 | **Planetary Pulse** | Complete Moon 10 | Gold | 1,000 AE |
+| K11 | **Veil Lifted** | Complete Moon 11 | Gold | 1,200 AE |
+| K12 | **Bell Ring** | Complete Moon 12 | Gold | 1,500 AE |
+| K13 | **Full Moon** | Complete Moon 13 (any ending) | Gold | 3,000 AE + ending-specific cosmetic |
+| K14 | **Best Friends Forever** | Max loyalty with any companion | Silver | Companion friendship frame |
+| K15 | **The Complete Circle** | Max loyalty with ALL 5 companions (across replays) | Gold | Group portrait cosmetic |
+| K16 | **Every Path Walked** | See all 4 ending variants (across replays) | Gold | "Eternal Wanderer" title |
+| K17 | **Speedrunner's Dream** | Complete Moon 1–13 in under 15 hours | Gold | Speedrun timer cosmetic |
 
 ---
 
@@ -345,6 +355,16 @@ All 52 standard + hidden achievements synced to Game Center:
 
 ---
 
-**Document Status:** DRAFT
+## 10. Design Gaps — Open Items
+
+| ID | Category | Issue | Resolution |
+|---|---|---|---|
+| GAP-01 | H04 Flower Child | Achievement references "hidden flower patches" — no flower patch locations documented | **RESOLVED** — 13-zone flower patch table added to [26_LEVEL_DESIGN.md](26_LEVEL_DESIGN.md) § 8.3 |
+| GAP-02 | S01–S04 World's Fair | Social achievement series references a build-submission/voting feature with no spec | **RESOLVED** — Submission & Voting mechanic spec added to [08_MONETIZATION.md](08_MONETIZATION.md) § 7.2.1 |
+| GAP-03 | K16 Every Path Walked | References "4 ending variants" but quest DB had no ending-variant quests | **RESOLVED** — Ending Variant Quest Triggers section added to [20_QUEST_DATABASE.md](20_QUEST_DATABASE.md) with trigger conditions, quest dependencies, and post-ending flags |
+
+---
+
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

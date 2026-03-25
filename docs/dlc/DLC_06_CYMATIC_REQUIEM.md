@@ -17,6 +17,22 @@
 
 ---
 
+## Table of Contents
+
+1. [Story Synopsis](#story-synopsis)
+2. [Main Quest Chain](#main-quest-chain)
+3. [Side Quests](#side-quests)
+4. [New Zone: Sunken Cathedral Sanctums](#new-zone-sunken-cathedral-sanctums)
+5. [Core Mechanic: Symphony Conduction](#core-mechanic-symphony-conduction)
+6. [New Enemies](#new-enemies)
+7. [Boss: The Dissonant Conductor (Maestro Vael)](#boss-the-dissonant-conductor-maestro-vael)
+8. [Lore Discoveries](#lore-discoveries)
+9. [Companion Reactions](#companion-reactions)
+10. [Rewards & Gear](#rewards-gear)
+11. [DLC Network Integration](#dlc-network-integration)
+
+---
+
 ## Story Synopsis
 
 Beneath the mud layer of a European city lies what the modern world believes was a cathedral. It wasn't. It was a Weather Engine — a colossal pipe organ whose resonance tubes extended miles underground, designed to control atmospheric conditions across an entire region. When the Mud Flood hit, the organ kept playing — a single, broken chord that has been generating catastrophic weather patterns for three centuries. The dissonance has corroded the organ's sentient conductor — an echo named Maestro Vael — into the Dissonant Conductor, a being who believes the storm IS the music and that silence means death.
@@ -249,3 +265,9 @@ The original Weather Engine was not just about weather — it controlled atmosph
 ---
 
 *For three hundred years, the storm raged because one musician refused to stop playing. Today, the silence is not emptiness. It is the space between notes where meaning lives.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

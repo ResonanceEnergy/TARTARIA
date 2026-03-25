@@ -37,7 +37,7 @@
 18. [Peak Vortex Swell](#peak-vortex-swell)
 19. [Layered Spiral Shockwaves](#layered-spiral-shockwaves)
 20. [Cataclysmic Spiral Slam](#cataclysmic-spiral-slam)
-21. [Accessibility & Battery Considerations](#accessibility--battery-considerations)
+21. [Accessibility & Battery Considerations](#accessibility-battery-considerations)
 
 ---
 
@@ -692,6 +692,25 @@ The airship is a living vehicle — its haptic presence communicates its state t
 
 **Exception:** Supernova Burst Thump and Cataclysmic Spiral Slam always fire at minimum 0.7× intensity regardless of battery — these are once-per-campaign events that must land.
 
+### Visual Substitutions (Haptics Off)
+When haptics are disabled, every haptic cue must have a visual or audio equivalent so no gameplay information is lost.
+
+| Haptic Category | Visual Substitute | Audio Substitute |
+|---|---|---|
+| **Ambient (Cat. 1)** | Subtle screen-edge glow pulse | Low-frequency ambient hum |
+| **Combat (Cat. 2)** | Screen shake + red flash on damage, white flash on hit | Impact SFX at higher volume |
+| **Dramatic (Cat. 3)** | Slow-motion camera + radial blur | Orchestral swell |
+| **Cosmic (Cat. 4)** | Full-screen bloom + particle burst | Deep bass rumble + choir |
+| **Environmental (Cat. 5)** | Environmental particle increase | Spatial audio cue |
+| **UI (Cat. 6)** | Button scale animation + highlight | Click/confirm SFX |
+
+### Deaf/HOH Haptic Enhancement
+For deaf and hard-of-hearing players, haptics become a PRIMARY information channel. When the audio accessibility profile is active:
+- All frequency-based audio cues gain paired haptic patterns at +30% intensity
+- Bell Tower Synchronization mini-game adds stronger haptic rhythm cues
+- Enemy frequency indicators use distinct haptic textures (not just pitch)
+- Pipe Organ Symphony Conduction adds visual waveform overlay + haptic beat guide
+
 ### Performance Sync
 - All haptic patterns are frame-synced via `CADisplayLink` callback
 - Haptic events queued in `CHHapticPatternPlayer` — minimum 16ms granularity
@@ -709,3 +728,9 @@ The airship is a living vehicle — its haptic presence communicates its state t
 - [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — Core Haptics API implementation
 - [07_MOBILE_UX.md](07_MOBILE_UX.md) — Touch + haptic integration
 - [12_VIVID_VISUALS.md](12_VIVID_VISUALS.md) — Visual events paired with these haptics
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

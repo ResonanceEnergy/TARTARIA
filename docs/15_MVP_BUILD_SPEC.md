@@ -10,7 +10,7 @@
 **Cross-References:**
 - [00_MASTER_GDD.md](00_MASTER_GDD.md) — Full game overview
 - [10_ROADMAP.md](10_ROADMAP.md) — Development roadmap context
-- [01_WORLD_LORE.md](01_WORLD_LORE.md) — Lore foundation
+- [01_LORE_BIBLE.md](01_LORE_BIBLE.md) — Lore foundation
 - [07_MOBILE_UX.md](07_MOBILE_UX.md) — UX/Touch patterns
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Core Haptics spec
 
@@ -19,7 +19,7 @@
 ## Table of Contents
 
 1. [Vertical Slice Scope](#1-vertical-slice-scope)
-2. [Target Hardware & Performance Budgets](#2-target-hardware--performance-budgets)
+2. [Target Hardware & Performance Budgets](#2-target-hardware-performance-budgets)
 3. [Unity Project Architecture](#3-unity-project-architecture)
 4. [Core Loop Implementation](#4-core-loop-implementation)
 5. [Aether Field System](#5-aether-field-system)
@@ -29,13 +29,15 @@
 9. [Tuning Mini-Game](#9-tuning-mini-game)
 10. [Companion: Milo](#10-companion-milo)
 11. [Combat: Harmonic Combat Prototype](#11-combat-harmonic-combat-prototype)
-12. [Camera & Controls](#12-camera--controls)
-13. [Audio & Haptics Foundation](#13-audio--haptics-foundation)
-14. [Visual Pipeline: Shaders & VFX](#14-visual-pipeline-shaders--vfx)
-15. [Save & Persistence](#15-save--persistence)
+12. [Camera & Controls](#12-camera-controls)
+13. [Audio & Haptics Foundation](#13-audio-haptics-foundation)
+14. [Visual Pipeline: Shaders & VFX](#14-visual-pipeline-shaders-vfx)
+15. [Save & Persistence](#15-save-persistence)
 16. [GATE 1 Exit Criteria](#16-gate-1-exit-criteria)
 17. [Week-by-Week Sprint Plan](#17-week-by-week-sprint-plan)
 18. [Risk Register](#18-risk-register)
+19. [Appendix A: Asset Budget Summary](#appendix-a-asset-budget-summary)
+20. [Appendix B: Key Technical Decisions](#appendix-b-key-technical-decisions)
 
 ---
 
@@ -893,3 +895,9 @@ If the answer is not unanimously "yes" — iterate before proceeding to Phase 2.
 ---
 
 *This is the foundation. 12 weeks. One zone. One companion. One enemy. One wonder. If this doesn't feel like magic, nothing we add afterward will fix it. Build it right.*
+
+---
+
+**Document Status:** FINAL  
+**Author:** Nathan / Resonance Energy  
+**Last Updated:** March 25, 2026

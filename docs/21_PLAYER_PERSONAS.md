@@ -23,7 +23,7 @@
 5. [Persona 3: The Session Sprinter](#5-persona-3-the-session-sprinter)
 6. [Persona 4: The Puzzle Maestro](#6-persona-4-the-puzzle-maestro)
 7. [Persona 5: The Completionist](#7-persona-5-the-completionist)
-8. [Audience Sizing & Market Context](#8-audience-sizing--market-context)
+8. [Audience Sizing & Market Context](#8-audience-sizing-market-context)
 9. [Persona-to-Feature Priority Map](#9-persona-to-feature-priority-map)
 10. [Monetization Acceptance by Persona](#10-monetization-acceptance-by-persona)
 11. [Retention Hooks by Persona](#11-retention-hooks-by-persona)
@@ -542,6 +542,6 @@ This means the MVP must nail: fast session loops, compelling Milo/Anastasia narr
 
 ---
 
-**Document Status:** DRAFT
+**Document Status:** FINAL
 **Author:** Nathan / Resonance Energy
-**Last Updated:** March 24, 2026
+**Last Updated:** March 25, 2026

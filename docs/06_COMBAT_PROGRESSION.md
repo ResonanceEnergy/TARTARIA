@@ -8,13 +8,13 @@
 1. [Combat Philosophy](#1-combat-philosophy)
 2. [Core Combat System](#2-core-combat-system)
 3. [Giant Mode](#3-giant-mode)
-4. [Weapons & Resonance Tools](#4-weapons--resonance-tools)
+4. [Weapons & Resonance Tools](#4-weapons-resonance-tools)
 5. [Enemy Bestiary](#5-enemy-bestiary)
 6. [Skill Trees](#6-skill-trees)
 7. [Cross-Class Synergies](#7-cross-class-synergies)
 8. [Progression Economy](#8-progression-economy)
 9. [Boss Encounters](#9-boss-encounters)
-10. [Difficulty & Accessibility](#10-difficulty--accessibility)
+10. [Difficulty & Accessibility](#10-difficulty-accessibility)
 
 ---
 
@@ -444,6 +444,6 @@ Players who invest in two trees unlock **Synergy Abilities:**
 
 ---
 
-**Document Status:** DRAFT  
+**Document Status:** FINAL  
 **Cross-References:** `02_AETHER_ENERGY_SYSTEM.md`, `04_ARCHITECTURE_GUIDE.md`, `05_CHARACTERS_DIALOGUE.md`  
-**Last Updated:** March 23, 2026
+**Last Updated:** March 25, 2026
