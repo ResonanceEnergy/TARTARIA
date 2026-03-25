@@ -6,7 +6,30 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ## [1.0.0] — 2026-03-25
 
-**Documentation Complete — 54 documents, 30 main docs + 10 appendices + 10 DLC + 4 support files.**
+**Documentation Complete — 55 documents, 30 main docs + 10 appendices + 10 DLC + 5 support files.**
+
+### Phase 7 — Formatting Standardization
+- Fixed title separator in `00_MASTER_GDD.md` and `README.md` (`:` → `—`)
+- Synced Master GDD version to 1.0.0
+- Fixed typo in `DLC_10_TRUE_TIMELINE.md` (`mirrorss` → `mirrors`)
+- Fixed typo in `12_VIVID_VISUALS.md` (`consumingthe` → `consuming the`)
+- TOC audit: 54 PASS / 0 FAIL
+
+### Phase 8 — Document Statistics
+- Created `docs/DOC_STATISTICS.md` — comprehensive word count report
+- 218,085 words across 54 documents, categorized by type with quality metrics
+
+### Phase 9 — Comprehensive Validator
+- Upgraded `_toc_audit.py` from TOC-only checker to 5-pass validation suite
+- Checks: TOC parity, inter-doc link resolution, FINAL footer, format/typos, word counts
+- Added `--toc` (TOC-only) and `--json` (machine-readable) CLI flags
+- Fixed `A_GLOSSARY.md` footer: COMPILED REFERENCE → FINAL
+- Added FINAL footer to `DOC_STATISTICS.md`
+- All 55 docs pass all checks
+
+### Phase 10 — Release Tag
+- Pushed all commits to `origin/main`
+- Tagged `v1.0.0` — documentation complete
 
 ### Release Package
 - Version bump v0.2.0 → v1.0.0
