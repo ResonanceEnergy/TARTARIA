@@ -7,7 +7,7 @@
 
 **Cross-References:**
 - [09_TECHNICAL_SPEC.md §9](09_TECHNICAL_SPEC.md) — Save data structure, auto-save policy, save slots
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Session interruption recovery, 10-second resume
+- [07_PC_UX.md](07_PC_UX.md) — Session interruption recovery, 10-second resume
 - [22_DIALOGUE_BRANCHING.md](22_DIALOGUE_BRANCHING.md) — Choice state variables (WorldChoice, CompanionLoyalty, HarmonyProfile)
 - [19_ECONOMY_BALANCE.md](19_ECONOMY_BALANCE.md) — Resource types and balances
 - [06_COMBAT_PROGRESSION.md](06_COMBAT_PROGRESSION.md) — Skill tree and progression state
@@ -37,7 +37,7 @@
 
 ### Core Principles
 
-1. **Never lose player progress.** A phone call, a crash, a dead battery — the player resumes exactly where they left off. Always.
+1. **Never lose player progress.** An alt-tab, a crash, a power outage — the player resumes exactly where they left off. Always.
 2. **Offline-first, cloud-enhanced.** The game must function identically with no internet. Cloud is for sync, backup, and cross-device — not for operation.
 3. **Invisible persistence.** Players should never think about saving. It just works.
 4. **Tamper-resistant, not tamper-proof.** Protect against casual cheating and data corruption. Don't wage war on advanced modders — they're not our threat.
@@ -57,12 +57,12 @@ App Launch
 ├── GAMEPLAY (auto-save running)
 │   ├── Every 10 seconds: dirty flag check
 │   ├── Trigger events: zone transition, quest complete, build placed
-│   ├── App backgrounding: emergency serialize (must complete in <2s)
-│   └── Low battery (<10%): immediate full save + cloud push
+│   ├── Alt-tab/minimize: emergency serialize (must complete in <2s)
+│   └── Manual save: immediate full save + cloud push
 │
-└── App Terminate / Background
+└── App Terminate / Alt-Tab
     ├── Final save written
-    ├── Cloud push queued (NSURLSession background task)
+    ├── Cloud push queued (background thread upload)
     └── State: fully recoverable
 ```
 
@@ -79,8 +79,8 @@ Expanding on the structure defined in [09_TECHNICAL_SPEC.md §9.1](09_TECHNICAL_
   "header": {
     "schema_version": 1,
     "game_version": "1.0.0",
-    "platform": "ios",
-    "device_model": "iPhone17,1",
+    "platform": "windows",
+    "device_model": "PC",
     "save_slot": 0,
     "created_utc": "2027-01-15T14:32:00Z",
     "modified_utc": "2027-03-22T09:15:30Z",
@@ -271,7 +271,7 @@ Expanding on [09_TECHNICAL_SPEC.md §9.2](09_TECHNICAL_SPEC.md):
 
 | Trigger | Save Type | Scope | Priority |
 |---|---|---|---|
-| **App backgrounding** | Emergency full | All blocks | **Critical** (must complete <2s) |
+| **Alt-tab / minimize** | Emergency full | All blocks | **Critical** (must complete <2s) |
 | **Low battery (<10%)** | Emergency full + cloud push | All blocks | **Critical** |
 | **Zone transition** | Full save | All blocks | High |
 | **Quest complete** | Full save | All blocks | High |
@@ -301,10 +301,10 @@ SaveStateSystem (ECS, LateSimulation Group)
 │   ├── Write to disk (background thread via NativeArray)
 │   └── Clear dirty flags
 │
-└── Emergency save (app backgrounding):
+└── Emergency save (alt-tab / minimize):
     ├── Serialize ALL blocks (ignore dirty flags)
     ├── Synchronous disk write (must complete)
-    └── Queue cloud upload via NSURLSession background task
+    └── Queue cloud upload via background thread
 ```
 
 ### 3.3 Save Slot Management
@@ -325,8 +325,8 @@ SaveStateSystem (ECS, LateSimulation Group)
 
 | Platform | Path | Backup |
 |---|---|---|
-| **iOS** | `Application Support/saves/` | iCloud backup included |
-| **iOS (settings)** | `UserDefaults` (non-save settings only) | iCloud key-value store |
+| **Windows** | `%AppData%/Tartaria/saves/` | Steam Cloud backup |
+| **Windows (settings)** | `%AppData%/Tartaria/settings.json` | Steam Cloud key-value store |
 
 ### 4.2 Serialization Format
 
@@ -335,7 +335,7 @@ SaveStateSystem (ECS, LateSimulation Group)
 | **In-memory** | ECS component data (native structs) | Zero-copy gameplay access |
 | **Serialization** | MessagePack binary | 40% smaller than JSON, faster parse |
 | **Compression** | LZ4 block compression | Fast decompress (<5ms for 500KB) |
-| **Encryption** | AES-256-GCM | Device-bound key from Keychain |
+| **Encryption** | AES-256-GCM | Device-bound key via Windows DPAPI |
 | **Disk** | Single file per save slot | Atomic write via temp + rename |
 
 ### 4.3 Write Safety
@@ -344,10 +344,10 @@ SaveStateSystem (ECS, LateSimulation Group)
 Atomic Save Write:
 1. Serialize to byte buffer (background thread)
 2. Compress with LZ4
-3. Encrypt with AES-256-GCM (key from iOS Keychain)
+3. Encrypt with AES-256-GCM (key via Windows DPAPI)
 4. Write to temp file: saves/slot_0.tmp
 5. fsync() temp file
-6. Rename temp → saves/slot_0.sav (atomic on APFS)
+6. Rename temp → saves/slot_0.sav (atomic on NTFS)
 7. Delete temp if rename succeeded
 ```
 
@@ -382,11 +382,11 @@ Local Save (MessagePack/LZ4/AES)
 │   ├── Binary payload: Cloud Storage gs://tartaria-saves/{uid}/{slot}.bin
 │   └── Purpose: cross-device sync, server validation, analytics
 │
-└── Secondary Cloud: iCloud Key-Value Store
+└── Secondary Cloud: Steam Cloud
     ├── Key: "save_slot_{N}_hash"
     ├── Value: SHA-256 of latest save
     ├── Purpose: fast "is cloud newer?" check without full download
-    └── Fallback: iCloud Documents for full save if Firebase unreachable
+    └── Fallback: Steam Cloud file storage for full save if Firebase unreachable
 ```
 
 ### 5.2 Sync Flow
@@ -397,10 +397,10 @@ On Save:
 2. If online:
    a. Upload save binary to Cloud Storage
    b. Update Firestore metadata document
-   c. Update iCloud key-value hash
+   c. Update Steam Cloud hash
 3. If offline:
    a. Queue upload in pending_sync table (SQLite)
-   b. iOS Background Task will retry when connectivity returns
+   b. Background thread will retry when connectivity returns
 
 On Launch:
 1. Load local save immediately (show game)
@@ -409,8 +409,8 @@ On Launch:
    a. Local newer → push to cloud
    b. Cloud newer → download + conflict resolution (§7)
    c. Equal → no action
-4. If Firebase unreachable → check iCloud hash
-   a. Hash mismatch → download from iCloud Documents
+4. If Firebase unreachable → check Steam Cloud hash
+   a. Hash mismatch → download from Steam Cloud
    b. Hash match → local is current
 ```
 
@@ -422,7 +422,7 @@ On Launch:
 | **Delta compression** | Binary diff against last synced version |
 | **Hash comparison** | SHA-256 compare before download (avoid redundant pulls) |
 | **Batch upload** | Aggregate incremental saves; push full save at checkpoint events only |
-| **Background transfer** | iOS NSURLSession for large uploads (survives app suspend) |
+| **Background transfer** | Background thread for large uploads (survives alt-tab) |
 
 **Target:** <50 KB per cloud sync event (average). <500 KB for full save push.
 
@@ -475,7 +475,7 @@ pending_sync.db (SQLite, local)
 | Scenario | Example | Resolution |
 |---|---|---|
 | **Same device, stale cloud** | Player was offline, cloud has old save | Local wins (newer modified_utc) |
-| **Device switch, cloud newer** | Played on iPad, now on iPhone | Cloud wins (newer modified_utc) |
+| **Device switch, cloud newer** | Played on desktop, now on laptop | Cloud wins (newer modified_utc) |
 | **Simultaneous play** | Two devices played offline, both push | Merge by block (see §7.2) |
 | **Corrupted local** | Checksum mismatch on local load | Cloud wins (automatic restore) |
 | **Corrupted cloud** | Server-side data integrity failure | Local wins (report to analytics) |
@@ -559,7 +559,7 @@ On Load:
 | Protection | Mechanism |
 |---|---|
 | **Checksum** | SHA-256 of serialized payload stored in header |
-| **Encryption** | AES-256-GCM, key in iOS Keychain (hardware-backed on Secure Enclave devices) |
+| **Encryption** | AES-256-GCM, key via Windows DPAPI (hardware-backed via TPM if available) |
 | **Atomic writes** | Temp + rename prevents partial corruption |
 | **Double buffer** | Previous save kept as `.bak` until next successful save |
 
@@ -569,7 +569,7 @@ On Load:
 |---|---|---|
 | **Play time sanity** | On cloud sync | Flag if play_time increases >24h between syncs |
 | **Resource rate limits** | On Aether harvest sync | Reject if harvest exceeds theoretical maximum for time window |
-| **IAP receipt verification** | On purchase | Apple receipt validation before granting premium currency |
+| **IAP receipt verification** | On purchase | Steam transaction validation before granting premium currency |
 | **Impossible state detection** | On cloud sync | Flag if Moon 10 reached but Moon 5 not completed |
 | **Building count vs time** | On cloud sync | Flag if 100 buildings placed in 1 hour of play |
 | **Leaderboard score bounds** | On RS submission | Reject scores exceeding mathematical maximum |
@@ -581,7 +581,7 @@ On Load:
 | **Low** | Unusual resource rates | Log to analytics, monitor |
 | **Medium** | Impossible state detected | Flag account, defer leaderboard submission |
 | **High** | Modified save binary (checksum mismatch + no valid migration path) | Restore last valid cloud save, notify player |
-| **Critical** | IAP receipt forgery | Revoke items, report to Apple |
+| **Critical** | IAP receipt forgery | Revoke items, report to Steam |
 
 **Design Principle:** Never ban or punish without manual review. False positives are worse than undetected cheating. Log, flag, review.
 
@@ -593,11 +593,11 @@ On Load:
 
 | Component | Size | Location |
 |---|---|---|
-| **5 save slots** | ~635 KB total | Application Support/saves/ |
-| **1 backup per slot** | ~635 KB total | Application Support/saves/backup/ |
-| **Pending sync queue** | <100 KB (SQLite) | Application Support/sync/ |
-| **Settings** | <10 KB | UserDefaults |
-| **Migration backups** | ~1.2 MB (2 versions retained) | Application Support/saves/migration/ |
+| **5 save slots** | ~635 KB total | %AppData%/Tartaria/saves/ |
+| **1 backup per slot** | ~635 KB total | %AppData%/Tartaria/saves/backup/ |
+| **Pending sync queue** | <100 KB (SQLite) | %AppData%/Tartaria/sync/ |
+| **Settings** | <10 KB | %AppData%/Tartaria/settings.json |
+| **Migration backups** | ~1.2 MB (2 versions retained) | %AppData%/Tartaria/saves/migration/ |
 | **Total save footprint** | **~2.6 MB** | |
 
 ### 10.2 Cloud Storage (per user)
@@ -606,7 +606,7 @@ On Load:
 |---|---|---|
 | **Active save slots** | ~635 KB | Cloud Storage |
 | **Firestore metadata** | ~5 KB | Firestore |
-| **iCloud key-value** | <1 KB | iCloud KVS |
+| **Steam Cloud KVS** | <1 KB | Steam Cloud KVS |
 | **Historical backups (30 days)** | ~10 MB | Cloud Storage (lifecycle rule) |
 | **Total cloud per user** | **~11 MB** | |
 | **Cost at 500K users** | ~5.5 TB | ~$120/month (Cloud Storage) |
@@ -620,7 +620,7 @@ On Load:
 | Disaster | Recovery Path |
 |---|---|
 | **Corrupted local save** | Load from cloud → if cloud also corrupt → load checkpoint → if all fail → archived backup |
-| **Lost device** | Sign in on new device → pull cloud save → continue |
+| **Lost device** | Sign in on new PC → pull cloud save → continue |
 | **Cloud outage** | Local saves unaffected; queue sync for when cloud returns |
 | **Accidental deletion (player)** | Archived deleted saves kept 30 days in cloud |
 | **App reinstall** | Cloud save detected on first launch; prompt to restore |
@@ -633,7 +633,7 @@ Load Attempt Order:
 1. Local save (slot_N.sav)
 2. Local backup (slot_N.bak)
 3. Cloud primary (Firebase Cloud Storage)
-4. Cloud secondary (iCloud Documents)
+4. Cloud secondary (Steam Cloud)
 5. Migration backup (slot_N_v{X}.bak)
 6. Checkpoint save (checkpoint.sav)
 7. Last resort: new game with "We're sorry" bonus pack (100 Aether Shards + cosmetic)
@@ -664,7 +664,7 @@ SaveStateSystem (SystemBase, LateSimulationSystemGroup)
 ├── OnAppBackground():
 │   ├── Force full serialize (all blocks, ignore dirty)
 │   ├── Synchronous disk write (blocking)
-│   └── Queue cloud upload via NSURLSession
+│   └── Queue cloud upload via background thread
 │
 └── OnDestroy():
     └── Final save + cleanup
@@ -700,7 +700,7 @@ struct SaveBlock : ISharedComponentData {
 | **Incremental serialize (1 dirty block)** | <2ms | Burst-compiled NativeArray copy |
 | **Full serialize (all blocks)** | <8ms | Parallel Burst jobs per block |
 | **LZ4 compression** | <3ms | Native LZ4 via Unity.Collections |
-| **AES encryption** | <2ms | CommonCrypto (hardware-accelerated on A-series) |
+| **AES encryption** | <2ms | Windows CNG (hardware-accelerated via AES-NI) |
 | **Disk write** | <5ms | Background thread, atomic rename |
 | **Total emergency save** | **<20ms** | Well within 2-second background budget |
 
@@ -727,8 +727,8 @@ struct SaveBlock : ISharedComponentData {
 ### Platform-Specific Edge Cases
 | Scenario | Behavior |
 |---|---|
-| iOS Low Power Mode active | Reduce auto-save frequency from every 30s to every 60s; disable cloud push |
-| iCloud account signed out mid-sync | Local save always authoritative; queue cloud push for next sign-in |
+| PC Low Power Mode / laptop battery saver | Reduce auto-save frequency from every 30s to every 60s; disable cloud push |
+| Steam account signed out mid-sync | Local save always authoritative; queue cloud push for next sign-in |
 | Device storage full (cannot write) | Keep last valid save in memory; show non-blocking warning; retry on space freed |
 | App update changes save schema | Migration runs on first load; `SaveSchemaVersion` field triggers sequential v1→v2→v3 migrations |
 | Time zone change (travel / DST) | All timestamps stored as UTC epoch; 17th Hour Alignment calculated server-side |

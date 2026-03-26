@@ -1,0 +1,27 @@
+{
+    "name": "Tartaria.Integration",
+    "rootNamespace": "Tartaria.Integration",
+    "references": [
+        "Tartaria.Core",
+        "Tartaria.Gameplay",
+        "Tartaria.AI",
+        "Tartaria.Audio",
+        "Tartaria.Camera",
+        "Tartaria.Input",
+        "Tartaria.UI",
+        "Tartaria.Save",
+        "Unity.Entities",
+        "Unity.Collections",
+        "Unity.Mathematics",
+        "Unity.Transforms"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

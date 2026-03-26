@@ -7,7 +7,7 @@
 > *Mini-games are not diversions in Tartaria — they ARE the Tartarian technology. Pipe organ conduction, harmonic rock cutting, cymatic water tuning, bell tower synchronization, resonance rail alignment, and fractal corruption purge are the actual tools of a civilization that built with sound, light, and sacred geometry. Every mini-game has depth, mastery progression, and tangible impact on the world.*
 
 **Cross-References:**
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Touch control standards & session design
+- [07_PC_UX.md](07_PC_UX.md) — Input control standards & session design
 - [03C_MOON_MECHANICS_DETAILED.md](03C_MOON_MECHANICS_DETAILED.md) — Moon context for each game
 - [02_AETHER_ENERGY_SYSTEM.md](02_AETHER_ENERGY_SYSTEM.md) — Aether reward integration
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic profiles for each mini-game
@@ -345,7 +345,7 @@ The fractal interior is the most visually unique space in the game:
 
 *See also:*
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic profiles for each mini-game
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Touch control standards
+- [07_PC_UX.md](07_PC_UX.md) — Input control standards
 - [11_SCRIPTED_CLIMAXES.md](11_SCRIPTED_CLIMAXES.md) — Climaxes using these mechanics
 
 ---

@@ -4,6 +4,84 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [1.4.0] — 2025-07-25
+
+**Unity 6000.3.6f1 Migration & Batch Setup Execution**  
+*Project compiles and setup wizard runs headlessly — scene, ScriptableObjects, and test geometry all generated*
+
+### Fixed
+- **manifest.json** — Corrected URP package name from `com.unity.rendering.universal` to `com.unity.render-pipelines.universal` (17.3.0) for Unity 6000.3.x compatibility
+- **CombatBridge.cs** — Fixed `DamageEvent` field name: `DamageType` → `Type` (2 occurrences) to match `CombatComponents.cs` definition
+- **DebugOverlay.cs** — Replaced `_em.Debug != null` (struct, not nullable in Entities 1.4.2) with `_world.IsCreated` check
+- **Tartaria.Editor.asmdef** — Added missing `Unity.Collections` reference required by Entities 1.4.2
+
+### Changed
+- **ProjectVersion.txt** — Updated from `6000.0.37f1` to `6000.3.6f1` (installed version)
+- **manifest.json** — Auto-upgraded 11 packages for Unity 6000.3.6f1: Entities 1.3.5→1.4.2, Burst 1.8.18→1.8.27, Collections 2.5.1→2.6.2, Physics 1.3.5→1.4.2, InputSystem 1.11.2→1.18.0, Addressables 2.3.1→2.8.0, VFX Graph 17.0.3→17.3.0, and others
+- **TextMeshPro** removed from manifest (merged into `com.unity.ugui` in Unity 6000.3.x; TMPro namespace still available)
+
+### Added
+- **ProjectSetupWizard.RunSetup()** — Batch-mode-safe entry point that skips `EditorUtility.DisplayDialog` calls when running headless
+- **Echohaven_VerticalSlice.unity** — Generated via batch mode: 13 game managers, Player capsule, CameraRig, test geometry (3 buildings, 6 pillars, 4 mud patches, 3 enemy spawns, 1 Aether vent)
+- **ScriptableObject configs** — Generated: 3 building configs (CrystalSpire, HarmonicFountain, StarDome), 2 performance profiles, TartariaConstants
+- **Asset directories** — Prefabs, Prefabs/Buildings, Materials, VFX, Audio/Music, Audio/SFX, Textures, Models
+
+---
+
+## [1.3.0] — 2025-07-25
+
+**Unity Deep Audit — Compilation & Runtime Fixes**  
+*10 files changed — comprehensive code audit, 6 critical fixes*
+
+### Fixed
+- **Tartaria.AI.asmdef** — Added missing `Tartaria.Gameplay` assembly reference (compilation blocker: AI systems use `PlayerTag`, `EnemyAI`, `MudGolem` from Gameplay)
+- **GameBootstrap.cs** — Now creates `PlayerTag` entity with `LocalTransform` in ECS world; without this, `DiscoverySystem`, `CompanionBehaviorSystem`, and `EnemyAISystem` would never execute (`RequireForUpdate<PlayerTag>`)
+- **CombatSystem.cs / EnemySpawnSystem** — Spawned enemies now receive `EnemyAI` component (with state, patrol, engage radius) and `LocalToWorld` for rendering; previously spawned entities had no AI behavior and no transform
+- **GameLoopController.cs** — `PollResonanceScore()` now distributes RS to `ZoneController.UpdateRS()` alongside HUD/Music/VFX; zone atmosphere was never updating
+- **GameStateManager.cs** — Replaced thread-unsafe `??=` singleton pattern with `Lazy<T>` for reliable initialization
+- **CombatBridge.cs** — Added `OnDestroy()` that cleans up the player combat ECS entity; previously leaked across scene loads
+
+### Changed
+- **PlayerTag** moved from `Tartaria.Gameplay.BuildingSystem` to `Tartaria.Core.ResonanceComponents` — avoids circular dependency (Core ← Gameplay) and makes it available to `GameBootstrap`
+- **EnemyAI + EnemyAIState** moved from `Tartaria.AI.AIComponents` to `Tartaria.Gameplay.CombatComponents` — avoids circular dependency (Gameplay ↔ AI) since AI already references Gameplay
+- **EnemyAISystem.cs** — Added `using Tartaria.Core;` for `PlayerTag` resolution after namespace move
+
+---
+
+## [1.2.0] — 2025-07-24
+
+**Integration Layer — 8 new bridging scripts wiring all systems together**
+
+---
+
+## [1.1.0] — 2026-03-26
+
+**Platform Migration: iOS → PC-First (Steam)**  
+*30+ files changed — complete platform pivot from iOS/mobile-first to PC/Steam-first*
+
+### Changed
+- **Primary platform** changed from iOS (iPhone 17+) to **Windows 10/11 (Steam)**; iOS retained as future secondary port
+- `00_MASTER_GDD.md` — Platform table, monetization model, dev overview rewritten for PC/Steam
+- `07_MOBILE_UX.md` → `07_PC_UX.md` — Complete rewrite: touch/gesture → keyboard+mouse & gamepad; session design updated for desktop
+- `09_TECHNICAL_SPEC.md` — Metal 3 → Vulkan/DX12; MetalFX → FSR 2/DLSS/XeSS; iPhone device matrix → PC GPU tiers; build pipeline → Steamworks
+- `10_ROADMAP.md` — TestFlight → Steam Early Access; App Store launch → Steam release; risk assessment updated
+- `14_HAPTIC_FEEDBACK.md` — Core Haptics/Taptic Engine → DualSense adaptive triggers & Xbox impulse triggers
+- `15_MVP_BUILD_SPEC.md` — Target hardware → PC GPU tiers; performance budgets updated; project folders restructured
+- `16_PLAYTHROUGH_PROTOTYPES.md` — Device matrix → PC hardware tiers; technical requirements updated
+- `21_PLAYER_PERSONAS.md` — iOS market sizing → Steam/PC market sizing
+- `23_LOCALIZATION.md` — App Store references → Steam Store
+- `24_ACCESSIBILITY.md` — VoiceOver/UIAccessibility → Windows Narrator/NVDA/JAWS; iOS Switch Control → Xbox Adaptive Controller; device matrix → PC tiers
+- `25_SAVE_SYSTEM.md` — iCloud → Steam Cloud; iOS Keychain → Windows DPAPI; storage paths → %LOCALAPPDATA%
+- `28_ACHIEVEMENTS.md` — Game Center → Steam Achievements
+- `29_PRODUCTION_PIPELINE.md` — Xcode/TestFlight/Instruments → Visual Studio/Steam/Unity Profiler; Core Haptics AHAP → gamepad haptic patterns
+- `30_MARKETING_POSITIONING.md` — App Store featuring → Steam featuring; ASO → Steam Store Optimization; press targets updated
+- `README.md` — Vision, tech stack, project structure, and navigation table updated for PC-first
+- `appendices/A_GLOSSARY.md` — Dynamic Island, Live Activities, MetalFX, ProMotion, Taptic Engine → PC equivalents
+- `appendices/D_CONTROLS.md` — Title & content updated from iOS touch to PC keyboard+mouse & gamepad
+- Scattered iOS/mobile references updated across 02, 03, 04, 08, 12, 13, 19 and other docs
+
+---
+
 ## [1.0.0] — 2026-03-25
 
 **Documentation Complete — 55 documents, 30 main docs + 10 appendices + 10 DLC + 5 support files.**
@@ -89,7 +167,7 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 - `25_SAVE_SYSTEM.md` — Persistence, cloud sync & offline-first design
 - `26_LEVEL_DESIGN.md` — Zone layout, traversal & encounter pacing
 - `27_TUTORIAL_ONBOARDING.md` — First-session script & teaching systems
-- `28_ACHIEVEMENTS.md` — Achievement taxonomy, rewards & Game Center
+- `28_ACHIEVEMENTS.md` — Achievement taxonomy, rewards & Steam Achievements
 - `29_PRODUCTION_PIPELINE.md` — Art/audio pipeline, outsource & tool chain
 - `30_MARKETING_POSITIONING.md` — Competitive landscape & launch strategy
 
@@ -147,13 +225,13 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 - `04_ARCHITECTURE_GUIDE.md` — Zones, buildings, sacred geometry
 - `05_CHARACTERS_DIALOGUE.md` — Characters, banter, dialogue trees
 - `06_COMBAT_PROGRESSION.md` — Combat systems & skill progression
-- `07_MOBILE_UX.md` — Touch controls, session flow, UX
+- `07_PC_UX.md` — PC controls, session flow, UX
 - `08_MONETIZATION.md` — F2P model, events, economy
-- `09_TECHNICAL_SPEC.md` — Unity 6 iOS architecture & optimization
+- `09_TECHNICAL_SPEC.md` — Unity 6 PC architecture & optimization
 - `10_ROADMAP.md` — Phases, budget, timeline
 - `12_VIVID_VISUALS.md` — Key visual moments & cinematography
 - `13_MINI_GAMES.md` — 6 interactive mini-games
-- `appendices/D_CONTROLS.md` — Touch control reference & gestures
+- `appendices/D_CONTROLS.md` — PC input reference & keybindings
 - `appendices/E_METRICS.md` — KPI, analytics & performance budgets
 - `README.md` — Project overview
 - `_toc_audit.py` — TOC parity validation script
@@ -166,4 +244,4 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
-*The Aether is pocket-sized and ready to awaken.*
+*The Aether is ready to awaken.*

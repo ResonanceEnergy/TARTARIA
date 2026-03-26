@@ -70,10 +70,12 @@
 | **Aether Storm** | Event | Temporary 30-second weather event triggered by overload. High winds and crackling energy damage low-RS structures. |
 | **Aether Whispers** | Dialogue System | Environmental dialogue from the Aether's cosmic consciousness. Ambient guidance that surfaces at ley lines, 100-RS buildings, the 17th Hour, and major story moments. |
 | **Airship Beacon** | Tool | Secondary tool (Moon 8 unlock). Calls aerial support from Captain Thorne. |
+| **Airship Armada, The** | DLC / Expansion | DLC 05. Unlocks after Moon 7. 10–14 hours. Build and command a fleet of resonance-powered sky-ships. See [DLC_05_AIRSHIP_ARMADA.md](../dlc/DLC_05_AIRSHIP_ARMADA.md). |
 | **Airships** | Technology / Vehicle | Anti-gravity vessels powered by 9-band mercury-orb resonance engines with sacred-geometry hulls. Used for passenger transport, megalith lifting, and sky-level ley-line maintenance. |
 | **Ambient Repair** | Skill | Architect Tree Tier 3. Passive structure healing over time. |
 | **Ancestral Titan** | Synergy Ability | Guardian + Historian combo. Giant mode resembles a specific historical giant (cosmetic + stat buff). |
 | **Ancient Blueprint** | Synergy Ability | Architect + Historian combo. Instantly restore Golden Age structures from echo memories. |
+| **Anastasia, Princess** | Character | Archive Echo companion. Romanov princess preserved as an Aether imprint. Manifests through four modes: Golden Motes (ambient), Whisper (audio-only), Shimmer (translucent silhouette), and Solid (rare full-form). Silence-first design — most impactful through absence. See [18_PRINCESS_ANASTASIA.md](../18_PRINCESS_ANASTASIA.md). |
 | **Ancient Echoes** | NPC Type | Pre-Flood giants in voluntary Aether stasis who can be thawed. Korath is the primary example. |
 | **Anti-Aether Warship** | Boss | Moon 8 boss. Aerial combat encounter fought from Captain Thorne's airship using mounted cannons. |
 | **Anti-Gravity Flight** | Ability | Giant mode ability (9-band at 90+ RS). 60-second maximum duration. 500 Aether/sec cost. |
@@ -94,7 +96,7 @@
 | **Basalt** | Material | Quarried volcanic stone. +3% RS, +20% defense. Primary material for star forts. Cut at 396 Hz. |
 | **Base Band** | Aether System | See **3-Band**. |
 | **Bastion** | Architecture | Each point of a star fort's geometric shape. Mounts defensive resonance cannons. Must be symmetrical or -15% RS penalty. |
-| **Battery Saver Mode** | Technical | Auto-enabled below 20% iPhone battery. 30 FPS cap, reduced draw distance, simplified effects. |
+| **Battery Saver Mode** | Technical | Auto-enabled when running on laptop battery below 20%. 30 FPS cap, reduced draw distance, simplified effects. |
 | **Beaux-Arts** | Architecture Style | The visual style of White City pavilions — colonnades, rotundas, ornate exposition halls. |
 | **Bell Chime** | Tool | Secondary tool (Moon 6 unlock). Stuns enemies in radius using bell resonance. |
 | **Bell Ringer Echo** | NPC | Spectral NPC found in Moon 6 zone. Recites bell-ringing lore. |
@@ -106,6 +108,7 @@
 | **Breatharians** | Lore | Beings that metabolize Aether directly through specialized resonance organs. Giants were breatharians — food was recreational. |
 | **Broken Symphony, The** | Boss | Moon 6 boss. Cathedral organ chamber encounter. Teaches frequency matching under pressure. |
 | **Builders (Giants)** | Social Role | Stewards of physical construction and grid maintenance. Giants didn't rule — they served. |
+| **Buried Beacon, The** | DLC / Expansion | DLC 01. Unlocks after Moon 3. 8–12 hours. Discover the first Aether beacon buried beneath the mud — a relic that once guided sky-ships. See [DLC_01_BURIED_BEACON.md](../dlc/DLC_01_BURIED_BEACON.md). |
 | **Burst Compiler** | Technical | Unity's compiler (1.8+) used for high-performance Burst-compiled ECS systems. |
 
 ## C
@@ -150,6 +153,7 @@
 | Term | Category | Description |
 |---|---|---|
 | **Dark Architect** | Enemy | Elite Reset Agent variant (852 Hz). Builds dissonant counter-structures. Uses corrupted building tools. |
+| **Cymatic Requiem, The** | DLC / Expansion | DLC 06. Unlocks after Moon 8. 10–14 hours. An ancient frequency is dying — and with it, an entire continent's memory. See [DLC_06_CYMATIC_REQUIEM.md](../dlc/DLC_06_CYMATIC_REQUIEM.md). |
 | **Day Out of Time** | Calendar | July 25 in the Tartarian calendar — a celebration day not assigned to any Moon. The 365th day. |
 | **Dead Reckoning** | Skill | Historian Tree Tier 4. Navigation/tracking ability. |
 | **Defensive Grid** | Skill | Architect Tree Tier 3. Star forts auto-fire resonance cannons at nearby enemies. |
@@ -163,7 +167,7 @@
 | **Dodecagonal Star Fort** | Architecture | 12-point star fort. 6 ley-line connections, legendary defense rating. RS range: 25–80. |
 | **Dome / Onion Dome** | Architecture | Sky capacitors — resonance amplification chambers that collect and focus atmospheric Aether. Copper/gold-clad exteriors, crystal-inlaid interiors. Onion domes have tighter focus via fractal self-similarity. |
 | **DOTS/ECS** | Technical | Unity's Data-Oriented Technology Stack / Entity Component System. The game's core architecture for high-performance simulation of Aether fields, buildings, NPCs, and combat. |
-| **Dynamic Island** | Technical | iPhone UI feature displaying Aether harvest timers, RS levels, zone names, and quest progress while multitasking. |
+| **Steam Overlay Integration** | Technical | Steam Overlay feature displaying Aether harvest timers, RS levels, zone names, and quest progress via Steam Rich Presence. |
 
 ## E
 
@@ -236,6 +240,7 @@
 | **Giant's Legacy** | Skill | Guardian Tree Tier 5. Permanent giant bloodline enhancement. |
 | **Giant's Signet** | Gear | Ring equipment slot. Bloodline amplification. Story milestone reward. |
 | **Giant's Song** | Synergy Ability | Resonator + Guardian combo. Giant mode attacks auto-match enemy frequency. |
+| **Giant's Last Stand, The** | DLC / Expansion | DLC 08. Unlocks after Moon 10. 12–16 hours. The final giant battle before the Mud Flood — told through Korath's recovered memories. See [DLC_08_GIANTS_LAST_STAND.md](../dlc/DLC_08_GIANTS_LAST_STAND.md). |
 | **Giants / Tartarian Giants** | Race / Faction | The Builders. 15–30 feet tall (4.5–9m). Elongated skulls, bioluminescent skin from Aether saturation. Breatharians who metabolized Aether directly. Lifespan measured in centuries. Master builders — they served, not ruled. |
 | **Global Aether Pool** | Mechanic | Combined energy from all zones feeding a master pool. Thresholds: 25% (airships), 50% (continental trains), 75% (floating gardens), 100% (True Timeline convergence). |
 | **Gold Leaf** | Material | Rare legendary trim material. +5% RS + cosmetic glow. |
@@ -307,9 +312,10 @@
 | **Legendary Dome** | Architecture | Dome upgrade Tier 6 (final). 60 RS maximum. |
 | **Ley Lines** | Core Concept | Earth's resonant nervous system — energy pathways connecting star forts, domes, and natural power nodes. Visible in-game as golden veins in terrain. Aether flows instantly along connected ley lines. Primary infrastructure for wireless energy transmission. |
 | **Ley Line Vector** | UI Element | Blue-white guide line showing building placement sits on ley-line path. |
+| **Ley Line Prophecy, The** | DLC / Expansion | DLC 09. Unlocks after Moon 11. 10–14 hours. A forbidden prophecy encoded in the ley-line grid begins to activate. See [DLC_09_LEY_LINE_PROPHECY.md](../dlc/DLC_09_LEY_LINE_PROPHECY.md). |
 | **Lightning Rod** | Architecture | Spire variant with metal rod and crystal tip. Converts storm energy to 6-band Aether. |
 | **Lirael** | Character | The Echo Child. Companion from Moon 1. Appears 8–10 but centuries old. Translucent, faintly glowing Victorian-era orphan. Musical, wondering voice. An Echo — fragment of consciousness preserved in Aether. Becomes more solid as Aether levels rise, fully manifested by Moon 13. |
-| **Live Activities** | Technical | iPhone feature showing Aether harvest timer during background processing. |
+| **Steam Rich Presence** | Technical | Steam feature showing Aether harvest timer and current activity to friends list. |
 | **Living City** | Skill / Effect | Architect Tree Tier 5. Your best-built zone becomes sentient and defends itself. Also the 3+6 combined Aether effect: automated construction + accelerated NPC population growth. |
 | **Living Colossus** | Synergy Ability | Resonator + Architect + Guardian triple synergy. Transform INTO a walking cathedral that fires resonance blasts. |
 | **Living Frequency** | Skill | Resonator Tree Tier 4. Frequency becomes a living, adaptive force. |
@@ -337,7 +343,7 @@
 | **Mercury Heart** | Artifact | The central Aether battery. Fragments scattered in every zone. Collect all to power the final convergence. The beating heart of the planetary grid itself. |
 | **Mercury Orb** | Architecture / Technology | Sphere atop needle spire variant. Stores excess energy (battery function). Also the core of airship anti-gravity engines. |
 | **Mercury Orb Launcher** | Weapon | Lobbed resonance cannon. Massive AoE. Creates temporary resonance zone on impact. |
-| **MetalFX Temporal Upscaling** | Technical | Apple's hardware AI upscaling technology. Core rendering strategy — render at lower resolution (540p–900p), upscale to output (1080p). |
+| **FSR 2 / DLSS Temporal Upscaling** | Technical | AMD FSR 2 and NVIDIA DLSS temporal upscaling technologies. Core rendering strategy — render at lower resolution (720p–1080p), upscale to output (1440p–4K). |
 | **Metatron's Cube** | Sacred Geometry | Template of 13 circles + connecting lines. Used for advanced dome vaulting patterns. |
 | **Milo the Mudslinger** | Character | Comic relief companion from Moon 1. 30s, 5'8". Former black-market antiquities dealer. Quick East London-ish voice. Uses humor as armor. Arc: cynical scammer → genuine builder. Signature: "Genuine Tartarian [X]! Only slightly cursed!" |
 | **Mountain Maker** | Skill | Guardian Tree Tier 4. Create terrain formations in giant mode. |
@@ -366,6 +372,7 @@
 | **Onion Dome** | Architecture | Ogee-arch-profile bulbous dome variant. Tighter Aether focus (higher RS per unit area) but smaller coverage radius. Multiply output via fractal self-similarity. |
 | **Orphan Train Lullaby Crystal** | Artifact | Moon 3 quest reward. Creates a passive 432 Hz healing zone around the player. Contains the last song Tartarian children sang. |
 | **Orphan Trains** | Lore / Event | Mass relocation of Tartarian children (1854–1929) whose parents perished in the Mud Flood. Disguised as charity, it was cultural erasure and bloodline dispersal by the Parasite Cabal. |
+| **Orphan Train, The** | DLC / Expansion | DLC 03. Unlocks after Moon 5. 8–12 hours. Ride the rails with Lirael to uncover the truth of the Tartarian children’s dispersal. See [DLC_03_ORPHAN_TRAIN.md](../dlc/DLC_03_ORPHAN_TRAIN.md). |
 | **Ortelius, Abraham** | Lore / Historical Figure | 16th-century cartographer (1570) whose maps labeled the Tartarian Empire. |
 | **Overload** | Mechanic | Pushing a district past 100% Aether capacity. Triggers spectacular effects (chain lightning, floating gardens, aurora explosion, fountain geysers) but risks Aether storms, elite enemy spawns, golem awakening, and dissonance cascades. An advanced strategic tool. |
 | **Overtone Moon (Moon 5)** | Campaign Chapter | Radiance, empowerment & command. Light show effects at 80% RS (normally requires 100%). White City storyline. |
@@ -376,6 +383,7 @@
 |---|---|---|
 | **Parasite Cabal** | Faction / Antagonist | Elite human faction that resented the Harmonic Meritocracy. Exploited the Mud Flood to suppress Tartarian civilization. Three-phase plan: Suppress, Rewrite, Control. Never seen directly in-game — only through diary fragments, coded letters, and whispered transmissions. |
 | **Parasite Codex** | Mechanic | In-game encyclopedia that grows as the player uncovers Reset cover stories through excavation. Reveals more secrets as Resonance Score increases. |
+| **Parasite Within, The** | DLC / Expansion | DLC 07. Unlocks after Moon 9. 10–14 hours. The Cabal’s corruption has a living source — and it’s inside the Aether grid itself. See [DLC_07_PARASITE_WITHIN.md](../dlc/DLC_07_PARASITE_WITHIN.md). |
 | **Pentagonal Star Fort** | Architecture | 5-point star fort. 2 ley-line connections, standard defense. RS range: 10–40. |
 | **Perfect Pitch** | Skill | Resonator Tree Tier 3. Enhanced frequency identification accuracy. |
 | **Perfect Resonance** | State | RS of exactly 100. Transcendent glow + levitation effects. Maximum output with 2× multiplier. Building "sings." |
@@ -387,7 +395,7 @@
 | **Prophecy Reading** | Skill | Historian Tree Tier 2. Interpret prophecy stone visions. |
 | **Prophecy Shard** | Tool | Secondary tool (Moon 9 unlock). Reveals enemy's next 3 moves. |
 | **Prophecy Stones (12)** | Artifact Set | One per continent/zone. Each reveals pre-Flood visions and map reveals when held during the 17th Hour. Together they form the complete True Timeline. Named: Stone of Dawn, Flow, Craft, Flight, Song, Stars, Giants, Children, Rail, Healing, Warning, Promise. |
-| **ProMotion** | Technical | iPhone 120Hz display technology. Used for smooth menu scrolling (120 Hz) while gameplay runs at 60 Hz. |
+| **High Refresh Rate** | Technical | 120Hz+ display support. Used for smooth menu scrolling (120 Hz) while gameplay runs at 60 Hz. |
 | **Pure Water** | Material | Aquifer + fountain sourced. +10% all properties. Universal enhancer. Essential for moats, fountains, and cleansing corruption. |
 | **Pure Water Fountain** | Architecture | Negative-ion generators emitting ionized "living water." Connected via underground channels to moats and pipes. The circulatory system of every Tartarian city. Building RS: 3–15. |
 
@@ -455,6 +463,7 @@
 | **Sludge Titan** | Boss | Moon 11 boss. Aquifer depths encounter. Environmental water combat. |
 | **Solar Moon (Moon 9)** | Campaign Chapter | Intention, pulsing & realizing. Prophecy stone markers visible without scanning. Zereth's voice first heard. |
 | **Sound Barrier** | Skill | Resonator Tree Tier 4. Defensive acoustic shield. |
+| **Star Fort, The** | DLC / Expansion | DLC 04. Unlocks after Moon 6. 10–14 hours. Rebuild the greatest star fort ever constructed and unlock the defensive grid’s true purpose. See [DLC_04_STAR_FORT.md](../dlc/DLC_04_STAR_FORT.md). |
 | **Speakers (Elders)** | Social Role | Those who could hear the planet's resonance directly. Guided decisions through cosmic listening rather than debate. Part of the Tartarian Harmonic Meritocracy. |
 | **Spectral Moon (Moon 11)** | Campaign Chapter | Liberation, releasing & dissolving. Fountain purification radius doubled. |
 | **Spiral Cut** | Technique | Advanced cutting technique (Moon 7+). Trace golden spiral through block for ornamental columns. |
@@ -485,7 +494,7 @@
 
 | Term | Category | Description |
 |---|---|---|
-| **Taptic Engine** | Technical | iPhone haptic feedback hardware. Used for Aether collection (light tap), building snap (medium), resonance match (ascending triple tap), giant mode (heavy impact + rumble), bell chimes (sharp tap). |
+| **Gamepad Haptics** | Technical | Controller haptic feedback (DualSense adaptive triggers, Xbox impulse triggers). Used for Aether collection (light rumble), building snap (medium), resonance match (ascending triple pulse), giant mode (heavy impact + rumble), bell chimes (sharp pulse). |
 | **Tar Spitter** | Enemy | Human-sized Mud Golem (285 Hz). Ranged combatant firing sludge projectiles. |
 | **Tartaria / Tartarian Empire** | Core Setting | A lost global hyper-civilization that mastered Aether, sacred geometry, and harmonic resonance millennia before the modern world. Labeled on European maps from the 1300s–1800s. Expanded through harmonic colonization — not war. Buried by the Mud Flood and suppressed by the Great Reset. |
 | **Tectonic Slam** | Skill | Guardian Tree Tier 3. Massive seismic attack in giant mode. |
@@ -502,6 +511,7 @@
 | **Transcendent Tone** | Skill | Resonator Tree Tier 5. Advanced near-capstone resonance ability. |
 | **Trinity** | Sacred Geometry | Equilateral triangle formation. Sacred formation multiplier: 3× base output with 3 buildings. |
 | **True Timeline** | Lore / Endgame | The convergence point accessible at 100% Global Aether Pool. Full revelation of history. Endgame content where the complete truth of the Mud Flood is uncovered. |
+| **True Timeline, The** | DLC / Expansion | DLC 10. Unlocks after Moon 13 (post-game). 15–20 hours. The ultimate expansion — rewrite history itself. See [DLC_10_TRUE_TIMELINE.md](../dlc/DLC_10_TRUE_TIMELINE.md). |
 | **Tuners (Humans)** | Social Role | Specialists in frequency, cymatics, and Aether direction. Where giants lifted structures, humans tuned them. Organized by frequency specialization. |
 | **Tuning Fork** | Tool | Secondary tool (Moon 1 unlock). Strike to reveal enemy frequency. The basic frequency-detection instrument. |
 | **Tuning Fork Boost** | Skill | Resonator Tree Tier 1. Enhanced Tuning Fork precision and range. |
@@ -529,6 +539,7 @@
 | **Wave Shield** | Tool | Secondary tool (Moon 3 unlock). Deflects ranged dissonance attacks. |
 | **White City** | Lore / Architecture | The 1893 Chicago World's Fair — hundreds of Tartarian pavilions paraded as "new" plaster construction, then burned/demolished. In-game: White City Pavilions are cultural resonance generators with Beaux-Arts styling. |
 | **White City Pavilions** | Architecture | Beaux-Arts colonnades, rotundas, and exposition halls. RS increases with NPC activity. Types: Grand Rotunda, Exhibition Hall, Concert Pavilion, Fountain Court, Arcade. |
+| **White City, The** | DLC / Expansion | DLC 02. Unlocks after Moon 4. 10–14 hours. Infiltrate the 1893 World’s Fair and expose the Reset’s greatest cover-up. See [DLC_02_WHITE_CITY.md](../dlc/DLC_02_WHITE_CITY.md). |
 | **Wireless Transmission** | Mechanic | Power travels instantly along connected ley lines. No cables or delay. Connecting a new star fort grants all linked buildings +15% output. |
 | **Wooden Post** | Architecture | First spire tier (0 RS). Starting point for spire construction. |
 | **World Maker** | Synergy Ability | Architect + Guardian + Historian triple synergy. Giant mode builds from memory — gesture and structures appear. |
@@ -549,7 +560,7 @@
 
 | Category | Count |
 |---|---|
-| **Characters (Named)** | 10 (Elara, Milo, Lirael, Thorne, Korath, Cassian, Zereth, Maelix, Peter the Great, Tesla) |
+| **Characters (Named)** | 11 (Elara, Milo, Lirael, Thorne, Korath, Cassian, Zereth, Maelix, Anastasia, Peter the Great, Tesla) |
 | **Factions** | 6 (Tartarian Giants, Harmonic Humans, Echoes, Parasite Cabal, Reset Agents, Dissonant Creatures) |
 | **Artifacts** | 20+ (Mercury Heart, Hyperborean Crystal, Giant Skeleton Keys, 12 Prophecy Stones, First Resonator's Staff, Red Mercury Vials, 17-Hour Clock, Orphan Train Lullaby Crystal) |
 | **Architecture Types** | 15+ (Domes, Spires, Star Forts, Cathedrals, Bell Towers, White City Pavilions, Aether Stations, Fountains, Cymatic Gardens, Pipe Organs, etc.) |
@@ -560,7 +571,8 @@
 | **Sacred Geometry Forms** | 10+ (Vesica Piscis, Seed of Life, Flower of Life, Metatron's Cube, Sri Yantra, Golden Rectangle, Trinity, Hexagram, Ennead, Dodecagon, Full Mandala) |
 | **Materials** | 10 (Granite, Marble, Copper, Crystal, Mercury, Pure Water, Gold Leaf, Basalt, Obsidian, Giant Bone) |
 | **Calendar Moons** | 13 (Magnetic through Cosmic) |
-| **Total Unique Terms** | ~300+ |
+| **DLC Expansions** | 10 (Buried Beacon, White City, Orphan Train, Star Fort, Airship Armada, Cymatic Requiem, Parasite Within, Giant's Last Stand, Ley Line Prophecy, True Timeline) |
+| **Total Unique Terms** | ~315+ |
 
 ---
 

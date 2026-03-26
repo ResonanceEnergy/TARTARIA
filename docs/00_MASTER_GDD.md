@@ -32,7 +32,7 @@ The Great Reset buried it all. Elites rewrote history, staged World's Fairs to p
 
 Your mission: **excavate, tune, restore the planetary grid, and trigger the New Golden Age.**
 
-**Mobile-First Vision:** "Restore paradise in your pocket — 5–15 minute sessions that matter." Short, addictive loops deliver wonder without frustration. Every restored dome lights the global map. Every tuned frequency feels magical on touch.
+**PC-First Vision:** "Restore paradise on your desktop — immersive sessions that matter." Deep, rewarding loops deliver wonder without frustration. Every restored dome lights the global map. Every tuned frequency feels magical with keyboard, mouse, and gamepad.
 
 ---
 
@@ -60,12 +60,12 @@ The player is a conductor of cosmic harmony — literally conducting buildings t
 | Influence | What We Take |
 |---|---|
 | **Breath of the Wild** | Observation-based exploration, no quest markers, visual discovery |
-| **Genshin Impact** | Session-based mobile gacha-free progression, elemental (Aether) system, world beauty |
+| **Genshin Impact** | Session-based gacha-free progression, elemental (Aether) system, world beauty |
 | **Cities: Skylines** | City-building satisfaction, grid management, visual upgrade feedback |
 | **No Man's Sky** | Procedural wonder zones, seamless exploration, collaborative restoration |
 | **Baldur's Gate 3** | Deep narrative branching, meaningful choices with long-term consequences |
 | **Crimson Desert (2026)** | Massive seamless open world, fluid physics traversal, region liberation |
-| **Honkai: Star Rail** | Strategic depth in bite-sized mobile sessions, character progression |
+| **Honkai: Star Rail** | Strategic depth in focused sessions, character progression |
 | **Gothic 1 Remake (2026)** | Living NPC societies, nuanced reputation, visible world-altering choices |
 
 ---
@@ -73,7 +73,7 @@ The player is a conductor of cosmic harmony — literally conducting buildings t
 ## 4. World & Setting
 
 ### Geography
-A planetary-scale map divided into **12–15 modular Aether Restoration Zones** (bite-sized for mobile): buried White Cities, star-fort clusters, sunken cathedrals, resonance rail networks, floating sky isles, and fountain sanctums. Each zone is self-contained yet links via portals and ley lines as the grid activates.
+A planetary-scale map divided into **12–15 modular Aether Restoration Zones**: buried White Cities, star-fort clusters, sunken cathedrals, resonance rail networks, floating sky isles, and fountain sanctums. Each zone is self-contained yet links via portals and ley lines as the grid activates.
 
 ### Time System
 - **13-Moon Calendar:** 13 perfect 28-day cycles (364 days) + Day Out of Time (harmony festival)
@@ -135,7 +135,7 @@ Every session (5–15 minutes) follows this addictive, rewarding cycle:
 ┌─────────────────────────────────────────────────────┐
 │              6. PORTAL OUT                            │
 │   Exit on a high note → see global grid progress     │
-│   Push notification: "Your star fort is singing"     │
+│   Return prompt: "Your star fort is singing"         │
 └─────────────────────────────────────────────────────┘
 ```
 
@@ -147,7 +147,7 @@ Every session (5–15 minutes) follows this addictive, rewarding cycle:
 |---|---|---|
 | **Aether Energy** | `02_AETHER_ENERGY_SYSTEM.md` | 3-6-9 harmonic bands, resonance coefficient, harvesting, storage, distribution, overloads |
 | **Sacred Geometry Building** | `04_ARCHITECTURE_GUIDE.md` | Golden-ratio snap, Tartarian templates, domes/spires/forts/fountains/organs |
-| **Giant Mode** | `07_MOBILE_UX.md` | Toggle avatar size, precision rock cutting, mega-construction, golem wrestling |
+| **Giant Mode** | `07_PC_UX.md` | Toggle avatar size, precision rock cutting, mega-construction, golem wrestling |
 | **Cymatic Tuning** | `02_AETHER_ENERGY_SYSTEM.md` | Organ/crystal mini-games, 3-6-9 rhythm puzzles, frequency alignment |
 | **Airship & Train Travel** | `04_ARCHITECTURE_GUIDE.md` | Anti-grav flight, megalith transport, resonance rail network |
 | **13-Moon Calendar** | `03_CAMPAIGN_13_MOONS.md` | Lunar phases affect buffs/events, 17-hour day windows |
@@ -155,7 +155,7 @@ Every session (5–15 minutes) follows this addictive, rewarding cycle:
 | **Pure Water Fountains** | `04_ARCHITECTURE_GUIDE.md` | Negative-ion healing, conductive moats, ionized mist auroras |
 | **Combat & Progression** | `06_COMBAT_PROGRESSION.md` | Resonance weapons, skill trees, adaptive difficulty |
 | **AI NPCs** | `05_CHARACTERS_DIALOGUE.md` | Persistent memory, procedural quests, reputation/faction system |
-| **Multiplayer** | `07_MOBILE_UX.md` | Co-op portals, shared restorations, wonder servers |
+| **Multiplayer** | `07_PC_UX.md` | Co-op portals, shared restorations, wonder servers |
 
 ---
 
@@ -237,16 +237,16 @@ Full details: `05_CHARACTERS_DIALOGUE.md`
 | Spec | Target |
 |---|---|
 | **Engine** | Unity 6 LTS (DOTS/ECS, URP, Addressables, Burst + Jobs) |
-| **Primary Platform** | iOS 18.0+ (iPhone 17 Pro/Max, A19/A20, 8–12 GB RAM) |
-| **Secondary** | iPadOS (universal binary), future PC/Console port via same codebase |
-| **Graphics** | Metal 3 + MetalFX Temporal Upscaling, 60 FPS at dynamic 720p–1080p |
+| **Primary Platform** | Windows 10/11 PC (DirectX 12 / Vulkan, 8–16 GB RAM, GTX 1070+ / RX 580+) |
+| **Secondary** | iOS / iPadOS (future port via same codebase) |
+| **Graphics** | DirectX 12 / Vulkan + FSR 2 / DLSS Temporal Upscaling, 60 FPS at 1080p–4K |
 | **RAM Target** | <2.8 GB peak, 1.5 GB texture budget, auto-purge at 7 GB |
-| **Initial App Size** | ~150 MB (Addressables + Asset Bundles for on-demand content) |
+| **Initial Install Size** | ~4 GB (full base content; DLC downloaded on purchase) |
 | **Backend** | Firebase / PlayFab (cloud sync, live-ops, A/B testing, analytics) |
-| **Auth** | Sign in with Apple + Game Center |
+| **Auth** | Steam account (future: Sign in with Apple + Game Center for iOS port) |
 | **Offline** | Offline-first progression, cloud sync on login |
 
-Full details: `06_TECHNICAL_FRAMEWORK.md`
+Full details: `09_TECHNICAL_SPEC.md`
 
 ---
 
@@ -261,9 +261,9 @@ Full details: `06_TECHNICAL_FRAMEWORK.md`
 | **Cosmetic IAP** | Dome skins, giant avatar themes, historical template packs |
 | **Battle Pass** | Seasonal (per-Moon) with exclusive cosmetics + lore drops |
 | **Golden Age Subscription** | $9.99/month: unlimited energy, exclusive wonders, priority events |
-| **Family Sharing** | All IAPs shareable — instant 15–20% revenue uplift |
+| **Family Sharing** | Steam Family Sharing support — goodwill + household uplift |
 
-**Year 1 Revenue Target:** $2M+ at 500k downloads (realistic with hybrid model + App Store featuring)
+**Year 1 Revenue Target:** $2M+ at 500k units sold (realistic with hybrid model + Steam featuring)
 
 Full details: `08_MONETIZATION_LIVEOPS.md`
 
@@ -275,8 +275,8 @@ Full details: `08_MONETIZATION_LIVEOPS.md`
 |---|---|---|---|
 | **Pre-Production** | GDD, prototypes, art bible | Months 1–2 | $20k–$30k |
 | **Phase 1 (MVP)** | 3 zones + core loop + tuning prototype | Months 3–5 | $100k–$150k |
-| **Phase 2 (Soft Launch)** | 8 zones + monetization + TestFlight | Months 6–8 | $150k–$250k |
-| **Phase 3 (Global Launch)** | Full 13 zones + campaign + polish | Months 9–11 | $100k–$150k |
+| **Phase 2 (Early Access)** | 8 zones + monetization + Steam Early Access | Months 6–8 | $150k–$250k |
+| **Phase 3 (Full Launch)** | Full 13 zones + campaign + polish | Months 9–11 | $100k–$150k |
 | **Post-Launch** | Live-ops, seasonal events, 2-person team | Month 12+ | $15k–$25k/event |
 
 **Total estimated budget:** $350k–$550k  
@@ -299,9 +299,9 @@ Full details: `09_DEVELOPMENT_ROADMAP.md`
 | `04_ARCHITECTURE_GUIDE.md` | Zones, buildings, trains, airships, fountains, bell towers |
 | `05_CHARACTERS_DIALOGUE.md` | Character profiles, dialogue trees, banter collections |
 | `06_COMBAT_PROGRESSION.md` | Combat systems, skill trees, resonance weapons |
-| `07_MOBILE_UX.md` | Touch controls, session flow, HUD, accessibility |
+| `07_PC_UX.md` | Input controls (keyboard/mouse/gamepad), session flow, HUD, accessibility |
 | `08_MONETIZATION.md` | F2P model, events, economy balancing, live-ops calendar |
-| `09_TECHNICAL_SPEC.md` | Unity 6 iOS architecture, RAM optimization, performance |
+| `09_TECHNICAL_SPEC.md` | Unity 6 PC architecture, GPU optimization, performance |
 | `10_ROADMAP.md` | Phases, milestones, budget, team, risk mitigation |
 | `11_SCRIPTED_CLIMAXES.md` | Beat-by-beat playable climax scripts (Star Fort Siege, Orphan Train Escort) |
 | `12_VIVID_VISUALS.md` | Enhanced atmospheric visual direction for 7 key moments |
@@ -320,13 +320,13 @@ Full details: `09_DEVELOPMENT_ROADMAP.md`
 | `25_SAVE_SYSTEM.md` | Offline-first persistence, cloud sync, conflict resolution |
 | `26_LEVEL_DESIGN.md` | Zone layout, traversal systems, POI density, encounter pacing |
 | `27_TUTORIAL_ONBOARDING.md` | First 30 minutes beat-by-beat, teaching philosophy |
-| `28_ACHIEVEMENTS.md` | 52 achievements, seasonal challenges, Game Center integration |
+| `28_ACHIEVEMENTS.md` | 52 achievements, seasonal challenges, Steam integration |
 | `29_PRODUCTION_PIPELINE.md` | Art/audio/animation pipeline, outsource specs, CI/CD |
 | `30_MARKETING_POSITIONING.md` | Competitive landscape, brand identity, launch strategy |
 | `appendices/A_GLOSSARY.md` | Tartarian terms, in-game vocabulary |
 | `appendices/B_ASSET_REFERENCE.md` | Art direction, visual reference boards |
 | `appendices/C_AUDIO_DESIGN.md` | Soundtrack design, cymatic audio, voice acting |
-| `appendices/D_CONTROLS.md` | Touch control reference, gestures, accessibility remaps |
+| `appendices/D_CONTROLS.md` | Input control reference, keybindings, accessibility remaps |
 | `appendices/E_METRICS.md` | KPI tracking, analytics dashboards, performance budgets |
 | `appendices/F_MOON_INDEX.md` | Moon-to-Document cross-reference map |
 | `appendices/G_NPC_INDEX.md` | Character & companion cross-reference index |

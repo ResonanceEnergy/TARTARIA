@@ -7,7 +7,7 @@
 > *These vivid visual descriptions provide frame-by-frame atmospheric direction for the most impactful moments in the game. Each entry specifies lighting, particle systems, camera behavior, color palettes, and environmental reactions — translating wonder and mystery into concrete art direction.*
 
 **Cross-References:**
-- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — Metal 3 rendering pipeline, particle budgets
+- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — DX12/Vulkan rendering pipeline, particle budgets
 - [11_SCRIPTED_CLIMAXES.md](11_SCRIPTED_CLIMAXES.md) — Climax sequences these visuals support
 - [03C_MOON_MECHANICS_DETAILED.md](03C_MOON_MECHANICS_DETAILED.md) — Moon-specific mechanics context
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic accompaniment to each visual moment
@@ -537,7 +537,7 @@ All three endings feature a final shot: the camera rises to orbital view. The pl
 ---
 
 *See also:*
-- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — VFX budgets & Metal 3 pipeline
+- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — VFX budgets & DX12/Vulkan pipeline
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic accompaniment for every visual
 - [11_SCRIPTED_CLIMAXES.md](11_SCRIPTED_CLIMAXES.md) — Playable sequences that use these visuals
 

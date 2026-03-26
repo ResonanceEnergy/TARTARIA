@@ -6,8 +6,8 @@
 > *"The Golden Age was for everyone. So is this game. Every hand, every eye, every ear, every mind should find their way into wonder."*
 
 **Cross-References:**
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Touch controls, session design, accessibility section
-- [appendices/D_CONTROLS.md](appendices/D_CONTROLS.md) — Control remapping, Switch Control, AssistiveTouch
+- [07_PC_UX.md](07_PC_UX.md) — PC controls, session design, accessibility section
+- [appendices/D_CONTROLS.md](appendices/D_CONTROLS.md) — Control remapping, gamepad support, accessibility input
 - [06_COMBAT_PROGRESSION.md](06_COMBAT_PROGRESSION.md) — Combat difficulty, frequency color system
 - [13_MINI_GAMES.md](13_MINI_GAMES.md) — Mini-game accessibility modes
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic accessibility & battery
@@ -24,7 +24,7 @@
 5. [Auditory Accessibility](#5-auditory-accessibility)
 6. [Cognitive Accessibility](#6-cognitive-accessibility)
 7. [Vestibular & Photosensitivity](#7-vestibular-photosensitivity)
-8. [iOS Platform Integration](#8-ios-platform-integration)
+8. [PC Platform Integration](#8-pc-platform-integration)
 9. [Testing Checklist](#9-testing-checklist)
 10. [Budget Impact Assessment](#10-budget-impact-assessment)
 11. [Prioritization Matrix](#11-prioritization-matrix)
@@ -35,8 +35,8 @@
 
 ### Why Accessibility Is Non-Negotiable
 
-1. **Apple requires it.** App Store review guidelines (§2.5.1) mandate VoiceOver support and dynamic type. Apps without accessibility are rejected or deprioritized from featuring.
-2. **15% of the world population has a disability.** That's ~165 million potential iOS users.
+1. **Steam rewards it.** Steam featuring guidelines strongly favor accessible games. Games with robust accessibility features earn higher visibility, positive community response, and press coverage.
+2. **15% of the world population has a disability.** That's hundreds of millions of potential PC gamers.
 3. **Accessibility IS good UX.** Subtitles improve comprehension for all users. Larger touch targets help everyone on a train. Customizable controls benefit power users.
 4. **Tartaria's theme demands it.** A game about rebuilding a utopia should be playable by everyone.
 
@@ -44,9 +44,9 @@
 
 | Tier | Scope | When |
 |---|---|---|
-| **A (Launch Required)** | Basic WCAG AA, VoiceOver nav, dynamic type, colorblind modes | Phase 1–2 |
+| **A (Launch Required)** | Basic WCAG AA, screen reader nav, DPI-aware text scaling, colorblind modes | Phase 1–2 |
 | **B (Soft Launch)** | Switch Control, motor remapping, audio descriptions | Phase 3 |
-| **C (Post-Launch)** | Full VoiceOver gameplay, AAC integration, community feedback | Phase 4+ |
+| **C (Post-Launch)** | Full screen reader gameplay, AAC integration, community feedback | Phase 4+ |
 
 ---
 
@@ -61,7 +61,7 @@
 | Audio descriptions | 1.2.5 | 🔶 Tier B | Narrated scene descriptions for key story moments |
 | Color not sole information carrier | 1.4.1 | ✅ Planned | Frequency matching uses color + shape + sound (see §3) |
 | Contrast ratio ≥ 4.5:1 (text) | 1.4.3 | ✅ Planned | All UI text on all background states |
-| Text resize up to 200% | 1.4.4 | ✅ Planned | iOS Dynamic Type integration |
+| Text resize up to 200% | 1.4.4 | ✅ Planned | DPI-aware text scaling integration |
 | Reflow (no horizontal scrolling) | 1.4.10 | ✅ Planned | Responsive UI layout engine |
 
 ### Operable
@@ -69,11 +69,11 @@
 | Criterion | WCAG ID | Status | Implementation |
 |---|---|---|---|
 | Keyboard accessible | 2.1.1 | ✅ Planned | External keyboard + Switch Control mapping |
-| No keyboard traps | 2.1.2 | ✅ Planned | VoiceOver escape gesture works globally |
+| No keyboard traps | 2.1.2 | ✅ Planned | Escape key / controller back button works globally |
 | Timing adjustable | 2.2.1 | ✅ Planned | All timed sequences pauseable; mini-game timing adjustable |
-| Pause/stop/hide moving content | 2.2.2 | ✅ Planned | All animations respect iOS Reduce Motion |
+| Pause/stop/hide moving content | 2.2.2 | ✅ Planned | All animations respect system Reduce Motion settings |
 | Three flashes or below threshold | 2.3.1 | ✅ Planned | No content flashes >3/second (Aether effects capped) |
-| Focus order logical | 2.4.3 | ✅ Planned | VoiceOver navigation follows visual hierarchy |
+| Focus order logical | 2.4.3 | ✅ Planned | Screen reader navigation follows visual hierarchy |
 | Link/button purpose clear | 2.4.4 | ✅ Planned | Descriptive labels on all interactive elements |
 
 ### Understandable
@@ -83,14 +83,14 @@
 | Language of page | 3.1.1 | ✅ Planned | NSLocale-aware language switching |
 | On focus, no context change | 3.2.1 | ✅ Planned | No auto-navigation on focus events |
 | Error identification | 3.3.1 | ✅ Planned | Clear feedback on failed actions (not just color) |
-| Labels on input | 3.3.2 | ✅ Planned | All settings controls labeled for VoiceOver |
+| Labels on input | 3.3.2 | ✅ Planned | All settings controls labeled for screen readers |
 
 ### Robust
 
 | Criterion | WCAG ID | Status | Implementation |
 |---|---|---|---|
 | Parsing (valid markup) | 4.1.1 | ✅ Planned | Unity UI Toolkit accessibility tree validation |
-| Name/role/value for UI | 4.1.2 | ✅ Planned | VoiceOver traits on all interactive components |
+| Name/role/value for UI | 4.1.2 | ✅ Planned | Accessibility traits on all interactive components |
 
 ---
 
@@ -138,16 +138,16 @@ The frequency-matching combat system relies on color (see [06_COMBAT_PROGRESSION
 
 | Feature | Implementation |
 |---|---|
-| **Dynamic Type** | All UI text responds to iOS text size settings (up to xxxLarge) |
+| **DPI-Aware Scaling** | All UI text responds to system DPI/text scaling settings |
 | **Minimum font size** | 11pt body, 13pt dialogue — never below |
 | **Font choice** | High x-height sans-serif; CJK uses system fonts (optimal rendering) |
 | **Text outline** | 1px dark outline on all in-world floating text |
 | **Subtitle backgrounds** | Always-on dark background behind subtitle text |
 | **Subtitle size scaling** | Small / Medium / Large / Extra Large (independent of system setting) |
 
-### 3.4 Screen Reader Support (VoiceOver)
+### 3.4 Screen Reader Support
 
-| Context | VoiceOver Behavior |
+| Context | Screen Reader Behavior |
 |---|---|
 | **Menus** | Full navigation with traits (button, heading, adjustable) |
 | **Dialogue** | Auto-read NPC lines; swipe to repeat; haptic on new line |
@@ -158,9 +158,9 @@ The frequency-matching combat system relies on color (see [06_COMBAT_PROGRESSION
 
 ### 3.5 Magnification & Zoom
 
-- Respect iOS Zoom accessibility feature
+- Respect system accessibility zoom features
 - Custom camera zoom limits extended for low-vision users
-- Pinch-to-zoom on dialogue portraits and codex entries
+- Scroll-to-zoom on dialogue portraits and codex entries
 
 ---
 
@@ -168,11 +168,11 @@ The frequency-matching combat system relies on color (see [06_COMBAT_PROGRESSION
 
 ### 4.1 One-Thumb Guarantee
 
-Per [07_MOBILE_UX.md](07_MOBILE_UX.md), every core action is one-thumb accessible. This is the baseline motor accessibility — not an add-on.
+Per [07_PC_UX.md](07_PC_UX.md), every core action is accessible via keyboard, mouse, or gamepad. This is the baseline motor accessibility — not an add-on.
 
 ### 4.2 Touch Target Sizes
 
-| Element | Default Size | Accessible Size | Apple Minimum |
+| Element | Default Size | Accessible Size | Design Minimum |
 |---|---|---|---|
 | Primary button | 44×44 pt | 54×54 pt | 44×44 pt ✅ |
 | Secondary button | 36×36 pt | 48×48 pt | 44×44 pt ⚠️ (increase to 44) |
@@ -195,11 +195,11 @@ Per [07_MOBILE_UX.md](07_MOBILE_UX.md), every core action is one-thumb accessibl
 
 ### 4.4 Switch Control & AssistiveTouch
 
-Full mapping for iOS Switch Control:
+Full mapping for Windows accessibility / Switch Control:
 
 | Game Action | Switch Action |
 |---|---|
-| Move | Auto-move to selected destination (tap switch to select) |
+| Move | Auto-move to selected destination (switch to select) |
 | Interact | Select + activate (2-switch workflow) |
 | Combat attack | Auto-target nearest enemy; switch activates attack |
 | Build placement | Cycle through valid positions; switch confirms |
@@ -212,10 +212,10 @@ Per [appendices/D_CONTROLS.md](appendices/D_CONTROLS.md):
 
 | Controller | Support Level |
 |---|---|
-| **MFi (Made for iPhone)** | Full mapping — all actions |
 | **DualSense (PS5)** | Full mapping + adaptive triggers for haptics |
 | **Xbox Wireless** | Full mapping |
-| **Adaptive controllers** | Switch-compatible via iOS accessibility APIs |
+| **Xbox Adaptive Controller** | Full mapping — all actions via switch-compatible inputs |
+| **Adaptive controllers** | Switch-compatible via Windows accessibility APIs |
 
 ### 4.6 Auto-Play Options
 
@@ -320,7 +320,7 @@ Narrated descriptions of key visual events for blind/low-vision players:
 | Camera bob during walk | Subtle | None |
 | Aether field waves | Animated | Static glow |
 
-**Setting:** Respects iOS `Reduce Motion` automatically + in-game override.
+**Setting:** Respects OS `Reduce Motion` preference automatically + in-game override.
 
 ### 7.2 Photosensitivity
 
@@ -336,22 +336,21 @@ Narrated descriptions of key visual events for blind/low-vision players:
 
 ---
 
-## 8. iOS Platform Integration
+## 8. PC Platform Integration
 
-### 8.1 Native Accessibility APIs
+### 8.1 Accessibility APIs & Standards
 
-| API | Usage |
+| API / Standard | Usage |
 |---|---|
-| `UIAccessibility` | VoiceOver traits, labels, values for all UI elements |
-| `UIAccessibilityCustomAction` | Game-specific VoiceOver actions (attack, build, interact) |
-| `Dynamic Type` | `UIFontMetrics` for scalable text in UI Toolkit |
-| `Reduce Motion` | `UIAccessibility.isReduceMotionEnabled` — triggers reduced VFX |
-| `Reduce Transparency` | Solid backgrounds on overlays when enabled |
-| `Invert Colors` | Smart Invert exemptions on game viewport (don't invert the 3D world) |
-| `Guided Access` | Support for restricted mode (educational / assisted use) |
-| `Switch Control` | Full scan-and-select path through all game systems |
-| `Voice Control` | Voice command mapping for core actions |
-| `AssistiveTouch` | Custom gesture remapping compatible |
+| **Windows UI Automation** | Screen reader traits, labels, values for all UI elements |
+| **Narrator / NVDA / JAWS** | Game-specific screen reader actions (attack, build, interact) |
+| **Windows Text Scaling** | `SystemParametersInfo` for scalable text in UI Toolkit |
+| **Reduce Motion** | Windows `SPI_GETCLIENTAREAANIMATION` — triggers reduced VFX |
+| **High Contrast** | Windows High Contrast theme detection; solid backgrounds on overlays |
+| **Color Filters** | Respect Windows colorblind filter settings + in-game override |
+| **Steam Big Picture** | Full controller navigation through all game systems |
+| **Voice Control** | Voice command mapping for core actions (Windows Speech Recognition) |
+| **Xbox Adaptive Controller** | Full scan-and-select path via switch-compatible inputs |
 
 ### 8.2 Accessibility Settings Location
 
@@ -391,31 +390,31 @@ Settings (⚙️)
 
 | Device | Test Focus | Priority |
 |---|---|---|
-| iPhone 15 Pro | Baseline VoiceOver + Switch Control | **High** |
-| iPhone 17 Pro | Target device — all features | **Critical** |
-| iPhone 17 Pro Max | Large display — layout validation | **High** |
-| iPad Air M2 | Multitasking, keyboard, larger touch targets | **Medium** |
-| iPad Pro M4 | External display mirroring | **Low** |
+| GTX 1060 / RX 580 (Min spec) | Baseline screen reader + accessibility features | **High** |
+| RTX 3060 / RX 6700 XT (Recommended) | Target hardware — all features | **Critical** |
+| RTX 4080+ (Ultra) | High-res layout validation | **High** |
+| Steam Deck | Handheld / controller-only navigation | **Medium** |
+| Laptop (integrated GPU) | Low-spec graceful degradation | **Low** |
 
 ### 9.2 Test Scenarios
 
 | Scenario | Tests | Pass Criteria |
 |---|---|---|
-| **VoiceOver full playthrough** | Navigate menus, enter zone, restore dome, combat, quest | All elements labeled, logical focus order |
+| **Screen reader full playthrough** | Navigate menus, enter zone, restore dome, combat, quest | All elements labeled, logical focus order |
 | **Switch Control 2-switch** | Complete first 15-minute demo | All mechanics accessible via scanning |
 | **Colorblind mode combat** | Fight all 7 frequency enemy types | All frequencies distinguishable via shape + color |
 | **Audio-off gameplay** | Play 30 minutes with device muted | All information conveyed visually |
-| **Visual-off gameplay** | Play with screen covered, VoiceOver + haptics | Navigate menus, basic zone exploration |
+| **Visual-off gameplay** | Play with monitor off, screen reader + gamepad haptics | Navigate menus, basic zone exploration |
 | **Reduced Motion** | Full session in reduce motion mode | No jarring cuts, no missing information |
 | **Dynamic Type xxxLarge** | All menus, dialogue, HUD | No text clipping, overlaps, or unreadable strings |
 | **Story Mode difficulty** | Complete Moon 1 in story mode | Zero fail states, auto-play functional |
-| **External controller** | MFi controller full playthrough | All actions mapped, no unmapped required inputs |
+| **External controller** | Gamepad full playthrough (DualSense / Xbox) | All actions mapped, no unmapped required inputs |
 
 ### 9.3 Automated Accessibility Tests
 
 | Test | Tool | Trigger |
 |---|---|---|
-| VoiceOver label coverage | Accessibility Inspector (Xcode) | Every build |
+| Screen reader label coverage | Accessibility Insights for Windows | Every build |
 | Contrast ratio validation | Custom shader analysis tool | Asset import |
 | Touch target size audit | UI bounds checker script | Every build |
 | Flash frequency analysis | Harding FPA test script | New VFX asset |
@@ -429,16 +428,16 @@ Settings (⚙️)
 
 | Tier | Features | Engineering Hours | Cost Estimate |
 |---|---|---|---|
-| **A (Launch)** | VoiceOver nav, dynamic type, colorblind, subtitles, difficulty | 200 hrs | $20,000–$30,000 |
+| **A (Launch)** | Screen reader nav, text scaling, colorblind, subtitles, difficulty | 200 hrs | $20,000–$30,000 |
 | **B (Soft Launch)** | Switch Control, motor remapping, audio descriptions, shape overlays | 120 hrs | $12,000–$18,000 |
-| **C (Post-Launch)** | Full VoiceOver gameplay, voice control, AAC, community tools | 160 hrs | $16,000–$24,000 |
+| **C (Post-Launch)** | Full screen reader gameplay, voice control, AAC, community tools | 160 hrs | $16,000–$24,000 |
 | **Total** | All accessibility features | **480 hrs** | **$48,000–$72,000** |
 
 ### 10.2 ROI Justification
 
 | Benefit | Estimated Impact |
 |---|---|
-| App Store featuring probability | +30% (Apple strongly favors accessible apps) |
+| Steam featuring probability | +30% (Steam favors accessible games in discovery) |
 | Addressable market expansion | +15% potential users (~75,000 at 500k downloads) |
 | Regulatory compliance (EU, US Section 508) | Avoids future forced updates |
 | Player satisfaction (all users) | Subtitle users: ~80% of all players; difficulty options: ~40% |
@@ -452,7 +451,7 @@ Settings (⚙️)
 
 | Feature | Effort | Impact | Priority |
 |---|---|---|---|
-| VoiceOver menu navigation | Medium | High | **P0** |
+| Screen reader menu navigation | Medium | High | **P0** |
 | Dynamic Type support | Medium | High | **P0** |
 | Colorblind mode (3 types) | Low | High | **P0** |
 | Subtitle system with backgrounds | Low | Very High | **P0** |
@@ -476,7 +475,7 @@ Settings (⚙️)
 
 | Feature | Effort | Impact | Priority |
 |---|---|---|---|
-| Full VoiceOver gameplay narration | Very High | Medium | **P2** |
+| Full screen reader gameplay narration | Very High | Medium | **P2** |
 | Voice Control actions | High | Low | **P2** |
 | Navigation breadcrumb trail | Medium | Medium | **P2** |
 | Community accessibility feedback tool | Low | Low | **P2** |

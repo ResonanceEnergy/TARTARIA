@@ -1,0 +1,158 @@
+using UnityEngine;
+using Tartaria.Core;
+
+namespace Tartaria.UI
+{
+    /// <summary>
+    /// UI Manager — central coordinator for all UI panels and screens:
+    ///   - HUD (in-game overlay)
+    ///   - Pause Menu
+    ///   - Settings
+    ///   - Aether Vision overlay
+    ///   - Dialogue box
+    ///   - Save/Load indicators
+    ///
+    /// Responds to GameStateManager transitions.
+    /// </summary>
+    public class UIManager : MonoBehaviour
+    {
+        public static UIManager Instance { get; private set; }
+
+        [Header("Panel References")]
+        [SerializeField] GameObject hudPanel;
+        [SerializeField] GameObject pauseMenuPanel;
+        [SerializeField] GameObject settingsPanel;
+        [SerializeField] GameObject dialoguePanel;
+        [SerializeField] GameObject loadingPanel;
+        [SerializeField] GameObject aetherVisionOverlay;
+
+        [Header("Dialogue")]
+        [SerializeField] TMPro.TextMeshProUGUI dialogueSpeakerText;
+        [SerializeField] TMPro.TextMeshProUGUI dialogueBodyText;
+        [SerializeField] UnityEngine.UI.Image dialoguePortrait;
+
+        [Header("Loading")]
+        [SerializeField] UnityEngine.UI.Image loadingBar;
+        [SerializeField] TMPro.TextMeshProUGUI loadingTipText;
+
+        [Header("Save Indicator")]
+        [SerializeField] GameObject saveIndicator;
+        [SerializeField] float saveIndicatorDuration = 2f;
+
+        float _saveIndicatorTimer;
+        bool _aetherVisionActive;
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
+        }
+
+        void OnEnable()
+        {
+            GameStateManager.Instance.OnStateChanged += HandleStateChange;
+        }
+
+        void OnDisable()
+        {
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged -= HandleStateChange;
+        }
+
+        void Update()
+        {
+            // Save indicator auto-hide
+            if (_saveIndicatorTimer > 0)
+            {
+                _saveIndicatorTimer -= Time.unscaledDeltaTime;
+                if (_saveIndicatorTimer <= 0 && saveIndicator != null)
+                    saveIndicator.SetActive(false);
+            }
+
+            // ESC = toggle pause
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Escape))
+                TogglePause();
+        }
+
+        // ─── State Management ────────────────────────
+
+        void HandleStateChange(GameState previous, GameState current)
+        {
+            // Manage panel visibility by game state
+            SetPanelActive(hudPanel, current == GameState.Exploration ||
+                                     current == GameState.Combat ||
+                                     current == GameState.Tuning);
+            SetPanelActive(pauseMenuPanel, current == GameState.Paused);
+            SetPanelActive(loadingPanel, current == GameState.Loading);
+
+            if (current == GameState.Paused)
+                Time.timeScale = 0f;
+            else if (previous == GameState.Paused)
+                Time.timeScale = 1f;
+        }
+
+        void SetPanelActive(GameObject panel, bool active)
+        {
+            if (panel != null) panel.SetActive(active);
+        }
+
+        // ─── Public API ──────────────────────────────
+
+        public void TogglePause()
+        {
+            var state = GameStateManager.Instance;
+            if (state.CurrentState == GameState.Paused)
+                state.ReturnToPrevious();
+            else if (state.IsPlaying)
+                state.TransitionTo(GameState.Paused);
+        }
+
+        public void ShowDialogue(string speaker, string text, Sprite portrait = null)
+        {
+            SetPanelActive(dialoguePanel, true);
+            if (dialogueSpeakerText != null) dialogueSpeakerText.text = speaker;
+            if (dialogueBodyText != null) dialogueBodyText.text = text;
+            if (dialoguePortrait != null && portrait != null) dialoguePortrait.sprite = portrait;
+        }
+
+        public void HideDialogue()
+        {
+            SetPanelActive(dialoguePanel, false);
+        }
+
+        public void ToggleAetherVision()
+        {
+            _aetherVisionActive = !_aetherVisionActive;
+            SetPanelActive(aetherVisionOverlay, _aetherVisionActive);
+        }
+
+        public void ShowSaveIndicator()
+        {
+            if (saveIndicator != null)
+            {
+                saveIndicator.SetActive(true);
+                _saveIndicatorTimer = saveIndicatorDuration;
+            }
+        }
+
+        public void UpdateLoadingProgress(float progress, string tip = null)
+        {
+            if (loadingBar != null)
+                loadingBar.fillAmount = progress;
+            if (loadingTipText != null && tip != null)
+                loadingTipText.text = tip;
+        }
+
+        public void ShowSettings()
+        {
+            SetPanelActive(settingsPanel, true);
+            SetPanelActive(pauseMenuPanel, false);
+        }
+
+        public void HideSettings()
+        {
+            SetPanelActive(settingsPanel, false);
+            SetPanelActive(pauseMenuPanel, true);
+        }
+    }
+}

@@ -50,7 +50,7 @@ When working on content for any Moon, consult every document listed. Changes to 
 | **Mechanics** | [27_TUTORIAL_ONBOARDING](../27_TUTORIAL_ONBOARDING.md), [06_COMBAT_PROGRESSION](../06_COMBAT_PROGRESSION.md) |
 | **Characters** | [05_CHARACTERS_DIALOGUE](../05_CHARACTERS_DIALOGUE.md) — Elara introduction |
 | **Visuals** | [12_VIVID_VISUALS](../12_VIVID_VISUALS.md) |
-| **UX** | [07_MOBILE_UX](../07_MOBILE_UX.md), [D_CONTROLS](appendices/../D_CONTROLS.md) |
+| **UX** | [07_PC_UX](../07_PC_UX.md), [D_CONTROLS](D_CONTROLS.md) |
 | **Referenced** | [00_MASTER_GDD](../00_MASTER_GDD.md), [15_MVP_BUILD_SPEC](../15_MVP_BUILD_SPEC.md) |
 
 ---
@@ -71,7 +71,7 @@ When working on content for any Moon, consult every document listed. Changes to 
 | **Mini-Games** | [13_MINI_GAMES](../13_MINI_GAMES.md) — Cymatic Water Tuning, Harmonic Rock Cutting |
 | **Characters** | [05_CHARACTERS_DIALOGUE](../05_CHARACTERS_DIALOGUE.md) — Milo, Lirael, Giant Stonemason Echo |
 | **Enemies** | [06_COMBAT_PROGRESSION](../06_COMBAT_PROGRESSION.md) — Sludge Grunt, Tar Spitter |
-| **Audio** | [C_AUDIO_DESIGN](appendices/../C_AUDIO_DESIGN.md) |
+| **Audio** | [C_AUDIO_DESIGN](C_AUDIO_DESIGN.md) |
 | **Haptics** | [14_HAPTIC_FEEDBACK](../14_HAPTIC_FEEDBACK.md) |
 | **MVP** | [15_MVP_BUILD_SPEC](../15_MVP_BUILD_SPEC.md) — Echohaven vertical slice |
 | **Level Design** | [26_LEVEL_DESIGN](../26_LEVEL_DESIGN.md) |
@@ -171,7 +171,7 @@ When working on content for any Moon, consult every document listed. Changes to 
 | **Quests** | [20_QUEST_DATABASE](../20_QUEST_DATABASE.md) |
 | **Mini-Games** | [13_MINI_GAMES](../13_MINI_GAMES.md) — Pipe Organ Symphony Conduction |
 | **Characters** | [05_CHARACTERS_DIALOGUE](../05_CHARACTERS_DIALOGUE.md) — Bell Ringer Echo, Lirael + Orphan Choir |
-| **Audio** | [C_AUDIO_DESIGN](appendices/../C_AUDIO_DESIGN.md) — Cathedral acoustics, 432 Hz pipe organ |
+| **Audio** | [C_AUDIO_DESIGN](C_AUDIO_DESIGN.md) — Cathedral acoustics, 432 Hz pipe organ |
 | **DLC** | [DLC_06_CYMATIC_REQUIEM](../dlc/DLC_06_CYMATIC_REQUIEM.md) — Extended cathedral content |
 
 ---
@@ -279,7 +279,7 @@ When working on content for any Moon, consult every document listed. Changes to 
 | **Quests** | [20_QUEST_DATABASE](../20_QUEST_DATABASE.md) |
 | **Mini-Games** | [13_MINI_GAMES](../13_MINI_GAMES.md) — Bell Tower Synchronization (planetary) |
 | **Characters** | [05_CHARACTERS_DIALOGUE](../05_CHARACTERS_DIALOGUE.md) — Reset Commander Echo |
-| **Audio** | [C_AUDIO_DESIGN](appendices/../C_AUDIO_DESIGN.md) — Bell harmonics, planetary resonance |
+| **Audio** | [C_AUDIO_DESIGN](C_AUDIO_DESIGN.md) — Bell harmonics, planetary resonance |
 
 ---
 

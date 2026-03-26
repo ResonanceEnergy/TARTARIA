@@ -3,7 +3,7 @@
 
 ---
 
-> *"The world doesn't need another mobile RPG. It needs a game that makes people feel something they forgot they could feel."*
+> *"The world doesn't need another RPG. It needs a game that makes people feel something they forgot they could feel."*
 
 **Cross-References:**
 - [10_ROADMAP.md](10_ROADMAP.md) — Launch timeline, budget, team
@@ -25,7 +25,7 @@
 6. [Launch Strategy](#6-launch-strategy)
 7. [Content Marketing & Community](#7-content-marketing-community)
 8. [Influencer & Press Strategy](#8-influencer-press-strategy)
-9. [App Store Optimization (ASO)](#9-app-store-optimization-aso)
+9. [Steam Store Optimization](#9-steam-store-optimization)
 10. [Seasonal Campaign Calendar](#10-seasonal-campaign-calendar)
 11. [Revenue & Growth Projections](#11-revenue-growth-projections)
 12. [Budget Allocation](#12-budget-allocation)
@@ -40,11 +40,11 @@
 
 ### Elevator Pitch (30 seconds)
 
-In a world where ancient Tartarian cities lie buried under corruption, you awaken as Elara — a silent hero who channels the power of sacred frequencies to restore wonder. Build golden-ratio architecture, fight corruption through harmonic combat, and uncover the truth of a civilization that vanished. It's *Genshin Impact* meets *Stardew Valley* — but tuned to 432 Hz and built for iOS.
+In a world where ancient Tartarian cities lie buried under corruption, you awaken as Elara — a silent hero who channels the power of sacred frequencies to restore wonder. Build golden-ratio architecture, fight corruption through harmonic combat, and uncover the truth of a civilization that vanished. It's *Genshin Impact* meets *Stardew Valley* — but tuned to 432 Hz and built for PC.
 
 ### Press Boilerplate (100 words)
 
-*TARTARIA: World of Wonder — Aether Awakening* is a session-based open-world restoration RPG and city-builder for iOS. Players explore 13 zones inspired by real-world Tartarian architecture conspiracy theories, wielding a frequency-tuning combat system with 7 sacred frequencies (174–852 Hz), building structures based on sacred geometry and golden-ratio principles, and restoring a lost civilization across a 13-Moon campaign. The game features 5 unique companions, 6 mini-games, and a deep harmonic puzzle system — all wrapped in a premium mobile experience designed for 15–45 minute sessions. Developed by Resonance Energy with a $350,000 budget over 24 months.
+*TARTARIA: World of Wonder — Aether Awakening* is a session-based open-world restoration RPG and city-builder for PC (Steam). Players explore 13 zones inspired by real-world Tartarian architecture conspiracy theories, wielding a frequency-tuning combat system with 7 sacred frequencies (174–852 Hz), building structures based on sacred geometry and golden-ratio principles, and restoring a lost civilization across a 13-Moon campaign. The game features 5 unique companions, 6 mini-games, and a deep harmonic puzzle system — all wrapped in a premium PC experience with full keyboard/mouse and gamepad support. Developed by Resonance Energy with a $350,000 budget over 24 months.
 
 ---
 
@@ -54,9 +54,9 @@ In a world where ancient Tartarian cities lie buried under corruption, you awake
 
 | Game | Platform | Genre | Strength | Weakness | TARTARIA Differentiation |
 |---|---|---|---|---|---|
-| **Genshin Impact** | Multi | Open-world action RPG | Polish, exploration, gacha revenue | Grind-heavy, P2W perception, 50GB+ install | Session-friendly, no gacha, 4.5 GB max |
+| **Genshin Impact** | Multi | Open-world action RPG | Polish, exploration, gacha revenue | Grind-heavy, P2W perception, 50GB+ install | Session-friendly, no gacha, ~8 GB max |
 | **Stardew Valley** | Multi | Farming / life sim | Depth, community, indie charm | No real-time combat, 2D pixel art | 3D world, harmonic combat, building system |
-| **Sky: Children of the Light** | iOS/Android | Social exploration | Emotional design, accessibility | Limited progression depth | Full RPG progression, building, combat |
+| **Sky: Children of the Light** | Multi | Social exploration | Emotional design, accessibility | Limited progression depth | Full RPG progression, building, combat |
 | **Cult of the Lamb** | Multi | Roguelike / base builder | Unique premise, combat loop | Dark tone, limited building | Positive restoration tone, sacred geometry |
 | **Townscaper** | Multi | City builder | Instant satisfaction, beautiful | No gameplay beyond building | Full RPG systems layered on building |
 
@@ -64,10 +64,10 @@ In a world where ancient Tartarian cities lie buried under corruption, you awake
 
 | Game | Overlap | Learning |
 |---|---|---|
-| **Monument Valley** | Visual wonder, puzzle-first, iOS-first | Premium mobile can succeed on emotion |
+| **Monument Valley** | Visual wonder, puzzle-first, premium | Premium games can succeed on emotion |
 | **Alto's Odyssey** | Atmospheric, session-based, meditative | Ambient + accessible = mass appeal |
-| **The Room** series | Mystery, tactile interaction, iOS | Haptic and touch-first design sells |
-| **Ori and the Blind Forest** | Restoration theme, emotional arc | "Heal the world" narrative resonates |
+| **The Room** series | Mystery, tactile interaction | Touch-first design sells |
+| **Ori and the Blind Forest** | Restoration theme, emotional arc, beloved PC game | "Heal the world" narrative resonates deeply on PC |
 
 ### 2.3 Competitive Matrix
 
@@ -77,7 +77,7 @@ In a world where ancient Tartarian cities lie buried under corruption, you awake
 | Sacred geometry building | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Session-based (15–45 min) | ❌ | ⚠️ | ✅ | ⚠️ | ✅ |
 | No gacha/lootbox | ❌ | ✅ | ⚠️ | ✅ | ✅ |
-| iOS-optimized (Metal) | ⚠️ | ✅ | ✅ | ❌ | ✅ |
+| PC-optimized (DX12/Vulkan) | ⚠️ | ✅ | ❌ | ✅ | ✅ |
 | Restoration (not destruction) | ❌ | ✅ | ✅ | ❌ | ✅ |
 | 432 Hz tuning system | ❌ | ❌ | ❌ | ❌ | ✅ |
 | WCAG accessibility | ❌ | ❌ | ⚠️ | ❌ | ✅ |
@@ -88,7 +88,7 @@ In a world where ancient Tartarian cities lie buried under corruption, you awake
 
 ### 3.1 The Five Pillars of Differentiation
 
-1. **Harmonic Combat** — No other mobile RPG uses scientifically-inspired frequencies as its combat system. Each of 7 frequencies (174–852 Hz) has distinct tactical properties. Players *tune* to fight, not just tap.
+1. **Harmonic Combat** — No other RPG uses scientifically-inspired frequencies as its combat system. Each of 7 frequencies (174–852 Hz) has distinct tactical properties. Players *tune* to fight, not just click.
 
 2. **Sacred Geometry Building** — Buildings snap to golden-ratio proportions, creating visually harmonious cities that feel *right* even to players who don't know why. The "Restoration Score" mechanic validates this mathematically.
 
@@ -96,7 +96,7 @@ In a world where ancient Tartarian cities lie buried under corruption, you awake
 
 4. **Real-World Mystery Foundation** — Tartarian architecture conspiracy theories are a genuine online subculture with millions of engaged followers. This built-in audience provides organic discovery and viral potential.
 
-5. **Session-Respectful Design** — Every system is designed for 15–45 minute sessions. No stamina timers, no wait-to-play. The game respects the player's time, which is the rarest feature in mobile gaming.
+5. **Session-Respectful Design** — Every system is designed for flexible session lengths — 15-minute bursts to 2-hour deep dives. No stamina timers, no wait-to-play. The game respects the player's time, which is rare in modern gaming.
 
 ### 3.2 Messaging Hierarchy
 
@@ -117,8 +117,8 @@ Per [23_LOCALIZATION.md](23_LOCALIZATION.md) language tiers:
 
 | Tier | Markets | Launch | Rationale |
 |---|---|---|---|
-| **Tier 1** | US, Canada, UK, Japan, South Korea, China (simplified) | Day 1 | Highest iOS RPG spend |
-| **Tier 2** | Germany, France, LatAm (Mexico, Brazil), Taiwan/HK | Month 13 | Strong iOS adoption, lower localization cost |
+| **Tier 1** | US, Canada, UK, Japan, South Korea, China (simplified) | Day 1 | Highest PC RPG spend, Steam global reach |
+| **Tier 2** | Germany, France, LatAm (Mexico, Brazil), Taiwan/HK | Month 13 | Strong Steam adoption, lower localization cost |
 | **Tier 3** | Brazil, Russia, Thailand, Turkey, Indonesia | Year 2 | Volume play, lower ARPU |
 
 ### 4.2 Audience Segments
@@ -129,20 +129,20 @@ Per [21_PLAYER_PERSONAS.md](21_PLAYER_PERSONAS.md):
 |---|---|---|---|
 | **Lore Seekers** (30%) | Tartaria/mystery communities | Reddit, YouTube, TikTok | "The mystery is real — explore it" |
 | **Harmonic Builders** (20%) | Creative/builder game fans | Instagram, Pinterest, YouTube | "Build beautiful cities with sacred geometry" |
-| **Session Sprinters** (25%) | Casual mobile RPG players | App Store featuring, Apple Arcade pitch | "15 minutes of wonder" |
+| **Session Sprinters** (25%) | PC RPG players | Steam featuring, discovery queue | "15 minutes of wonder or 2 hours of deep dive" |
 | **Puzzle Maestros** (15%) | Puzzle/strategy fans | Word-of-mouth, review sites | "Every battle is a harmonic puzzle" |
-| **Completionists** (10%) | Achievement hunters | Leaderboards, community forums | "364 hours to 100%" |
+| **Completionists** (10%) | Achievement hunters | Steam Achievements, community forums | "364 hours to 100%" |
 
 ### 4.3 Addressable Market
 
 | Metric | Value | Source |
 |---|---|---|
-| iOS gamers worldwide | ~1.1 billion | Sensor Tower 2025 |
-| iOS RPG players (monthly active) | ~120 million | — |
-| Premium-willing (no gacha tolerance) | ~15 million | — |
-| Session-based RPG seekers | ~8 million | — |
-| **SAM (Serviceable Addressable Market)** | ~5 million | Conservative |
-| **SOM (Year 1 target)** | 500,000 players | 10% of SAM |
+| PC gamers worldwide | ~1.8 billion | Newzoo 2025 |
+| PC RPG players (monthly active) | ~200 million | — |
+| Premium-willing (no gacha tolerance) | ~40 million | — |
+| Session-based RPG seekers | ~15 million | — |
+| **SAM (Serviceable Addressable Market)** | ~8 million | Conservative |
+| **SOM (Year 1 target)** | 500,000 players | ~6% of SAM |
 
 ---
 
@@ -172,10 +172,10 @@ Per [21_PLAYER_PERSONAS.md](21_PLAYER_PERSONAS.md):
 
 | Asset | Spec | Use |
 |---|---|---|
-| **Hero image** | 2560×1440, Elara + companions + Echohaven dome | App Store, website hero |
-| **App icon** | 1024×1024, Tartarian dome + Aether glow | App Store icon |
-| **Screenshots** | 6–8, story → combat → building → exploration | App Store listing |
-| **Preview video** | 30 seconds, 1080×1920 vertical + 1920×1080 horizontal | App Store + social |
+| **Hero image** | 3840×2160, Elara + companions + Echohaven dome | Steam capsule, website hero |
+| **Capsule art** | 460×215 (small), 231×87 (header), 920×430 (main), 600×900 (vertical) | Steam store page |
+| **Screenshots** | 6–8, 1920×1080 or 3840×2160, story → combat → building → exploration | Steam store listing |
+| **Preview video** | 30-second teaser + 90-second gameplay, 1920×1080 minimum | Steam store + social |
 | **Social templates** | Instagram (1080²), Twitter (1600×900), TikTok (1080×1920) | Social media |
 | **Press kit** | Logo variants, screenshots, key art, fact sheet, trailer | Media distribution |
 
@@ -188,25 +188,27 @@ Per [21_PLAYER_PERSONAS.md](21_PLAYER_PERSONAS.md):
 | Phase | Timing | Activity |
 |---|---|---|
 | **Pre-Announcement** | Launch − 6 months | Build Tartaria lore community (Reddit, TikTok), no game reveal |
-| **Announcement** | Launch − 4 months | Reveal trailer, press kit, App Store pre-order page |
+| **Announcement** | Launch − 4 months | Reveal trailer, press kit, Steam wishlist page live |
 | **Hype Building** | Launch − 3 months | Developer diary videos, influencer early access, ARG |
-| **Beta** | Launch − 2 months | TestFlight external beta (10,000 players), press previews |
-| **Launch Week** | Launch | App Store feature pitch (submitted 8 weeks prior), PR blitz, social push |
+| **Beta** | Launch − 2 months | Steam Playtest beta (10,000 players), press previews |
+| **Launch Week** | Launch | Steam visibility round, PR blitz, social push |
 | **Post-Launch 30 Days** | Launch + 1 month | Response to feedback, hotfix cadence, community events |
 | **First Content Update** | Launch + 3 months | Season 1 event, first DLC zone tease |
 
-### 6.2 App Store Feature Strategy
+### 6.2 Steam Featuring Strategy
 
-Apple favors games that:
-- Use latest iOS features (Metal 3, haptics, Dynamic Island) ✅
+Valve favors games that:
+- Are well-optimized for PC (full keyboard/mouse/gamepad support, resolution options) ✅
 - Are premium or fair free-to-play (no predatory monetization) ✅
 - Have exceptional accessibility ✅
-- Launch iOS-first or iOS-exclusive ✅
+- Use Steam features (Achievements, Cloud Saves, Trading Cards, Workshop potential) ✅
+- Have strong wishlist numbers and community engagement ✅
 
-**Feature pitch assets:**
-- Prepared using Apple's "[Getting Featured](https://developer.apple.com/app-store/getting-featured/)" guide
-- Submit 8 weeks before launch via App Store Connect
-- Include: key art, description, accessibility features, iOS tech showcase
+**Featuring preparation:**
+- Build Steam store page 6+ months before launch (maximize wishlist accumulation)
+- Use Steamworks marketing tools: visibility rounds, daily deals, themed sales
+- Include: capsule art, screenshots, animated trailer, Steam Deck compatibility badge
+- Engage with Steam Labs experiments (Interactive Recommender, Deep Dive)
 
 ### 6.3 Launch Day Pricing
 
@@ -238,7 +240,7 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md):
 | Platform | Purpose | Priority |
 |---|---|---|
 | **Discord** | Core community hub, beta feedback, dev Q&A | P0 |
-| **Reddit** | r/TartariaGame subreddit, cross-posts to r/iOSgaming | P0 |
+| **Reddit** | r/TartariaGame subreddit, cross-posts to r/PCgaming, r/Steam, r/IndieGaming | P0 |
 | **TikTok** | Short-form gameplay, 432 Hz ASMR content | P0 (highest organic reach) |
 | **Instagram** | Art, screenshots, Reels | P1 |
 | **YouTube** | Long-form dev diaries, gameplay, trailers | P1 |
@@ -264,13 +266,13 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md):
 | Tier | Followers | Count | Budget Per | Total |
 |---|---|---|---|---|
 | **Macro** (gaming YouTubers) | 500K–5M | 3–5 | $2,000–$5,000 | $10,000–$25,000 |
-| **Mid-tier** (iOS/indie specialists) | 50K–500K | 10–15 | $500–$2,000 | $5,000–$20,000 |
+| **Mid-tier** (PC/indie specialists) | 50K–500K | 10–15 | $500–$2,000 | $5,000–$20,000 |
 | **Micro** (Tartaria/alternative history) | 10K–50K | 20–30 | $0 (free copy + early access) | $0 |
 
 ### 8.2 Influencer Selection Criteria
 
 1. Audience overlap with player personas (Lore Seekers, Builders)
-2. iOS/mobile gaming content (not exclusively PC/console)
+2. PC/indie gaming content
 3. Positive tone alignment (restoration, wonder, not cynicism)
 4. Previous coverage of: Sky, Monument Valley, Genshin, indie RPGs, Tartaria lore
 5. Engagement rate >3% (not just follower count)
@@ -279,7 +281,7 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md):
 
 | Outlet Type | Examples | Approach |
 |---|---|---|
-| **iOS gaming** | TouchArcade, PocketGamer, AppSpy | Early preview build + exclusive angle |
+| **PC gaming** | PC Gamer, Rock Paper Shotgun, Eurogamer | Early preview build + exclusive angle |
 | **Indie gaming** | IndieGamesPlus, RockPaperShotgun indie column | Developer story + unique premise |
 | **Music/audio** | Sound on Sound, Game Audio Network | 432 Hz tuning system deep dive |
 | **Alternative history** | Tartaria-focused YouTubers, podcasters | Lore collaboration |
@@ -297,17 +299,17 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md):
 
 ---
 
-## 9. App Store Optimization (ASO)
+## 9. Steam Store Optimization
 
-### 9.1 Metadata Strategy
+### 9.1 Store Page Strategy
 
 | Field | Content |
 |---|---|
-| **Title** | TARTARIA: World of Wonder |
-| **Subtitle** | Rebuild a Lost Civilization |
-| **Keywords** (100 chars)** | tartaria,RPG,restoration,sacred geometry,432Hz,city builder,harmonic,frequencies,mystery,golden ratio |
-| **Category** | Games > Role Playing |
-| **Secondary Category** | Games > Strategy |
+| **Title** | TARTARIA: World of Wonder — Aether Awakening |
+| **Short Description** | Rebuild a lost Tartarian civilization through harmonic combat and sacred geometry |
+| **Tags** | RPG, City Builder, Open World, Restoration, Indie, Exploration, Building, Mystery, Atmospheric, Singleplayer |
+| **Genre** | RPG, Strategy, Indie |
+| **Category** | Single-player, Steam Achievements, Steam Cloud, Full Controller Support, Steam Trading Cards |
 
 ### 9.2 Screenshot Strategy
 
@@ -326,7 +328,7 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md):
 
 - In-app review prompt: After completing Moon 2 (positive emotional moment, ~4 hours played)
 - Never prompt during failure states or loading
-- Target: 4.5+ stars (required for consistent App Store featuring)
+- Target: "Very Positive" rating (required for consistent Steam featuring)
 - Respond to all reviews within 48 hours
 
 ---
@@ -337,7 +339,7 @@ Aligned with [03B_EXPANSION_PACKS.md](03B_EXPANSION_PACKS.md) seasonal content:
 
 | Season | Theme | Marketing Focus | In-Game Event |
 |---|---|---|---|
-| **Spring** (Launch) | "Awakening" | Launch campaign, App Store feature | Spring Restoration Festival |
+| **Spring** (Launch) | "Awakening" | Launch campaign, Steam featuring push | Spring Restoration Festival |
 | **Summer** | "Radiance" | DLC 1 tease, influencer refresh | Aether Solstice event |
 | **Autumn** | "Harvest" | Year 1 retrospective, community awards | Resonance Harvest mini-game |
 | **Winter** | "Stillness" | Year 2 roadmap reveal, holiday sale | Winter Crystalline event |
@@ -373,8 +375,8 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md) $2M+ Year 1 target:
 
 | Channel | CPI Target (US) | CPI Target (JP) |
 |---|---|---|
-| Organic (App Store) | $0 | $0 |
-| Apple Search Ads | $2.50–$4.00 | $3.00–$5.00 |
+| Organic (Steam discovery) | $0 | $0 |
+| Steam visibility rounds | $1.50–$3.00 | $2.00–$4.00 |
 | Social (TikTok/Meta) | $1.50–$3.00 | $2.50–$4.50 |
 | Influencer (attributed) | $1.00–$2.00 | $1.50–$3.00 |
 | **Target blended CPI** | **$1.80** | **$3.00** |
@@ -397,7 +399,7 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md) $2M+ Year 1 target:
 |---|---|---|
 | **Trailer production** | $5,000–$8,000 | 15% |
 | **Influencer partnerships** | $15,000–$25,000 | 40% |
-| **Apple Search Ads (launch)** | $5,000–$10,000 | 20% |
+| **Steam visibility rounds (launch)** | $5,000–$10,000 | 20% |
 | **Social media ads (TikTok/Meta)** | $5,000–$10,000 | 20% |
 | **Press kit / events** | $2,000–$3,000 | 5% |
 | **Total marketing** | **$32,000–$56,000** | (~10–16% of total budget) |
@@ -406,7 +408,7 @@ Per [08_MONETIZATION.md](08_MONETIZATION.md) $2M+ Year 1 target:
 
 | Activity | Monthly Budget |
 |---|---|
-| Apple Search Ads (maintenance) | $1,000–$2,000 |
+| Steam visibility & promotions | $1,000–$2,000 |
 | Social media content creation | $500–$1,000 |
 | Community managers (part-time) | $1,000–$2,000 |
 | Influencer refresh (quarterly) | $3,000–$5,000 (quarterly) |

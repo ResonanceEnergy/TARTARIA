@@ -29,7 +29,7 @@ Every story beat, every zone, every Moon, every ending — accessible to free pl
 2. **No pay-to-win.** Purchased items never provide combat or RS advantages unavailable through gameplay.
 3. **No energy gates.** Players never hit "wait 4 hours or pay $0.99." Aether is a gameplay resource, not a monetization timer.
 4. **Transparency.** All prices visible before any tap. No hidden costs, no dark patterns, no "are you sure you don't want to buy?" pop-ups.
-5. **Family-safe.** Apple Family Sharing on all IAPs. Parental controls respected.
+5. **Family-safe.** Steam Family Sharing on all purchases. Parental controls respected.
 6. **Value perception.** Every purchase should feel like the player got MORE than expected.
 
 ---
@@ -194,7 +194,7 @@ Ads are presented in-character:
 | DAU (Month 3) | ~50,000 |
 | Ad view rate | 40% of DAU |
 | Avg ads per viewer | 2.3 |
-| eCPM (rewarded video, iOS) | $15–$25 |
+| eCPM (rewarded video, PC) | $15–$25 |
 | Monthly ad revenue | $34,500–$57,500 |
 
 ---
@@ -373,7 +373,7 @@ Week 4:  Moon Climax Events + battle pass final push
 |---|---|
 | "P2W creep" over time | Quarterly community audit of all purchasable items |
 | Whale exploitation | Soft spending cap alerts ($50/month → "Hey, just checking in") |
-| Child purchasing | Apple parental controls + in-game spending confirmation |
+| Child purchasing | Steam parental controls + in-game spending confirmation |
 | Review bombing | Transparent roadmap + active community management |
 | Ad fatigue | Hard daily caps + in-character ad prompts |
 
@@ -388,5 +388,5 @@ Track monthly:
 ---
 
 **Document Status:** FINAL  
-**Cross-References:** `00_MASTER_GDD.md`, `07_MOBILE_UX.md`, `10_ROADMAP.md`  
+**Cross-References:** `00_MASTER_GDD.md`, `07_PC_UX.md`, `10_ROADMAP.md`  
 **Last Updated:** March 25, 2026

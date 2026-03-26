@@ -8,7 +8,7 @@
 **Cross-References:**
 - [00_MASTER_GDD.md](00_MASTER_GDD.md) — Core pillars & gameplay loop
 - [15_MVP_BUILD_SPEC.md](15_MVP_BUILD_SPEC.md) — Phase 1 vertical slice specification
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Session pacing & touch controls
+- [07_PC_UX.md](07_PC_UX.md) — Session pacing & input controls
 - [10_ROADMAP.md](10_ROADMAP.md) — Gate criteria per phase
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic validation targets
 
@@ -51,7 +51,7 @@
 | 10 — Vertical Slice | Does the combined experience pass Gate 1? |
 
 **Prototype Rules:**
-- Every prototype must run on target hardware (iPhone 17 Pro) at 60 FPS
+- Every prototype must run on target PC hardware (recommended spec: RTX 3060 tier) at 60 FPS
 - Every prototype has a hard time limit — if the experience can't land within that window, it's too slow
 - Every prototype ends with a tester questionnaire (see Section 14)
 - No placeholder art — even prototypes use final-quality visuals for the systems being tested
@@ -454,7 +454,7 @@ A single continuous 15-minute play session that includes:
 - [ ] Aether harvesting (visible energy flow)
 - [ ] At least one combat encounter (Mud Golem)
 - [ ] Milo companion with contextual dialogue
-- [ ] Runs at 60 FPS on iPhone 17 Pro
+- [ ] Runs at 60 FPS on recommended PC hardware
 - [ ] Haptic feedback on all core interactions
 
 ### Combined Flow
@@ -496,7 +496,7 @@ If they say "Can I play more?" — **Gate 1 passes.**
 | Companion dialogue | 45s | Milo humor + Lirael wonder |
 | Global grid update | 30s | Planetary progress visualization |
 
-### App Store Trailer (30s)
+### Steam Trailer (30s)
 | Second | Shot | Audio |
 |---|---|---|
 | 0–5 | Mud-covered ruin → swipe reveals dome | Ambient → rising tone |
@@ -508,9 +508,9 @@ If they say "Can I play more?" — **Gate 1 passes.**
 
 ### Press Kit Prototype
 - 3 × 10-second GIF captures of key moments (excavation, tuning, restoration)
-- 6 screenshots at 6.7" iPhone resolution (exploration, building, combat, map, companion, night)
+- 6 screenshots at 1920×1080 / 2560×1440 PC resolution (exploration, building, combat, map, companion, night)
 - 1 × 30-second trailer (above spec)
-- Playable build link (TestFlight internal)
+- Playable build link (Steam beta branch internal)
 
 ---
 
@@ -520,24 +520,23 @@ If they say "Can I play more?" — **Gate 1 passes.**
 
 | Requirement | Target | Measurement |
 |---|---|---|
-| Frame rate | 60 FPS sustained | Xcode Instruments GPU profiler |
-| RAM | <2.8 GB peak | Memory Graph Debugger |
-| Thermal | No throttling in 15 min | Device temperature logged |
-| Battery | <8% drain per 15 min session | Battery Health API |
-| Touch latency | <16ms input-to-response | UIEvent timestamp delta |
-| Haptic latency | <10ms trigger-to-feedback | Core Haptics timing log |
-| Load time | <5s cold start, <2s warm | Stopwatch / os_signpost |
-| Crash rate | 0% during prototype session | Xcode crash log |
+| Frame rate | 60 FPS sustained | Unity Profiler GPU profiler |
+| RAM | <4 GB peak | Task Manager / Unity Profiler |
+| Thermal | No GPU throttling in 15 min | GPU temperature logged |
+| Input latency | <16ms input-to-response | Input System timestamp delta |
+| Haptic latency | <10ms trigger-to-feedback | Gamepad haptics timing log |
+| Load time | <5s cold start, <2s warm | Stopwatch / Unity Profiler |
+| Crash rate | 0% during prototype session | Unity crash log |
 
 ### Device Matrix
 
 | Device | Priority | Notes |
 |---|---|---|
-| iPhone 17 Pro Max | Primary | Full target spec |
-| iPhone 17 Pro | Primary | Slightly less RAM, smaller screen |
-| iPhone 16 Pro | Secondary | Backward compatibility validation |
-| iPhone 15 Pro | Stretch | Minimum viable device |
-| iPad Pro M4 | Tertiary | Tablet layout verification |
+| RTX 3060 / RX 6700 XT (Recommended) | Primary | Full target spec |
+| GTX 1060 / RX 580 (Minimum) | Primary | Min-spec validation |
+| RTX 4080+ (Ultra) | Secondary | High-end visual quality check |
+| Steam Deck | Stretch | Handheld / portable validation |
+| Laptop (integrated GPU) | Tertiary | Low-spec graceful degradation |
 
 ---
 
@@ -592,5 +591,5 @@ SESSION:   [Duration in minutes]
 ---
 
 **Document Status:** FINAL  
-**Cross-References:** `00_MASTER_GDD.md`, `15_MVP_BUILD_SPEC.md`, `10_ROADMAP.md`, `07_MOBILE_UX.md`  
+**Cross-References:** `00_MASTER_GDD.md`, `15_MVP_BUILD_SPEC.md`, `10_ROADMAP.md`, `07_PC_UX.md`  
 **Last Updated:** March 25, 2026

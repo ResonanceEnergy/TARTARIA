@@ -27,7 +27,7 @@
 6. [Seasonal Rotating Achievements](#6-seasonal-rotating-achievements)
 7. [Reward Structure](#7-reward-structure)
 8. [Backend & Storage](#8-backend-storage)
-9. [Apple Game Center Integration](#9-apple-game-center-integration)
+9. [Steam Achievements Integration](#9-steam-achievements-integration)
 10. [Design Gaps — Open Items](#10-design-gaps-open-items)
 
 ---
@@ -188,7 +188,7 @@ Revealed only upon unlock. Designed for moments of delight and social sharing.
 | H06 | **The Gravity of the Situation** | Jump from the highest point in the game | Featherfall trail effect |
 | H07 | **Reverse Engineering** | Destroy a building you placed yourself (hold + deconstruct) | "Overthinker" title |
 | H08 | **Frequency Master** | Defeat 7 enemies of 7 different frequencies in a single combat | Rainbow resonance VFX |
-| H09 | **Silence Is Golden** | Complete Moon 1 without tapping any dialogue option (listen only) | "Silent" title |
+| H09 | **Silence Is Golden** | Complete Moon 1 without clicking any dialogue option (listen only) | "Silent" title |
 | H10 | **Korath's Respect** | Raise Korath from -5 to +5 loyalty in a single playthrough | Korath's armor cosmetic |
 | H11 | **Anastasia's Awakening** | Trigger all 5 of Anastasia's spoken words | Celestial veil cosmetic |
 | H12 | **100% Pure Resonance** | Achieve 100 RS in every zone simultaneously | "Perfect Resonance" title + golden aura |
@@ -325,21 +325,21 @@ Per [25_SAVE_SYSTEM.md](25_SAVE_SYSTEM.md), achievements are stored in the Meta 
 
 ---
 
-## 9. Apple Game Center Integration
+## 9. Steam Achievements Integration
 
-### 9.1 Game Center Achievements
+### 9.1 Steam Achievements
 
-All 52 standard + hidden achievements synced to Game Center:
+All 52 standard + hidden achievements synced to Steam:
 
-| Game Center Feature | Usage |
+| Steam Feature | Usage |
 |---|---|
 | **Achievements** | 1:1 mapping (52 achievements) |
-| **Progress** | Percentage-based for tiered achievements |
-| **Hidden** | 12 achievements marked as hidden in Game Center dashboard |
+| **Progress** | Achievement progress tracked via Steamworks Stats API |
+| **Hidden** | 12 achievements marked as hidden in Steamworks dashboard |
 | **Leaderboards** | RS by zone, total RS, speedrun time, World's Fair votes |
-| **Challenges** | Player-to-player achievement challenges via Game Center |
+| **Global Achievement Stats** | Public completion percentages for all achievements |
 
-### 9.2 Game Center Leaderboards
+### 9.2 Steam Leaderboards
 
 | Leaderboard | Metric | Scope |
 |---|---|---|

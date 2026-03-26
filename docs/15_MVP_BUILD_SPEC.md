@@ -5,14 +5,14 @@
 
 > *"If the first 15 minutes don't feel like magic, nothing else matters."*
 
-**Document Purpose:** Exact specification for the Phase 1 vertical slice (Months 1–3). Every system described here must be playable on an iPhone 17 Pro at 60 FPS by the end of Month 3. This is the GATE 1 deliverable — the foundation upon which everything else is built.
+**Document Purpose:** Exact specification for the Phase 1 vertical slice (Months 1–3). Every system described here must be playable on a mid-range PC (GTX 1070+ / RX 580+) at 60 FPS by the end of Month 3. This is the GATE 1 deliverable — the foundation upon which everything else is built.
 
 **Cross-References:**
 - [00_MASTER_GDD.md](00_MASTER_GDD.md) — Full game overview
 - [10_ROADMAP.md](10_ROADMAP.md) — Development roadmap context
 - [01_LORE_BIBLE.md](01_LORE_BIBLE.md) — Lore foundation
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — UX/Touch patterns
-- [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Core Haptics spec
+- [07_PC_UX.md](07_PC_UX.md) — PC Input & UX patterns
+- [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic & Force Feedback spec
 
 ---
 
@@ -53,7 +53,7 @@
 | Tuning mini-game | Frequency matching for Aether nodes (3 variants) | Full |
 | Milo companion | Dialogue, idle chatter, follow AI, lore triggers | Full |
 | Mud Golem enemy | 1 enemy type, harmonic combat, patrol AI | Full |
-| Core Haptics | Touch feedback on all interactions | Full |
+| Gamepad Haptics | Force feedback on all interactions | Full |
 | Adaptive music | 2-layer prototype (ambient + RS-reactive) | Prototype |
 | Day/night cycle | 17-hour visual cycle (no calendar system yet) | Prototype |
 
@@ -69,7 +69,7 @@ The vertical slice must support this exact play session:
 
 ```
 0:00  — Player awakens in a modern ruin. Mud everywhere. A hum beneath.
-1:00  — First movement. Touch to walk. Camera follows. The hum grows.
+1:00  — First movement. WASD to walk. Camera follows. The hum grows.
 2:00  — Discovery: a buried dome, only the tip visible. Milo appears.
 3:00  — Milo speaks: "You can hear it, can't you? The frequency beneath the mud."
 4:00  — Tutorial: Aether scan. The dome lights up. Connection points revealed.
@@ -91,26 +91,28 @@ The vertical slice must support this exact play session:
 
 ## 2. Target Hardware & Performance Budgets
 
-### Primary Target
+### Primary Target (Recommended PC)
 | Spec | Value |
 |---|---|
-| Device | iPhone 17 Pro (A19 Bionic) |
-| OS | iOS 18.0+ |
-| GPU API | Metal 3 |
-| Upscaling | MetalFX Temporal |
-| Render Resolution | 1080p → 2796×1290 native via MetalFX |
-| Frame Target | 60 FPS sustained, 120 FPS UI elements |
-| Thermal Envelope | ≤ 38°C skin temperature after 30 min play |
-| Memory Budget | ≤ 1.8 GB (of 8 GB device RAM) |
+| GPU | NVIDIA RTX 3060 / AMD RX 6700 XT (8 GB VRAM) |
+| CPU | Intel i5-12400 / AMD Ryzen 5 5600X |
+| RAM | 16 GB |
+| OS | Windows 10/11 (64-bit) |
+| GPU API | DirectX 12 (primary), Vulkan (fallback) |
+| Upscaling | FSR 2 / DLSS (optional) |
+| Render Resolution | 1080p–1440p native |
+| Frame Target | 60 FPS sustained |
+| Memory Budget | ≤ 4 GB |
 
-### Fallback Target
+### Minimum Target
 | Spec | Value |
 |---|---|
-| Device | iPhone 15 Pro (A17 Pro) |
-| Render Resolution | 720p → native via MetalFX |
-| Frame Target | 30 FPS sustained |
-| Thermal Envelope | ≤ 40°C after 30 min |
-| Memory Budget | ≤ 1.5 GB |
+| GPU | NVIDIA GTX 1070 / AMD RX 580 (4 GB VRAM) |
+| CPU | Intel i5-8400 / AMD Ryzen 5 2600 |
+| RAM | 8 GB |
+| Render Resolution | 1080p via FSR Performance |
+| Frame Target | 30 FPS sustained (60 optional with reduced quality) |
+| Memory Budget | ≤ 3 GB |
 
 ### Per-Frame Budgets (at 60 FPS = 16.67ms)
 | System | Budget (ms) | Notes |
@@ -120,21 +122,21 @@ The vertical slice must support this exact play session:
 | Physics + ECS | 1.5 | Burst compiled jobs |
 | AI (companion + enemy) | 1.0 | DOTS-based state machines |
 | Audio | 0.5 | Spatial audio + adaptive layers |
-| Haptics | 0.2 | Core Haptics CHHapticEngine |
-| Input processing | 0.3 | Touch + gesture recognition |
-| UI | 0.5 | SwiftUI overlay via Unity bridge |
+| Haptics | 0.1 | Gamepad rumble (XInput / DualSense) |
+| Input processing | 0.3 | Keyboard + mouse + gamepad |
+| UI | 0.5 | UI Toolkit (retained mode) |
 | Headroom | 2.67 | Thermal spikes, GC, OS interrupts |
 
-### Thermal State Machine
+### GPU Quality Auto-Scaling
 ```
-NOMINAL (< 35°C)
-  → Full quality, 60 FPS, all VFX
-WARM (35–38°C)
+STABLE (60+ FPS sustained)
+  → Full quality, all VFX, maintain current settings
+DROPPING (50–59 FPS)
   → Reduce particle count 50%, disable secondary shadows
-HOT (38–40°C)
-  → Drop to 30 FPS, reduce Aether bands to 2
-CRITICAL (> 40°C)
-  → Force 30 FPS, minimal VFX, save & warn player
+LOW (40–49 FPS)
+  → Drop FSR/DLSS to Performance mode, reduce Aether bands to 2
+CRITICAL (<40 FPS)
+  → Target 30 FPS, minimal VFX, suggest lower quality preset
 ```
 
 ---
@@ -148,7 +150,7 @@ CRITICAL (> 40°C)
 | Render Pipeline | URP (Universal Render Pipeline) |
 | ECS Framework | DOTS (Entities 1.x, Burst, Jobs) |
 | Asset Management | Addressables (local for Phase 1) |
-| Build Backend | IL2CPP (ARM64) |
+| Build Backend | IL2CPP (x86_64) |
 | Scripting Runtime | .NET Standard 2.1 |
 
 ### Project Folder Structure
@@ -165,7 +167,7 @@ Assets/
 │   ├── Audio/
 │   │   ├── Music/             # Adaptive layers (432 Hz base)
 │   │   ├── SFX/               # Interaction, combat, ambient
-│   │   └── Haptics/           # AHAP files for Core Haptics
+│   │   └── Haptics/           # Gamepad haptic profiles
 │   ├── Scripts/
 │   │   ├── Core/              # Aether, RS, golden ratio engine
 │   │   ├── Gameplay/          # Building, tuning, combat
@@ -187,7 +189,7 @@ Assets/
 │       ├── GoldenRatioConstants.asset
 │       └── AetherConfig.asset
 ├── Plugins/
-│   └── iOS/                   # Core Haptics bridge, Metal shaders
+│   └── Platform/              # Gamepad haptics, platform-specific shaders
 └── StreamingAssets/
     └── Audio/                 # Runtime-loaded adaptive stems
 ```
@@ -201,7 +203,7 @@ Assets/
 | AIGroup | CompanionBehaviorSystem, EnemyPatrolSystem, EnemyEngageSystem | Medium |
 | CombatGroup | HarmonicCombatSystem, DamageResolutionSystem | Medium |
 | AudioGroup | AdaptiveMusicSystem, SpatialAudioSystem | Low |
-| HapticsGroup | HapticEventSystem, HapticThermalGateSystem | Low |
+| HapticsGroup | HapticEventSystem, HapticQualityGateSystem | Low |
 
 ---
 
@@ -274,7 +276,7 @@ AetherSimKernel:
   5. Write to 3D texture for URP to sample
 
 Per frame: ~120k voxels × 3 bands = 360k cells @ ~5.5 FLOPS/cell
-Budget: 2.0ms on A19 GPU (well within)
+Budget: 2.0ms on mid-range GPU (well within)
 ```
 
 ### Resonance Source/Sink Model
@@ -292,7 +294,7 @@ Budget: 2.0ms on A19 GPU (well within)
 - Instanced quad billboards (2k–8k particles per band, LOD by distance)
 - Color palette: golden (#D4A017) → white-gold (#F5E6CC) → amber (#FF8C00)
 - Alpha blending with multiplicative mode for a "glowing mist" look
-- MetalFX temporal reprojection: render at half-res, upscale; saves 40% fill rate
+- FSR 2 / DLSS temporal reprojection: render at half-res, upscale; saves 40% fill rate
 
 ---
 
@@ -569,9 +571,9 @@ Combat in Tartaria is not about violence — it's about FREQUENCY. The player do
 ### Player Abilities (Phase 1: 3 abilities)
 | Ability | Input | Effect | Cooldown |
 |---|---|---|---|
-| Resonance Pulse | Tap enemy | AOE burst, pushes enemies back, minor damage | 2s |
-| Harmonic Strike | Swipe toward enemy | Directed attack, high single-target damage | 3s |
-| Frequency Shield | Two-finger hold | absorbs incoming attacks for 3s | 8s |
+| Resonance Pulse | Left-click enemy | AOE burst, pushes enemies back, minor damage | 2s |
+| Harmonic Strike | Right-click toward enemy | Directed attack, high single-target damage | 3s |
+| Frequency Shield | Ctrl / Left trigger | absorbs incoming attacks for 3s | 8s |
 
 ### Mud Golem (Enemy Spec)
 | Attribute | Value |
@@ -631,23 +633,23 @@ public partial struct HarmonicCombatSystem : ISystem
 | Combat | Pull back to 20m, wider FOV, track nearest enemy |
 | Cinematic | Pre-authored Cinemachine paths for restoration reveals |
 
-### Touch Controls
-| Gesture | Action |
+### Input Controls
+| Input | Action |
 |---|---|
-| Tap ground | Move to location (pathfinding) |
-| Tap object | Interact (examine, start tuning) |
-| Tap enemy | Resonance Pulse attack |
-| Swipe (combat) | Harmonic Strike |
-| Two-finger hold | Frequency Shield |
-| Pinch | Zoom |
-| Two-finger rotate | Camera orbit |
-| Long press | Aether vision toggle |
+| WASD | Move to location (direct control) |
+| Left-click object | Interact (examine, start tuning) |
+| Left-click enemy | Resonance Pulse attack |
+| Right-click (combat) | Harmonic Strike |
+| Ctrl / Left trigger | Frequency Shield |
+| Scroll wheel | Zoom |
+| Middle mouse / Q/E | Camera orbit |
+| Tab | Aether vision toggle |
 
 ### Control Configuration
-- Virtual joystick option (accessibility)
-- Haptic confirmation on all taps
-- Dead zone: 10px to prevent misfire
-- Gesture recognition priority: combat > interaction > movement
+- Full keybinding remapping
+- Gamepad support (Xbox, PlayStation, Steam Deck) with auto-detect
+- Haptic confirmation on all interactions (gamepad)
+- Mouse sensitivity and dead zone configuration
 
 ---
 
@@ -684,12 +686,12 @@ Layer 2 (Reactive): Event-driven
   - Restoration: Expanding harmonic series (brass + choir)
 ```
 
-### Core Haptics Integration
+### Gamepad Haptics Integration
 | Event | Haptic Pattern | Duration | Intensity |
 |---|---|---|---|
-| Footstep | Single tap | 20ms | 0.3 |
-| Discovery | Rising buzz | 500ms | 0.4→0.8 |
-| Tuning (on-frequency) | Sustained hum | Continuous | 0.5 |
+| Footstep | Single rumble pulse | 20ms | 0.3 |
+| Discovery | Rising rumble | 500ms | 0.4→0.8 |
+| Tuning (on-frequency) | Sustained low rumble | Continuous | 0.5 |
 | Tuning (off-frequency) | Irregular buzz | Continuous | 0.3 |
 | Perfect tune | Warm cascade | 1000ms | 0.6→1.0→0.0 |
 | Building emergence | Rolling wave | 5000ms | 0.3→1.0 |
@@ -697,27 +699,27 @@ Layer 2 (Reactive): Event-driven
 | Combat hit | Sharp snap | 50ms | 0.9 |
 | Golem death | Dissolving crackle | 1500ms | 0.8→0.0 |
 
-### AHAP File Example (Building Emergence)
+### Haptic Profile Example (Building Emergence — XInput)
 ```json
 {
-  "Version": 1.0,
-  "Pattern": [
-    {"Event": {"Time": 0.0, "EventType": "HapticContinuous",
-      "EventParameters": [
-        {"ParameterID": "HapticIntensity", "ParameterValue": 0.3},
-        {"ParameterID": "HapticSharpness", "ParameterValue": 0.2}
-      ],
-      "EventDuration": 5.0}},
-    {"ParameterCurve": {
-      "ParameterID": "HapticIntensityControl",
-      "Time": 0.0,
-      "ParameterCurveControlPoints": [
-        {"Time": 0.0, "ParameterValue": 0.3},
-        {"Time": 2.5, "ParameterValue": 0.7},
-        {"Time": 4.0, "ParameterValue": 1.0},
-        {"Time": 5.0, "ParameterValue": 0.0}
-      ]}}
-  ]
+  "name": "building_emergence",
+  "duration_ms": 5000,
+  "left_motor": {
+    "curve": [
+      {"time": 0.0, "value": 0.3},
+      {"time": 0.5, "value": 0.5},
+      {"time": 0.8, "value": 1.0},
+      {"time": 1.0, "value": 0.0}
+    ]
+  },
+  "right_motor": {
+    "curve": [
+      {"time": 0.0, "value": 0.1},
+      {"time": 0.4, "value": 0.4},
+      {"time": 0.7, "value": 0.8},
+      {"time": 1.0, "value": 0.0}
+    ]
+  }
 }
 ```
 
@@ -761,7 +763,7 @@ Layer 2 (Reactive): Event-driven
 ### Phase 1: Local Only
 - Data: JSON serialized to Application.persistentDataPath
 - Contents: RS value, building states (buried/revealed/tuning/active), node completion flags, discovered POIs, Milo dialogue history
-- Auto-save: on every RS change, building state change, and app backgrounding
+- Auto-save: on every RS change, building state change, and alt-tab/minimize
 - Manual save: not exposed (auto-save only for Phase 1)
 
 ### Save Data Structure
@@ -797,15 +799,15 @@ public class BuildingState
 | # | Criterion | Measurement |
 |---|---|---|
 | 1 | 15-minute play session complete | Documented playtest video |
-| 2 | 60 FPS on iPhone 17 Pro (sustained) | Xcode GPU profiler, 30-min session |
-| 3 | 30 FPS on iPhone 15 Pro (sustained) | Same |
-| 4 | Thermal ≤ 38°C after 30 min (iPhone 17 Pro) | IR thermometer reading |
+| 2 | 60 FPS on Recommended PC (sustained) | Unity Profiler, 30-min session |
+| 3 | 30 FPS on Minimum PC (sustained) | Same |
+| 4 | Memory ≤ 4 GB after 30 min | Profiler reading |
 | 5 | Aether field visible, flowing, RS-responsive | Qualitative + visual test |
 | 6 | 3 buildings restorable with tuning mini-games | Functional test |
 | 7 | Mud dissolution shader working | Visual quality assessment |
 | 8 | Milo functional (follow, speak, hide) | Behavior tree test matrix |
 | 9 | 1 enemy type engageable and defeatable | Combat flow test |
-| 10 | Core Haptics working on all interactions | Haptic review on device |
+| 10 | Gamepad haptics working on all interactions | Haptic review with Xbox/DualSense controller |
 | 11 | Adaptive music responds to RS changes | Audio review |
 | 12 | No crashes in 1-hour stress test | Automated + manual test |
 
@@ -822,10 +824,10 @@ If the answer is not unanimously "yes" — iterate before proceeding to Phase 2.
 
 | Week | Focus | Deliverables | Exit Test |
 |---|---|---|---|
-| 1 | Project Setup | Unity 6, URP, DOTS scaffolding, Git, CI (Xcode Cloud) | Clean build on device |
+| 1 | Project Setup | Unity 6, URP, DOTS scaffolding, Git, CI (GitHub Actions) | Clean build on PC |
 | 2 | Aether System | 3-band compute shader, volumetric render, grid partition | Aether visible at 60 FPS |
 | 3 | Resonance Score | RS accumulation, golden-ratio validator, threshold events | RS accrues from test inputs, sky color shifts |
-| 4 | Performance | MetalFX integration, thermal state machine, profiling | 60 FPS + ≤35°C for 30 min (blank scene + Aether) |
+| 4 | Performance | FSR 2/DLSS integration, quality auto-scaling, profiling | 60 FPS on Recommended PC (blank scene + Aether) |
 
 ### Month 2: Building & Exploration
 
@@ -834,7 +836,7 @@ If the answer is not unanimously "yes" — iterate before proceeding to Phase 2.
 | 5 | Building System | Placement, state machine, ScriptableObject data | Building transitions through all states |
 | 6 | Restoration VFX | Mud dissolution shader, emergence particles, sound | Beautiful restoration on all 3 buildings |
 | 7 | Zone: Echohaven | Terrain, blockout architecture, POI placement, lighting | Walk the full zone, discover all POIs |
-| 8 | Controls & Camera | Touch input, camera rig, Cinemachine, gesture handling | Responsive input, smooth camera on device |
+| 8 | Controls & Camera | Keyboard/mouse/gamepad input, camera rig, Cinemachine | Responsive input, smooth camera on PC |
 
 ### Month 3: Gameplay & Integration
 
@@ -851,15 +853,15 @@ If the answer is not unanimously "yes" — iterate before proceeding to Phase 2.
 
 | Risk | Probability | Impact | Mitigation |
 |---|---|---|---|
-| MetalFX upscaling artifacts | Medium | Medium | Fallback to native 1080p if quality insufficient |
+| FSR 2/DLSS upscaling artifacts | Medium | Medium | FSR 2/DLSS fallback modes; native rendering at lower res if quality insufficient |
 | Aether compute exceeds 2ms budget | Low | High | Reduce voxel grid (48³), simplify advection |
-| Thermal limit exceeded on A17 Pro | Medium | Medium | Pre-authored thermal profiles per chip |
+| GPU quality scaling insufficient | Medium | Medium | Pre-authored quality profiles per GPU vendor (NVIDIA/AMD/Intel) |
 | Mud dissolution shader banding | Medium | Low | Add dithering + noise variation |
 | Milo pathfinding in complex terrain | Medium | Medium | NavMesh + off-mesh links for terrain gaps |
 | 432 Hz tuning feels "off" to western ears | Low | Low | A/B test with 440 Hz variant, data-decide |
-| Touch combat gestures conflict | Medium | Medium | Combat mode toggle vs exploration mode |
-| Save corruption on backgrounding | Medium | High | Double-write + checksum verification |
-| Core Haptics latency on older devices | Low | Low | Hardware-check: disable on non-Taptic devices |
+| Touch combat gestures conflict | Medium | Medium | Context-sensitive input; combat mode vs exploration mode |
+| Save corruption on alt-tab/crash | Medium | High | Double-write + checksum verification |
+| Gamepad haptics latency | Low | Low | Hardware-check: disable haptics if not supported |
 | Scope creep from "just one more feature" | High | High | Strict GATE 1 scope freeze after Week 4 |
 
 ---
@@ -875,10 +877,10 @@ If the answer is not unanimously "yes" — iterate before proceeding to Phase 2.
 | Audio (music stems) | 6 layers | 5 MB | 30 MB |
 | Audio (SFX) | 40 clips | 200 KB | 8 MB |
 | Audio (dialogue) | 40 lines | 500 KB | 20 MB |
-| Haptic (AHAP files) | 15 patterns | 2 KB | 30 KB |
+| Haptic (gamepad profiles) | 15 patterns | 2 KB | 30 KB |
 | Shaders | 5 custom | — | — |
 | VFX graphs | 6 | — | — |
-| **Estimated Build Size** | | | **~160 MB** |
+| **Estimated Build Size** | | | **~250 MB** |
 
 ---
 
@@ -888,9 +890,9 @@ If the answer is not unanimously "yes" — iterate before proceeding to Phase 2.
 |---|---|---|
 | ECS vs MonoBehaviour | DOTS ECS for core (Aether, RS, combat), MonoBehaviour for UI/Camera | Performance-critical systems benefit from Burst+Jobs; camera/UI need MonoBehaviour flexibility |
 | Addressables vs Resources | Addressables (local bundles) | Future-proofs for Phase 2 remote loading |
-| Audio middleware | Native Unity Audio + Core Haptics bridge | No middleware dependency; full haptic control |
+| Audio middleware | Native Unity Audio + gamepad haptics via Unity Input System | No middleware dependency; cross-platform haptic control |
 | Save format | JSON (local) | Simple, debuggable, human-readable; Phase 3 adds Firebase |
-| UI framework | Unity UI Toolkit + SwiftUI overlay | Native iOS feel for menus; Unity for HUD |
+| UI framework | Unity UI Toolkit | Consistent cross-platform look; full keyboard/mouse/gamepad support |
 
 ---
 

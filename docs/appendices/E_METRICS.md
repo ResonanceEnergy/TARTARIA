@@ -75,7 +75,7 @@
 | No quest completion in 48 hours | Medium | Offer catch-up boost / daily reward |
 | Aether balance hoarding (not spending) | Medium | Surface new crafting/building goals |
 | Skipping companion dialogue | Low | Reduce dialogue frequency for that player |
-| Uninstall from settings screen (iOS signal) | Critical | Final retention push (if available) |
+| Uninstall detected (Steam signal) | Critical | Final retention push (if available) |
 
 ---
 
@@ -239,18 +239,18 @@
 
 | Metric | Target | Hard Limit | Notes |
 |---|---|---|---|
-| **Total RAM** | ≤ 2.5 GB | ≤ 3.5 GB | iPhone 17 Pro has 8 GB |
-| **Texture Memory** | ≤ 800 MB | ≤ 1.2 GB | ASTC compressed |
-| **Mesh Memory** | ≤ 200 MB | ≤ 400 MB | LOD system active |
+| **Total RAM** | ≤ 3.5 GB | ≤ 4.5 GB | Recommended spec has 16 GB |
+| **Texture Memory** | ≤ 1.2 GB | ≤ 2.0 GB | BC7 compressed |
+| **Mesh Memory** | ≤ 300 MB | ≤ 600 MB | LOD system active |
 | **Audio Memory** | ≤ 100 MB | ≤ 200 MB | Streaming + procedural |
 | **Script Heap** | ≤ 256 MB | ≤ 512 MB | ECS minimizes GC |
 
-### Thermal & Battery
+### Thermal & Power
 
 | Metric | Target | Red Flag |
 |---|---|---|
-| **Thermal State** | Nominal for 30-min session | Serious within 15 min |
-| **Battery Drain** | ≤ 8% per 15-min session | > 12% per 15 min |
+| **GPU Temperature** | Nominal for 60-min session | Throttling within 15 min |
+| **Laptop Battery Drain** | ≤ 15% per 30-min session | > 25% per 30 min |
 | **CPU Utilization** | ≤ 60% sustained | > 80% sustained |
 | **GPU Utilization** | ≤ 70% sustained | > 85% sustained |
 
@@ -258,8 +258,8 @@
 
 | Metric | Target | Red Flag |
 |---|---|---|
-| **App Download Size** | ≤ 250 MB (initial) | > 400 MB |
-| **Total Install Size** | ≤ 2 GB (all content) | > 3 GB |
+| **Initial Download Size** | ≤ 5 GB (initial) | > 8 GB |
+| **Total Install Size** | ≤ 15 GB (all content) | > 20 GB |
 | **Addressable Bundle Size** | ≤ 50 MB per Moon chunk | > 80 MB |
 | **API Call Frequency** | ≤ 5 calls per minute (idle) | > 15 calls per minute |
 | **Cloud Save Size** | ≤ 5 MB per player | > 10 MB |

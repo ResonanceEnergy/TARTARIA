@@ -10,7 +10,7 @@
 - [22_DIALOGUE_BRANCHING.md](22_DIALOGUE_BRANCHING.md) — ~4,000 dialogue nodes, JSON format
 - [appendices/C_AUDIO_DESIGN.md](appendices/C_AUDIO_DESIGN.md) — Voice acting, 432 Hz audio spec
 - [01_LORE_BIBLE.md](01_LORE_BIBLE.md) — Old Tartarian conlang, 3-6-9 numerology
-- [08_MONETIZATION.md](08_MONETIZATION.md) — Regional pricing, App Store Optimization
+- [08_MONETIZATION.md](08_MONETIZATION.md) — Regional pricing, Steam Store Optimization
 - [10_ROADMAP.md](10_ROADMAP.md) — Phased launch timeline
 
 ---
@@ -47,10 +47,10 @@
 
 ### Why Localization Matters for Tartaria
 
-- **iOS global market:** 60% of App Store revenue comes from non-English markets
+- **PC global market:** 60% of Steam revenue comes from non-English markets
 - **Tartaria's real-world fan base:** r/tartaria, r/culturallayer, alt-history communities span 30+ countries
 - **Genre precedent:** Genshin Impact's global success required launch-day Chinese, Japanese, Korean, English
-- **Apple featuring criteria:** Multi-language support significantly increases App Store featuring probability
+- **Steam featuring criteria:** Multi-language support significantly increases Steam featuring probability
 
 ---
 
@@ -172,7 +172,7 @@ UI elements must be designed with expansion headroom:
 | **Number formatting** | 1,000,000 | JA: 100万, DE: 1.000.000, ZH: 100万 |
 | **Date formatting** | March 24, 2026 | JA: 2026年3月24日, DE: 24. März 2026 |
 | **Color symbolism** | Gold = power/wonder | JA: Gold OK; ZH: Red = luck, White = death — review |
-| **Currency display** | $4.99 | Regional App Store prices (¥800, €5.49, ₩6,500) |
+| **Currency display** | $4.99 | Regional Steam prices (¥800, €5.49, ₩6,500) |
 | **Humor** | Milo's British sarcasm | JA: Convert to tsukkomi-style; KO: Adapt to aegyo-style |
 | **Directional metaphors** | "Move forward" | RTL languages: directional UI flip (future Arabic/Hebrew) |
 

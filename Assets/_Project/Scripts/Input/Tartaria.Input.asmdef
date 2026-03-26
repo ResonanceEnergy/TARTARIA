@@ -1,0 +1,17 @@
+{
+    "name": "Tartaria.Input",
+    "rootNamespace": "Tartaria.Input",
+    "references": [
+        "Tartaria.Core",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -190,7 +190,7 @@ Players place or repair three core structural components on every building:
 
 **Touch Optimization (Mobile):**
 - Bottom-screen key layout (thumb-friendly)
-- Haptic feedback on correct hits (iPhone Taptic Engine pulse at 432 Hz timing)
+- Haptic feedback on correct hits (gamepad rumble pulse at 432 Hz timing)
 - Short rounds (15–30 seconds per tune attempt)
 
 ### 6.2 Cymatic Garden Puzzle (Exterior Zones)
@@ -477,5 +477,5 @@ The Hidden Hour (17th) lasts ~3.5 real-time minutes — a precious window that v
 ---
 
 **Document Status:** FINAL  
-**Cross-References:** `01_LORE_BIBLE.md` (sections 4–5), `04_ARCHITECTURE_GUIDE.md`, `07_MOBILE_UX.md`  
+**Cross-References:** `01_LORE_BIBLE.md` (sections 4–5), `04_ARCHITECTURE_GUIDE.md`, `07_PC_UX.md`  
 **Last Updated:** March 25, 2026
