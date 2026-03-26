@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ac385fd809c5af449bcd16118c002e0, type: 3}
+  m_Name: TartariaConstants
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.TartariaConstants
+  phi: 1.618034
+  phiInverse: 0.618034
+  phiSquared: 2.618034
+  sqrtPhi: 1.2720196
+  baseFrequencyHz: 432
+  telluricFrequencyHz: 7.83
+  healingFrequencyHz: 528
+  celestialFrequencyHz: 1296
+  band3Frequency: 129.6
+  band6Frequency: 432
+  band9Frequency: 1296
+  rsThresholdLit: 25
+  rsThresholdHarmonic: 50
+  rsThresholdRadiant: 75
+  rsThresholdFull: 100
+  rsDiscovery: 5
+  rsTuneBasic: 10
+  rsTunePerfect: 25
+  rsRestore: 50
+  rsDefeatEnemy: 15
+  goldenRatioMultiplier: 1.618
+  freq432Multiplier: 1.5
+  perfectNodeMultiplier: 2
+  harmonicsOnlyMultiplier: 1.3

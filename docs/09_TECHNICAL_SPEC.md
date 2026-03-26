@@ -1,5 +1,5 @@
 # TARTARIA WORLD OF WONDER — Technical Specification
-## Unity 6, Metal 3, iOS Optimization & Backend Architecture
+## Unity 6, DirectX 12 / Vulkan, PC Optimization & Backend Architecture
 
 ---
 
@@ -12,7 +12,7 @@
 5. [Asset Pipeline](#5-asset-pipeline)
 6. [Audio Architecture](#6-audio-architecture)
 7. [Networking & Backend](#7-networking-backend)
-8. [iPhone-Specific Optimizations](#8-iphone-specific-optimizations)
+8. [PC-Specific Optimizations](#8-pc-specific-optimizations)
 9. [Save System](#9-save-system)
 10. [Build & Deployment](#10-build-deployment)
 
@@ -25,7 +25,7 @@
 | Component | Technology |
 |---|---|
 | **Engine** | Unity 6 LTS (2026.x) |
-| **Scripting Backend** | IL2CPP (mandatory for iOS) |
+| **Scripting Backend** | IL2CPP (for performance) |
 | **Architecture** | DOTS/ECS (Entities 1.x) |
 | **Render Pipeline** | URP (Universal Render Pipeline) |
 | **Compiler** | Burst Compiler 1.8+ |
@@ -39,26 +39,28 @@
 
 | Spec | Requirement |
 |---|---|
-| **Minimum iOS** | 18.0 |
-| **Minimum Device** | iPhone 15 Pro (A17 Pro) |
-| **Target Device** | iPhone 17 Pro / Pro Max (A19) |
-| **Future-Proofing** | iPhone 18 (A20) optimizations ready |
-| **iPad Support** | Universal binary, iPad Air M2+ |
-| **Graphics API** | Metal 3 (exclusive — no OpenGL fallback) |
-| **App Store Category** | Games > Adventure |
-| **Rating** | 9+ (no violence, no real gambling) |
+| **Minimum OS** | Windows 10 (64-bit, version 1909+) |
+| **Recommended OS** | Windows 11 |
+| **Minimum GPU** | NVIDIA GTX 1070 / AMD RX 580 (4 GB VRAM) |
+| **Recommended GPU** | NVIDIA RTX 3060 / AMD RX 6700 XT (8 GB VRAM) |
+| **Minimum CPU** | Intel i5-8400 / AMD Ryzen 5 2600 |
+| **Recommended CPU** | Intel i5-12400 / AMD Ryzen 5 5600X |
+| **Minimum RAM** | 8 GB |
+| **Recommended RAM** | 16 GB |
+| **Graphics API** | DirectX 12 (primary), Vulkan (fallback) |
+| **Distribution** | Steam |
+| **Rating** | ESRB E10+ / PEGI 7 |
+| **Future Port** | iOS 18.0+ (post-PC launch) |
 
-### 1.3 Supported Device Matrix
+### 1.3 Supported Hardware Tiers
 
-| Device | Chip | Metal | Target FPS | Resolution |
+| Tier | GPU Example | VRAM | Target FPS | Resolution |
 |---|---|---|---|---|
-| iPhone 15 Pro | A17 Pro | Metal 3 | 30 (60 optional) | 720p upscaled |
-| iPhone 16 Pro | A18 Pro | Metal 3 | 60 | 900p → 1080p |
-| iPhone 17 Pro | A19 | Metal 3+ | 60 locked | 1080p native |
-| iPhone 17 Pro Max | A19 | Metal 3+ | 60 locked | 1080p native |
-| iPhone 18 (target) | A20 | Metal 3+ | 60 locked | 1200p → 1440p |
-| iPad Air M2 | M2 | Metal 3 | 60 | 1080p |
-| iPad Pro M4 | M4 | Metal 3 | 60 locked | 1200p |
+| **Minimum** | GTX 1070 / RX 580 | 4 GB | 30 (60 optional) | 1080p (FSR Performance) |
+| **Recommended** | RTX 3060 / RX 6700 XT | 8 GB | 60 locked | 1080p–1440p |
+| **High** | RTX 3070 / RX 6800 XT | 8–12 GB | 60 locked | 1440p–4K (FSR/DLSS Quality) |
+| **Ultra** | RTX 4070+ / RX 7900+ | 12+ GB | 60 locked | 4K native |
+| **Steam Deck** | RDNA 2 (custom) | 1 GB (shared) | 30–40 | 800p (FSR Performance) |
 
 ---
 
@@ -69,8 +71,8 @@
 ```
 URP Asset Settings:
 ├── HDR: On
-├── MSAA: 2x (mobile)
-├── Render Scale: Dynamic (0.65–1.0)
+├── MSAA: 4x (2x on Minimum tier)
+├── Render Scale: Dynamic (0.5–1.0, per quality preset)
 ├── Shadow Distance: 80m
 ├── Shadow Cascades: 2
 ├── Shadow Resolution: 1024
@@ -85,22 +87,24 @@ URP Asset Settings:
 └── Dynamic Batching: Off (unnecessary with SRP Batcher)
 ```
 
-### 2.2 MetalFX Temporal Upscaling
+### 2.2 FSR 2 / DLSS Temporal Upscaling
 
-**Core rendering strategy — render at lower resolution, upscale with hardware AI:**
+**Core rendering strategy — render at lower resolution, upscale with temporal reconstruction:**
 
-| Quality Level | Render Resolution | Output | GPU Savings |
-|---|---|---|---|
-| Performance | 540p | 1080p | ~60% |
-| Balanced | 720p | 1080p | ~45% |
-| Quality | 900p | 1080p | ~25% |
-| Max (A19+) | 1080p | 1080p | 0% (native) |
+| Quality Level | Render Resolution | Output (1080p) | Output (1440p) | Output (4K) |
+|---|---|---|---|---|
+| Performance | 540p | 1080p | 720p → 1440p | 1080p → 4K |
+| Balanced | 720p | 1080p | 960p → 1440p | 1440p → 4K |
+| Quality | 900p | 1080p | 1200p → 1440p | 2160p → 4K |
+| Native | — | 1080p | 1440p | 4K |
 
 **Implementation:**
-- Custom URP Renderer Feature wrapping MetalFX Temporal Scaler
+- AMD FSR 2.2 (all GPUs, primary — works on NVIDIA, AMD, Intel)
+- NVIDIA DLSS 3.5 (RTX GPUs, optional — better quality when available)
+- Intel XeSS (Arc GPUs, optional)
 - Motion vectors from URP pass (required for temporal stability)
 - Reactive mask for UI elements (prevents ghosting on HUD)
-- Auto-switch based on thermal state (see §8.4)
+- Auto-select based on detected GPU vendor and driver version
 
 ### 2.3 Lighting
 
@@ -141,26 +145,26 @@ URP Asset Settings:
 
 | Category | Budget | Notes |
 |---|---|---|
-| **Total Peak RAM** | ≤2.8 GB | iOS terminates at ~3.5 GB; keep 700 MB headroom |
-| **Texture Memory** | 1.5 GB | ASTC compressed, mip-streamed |
-| **Mesh Memory** | 400 MB | LOD'd, Addressable loaded |
+| **Total Peak RAM** | ≤4 GB | PC has more headroom; keep conservative for Minimum tier |
+| **Texture Memory** | 2 GB | BC7 compressed, mip-streamed |
+| **Mesh Memory** | 600 MB | LOD'd, Addressable loaded |
 | **Audio Memory** | 200 MB | Streaming for music, loaded for SFX |
-| **Script/ECS Memory** | 300 MB | Entity archetype pools |
-| **UI Memory** | 100 MB | UI Toolkit + atlas textures |
-| **System Overhead** | 300 MB | Unity runtime + IL2CPP |
+| **Script/ECS Memory** | 400 MB | Entity archetype pools |
+| **UI Memory** | 200 MB | UI Toolkit + atlas textures |
+| **System Overhead** | 600 MB | Unity runtime + IL2CPP |
 
 ### 3.2 Texture Specifications
 
 | Type | Max Size | Format | Mip Chain |
 |---|---|---|---|
-| **Character Albedo** | 1024×1024 | ASTC 6×6 | Full |
-| **Building Albedo** | 2048×2048 | ASTC 8×8 | Full |
-| **Terrain** | 2048×2048 | ASTC 8×8 | Full |
-| **Lightmaps** | 1024×1024 | ASTC 4×4 (high quality) | No |
-| **UI Atlas** | 2048×2048 | ASTC 4×4 | No |
-| **Skybox** | 2048×2048 | ASTC 6×6 | Yes |
-| **Normal Maps** | 1024×1024 | ASTC 6×6 | Full |
-| **Effects/VFX** | 512×512 | ASTC 6×6 | Full |
+| **Character Albedo** | 2048×2048 | BC7 | Full |
+| **Building Albedo** | 4096×4096 | BC7 | Full |
+| **Terrain** | 4096×4096 | BC7 | Full |
+| **Lightmaps** | 2048×2048 | BC6H (HDR) | No |
+| **UI Atlas** | 4096×4096 | BC7 | No |
+| **Skybox** | 4096×4096 | BC6H | Yes |
+| **Normal Maps** | 2048×2048 | BC5 | Full |
+| **Effects/VFX** | 1024×1024 | BC7 | Full |
 
 ### 3.3 Draw Call Budget
 
@@ -185,8 +189,8 @@ URP Asset Settings:
 | **CPU → GPU Submission** | 1ms | SRP Batcher |
 | **GPU: Render** | 6ms | URP + custom shaders |
 | **GPU: Post-Process** | 1ms | Bloom + color grading |
-| **GPU: MetalFX Upscale** | 0.5ms | Hardware-accelerated |
-| **Headroom** | 1.17ms | Thermal throttle buffer |
+| **GPU: FSR/DLSS Upscale** | 0.5ms | Temporal upscaling |
+| **Headroom** | 1.17ms | Driver overhead buffer |
 
 ---
 
@@ -286,11 +290,11 @@ struct HarmonicCombatant : IComponentData {
 
 | Phase | Content | Size |
 |---|---|---|
-| **Initial Download** | Core + Zone 1–3 + Prologue | ~1.2 GB |
-| **Background Download** | Zone 4–6 + Moon 1–3 story | ~800 MB |
-| **On-Demand** | Zone 7+ (per-zone, prompted) | ~200 MB each |
-| **Cosmetic Packs** | Downloaded on purchase | ~5–50 MB each |
-| **Total (all content)** | | ~4.5 GB |
+| **Initial Download** | Core + Zone 1–3 + Prologue | ~2 GB |
+| **Background Download** | Zone 4–6 + Moon 1–3 story | ~1.5 GB |
+| **On-Demand** | Zone 7+ (per-zone, prompted) | ~400 MB each |
+| **Cosmetic Packs** | Downloaded on purchase | ~10–100 MB each |
+| **Total (all content)** | | ~8 GB |
 
 ### 5.3 LOD Pipeline
 
@@ -312,7 +316,7 @@ struct HarmonicCombatant : IComponentData {
 | Component | Technology |
 |---|---|
 | **Engine** | Unity Audio (FMOD optional for advanced spatials) |
-| **Spatial Audio** | Apple Spatial Audio (AirPods Pro 2+) |
+| **Spatial Audio** | Windows Sonic / Dolby Atmos (headphone) |
 | **Music** | Adaptive layers — 4 stems per zone |
 | **SFX** | Object-pooled AudioSource per archetype |
 | **Voice** | Streamed, compressed Vorbis 128kbps |
@@ -357,17 +361,17 @@ Music Layer Architecture (per zone):
 ### 7.1 Architecture
 
 ```
-Client (iOS)
+Client (PC)
     │
-    ├── Firebase Auth ──────── Sign in with Apple + Game Center
-    ├── Firestore ──────────── Player profile, save state, cosmetics
+    ├── Firebase Auth ────────── Steam Authentication
+    ├── Firestore ────────────── Player profile, save state, cosmetics
     ├── Firebase Functions ──── Server-authoritative validation
     │   ├── Aether harvest validation
     │   ├── IAP receipt verification
     │   └── Event scoring
     ├── Firebase Remote Config ── A/B testing, feature flags, tuning
     ├── Firebase Analytics ───── KPI tracking, funnel analysis
-    ├── Firebase Crashlytics ─── Crash reporting + ANR detection
+    ├── Firebase Crashlytics ─── Crash reporting + hang detection
     ├── Cloud Storage ────────── User-generated content (builds)
     │
     └── PlayFab (secondary)
@@ -383,7 +387,7 @@ Critical systems that MUST be server-validated:
 | System | Why | Validation |
 |---|---|---|
 | **Aether Harvest** | Prevent infinite aether exploits | Server calculates max yield per session based on zone + RS + time |
-| **IAP Purchases** | Receipt fraud prevention | Firebase Function verifies Apple receipt before granting items |
+| **IAP Purchases** | Receipt fraud prevention | Firebase Function verifies Steam transaction before granting items |
 | **Battle Pass Progress** | Prevent tier manipulation | Server tracks XP events, client displays |
 | **Leaderboards** | Score integrity | Server validates RS calculations before posting |
 | **Cosmetic Ownership** | Duplication prevention | Server of record for owned items |
@@ -405,112 +409,107 @@ Critical systems that MUST be server-validated:
 
 ---
 
-## 8. iPhone-Specific Optimizations
+## 8. PC-Specific Optimizations
 
-### 8.1 A-Series Chip Optimizations
+### 8.1 GPU Tier Optimizations
 
-| Feature | A17 Pro | A18 Pro | A19 | A20 |
+| Feature | Minimum (GTX 1070) | Recommended (RTX 3060) | High (RTX 3070) | Ultra (RTX 4070+) |
 |---|---|---|---|---|
-| **Ray Tracing** | Software fallback | Hardware RT (limited) | Full hardware RT | Full + RT GI |
-| **MetalFX** | Temporal only | Temporal + Spatial | Full suite | Full + AI upscale |
-| **Neural Engine** | NPC pathfinding | + ambient occlusion | + foliage animation | + real-time GI assist |
-| **Mesh Shading** | N/A | Basic | Full | Full + amplification |
-| **Thread Count** | 6 (2P+4E) | 6 (2P+4E) | 6+ (predicted) | 6+ (predicted) |
+| **Ray Tracing** | Software fallback | RT reflections (limited) | Full RT reflections + AO | Full RT + RT GI |
+| **Upscaling** | FSR 2 Performance | FSR 2 Balanced / DLSS Quality | FSR 2 Quality / DLSS Quality | Native or DLSS Ultra Quality |
+| **Shadow Quality** | 1 cascade, 30m | 2 cascades, 80m | 3 cascades, 120m | 4 cascades, 200m |
+| **Volumetric Fog** | Disabled | Half-res | Full-res | Full-res + temporal |
+| **Particle Count** | 50% | 100% | 150% | 200% |
+| **Draw Distance** | 200m | 400m | 600m | 1000m |
 
-### 8.2 Thermal Management
+### 8.2 GPU Power Management
 
 ```
-Thermal State Machine:
-├── NOMINAL (< 35°C)
-│   └── Full quality, 60 FPS target
-├── FAIR (35–40°C)
-│   ├── Drop MetalFX to Balanced
-│   ├── Reduce shadow distance → 50m
-│   └── Reduce particle count → 75%
-├── SERIOUS (40–45°C)
-│   ├── Drop MetalFX to Performance
-│   ├── Drop to 30 FPS target
-│   ├── Reduce shadow → 30m, 1 cascade
-│   ├── Reduce particle count → 50%
+Quality Auto-Adjust System:
+├── 60+ FPS sustained
+│   └── Maintain current settings, attempt quality increase after 30s
+├── 50–59 FPS detected
+│   ├── Reduce shadow distance by one tier
+│   └── Reduce particle count by 25%
+├── 40–49 FPS detected
+│   ├── Drop FSR/DLSS to next lower quality
+│   ├── Reduce shadow cascades
 │   └── Disable volumetric fog
-└── CRITICAL (> 45°C)
-    ├── 30 FPS hard lock
-    ├── Minimal post-processing
-    ├── LOD bias +2 (aggressive)
-    ├── Disable all optional VFX
-    └── Toast: "Your device is warm — we've adjusted quality to keep things comfortable"
+└── <40 FPS detected
+    ├── Drop to Performance upscaling
+    ├── Reduce draw distance
+    ├── Simplify post-processing
+    └── Suggest lower quality preset in Settings
 ```
 
-**Implementation:** Poll `ProcessInfo.thermalState` every 5 seconds. Transition between states with 1-second lerp (no jarring pop).
+**Implementation:** Monitor frame time average over 5-second window. Adjust with 1-second lerp (no jarring pop). Player can disable auto-adjust.
 
-### 8.3 Battery-Aware Mode
+### 8.3 Quality Presets
 
-| Battery Level | Action |
-|---|---|
-| **> 50%** | Full performance |
-| **20–50%** | Suggest "Battery Saver" mode (player choice) |
-| **< 20%** | Auto-enable Battery Saver + prompt save |
-| **< 10%** | Auto-save + reduce to minimum quality |
+| Preset | Resolution Target | Effects | VRAM Budget |
+|---|---|---|---|
+| **Low** | 1080p (FSR Perf) | Baked shadows, no volumetrics, basic particles | 2 GB |
+| **Medium** | 1080p–1440p | Dynamic shadows, basic volumetrics | 4 GB |
+| **High** | 1440p–4K (FSR Quality) | RT reflections, full volumetrics, high particles | 6 GB |
+| **Ultra** | 4K native or DLSS | Full RT, maximum everything | 8+ GB |
+| **Custom** | User-defined | Individual setting control | Variable |
 
-**Battery Saver Mode:**
-- 30 FPS cap
-- MetalFX Performance mode
-- Reduced draw distance
-- Simplified particle effects
-- Darker screen brightness suggestion
+### 8.4 Variable Refresh Rate
 
-### 8.4 ProMotion (120Hz Display)
+- **G-Sync / FreeSync / VRR** support — auto-enabled when detected
+- **Frame rate cap:** Configurable (30 / 60 / 120 / 144 / Unlimited / Monitor refresh)
+- **V-Sync:** On / Off / Adaptive (reduce tearing without forced frame lock)
+- **Menus/UI:** Unlocked framerate
+- **Gameplay:** Player-configured cap (default 60)
+- **Cutscenes:** Optional 30 FPS cinematic mode
+- **Background:** 15 FPS when minimized (configurable, or pause)
 
-- **Menus/UI:** 120 Hz (smooth scrolling)
-- **Gameplay:** 60 Hz (performance target)
-- **Cutscenes:** 30 Hz (cinematic, saves battery)
-- **Idle:** 24 Hz (when paused/background)
+### 8.5 Haptic Feedback (Gamepad)
 
-Managed via `CADisplayLink.preferredFrameRateRange`.
+| Event | XInput (Xbox) | DualSense (PlayStation) |
+|---|---|---|
+| **Aether collection** | Light rumble, 100ms | Light haptic + trigger resistance ease |
+| **Building snap** | Medium rumble, 150ms | Medium haptic |
+| **Resonance match** | Three ascending pulses | Three ascending haptics + adaptive trigger click |
+| **Giant mode activate** | Heavy rumble, 500ms | Heavy haptic + both triggers full resistance |
+| **Mud clearing** | Continuous low rumble | Continuous texture feedback via adaptive triggers |
+| **Bell tower chime** | Sharp pulse per chime | Sharp haptic per chime |
+| **Currency purchase** | Double pulse | Double haptic |
+| **Combo hit** | Escalating rumble per combo | Escalating haptic + increasing trigger resistance |
+| **Critical discovery** | Pulse-pause-pulse-pulse | Pulse-pause-pulse-pulse + trigger snap |
 
-### 8.5 Haptic Feedback (Taptic Engine)
-
-| Event | Haptic Pattern |
-|---|---|
-| **Aether collection** | Light tap (UIImpactFeedbackGenerator.light) |
-| **Building snap** | Medium tap |
-| **Resonance match** | Three ascending taps |
-| **Giant mode activate** | Heavy impact + rumble |
-| **Mud clearing** | Continuous soft texture |
-| **Bell tower chime** | Sharp tap per chime |
-| **Currency purchase** | Satisfying double tap |
-| **Combo hit** | Escalating taps per combo |
-| **Critical discovery** | Pattern: tap-pause-tap-tap |
-
-### 8.6 Dynamic Island & Live Activities
+### 8.6 Steam Integration
 
 | Feature | Usage |
 |---|---|
-| **Live Activity** | Aether harvest timer (background processing completion) |
-| **Dynamic Island (compact)** | Current RS + aether level while multitasking |
-| **Dynamic Island (expanded)** | Zone name + active quest + session timer |
-| **Lock Screen Widget** | Daily aether status + next event countdown |
+| **Steam Rich Presence** | Current zone + RS% + active Moon (shown on friends list) |
+| **Steam Overlay** | In-game browser, friend invites, screenshots |
+| **Steam Cloud** | Save file sync (automatic, bidirectional) |
+| **Steam Input** | Universal controller support (Xbox, PS, Switch Pro, Steam Deck) |
+| **Steam Workshop** | Future: community-created building blueprints |
+| **Steam Trading Cards** | 13 cards (one per Moon) — craftable badge |
 
-### 8.7 iCloud Integration
+### 8.7 Display & Resolution
 
-| Data | Storage | Sync |
-|---|---|---|
-| **Save files** | iCloud Key-Value Store | Automatic |
-| **Screenshots** | Local only | N/A |
-| **Settings** | NSUbiquitousKeyValueStore | Automatic |
-| **Large saves** | CloudKit + iCloud Documents | On-demand |
+| Feature | Details |
+|---|---|
+| **Resolution** | All standard resolutions from 720p to 8K, custom supported |
+| **Window Modes** | Fullscreen, Borderless Windowed, Windowed |
+| **Ultrawide** | 21:9 and 32:9 natively supported (extended FOV, not cropped) |
+| **Multi-Monitor** | Primary monitor only (UI follows primary) |
+| **HDR** | HDR10 supported on compatible displays |
+| **UI Scaling** | Independent UI scale (50%–200%) for 4K / ultrawide |
 
-**Conflict resolution:** Server (Firebase) is source of truth. iCloud is secondary backup for offline-first saves.
-
-### 8.8 Metal 3 Specific Features
+### 8.8 DirectX 12 / Vulkan Features
 
 | Feature | Implementation |
 |---|---|
-| **Mesh Shaders** | Procedural foliage, crowd NPCs in restored cities |
-| **Offline Compilation** | Pre-compiled Metal shaders in app bundle |
-| **Sparse Textures** | Terrain virtual texturing |
-| **Lossless Compression** | Lightmap storage on device |
-| **Indirect Command Buffers** | GPU-driven rendering for architecture LODs |
+| **Mesh Shaders** | Procedural foliage, crowd NPCs in restored cities (DX12 Ultimate) |
+| **Shader Pre-compilation** | Pre-compiled shader cache per GPU on first launch |
+| **Virtual Texturing** | Terrain streaming textures |
+| **DirectStorage** | Fast asset loading from NVMe SSD (when available) |
+| **GPU-Driven Rendering** | Indirect draw calls for architecture LODs |
+| **Async Compute** | Parallel GPU work for post-processing and upscaling |
 
 ---
 
@@ -563,7 +562,7 @@ Save File (~500 KB compressed)
 | Quest completion | Full save |
 | Building placement | Incremental (world only) |
 | Every 5 minutes of play | Incremental |
-| App backgrounding | Emergency full save |
+| Alt-tab / minimize | Emergency full save |
 | Before boss encounter | Checkpoint |
 | Manual (player-initiated) | Full save |
 
@@ -584,32 +583,33 @@ Save File (~500 KB compressed)
 | **Scripting Backend** | IL2CPP |
 | **API Compatibility** | .NET Standard 2.1 |
 | **Managed Code Stripping** | High |
-| **Architecture** | ARM64 only |
-| **Minimum iOS** | 18.0 |
-| **Bitcode** | Disabled (deprecated by Apple) |
-| **App Thinning** | Enabled (asset slicing per device) |
-| **On-Demand Resources** | ODR for zone packs beyond initial download |
+| **Architecture** | x86_64 |
+| **Minimum OS** | Windows 10 (1909+) |
+| **Graphics APIs** | DirectX 12 (default), Vulkan (fallback) |
+| **Installer** | Steamworks SDK, standalone .exe with installer |
+| **Anti-Cheat** | Steam Anti-Cheat (optional, for leaderboards) |
 
 ### 10.2 CI/CD Pipeline
 
 ```
 Git Push → GitHub Actions
-├── Build (Unity Build Server, macOS runner)
+├── Build (Unity Build Server, Windows runner)
 │   ├── Run unit tests (EditMode + PlayMode)
-│   ├── IL2CPP compile (ARM64)
+│   ├── IL2CPP compile (x86_64)
 │   ├── Addressables build (per group)
-│   └── Generate IPA
+│   └── Generate Windows build (.exe + data)
 ├── Test
-│   ├── XCTest (native iOS tests)
+│   ├── Unity Test Runner (automated)
 │   ├── Performance regression (frame budget checks)
 │   └── Memory regression (peak RAM checks)
 ├── Deploy
-│   ├── TestFlight (internal) → auto
-│   ├── TestFlight (external) → manual approval
-│   └── App Store Connect → manual release
+│   ├── Steam beta branch (internal) → auto
+│   ├── Steam beta branch (external / Early Access) → manual approval
+│   └── Steam full release → manual release
 └── Post-Deploy
-    ├── Upload dSYM to Crashlytics
+    ├── Upload PDB symbols to Crashlytics
     ├── Upload Addressables to CDN
+    ├── Update Steam depot
     └── Tag release in Git
 ```
 
@@ -619,27 +619,28 @@ No build passes CI without meeting these thresholds:
 
 | Metric | Pass | Fail |
 |---|---|---|
-| **Average FPS** | ≥55 | <50 |
+| **Average FPS (Recommended tier)** | ≥55 | <50 |
 | **1% Low FPS** | ≥30 | <25 |
-| **Peak RAM** | ≤2.6 GB | >2.8 GB |
-| **Load Time (zone)** | ≤4s | >6s |
-| **Load Time (app launch)** | ≤6s | >10s |
-| **IPA Size (thin)** | ≤1.5 GB | >2.0 GB |
-| **Battery Drain (30 min session)** | ≤15% | >20% |
+| **Peak RAM** | ≤3.5 GB | >4.0 GB |
+| **Load Time (zone)** | ≤3s | >5s |
+| **Load Time (app launch)** | ≤5s | >8s |
+| **Install Size (base)** | ≤3 GB | >4 GB |
+| **Shader Compile (first launch)** | ≤60s | >120s |
 
-### 10.4 App Store Optimization
+### 10.4 Steam Store Optimization
 
 | Field | Value |
 |---|---|
 | **Title** | Tartaria: World of Wonder |
-| **Subtitle** | Tune the World. Reclaim the Golden Age. |
-| **Keywords** | tartaria, restoration, city builder, RPG, open world, adventure, puzzle, aether |
-| **Category** | Games > Adventure (primary), Games > Puzzle (secondary) |
-| **Screenshots** | 6.7" (iPhone Pro Max) + 6.1" (iPhone Pro) + 12.9" (iPad) |
+| **Tagline** | Tune the World. Reclaim the Golden Age. |
+| **Tags** | Adventure, Open World, City Builder, RPG, Puzzle, Restoration, Atmospheric |
+| **Categories** | Single-player, Steam Achievements, Steam Cloud, Full Controller Support, Steam Trading Cards |
+| **Screenshots** | 1920×1080 and 3840×2160 (min 5, target 10) |
 | **Preview Video** | 30s gameplay trailer — dome restoration → combat → giant mode |
+| **System Requirements** | Minimum / Recommended / High (3 tiers) |
 
 ---
 
 **Document Status:** FINAL  
-**Cross-References:** `00_MASTER_GDD.md`, `07_MOBILE_UX.md`, `06_COMBAT_PROGRESSION.md`  
+**Cross-References:** `00_MASTER_GDD.md`, `07_PC_UX.md`, `06_COMBAT_PROGRESSION.md`  
 **Last Updated:** March 25, 2026

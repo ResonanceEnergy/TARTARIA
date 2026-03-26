@@ -9,7 +9,7 @@
 2. [Phase Overview](#2-phase-overview)
 3. [Phase 1: Foundation (Months 1–3)](#3-phase-1-foundation-months-13)
 4. [Phase 2: MVP Build (Months 4–6)](#4-phase-2-mvp-build-months-46)
-5. [Phase 3: Polish & Soft Launch (Months 7–9)](#5-phase-3-polish-soft-launch-months-79)
+5. [Phase 3: Polish & Early Access (Months 7–9)](#5-phase-3-polish-early-access-months-79)
 6. [Phase 4: Full Launch (Months 10–12)](#6-phase-4-full-launch-months-1012)
 7. [Phase 5: Live-Ops & Expansion (Months 13–24)](#7-phase-5-live-ops-expansion-months-1324)
 8. [Team Structure](#8-team-structure)
@@ -26,7 +26,7 @@
 - The MVP (3 zones, Prologue + Moon 1–3) must be a complete, satisfying experience
 - Every milestone has a playable deliverable — no "engine-only" milestones
 - Build the Aether system and golden ratio enforcement FIRST — everything else layers on top
-- Playtest every 2 weeks with real iOS devices
+- Playtest every 2 weeks with real PC hardware
 - Performance targets are non-negotiable from day one
 
 ---
@@ -48,16 +48,16 @@ Gate:   ■           ■           ■     ■     ■           ■
 |---|---|---|---|
 | **1: Foundation** | 3 months | $50,000 | Vertical slice (1 zone, core loop) |
 | **2: MVP Build** | 3 months | $60,000 | 3 zones, Prologue + Moon 1–3, all core systems |
-| **3: Polish + Soft Launch** | 3 months | $65,000 | TestFlight → limited markets |
-| **4: Full Launch** | 3 months | $75,000 | Global iOS + iPad release |
-| **5: Live-Ops** | 12 months | $100,000 | Moons 4–13, DLC expansions, events |
+| **3: Polish + Early Access** | 3 months | $65,000 | Steam Early Access → global (PC) |
+| **4: Full Launch** | 3 months | $75,000 | Steam full release (PC) |
+| **5: Live-Ops** | 12 months | $100,000 | Moons 4–13, DLC expansions, events; iOS port begins Month 18+ |
 | **Total** | **24 months** | **$350,000** | Complete 13-Moon experience |
 
 ---
 
 ## 3. Phase 1: Foundation (Months 1–3)
 
-**Goal:** Prove the core loop works and feels magical on iPhone.
+**Goal:** Prove the core loop works and feels magical on PC.
 
 ### Month 1: Engine & Core Systems
 
@@ -66,9 +66,9 @@ Gate:   ■           ■           ■     ■     ■           ■
 | 1 | Unity 6 project setup, URP configured, DOTS scaffolding, Git + CI/CD |
 | 2 | Aether field system (3 bands, flow calculation, grid partitioning) |
 | 3 | Resonance Score system + golden ratio validation engine |
-| 4 | MetalFX integration + thermal state machine + device matrix testing |
+| 4 | FSR 2/DLSS integration + GPU quality auto-scaling + hardware tier testing |
 
-**Exit Criteria:** Aether flows visually on iPhone 15 Pro at 60 FPS. Golden ratio snapping works in editor.
+**Exit Criteria:** Aether flows visually on a GTX 1070-class PC at 60 FPS. Golden ratio snapping works in editor.
 
 ### Month 2: Building & Exploration
 
@@ -77,7 +77,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 | 1 | Building placement system (sacred geometry snap, proportion checks) |
 | 2 | Mud corruption shader + restoration reveal dissolve |
 | 3 | First zone: Echohaven (500m radius, terrain, basic architecture blockout) |
-| 4 | Player movement + camera + basic touch controls |
+| 4 | Player movement + camera + keyboard/mouse/gamepad controls |
 
 **Exit Criteria:** Player can walk through Echohaven, find a buried dome, and begin restoration. RS updates in real-time.
 
@@ -90,7 +90,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 | 3 | First enemy type (Mud Golem) + harmonic combat prototype |
 | 4 | Integration pass — full loop: explore → tune → restore → harvest → combat |
 
-**Exit Criteria (GATE 1):** A single continuous 15-minute play session that includes exploration, tuning, building restoration, aether harvesting, and one combat encounter. Runs at 60 FPS on iPhone 15 Pro. Internal team plays it and says "I want to keep playing."
+**Exit Criteria (GATE 1):** A single continuous 15-minute play session that includes exploration, tuning, building restoration, aether harvesting, and one combat encounter. Runs at 60 FPS on GTX 1070-class PC. Internal team plays it and says "I want to keep playing."
 
 ---
 
@@ -125,11 +125,11 @@ Gate:   ■           ■           ■     ■     ■           ■
 | 3 | 17-hour day/night cycle + 13-moon calendar system |
 | 4 | Save system + Firebase integration + IAP framework |
 
-**Exit Criteria (GATE 2):** 3 zones playable with 4+ hours of content. Campaign through Moon 3 complete with all companions, dialogue, combat encounters, and boss fight. Performance within budget on all target devices.
+**Exit Criteria (GATE 2):** 3 zones playable with 4+ hours of content. Campaign through Moon 3 complete with all companions, dialogue, combat encounters, and boss fight. Performance within budget on all target PC hardware tiers.
 
 ---
 
-## 5. Phase 3: Polish & Soft Launch (Months 7–9)
+## 5. Phase 3: Polish & Early Access (Months 7–9)
 
 **Goal:** Make it beautiful, test with real players, iterate on data.
 
@@ -139,8 +139,8 @@ Gate:   ■           ■           ■     ■     ■           ■
 |---|---|
 | 1 | Visual polish pass — shaders, particles, lighting, VFX |
 | 2 | Audio pass — all SFX, ambient loops, voice lines for Moons 1–3 |
-| 3 | Onboarding flow (first 30 minutes — see `07_MOBILE_UX.md`) |
-| 4 | Accessibility pass — VoiceOver, motor options, colorblind modes |
+| 3 | Onboarding flow (first 30 minutes — see `07_PC_UX.md`) |
+| 4 | Accessibility pass — Windows Narrator/NVDA, motor options, colorblind modes |
 
 ### Month 8: Monetization + QA
 
@@ -151,16 +151,16 @@ Gate:   ■           ■           ■     ■     ■           ■
 | 3 | Rewarded ad integration (in-character prompts) |
 | 4 | Full QA pass: 500+ test cases, device matrix, edge cases |
 
-### Month 9: Soft Launch
+### Month 9: Early Access Launch
 
 | Week | Deliverable |
 |---|---|
-| 1 | TestFlight internal → 50 external testers |
-| 2 | Soft launch: Canada, Australia, Netherlands (small English-speaking markets) |
+| 1 | Steam beta branch → 50 external testers (Steam playtest) |
+| 2 | Steam Early Access launch (global, all PC players) |
 | 3 | Data collection: retention, FTUE completion, monetization, crash rates |
 | 4 | Iterate based on data — fix top 3 drop-off points |
 
-**Exit Criteria (GATE 3 - Soft Launch):** App on TestFlight, 50+ external testers.
+**Exit Criteria (GATE 3 - Early Access):** Game on Steam Early Access, 50+ external testers via Steam Playtest.
 
 **Exit Criteria (GATE 4 - Data Review):**
 - Day 1 retention >40%
@@ -174,22 +174,22 @@ Gate:   ■           ■           ■     ■     ■           ■
 
 ## 6. Phase 4: Full Launch (Months 10–12)
 
-**Goal:** Global release + first live event.
+**Goal:** Steam full release + first live event.
 
 ### Month 10: Launch Prep
 
 | Week | Deliverable |
 |---|---|
-| 1 | Iterate on soft launch data — final balancing pass |
-| 2 | App Store assets: screenshots, preview video, metadata |
+| 1 | Iterate on Early Access data — final balancing pass |
+| 2 | Steam store assets: screenshots, preview video, metadata, capsule art |
 | 3 | Marketing campaign begin (social, press kit, influencer outreach) |
-| 4 | Submission to App Store Review |
+| 4 | Steam store page finalization + review build |
 
-### Month 11: Global Launch
+### Month 11: Full Launch
 
 | Week | Deliverable |
 |---|---|
-| 1 | **LAUNCH DAY** — worldwide iOS release |
+| 1 | **LAUNCH DAY** — Steam full release (PC) |
 | 2 | Hotfix window — monitor crashes, server load, exploit reports |
 | 3 | First "Cosmic Alignment" live event |
 | 4 | First Moon battle pass goes live |
@@ -198,7 +198,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 
 | Week | Deliverable |
 |---|---|
-| 1 | Performance optimization pass (based on real-world device data) |
+| 1 | Performance optimization pass (based on real-world PC hardware data) |
 | 2 | First "World's Fair" event |
 | 3 | Community feedback integration (top 10 QoL requests) |
 | 4 | Metrics review + planning for Phase 5 |
@@ -206,7 +206,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 **Exit Criteria (GATE 5):**
 - 100,000+ downloads in first month
 - Revenue tracking toward projections
-- 4.5+ App Store rating
+- 4.5+ Steam review score (Very Positive)
 - Day 30 retention >10%
 - No critical bugs or server issues
 
@@ -231,7 +231,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 | 21 | Moon 12 (Crystal) + World's Fair #4 |
 | 22 | Moon 13 (Cosmic) + Zone 11–12 + Endgame + **DLC 10: True Timeline Divergence** ($12.99) |
 | 23 | Post-game sandbox + Golden Age free-build mode + Anastasia Golden Mote epilogue |
-| 24 | **Day Out of Time** expansion + Year 2 roadmap announcement |
+| 24 | **Day Out of Time** expansion + Year 2 roadmap announcement + **iOS port development begins** |
 
 **Launch-Window DLCs (available from Phases 2–4, Moons 1–3):**
 
@@ -270,7 +270,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 
 | Role | Count | Responsibility |
 |---|---|---|
-| **Lead Dev / Tech Director** | 1 | Architecture, DOTS/ECS, Metal 3, performance |
+| **Lead Dev / Tech Director** | 1 | Architecture, DOTS/ECS, DirectX 12/Vulkan, performance |
 | **Gameplay Programmer** | 1 | Combat, building, Aether system, skill trees |
 | **3D Artist** | 1 | Architecture kits, characters, VFX |
 | **2D Artist / UI Designer** | 1 | UI Toolkit, HUD, cosmetics, marketing assets |
@@ -307,9 +307,9 @@ Gate:   ■           ■           ■     ■     ■           ■
 | Risk | Impact | Likelihood | Mitigation |
 |---|---|---|---|
 | **DOTS/ECS complexity** | Schedule slip | High | Prototype in Month 1; fallback to MonoBehaviour for non-perf-critical systems |
-| **MetalFX integration issues** | Visual quality compromise | Medium | Build fallback render path without MetalFX (lower res, still playable) |
+| **FSR 2/DLSS integration issues** | Visual quality compromise | Medium | Build fallback render path; FSR 2 works on all GPUs as universal fallback |
 | **Scope creep (13 Moons)** | Budget overrun | High | Ship 3 Moons at launch; remaining Moons funded by revenue |
-| **App Store rejection** | Launch delay | Medium | Follow guidelines from day 1; pre-submission review with Apple |
+| **Steam review issues** | Launch delay | Low | Follow Steamworks guidelines from day 1; pre-launch review period |
 | **Player retention below targets** | Revenue shortfall | Medium | Soft launch in 3 markets; 4 weeks to iterate before global |
 
 ### Medium Risk
@@ -340,7 +340,7 @@ Gate:   ■           ■           ■     ■     ■           ■
 Each gate requires sign-off on:
 
 - [ ] **Playable build** — demonstrates gate-specific features
-- [ ] **Performance targets** — within budget on all target devices
+- [ ] **Performance targets** — within budget on all target PC hardware tiers
 - [ ] **Quality bar** — team consensus that it "feels right"
 - [ ] **Budget status** — on track or with approved variance
 - [ ] **Risk review** — updated risk register, no blockers
@@ -367,7 +367,7 @@ Each gate requires sign-off on:
 | **Vertical Slice** | 3 | June 2026 |
 | **Feature Complete** | 6 | September 2026 |
 | **Soft Launch** | 9 | December 2026 |
-| **Global Launch** | 11 | February 2027 |
+| **Steam Full Release** | 11 | February 2027 |
 | **Moon 7 (midpoint)** | 16 | July 2027 |
 | **Moon 13 (complete)** | 22 | January 2028 |
 | **Year 2 Roadmap** | 24 | March 2028 |

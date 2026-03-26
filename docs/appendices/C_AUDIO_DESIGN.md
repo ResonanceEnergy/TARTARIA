@@ -538,19 +538,19 @@ Audio and haptic systems share a synchronization bus that ensures every felt vib
 
 ## 13. Technical Audio Specifications
 
-### Platform: iOS (A19/A20 Chip)
+### Platform: PC (Windows 10/11, Vulkan/DX12)
 
 | Parameter | Specification |
 |---|---|
 | **Sample Rate** | 48 kHz (all assets) |
 | **Bit Depth** | 24-bit source, 16-bit compressed delivery |
-| **Format (music stems)** | AAC 256 kbps VBR (streamed from Addressable bundle) |
+| **Format (music stems)** | Vorbis 256 kbps VBR (streamed from Addressable bundle) |
 | **Format (SFX)** | OPUS for long sounds, uncompressed WAV for short stingers (<500ms) |
-| **Simultaneous voices** | 64 max (32 audio + 32 streaming) |
-| **Memory budget** | 80 MB active audio (from total 2.8 GB RAM budget) |
-| **Latency target** | <12ms input-to-sound (Core Audio direct) |
-| **Haptic sync** | CHHapticEngine with AHAP pattern files, phase-locked to audio timeline |
-| **Spatial audio** | Binaural via AirPods Pro/Max (head-tracked), stereo fallback for speakers |
+| **Simultaneous voices** | 96 max (48 audio + 48 streaming) |
+| **Memory budget** | 128 MB active audio (from total 4 GB RAM budget) |
+| **Latency target** | <12ms input-to-sound (WASAPI exclusive / ASIO) |
+| **Haptic sync** | Gamepad haptic API with pattern files, phase-locked to audio timeline |
+| **Spatial audio** | Steam Audio binaural HRTF (headphones), stereo/5.1/7.1 fallback for speakers |
 | **Dynamic range** | -60 dB (silence floor) to 0 dB (spectacle peak), 48 dB effective dynamic range |
 
 ### Mixing Strategy

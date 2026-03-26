@@ -44,7 +44,7 @@
 | **3-Band Aether** (174–396 Hz) | Moon 1 | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [01_LORE_BIBLE](../01_LORE_BIBLE.md), [06_COMBAT_PROGRESSION](../06_COMBAT_PROGRESSION.md) |
 | **6-Band Aether** (396–639 Hz) | Moon 5 | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [01_LORE_BIBLE](../01_LORE_BIBLE.md), [03_CAMPAIGN_13_MOONS](../03_CAMPAIGN_13_MOONS.md) |
 | **9-Band Aether** (639–963 Hz) | Moon 7 | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [01_LORE_BIBLE](../01_LORE_BIBLE.md), [03_CAMPAIGN_13_MOONS](../03_CAMPAIGN_13_MOONS.md) |
-| **Resonance Score (RS) Meter** | Prologue | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [15_MVP_BUILD_SPEC](../15_MVP_BUILD_SPEC.md), [07_MOBILE_UX](../07_MOBILE_UX.md) |
+| **Resonance Score (RS) Meter** | Prologue | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [15_MVP_BUILD_SPEC](../15_MVP_BUILD_SPEC.md), [07_PC_UX](../07_PC_UX.md) |
 | **Ley Line Network** | Moon 1+ | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [01_LORE_BIBLE](../01_LORE_BIBLE.md), [DLC_09_LEY_LINE_PROPHECY](../dlc/DLC_09_LEY_LINE_PROPHECY.md) |
 | **Star Fort Routing** | Moon 4 | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [04_ARCHITECTURE_GUIDE](../04_ARCHITECTURE_GUIDE.md), [DLC_04_STAR_FORT](../dlc/DLC_04_STAR_FORT.md) |
 | **17th Hour Alignment** | Prologue | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [01_LORE_BIBLE](../01_LORE_BIBLE.md) |
@@ -70,7 +70,7 @@
 
 | System | Primary Doc | Also Referenced In |
 |--------|-------------|-------------------|
-| **Skill Trees** (Resonator, Architect, Guardian, Historian) | [06_COMBAT_PROGRESSION](../06_COMBAT_PROGRESSION.md) | [00_MASTER_GDD](../00_MASTER_GDD.md), [07_MOBILE_UX](../07_MOBILE_UX.md), [19_ECONOMY_BALANCE](../19_ECONOMY_BALANCE.md) |
+| **Skill Trees** (Resonator, Architect, Guardian, Historian) | [06_COMBAT_PROGRESSION](../06_COMBAT_PROGRESSION.md) | [00_MASTER_GDD](../00_MASTER_GDD.md), [07_PC_UX](../07_PC_UX.md), [19_ECONOMY_BALANCE](../19_ECONOMY_BALANCE.md) |
 | **13-Moon Calendar Progression** | [03_CAMPAIGN_13_MOONS](../03_CAMPAIGN_13_MOONS.md) | [01_LORE_BIBLE](../01_LORE_BIBLE.md), [10_ROADMAP](../10_ROADMAP.md) |
 | **Aether Energy Resource System** | [02_AETHER_ENERGY_SYSTEM](../02_AETHER_ENERGY_SYSTEM.md) | [19_ECONOMY_BALANCE](../19_ECONOMY_BALANCE.md) |
 | **Save System / Checkpoints** | [25_SAVE_SYSTEM](../25_SAVE_SYSTEM.md) | [09_TECHNICAL_SPEC](../09_TECHNICAL_SPEC.md) |

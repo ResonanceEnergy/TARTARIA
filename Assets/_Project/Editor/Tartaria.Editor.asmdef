@@ -1,0 +1,29 @@
+{
+    "name": "Tartaria.Editor",
+    "rootNamespace": "Tartaria.Editor",
+    "references": [
+        "Tartaria.Core",
+        "Tartaria.Gameplay",
+        "Tartaria.AI",
+        "Tartaria.Audio",
+        "Tartaria.Camera",
+        "Tartaria.Input",
+        "Tartaria.UI",
+        "Tartaria.Save",
+        "Tartaria.Integration",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "Unity.Collections"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

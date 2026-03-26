@@ -11,7 +11,7 @@
 - [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — Zone streaming (500m radius), LOD pipeline, memory budgets
 - [06_COMBAT_PROGRESSION.md](06_COMBAT_PROGRESSION.md) — Encounter frequency, escalation curves
 - [03B_EXPANSION_PACKS.md](03B_EXPANSION_PACKS.md) — DLC zones and Moon-to-zone mapping
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Session length design, one-thumb navigation
+- [07_PC_UX.md](07_PC_UX.md) — Session length design, keyboard/mouse navigation
 - [19_ECONOMY_BALANCE.md](19_ECONOMY_BALANCE.md) — Resource placement (Aether bands, material drops)
 - [20_QUEST_DATABASE.md](20_QUEST_DATABASE.md) — 184 quests distributed across zones
 
@@ -41,7 +41,7 @@
 2. **Landmark navigation, not mini-maps.** The world teaches its own geography. Tall spires, glowing ley lines, and unique silhouettes guide the player. Mini-map is optional (see [24_ACCESSIBILITY.md](24_ACCESSIBILITY.md)).
 3. **Restoration is exploration.** Cleaning a building isn't just a reward — it changes the zone's geometry, opening new paths and sight-lines. The level transforms as you play.
 4. **The golden route.** Every zone has a "golden route" — a natural walking path that hits 80% of the key content in the optimal order. Players who wander find secrets. Players who follow the architecture find the story.
-5. **Respect session length.** Zone beats are tuned to the 5 session types from [07_MOBILE_UX.md](07_MOBILE_UX.md): Micro (1–3 min), Quick (5–10 min), Standard (15–30 min), Deep (30–60 min), Epic (45–90 min). A player can complete a meaningful loop in any session.
+5. **Respect session length.** Zone beats are tuned to the 5 session types from [07_PC_UX.md](07_PC_UX.md): Micro (1–3 min), Quick (5–10 min), Standard (15–30 min), Deep (30–60 min), Epic (45–90 min). A player can complete a meaningful loop in any session.
 6. **Verticality tells time.** Tartarian zones are layered: underground = buried past, ground = corrupted present, restored heights = hopeful future. Ascending through a zone IS the restoration arc.
 
 ---

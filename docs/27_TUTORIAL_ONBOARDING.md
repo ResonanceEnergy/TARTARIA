@@ -6,7 +6,7 @@
 > *"The best tutorial is one the player never notices. They think they're exploring. They think they're making choices. They don't realize they've been taught everything."*
 
 **Cross-References:**
-- [07_MOBILE_UX.md §5](07_MOBILE_UX.md) — Onboarding section, session design
+- [07_PC_UX.md §5](07_PC_UX.md) — Onboarding section, session design
 - [15_MVP_BUILD_SPEC.md](15_MVP_BUILD_SPEC.md) — 15-minute vertical slice demo, Echohaven scope
 - [26_LEVEL_DESIGN.md](26_LEVEL_DESIGN.md) — Echohaven POI map, demo script
 - [06_COMBAT_PROGRESSION.md](06_COMBAT_PROGRESSION.md) — Combat primer, frequency system
@@ -511,9 +511,9 @@ When a game update introduces a new system:
 |---|---|---|
 | Player dies 3× in 5 min | Struggle counter | "Would you like to try Story difficulty?" (one-time prompt) |
 | Player takes >2 min on tutorial building | Timing monitor | Auto-snap placement, wider gesture forgiveness |
-| Player has VoiceOver enabled at OS level | iOS API check | Auto-enable audio descriptions + subtitle backgrounds |
-| Player has Reduce Motion enabled at OS level | iOS API check | Auto-disable camera shake, particle reduction |
-| Player has Dynamic Type xxxLarge | iOS API check | Auto-scale in-game UI text |
+| Player has screen reader enabled at OS level | Windows Accessibility API check | Auto-enable audio descriptions + subtitle backgrounds |
+| Player has Reduce Motion enabled at OS level | Windows Accessibility API check | Auto-disable camera shake, particle reduction |
+| Player has large text/DPI scaling | Windows Accessibility API check | Auto-scale in-game UI text |
 
 ---
 

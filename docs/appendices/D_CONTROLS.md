@@ -1,12 +1,12 @@
-# TARTARIA WORLD OF WONDER — Appendix D: Touch Control Reference
-## Complete Gesture & Input Design for iOS
+# TARTARIA WORLD OF WONDER — Appendix D: Control Reference
+## Complete Input Design for PC (Keyboard+Mouse & Gamepad)
 
 ---
 
-> *Every interaction is a restoration. The phone is the tuning fork. Your fingers conduct the resonance.*
+> *Every interaction is a restoration. Your hands conduct the resonance.*
 
 **Cross-References:**
-- [07_MOBILE_UX.md](../07_MOBILE_UX.md) — Full UX design & session flow
+- [07_PC_UX.md](../07_PC_UX.md) — Full UX design & session flow
 - [14_HAPTIC_FEEDBACK.md](../14_HAPTIC_FEEDBACK.md) — Haptic response per gesture
 - [13_MINI_GAMES.md](../13_MINI_GAMES.md) — Mini-game-specific inputs
 - [06_COMBAT_PROGRESSION.md](../06_COMBAT_PROGRESSION.md) — Combat control mechanics
@@ -267,7 +267,7 @@ When Giant-Mode is activated (60-second burst, Moon 1+):
 ## Accessibility Remaps
 
 ### Switch Control Compatibility
-- All actions mapped to **iOS Switch Control** via the accessibility API
+- All actions mapped to **Windows accessibility APIs** and Xbox Adaptive Controller
 - Sequential scanning of interactive elements
 - Dwell selection (configurable timer: 0.5s – 5.0s)
 - External switch support via Bluetooth
@@ -296,7 +296,7 @@ When Giant-Mode is activated (60-second burst, Moon 1+):
 | **Color-Blind Modes** | Protanopia, Deuteranopia, Tritanopia filters |
 | **High Contrast HUD** | Solid backgrounds behind all text/icons |
 | **Enlarged Text** | UI text scales 1.0× – 2.5× |
-| **Screen Reader** | VoiceOver narrates all UI elements + game state changes |
+| **Screen Reader** | Windows Narrator / NVDA / JAWS narrates all UI elements + game state changes |
 | **Subtitle Size** | Small / Medium / Large / Extra-large |
 | **Subtitle Background** | Transparent / Semi-opaque / Solid |
 

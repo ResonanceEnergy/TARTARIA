@@ -4,15 +4,15 @@
 
 ## The Vision
 
-**TARTARIA WORLD OF WONDER** is a session-based, open-world restoration RPG / light city-builder / harmonic puzzle-action hybrid for iOS (iPhone 17+). Players awaken as a Tartarian descendant in a post-Mud Flood world, excavating buried wonders, tuning atmospheric Aether through sacred-geometry architecture, and restoring a globe-spanning free-energy grid — one glowing dome at a time.
+**TARTARIA WORLD OF WONDER** is a session-based, open-world restoration RPG / light city-builder / harmonic puzzle-action hybrid for PC (Steam). Players awaken as a Tartarian descendant in a post-Mud Flood world, excavating buried wonders, tuning atmospheric Aether through sacred-geometry architecture, and restoring a globe-spanning free-energy grid — one glowing dome at a time.
 
 Every restored cathedral hums. Every connected star fort lights the sky. Every ringing bell tower sends scalar waves across continents. The empire never fell — it was only buried. And you are the one conducting its resurrection.
 
 ## Core Fantasy
 
-> "Restore paradise in your pocket — 5–15 minute sessions that matter."
+> "Restore paradise on your desktop — immersive sessions that matter."
 
-- **Explore & Excavate** — Swipe through physics-based mud layers to reveal Tartarian grandeur
+- **Explore & Excavate** — Dig through physics-based mud layers to reveal Tartarian grandeur
 - **Tune & Align** — Play 3-6-9 harmonic sequences on pipe organs and cymatic puzzles
 - **Restore Architecture** — Snap sacred-geometry templates to golden-ratio grids
 - **Harvest Aether** — Watch wireless energy flow as glowing ley lines across the world map
@@ -36,9 +36,9 @@ docs/
 ├── 04_ARCHITECTURE_GUIDE.md      # Zones, buildings, sacred geometry
 ├── 05_CHARACTERS_DIALOGUE.md     # Characters, banter, dialogue trees
 ├── 06_COMBAT_PROGRESSION.md      # Combat systems & skill progression
-├── 07_MOBILE_UX.md               # Touch controls, session flow, UX
+├── 07_PC_UX.md                 # PC controls, session flow, UX
 ├── 08_MONETIZATION.md            # F2P model, events, economy
-├── 09_TECHNICAL_SPEC.md          # Unity 6 iOS architecture & optimization
+├── 09_TECHNICAL_SPEC.md          # Unity 6 PC architecture & optimization
 ├── 10_ROADMAP.md                 # Phases, budget, timeline
 ├── 11_SCRIPTED_CLIMAXES.md       # Beat-by-beat climax scripts
 ├── 12_VIVID_VISUALS.md           # Key visual moments & cinematography
@@ -57,14 +57,14 @@ docs/
 ├── 25_SAVE_SYSTEM.md             # Persistence, cloud sync & offline-first design
 ├── 26_LEVEL_DESIGN.md            # Zone layout, traversal & encounter pacing
 ├── 27_TUTORIAL_ONBOARDING.md     # First-session script & teaching systems
-├── 28_ACHIEVEMENTS.md            # Achievement taxonomy, rewards & Game Center
+├── 28_ACHIEVEMENTS.md            # Achievement taxonomy, rewards & Steam Achievements
 ├── 29_PRODUCTION_PIPELINE.md     # Art/audio pipeline, outsource & tool chain
 ├── 30_MARKETING_POSITIONING.md   # Competitive landscape & launch strategy
 ├── appendices/
 │   ├── A_GLOSSARY.md             # Tartarian terms & concepts
 │   ├── B_ASSET_REFERENCE.md      # Art direction & visual guides
 │   ├── C_AUDIO_DESIGN.md         # Cymatic soundtrack & voice design
-│   ├── D_CONTROLS.md             # Touch control reference & gestures
+│   ├── D_CONTROLS.md             # PC input reference & keybindings
 │   ├── E_METRICS.md              # KPI, analytics & performance budgets
 │   ├── F_MOON_INDEX.md           # Moon-by-Moon quick reference
 │   ├── G_NPC_INDEX.md            # NPC directory & dialogue hooks
@@ -78,9 +78,9 @@ docs/
 ## Tech Stack
 
 - **Engine:** Unity 6 LTS (DOTS/ECS, URP, Addressables, Burst + Jobs)
-- **Platform:** iOS 18.0+ (iPhone 17 Pro/Max, A19/A20, 8–12 GB RAM)
-- **Graphics:** Metal 3 + MetalFX Temporal Upscaling, baked lighting, ASTC compression
-- **Backend:** Firebase / PlayFab for cloud sync, live-ops, A/B testing
+- **Platform:** Windows 10/11 (Steam) — Min: GTX 1060 / 8 GB RAM; Recommended: RTX 3060 / 16 GB RAM
+- **Graphics:** Vulkan / DX12 + FSR 2 / DLSS Temporal Upscaling, baked lighting, BC7 compression
+- **Backend:** Firebase / PlayFab for cloud sync, live-ops, A/B testing; Steam Cloud for saves
 - **Audio:** Procedural 432 Hz adaptive soundtrack + cymatic sound design
 
 ## Quick Navigation
@@ -92,7 +92,7 @@ docs/
 | **World** | [04](docs/04_ARCHITECTURE_GUIDE.md) · [26](docs/26_LEVEL_DESIGN.md) · [12](docs/12_VIVID_VISUALS.md) | Architecture, zones, visuals |
 | **Characters** | [05](docs/05_CHARACTERS_DIALOGUE.md) · [18](docs/18_PRINCESS_ANASTASIA.md) · [22](docs/22_DIALOGUE_BRANCHING.md) | NPCs, Anastasia, dialogue trees |
 | **Systems** | [06](docs/06_COMBAT_PROGRESSION.md) · [13](docs/13_MINI_GAMES.md) · [19](docs/19_ECONOMY_BALANCE.md) · [20](docs/20_QUEST_DATABASE.md) | Combat, mini-games, economy, quests |
-| **Mobile** | [07](docs/07_MOBILE_UX.md) · [14](docs/14_HAPTIC_FEEDBACK.md) · [25](docs/25_SAVE_SYSTEM.md) · [27](docs/27_TUTORIAL_ONBOARDING.md) | UX, haptics, saves, onboarding |
+| **PC Experience** | [07](docs/07_PC_UX.md) · [14](docs/14_HAPTIC_FEEDBACK.md) · [25](docs/25_SAVE_SYSTEM.md) · [27](docs/27_TUTORIAL_ONBOARDING.md) | UX, haptics, saves, onboarding |
 | **Business** | [08](docs/08_MONETIZATION.md) · [21](docs/21_PLAYER_PERSONAS.md) · [30](docs/30_MARKETING_POSITIONING.md) | Monetization, personas, marketing |
 | **Production** | [09](docs/09_TECHNICAL_SPEC.md) · [10](docs/10_ROADMAP.md) · [15](docs/15_MVP_BUILD_SPEC.md) · [29](docs/29_PRODUCTION_PIPELINE.md) | Tech spec, roadmap, MVP, pipeline |
 | **Polish** | [11](docs/11_SCRIPTED_CLIMAXES.md) · [16](docs/16_PLAYTHROUGH_PROTOTYPES.md) · [17](docs/17_DAY_OUT_OF_TIME.md) · [28](docs/28_ACHIEVEMENTS.md) | Climaxes, prototypes, events, achievements |

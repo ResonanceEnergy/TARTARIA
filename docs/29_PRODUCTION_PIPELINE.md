@@ -298,9 +298,9 @@ Per [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md):
 
 | Phase | Deliverable | Tool |
 |---|---|---|
-| Design | Haptic event specification (21 subsystems) | Spreadsheet → Core Haptics AHAP |
-| Implementation | AHAP files per event category | Apple Core Haptics API |
-| Testing | Device testing matrix (per haptic intensity tier) | Physical device test |
+| Design | Haptic event specification (21 subsystems) | Spreadsheet → Gamepad haptic patterns |
+| Implementation | Haptic pattern files per event category | Gamepad Haptics API (DualSense / Xbox) |
+| Testing | Device testing matrix (per haptic intensity tier) | Physical controller test |
 
 ---
 
@@ -471,9 +471,9 @@ Creator submits asset
 | **GitHub** | Version control, CI/CD | Team plan ($4/user/month) |
 | **GitHub Actions** | CI/CD pipeline | Included with repo |
 | **Crowdin / Lokalise** | Localization management | $50–$120/month |
-| **TestFlight** | iOS beta testing | Free (Apple) |
-| **Xcode** | iOS build, signing, profiling | Free (Apple) |
-| **Instruments** | Performance profiling | Free (Apple) |
+| **Steam** | PC beta testing & Early Access | Free (Steamworks) |
+| **Visual Studio / Rider** | PC build, profiling | Free / $150/year |
+| **Instruments / Unity Profiler** | Performance profiling | Free |
 | **Firebase** | Backend, analytics, auth | Free tier → ~$200/month at scale |
 
 ### 9.2 Annual Tool Cost
@@ -504,7 +504,7 @@ Per [10_ROADMAP.md](10_ROADMAP.md), each phase has gate criteria:
 | **Gate 2: Alpha** | Phase 2 → 3 | Moon 1–4 playable, 5 zones, all companions, 4 mini-games |
 | **Gate 3: Beta** | Phase 3 → 4 | Moon 1–13 playable, all zones, all systems functional |
 | **Gate 4: Release Candidate** | Phase 4 → 5 | Full polish, localization Tier 1, accessibility Tier A, store assets |
-| **Gate 5: Launch** | Phase 5 | App Store approved, marketing live, analytics verified |
+| **Gate 5: Launch** | Phase 5 | Steam store approved, marketing live, analytics verified |
 
 ### 10.2 Automated Quality Checks (CI)
 
@@ -512,7 +512,7 @@ Per [10_ROADMAP.md](10_ROADMAP.md), each phase has gate criteria:
 |---|---|---|
 | Unit tests (EditMode) | Every push | Unity Test Framework |
 | PlayMode tests | Every push to develop | Unity Test Framework |
-| IL2CPP build | Daily | GitHub Actions (macOS) |
+| IL2CPP build | Daily | GitHub Actions (Windows) |
 | Addressable bundle validation | Merge to develop | Custom script |
 | Texture size audit | Asset import | Custom editor script |
 | Poly count audit | Asset import | Custom editor script |
@@ -532,7 +532,7 @@ Per [10_ROADMAP.md](10_ROADMAP.md), each phase has gate criteria:
 | Unity DOTS breaking change | High | Low | Pin Unity LTS version, test updates before adoption |
 | Scope creep (too many building types) | High | High | Lock asset list per phase, defer to DLC |
 | Performance on target device | High | Medium | Weekly profiling sessions, thermal budget monitoring |
-| App Store rejection | Medium | Low | Pre-review compliance checklist, TestFlight external testing |
+| Steam review delay | Medium | Low | Follow Steam guidelines from day 1, early Steamworks testing |
 | Budget overrun | High | Medium | Monthly budget review, cut cosmetic variety before core content |
 
 ### 11.2 Contingency Plans

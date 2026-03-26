@@ -7,7 +7,7 @@
 
 **Cross-References:**
 - [00_MASTER_GDD.md](00_MASTER_GDD.md) — Core pillars (Wonder, Mystery, Harmony, Cosmic Sync, Humor)
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Session types, touch controls, accessibility
+- [07_PC_UX.md](07_PC_UX.md) — Session types, input controls, accessibility
 - [08_MONETIZATION.md](08_MONETIZATION.md) — Revenue stream mapping per persona
 - [19_ECONOMY_BALANCE.md](19_ECONOMY_BALANCE.md) — Reward curves, "One More" principle
 - [appendices/E_METRICS.md](appendices/E_METRICS.md) — Retention & engagement KPIs
@@ -59,7 +59,7 @@ All personas share the mobile reality:
 - Interrupted frequently — save-anywhere mandatory
 - Time-scarce — respect **5–15 minute** session windows
 - Touch-native — no controller assumption
-- Visually motivated — App Store screenshots sell the first download
+- Visually motivated — Steam store screenshots sell the first download
 
 ---
 
@@ -211,7 +211,7 @@ Minute 25-45: Deep session — plans entire district, experiments with spire var
 | **Gender** | 50/50 |
 | **Platform Comfort** | Very high — phone is primary gaming device |
 | **Mobile Behavior** | Plays in transit, lunch breaks, between meetings |
-| **Referral Source** | App Store featuring, TikTok gameplay clips, word of mouth |
+| **Referral Source** | Steam featuring, TikTok gameplay clips, word of mouth |
 | **Comparable Games** | Genshin (dailies), Honkai: Star Rail, AFK Arena, Cookie Run |
 
 ### Motivations & Fears
@@ -270,7 +270,7 @@ Minute 7-10: Bank progress → exit
 | **Gender** | 60% Female, 40% Male |
 | **Platform Comfort** | Moderate — selective about games, high skill ceiling valued |
 | **Mobile Behavior** | Focused sessions, headphones in, minimal multitasking |
-| **Referral Source** | App Store "Games We Love," puzzle game communities, review sites |
+| **Referral Source** | Steam "Games We Love," puzzle game communities, review sites |
 | **Comparable Games** | The Witness, Monument Valley, Cytus II, Okami, Into the Breach |
 
 ### Motivations & Fears
@@ -380,7 +380,7 @@ Minute 60-90: Moon-end sweep — verify completion before advancing
 
 | Segment | Global Size (2026) | Tartaria Relevance |
 |---|---|---|
-| **Mobile Gamers (iOS)** | ~1.1 billion | Total addressable |
+| **PC Gamers (Steam)** | ~400 million | Total addressable |
 | **Adventure/RPG Mobile** | ~280 million | Primary genre audience |
 | **City-Builder Mobile** | ~120 million | Secondary genre overlap |
 | **Puzzle Mobile** | ~400 million | Tertiary (mini-games) |
@@ -390,16 +390,16 @@ Minute 60-90: Moon-end sweep — verify completion before advancing
 
 | Filter | Reduction | Remaining |
 |---|---|---|
-| iOS 18+ (iPhone 15 Pro+) | ~15% of iOS gamers | ~165 million |
-| English-speaking primary | ~40% | ~66 million |
-| Adventure/RPG/Builder interest | ~25% | ~16.5 million |
-| Alt-history curiosity | ~10% | ~1.65 million |
+| Steam users with recommended+ GPU | ~30% of PC gamers | ~120 million |
+| English-speaking primary | ~40% | ~48 million |
+| Adventure/RPG/Builder interest | ~25% | ~12 million |
+| Alt-history curiosity | ~10% | ~1.2 million |
 
 ### Realistic Year-1 Target
 
 | Metric | Target | Basis |
 |---|---|---|
-| **Downloads** | 500,000 | App Store featuring + organic |
+| **Downloads** | 500,000 | Steam featuring + organic |
 | **D30 Retention** | 12% | 60,000 monthly actives |
 | **Conversion Rate** | 3.5% | 21,000 paying users |
 | **ARPU** | $4.00 | Hybrid model (cosmetic + pass + sub) |

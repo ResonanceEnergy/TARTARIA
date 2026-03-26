@@ -1,0 +1,22 @@
+{
+    "name": "Tartaria.AI",
+    "rootNamespace": "Tartaria.AI",
+    "references": [
+        "Tartaria.Core",
+        "Tartaria.Gameplay",
+        "Unity.Entities",
+        "Unity.Burst",
+        "Unity.Collections",
+        "Unity.Mathematics",
+        "Unity.Transforms"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,5 +1,5 @@
 # TARTARIA WORLD OF WONDER — Haptic Feedback Design Bible
-## Complete Core Haptics (Taptic Engine) Specification
+## Force Feedback & Gamepad Haptic Specification
 ### Every Touch, Every Pulse, Every Cosmic Moment
 
 ---
@@ -7,8 +7,8 @@
 > *Haptics in Tartaria are not decorative — they are the player's physical connection to resonance. When a dome breathes, the player feels it. When a bell rings across continents, the player's hands carry the wave. When the timeline cracks open, the player's body knows before their eyes confirm it. This document specifies every haptic interaction in the game, from idle hums to cataclysmic cosmic events.*
 
 **Cross-References:**
-- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — Core Haptics API, Taptic Engine specs, iOS platform
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Touch control integration
+- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — Haptic API, XInput/DualSense specs, PC platform
+- [07_PC_UX.md](07_PC_UX.md) — Input + haptic integration
 - [12_VIVID_VISUALS.md](12_VIVID_VISUALS.md) — Visual events paired with haptic profiles
 - [13_MINI_GAMES.md](13_MINI_GAMES.md) — Mini-game haptic accompaniment
 - [11_SCRIPTED_CLIMAXES.md](11_SCRIPTED_CLIMAXES.md) — Climax haptic escalation
@@ -43,7 +43,7 @@
 
 ## Haptic Design Philosophy
 
-**The Resonance Principle:** Every haptic event must feel like it originates from within the world — not from a phone. Players should unconsciously associate haptic feedback with the living architecture, the cosmic forces, and the resonance grid they're rebuilding.
+**The Resonance Principle:** Every haptic event must feel like it originates from within the world — not from a controller. Players should unconsciously associate haptic feedback with the living architecture, the cosmic forces, and the resonance grid they’re rebuilding.
 
 **Hierarchy of Intensity:**
 1. **Ambient (0.1–0.2 intensity):** Background world-feel — dome humming, water flowing, idle Aether
@@ -53,10 +53,11 @@
 5. **Cosmic (0.9–1.0 intensity):** Once-per-campaign moments — planetary ring, timeline crack, final choice
 
 **Technical Constraints:**
-- Core Haptics API on iOS (CHHapticEngine)
+- XInput rumble motors (Xbox controllers) + DualSense adaptive triggers and haptic feedback (PlayStation controllers)
 - Maximum pattern duration: 30 seconds per continuous event (chain for longer)
-- Battery-aware: intensity reduces by 20% below 30% battery, 40% below 15%
+- Power-aware: intensity reduces when gamepad battery is low (controller-dependent)
 - Framerate-synced: haptic events tied to visual frames, never free-running
+- Fallback: keyboard/mouse players receive visual-only substitutes (see Accessibility section)
 
 ---
 
@@ -69,10 +70,10 @@
 - **Completion:** Deep satisfying "lock" (0.7, 100ms) followed by warm sustained hum (0.2, 3 seconds).
 
 ### Category 2: Combat Haptics
-- **Resonance weapon swing:** Swift sweep (0.3, 80ms, directional — left-to-right or right-to-left matching swipe direction)
+- **Resonance weapon swing:** Swift sweep (0.3, 80ms, directional — left motor or right motor matching attack direction)
 - **Hit connection:** Sharp impact (0.5, 40ms) with brief "ring" tail (0.2, 150ms) — the weapon resonates
 - **Golem shatter:** Heavy thud (0.6, 60ms) → crystalline scatter (0.3, rapid irregular pulses over 300ms)
-- **Wraith phase:** Unsettling hollow pulse (0.2, 100ms) — feels like something passing through the device
+- **Wraith phase:** Unsettling hollow pulse (0.2, 100ms) — feels like something passing through the controller
 - **Player damage:** Jarring irregular burst (0.7, 50ms) — deliberately unpleasant, breaking the world's natural rhythm
 - **Giant mode combat:** All impacts scaled 2× in duration and 1.5× in intensity. Player FEELS large.
 
@@ -136,7 +137,7 @@ The airship is a living vehicle — its haptic presence communicates its state t
 ### Hover/Idle
 - **Pattern:** Low continuous hum (0.15 intensity, 2 Hz oscillation)
 - **Character:** Anti-gravity engine vibration — smooth, mechanical-organic hybrid
-- **Direction:** Centered below thumbs (where the controls are)
+- **Direction:** Centered in both motors (where the player's hands rest)
 - **Mercury orb:** Subtle liquid sloshing overlay (0.05, random gentle shifts every 2–4 seconds)
 
 ### Anti-Gravity Engagement
@@ -165,7 +166,7 @@ The airship is a living vehicle — its haptic presence communicates its state t
 
 ### Banking (Turn)
 - **Pattern:** Directional pulse favoring the turn direction
-- **Left bank:** Stronger haptic on left side of device (0.25 left, 0.1 right)
+- **Left bank:** Stronger haptic on left motor (0.25 left, 0.1 right)
 - **Right bank:** Reversed
 - **Duration:** Sustained through the turn, returns to centered on straightening
 - **Sharp turn:** Intensity spikes briefly (0.4 peak) — the airship straining
@@ -285,7 +286,7 @@ The airship is a living vehicle — its haptic presence communicates its state t
 - **Detection:** Within 20m of a ley-line
 - **Pattern:** Gentle pulse matching the line's flow direction (0.1, 1 Hz)
 - **Character:** The earth's heartbeat — steady, alive, warm
-- **Directional:** Pulse subtly stronger on the side nearest the ley-line
+- **Directional:** Pulse subtly stronger on the motor nearest the ley-line direction
 
 ### Entering the River
 - **Trigger:** Player steps into or onto ley-line river (bridges, crossing points)
@@ -523,7 +524,7 @@ The airship is a living vehicle — its haptic presence communicates its state t
 
 ### Flow & Tracing
 - **When player moves through/traces aurora bands:**
-- **Pattern:** Directional flow matching finger/movement direction (0.15–0.25)
+- **Pattern:** Directional flow matching movement direction (0.15–0.25)
 - **Texture:** Rippling — smooth but with micro-variations every 100ms (0.02 variance)
 - **Color response:** Different aurora colors produce different haptic textures:
   - Green: smooth flowing (standard sine)
@@ -550,7 +551,7 @@ The airship is a living vehicle — its haptic presence communicates its state t
 
 ### Initiating Spiral
 - **Trigger:** Any radial resonance event (dome activation, fountain bloom, bell tower ring expanding)
-- **Pattern:** Rotational haptic — intensity sweeps clockwise (or counterclockwise for corruption) around the device
+- **Pattern:** Rotational haptic — intensity alternates between left and right motors (or clockwise on DualSense for corruption)
 - **One revolution:** 500ms
 - **Starting intensity:** 0.2 (center) → 0.15 (edge) — spiral carries energy outward
 - **Character:** Like holding a spinning lens of energy
@@ -588,7 +589,7 @@ The airship is a living vehicle — its haptic presence communicates its state t
 ### Trigger
 - **The release:**
 - **Pattern:** Spiral EXPLODES outward — revolution instantly slows to 1000ms while intensity peaks (0.8)
-- **The feel:** Like the device expanded. The tight vortex became vast.
+- **The feel:** Like the controller expanded. The tight vortex became vast.
 - **Single-frame hard pulse:** (0.9, 50ms) at the moment of expansion — the "pop"
 
 ### Cascade Resonance
@@ -654,10 +655,10 @@ The airship is a living vehicle — its haptic presence communicates its state t
 ### Trigger
 - **THE SLAM:**
 - **Pattern:** ALL haptic activity ceases for exactly 200ms (the breath before). Then:
-  - 1.0 intensity, 250ms sustained SLAM — device at absolute maximum
+  - 1.0 intensity, 250ms sustained SLAM — controller at absolute maximum
   - Immediately: spiral slam — explosive outward spiral (single revolution at 1.0 intensity over 300ms)
   - Then: total silence for 500ms
-- **Battery protection:** Even at low battery, this event fires at minimum 0.7 intensity
+- **Battery protection:** Even at low controller battery, this event fires at minimum 0.7 intensity
 - **Character:** Cataclysm. Finality. The biggest single moment in the entire game.
 
 ### Spiral Shockwave Cascade
@@ -682,15 +683,15 @@ The airship is a living vehicle — its haptic presence communicates its state t
 - **Off:** Complete haptic disable. Visual indicators substitute for all haptic cues.
 - **Custom:** Per-category intensity sliders (0–100%) for each of the 6 general categories.
 
-### Battery-Aware Scaling
-| Battery Level | Intensity Multiplier | Disabled Features |
+### Controller-Aware Scaling
+| Controller Type | Haptic Capability | Scaling Notes |
 |---|---|---|
-| 50–100% | 1.0× (full) | None |
-| 30–49% | 0.8× | Ambient environmental (Cat. 5) reduced further to 0.5× |
-| 15–29% | 0.6× | Ambient disabled. Only interactive + dramatic + cosmic remain. |
-| <15% | 0.4× | Only combat + UI + cosmic events. Reduced to minimum effective intensity. |
+| Xbox (XInput) | Dual rumble motors (left heavy, right light) | Directional via motor balance, no fine-grain texture |
+| DualSense (PS5) | HD haptics + adaptive triggers | Full haptic texture, trigger resistance for tension events |
+| Generic XInput | Basic rumble | Simplified to on/off intensity, no directional |
+| Keyboard/Mouse | None | Full visual/audio substitutes (see below) |
 
-**Exception:** Supernova Burst Thump and Cataclysmic Spiral Slam always fire at minimum 0.7× intensity regardless of battery — these are once-per-campaign events that must land.
+**Exception:** Supernova Burst Thump and Cataclysmic Spiral Slam always fire at minimum 0.7× intensity regardless of controller battery — these are once-per-campaign events that must land.
 
 ### Visual Substitutions (Haptics Off)
 When haptics are disabled, every haptic cue must have a visual or audio equivalent so no gameplay information is lost.
@@ -712,9 +713,9 @@ For deaf and hard-of-hearing players, haptics become a PRIMARY information chann
 - Pipe Organ Symphony Conduction adds visual waveform overlay + haptic beat guide
 
 ### Performance Sync
-- All haptic patterns are frame-synced via `CADisplayLink` callback
-- Haptic events queued in `CHHapticPatternPlayer` — minimum 16ms granularity
-- Complex layered haptics (e.g., Formation Flight with 5+ ships) may simplify on older A-series chips
+- All haptic patterns are frame-synced via Unity’s Input System haptic API
+- Haptic events queued through `InputDevice.SetMotorSpeeds()` (XInput) or `DualSenseGamepadHID` (DualSense) — minimum 16ms granularity
+- Complex layered haptics (e.g., Formation Flight with 5+ ships) may simplify on basic XInput controllers
 - Profiling target: haptic computation ≤ 0.5ms per frame
 
 ---
@@ -725,8 +726,8 @@ For deaf and hard-of-hearing players, haptics become a PRIMARY information chann
 ---
 
 *See also:*
-- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — Core Haptics API implementation
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — Touch + haptic integration
+- [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — Haptic API implementation
+- [07_PC_UX.md](07_PC_UX.md) — Input + haptic integration
 - [12_VIVID_VISUALS.md](12_VIVID_VISUALS.md) — Visual events paired with these haptics
 
 ---

@@ -8,7 +8,7 @@
 **Cross-References:**
 - [04_ARCHITECTURE_GUIDE.md](../04_ARCHITECTURE_GUIDE.md) — Zone layouts, building types, sacred geometry rules
 - [12_VIVID_VISUALS.md](../12_VIVID_VISUALS.md) — Key visual moment cinematography
-- [09_TECHNICAL_SPEC.md](../09_TECHNICAL_SPEC.md) — Unity 6 rendering pipeline, Metal 3, memory budgets
+- [09_TECHNICAL_SPEC.md](../09_TECHNICAL_SPEC.md) — Unity 6 rendering pipeline, DX12/Vulkan, memory budgets
 
 ---
 
@@ -307,7 +307,7 @@
 - **Background:** Translucent dark with subtle Aether shimmer (not opaque — the world shows through)
 - **Typography:** Serif for headers (Tartarian aesthetic), clean sans-serif for body text (readability)
 - **Iconography:** Minimal line-art style — golden on dark, consistent 2px stroke weight
-- **Touch targets:** Minimum 44pt (Apple guidelines), generous padding, clear active states
+- **Touch targets:** Minimum 44px (UI design standard), generous padding, clear active states
 
 ### HUD Elements
 - **RS Meter:** Arc gauge (top-center) — golden fill, 3 segment markers (3-6-9 bands), subtle pulse at high values
@@ -454,7 +454,7 @@ Natural lighting enhanced by Aether emission. No artificial electric lights exis
 | **VFX/Particles** | GPU particles | 2 MB | 4-8 |
 | **Zone Total** | ~370k tris | ~62 MB | ~50-70 |
 
-**Target: 60 FPS on A19 chip at dynamic 720p-1080p with MetalFX upscaling**
+**Target: 60 FPS on recommended PC (RTX 3060) at dynamic 1080p–1440p with FSR 2/DLSS upscaling**
 
 ---
 

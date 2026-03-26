@@ -11,7 +11,7 @@
 - [03A_MAIN_STORYLINE_REWRITE.md](03A_MAIN_STORYLINE_REWRITE.md) — Main storyline integration
 - [17_DAY_OUT_OF_TIME.md](17_DAY_OUT_OF_TIME.md) — Solidification moment, festival farewell
 - [11_SCRIPTED_CLIMAXES.md](11_SCRIPTED_CLIMAXES.md) — Climax appearances per Moon
-- [07_MOBILE_UX.md](07_MOBILE_UX.md) — HUD companion mode indicator
+- [07_PC_UX.md](07_PC_UX.md) — HUD companion mode indicator
 - [09_TECHNICAL_SPEC.md](09_TECHNICAL_SPEC.md) — ECS archetype, Addressable bundles
 - [12_VIVID_VISUALS.md](12_VIVID_VISUALS.md) — Manifestation visual design
 - [14_HAPTIC_FEEDBACK.md](14_HAPTIC_FEEDBACK.md) — Haptic sync profile

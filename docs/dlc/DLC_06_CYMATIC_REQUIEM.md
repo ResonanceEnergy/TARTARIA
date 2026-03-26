@@ -141,7 +141,7 @@ The player conducts musical performances by directing ensemble members in real-t
 ### Conduction Interface
 - **Baton Control:** Touch/swipe gestures direct different sections of the ensemble
 - **Tempo Management:** Hold steady tempo (tempo wheel on screen) — drift causes dissonance
-- **Dynamic Control:** Pressure-sensitive volume (harder touch = louder, iPhone haptic feedback)
+- **Dynamic Control:** Pressure-sensitive volume (harder input = louder, gamepad haptic feedback)
 - **Section Cueing:** Tap musician icons to bring sections in/out
 
 ### Performance Scoring
@@ -153,7 +153,7 @@ The player conducts musical performances by directing ensemble members in real-t
 | Transcendent | 95–100% | Perfect performance: ionized mist rain, regional aurora |
 
 ### Haptic Feedback During Conduction
-- Each instrument section vibrates at different frequencies via Core Haptics
+- Each instrument section vibrates at different frequencies via gamepad haptics
 - Maintaining tempo: rhythmic heartbeat pulse
 - Harmony achieved: warm sustained vibration
 - Dissonance creeping in: sharp, irregular pulses
