@@ -231,7 +231,10 @@ After the session, ask: "How is this combat different from other mobile games?"
 
 **Duration:** 25 minutes  
 **Gate:** Phase 2, Month 4  
-**Build Requirements:** Princess Anastasia companion system (4 modes), golden particle effects, 20+ dialogue lines, haptic sync
+**Build Requirements:** Princess Anastasia companion system (4 modes), golden particle effects with midnight-sapphire gown silhouette and crystalline wing array, 20+ dialogue lines, haptic sync
+
+### Visual Benchmark
+Anastasia's echo form at Silent Mode (30% opacity): golden particle figure with faint shape of voluminous midnight-sapphire ball gown, off-shoulder bodice crystals catching Aether light, translucent fan-shaped crystal wing behind right shoulder throwing faint prismatic caustics. At Conversational Mode (70%): silver floral embroidery visible on skirt, crystal choker glints at neckline, cape-sleeves trail light arcs, wing array shimmers with aurora-like color shifts. **Canonical reference: `Anastasia.jpg`**
 
 ### Setup
 - Post-Moon 1 Echohaven — dome already restored
@@ -243,14 +246,14 @@ After the session, ask: "How is this combat different from other mobile games?"
 | Minute | Event | Success Metric |
 |---|---|---|
 | 0:00–2:00 | Golden particles coalesce near restored dome | Player investigates without prompting |
-| 2:00–4:00 | Anastasia manifests in Silent Mode — translucent, gold (#FFD700) | Player pauses to observe |
+| 2:00–4:00 | Anastasia manifests in Silent Mode — translucent gold (#FFD700) figure, midnight-sapphire gown silhouette, faint crystal wing array | Player pauses to observe |
 | 4:00–7:00 | Exploration — Anastasia follows but says nothing | Player glances at her periodically |
 | 7:00–8:00 | Player approaches a lore fragment — Anastasia shifts to Reactive Whisper | Player notices the mode change |
 | 8:00–12:00 | 3 soft whispers during exploration (non-intrusive) | Player does NOT feel interrupted |
 | 12:00–15:00 | Player enters combat — Anastasia goes Invisible | Player doesn't notice absence (good) |
 | 15:00–17:00 | Post-combat — Anastasia re-manifests, comments on the fight quietly | Player reads her comment |
 | 17:00–20:00 | Building mode — Anastasia in Conversational Mode near architecture | Player engages with building dialogue |
-| 20:00–23:00 | Nightfall — Anastasia's glow intensifies, she hums softly | Player stays in zone longer |
+| 20:00–23:00 | Nightfall — Anastasia's glow intensifies, sapphire gown bleeds through gold particles, crystal wing array casts prismatic light on nearby walls; she hums softly | Player stays in zone longer |
 | 23:00–25:00 | Golden mote Easter egg discovery (if player finds it) | Delight moment |
 
 ### Mode Transition Validation
@@ -266,7 +269,7 @@ After the session, ask: "How is this combat different from other mobile games?"
 - Player forgets Anastasia exists during Silent Mode → presence too subtle
 - Player feels annoyed during Reactive Whisper → whispers too frequent
 - Conversational Mode competes with Milo/Lirael → NPC traffic jam
-- Anastasia's golden glow is visually distracting during gameplay → VFX too bright
+- Anastasia's golden glow + crystal wing caustics are visually distracting during gameplay → VFX too bright
 - Player asks "what does she do?" → unclear companion value proposition
 
 ### Key Metrics

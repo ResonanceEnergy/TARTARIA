@@ -103,6 +103,7 @@
 | **Cassian** | Charcoal with red flickers (#2F4F4F, #DC143C) | Ambiguous, conflicted, dangerous |
 | **Zereth** | Corrupted violet → healed aurora (#4B0082 → #7FFFD4) | Tormented → transcendent |
 | **Veritas** | Ivory + crystal (#FFFFF0, #E0E0E0) | Pure, precise, musical |
+| **Anastasia** | Primary gold (#FFD700) + midnight sapphire (#191970) + crystal silver (#C0C0C0) + teal accent (#00CED1) | Preserved, regal, liminal — golden echo-particles over voluminous midnight-sapphire ball gown, silver floral vine embroidery, off-shoulder crystal-encrusted bodice, sheer cape-sleeves, ornate crystal choker, iridescent fan-shaped crystalline wing array (Archive anchor). Ref: `Anastasia.jpg` |
 
 ---
 
