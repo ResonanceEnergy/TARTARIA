@@ -185,7 +185,8 @@
 ## 6. Princess Anastasia
 
 **Role:** Historical echo, secret quest line, thematic parallel  
-**Integration:** 13 Moon-specific events
+**Integration:** 13 Moon-specific events  
+**Visual Signature:** Translucent golden figure in a voluminous midnight-sapphire (#191970) ball gown with silver-crystal floral vine embroidery, off-shoulder jeweled bodice, sheer crystal-beaded cape-sleeves, ornate crystal choker, and a fan-shaped iridescent crystalline wing array behind the right shoulder that refracts Aether light into prismatic caustics. Canonical reference: `Anastasia.jpg`
 
 | Document | Content |
 |----------|---------|

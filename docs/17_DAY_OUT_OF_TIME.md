@@ -262,24 +262,24 @@ See [18_PRINCESS_ANASTASIA.md](18_PRINCESS_ANASTASIA.md) for Anastasia's full ch
 
 **The Sequence:**
 
-1. **The Glow (0:00–3:00):** Anastasia's golden particles begin behaving differently. Instead of drifting, they contract. Instead of shimmering, they crystallize. Nearby companions notice and fall silent. Milo stops mid-quip. Lirael's eyes widen.
+1. **The Glow (0:00–3:00):** Anastasia's golden particles begin behaving differently. Instead of drifting, they contract. Instead of shimmering, they crystallize. The crystalline wing array behind her right shoulder flares — prismatic light spills outward, casting rainbow caustics across every nearby surface and companion. Milo stops mid-quip. Lirael's eyes widen.
 
-2. **The Shift (3:00–5:00):** Anastasia's translucence fades. Color blooms through her — not the warm gold (#FFD700) of her echo form, but actual human color. Hair darkens to deep chestnut. Skin gains warmth. Eyes become blue-grey instead of golden. For the first time, she casts a shadow.
+2. **The Shift (3:00–5:00):** Anastasia's translucence fades. Color blooms through her — not the warm gold (#FFD700) of her echo form, but actual human color. Hair resolves from golden filaments to rich chestnut-brown, the soft updo and loose tendrils suddenly real. Skin gains warmth. Eyes become blue-grey instead of golden. The midnight-sapphire gown materializes: voluminous, floor-length, silver-crystal floral embroidery catching real light for the first time. The raised jewel encrustation on her off-shoulder bodice stops scattering Aether and begins scattering sunlight. The crystal choker at her collarbone solidifies into faceted stone. The sheer cape-sleeves settle with actual weight. For the first time, she casts a shadow — and the crystalline wing structure behind her casts one too.
 
 3. **The Moment (5:00–15:00, 10 seconds of game-time = stretched to ~2 minutes of player-time through slow motion):**
    - Anastasia is fully solid. Fully real. Fully present.
-   - She looks at her own hands. Turns them over. Touches her face.
-   - She looks at the player.
-   - She takes one step forward. Her foot makes a sound. An actual footstep. The first sound she has made that isn't spectral.
+   - She looks at her own hands. Turns them over — silver embroidery glints on the sleeve-capes. Touches her face.
+   - She looks at the player. The midnight-sapphire skirt shifts with actual fabric physics, ruffled tiers catching the light.
+   - She takes one step forward. The gown's train sweeps the ground. Her foot makes a sound. An actual footstep. The first sound she has made that isn't spectral.
    - A single tear — an actual tear, not light — falls from her eye.
 
 4. **The Words (she speaks once, in a voice that is no longer a whisper):**
 
 > Anastasia: "...I can feel the ground."
 
-5. **The Return (15:00–20:00):** The harmonic peak passes. Golden light returns. Her edges begin to shimmer. She becomes translucent again. The shadow fades. She is an echo once more.
+5. **The Return (15:00–20:00):** The harmonic peak passes. Golden light returns. The midnight-sapphire gown dissolves back into warm particle-light; the silver embroidery becomes luminous tracery. The crystalline wings lose their solidity, refracting into spectral ghosts of themselves. Her edges begin to shimmer. She becomes translucent again. The shadow fades. She is an echo once more.
 
-   But she is smiling. And her echo-form seems warmer than before.
+   But she is smiling. And her echo-form seems warmer than before — the sapphire undertone richer, the crystal wing array glowing brighter than it ever did before today.
 
 > Anastasia (back in whisper-mode): "Ten seconds. That's more than most people get in a lifetime."
 

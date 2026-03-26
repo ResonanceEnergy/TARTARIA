@@ -79,6 +79,10 @@ Her arc answers it: **No. But it's close enough to matter.**
 
 ## 2. Visual Design
 
+### Reference Image
+
+> **Visual anchor:** `Anastasia.jpg` — The canonical reference for Anastasia's solidified appearance. Every visual element described below derives from this image. All echo-form particle behavior should resolve toward this exact form at maximum opacity (70% Conversational, 100% Solidification).
+
 ### Color Palette
 
 | Element | Hex | RGB | Usage |
@@ -87,24 +91,47 @@ Her arc answers it: **No. But it's close enough to matter.**
 | **Ambient Glow** | #FFF8E1 | 255, 248, 225 | Surrounding aura, ambient light emission |
 | **Deep Gold** | #DAA520 | 218, 165, 32 | Architectural interaction glow, lore proximity |
 | **Faded Gold** | #FFE082 | 255, 224, 130 | Low-activity state, distant observation |
-| **Solid State** (Day Out of Time only) | Human skin tones | — | Chestnut hair, blue-grey eyes, warm skin |
+| **Midnight Sapphire** | #191970 | 25, 25, 112 | Gown fabric — skirt, mid-section, dominant color of the dress |
+| **Crystal Silver** | #C0C0C0 | 192, 192, 192 | Floral embroidery, bodice jewel encrustation, choker, wings |
+| **Teal Accent** | #00CED1 | 0, 206, 209 | Environmental glow lines echoing Tartarian architecture (floor, walls) — not on Anastasia herself, but the world reacts to her presence with these accent traces |
+| **Solid State** (Day Out of Time only) | Human skin tones | — | Chestnut-brown hair, blue-grey eyes, warm skin, natural lip color |
 
 ### Form Description
 
 **Default (Echo Form):**
 - Translucent humanoid figure composed of golden light particles
-- Particles drift gently, like dust motes in a sunbeam
+- Particles drift gently, like dust motes in a sunbeam — tiny sparkle-motes orbit her figure and scatter through the surrounding space
 - Silhouette is clearly feminine, regal posture: straight spine, chin slightly elevated, hands relaxed at sides or clasped in front
-- Hair appears mid-length and gently moves regardless of wind direction (Aether drift)
-- Eyes are the most defined feature — warm gold, expressive, often the only part of her that looks directly at the player
+- **Hair:** Chestnut-brown, worn in a soft, romantic updo — loosely gathered at the crown with natural tendrils falling to frame the face and draping gently past the shoulders. Moves regardless of wind direction (Aether drift). In echo form the hair reads as warm golden filaments; at Conversational opacity, the chestnut tones emerge
+- **Eyes:** The most defined feature — warm gold in echo form, resolving to blue-grey at Solidification. Expressive, often the only part of her that looks directly at the player
+- **Expression:** A gentle, knowing, warm half-smile — confident without being aloof, inviting without being cloying
 - No feet contact with ground — hovers 2–3 cm above surfaces (except during solidification)
 - Translucency varies: 30% opacity (Silent), 50% (Reactive Whisper), 70% (Conversational), 0% (Invisible)
+- At higher opacity (50–70%), midnight-sapphire bleeds through the golden particle field — deep blue fabric visible beneath warm gold light, creating a haunting dual-tone interplay
 
-**Clothing (Implied Through Light):**
-- Silhouette suggests a high-collared Edwardian-era dress with clean lines
-- No specific fabric detail — just the shape implied by how light flows around her form
-- A circlet or tiara shape occasionally resolves at the crown of her head when she concentrates (Conversational mode only)
-- Small pendant at her throat (her tiara and pendant are the most "solid" parts of her form even in echo state — the artifacts that anchored her to the Archive)
+**The Gown (Implied Through Light → Fully Realized in Solidification):**
+
+The gown is a grand Tartarian-era ball gown — an unmistakable silhouette even in echo form:
+
+- **Bodice:** Off-shoulder with a sweetheart neckline. Heavily encrusted with three-dimensional silver-crystal floral appliqués — not flat embroidery but raised, sculpted flowers and diamond-faceted jewels clustered densely across the bust and shoulders. The silver encrustation cascades downward from the neckline, thinning as it reaches the waist. In echo form, this is the most "solid" region of her figure — the crystals catch and scatter Aether light even at low opacity
+- **Cape-Sleeves:** Sheer, translucent panels that drape from the off-shoulder line down to wrist length, gathered at the back into a trailing cape that flows behind her. Beaded with tiny crystal points arranged in delicate lines — when she gestures, these trace luminous arcs through the air. The cape extends well below the waist, blending with the skirt's silhouette
+- **Waist:** Fitted, cinched, defined — the bodice transitions to skirt at a natural waistline with a clean silver-to-sapphire gradient
+- **Skirt:** Voluminous, floor-length, dramatically full. The fabric is midnight-sapphire (#191970) with an all-over sparkle texture — like a night sky captured in silk. Layered tiers at the sides create sculpted ruffled folds of fabric that add architectural dimension. The skirt pools into a generous train at the floor
+- **Embroidery:** Silver-white botanical vine motifs climb the entire skirt surface — trailing stems, full-bloom flowers (five-petal roses, small star-shaped blossoms), curving leaf clusters, and delicate branching tendrils. The embroidery is densest at the lower half and hem, thinning toward the waist, creating a sense of growth ascending from the earth. In echo form these appear as faint luminous tracery; at Conversational opacity they shimmer like frost on glass; at Solidification they are fully realized silver threadwork
+- **Choker Necklace:** An ornate crystal-and-diamond choker spanning the full collarbone — composed of multi-faceted stones in a scalloped setting. This is the most consistently visible accessory across all opacity states, glinting even at 30% Silent Mode. (Replaces earlier "pendant" — the choker is the Archive seal, the signature artifact linking Anastasia to the planetary grid)
+
+**Crystalline Wing Structure:**
+
+The defining visual element that marks Anastasia as an Archive Echo rather than a standard ghost. Positioned behind her right shoulder and emanating from between the shoulder blades:
+
+- A fan-shaped array of elongated crystal spears radiating outward and upward — five to seven primary shards graduating in height, with smaller shards filling the gaps
+- Iridescent and prismatic — refracts Aether light into rainbow caustics on nearby surfaces (walls, floors, companions)
+- The crystal surfaces shift between blue, white, pale gold, and spectral rainbow depending on viewing angle
+- **Echo form:** Faint, translucent, visible primarily as refracted light thrown onto nearby architecture
+- **Reactive Whisper:** Brightens slightly, the crystal edges glow teal-white
+- **Conversational (70%):** Shimmers like frozen aurora borealis — visible prismatic color shifts pulse slowly
+- **Solidification (100%):** Fully materializes as a spectacular crown-like radiance — solid crystal, weight, physical light refraction. The single most visually dramatic element of the solidification moment
+- **Function:** This is the Archive anchor — the geometric key that preserves Anastasia's consciousness in the planetary grid. It is the reason she can exist as a complete being rather than a looping fragment
 
 ### VFX Specifications
 
