@@ -309,6 +309,11 @@ namespace Tartaria.Editor
             debugGO.transform.SetParent(managersGO.transform);
             debugGO.AddComponent<DebugOverlay>();
 
+            // WorldInitializer (creates companion, spawn triggers, building ECS entities)
+            var worldInitGO = new GameObject("WorldInitializer");
+            worldInitGO.transform.SetParent(managersGO.transform);
+            worldInitGO.AddComponent<WorldInitializer>();
+
             // === Player ===
             var playerGO = CreatePlayer();
 
