@@ -68,10 +68,6 @@ namespace Tartaria.UI
                 if (_saveIndicatorTimer <= 0 && saveIndicator != null)
                     saveIndicator.SetActive(false);
             }
-
-            // ESC = toggle pause
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Escape))
-                TogglePause();
         }
 
         // ─── State Management ────────────────────────

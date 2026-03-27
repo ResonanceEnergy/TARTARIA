@@ -35,6 +35,9 @@ namespace Tartaria.Integration
         Entity _rsEntity;
         bool _ecsReady;
 
+        // Player cache
+        Transform _cachedPlayer;
+
         void Start()
         {
             _visible = showOnStart;
@@ -137,10 +140,14 @@ namespace Tartaria.Integration
             cy += lineHeight;
 
             // Player position
-            var player = GameObject.FindWithTag("Player");
-            if (player != null)
+            if (_cachedPlayer == null)
             {
-                var pos = player.transform.position;
+                var playerObj = GameObject.FindWithTag("Player");
+                if (playerObj != null) _cachedPlayer = playerObj.transform;
+            }
+            if (_cachedPlayer != null)
+            {
+                var pos = _cachedPlayer.position;
                 DrawLabel(labelStyle, cx, cy, $"Player: ({pos.x:F1}, {pos.y:F1}, {pos.z:F1})");
             }
             cy += lineHeight;

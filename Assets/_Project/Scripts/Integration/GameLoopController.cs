@@ -312,6 +312,9 @@ namespace Tartaria.Integration
 
             // Milo speaks
             DialogueManager.Instance?.PlayContextDialogue("discovery");
+
+            // Anastasia: lore whisper on discovery
+            AnastasiaController.Instance?.TryDeliverLine("discovery");
         }
 
         /// <summary>
@@ -360,6 +363,15 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayBuildingEmergence(position);
             DialogueManager.Instance?.PlayContextDialogue("restoration");
 
+            // Anastasia: first restoration triggers manifestation, subsequent ones get memory fragments
+            if (AnastasiaController.Instance != null)
+            {
+                if (!AnastasiaController.Instance.HasManifested)
+                    AnastasiaController.Instance.TriggerFirstManifestation();
+                else
+                    AnastasiaController.Instance.TryDeliverLine("restoration");
+            }
+
             SaveManager.Instance?.MarkDirty();
         }
 
@@ -379,6 +391,25 @@ namespace Tartaria.Integration
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
 
             SaveManager.Instance?.MarkDirty();
+        }
+
+        // ─── RS Reward Queue (generic) ───────────────
+
+        /// <summary>
+        /// Queue a generic RS reward via ECS. Used by QuestManager, WorkshopSystem, etc.
+        /// </summary>
+        public void QueueRSReward(float amount, string source)
+        {
+            if (!_ecsReady) return;
+            Debug.Log($"[GameLoop] RS reward +{amount} from {source}");
+            var buffer = _em.GetBuffer<ResonanceEvent>(_rsEntity);
+            buffer.Add(new ResonanceEvent
+            {
+                Action = ResonanceAction.CollectAether,
+                BaseReward = amount,
+                Multiplier = 1f,
+                GoldenRatioMatch = 0f
+            });
         }
 
         // ─── Player ECS Position Sync ────────────────

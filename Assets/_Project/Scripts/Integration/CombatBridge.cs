@@ -37,6 +37,7 @@ namespace Tartaria.Integration
         EntityManager _em;
         Entity _playerCombatEntity;
         EntityQuery _enemyQuery;
+        Transform _playerTransform;
         bool _initialized;
 
         float _pulseTimer;
@@ -80,6 +81,11 @@ namespace Tartaria.Integration
             _em.AddBuffer<DamageEvent>(_playerCombatEntity);
             // Cache enemy query for reuse in MonitorEnemies/DamageNearbyEnemies/DamageEnemiesInCone
             _enemyQuery = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
+
+            // Cache player transform
+            var playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null) _playerTransform = playerObj.transform;
+
             _initialized = true;
         }
 
@@ -300,14 +306,22 @@ namespace Tartaria.Integration
 
         Vector3 GetPlayerPosition()
         {
-            var player = GameObject.FindWithTag("Player");
-            return player != null ? player.transform.position : Vector3.zero;
+            if (_playerTransform == null)
+            {
+                var playerObj = GameObject.FindWithTag("Player");
+                if (playerObj != null) _playerTransform = playerObj.transform;
+            }
+            return _playerTransform != null ? _playerTransform.position : Vector3.zero;
         }
 
         Vector3 GetPlayerForward()
         {
-            var player = GameObject.FindWithTag("Player");
-            return player != null ? player.transform.forward : Vector3.forward;
+            if (_playerTransform == null)
+            {
+                var playerObj = GameObject.FindWithTag("Player");
+                if (playerObj != null) _playerTransform = playerObj.transform;
+            }
+            return _playerTransform != null ? _playerTransform.forward : Vector3.forward;
         }
 
         void OnDestroy()

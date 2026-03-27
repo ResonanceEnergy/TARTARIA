@@ -13,6 +13,9 @@ namespace Tartaria.Input
     [RequireComponent(typeof(CharacterController))]
     public class PlayerInputHandler : MonoBehaviour
     {
+        [Header("Input")]
+        [SerializeField] InputActionAsset inputActions;
+
         [Header("Movement")]
         [SerializeField] float moveSpeed = 6.0f;
         [SerializeField] float sprintMultiplier = 1.6f;
@@ -39,6 +42,8 @@ namespace Tartaria.Input
         InputAction _aetherVisionAction;
         InputAction _pauseAction;
 
+        InputActionMap _playerMap;
+
         public Vector3 MoveDirection { get; private set; }
         public bool IsMoving => _moveInput.sqrMagnitude > 0.01f;
         public bool AetherVisionActive { get; private set; }
@@ -61,19 +66,38 @@ namespace Tartaria.Input
 
         void SetupInputActions()
         {
-            // These will be populated from the InputActionAsset in Unity Editor.
-            // For now, use direct keyboard polling as fallback.
+            if (inputActions == null) return;
+
+            _playerMap = inputActions.FindActionMap("Player");
+            if (_playerMap == null) return;
+
+            _moveAction = _playerMap.FindAction("Move");
+            _sprintAction = _playerMap.FindAction("Sprint");
+            _interactAction = _playerMap.FindAction("Interact");
+            _attackAction = _playerMap.FindAction("ResonancePulse");
+            _shieldAction = _playerMap.FindAction("FrequencyShield");
+            _aetherVisionAction = _playerMap.FindAction("AetherVision");
+            _pauseAction = _playerMap.FindAction("Pause");
+
+            // Subscribe to button callbacks
+            if (_interactAction != null) _interactAction.performed += OnInteractPerformed;
+            if (_aetherVisionAction != null) _aetherVisionAction.performed += OnAetherVisionPerformed;
+            if (_pauseAction != null) _pauseAction.performed += OnPausePerformed;
+            if (_attackAction != null) _attackAction.performed += OnResonancePulsePerformed;
+            if (_shieldAction != null) _shieldAction.performed += OnFrequencyShieldPerformed;
+
+            _playerMap.Enable();
         }
 
         void CleanupInputActions()
         {
-            _moveAction?.Disable();
-            _sprintAction?.Disable();
-            _interactAction?.Disable();
-            _attackAction?.Disable();
-            _shieldAction?.Disable();
-            _aetherVisionAction?.Disable();
-            _pauseAction?.Disable();
+            if (_interactAction != null) _interactAction.performed -= OnInteractPerformed;
+            if (_aetherVisionAction != null) _aetherVisionAction.performed -= OnAetherVisionPerformed;
+            if (_pauseAction != null) _pauseAction.performed -= OnPausePerformed;
+            if (_attackAction != null) _attackAction.performed -= OnResonancePulsePerformed;
+            if (_shieldAction != null) _shieldAction.performed -= OnFrequencyShieldPerformed;
+
+            _playerMap?.Disable();
         }
 
         void Update()
@@ -81,7 +105,6 @@ namespace Tartaria.Input
             if (!GameStateManager.Instance.IsPlaying) return;
 
             HandleMovementInput();
-            HandleInteractionInput();
 
             if (GameStateManager.Instance.CurrentState == GameState.Combat)
                 HandleCombatInput();
@@ -89,12 +112,9 @@ namespace Tartaria.Input
 
         void HandleMovementInput()
         {
-            // WASD / Left Stick
-            _moveInput = new Vector2(
-                UnityEngine.Input.GetAxisRaw("Horizontal"),
-                UnityEngine.Input.GetAxisRaw("Vertical")
-            );
-            _isSprinting = UnityEngine.Input.GetKey(KeyCode.LeftShift);
+            // Read from Input System actions
+            _moveInput = _moveAction != null ? _moveAction.ReadValue<Vector2>() : Vector2.zero;
+            _isSprinting = _sprintAction != null && _sprintAction.IsPressed();
 
             // Camera-relative movement
             if (_mainCamera != null && _moveInput.sqrMagnitude > 0.01f)
@@ -129,54 +149,58 @@ namespace Tartaria.Input
             _controller.Move(_velocity * Time.deltaTime);
         }
 
-        void HandleInteractionInput()
+        // ─── Input Action Callbacks ──────────────────
+
+        void OnInteractPerformed(InputAction.CallbackContext ctx)
         {
-            // Left-click = interact
-            if (UnityEngine.Input.GetMouseButtonDown(0))
+            if (!GameStateManager.Instance.IsPlaying) return;
+
+            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+            {
+                // Left-click in combat = Resonance Pulse
+                OnResonancePulse?.Invoke();
+            }
+            else
             {
                 TryInteract();
             }
+        }
 
-            // Tab = toggle Aether vision
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Tab))
-            {
-                AetherVisionActive = !AetherVisionActive;
-            }
+        void OnAetherVisionPerformed(InputAction.CallbackContext ctx)
+        {
+            if (!GameStateManager.Instance.IsPlaying) return;
+            AetherVisionActive = !AetherVisionActive;
+            UI.UIManager.Instance?.ToggleAetherVision();
+        }
 
-            // Escape = pause
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Escape))
-            {
-                if (GameStateManager.Instance.IsPaused)
-                    GameStateManager.Instance.ReturnToPrevious();
-                else
-                    GameStateManager.Instance.TransitionTo(GameState.Paused);
-            }
+        void OnPausePerformed(InputAction.CallbackContext ctx)
+        {
+            UI.UIManager.Instance?.TogglePause();
+        }
+
+        void OnResonancePulsePerformed(InputAction.CallbackContext ctx)
+        {
+            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+                OnResonancePulse?.Invoke();
+        }
+
+        void OnFrequencyShieldPerformed(InputAction.CallbackContext ctx)
+        {
+            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+                OnFrequencyShield?.Invoke();
         }
 
         void HandleCombatInput()
         {
-            // Left-click in combat = Resonance Pulse
-            if (UnityEngine.Input.GetMouseButtonDown(0))
-            {
-                OnResonancePulse?.Invoke();
-            }
-
-            // Right-click = Harmonic Strike
+            // Right-click = Harmonic Strike (read directly for hold semantics)
             if (UnityEngine.Input.GetMouseButtonDown(1))
             {
                 OnHarmonicStrike?.Invoke();
-            }
-
-            // Ctrl / Left trigger = Frequency Shield
-            if (UnityEngine.Input.GetKeyDown(KeyCode.LeftControl))
-            {
-                OnFrequencyShield?.Invoke();
             }
         }
 
         void TryInteract()
         {
-            // Raycast from mouse position
             if (_mainCamera == null) return;
 
             Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.Input.mousePosition);
@@ -194,7 +218,7 @@ namespace Tartaria.Input
             }
         }
 
-        // Combat events — consumed by CombatController
+        // Combat events -- consumed by CombatController
         public event System.Action OnResonancePulse;
         public event System.Action OnHarmonicStrike;
         public event System.Action OnFrequencyShield;
