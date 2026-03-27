@@ -2,6 +2,10 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Core;
 
+#if ENABLE_INPUT_SYSTEM
+using Pointer = UnityEngine.InputSystem.Pointer;
+#endif
+
 namespace Tartaria.Input
 {
     /// <summary>
@@ -39,6 +43,7 @@ namespace Tartaria.Input
         InputAction _interactAction;
         InputAction _attackAction;
         InputAction _shieldAction;
+        InputAction _harmonicStrikeAction;
         InputAction _aetherVisionAction;
         InputAction _pauseAction;
 
@@ -75,6 +80,7 @@ namespace Tartaria.Input
             _sprintAction = _playerMap.FindAction("Sprint");
             _interactAction = _playerMap.FindAction("Interact");
             _attackAction = _playerMap.FindAction("ResonancePulse");
+            _harmonicStrikeAction = _playerMap.FindAction("HarmonicStrike");
             _shieldAction = _playerMap.FindAction("FrequencyShield");
             _aetherVisionAction = _playerMap.FindAction("AetherVision");
             _pauseAction = _playerMap.FindAction("Pause");
@@ -84,6 +90,7 @@ namespace Tartaria.Input
             if (_aetherVisionAction != null) _aetherVisionAction.performed += OnAetherVisionPerformed;
             if (_pauseAction != null) _pauseAction.performed += OnPausePerformed;
             if (_attackAction != null) _attackAction.performed += OnResonancePulsePerformed;
+            if (_harmonicStrikeAction != null) _harmonicStrikeAction.performed += OnHarmonicStrikePerformed;
             if (_shieldAction != null) _shieldAction.performed += OnFrequencyShieldPerformed;
 
             _playerMap.Enable();
@@ -95,6 +102,7 @@ namespace Tartaria.Input
             if (_aetherVisionAction != null) _aetherVisionAction.performed -= OnAetherVisionPerformed;
             if (_pauseAction != null) _pauseAction.performed -= OnPausePerformed;
             if (_attackAction != null) _attackAction.performed -= OnResonancePulsePerformed;
+            if (_harmonicStrikeAction != null) _harmonicStrikeAction.performed -= OnHarmonicStrikePerformed;
             if (_shieldAction != null) _shieldAction.performed -= OnFrequencyShieldPerformed;
 
             _playerMap?.Disable();
@@ -106,8 +114,6 @@ namespace Tartaria.Input
 
             HandleMovementInput();
 
-            if (GameStateManager.Instance.CurrentState == GameState.Combat)
-                HandleCombatInput();
         }
 
         void HandleMovementInput()
@@ -190,20 +196,20 @@ namespace Tartaria.Input
                 OnFrequencyShield?.Invoke();
         }
 
-        void HandleCombatInput()
+        void OnHarmonicStrikePerformed(InputAction.CallbackContext ctx)
         {
-            // Right-click = Harmonic Strike (read directly for hold semantics)
-            if (UnityEngine.Input.GetMouseButtonDown(1))
-            {
+            if (GameStateManager.Instance.CurrentState == GameState.Combat)
                 OnHarmonicStrike?.Invoke();
-            }
         }
 
         void TryInteract()
         {
             if (_mainCamera == null) return;
 
-            Ray ray = _mainCamera.ScreenPointToRay(UnityEngine.Input.mousePosition);
+            Vector2 pointerPos = Pointer.current != null
+                ? Pointer.current.position.ReadValue()
+                : new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+            Ray ray = _mainCamera.ScreenPointToRay(pointerPos);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, interactableLayer))
             {
                 var interactable = hit.collider.GetComponent<IInteractable>();

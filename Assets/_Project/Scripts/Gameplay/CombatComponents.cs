@@ -56,7 +56,44 @@ namespace Tartaria.Gameplay
 
     // ─── Damage Events ───────────────────────────
 
-    public struct DamageEvent : IBufferElementData
+    /// <summary>
+    /// Fractal Wraith -- Moon 2 enemy. Phases through matter, drains Aether
+    /// from buildings it touches. Must be hit with Resonance Pulse during
+    /// its 1.5s materialise window.
+    /// </summary>
+    public struct FractalWraith : IComponentData
+    {
+        public float PhaseCycleDuration;       // 4s total (2.5 phased + 1.5 material)
+        public float PhaseTimer;
+        public bool IsPhased;                  // True = intangible, draining Aether
+        public float AetherDrainPerSecond;     // Drains from nearest building
+        public float MaterialiseWindow;        // 1.5s window when hittable
+        public float AttackDamage;             // 12
+        public float MoveSpeed;               // 0.8x player speed
+        public float3 TargetBuildingPos;       // Current building being drained
+    }
+
+    /// <summary>
+    /// Mirror Wraith -- Moon 2 elite. Copies the player's last 3 attacks
+    /// and reflects them back. Must be defeated with an attack type NOT
+    /// in its mirror buffer.
+    /// </summary>
+    public struct MirrorWraith : IComponentData
+    {
+        public DamageType MirrorSlot0;         // Last attack received
+        public DamageType MirrorSlot1;         // Second-to-last
+        public DamageType MirrorSlot2;         // Third-to-last
+        public int MirrorCount;                // How many slots filled (0-3)
+        public float ReflectDamageMultiplier;  // 0.75x of original
+        public float ReflectCooldown;          // 2s between reflections
+        public float ReflectTimer;
+        public float AttackDamage;             // 18
+        public float MoveSpeed;               // 0.7x player speed
+        public float TeleportCooldown;         // Blinks behind player
+        public float TeleportTimer;
+    }
+
+    // ─── Damage Events ───────────────────────────
     {
         public Entity Source;
         public Entity Target;

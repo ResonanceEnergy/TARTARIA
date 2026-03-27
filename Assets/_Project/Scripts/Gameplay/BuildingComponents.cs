@@ -58,7 +58,8 @@ namespace Tartaria.Gameplay
     {
         FrequencySlider = 0,   // Variant A: horizontal slider
         WaveformTrace   = 1,   // Variant B: trace golden waveform
-        HarmonicPattern = 2    // Variant C: rhythm tap pattern
+        HarmonicPattern = 2,   // Variant C: rhythm tap pattern
+        BellTower       = 3    // Variant D: rhythmic bell ringing, scalar wave shield
     }
 
     // ─────────────────────────────────────────────

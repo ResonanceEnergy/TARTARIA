@@ -1,5 +1,6 @@
 using Unity.Entities;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Tartaria.Core;
 using Tartaria.Save;
 
@@ -41,11 +42,15 @@ namespace Tartaria.Integration
         void Start()
         {
             _visible = showOnStart;
+
+            // Cache player transform at startup
+            var playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null) _cachedPlayer = playerObj.transform;
         }
 
         void Update()
         {
-            if (UnityEngine.Input.GetKeyDown(toggleKey))
+            if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
                 _visible = !_visible;
 
             // FPS calculation
