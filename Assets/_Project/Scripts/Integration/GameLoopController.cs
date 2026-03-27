@@ -71,6 +71,17 @@ namespace Tartaria.Integration
                 playerInput.OnFrequencyShield += HandleFrequencyShield;
             }
 
+            // Wire save events for subsystem sync
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnBeforeSave;
+                SaveManager.Instance.OnAfterLoad += OnAfterLoad;
+            }
+
+            // Wire Workshop UI → WorkshopSystem
+            if (WorkshopUIPanel.Instance != null)
+                WorkshopUIPanel.Instance.OnUpgradeRequested += HandleWorkshopUpgrade;
+
             // Deferred ECS init (world may not be ready in Awake)
             InitECS();
         }
@@ -84,6 +95,13 @@ namespace Tartaria.Integration
                 playerInput.OnHarmonicStrike -= HandleHarmonicStrike;
                 playerInput.OnFrequencyShield -= HandleFrequencyShield;
             }
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnBeforeSave;
+                SaveManager.Instance.OnAfterLoad -= OnAfterLoad;
+            }
+            if (WorkshopUIPanel.Instance != null)
+                WorkshopUIPanel.Instance.OnUpgradeRequested -= HandleWorkshopUpgrade;
         }
 
         void InitECS()
@@ -476,6 +494,211 @@ namespace Tartaria.Integration
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
 
             Debug.Log("[GameLoop] Zone victory sequence complete. Vertical slice finished!");
+        }
+
+        // ─── Save/Load Subsystem Sync ────────────────
+
+        void OnBeforeSave(SaveData save)
+        {
+            // Anastasia
+            var ana = AnastasiaController.Instance;
+            if (ana != null)
+            {
+                var d = ana.GetSaveData();
+                save.anastasia.bitmaskLow = d.bitmaskLow;
+                save.anastasia.bitmaskHigh = d.bitmaskHigh;
+                save.anastasia.motesCollected = d.motesCollected;
+                save.anastasia.currentMoon = d.currentMoon;
+                save.anastasia.hasManifested = d.hasManifested;
+                save.anastasia.postSolidWarmGlow = d.postSolidWarmGlow;
+                save.anastasia.solidPhase = d.solidPhase;
+            }
+
+            // Quests
+            var qm = QuestManager.Instance;
+            if (qm != null)
+            {
+                var states = qm.GetAllStatesForSave();
+                var entries = new QuestSaveEntry[states.Count];
+                int i = 0;
+                foreach (var kvp in states)
+                {
+                    entries[i++] = new QuestSaveEntry
+                    {
+                        questId = kvp.Key,
+                        status = (int)kvp.Value.status,
+                        objectiveProgress = kvp.Value.objectiveProgress ?? System.Array.Empty<int>()
+                    };
+                }
+                save.quests.entries = entries;
+            }
+
+            // Workshop
+            var ws = WorkshopSystem.Instance;
+            if (ws != null)
+            {
+                var tiers = ws.GetTiersForSave();
+                var entries = new WorkshopSaveEntry[tiers.Count];
+                int i = 0;
+                foreach (var kvp in tiers)
+                {
+                    entries[i++] = new WorkshopSaveEntry
+                    {
+                        buildingId = kvp.Key,
+                        tier = kvp.Value
+                    };
+                }
+                save.workshop.entries = entries;
+            }
+
+            // Zone
+            var zt = ZoneTransitionSystem.Instance;
+            if (zt != null)
+            {
+                save.zone.currentZoneIndex = zt.CurrentZoneIndex;
+            }
+        }
+
+        void OnAfterLoad(SaveData save)
+        {
+            // Anastasia
+            var ana = AnastasiaController.Instance;
+            if (ana != null && save.anastasia != null)
+            {
+                ana.RestoreFromSave(new AnastasiaController.AnastasiaSaveData
+                {
+                    bitmaskLow = save.anastasia.bitmaskLow,
+                    bitmaskHigh = save.anastasia.bitmaskHigh,
+                    motesCollected = save.anastasia.motesCollected,
+                    currentMoon = save.anastasia.currentMoon,
+                    hasManifested = save.anastasia.hasManifested,
+                    postSolidWarmGlow = save.anastasia.postSolidWarmGlow,
+                    solidPhase = save.anastasia.solidPhase
+                });
+            }
+
+            // Quests
+            var qm = QuestManager.Instance;
+            if (qm != null && save.quests?.entries != null)
+            {
+                var dict = new System.Collections.Generic.Dictionary<string, QuestState>();
+                foreach (var e in save.quests.entries)
+                {
+                    dict[e.questId] = new QuestState
+                    {
+                        status = (QuestStatus)e.status,
+                        objectiveProgress = e.objectiveProgress
+                    };
+                }
+                qm.RestoreFromSave(dict);
+            }
+
+            // Workshop
+            var ws = WorkshopSystem.Instance;
+            if (ws != null && save.workshop?.entries != null)
+            {
+                var dict = new System.Collections.Generic.Dictionary<string, int>();
+                foreach (var e in save.workshop.entries)
+                    dict[e.buildingId] = e.tier;
+                ws.RestoreFromSave(dict);
+            }
+
+            // Zone
+            var zt = ZoneTransitionSystem.Instance;
+            if (zt != null && save.zone != null)
+            {
+                if (save.zone.currentZoneIndex > 0)
+                    zt.TransitionToZone(save.zone.currentZoneIndex);
+            }
+        }
+
+        // ─── Workshop UI Bridge ──────────────────────
+
+        void HandleWorkshopUpgrade(string buildingId)
+        {
+            var ws = WorkshopSystem.Instance;
+            if (ws == null) return;
+
+            if (ws.TryUpgrade(buildingId))
+            {
+                // Refresh the UI with updated data
+                var panel = WorkshopUIPanel.Instance;
+                if (panel != null)
+                    panel.RefreshBuilding(CreateBuildingDisplayData(buildingId, ws));
+            }
+        }
+
+        /// <summary>
+        /// Populate Workshop UI with all buildings in the current zone.
+        /// Call when opening the panel or when zone changes.
+        /// </summary>
+        public void RefreshWorkshopUI()
+        {
+            var ws = WorkshopSystem.Instance;
+            var panel = WorkshopUIPanel.Instance;
+            if (ws == null || panel == null) return;
+
+            var buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            var displayList = new System.Collections.Generic.List<BuildingDisplayData>();
+
+            foreach (var b in buildings)
+            {
+                if (b.State != BuildingRestorationState.Active) continue;
+                displayList.Add(CreateBuildingDisplayData(b.BuildingId, ws));
+            }
+
+            panel.SetBuildings(displayList);
+        }
+
+        BuildingDisplayData CreateBuildingDisplayData(string buildingId, WorkshopSystem ws)
+        {
+            int tier = ws.GetTier(buildingId);
+            var nextInfo = ws.GetNextTierInfo(buildingId);
+            bool isMax = string.IsNullOrEmpty(nextInfo.tierName);
+            float currentRS = 0f;
+
+            if (_ecsReady)
+                currentRS = _em.GetComponentData<ResonanceScore>(_rsEntity).CurrentRS;
+
+            var building = FindBuilding(buildingId);
+            string name = building?.Definition?.buildingName ?? buildingId;
+
+            return new BuildingDisplayData
+            {
+                buildingId = buildingId,
+                buildingName = name,
+                currentTier = tier,
+                maxTier = 5,
+                currentTierName = tier == 0 ? "Restored" : GetTierName(tier),
+                nextTierName = isMax ? "" : nextInfo.tierName,
+                nextTierDescription = isMax ? "" : nextInfo.description,
+                rsRequired = isMax ? 0 : nextInfo.rsRequirement,
+                currentRS = currentRS,
+                outputMultiplier = ws.GetOutputMultiplier(buildingId),
+                canUpgrade = ws.CanUpgrade(buildingId),
+                isMaxTier = isMax
+            };
+        }
+
+        InteractableBuilding FindBuilding(string buildingId)
+        {
+            var buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            foreach (var b in buildings)
+                if (b.BuildingId == buildingId) return b;
+            return null;
+        }
+
+        static string GetTierName(int tier)
+        {
+            return tier switch
+            {
+                1 => "Reinforced",
+                2 => "Harmonized",
+                3 => "Resonant",
+                4 => "Ascended",
+                5 => "Perfected",
+                _ => "Unknown"
+            };
         }
     }
 }

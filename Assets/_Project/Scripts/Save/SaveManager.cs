@@ -91,6 +91,7 @@ namespace Tartaria.Save
         {
             if (_currentSave == null) return;
 
+            FireBeforeSave();
             _currentSave.header.modifiedUtc = DateTime.UtcNow.ToString("o");
             _currentSave.header.playTimeSeconds += _autoSaveTimer;
 
@@ -143,6 +144,13 @@ namespace Tartaria.Save
                 Debug.Log($"[SaveManager] Loaded save — RS: {_currentSave.world.resonanceScore}, " +
                           $"Play time: {_currentSave.header.playTimeSeconds:F0}s");
             }
+            // Push loaded data into subsystems (deferred to allow Awake/Start order)
+            Invoke(nameof(DeferredFireAfterLoad), 0.1f);
+        }
+
+        void DeferredFireAfterLoad()
+        {
+            FireAfterLoad();
         }
 
         /// <summary>
@@ -194,7 +202,7 @@ namespace Tartaria.Save
             {
                 header = new SaveHeader
                 {
-                    schemaVersion = 1,
+                    schemaVersion = 2,
                     gameVersion = Application.version,
                     platform = "windows",
                     saveSlot = 0,
@@ -235,10 +243,14 @@ namespace Tartaria.Save
         /// </summary>
         void MigrateIfNeeded(SaveData data)
         {
-            if (data.header.schemaVersion < 1)
+            if (data.header.schemaVersion < 2)
             {
-                // Future: migration logic here
-                data.header.schemaVersion = 1;
+                // v1 → v2: add Anastasia, quest, workshop, zone blocks
+                if (data.anastasia == null) data.anastasia = new AnastasiaSaveBlock();
+                if (data.quests == null) data.quests = new QuestSaveBlock();
+                if (data.workshop == null) data.workshop = new WorkshopSaveBlock();
+                if (data.zone == null) data.zone = new ZoneSaveBlock();
+                data.header.schemaVersion = 2;
                 MarkDirty();
             }
         }
@@ -259,6 +271,28 @@ namespace Tartaria.Save
             if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
             File.WriteAllText(path, content, Encoding.UTF8);
+        }
+
+        // ─── Subsystem Sync ─────────────────────────
+
+        /// <summary>
+        /// Fired before save writes to disk. Subscribers should push their data into CurrentSave.
+        /// </summary>
+        public event Action<SaveData> OnBeforeSave;
+
+        /// <summary>
+        /// Fired after save loads from disk. Subscribers should pull their data from CurrentSave.
+        /// </summary>
+        public event Action<SaveData> OnAfterLoad;
+
+        void FireBeforeSave()
+        {
+            OnBeforeSave?.Invoke(_currentSave);
+        }
+
+        void FireAfterLoad()
+        {
+            OnAfterLoad?.Invoke(_currentSave);
         }
     }
 }
