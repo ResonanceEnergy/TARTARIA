@@ -29,9 +29,17 @@ namespace Tartaria.Editor
             CreateBuildingPrefabs();
             CreateAudioManifest();
             CreateUICanvas();
+
+            // Invoke sub-factory scripts
+            AnastasiaDialoguePopulator.BuildDatabase();
+            ZoneDefinitionFactory.BuildAllZones();
+            QuestDefinitionFactory.BuildAllQuests();
+            AnastasiaPrefabFactory.BuildAnastasiaPrefab();
+            GoldenMotePrefabFactory.BuildMotePrefab();
+
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("[Tartaria] All assets built.");
+            Debug.Log("[Tartaria] All assets built (including Anastasia, Zones, Quests, Prefabs).");
         }
 
         [MenuItem("Tartaria/Build Assets/Materials", false, 11)]

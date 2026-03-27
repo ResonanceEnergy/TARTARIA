@@ -34,8 +34,9 @@ namespace Tartaria.Gameplay
 
     public enum EnemyType : byte
     {
-        MudGolem = 0
-        // Future: DissonanceCrystal, CorruptedGuardian, etc.
+        MudGolem = 0,
+        FractalWraith = 1,   // Moon 2: phases through matter, drains Aether
+        MirrorWraith = 2     // Moon 2 elite: copies player's last 3 attacks
     }
 
     public struct EnemyTag : IComponentData

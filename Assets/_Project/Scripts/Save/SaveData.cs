@@ -5,7 +5,7 @@ namespace Tartaria.Save
 {
     /// <summary>
     /// Save Data schema — serialized to JSON at Application.persistentDataPath.
-    /// Schema v1 for Phase 1 vertical slice.
+    /// Schema v2 — adds Anastasia, quest, workshop, and zone persistence.
     /// Forward-compatible: v1.0 saves must load in v5.0.
     /// </summary>
     [Serializable]
@@ -14,13 +14,17 @@ namespace Tartaria.Save
         public SaveHeader header = new();
         public PlayerSaveData player = new();
         public WorldSaveData world = new();
+        public AnastasiaSaveBlock anastasia = new();
+        public QuestSaveBlock quests = new();
+        public WorkshopSaveBlock workshop = new();
+        public ZoneSaveBlock zone = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 1;
-        public string gameVersion = "0.1.0";
+        public int schemaVersion = 2;
+        public string gameVersion = "0.2.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
@@ -83,5 +87,53 @@ namespace Tartaria.Save
         }
 
         public Vector3 ToVector3() => new(x, y, z);
+    }
+
+    // ─── v2 Save Blocks ──────────────────────────
+
+    [Serializable]
+    public class AnastasiaSaveBlock
+    {
+        public ulong bitmaskLow;
+        public ulong bitmaskHigh;
+        public ushort motesCollected;
+        public int currentMoon = 1;
+        public bool hasManifested;
+        public bool postSolidWarmGlow;
+        public int solidPhase;
+    }
+
+    [Serializable]
+    public class QuestSaveBlock
+    {
+        public QuestSaveEntry[] entries = Array.Empty<QuestSaveEntry>();
+    }
+
+    [Serializable]
+    public class QuestSaveEntry
+    {
+        public string questId;
+        public int status; // QuestStatus cast to int
+        public int[] objectiveProgress = Array.Empty<int>();
+    }
+
+    [Serializable]
+    public class WorkshopSaveBlock
+    {
+        public WorkshopSaveEntry[] entries = Array.Empty<WorkshopSaveEntry>();
+    }
+
+    [Serializable]
+    public class WorkshopSaveEntry
+    {
+        public string buildingId;
+        public int tier;
+    }
+
+    [Serializable]
+    public class ZoneSaveBlock
+    {
+        public int currentZoneIndex;
+        public int highestZoneUnlocked;
     }
 }
