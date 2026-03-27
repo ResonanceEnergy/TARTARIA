@@ -177,6 +177,94 @@ namespace Tartaria.Integration
                 "The whole zone is transforming! Color is returning! This is what Echohaven looked like!", true);
             AddLine("zone_complete", "milo_zc_01", "Milo",
                 "*howling with joy* Echohaven is ALIVE again! Every building singing in harmony!", true);
+
+            // ── Lirael: Discovery lines (Moon 2+) ──
+            AddLine("discovery", "lirael_disc_01", "Lirael",
+                "I can see the original blueprint... faintly. The crystal memory still holds its shape.", true);
+            AddLine("discovery", "lirael_disc_02", "Lirael",
+                "This structure once channeled frequencies we've forgotten. Let me project what it should look like.");
+            AddLine("discovery", "lirael_disc_03", "Lirael",
+                "The fractals here are damaged but not destroyed. There's hope in the geometry.");
+
+            // ── Lirael: Corruption lines ──
+            AddLine("corruption_detected", "lirael_corr_01", "Lirael",
+                "I sense dissonance ahead. Dark fractals -- someone has poisoned the Aether conduits.", true);
+            AddLine("corruption_detected", "lirael_corr_02", "Lirael",
+                "This corruption follows a pattern. Three stages to purge it: identify, isolate, purify.");
+            AddLine("corruption_purged", "lirael_purge_01", "Lirael",
+                "The crystal lattice is clean again. I'll remember this corruption pattern for next time.");
+            AddLine("corruption_purged", "lirael_purge_02", "Lirael",
+                "Beautiful. The Aether flows freely once more. Another memory preserved.");
+
+            // ── Lirael: Tuning lines ──
+            AddLine("tuning_start", "lirael_tune_01", "Lirael",
+                "Listen for the crystal harmonic beneath the noise. I can amplify it for you.");
+            AddLine("tuning_success", "lirael_tunesuc_01", "Lirael",
+                "Perfect resonance. The crystals remember this frequency from before the burial.");
+            AddLine("tuning_fail", "lirael_tunefail_01", "Lirael",
+                "The frequency scattered. Don't force it -- let the crystal guide your hand.");
+
+            // ── Lirael: Combat lines ──
+            AddLine("combat_start", "lirael_cbt_01", "Lirael",
+                "Fractal Wraiths -- twisted echoes of what these buildings once projected. Be careful, they drain Aether.", true);
+            AddLine("combat_start", "lirael_cbt_02", "Lirael",
+                "Wait for the materialise window. They're vulnerable for 1.5 seconds between phases.");
+            AddLine("combat_victory", "lirael_cbtvic_01", "Lirael",
+                "The wraith has dissolved. Its stolen Aether returns to the field. Nothing is truly lost.");
+
+            // ── Lirael: Exploration / idle ──
+            AddLine("exploration_idle", "lirael_idle_01", "Lirael",
+                "Every crystal in Tartaria held a memory. The World Fairs displayed them as 'exhibits' then demolished them...");
+            AddLine("exploration_idle", "lirael_idle_02", "Lirael",
+                "I sang to these walls once, in another age. The resonance still answers.");
+            AddLine("exploration_idle", "lirael_idle_03", "Lirael",
+                "The Crystalline Caverns where I was born... they connected to every dome via harmonic tunnels.");
+
+            // ── Lirael: Companion join ──
+            AddLine("companion_join_lirael", "lirael_join_01", "Lirael",
+                "I have waited centuries in crystal silence for someone who could hear the old frequencies. I will walk with you.", true);
+
+            // ── Lirael: Blueprint projection ──
+            AddLine("blueprint_projection", "lirael_blueprint_01", "Lirael",
+                "Close your eyes and listen. I'll project the original blueprint into the Aether field.");
+            AddLine("blueprint_projection", "lirael_blueprint_02", "Lirael",
+                "This building's proportions follow the golden spiral perfectly. Look at the harmonic symmetry.");
+
+            // ══════════════ CASSIAN DIALOGUE ══════════════
+
+            // ── Cassian: Introduction ──
+            AddLine("cassian_intro", "cassian_intro_01", "Cassian",
+                "Another restorer? I didn't think anyone still remembered how to read the frequency maps. I'm Cassian. I've been... studying these ruins for some time.", true);
+
+            // ── Cassian: Low trust ──
+            AddLine("cassian_guarded", "cassian_low_trust_01", "Cassian",
+                "My background? Let's just say I have my reasons for being here. Same as you, I imagine.");
+            AddLine("cassian_guarded", "cassian_low_trust_02", "Cassian",
+                "I wouldn't touch those crystals without proper calibration. But you seem confident enough.");
+            AddLine("cassian_guarded", "cassian_low_trust_03", "Cassian",
+                "The demolition records were thorough. Almost too thorough. Someone wanted these buildings forgotten.");
+
+            // ── Cassian: Mid trust ──
+            AddLine("cassian_intel", "cassian_mid_trust_01", "Cassian",
+                "I've mapped the corruption vectors in this zone. The spread follows phi-spiral patterns -- predictable, if you know where to look.");
+            AddLine("cassian_intel", "cassian_mid_trust_02", "Cassian",
+                "Here, take this frequency signature. It should help you locate buried foundations. Consider it... professional courtesy.");
+
+            // ── Cassian: High trust ──
+            AddLine("cassian_confession", "cassian_high_trust_01", "Cassian",
+                "I'll be honest with you. Not everything I've told you has been... entirely accurate. I had my orders. But watching what you've restored -- it changes things.");
+            AddLine("cassian_confession", "cassian_high_trust_02", "Cassian",
+                "They sent me to monitor you. The same faction that buried Tartaria the first time. They're afraid the technology will surface again.", true);
+            AddLine("cassian_confession", "cassian_high_trust_03", "Cassian",
+                "I've seen what Aether energy can do in the right hands. Maybe it's time I stopped reporting back and started helping properly.");
+
+            // ── Cassian: Idle ──
+            AddLine("cassian_idle", "cassian_idle_01", "Cassian",
+                "These floor mosaics aren't decorative. They're circuit diagrams. Took me years to realise that.");
+            AddLine("cassian_idle", "cassian_idle_02", "Cassian",
+                "Interesting. The corruption density has shifted since yesterday. Something is accelerating the decay.");
+            AddLine("cassian_idle", "cassian_idle_03", "Cassian",
+                "Don't mind me. Just... taking measurements. For my own records.");
         }
 
         void AddLine(string context, string id, string speaker, string text, bool oneShot = false)

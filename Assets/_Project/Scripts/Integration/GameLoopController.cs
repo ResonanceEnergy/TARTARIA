@@ -557,6 +557,59 @@ namespace Tartaria.Integration
             {
                 save.zone.currentZoneIndex = zt.CurrentZoneIndex;
             }
+
+            // Corruption
+            var cs = CorruptionSystem.Instance;
+            if (cs != null)
+            {
+                var states = cs.GetAllStates();
+                var entries = new CorruptionSaveEntry[states.Count];
+                int ci = 0;
+                foreach (var s in states)
+                {
+                    entries[ci++] = new CorruptionSaveEntry
+                    {
+                        buildingId = s.buildingId,
+                        corruptionLevel = s.corruptionLevel,
+                        stage = (int)s.stage,
+                        identified = s.identified,
+                        isolated = s.isolated,
+                        purged = s.purged
+                    };
+                }
+                save.corruption.entries = entries;
+            }
+
+            // Campaign
+            var cf = CampaignFlowController.Instance;
+            if (cf != null)
+            {
+                var cData = cf.GetSaveData();
+                save.campaign.currentMoon = cData.currentMoon;
+                save.campaign.completedMoons = cData.completedMoons?.ToArray()
+                    ?? System.Array.Empty<int>();
+            }
+
+            // Skill Tree
+            var st = Gameplay.SkillTreeSystem.Instance;
+            if (st != null)
+            {
+                var stData = st.GetSaveData();
+                save.skillTree.unlockedSkillIds = stData.unlockedSkills?.ToArray()
+                    ?? System.Array.Empty<int>();
+            }
+
+            // Cassian
+            var cas = CassianNPCController.Instance;
+            if (cas != null)
+            {
+                var casData = cas.GetSaveData();
+                save.cassian.trustLevel = casData.trustLevel;
+                save.cassian.interactionCount = casData.interactionCount;
+                save.cassian.introduced = casData.introduced;
+                save.cassian.sharedIntelIds = casData.sharedIntelIds?.ToArray()
+                    ?? System.Array.Empty<string>();
+            }
         }
 
         void OnAfterLoad(SaveData save)
@@ -609,6 +662,66 @@ namespace Tartaria.Integration
             {
                 if (save.zone.currentZoneIndex > 0)
                     zt.TransitionToZone(save.zone.currentZoneIndex);
+            }
+
+            // Corruption
+            var cs = CorruptionSystem.Instance;
+            if (cs != null && save.corruption?.entries != null)
+            {
+                var cStates = new System.Collections.Generic.List<CorruptionSystem.CorruptionState>();
+                foreach (var e in save.corruption.entries)
+                {
+                    cStates.Add(new CorruptionSystem.CorruptionState
+                    {
+                        buildingId = e.buildingId,
+                        corruptionLevel = e.corruptionLevel,
+                        stage = (CorruptionSystem.PurgeStage)e.stage,
+                        identified = e.identified,
+                        isolated = e.isolated,
+                        purged = e.purged
+                    });
+                }
+                cs.RestoreFromSave(cStates);
+            }
+
+            // Campaign
+            var cf = CampaignFlowController.Instance;
+            if (cf != null && save.campaign != null)
+            {
+                cf.RestoreFromSave(new CampaignSaveData
+                {
+                    currentMoon = save.campaign.currentMoon,
+                    completedMoons = save.campaign.completedMoons != null
+                        ? new System.Collections.Generic.List<int>(save.campaign.completedMoons)
+                        : new System.Collections.Generic.List<int>()
+                });
+            }
+
+            // Skill Tree
+            var st = Gameplay.SkillTreeSystem.Instance;
+            if (st != null && save.skillTree != null)
+            {
+                st.RestoreFromSave(new Gameplay.SkillTreeSaveData
+                {
+                    unlockedSkills = save.skillTree.unlockedSkillIds != null
+                        ? new System.Collections.Generic.List<int>(save.skillTree.unlockedSkillIds)
+                        : new System.Collections.Generic.List<int>()
+                });
+            }
+
+            // Cassian
+            var cas = CassianNPCController.Instance;
+            if (cas != null && save.cassian != null)
+            {
+                cas.RestoreFromSave(new CassianSaveData
+                {
+                    trustLevel = save.cassian.trustLevel,
+                    interactionCount = save.cassian.interactionCount,
+                    introduced = save.cassian.introduced,
+                    sharedIntelIds = save.cassian.sharedIntelIds != null
+                        ? new System.Collections.Generic.List<string>(save.cassian.sharedIntelIds)
+                        : new System.Collections.Generic.List<string>()
+                });
             }
         }
 

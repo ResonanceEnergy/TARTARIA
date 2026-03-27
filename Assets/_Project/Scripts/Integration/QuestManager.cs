@@ -147,6 +147,15 @@ namespace Tartaria.Integration
             return result;
         }
 
+        /// <summary>
+        /// Check if a quest has been completed.
+        /// </summary>
+        public bool IsQuestComplete(string questId)
+        {
+            return _questStates.TryGetValue(questId, out var state)
+                && state.status == QuestStatus.Completed;
+        }
+
         // ─── Internal ────────────────────────────────
 
         void CompleteQuest(string questId)

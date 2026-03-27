@@ -18,6 +18,10 @@ namespace Tartaria.Save
         public QuestSaveBlock quests = new();
         public WorkshopSaveBlock workshop = new();
         public ZoneSaveBlock zone = new();
+        public CorruptionSaveBlock corruption = new();
+        public CampaignSaveBlock campaign = new();
+        public SkillTreeSaveBlock skillTree = new();
+        public CassianSaveBlock cassian = new();
     }
 
     [Serializable]
@@ -135,5 +139,57 @@ namespace Tartaria.Save
     {
         public int currentZoneIndex;
         public int highestZoneUnlocked;
+        public ZoneBuildingSnapshot[] zoneSnapshots = Array.Empty<ZoneBuildingSnapshot>();
+    }
+
+    /// <summary>
+    /// Per-zone snapshot of building states -- saved on zone exit, restored on zone re-entry.
+    /// </summary>
+    [Serializable]
+    public class ZoneBuildingSnapshot
+    {
+        public int zoneIndex;
+        public BuildingSaveState[] buildings = Array.Empty<BuildingSaveState>();
+    }
+
+    // ─── v3 Save Blocks (corruption, campaign, skills, cassian) ──
+
+    [Serializable]
+    public class CorruptionSaveBlock
+    {
+        public CorruptionSaveEntry[] entries = Array.Empty<CorruptionSaveEntry>();
+    }
+
+    [Serializable]
+    public class CorruptionSaveEntry
+    {
+        public string buildingId;
+        public float corruptionLevel;
+        public int stage;     // PurgeStage cast to int
+        public bool identified;
+        public bool isolated;
+        public bool purged;
+    }
+
+    [Serializable]
+    public class CampaignSaveBlock
+    {
+        public int currentMoon;
+        public int[] completedMoons = Array.Empty<int>();
+    }
+
+    [Serializable]
+    public class SkillTreeSaveBlock
+    {
+        public int[] unlockedSkillIds = Array.Empty<int>();
+    }
+
+    [Serializable]
+    public class CassianSaveBlock
+    {
+        public float trustLevel;
+        public int interactionCount;
+        public bool introduced;
+        public string[] sharedIntelIds = Array.Empty<string>();
     }
 }
