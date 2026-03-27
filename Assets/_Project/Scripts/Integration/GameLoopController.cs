@@ -326,10 +326,7 @@ namespace Tartaria.Integration
 
             if (_ecsReady)
             {
-                if (isPerfect)
-                    ResonanceEventHelper.QueueTuneNode(_em, _rsEntity, accuracy, goldenMatch);
-                else
-                    ResonanceEventHelper.QueueTuneNode(_em, _rsEntity, accuracy, goldenMatch);
+                ResonanceEventHelper.QueueTuneNode(_em, _rsEntity, accuracy, goldenMatch);
             }
 
             // Haptics

@@ -213,25 +213,24 @@ namespace Tartaria.Integration
         System.Collections.IEnumerator EmergenceSequence(float duration)
         {
             float elapsed = 0f;
+            Vector3 initialScale = transform.localScale;
+            float buriedY = initialScale.y * 0.3f;
+            float fullY = initialScale.y;
 
             // Animate mud dissolution via material property
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float progress = elapsed / duration;
+                float progress = Mathf.Clamp01(elapsed / duration);
 
                 if (mainRenderer != null && mainRenderer.material.HasProperty("_DissolveProgress"))
                     mainRenderer.material.SetFloat("_DissolveProgress", progress);
 
-                // Scale up building from buried to full height
-                float scaleY = Mathf.Lerp(0.3f, 1f, progress);
-                Vector3 scale = transform.localScale;
-                scale.y = scale.y * scaleY / Mathf.Lerp(0.3f, 1f, (elapsed - Time.deltaTime) / duration);
-                // Simplified: just lerp scale directly
+                // Scale up building from buried (30%) to full height
                 transform.localScale = new Vector3(
-                    transform.localScale.x,
-                    Mathf.Lerp(transform.localScale.x * 0.3f, transform.localScale.x, progress),
-                    transform.localScale.z);
+                    initialScale.x,
+                    Mathf.Lerp(buriedY, fullY, progress),
+                    initialScale.z);
 
                 yield return null;
             }

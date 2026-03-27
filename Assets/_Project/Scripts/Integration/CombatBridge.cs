@@ -36,6 +36,7 @@ namespace Tartaria.Integration
         World _world;
         EntityManager _em;
         Entity _playerCombatEntity;
+        EntityQuery _enemyQuery;
         bool _initialized;
 
         float _pulseTimer;
@@ -77,7 +78,8 @@ namespace Tartaria.Integration
             });
             _em.AddComponentData(_playerCombatEntity, new PlayerCombatState());
             _em.AddBuffer<DamageEvent>(_playerCombatEntity);
-
+            // Cache enemy query for reuse in MonitorEnemies/DamageNearbyEnemies/DamageEnemiesInCone
+            _enemyQuery = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
             _initialized = true;
         }
 
@@ -151,8 +153,7 @@ namespace Tartaria.Integration
             bool anyEnemyDied = false;
             float3 deathPos = float3.zero;
 
-            var query = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
             for (int i = 0; i < entities.Length; i++)
             {
@@ -220,8 +221,7 @@ namespace Tartaria.Integration
 
         void DamageNearbyEnemies(Vector3 origin, float range, float damage, DamageType type)
         {
-            var query = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
             float3 pos = new float3(origin.x, origin.y, origin.z);
 
@@ -262,8 +262,7 @@ namespace Tartaria.Integration
         void DamageEnemiesInCone(Vector3 origin, Vector3 forward, float range,
             float coneAngle, float damage, DamageType type)
         {
-            var query = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
 
             float3 pos = new float3(origin.x, origin.y, origin.z);
             float3 fwd = new float3(forward.x, 0, forward.z);

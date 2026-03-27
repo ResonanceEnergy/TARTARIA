@@ -44,6 +44,11 @@ namespace Tartaria.Gameplay
             _currentFrequency = 0f;
             _accuracy = 0f;
             _isActive = true;
+            _patternIndex = 0;
+            _correctTaps = 0;
+            _lastTapTime = Time.time;
+            _traceAccumulatedAccuracy = 0f;
+            _traceSamples = 0;
 
             GameStateManager.Instance.TransitionTo(GameState.Tuning);
         }
