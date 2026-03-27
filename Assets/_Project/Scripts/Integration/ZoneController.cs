@@ -37,6 +37,7 @@ namespace Tartaria.Integration
 
         InteractableBuilding[] _buildings;
         Transform _playerTransform;
+        PlayerInputHandler _playerInputHandler;
         float _discoveryTimer;
         float _currentRS;
         bool _zoneNameShown;
@@ -166,8 +167,9 @@ namespace Tartaria.Integration
             }
 
             // Reset idle timer on movement
-            var input = FindAnyObjectByType<Input.PlayerInputHandler>();
-            if (input != null && input.IsMoving)
+            if (_playerInputHandler == null)
+                _playerInputHandler = FindAnyObjectByType<Input.PlayerInputHandler>();
+            if (_playerInputHandler != null && _playerInputHandler.IsMoving)
                 _idleTimer = 0f;
         }
 
