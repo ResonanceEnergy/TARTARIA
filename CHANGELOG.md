@@ -4,6 +4,24 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [1.5.0] — 2025-07-25
+
+**BUILD ALL — Runtime Systems Complete + Gate 1 Readiness**  
+*36 C# files compile clean under Unity 6000.3.6f1 — full vertical slice gameplay loop wired*
+
+### Added
+- **WorldInitializer.cs** (Integration) — Creates ECS entities requiring cross-assembly types: Milo companion (CompanionBehavior + MiloPersonality), 3 enemy spawn triggers (MudGolem at RS 25/50/75), 3 building entities (Dome/Fountain/Spire with DiscoveryTrigger + MudDissolution). Runs after GameBootstrap, before GameLoopController
+- **Player ECS position sync** — GameLoopController now copies MonoBehaviour CharacterController position → ECS PlayerTag entity LocalTransform every frame, enabling DiscoverySystem, EnemyAISystem, and CompanionBehaviorSystem to track the player
+- **Zone victory sequence** — Coroutine at RS 100: cinematic state → Milo zone_complete dialogue → 6s camera sweep → "ECHOHAVEN RESTORED" HUD overlay → return to exploration
+- **ProjectSetupWizard** updated to add WorldInitializer GameObject to generated scenes
+
+### Verified
+- **Unity batch compile**: Exit code 0, zero CS errors/warnings across all 10 assemblies
+- **Assembly dependency graph**: Core → Gameplay/AI/Audio/Camera/Input/UI/Save → Integration → Editor (no circular references)
+- **Complete vertical slice loop**: Explore → Discover (proximity) → Tune (3 variants) → Restore (emergence cinematic) → Combat (3 attacks + stun) → Victory (RS 100)
+
+---
+
 ## [1.4.0] — 2025-07-25
 
 **Unity 6000.3.6f1 Migration & Batch Setup Execution**  

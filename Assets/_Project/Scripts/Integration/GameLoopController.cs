@@ -1,4 +1,6 @@
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Audio;
@@ -34,6 +36,7 @@ namespace Tartaria.Integration
         World _ecsWorld;
         EntityManager _em;
         Entity _rsEntity;
+        Entity _playerEntity;
         bool _ecsReady;
 
         // RS tracking
@@ -45,6 +48,9 @@ namespace Tartaria.Integration
         // Save sync
         float _saveSyncTimer;
         const float SAVE_SYNC_INTERVAL = 5f;
+
+        // Victory
+        bool _zoneVictoryTriggered;
 
         void Awake()
         {
@@ -93,6 +99,11 @@ namespace Tartaria.Integration
                 _rsEntity = query.GetSingletonEntity();
                 _ecsReady = true;
             }
+
+            // Find player entity for position sync
+            var playerQuery = _em.CreateEntityQuery(typeof(PlayerTag), typeof(LocalTransform));
+            if (playerQuery.CalculateEntityCount() > 0)
+                _playerEntity = playerQuery.GetSingletonEntity();
         }
 
         void Update()
@@ -100,6 +111,7 @@ namespace Tartaria.Integration
             if (!_ecsReady) { InitECS(); return; }
 
             PollResonanceScore();
+            SyncPlayerPositionToECS();
             SyncSaveData();
         }
 
@@ -185,6 +197,7 @@ namespace Tartaria.Integration
                     VFXController.Instance?.TriggerZoneComplete();
                     if (HUDController.Instance != null)
                         HUDController.Instance.SetZoneName("Echohaven — Restored");
+                    StartZoneVictorySequence();
                     break;
             }
 
@@ -369,6 +382,72 @@ namespace Tartaria.Integration
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
 
             SaveManager.Instance?.MarkDirty();
+        }
+
+        // ─── Player ECS Position Sync ────────────────
+
+        /// <summary>
+        /// Copies the MonoBehaviour player world position into the ECS
+        /// PlayerTag entity's LocalTransform so DiscoverySystem, EnemyAISystem,
+        /// and CompanionBehaviorSystem see the correct position.
+        /// </summary>
+        void SyncPlayerPositionToECS()
+        {
+            if (playerInput == null || !_em.Exists(_playerEntity)) return;
+
+            var pos = playerInput.transform.position;
+            var rot = playerInput.transform.rotation;
+
+            _em.SetComponentData(_playerEntity, new LocalTransform
+            {
+                Position = new float3(pos.x, pos.y, pos.z),
+                Rotation = new quaternion(rot.x, rot.y, rot.z, rot.w),
+                Scale = 1f
+            });
+        }
+
+        // ─── Zone Victory Sequence ───────────────────
+
+        void StartZoneVictorySequence()
+        {
+            if (_zoneVictoryTriggered) return;
+            _zoneVictoryTriggered = true;
+
+            StartCoroutine(ZoneVictoryCoroutine());
+        }
+
+        System.Collections.IEnumerator ZoneVictoryCoroutine()
+        {
+            Debug.Log("[GameLoop] Zone victory sequence started!");
+
+            GameStateManager.Instance.TransitionTo(GameState.Cinematic);
+            DialogueManager.Instance?.PlayContextDialogue("zone_complete");
+
+            // Let the celebration effects play for a few seconds
+            yield return new WaitForSeconds(3f);
+
+            // Camera sweep of restored zone
+            if (cameraController != null)
+            {
+                var zone = ZoneController.Instance;
+                if (zone != null)
+                    cameraController.FocusOnPoint(zone.transform.position, 6f);
+            }
+
+            yield return new WaitForSeconds(6f);
+
+            // Display zone complete message via HUD
+            HUDController.Instance?.ShowInteractionPrompt(
+                "ECHOHAVEN RESTORED\nResonance Score: 100 — Zone Complete");
+
+            yield return new WaitForSeconds(5f);
+
+            HUDController.Instance?.HideInteractionPrompt();
+
+            // Return to exploration — in full game this would advance to next zone
+            GameStateManager.Instance.TransitionTo(GameState.Exploration);
+
+            Debug.Log("[GameLoop] Zone victory sequence complete. Vertical slice finished!");
         }
     }
 }
