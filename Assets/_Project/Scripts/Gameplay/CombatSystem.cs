@@ -163,10 +163,11 @@ namespace Tartaria.Gameplay
             em.AddComponentData(entity, new EnemyAI
             {
                 State = EnemyAIState.Spawning,
-                StateTimer = 3f,
+                StateTimer = 0f,
                 PatrolTarget = trigger.SpawnPosition,
                 EngageRadius = 50f,
                 AttackRange = 3f,
+                SpawnGracePeriod = 3f,
                 MoveSpeed = 4f,
                 AttackCooldown = 0f
             });
