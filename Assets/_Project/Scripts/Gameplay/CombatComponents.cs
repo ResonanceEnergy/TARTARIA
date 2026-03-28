@@ -94,6 +94,7 @@ namespace Tartaria.Gameplay
     }
 
     // ─── Damage Events ───────────────────────────
+    public struct DamageEvent : IBufferElementData
     {
         public Entity Source;
         public Entity Target;
