@@ -265,52 +265,52 @@ namespace Tartaria.Integration
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, tuningDifficultyMultiplier = 1.3f, enemyHealthMultiplier = 1.5f, enemyDamageMultiplier = 1.3f, specialMechanic = "pipe_organ" }
                 },
                 new MoonDefinition {
-                    moonName = "Pyrrhus", zoneIndex = 6,
+                    moonName = "Giant's Awakening", zoneIndex = 6,
                     rsThresholdToAdvance = 1900f,
-                    requiredQuestIds = new[] { "pyrrhus_main" },
-                    questIdsToActivate = new[] { "pyrrhus_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, specialMechanic = "fire_trials", enemyHealthMultiplier = 1.6f, enemyDamageMultiplier = 1.4f, corruptionSpreadRate = 1.5f }
+                    requiredQuestIds = new[] { "giants_awakening_main", "korath_thaw" },
+                    questIdsToActivate = new[] { "giants_awakening_main", "korath_thaw", "cassian_confrontation" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, specialMechanic = "giant_stasis_thaw", enemyHealthMultiplier = 1.6f, enemyDamageMultiplier = 1.4f, corruptionSpreadRate = 1.5f }
                 },
                 new MoonDefinition {
-                    moonName = "Aethon", zoneIndex = 7,
+                    moonName = "The Airship Armada", zoneIndex = 7,
                     rsThresholdToAdvance = 2500f,
-                    requiredQuestIds = new[] { "aethon_main" },
-                    questIdsToActivate = new[] { "aethon_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, enemyHealthMultiplier = 1.7f, enemyDamageMultiplier = 1.5f, aetherDrainMultiplier = 1.5f }
+                    requiredQuestIds = new[] { "airship_armada_main", "fleet_restoration" },
+                    questIdsToActivate = new[] { "airship_armada_main", "fleet_restoration", "thorne_companion" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "mercury_orb_tuning", enemyHealthMultiplier = 1.7f, enemyDamageMultiplier = 1.5f, aetherDrainMultiplier = 1.5f }
                 },
                 new MoonDefinition {
-                    moonName = "Umbriel", zoneIndex = 8,
+                    moonName = "The Ley Line Prophecy", zoneIndex = 8,
                     rsThresholdToAdvance = 3200f,
-                    requiredQuestIds = new[] { "umbriel_main" },
-                    questIdsToActivate = new[] { "umbriel_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "shadow_realm", enemyHealthMultiplier = 1.8f, enemyDamageMultiplier = 1.6f, rsGainMultiplier = 0.9f }
+                    requiredQuestIds = new[] { "ley_line_prophecy_main", "prophecy_stones" },
+                    questIdsToActivate = new[] { "ley_line_prophecy_main", "prophecy_stones", "zereth_whispers" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "prophecy_stones", enemyHealthMultiplier = 1.8f, enemyDamageMultiplier = 1.6f, rsGainMultiplier = 0.9f }
                 },
                 new MoonDefinition {
-                    moonName = "Luminara", zoneIndex = 9,
+                    moonName = "The Living Grid", zoneIndex = 9,
                     rsThresholdToAdvance = 4000f,
-                    requiredQuestIds = new[] { "luminara_main" },
-                    questIdsToActivate = new[] { "luminara_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, enemyHealthMultiplier = 2.0f, enemyDamageMultiplier = 1.7f, tuningDifficultyMultiplier = 1.4f }
+                    requiredQuestIds = new[] { "living_grid_main", "continental_rail" },
+                    questIdsToActivate = new[] { "living_grid_main", "continental_rail", "trigger_room" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "continental_train", enemyHealthMultiplier = 2.0f, enemyDamageMultiplier = 1.7f, tuningDifficultyMultiplier = 1.4f }
                 },
                 new MoonDefinition {
-                    moonName = "Sideralis", zoneIndex = 10,
+                    moonName = "Veil Between Worlds", zoneIndex = 10,
                     rsThresholdToAdvance = 5000f,
-                    requiredQuestIds = new[] { "sideralis_main" },
-                    questIdsToActivate = new[] { "sideralis_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "star_map", enemyHealthMultiplier = 2.2f, enemyDamageMultiplier = 1.8f, corruptionSpreadRate = 2.0f }
+                    requiredQuestIds = new[] { "veil_main", "aquifer_purification" },
+                    questIdsToActivate = new[] { "veil_main", "aquifer_purification", "fountain_chain" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "spectral_solidification", enemyHealthMultiplier = 2.2f, enemyDamageMultiplier = 1.8f, corruptionSpreadRate = 2.0f }
                 },
                 new MoonDefinition {
-                    moonName = "Zenithara", zoneIndex = 11,
+                    moonName = "Planetary Bell-Tower Ring", zoneIndex = 11,
                     rsThresholdToAdvance = 6500f,
-                    requiredQuestIds = new[] { "zenithara_main" },
-                    questIdsToActivate = new[] { "zenithara_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, enemyHealthMultiplier = 2.5f, enemyDamageMultiplier = 2.0f, tuningDifficultyMultiplier = 1.5f, aetherDrainMultiplier = 2.0f }
+                    requiredQuestIds = new[] { "bell_tower_ring_main", "tower_synchronization" },
+                    questIdsToActivate = new[] { "bell_tower_ring_main", "tower_synchronization", "final_prophecy_stone" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "bell_tower_sync", enemyHealthMultiplier = 2.5f, enemyDamageMultiplier = 2.0f, tuningDifficultyMultiplier = 1.5f, aetherDrainMultiplier = 2.0f }
                 },
                 new MoonDefinition {
-                    moonName = "The Hidden Moon", zoneIndex = 12,
+                    moonName = "True Timeline Convergence", zoneIndex = 12,
                     rsThresholdToAdvance = float.MaxValue, // Final moon
-                    requiredQuestIds = new[] { "hidden_moon_final" },
-                    questIdsToActivate = new[] { "hidden_moon_final", "anastasia_finale" },
+                    requiredQuestIds = new[] { "convergence_final", "anastasia_finale" },
+                    questIdsToActivate = new[] { "convergence_final", "anastasia_finale", "echo_realm_travel" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "true_history", enemyHealthMultiplier = 3.0f, enemyDamageMultiplier = 2.5f, rsGainMultiplier = 1.5f, corruptionSpreadRate = 2.5f, tuningDifficultyMultiplier = 1.8f, aetherDrainMultiplier = 2.5f }
                 }
             };

@@ -35,13 +35,16 @@ namespace Tartaria.Save
         public MiloSaveBlock milo = new();
         public LiraelSaveBlock lirael = new();
         public ZerethSaveBlock zereth = new();
+
+        // v5 save blocks
+        public VeritasSaveBlock veritas = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 4;
-        public string gameVersion = "0.4.0";
+        public int schemaVersion = 5;
+        public string gameVersion = "0.5.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
@@ -310,5 +313,20 @@ namespace Tartaria.Save
         public bool physicallyManifested;
         public bool finalConfrontationStarted;
         public bool redeemed;
+    }
+
+    // ─── v5 Save Blocks (Veritas) ────────────────
+
+    [Serializable]
+    public class VeritasSaveBlock
+    {
+        public float trust;
+        public bool introduced;
+        public int trustTier;             // VeritasTrustTier cast to int
+        public int registersRestored;
+        public float performanceAccuracy;
+        public bool requiemPerformed;
+        public bool bellTowerSyncComplete;
+        public bool finalNoteDelivered;
     }
 }

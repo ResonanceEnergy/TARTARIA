@@ -307,7 +307,18 @@ namespace Tartaria.Integration
         MirrorWraith = 2,
         RailWraith = 3,
         DissonanceHarvester = 4,
-        DissonanceLeviathan = 5
+        DissonanceLeviathan = 5,
+        SiegeGolem = 6,
+        HarmonicParasite = 7,
+        DissonantConductor = 8,
+        CorruptedCraft = 9,
+        SkyReaver = 10,
+        ProphecyGuardian = 11,
+        ResetSeeker = 12,
+        TemporalWraith = 13,
+        LivingSludge = 14,
+        SludgeLeviathan = 15,
+        TitanGolem = 16
     }
 
     [Serializable]

@@ -281,6 +281,15 @@ namespace Tartaria.Save
                 data.header.gameVersion = "0.4.0";
                 MarkDirty();
             }
+
+            if (data.header.schemaVersion < 5)
+            {
+                // v4 → v5: add Veritas companion block
+                if (data.veritas == null) data.veritas = new VeritasSaveBlock();
+                data.header.schemaVersion = 5;
+                data.header.gameVersion = "0.5.0";
+                MarkDirty();
+            }
         }
 
         static string ComputeChecksum(string content)

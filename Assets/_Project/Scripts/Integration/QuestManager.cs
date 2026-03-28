@@ -259,6 +259,9 @@ namespace Tartaria.Integration
         TalkToNPC = 5,
         CollectItem = 6,
         CompleteTuning = 7,
+        CompleteMiniGame = 8,
+        DefeatBoss = 9,
+        CompanionMilestone = 10,
     }
 
     [Serializable]
