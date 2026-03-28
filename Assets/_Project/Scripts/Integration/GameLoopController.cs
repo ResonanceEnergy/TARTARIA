@@ -802,6 +802,21 @@ namespace Tartaria.Integration
                 save.zereth.finalConfrontationStarted = zd.finalConfrontationStarted;
                 save.zereth.redeemed = zd.redeemed;
             }
+
+            // Veritas
+            var veritas = VeritasController.Instance;
+            if (veritas != null)
+            {
+                var vd = veritas.GetSaveData();
+                save.veritas.trust = vd.trust;
+                save.veritas.introduced = vd.introduced;
+                save.veritas.trustTier = (int)vd.trustTier;
+                save.veritas.registersRestored = vd.registersRestored;
+                save.veritas.performanceAccuracy = vd.performanceAccuracy;
+                save.veritas.requiemPerformed = vd.requiemPerformed;
+                save.veritas.bellTowerSyncComplete = vd.bellTowerSyncComplete;
+                save.veritas.finalNoteDelivered = vd.finalNoteDelivered;
+            }
         }
 
         void OnAfterLoad(SaveData save)
@@ -1079,6 +1094,23 @@ namespace Tartaria.Integration
                     physicallyManifested = save.zereth.physicallyManifested,
                     finalConfrontationStarted = save.zereth.finalConfrontationStarted,
                     redeemed = save.zereth.redeemed
+                });
+            }
+
+            // Veritas
+            var veritasLoad = VeritasController.Instance;
+            if (veritasLoad != null && save.veritas != null)
+            {
+                veritasLoad.LoadSaveData(new VeritasSaveData
+                {
+                    trust = save.veritas.trust,
+                    introduced = save.veritas.introduced,
+                    trustTier = (VeritasTrustTier)save.veritas.trustTier,
+                    registersRestored = save.veritas.registersRestored,
+                    performanceAccuracy = save.veritas.performanceAccuracy,
+                    requiemPerformed = save.veritas.requiemPerformed,
+                    bellTowerSyncComplete = save.veritas.bellTowerSyncComplete,
+                    finalNoteDelivered = save.veritas.finalNoteDelivered
                 });
             }
         }

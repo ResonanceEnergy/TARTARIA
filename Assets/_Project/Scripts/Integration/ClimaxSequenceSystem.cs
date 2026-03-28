@@ -47,6 +47,10 @@ namespace Tartaria.Integration
             RegisterClimax(Moon1Climax.Build());
             RegisterClimax(Moon2Climax.Build());
             RegisterClimax(Moon3Climax.Build());
+            RegisterClimax(Moon4Climax.Build());
+            RegisterClimax(Moon5Climax.Build());
+            RegisterClimax(Moon6Climax.Build());
+            RegisterClimax(Moon7Climax.Build());
         }
 
         // ─── Public API ──────────────────────────────
@@ -728,6 +732,527 @@ namespace Tartaria.Integration
                 speaker = "Milo",
                 dialogueText = "...I'm not crying. It's the ionised mist. Shut up.",
                 duration = 3f,
+                pauseAfter = 2f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 4 Climax: Star Fort Siege ──────────
+
+    /// <summary>
+    /// Moon 4 (Self-Existing Moon) scripted climax per GDD §11:
+    ///   Phase 1: The Breach — corruption breaks through outer wall
+    ///   Phase 2: Coordinated Defense — bell tower + companion strategy
+    ///   Phase 3: Bell Tower Stand — hold the star points
+    ///   Phase 4: Resolution — Star Chamber activation
+    /// </summary>
+    public static class Moon4Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 3,
+                climaxId = "star_fort_siege_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Phase 1: The Breach
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "The outer wall is buckling! Corruption is pouring through the eastern bastion — we need to hold the five points!",
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 40f,
+                duration = 3f,
+                pauseAfter = 0.5f
+            });
+
+            // Phase 2: Coordinated Defense
+            var breachWave = new WaveEncounterDef
+            {
+                encounterId = "star_fort_breach",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 8f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.SiegeGolem, count = 3, healthMultiplier = 1.3f },
+                            new() { enemyType = EnemyTypeId.FractalWraith, count = 4, healthMultiplier = 1.2f, spawnDelay = 2f }
+                        }
+                    },
+                    new()
+                    {
+                        waveIndex = 1,
+                        rsReward = 10f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.SiegeGolem, count = 5, healthMultiplier = 1.5f },
+                            new() { enemyType = EnemyTypeId.MirrorWraith, count = 3, healthMultiplier = 1.4f, spawnDelay = 3f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(0, 0, 20),
+                waveEncounter = breachWave,
+                pauseAfter = 2f
+            });
+
+            // Phase 3: Bell Tower Stand
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Cassian",
+                dialogueText = "The bell towers are resonating — if we can synchronize all five points, the star formation will amplify our frequency a thousandfold!",
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "aether_wake",
+                worldPosition = new Vector3(0, 30, 0),
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            // Phase 4: Resolution — Star Chamber activation
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 60, 0),
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 100f,
+                duration = 5f,
+                pauseAfter = 0.5f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 25f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "The Star Chamber... it's online. Five frequencies locked into a pentagonal matrix. I've never felt anything like this in my life.",
+                duration = 5f,
+                pauseAfter = 2f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 5 Climax: Intercontinental Connection ──
+
+    /// <summary>
+    /// Moon 5 (Overtone Moon) scripted climax per GDD §03C:
+    ///   1. White City demolition discovery shocks companions
+    ///   2. Underground telegraph network activated
+    ///   3. Milo's outburst at White City demolition
+    ///   4. Intercontinental resonance bridge forms
+    /// </summary>
+    public static class Moon5Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 4,
+                climaxId = "intercontinental_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Discovery of the underwater passage
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Lirael",
+                dialogueText = "The passage beneath the colosseum... it connects to the resonance stage. The architects built it to amplify across continents.",
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            // Beat 2: Combat — corruption defends the relay
+            var relayWave = new WaveEncounterDef
+            {
+                encounterId = "intercontinental_relay",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 10f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.MirrorWraith, count = 4, healthMultiplier = 1.4f },
+                            new() { enemyType = EnemyTypeId.DissonanceHarvester, count = 3, healthMultiplier = 1.3f, spawnDelay = 3f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(30, -5, 0),
+                waveEncounter = relayWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 3: Milo's emotional outburst
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Milo",
+                dialogueText = "They DEMOLISHED it! The White City -- the most beautiful thing humanity ever built -- and they tore it down in a year! Do you understand what that means?! They KNEW what it was!",
+                duration = 6f,
+                pauseAfter = 2f
+            });
+
+            // Beat 4: Camera pan — resonance bridge VFX
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 40, 0),
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            // Beat 5: Bridge activation VFX
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "zone_complete",
+                worldPosition = Vector3.up * 25f,
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            // Beat 6: Environment restoration
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 100f,
+                duration = 5f,
+                pauseAfter = 0.5f
+            });
+
+            // Beat 7: RS cascade
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 25f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            // Beat 8: Lirael revelation
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Lirael",
+                dialogueText = "The bridge is singing. I can feel resonance from... everywhere. Every zone we've restored is connected now. We're not just saving buildings -- we're rebuilding a nervous system.",
+                duration = 6f,
+                pauseAfter = 2f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 6 Climax: The Cymatic Requiem ──────
+
+    /// <summary>
+    /// Moon 6 (Rhythmic Moon) scripted climax per GDD §03C:
+    ///   1. Full 5-register organ symphony
+    ///   2. Veritas plays bass and pedal
+    ///   3. Lirael sings the solo Silver Passage
+    ///   4. Children's choir joins from the nave
+    ///   5. Cathedral overload — kaleidoscopic light + ionized mist
+    ///   6. Zereth calibration revelation
+    /// </summary>
+    public static class Moon6Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 5,
+                climaxId = "cymatic_requiem_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Veritas at the organ
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Veritas",
+                dialogueText = "I have waited four hundred years to finish this piece. Every register is alive. Every pipe remembers its note. Will you conduct while I play?",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 2: Combat — Harmonic Parasites attack during performance
+            var parasiteWave = new WaveEncounterDef
+            {
+                encounterId = "requiem_parasites",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 8f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.HarmonicParasite, count = 5, healthMultiplier = 1.2f },
+                        }
+                    },
+                    new()
+                    {
+                        waveIndex = 1,
+                        rsReward = 12f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.HarmonicParasite, count = 6, healthMultiplier = 1.4f },
+                            new() { enemyType = EnemyTypeId.DissonantConductor, count = 1, healthMultiplier = 2.0f, spawnDelay = 5f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(0, 5, 10),
+                waveEncounter = parasiteWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 3: Lirael's Silver Passage solo
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Lirael",
+                dialogueText = "I remember now... my name before. The note between silence and song. THIS note.",
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            // Beat 4: Children's choir VFX
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "aether_wake",
+                worldPosition = new Vector3(0, 15, 0),
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            // Beat 5: Cathedral overload — kaleidoscopic light
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 80, 0),
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            // Beat 6: Environment shift to full restoration
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 100f,
+                duration = 5f,
+                pauseAfter = 0.5f
+            });
+
+            // Beat 7: RS cascade
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 30f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            // Beat 8: Zereth revelation
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Veritas",
+                dialogueText = "The tuning records... the last calibration was signed 'Z.' The work is flawless. If Zereth was our enemy, why does his calibration ring with such perfect harmony?",
+                duration = 6f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 9: Milo reaction
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Milo",
+                dialogueText = "...okay. That was. Um. That was really something. Don't tell anyone I said that.",
+                duration = 3f,
+                pauseAfter = 2f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 7 Climax: Korath's Sacrifice ───────
+
+    /// <summary>
+    /// Moon 7 (Resonant Moon) scripted climax per GDD §03C:
+    ///   1. Giant stasis thawing — Korath channels RS to free the last giant
+    ///   2. Cassian confrontation choice (ally or oppose)
+    ///   3. Titan Golem boss wave
+    ///   4. Korath channels his life-force into the giant
+    ///   5. Giant awakens — environment transforms
+    ///   6. Korath's final words
+    /// </summary>
+    public static class Moon7Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 6,
+                climaxId = "korath_sacrifice_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Korath at the stasis chamber
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Korath",
+                dialogueText = "The last giant sleeps beneath this citadel. Eight hundred years of stasis — but the ice is singing. It wants to wake. It needs a key made of living resonance.",
+                duration = 6f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 2: Cassian confrontation
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Cassian",
+                dialogueText = "Korath — you can't channel that much RS through a mortal body. The mathematics are clear: the energy required to thaw a giant would consume the source. You know this.",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 3: Titan Golem boss wave
+            var titanWave = new WaveEncounterDef
+            {
+                encounterId = "korath_sacrifice_titan",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 12f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.TitanGolem, count = 1, healthMultiplier = 3.0f },
+                            new() { enemyType = EnemyTypeId.SiegeGolem, count = 4, healthMultiplier = 1.5f, spawnDelay = 5f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(0, 0, 15),
+                waveEncounter = titanWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 4: Korath channels life-force
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "zone_complete",
+                worldPosition = new Vector3(0, 20, 15),
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Korath",
+                dialogueText = "Every teaching I gave you... every revelation... was preparation for this moment. The giant cannot wake without a conductor. The conductor cannot survive the current. This is the mathematics of sacrifice.",
+                duration = 7f,
+                pauseAfter = 2f
+            });
+
+            // Beat 5: Environment transformation — giant awakens
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 100, 0),
+                duration = 7f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 100f,
+                duration = 5f,
+                pauseAfter = 0.5f
+            });
+
+            // Beat 6: RS cascade
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 35f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            // Beat 7: Korath's final words
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Korath",
+                dialogueText = "The giant breathes. The citadel sings. Remember what I taught you about the Day Out of Time... there is a moment between heartbeats where all things are possible. I go there now.",
+                duration = 7f,
+                pauseAfter = 2f
+            });
+
+            // Beat 8: Milo goes silent
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Wait,
+                duration = 4f,
                 pauseAfter = 2f
             });
 

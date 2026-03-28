@@ -131,7 +131,11 @@ namespace Tartaria.Editor
                     fogDensity = 0.015f,
                     ambientLow = new Color(0.2f, 0.2f, 0.22f),
                     ambientHigh = new Color(0.65f, 0.65f, 0.7f),
-                    loadingTip = "Highland architecture bends but never breaks. Like reeds."
+                    loadingTip = "Highland architecture bends but never breaks. Like reeds.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "lirael", position = new Vector3(-3, 1, 8), yRotation = 120f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 4
                 new ZoneData
@@ -148,7 +152,12 @@ namespace Tartaria.Editor
                     fogDensity = 0.025f,
                     ambientLow = new Color(0.15f, 0.13f, 0.1f),
                     ambientHigh = new Color(0.55f, 0.5f, 0.38f),
-                    loadingTip = "Star forts were amplifiers. Five points, each at a different frequency."
+                    loadingTip = "Star forts were amplifiers. Five points, each at a different frequency.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "thorne", position = new Vector3(10, 1, -8), yRotation = 315f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "cassian", position = new Vector3(-6, 1, 12), yRotation = 180f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 5
                 new ZoneData
@@ -165,7 +174,13 @@ namespace Tartaria.Editor
                     fogDensity = 0.03f,
                     ambientLow = new Color(0.12f, 0.15f, 0.2f),
                     ambientHigh = new Color(0.45f, 0.55f, 0.65f),
-                    loadingTip = "Water doesn't corrupt -- it preserves."
+                    loadingTip = "Water doesn't corrupt -- it preserves.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "milo", position = new Vector3(6, 1, 4), yRotation = 225f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "lirael", position = new Vector3(-8, 1, 10), yRotation = 90f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "thorne", position = new Vector3(14, 1, -4), yRotation = 270f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 6
                 new ZoneData
@@ -182,7 +197,12 @@ namespace Tartaria.Editor
                     fogDensity = 0.02f,
                     ambientLow = new Color(0.12f, 0.1f, 0.08f),
                     ambientHigh = new Color(0.5f, 0.42f, 0.3f),
-                    loadingTip = "Read with your ears, not your eyes."
+                    loadingTip = "Read with your ears, not your eyes.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "veritas", position = new Vector3(0, 1, 15), yRotation = 0f, requiresIntroduction = true },
+                        new NPCSpawnPoint { npcId = "lirael", position = new Vector3(-5, 1, 12), yRotation = 45f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 7
                 new ZoneData
@@ -220,7 +240,11 @@ namespace Tartaria.Editor
                     fogDensity = 0.04f,
                     ambientLow = new Color(0.08f, 0.15f, 0.08f),
                     ambientHigh = new Color(0.3f, 0.55f, 0.3f),
-                    loadingTip = "The strongest structures let life grow through them."
+                    loadingTip = "The strongest structures let life grow through them.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "thorne", position = new Vector3(8, 1, 6), yRotation = 200f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 9
                 new ZoneData
@@ -237,7 +261,11 @@ namespace Tartaria.Editor
                     fogDensity = 0.012f,
                     ambientLow = new Color(0.1f, 0.08f, 0.15f),
                     ambientHigh = new Color(0.45f, 0.4f, 0.65f),
-                    loadingTip = "corruption fears light. It's the one thing they can't absorb."
+                    loadingTip = "corruption fears light. It's the one thing they can't absorb.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "zereth", position = new Vector3(0, 5, 20), yRotation = 180f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 10
                 new ZoneData
@@ -254,7 +282,11 @@ namespace Tartaria.Editor
                     fogDensity = 0.05f,
                     ambientLow = new Color(0.2f, 0.1f, 0.05f),
                     ambientHigh = new Color(0.6f, 0.35f, 0.15f),
-                    loadingTip = "The Tartarian smiths shaped metal with sound, not muscle."
+                    loadingTip = "The Tartarian smiths shaped metal with sound, not muscle.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "korath", position = new Vector3(-10, 1, 5), yRotation = 90f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 11
                 new ZoneData
@@ -271,7 +303,12 @@ namespace Tartaria.Editor
                     fogDensity = 0.028f,
                     ambientLow = new Color(0.12f, 0.15f, 0.2f),
                     ambientHigh = new Color(0.4f, 0.5f, 0.6f),
-                    loadingTip = "Tides come and go. Echoes stay."
+                    loadingTip = "Tides come and go. Echoes stay.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "lirael", position = new Vector3(-6, 1, 8), yRotation = 45f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "veritas", position = new Vector3(4, 1, 12), yRotation = 315f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 12
                 new ZoneData
@@ -288,7 +325,12 @@ namespace Tartaria.Editor
                     fogDensity = 0.008f,
                     ambientLow = new Color(0.05f, 0.05f, 0.1f),
                     ambientHigh = new Color(0.2f, 0.2f, 0.35f),
-                    loadingTip = "Everything is geometry at sufficient distance."
+                    loadingTip = "Everything is geometry at sufficient distance.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "veritas", position = new Vector3(0, 1, 18), yRotation = 0f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "thorne", position = new Vector3(12, 1, -6), yRotation = 270f, requiresIntroduction = false },
+                    }
                 },
                 // Moon 13
                 new ZoneData
@@ -305,7 +347,17 @@ namespace Tartaria.Editor
                     fogDensity = 0.01f,
                     ambientLow = new Color(0.1f, 0.08f, 0.05f),
                     ambientHigh = new Color(0.85f, 0.8f, 0.55f),
-                    loadingTip = "After eight hundred years of silence... it's singing."
+                    loadingTip = "After eight hundred years of silence... it's singing.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "milo", position = new Vector3(5, 1, 3), yRotation = 180f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "lirael", position = new Vector3(-4, 1, 6), yRotation = 90f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "thorne", position = new Vector3(12, 1, -2), yRotation = 270f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "cassian", position = new Vector3(-10, 1, -5), yRotation = 0f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "korath", position = new Vector3(0, 1, 20), yRotation = 180f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "veritas", position = new Vector3(8, 1, 15), yRotation = 225f, requiresIntroduction = false },
+                        new NPCSpawnPoint { npcId = "zereth", position = new Vector3(0, 3, 25), yRotation = 180f, requiresIntroduction = false },
+                    }
                 },
             };
         }
