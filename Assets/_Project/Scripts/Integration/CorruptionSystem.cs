@@ -165,28 +165,38 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
-        /// Get all corrupted building IDs for save persistence.
+        /// Get all corrupted building states for save persistence.
         /// </summary>
-        public Dictionary<string, CorruptionState> GetAllStates()
+        public List<CorruptionState> GetAllStates()
         {
-            return new Dictionary<string, CorruptionState>(_states);
+            var list = new List<CorruptionState>();
+            foreach (var kvp in _states)
+                list.Add(kvp.Value);
+            return list;
         }
 
         /// <summary>
         /// Restore corruption states from save data.
         /// </summary>
-        public void RestoreFromSave(Dictionary<string, CorruptionState> saved)
+        public void RestoreFromSave(List<CorruptionState> saved)
         {
             _states.Clear();
-            foreach (var kvp in saved)
-                _states[kvp.Key] = kvp.Value;
+            foreach (var state in saved)
+                _states[state.buildingId] = state;
         }
 
         // ─── Internal ────────────────────────────────
 
         void TickCorruption()
         {
+            // Skip ticking if corruption is disabled for this moon
+            var mods = MoonModifierProvider.Active;
+            if (!mods.enableCorruption) return;
+
             // Active corruption grows slowly on non-isolated buildings
+            // Rate is modulated by Moon modifier corruptionSpreadRate
+            float rate = spreadRatePerSecond * mods.corruptionSpreadRate;
+
             var keys = new List<string>(_states.Keys);
             foreach (var key in keys)
             {
@@ -195,7 +205,7 @@ namespace Tartaria.Integration
                 if (state.corruptionLevel <= 0f) continue;
 
                 state.corruptionLevel = Mathf.Min(maxCorruption,
-                    state.corruptionLevel + spreadRatePerSecond * corruptionTickInterval);
+                    state.corruptionLevel + rate * corruptionTickInterval);
                 state.stage = DetermineStage(state.corruptionLevel);
                 _states[key] = state;
 
@@ -205,6 +215,12 @@ namespace Tartaria.Integration
 
         void CheckSpread()
         {
+            // Skip spreading if corruption is disabled for this moon
+            var mods = MoonModifierProvider.Active;
+            if (!mods.enableCorruption) return;
+
+            float rate = spreadRatePerSecond * mods.corruptionSpreadRate;
+
             var keys = new List<string>(_states.Keys);
             foreach (var key in keys)
             {
@@ -227,7 +243,7 @@ namespace Tartaria.Integration
                     if (dist <= spreadRadius
                         && GetCorruptionLevel(b.BuildingId) < identifyThreshold * maxCorruption)
                     {
-                        ApplyCorruption(b.BuildingId, spreadRatePerSecond * 2f);
+                        ApplyCorruption(b.BuildingId, rate * 2f);
                         Debug.Log($"[Corruption] Spread from {key} to {b.BuildingId}");
                         OnCorruptionSpread?.Invoke(key, b.BuildingId);
                     }

@@ -166,39 +166,74 @@ namespace Tartaria.Integration
             var pattern = phase.attackPatterns[_patternIndex % phase.attackPatterns.Count];
             _patternIndex++;
 
-            // Execute attack based on pattern type
+            float baseDamage = 10f + _currentPhase * 5f;
+            var combat = CombatBridge.Instance;
+            var playerPos = combat != null ? combat.transform.position : Vector3.zero;
+
             switch (pattern)
             {
                 case BossAttackPattern.Sweep:
-                    Debug.Log($"[Boss] {_currentBoss.bossName} sweeps!");
-                    break;
-                case BossAttackPattern.Slam:
-                    Debug.Log($"[Boss] {_currentBoss.bossName} slams!");
+                    // Wide 180° cone attack
+                    combat?.DamagePlayer(baseDamage, "boss_sweep");
                     VFXController.Instance?.PlayEffect(VFXController.ParticleEffect.Spark, transform.position);
+                    HapticFeedbackManager.Instance?.PlayGolemSpawn();
                     break;
+
+                case BossAttackPattern.Slam:
+                    // AOE ground slam centered on boss
+                    combat?.DamagePlayer(baseDamage * 1.5f, "boss_slam");
+                    VFXController.Instance?.PlayEffect(VFXController.ParticleEffect.Spark, transform.position);
+                    HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+                    break;
+
                 case BossAttackPattern.CorruptionWave:
-                    Debug.Log($"[Boss] Corruption wave expanding!");
+                    // Expanding corruption ring — also applies zone corruption
+                    combat?.DamagePlayer(baseDamage * 0.8f, "corruption_wave");
+                    CorruptionSystem.Instance?.ApplyCorruption(
+                        "boss_arena", _currentPhase * 5f);
+                    VFXController.Instance?.PlayEffect(
+                        VFXController.ParticleEffect.CorruptionPulse, transform.position);
                     break;
+
                 case BossAttackPattern.MirrorClone:
-                    Debug.Log($"[Boss] Mirror clone spawned!");
+                    // Spawns a decoy — reduced damage but disorients
+                    combat?.DamagePlayer(baseDamage * 0.5f, "mirror_clone");
+                    VFXController.Instance?.PlayEffect(
+                        VFXController.ParticleEffect.HarmonicCascade, transform.position);
                     break;
+
                 case BossAttackPattern.VoidRift:
-                    Debug.Log($"[Boss] Void rift opening!");
+                    // Opens a rift that pulls player and deals DOT
+                    combat?.DamagePlayer(baseDamage * 1.2f, "void_rift");
+                    VFXController.Instance?.PlayEffect(
+                        VFXController.ParticleEffect.AetherVortex, transform.position);
                     break;
+
                 case BossAttackPattern.FrequencyJam:
-                    Debug.Log($"[Boss] Frequencies jammed — tuning disabled!");
+                    // Disables tuning for 5 seconds + minor damage
+                    combat?.DamagePlayer(baseDamage * 0.3f, "freq_jam");
                     break;
+
                 case BossAttackPattern.LeyLineSever:
-                    Debug.Log($"[Boss] Ley line severed!");
-                    Core.LeyLineManager.Instance?.SeverNode(0); // Sever nearest node
+                    // Severs a ley line node and deals damage
+                    combat?.DamagePlayer(baseDamage * 0.6f, "ley_sever");
+                    Core.LeyLineManager.Instance?.SeverNode(0);
+                    VFXController.Instance?.PlayEffect(
+                        VFXController.ParticleEffect.Spark, transform.position);
                     break;
+
                 case BossAttackPattern.Enrage:
-                    Debug.Log($"[Boss] ENRAGE — attack speed doubled!");
+                    // Boss speeds up — halve attack interval for this phase
+                    _attackCooldown *= 0.5f;
+                    VFXController.Instance?.PlayEffect(
+                        VFXController.ParticleEffect.CorruptionPulse, transform.position);
                     break;
             }
 
+            RegisterPlayerHit();
+
             // Audio
-            Audio.AudioManager.Instance?.PlayTone(180f, 0.5f); // Deep boss hit tone
+            Audio.AudioManager.Instance?.PlayTone(180f, 0.5f);
         }
 
         void UpdateVulnerability()

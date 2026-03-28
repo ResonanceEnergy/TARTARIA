@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Tartaria.Core;
 
 namespace Tartaria.Camera
@@ -101,25 +102,35 @@ namespace Tartaria.Camera
         {
             if (GameStateManager.Instance.IsPaused) return;
 
+            var mouse = Mouse.current;
+            var keyboard = Keyboard.current;
+
             // Scroll wheel = zoom
-            float scroll = UnityEngine.Input.mouseScrollDelta.y;
-            if (Mathf.Abs(scroll) > 0.01f)
+            if (mouse != null)
             {
-                _zoomOffset -= scroll * zoomSpeed;
-                _zoomOffset = Mathf.Clamp(_zoomOffset, zoomMin - exploreDistance, zoomMax - exploreDistance);
+                float scroll = mouse.scroll.ReadValue().y / 120f;
+                if (Mathf.Abs(scroll) > 0.01f)
+                {
+                    _zoomOffset -= scroll * zoomSpeed;
+                    _zoomOffset = Mathf.Clamp(_zoomOffset, zoomMin - exploreDistance, zoomMax - exploreDistance);
+                }
+
+                // Middle mouse = orbit
+                if (mouse.middleButton.isPressed)
+                {
+                    float mouseX = mouse.delta.ReadValue().x * 0.1f;
+                    _currentYaw += mouseX * orbitSpeed * Time.deltaTime;
+                }
             }
 
-            // Middle mouse / Q+E = orbit
-            if (UnityEngine.Input.GetMouseButton(2))
+            // Q/E = orbit
+            if (keyboard != null)
             {
-                float mouseX = UnityEngine.Input.GetAxis("Mouse X");
-                _currentYaw += mouseX * orbitSpeed * Time.deltaTime;
+                if (keyboard.qKey.isPressed)
+                    _currentYaw -= orbitSpeed * Time.deltaTime;
+                if (keyboard.eKey.isPressed)
+                    _currentYaw += orbitSpeed * Time.deltaTime;
             }
-
-            if (UnityEngine.Input.GetKey(KeyCode.Q))
-                _currentYaw -= orbitSpeed * Time.deltaTime;
-            if (UnityEngine.Input.GetKey(KeyCode.E))
-                _currentYaw += orbitSpeed * Time.deltaTime;
         }
 
         void ApplyCamera()
@@ -145,6 +156,45 @@ namespace Tartaria.Camera
             {
                 _camera.fieldOfView = Mathf.Lerp(
                     _camera.fieldOfView, _targetFOV, Time.deltaTime * smoothSpeed);
+            }
+        }
+
+        // ─── Giant / Micro Mode ─────────────────────
+
+        /// <summary>
+        /// Switch camera to Giant Mode — extreme pull-back for oversized player.
+        /// Called by GiantModeController when player grows to Tartarian scale.
+        /// </summary>
+        public void SetGiantMode(bool active)
+        {
+            if (active)
+            {
+                _currentDistance = zoomMax * 1.5f;
+                _currentPitch = 65f;
+                _targetFOV = 70f;
+            }
+            else
+            {
+                // Restore based on current game state
+                UpdateCameraMode();
+            }
+        }
+
+        /// <summary>
+        /// Switch camera to Micro Mode — extreme zoom-in for shrunken player.
+        /// Called by MicroGiantController for ant-scale exploration segments.
+        /// </summary>
+        public void SetMicroMode(bool active)
+        {
+            if (active)
+            {
+                _currentDistance = 2f;
+                _currentPitch = 30f;
+                _targetFOV = 35f;
+            }
+            else
+            {
+                UpdateCameraMode();
             }
         }
 

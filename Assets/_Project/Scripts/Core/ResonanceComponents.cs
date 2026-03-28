@@ -12,6 +12,8 @@ namespace Tartaria.Core
         public float GlobalRS;           // Cumulative across all zones
         public float HighestZoneRS;      // Best single-zone score
         public int ThresholdReached;     // 0, 25, 50, 75, 100
+        public float SkillRSMultiplier;  // Set from SkillTreeSystem.GetModifier(RSMultiplier)
+        public float MoonRSMultiplier;   // Set from MoonModifierProvider.Active.rsGainMultiplier
     }
 
     // ─────────────────────────────────────────────

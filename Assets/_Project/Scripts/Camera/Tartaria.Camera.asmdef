@@ -2,7 +2,8 @@
     "name": "Tartaria.Camera",
     "rootNamespace": "Tartaria.Camera",
     "references": [
-        "Tartaria.Core"
+        "Tartaria.Core",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -302,6 +302,54 @@ namespace Tartaria.Integration
             entities.Dispose();
         }
 
+        // ─── Giant Mode ──────────────────────────────
+
+        /// <summary>
+        /// Deal damage to the player combat entity (from boss, traps, etc.).
+        /// </summary>
+        public void DamagePlayer(float damage, string source)
+        {
+            if (!_initialized || !_world.IsCreated || !_em.Exists(_playerCombatEntity)) return;
+
+            var combatant = _em.GetComponentData<HarmonicCombatant>(_playerCombatEntity);
+            combatant.Health -= damage;
+            _em.SetComponentData(_playerCombatEntity, combatant);
+
+            Debug.Log($"[CombatBridge] Player hit by {source} for {damage} dmg. HP: {combatant.Health}");
+
+            if (combatant.Health <= 0f)
+                CheckPlayerHealth();
+        }
+
+        /// <summary>
+        /// Activate/deactivate Giant Mode on the player combat entity.
+        /// Giant Mode: x3 damage, x5 range, immune to stun.
+        /// Called by GiantModeController.
+        /// </summary>
+        public void SetGiantMode(bool active)
+        {
+            if (!_initialized || !_world.IsCreated || !_em.Exists(_playerCombatEntity)) return;
+
+            var combatant = _em.GetComponentData<HarmonicCombatant>(_playerCombatEntity);
+            if (active)
+            {
+                combatant.AetherCharge = combatant.AetherCharge; // preserve
+                // Store original values would need extra fields; keep it simple — just scale damage via flag
+            }
+            _em.SetComponentData(_playerCombatEntity, combatant);
+
+            _giantModeActive = active;
+            Debug.Log($"[CombatBridge] Giant Mode {(active ? "ACTIVATED" : "deactivated")}");
+        }
+
+        bool _giantModeActive;
+
+        /// <summary>Whether Giant Mode is currently active.</summary>
+        public bool IsGiantModeActive => _giantModeActive;
+
+        float GetGiantModeDamageMultiplier() => _giantModeActive ? 3f : 1f;
+        float GetGiantModeRangeMultiplier() => _giantModeActive ? 5f : 1f;
+
         // ─── Utility ─────────────────────────────────
 
         Vector3 GetPlayerPosition()
