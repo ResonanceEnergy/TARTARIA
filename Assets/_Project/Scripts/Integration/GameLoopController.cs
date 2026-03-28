@@ -129,8 +129,38 @@ namespace Tartaria.Integration
             if (!_ecsReady) { InitECS(); return; }
 
             PollResonanceScore();
+            SyncRSModifiers();
             SyncPlayerPositionToECS();
             SyncSaveData();
+        }
+
+        // ─── RS Modifier Sync ─────────────────────────
+
+        /// <summary>
+        /// Push SkillTree RS multiplier and Moon RS multiplier into
+        /// the ECS ResonanceScore component (Burst can't call managed code).
+        /// </summary>
+        void SyncRSModifiers()
+        {
+            if (!_em.Exists(_rsEntity)) return;
+
+            var rs = _em.GetComponentData<ResonanceScore>(_rsEntity);
+
+            // SkillTree RS multiplier (base 1.0 + modifier value)
+            float skillMod = 1f;
+            if (SkillTreeSystem.Instance != null)
+                skillMod = 1f + SkillTreeSystem.Instance.GetModifier(SkillModifierType.RSMultiplier);
+
+            // Moon campaign RS multiplier
+            float moonMod = MoonModifierProvider.Active.rsGainMultiplier;
+
+            if (Mathf.Abs(rs.SkillRSMultiplier - skillMod) > 0.001f
+                || Mathf.Abs(rs.MoonRSMultiplier - moonMod) > 0.001f)
+            {
+                rs.SkillRSMultiplier = skillMod;
+                rs.MoonRSMultiplier = moonMod;
+                _em.SetComponentData(_rsEntity, rs);
+            }
         }
 
         // ─── RS Polling & Distribution ───────────────
@@ -610,6 +640,55 @@ namespace Tartaria.Integration
                 save.cassian.sharedIntelIds = casData.sharedIntelIds?.ToArray()
                     ?? System.Array.Empty<string>();
             }
+
+            // Economy
+            var econ = Core.EconomySystem.Instance;
+            if (econ != null)
+            {
+                var econData = econ.GetSaveData();
+                save.economy.aetherShards = econData.aetherShards;
+                save.economy.resonanceCrystals = econData.resonanceCrystals;
+                save.economy.starFragments = econData.starFragments;
+                var bList = new System.Collections.Generic.List<Save.EconomyBuildingEntry>();
+                if (econData.buildings != null)
+                {
+                    foreach (var b in econData.buildings)
+                        bList.Add(new Save.EconomyBuildingEntry
+                        {
+                            buildingId = b.buildingId,
+                            baseIncome = b.baseIncome,
+                            outputType = b.outputType,
+                            level = b.level,
+                            active = b.active
+                        });
+                }
+                save.economy.buildings = bList.ToArray();
+            }
+
+            // Thorne
+            var thorne = ThorneController.Instance;
+            if (thorne != null)
+            {
+                var td = thorne.GetSaveData();
+                save.thorne.trust = td.trust;
+                save.thorne.introduced = td.introduced;
+                save.thorne.militiaActive = td.militiaActive;
+                save.thorne.combatBriefingsGiven = td.combatBriefingsGiven;
+                save.thorne.zonesSecuredTogether = td.zonesSecuredTogether;
+            }
+
+            // Korath
+            var korath = KorathController.Instance;
+            if (korath != null)
+            {
+                var kd = korath.GetSaveData();
+                save.korath.trust = kd.trust;
+                save.korath.introduced = kd.introduced;
+                save.korath.dayOutOfTimeRevealed = kd.dayOutOfTimeRevealed;
+                save.korath.teachingsGiven = kd.teachingsGiven;
+                save.korath.revelationsUnlocked = kd.revelationsUnlocked;
+                save.korath.highestPlayerRS = kd.highestPlayerRS;
+            }
         }
 
         void OnAfterLoad(SaveData save)
@@ -721,6 +800,61 @@ namespace Tartaria.Integration
                     sharedIntelIds = save.cassian.sharedIntelIds != null
                         ? new System.Collections.Generic.List<string>(save.cassian.sharedIntelIds)
                         : new System.Collections.Generic.List<string>()
+                });
+            }
+
+            // Economy
+            var econ = Core.EconomySystem.Instance;
+            if (econ != null && save.economy != null)
+            {
+                var buildings = new System.Collections.Generic.List<Core.BuildingIncomeSave>();
+                if (save.economy.buildings != null)
+                {
+                    foreach (var e in save.economy.buildings)
+                        buildings.Add(new Core.BuildingIncomeSave
+                        {
+                            buildingId = e.buildingId,
+                            baseIncome = e.baseIncome,
+                            outputType = e.outputType,
+                            level = e.level,
+                            active = e.active
+                        });
+                }
+                econ.LoadSaveData(new Core.EconomySaveData
+                {
+                    aetherShards = save.economy.aetherShards,
+                    resonanceCrystals = save.economy.resonanceCrystals,
+                    starFragments = save.economy.starFragments,
+                    buildings = buildings
+                });
+            }
+
+            // Thorne
+            var thorne = ThorneController.Instance;
+            if (thorne != null && save.thorne != null)
+            {
+                thorne.LoadSaveData(new ThorneSaveData
+                {
+                    trust = save.thorne.trust,
+                    introduced = save.thorne.introduced,
+                    militiaActive = save.thorne.militiaActive,
+                    combatBriefingsGiven = save.thorne.combatBriefingsGiven,
+                    zonesSecuredTogether = save.thorne.zonesSecuredTogether
+                });
+            }
+
+            // Korath
+            var korath = KorathController.Instance;
+            if (korath != null && save.korath != null)
+            {
+                korath.LoadSaveData(new KorathSaveData
+                {
+                    trust = save.korath.trust,
+                    introduced = save.korath.introduced,
+                    dayOutOfTimeRevealed = save.korath.dayOutOfTimeRevealed,
+                    teachingsGiven = save.korath.teachingsGiven,
+                    revelationsUnlocked = save.korath.revelationsUnlocked,
+                    highestPlayerRS = save.korath.highestPlayerRS
                 });
             }
         }

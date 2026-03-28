@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Tartaria.Core;
 using Tartaria.Input;
 
@@ -86,8 +87,11 @@ namespace Tartaria.Gameplay
 
         void UpdateFrequencySlider()
         {
+            var mouse = Mouse.current;
+            if (mouse == null) return;
+
             // Mouse X position maps to frequency range
-            float mouseX = UnityEngine.Input.mousePosition.x / Screen.width;
+            float mouseX = mouse.position.ReadValue().x / Screen.width;
             float freqRange = _currentConfig.targetFrequency * 2f;
             _currentFrequency = mouseX * freqRange;
 
@@ -107,7 +111,7 @@ namespace Tartaria.Gameplay
             }
 
             // Player confirms with click
-            if (UnityEngine.Input.GetMouseButtonDown(0))
+            if (mouse.leftButton.wasPressedThisFrame)
             {
                 CompleteTuning();
             }
@@ -120,10 +124,11 @@ namespace Tartaria.Gameplay
 
         void UpdateWaveformTrace()
         {
-            if (UnityEngine.Input.GetMouseButton(0))
+            var mouse = Mouse.current;
+            if (mouse != null && mouse.leftButton.isPressed)
             {
                 // Track how closely mouse follows the golden waveform
-                float mouseY = UnityEngine.Input.mousePosition.y / Screen.height;
+                float mouseY = mouse.position.ReadValue().y / Screen.height;
                 float targetY = GenerateGoldenWaveform(Time.time);
                 float sampleAccuracy = 1.0f - Mathf.Abs(mouseY - targetY);
 
@@ -154,7 +159,8 @@ namespace Tartaria.Gameplay
 
         void UpdateHarmonicPattern()
         {
-            if (UnityEngine.Input.GetMouseButtonDown(0) && _patternIndex < _totalTaps)
+            var mouse = Mouse.current;
+            if (mouse != null && mouse.leftButton.wasPressedThisFrame && _patternIndex < _totalTaps)
             {
                 float expectedBeat = GetExpectedBeatTime(_patternIndex);
                 float timing = Mathf.Abs(Time.time - expectedBeat);
@@ -199,11 +205,15 @@ namespace Tartaria.Gameplay
             }
 
             // Check directional input (WASD mapped to bell directions)
+            var keyboard = Keyboard.current;
             int inputDir = -1;
-            if (UnityEngine.Input.GetKeyDown(KeyCode.W)) inputDir = 0; // North
-            if (UnityEngine.Input.GetKeyDown(KeyCode.D)) inputDir = 1; // East
-            if (UnityEngine.Input.GetKeyDown(KeyCode.S)) inputDir = 2; // South
-            if (UnityEngine.Input.GetKeyDown(KeyCode.A)) inputDir = 3; // West
+            if (keyboard != null)
+            {
+                if (keyboard.wKey.wasPressedThisFrame) inputDir = 0; // North
+                if (keyboard.dKey.wasPressedThisFrame) inputDir = 1; // East
+                if (keyboard.sKey.wasPressedThisFrame) inputDir = 2; // South
+                if (keyboard.aKey.wasPressedThisFrame) inputDir = 3; // West
+            }
 
             if (inputDir < 0) return;
 

@@ -22,13 +22,21 @@ namespace Tartaria.Save
         public CampaignSaveBlock campaign = new();
         public SkillTreeSaveBlock skillTree = new();
         public CassianSaveBlock cassian = new();
+
+        // v3 save blocks
+        public EconomySaveBlock economy = new();
+        public CodexSaveBlock codex = new();
+        public ThorneSaveBlock thorne = new();
+        public KorathSaveBlock korath = new();
+        public TutorialSaveBlock tutorial = new();
+        public DialogueTreeSaveBlock dialogueTree = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 2;
-        public string gameVersion = "0.2.0";
+        public int schemaVersion = 3;
+        public string gameVersion = "0.3.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
@@ -191,5 +199,67 @@ namespace Tartaria.Save
         public int interactionCount;
         public bool introduced;
         public string[] sharedIntelIds = Array.Empty<string>();
+    }
+
+    // ─── v3 Save Blocks (economy, codex, thorne, korath, tutorial, dialogue) ──
+
+    [Serializable]
+    public class EconomySaveBlock
+    {
+        public int aetherShards;
+        public int resonanceCrystals;
+        public int starFragments;
+        public EconomyBuildingEntry[] buildings = Array.Empty<EconomyBuildingEntry>();
+    }
+
+    [Serializable]
+    public class EconomyBuildingEntry
+    {
+        public string buildingId;
+        public int baseIncome;
+        public int outputType;
+        public int level;
+        public bool active;
+    }
+
+    [Serializable]
+    public class CodexSaveBlock
+    {
+        public string[] unlockedEntryIds = Array.Empty<string>();
+    }
+
+    [Serializable]
+    public class ThorneSaveBlock
+    {
+        public float trust;
+        public bool introduced;
+        public bool militiaActive;
+        public int combatBriefingsGiven;
+        public int zonesSecuredTogether;
+    }
+
+    [Serializable]
+    public class KorathSaveBlock
+    {
+        public float trust;
+        public bool introduced;
+        public bool dayOutOfTimeRevealed;
+        public int teachingsGiven;
+        public int revelationsUnlocked;
+        public float highestPlayerRS;
+    }
+
+    [Serializable]
+    public class TutorialSaveBlock
+    {
+        public string[] completedStepIds = Array.Empty<string>();
+        public bool tutorialFinished;
+    }
+
+    [Serializable]
+    public class DialogueTreeSaveBlock
+    {
+        public string[] seenDialogueIds = Array.Empty<string>();
+        public string[] chosenBranchIds = Array.Empty<string>();
     }
 }

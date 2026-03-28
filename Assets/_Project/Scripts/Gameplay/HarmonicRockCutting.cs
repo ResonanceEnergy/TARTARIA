@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Tartaria.Core;
 
 namespace Tartaria.Gameplay
@@ -126,8 +127,10 @@ namespace Tartaria.Gameplay
         void HandleTracing()
         {
             var vein = _veins[_currentVein];
+            var mouse = Mouse.current;
+            if (mouse == null) return;
 
-            if (UnityEngine.Input.GetMouseButtonDown(0))
+            if (mouse.leftButton.wasPressedThisFrame)
             {
                 // Start tracing if near vein start point
                 Vector2 mousePos = GetNormalizedMousePosition();
@@ -139,7 +142,7 @@ namespace Tartaria.Gameplay
                 }
             }
 
-            if (_isTracing && UnityEngine.Input.GetMouseButton(0))
+            if (_isTracing && mouse.leftButton.isPressed)
             {
                 Vector2 mousePos = GetNormalizedMousePosition();
 
@@ -171,7 +174,7 @@ namespace Tartaria.Gameplay
                 }
             }
 
-            if (_isTracing && UnityEngine.Input.GetMouseButtonUp(0))
+            if (_isTracing && mouse.leftButton.wasReleasedThisFrame)
             {
                 CompleteVein();
             }
@@ -293,9 +296,12 @@ namespace Tartaria.Gameplay
 
         Vector2 GetNormalizedMousePosition()
         {
+            var mouse = Mouse.current;
+            if (mouse == null) return Vector2.zero;
+            var pos = mouse.position.ReadValue();
             return new Vector2(
-                UnityEngine.Input.mousePosition.x / Screen.width,
-                UnityEngine.Input.mousePosition.y / Screen.height);
+                pos.x / Screen.width,
+                pos.y / Screen.height);
         }
 
         // ─── Data Types ─────────────────────────────

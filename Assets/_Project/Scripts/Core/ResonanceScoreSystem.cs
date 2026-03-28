@@ -29,7 +29,9 @@ namespace Tartaria.Core
                 CurrentRS = 0f,
                 GlobalRS = 0f,
                 HighestZoneRS = 0f,
-                ThresholdReached = 0
+                ThresholdReached = 0,
+                SkillRSMultiplier = 1f,
+                MoonRSMultiplier = 1f
             });
             state.EntityManager.AddBuffer<ResonanceEvent>(rsEntity);
         }
@@ -51,7 +53,9 @@ namespace Tartaria.Core
                             ? GoldenRatioValidator.PHI * evt.GoldenRatioMatch
                             : 1.0f);
 
-                    float finalReward = evt.BaseReward * evt.Multiplier * goldenMultiplier;
+                    float finalReward = evt.BaseReward * evt.Multiplier * goldenMultiplier
+                        * score.ValueRO.SkillRSMultiplier
+                        * score.ValueRO.MoonRSMultiplier;
                     score.ValueRW.CurrentRS = math.min(100f,
                         score.ValueRO.CurrentRS + finalReward);
                     score.ValueRW.GlobalRS += finalReward;
