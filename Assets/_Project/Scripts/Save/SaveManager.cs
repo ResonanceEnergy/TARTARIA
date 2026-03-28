@@ -253,6 +253,34 @@ namespace Tartaria.Save
                 data.header.schemaVersion = 2;
                 MarkDirty();
             }
+
+            if (data.header.schemaVersion < 3)
+            {
+                // v2 → v3: add corruption, campaign, skill tree, companion blocks
+                if (data.corruption == null) data.corruption = new CorruptionSaveBlock();
+                if (data.campaign == null) data.campaign = new CampaignSaveBlock();
+                if (data.skillTree == null) data.skillTree = new SkillTreeSaveBlock();
+                if (data.cassian == null) data.cassian = new CassianSaveBlock();
+                if (data.economy == null) data.economy = new EconomySaveBlock();
+                if (data.thorne == null) data.thorne = new ThorneSaveBlock();
+                if (data.korath == null) data.korath = new KorathSaveBlock();
+                data.header.schemaVersion = 3;
+                MarkDirty();
+            }
+
+            if (data.header.schemaVersion < 4)
+            {
+                // v3 → v4: add Milo, Lirael, Zereth, tutorial, dialogue, codex blocks
+                if (data.milo == null) data.milo = new MiloSaveBlock();
+                if (data.lirael == null) data.lirael = new LiraelSaveBlock();
+                if (data.zereth == null) data.zereth = new ZerethSaveBlock();
+                if (data.tutorial == null) data.tutorial = new TutorialSaveBlock();
+                if (data.dialogueTree == null) data.dialogueTree = new DialogueTreeSaveBlock();
+                if (data.codex == null) data.codex = new CodexSaveBlock();
+                data.header.schemaVersion = 4;
+                data.header.gameVersion = "0.4.0";
+                MarkDirty();
+            }
         }
 
         static string ComputeChecksum(string content)

@@ -230,39 +230,39 @@ namespace Tartaria.Integration
                     modifiers = new MoonModifiers { rsGainMultiplier = 1.2f, tuningDifficultyMultiplier = 0.8f }
                 },
                 new MoonDefinition {
-                    moonName = "Solara", zoneIndex = 1,
+                    moonName = "Shadow & Purge", zoneIndex = 1,
                     rsThresholdToAdvance = 250f,
-                    requiredQuestIds = new[] { "solara_main", "solara_corruption" },
-                    questIdsToActivate = new[] { "solara_main", "solara_corruption", "lirael_companion" },
-                    modifiers = new MoonModifiers { enableCorruption = true, corruptionSpreadRate = 0.8f, enemyHealthMultiplier = 1.1f }
+                    requiredQuestIds = new[] { "shadow_purge_main", "corruption_bloom" },
+                    questIdsToActivate = new[] { "shadow_purge_main", "corruption_bloom", "cassian_companion" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableMicroMode = true, corruptionSpreadRate = 0.8f, enemyHealthMultiplier = 1.1f, specialMechanic = "dissonance_lens" }
                 },
                 new MoonDefinition {
-                    moonName = "Resonara", zoneIndex = 2,
+                    moonName = "Windswept Highlands", zoneIndex = 2,
                     rsThresholdToAdvance = 450f,
-                    requiredQuestIds = new[] { "resonara_main" },
-                    questIdsToActivate = new[] { "resonara_main", "bell_tower_quest" },
-                    modifiers = new MoonModifiers { enableCorruption = true, specialMechanic = "bell_tower", tuningDifficultyMultiplier = 1.2f, enemyHealthMultiplier = 1.2f }
+                    requiredQuestIds = new[] { "highlands_main", "orphan_train_escort" },
+                    questIdsToActivate = new[] { "highlands_main", "orphan_train_escort", "rail_network" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableMicroMode = true, tuningDifficultyMultiplier = 1.1f, enemyHealthMultiplier = 1.2f, specialMechanic = "rail_network" }
                 },
                 new MoonDefinition {
-                    moonName = "Crystallis", zoneIndex = 3,
+                    moonName = "Star Fort Bastion", zoneIndex = 3,
                     rsThresholdToAdvance = 700f,
-                    requiredQuestIds = new[] { "crystallis_main" },
-                    questIdsToActivate = new[] { "crystallis_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, specialMechanic = "crystal_caves", enemyHealthMultiplier = 1.3f, enemyDamageMultiplier = 1.2f }
+                    requiredQuestIds = new[] { "star_fort_main", "korath_echo" },
+                    questIdsToActivate = new[] { "star_fort_main", "korath_echo", "precision_cutting" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableMicroMode = true, enemyHealthMultiplier = 1.3f, enemyDamageMultiplier = 1.2f, specialMechanic = "golden_ratio" }
                 },
                 new MoonDefinition {
-                    moonName = "Verdantia", zoneIndex = 4,
+                    moonName = "White City", zoneIndex = 4,
                     rsThresholdToAdvance = 1000f,
-                    requiredQuestIds = new[] { "verdantia_main" },
-                    questIdsToActivate = new[] { "verdantia_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, corruptionSpreadRate = 1.2f, enemyHealthMultiplier = 1.4f }
+                    requiredQuestIds = new[] { "white_city_main" },
+                    questIdsToActivate = new[] { "white_city_main", "overtone_networks" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, rsGainMultiplier = 1.3f, corruptionSpreadRate = 1.2f, enemyHealthMultiplier = 1.4f, specialMechanic = "overtone_resonance" }
                 },
                 new MoonDefinition {
-                    moonName = "Thalassar", zoneIndex = 5,
+                    moonName = "Sunken Cathedral", zoneIndex = 5,
                     rsThresholdToAdvance = 1400f,
-                    requiredQuestIds = new[] { "thalassar_main" },
-                    questIdsToActivate = new[] { "thalassar_main" },
-                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, aetherDrainMultiplier = 1.3f, enemyHealthMultiplier = 1.5f, enemyDamageMultiplier = 1.3f }
+                    requiredQuestIds = new[] { "cathedral_main", "cymatic_requiem" },
+                    questIdsToActivate = new[] { "cathedral_main", "cymatic_requiem", "veritas_companion" },
+                    modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, tuningDifficultyMultiplier = 1.3f, enemyHealthMultiplier = 1.5f, enemyDamageMultiplier = 1.3f, specialMechanic = "pipe_organ" }
                 },
                 new MoonDefinition {
                     moonName = "Pyrrhus", zoneIndex = 6,

@@ -30,13 +30,18 @@ namespace Tartaria.Save
         public KorathSaveBlock korath = new();
         public TutorialSaveBlock tutorial = new();
         public DialogueTreeSaveBlock dialogueTree = new();
+
+        // v4 save blocks
+        public MiloSaveBlock milo = new();
+        public LiraelSaveBlock lirael = new();
+        public ZerethSaveBlock zereth = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 3;
-        public string gameVersion = "0.3.0";
+        public int schemaVersion = 4;
+        public string gameVersion = "0.4.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
@@ -261,5 +266,49 @@ namespace Tartaria.Save
     {
         public string[] seenDialogueIds = Array.Empty<string>();
         public string[] chosenBranchIds = Array.Empty<string>();
+    }
+
+    // ─── v4 Save Blocks (Milo, Lirael) ──────────
+
+    [Serializable]
+    public class MiloSaveBlock
+    {
+        public float trust;
+        public bool introduced;
+        public int artifactsAppraised;
+        public int jokesDelivered;
+        public int sincereMoments;
+        public bool orphanTrainWitnessed;
+        public bool whiteCityOutburst;
+        public bool korathSacrificeWitnessed;
+    }
+
+    [Serializable]
+    public class LiraelSaveBlock
+    {
+        public float trust;
+        public bool introduced;
+        public float solidity;
+        public int songsRemembered;
+        public int dissonanceWarningsGiven;
+        public bool orphanTrainRemembered;
+        public bool childrenChoirConducted;
+        public bool korathSongsLearned;
+        public bool fountainHealed;
+        public bool fullyManifested;
+    }
+
+    [Serializable]
+    public class ZerethSaveBlock
+    {
+        public float presenceLevel;
+        public int phase;
+        public int prophecyStonesTriggered;
+        public int voiceResponsesPlayed;
+        public bool korathRevelationHeard;
+        public bool triggerRoomDiscovered;
+        public bool physicallyManifested;
+        public bool finalConfrontationStarted;
+        public bool redeemed;
     }
 }

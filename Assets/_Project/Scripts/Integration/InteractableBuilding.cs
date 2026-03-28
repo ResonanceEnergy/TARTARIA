@@ -336,5 +336,32 @@ namespace Tartaria.Integration
         {
             return definition != null ? definition.buildingName : buildingId;
         }
+
+        // ─── Mini-Game Bonus Reception ───────────────
+
+        /// <summary>
+        /// Apply an RS bonus from a nearby mini-game completion.
+        /// Active buildings gain a resonance amplification boost;
+        /// tuning-in-progress buildings get node accuracy nudge.
+        /// </summary>
+        public void ReceiveMiniGameBonus(float rsBonus, string miniGameType)
+        {
+            if (_state == BuildingRestorationState.Buried) return;
+
+            if (_state == BuildingRestorationState.Active)
+            {
+                // Active buildings: queue RS reward through game loop
+                GameLoopController.Instance?.QueueRSReward(
+                    rsBonus * 0.2f, $"building_bonus_{miniGameType}");
+            }
+            else if (_state == BuildingRestorationState.Tuning && _nodesCompleted > 0)
+            {
+                // In-progress buildings: small accuracy boost on last node
+                int lastNode = _nodesCompleted - 1;
+                _nodeAccuracies[lastNode] = Mathf.Min(_nodeAccuracies[lastNode] + 0.05f, 1f);
+            }
+
+            Debug.Log($"[Building] {GetDisplayName()} received {miniGameType} bonus: {rsBonus:F1} RS");
+        }
     }
 }

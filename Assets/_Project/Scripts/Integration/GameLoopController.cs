@@ -420,6 +420,10 @@ namespace Tartaria.Integration
                     AnastasiaController.Instance.TryDeliverLine("restoration");
             }
 
+            // Companion notifications
+            MiloController.Instance?.NotifyBuildingRestored();
+            LiraelController.Instance?.NotifyBuildingRestored();
+
             SaveManager.Instance?.MarkDirty();
         }
 
@@ -434,6 +438,9 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayGolemDeath();
             VFXController.Instance?.PlayEnemyDissolution(position);
             DialogueManager.Instance?.PlayContextDialogue("combat_victory");
+
+            // Companion notifications
+            MiloController.Instance?.NotifyCombatVictory();
 
             // Return to exploration
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
@@ -458,6 +465,24 @@ namespace Tartaria.Integration
                 Multiplier = 1f,
                 GoldenRatioMatch = 0f
             });
+        }
+
+        // ─── Mini-Game → Building Bonus Bridge ───────
+
+        /// <summary>
+        /// Called when any mini-game completes. Broadcasts RS bonus to all
+        /// active/in-progress buildings in the scene + queues direct RS reward.
+        /// </summary>
+        public void OnMiniGameCompleted(float rsReward, string miniGameType)
+        {
+            Debug.Log($"[GameLoop] Mini-game completed: {miniGameType}, RS {rsReward:F1}");
+
+            QueueRSReward(rsReward, miniGameType);
+
+            // Broadcast to all buildings
+            var buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            foreach (var b in buildings)
+                b.ReceiveMiniGameBonus(rsReward, miniGameType);
         }
 
         // ─── Player ECS Position Sync ────────────────
@@ -498,6 +523,10 @@ namespace Tartaria.Integration
 
             GameStateManager.Instance.TransitionTo(GameState.Cinematic);
             DialogueManager.Instance?.PlayContextDialogue("zone_complete");
+
+            // Companion zone-complete notifications
+            MiloController.Instance?.NotifyZoneComplete();
+            LiraelController.Instance?.NotifyZoneComplete();
 
             // Let the celebration effects play for a few seconds
             yield return new WaitForSeconds(3f);
@@ -689,6 +718,90 @@ namespace Tartaria.Integration
                 save.korath.revelationsUnlocked = kd.revelationsUnlocked;
                 save.korath.highestPlayerRS = kd.highestPlayerRS;
             }
+
+            // Milo
+            var milo = MiloController.Instance;
+            if (milo != null)
+            {
+                var md = milo.GetSaveData();
+                save.milo.trust = md.trust;
+                save.milo.introduced = md.introduced;
+                save.milo.artifactsAppraised = md.artifactsAppraised;
+                save.milo.jokesDelivered = md.jokesDelivered;
+                save.milo.sincereMoments = md.sincereMoments;
+                save.milo.orphanTrainWitnessed = md.orphanTrainWitnessed;
+                save.milo.whiteCityOutburst = md.whiteCityOutburst;
+                save.milo.korathSacrificeWitnessed = md.korathSacrificeWitnessed;
+            }
+
+            // Lirael
+            var lirael = LiraelController.Instance;
+            if (lirael != null)
+            {
+                var ld = lirael.GetSaveData();
+                save.lirael.trust = ld.trust;
+                save.lirael.introduced = ld.introduced;
+                save.lirael.solidity = ld.solidity;
+                save.lirael.songsRemembered = ld.songsRemembered;
+                save.lirael.dissonanceWarningsGiven = ld.dissonanceWarningsGiven;
+                save.lirael.orphanTrainRemembered = ld.orphanTrainRemembered;
+                save.lirael.childrenChoirConducted = ld.childrenChoirConducted;
+                save.lirael.korathSongsLearned = ld.korathSongsLearned;
+                save.lirael.fountainHealed = ld.fountainHealed;
+                save.lirael.fullyManifested = ld.fullyManifested;
+            }
+
+            // Tutorial
+            var tut = TutorialSystem.Instance;
+            if (tut != null)
+            {
+                var td = tut.GetSaveData();
+                var stepIds = new System.Collections.Generic.List<string>();
+                if (td.completedSteps != null)
+                    foreach (int s in td.completedSteps)
+                        stepIds.Add(s.ToString());
+                save.tutorial.completedStepIds = stepIds.ToArray();
+                save.tutorial.tutorialFinished = td.finished;
+            }
+
+            // DialogueTree
+            var dtr = DialogueTreeRunner.Instance;
+            if (dtr != null)
+            {
+                var dd = dtr.GetSaveData();
+                save.dialogueTree.seenDialogueIds = dd.visitedNodeIds?.ToArray()
+                    ?? System.Array.Empty<string>();
+                var branchIds = new System.Collections.Generic.List<string>();
+                if (dd.choiceRecords != null)
+                    foreach (var r in dd.choiceRecords)
+                        branchIds.Add($"{r.nodeId}:{r.choiceIndex}");
+                save.dialogueTree.chosenBranchIds = branchIds.ToArray();
+            }
+
+            // Codex
+            var codex = UI.WorldMapUI.Instance;
+            if (codex != null)
+            {
+                var cd = codex.GetSaveData();
+                save.codex.unlockedEntryIds = cd.unlockedEntryIds?.ToArray()
+                    ?? System.Array.Empty<string>();
+            }
+
+            // Zereth
+            var zereth = ZerethController.Instance;
+            if (zereth != null)
+            {
+                var zd = zereth.GetSaveData();
+                save.zereth.presenceLevel = zd.presenceLevel;
+                save.zereth.phase = zd.phase;
+                save.zereth.prophecyStonesTriggered = zd.prophecyStonesTriggered;
+                save.zereth.voiceResponsesPlayed = zd.voiceResponsesPlayed;
+                save.zereth.korathRevelationHeard = zd.korathRevelationHeard;
+                save.zereth.triggerRoomDiscovered = zd.triggerRoomDiscovered;
+                save.zereth.physicallyManifested = zd.physicallyManifested;
+                save.zereth.finalConfrontationStarted = zd.finalConfrontationStarted;
+                save.zereth.redeemed = zd.redeemed;
+            }
         }
 
         void OnAfterLoad(SaveData save)
@@ -855,6 +968,117 @@ namespace Tartaria.Integration
                     teachingsGiven = save.korath.teachingsGiven,
                     revelationsUnlocked = save.korath.revelationsUnlocked,
                     highestPlayerRS = save.korath.highestPlayerRS
+                });
+            }
+
+            // Milo
+            var milo = MiloController.Instance;
+            if (milo != null && save.milo != null)
+            {
+                milo.LoadSaveData(new MiloSaveData
+                {
+                    trust = save.milo.trust,
+                    introduced = save.milo.introduced,
+                    artifactsAppraised = save.milo.artifactsAppraised,
+                    jokesDelivered = save.milo.jokesDelivered,
+                    sincereMoments = save.milo.sincereMoments,
+                    orphanTrainWitnessed = save.milo.orphanTrainWitnessed,
+                    whiteCityOutburst = save.milo.whiteCityOutburst,
+                    korathSacrificeWitnessed = save.milo.korathSacrificeWitnessed
+                });
+            }
+
+            // Lirael
+            var lirael = LiraelController.Instance;
+            if (lirael != null && save.lirael != null)
+            {
+                lirael.LoadSaveData(new LiraelSaveData
+                {
+                    trust = save.lirael.trust,
+                    introduced = save.lirael.introduced,
+                    solidity = save.lirael.solidity,
+                    songsRemembered = save.lirael.songsRemembered,
+                    dissonanceWarningsGiven = save.lirael.dissonanceWarningsGiven,
+                    orphanTrainRemembered = save.lirael.orphanTrainRemembered,
+                    childrenChoirConducted = save.lirael.childrenChoirConducted,
+                    korathSongsLearned = save.lirael.korathSongsLearned,
+                    fountainHealed = save.lirael.fountainHealed,
+                    fullyManifested = save.lirael.fullyManifested
+                });
+            }
+
+            // Tutorial
+            var tut = TutorialSystem.Instance;
+            if (tut != null && save.tutorial != null)
+            {
+                var completedSteps = new System.Collections.Generic.List<int>();
+                if (save.tutorial.completedStepIds != null)
+                    foreach (var id in save.tutorial.completedStepIds)
+                        if (int.TryParse(id, out int step))
+                            completedSteps.Add(step);
+                tut.RestoreFromSave(new TutorialSaveData
+                {
+                    completedSteps = completedSteps,
+                    currentIndex = completedSteps.Count,
+                    finished = save.tutorial.tutorialFinished
+                });
+            }
+
+            // DialogueTree
+            var dtr = DialogueTreeRunner.Instance;
+            if (dtr != null && save.dialogueTree != null)
+            {
+                var visited = save.dialogueTree.seenDialogueIds != null
+                    ? new System.Collections.Generic.List<string>(save.dialogueTree.seenDialogueIds)
+                    : new System.Collections.Generic.List<string>();
+                var choices = new System.Collections.Generic.List<DialogueChoiceRecord>();
+                if (save.dialogueTree.chosenBranchIds != null)
+                {
+                    foreach (var entry in save.dialogueTree.chosenBranchIds)
+                    {
+                        int sep = entry.LastIndexOf(':');
+                        if (sep > 0 && int.TryParse(entry.Substring(sep + 1), out int ci))
+                            choices.Add(new DialogueChoiceRecord
+                            {
+                                nodeId = entry.Substring(0, sep),
+                                choiceIndex = ci
+                            });
+                    }
+                }
+                dtr.RestoreFromSave(new DialogueTreeSaveData
+                {
+                    visitedNodeIds = visited,
+                    choiceRecords = choices
+                });
+            }
+
+            // Codex
+            var codex = UI.WorldMapUI.Instance;
+            if (codex != null && save.codex != null)
+            {
+                codex.LoadSaveData(new UI.CodexSaveData
+                {
+                    unlockedEntryIds = save.codex.unlockedEntryIds != null
+                        ? new System.Collections.Generic.List<string>(save.codex.unlockedEntryIds)
+                        : new System.Collections.Generic.List<string>()
+                });
+            }
+
+            // Zereth
+            var zereth = ZerethController.Instance;
+            if (zereth != null && save.zereth != null)
+            {
+                zereth.LoadSaveData(new ZerethSaveData
+                {
+                    presenceLevel = save.zereth.presenceLevel,
+                    phase = save.zereth.phase,
+                    prophecyStonesTriggered = save.zereth.prophecyStonesTriggered,
+                    voiceResponsesPlayed = save.zereth.voiceResponsesPlayed,
+                    korathRevelationHeard = save.zereth.korathRevelationHeard,
+                    triggerRoomDiscovered = save.zereth.triggerRoomDiscovered,
+                    physicallyManifested = save.zereth.physicallyManifested,
+                    finalConfrontationStarted = save.zereth.finalConfrontationStarted,
+                    redeemed = save.zereth.redeemed
                 });
             }
         }
