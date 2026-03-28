@@ -64,9 +64,11 @@ namespace Tartaria.Gameplay
         /// <summary>
         /// Get all nodes in a given tree.
         /// </summary>
+        static readonly List<SkillNode> EmptyNodes = new();
+
         public IReadOnlyList<SkillNode> GetTree(SkillTreeType tree)
         {
-            return _trees.TryGetValue(tree, out var t) ? t.nodes.AsReadOnly() : null;
+            return _trees.TryGetValue(tree, out var t) ? t.nodes.AsReadOnly() : EmptyNodes.AsReadOnly();
         }
 
         /// <summary>

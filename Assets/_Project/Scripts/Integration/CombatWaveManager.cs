@@ -304,7 +304,10 @@ namespace Tartaria.Integration
     {
         MudGolem = 0,
         FractalWraith = 1,
-        MirrorWraith = 2
+        MirrorWraith = 2,
+        RailWraith = 3,
+        DissonanceHarvester = 4,
+        DissonanceLeviathan = 5
     }
 
     [Serializable]

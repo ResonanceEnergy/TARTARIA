@@ -47,6 +47,7 @@ namespace Tartaria.Editor
                 so.ambientLow = z.ambientLow;
                 so.ambientHigh = z.ambientHigh;
                 so.loadingTip = z.loadingTip;
+                so.npcSpawnPoints = z.npcSpawns ?? System.Array.Empty<NPCSpawnPoint>();
 
                 AssetDatabase.CreateAsset(so, assetPath);
                 created++;
@@ -64,6 +65,7 @@ namespace Tartaria.Editor
             public int buildingCount;
             public Vector3 spawnPos;
             public Color fogLow, fogHigh, ambientLow, ambientHigh;
+            public NPCSpawnPoint[] npcSpawns;
         }
 
         static ZoneData[] GetZoneData()
@@ -85,7 +87,13 @@ namespace Tartaria.Editor
                     fogDensity = 0.035f,
                     ambientLow = new Color(0.15f, 0.12f, 0.1f),
                     ambientHigh = new Color(0.6f, 0.55f, 0.4f),
-                    loadingTip = "The stones remember their shape. You just need to remind them."
+                    loadingTip = "The stones remember their shape. You just need to remind them.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "milo", position = new Vector3(5, 1, 3), yRotation = 180f, requiresIntroduction = true },
+                        new NPCSpawnPoint { npcId = "lirael", position = new Vector3(-4, 1, 6), yRotation = 90f, requiresIntroduction = true },
+                        new NPCSpawnPoint { npcId = "thorne", position = new Vector3(12, 1, -2), yRotation = 270f, requiresIntroduction = true },
+                    }
                 },
                 // Moon 2
                 new ZoneData
@@ -102,7 +110,11 @@ namespace Tartaria.Editor
                     fogDensity = 0.02f,
                     ambientLow = new Color(0.1f, 0.12f, 0.18f),
                     ambientHigh = new Color(0.4f, 0.5f, 0.65f),
-                    loadingTip = "Crystals amplify Aether the way a bell amplifies silence."
+                    loadingTip = "Crystals amplify Aether the way a bell amplifies silence.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "cassian", position = new Vector3(8, 1, -5), yRotation = 0f, requiresIntroduction = true },
+                    }
                 },
                 // Moon 3
                 new ZoneData
@@ -187,7 +199,11 @@ namespace Tartaria.Editor
                     fogDensity = 0.018f,
                     ambientLow = new Color(0.15f, 0.13f, 0.11f),
                     ambientHigh = new Color(0.5f, 0.45f, 0.35f),
-                    loadingTip = "Synchronization was the Tartarian word for prayer."
+                    loadingTip = "Synchronization was the Tartarian word for prayer.",
+                    npcSpawns = new[]
+                    {
+                        new NPCSpawnPoint { npcId = "korath", position = new Vector3(-6, 1, 10), yRotation = 45f, requiresIntroduction = true },
+                    }
                 },
                 // Moon 8
                 new ZoneData

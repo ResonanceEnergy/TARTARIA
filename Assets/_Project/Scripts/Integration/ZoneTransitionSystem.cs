@@ -206,6 +206,9 @@ namespace Tartaria.Integration
         public int buildingCount = 3;
         public Vector3 playerSpawnPosition;
 
+        [Header("NPC Spawns")]
+        public NPCSpawnPoint[] npcSpawnPoints = System.Array.Empty<NPCSpawnPoint>();
+
         [Header("Atmosphere")]
         public Color fogColorLow = new(0.3f, 0.25f, 0.2f);
         public Color fogColorHigh = new(0.8f, 0.75f, 0.5f);
@@ -216,5 +219,14 @@ namespace Tartaria.Integration
         [Header("Loading Screen")]
         [TextArea(1, 2)]
         public string loadingTip;
+    }
+
+    [System.Serializable]
+    public class NPCSpawnPoint
+    {
+        public string npcId;
+        public Vector3 position;
+        public float yRotation;
+        public bool requiresIntroduction;
     }
 }
