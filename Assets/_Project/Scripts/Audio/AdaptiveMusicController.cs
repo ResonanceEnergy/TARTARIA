@@ -4,125 +4,307 @@ using Tartaria.Core;
 namespace Tartaria.Audio
 {
     /// <summary>
-    /// Adaptive Music Controller — 2-layer prototype:
+    /// Adaptive Music Controller — 4-layer RS-reactive music system.
     ///
-    /// Layer 1 (Bed): Always active, crossfades based on RS
-    ///   RS 0–50:  Minor key, sparse, melancholic (solo cello at 432 Hz)
-    ///   RS 50–100: Major key, lush, hopeful (full strings + crystalline synth)
+    /// Layer 0 (RS 0-25):   Ambient drone, desolate, sparse
+    /// Layer 1 (RS 15-50):  Melodic fragments emerge, hope
+    /// Layer 2 (RS 40-75):  Full orchestral, harmonic richness
+    /// Layer 3 (RS 65-100): Triumphant, golden cascade, choir
+    /// Combat overlay:      Percussive rhythm, low pulse
+    /// Boss overlay:        Dissonant tritone tension
     ///
-    /// Layer 2 (Reactive): Event-driven
-    ///   Discovery: ascending arpeggio (harp)
-    ///   Tuning:    real-time frequency matching
-    ///   Combat:    percussive rhythm, dissonant overtones
-    ///   Restoration: expanding harmonic series (brass + choir)
-    ///
-    /// All content tuned to A4 = 432 Hz.
+    /// All audio generated procedurally at runtime (prototype mode).
+    /// Zone-specific motifs via golden-ratio frequency stepping.
     /// Budget: 0.5ms per frame.
     /// </summary>
     public class AdaptiveMusicController : MonoBehaviour
     {
         public static AdaptiveMusicController Instance { get; private set; }
 
-        [Header("Bed Layers")]
-        [SerializeField] AudioClip bedLayerLow;      // RS 0–50: melancholic
-        [SerializeField] AudioClip bedLayerHigh;      // RS 50–100: hopeful
+        [Header("Volume Settings")]
+        [SerializeField] float masterVolume = 0.6f;
+        [SerializeField] float combatVolumeBoost = 1.2f;
+        [SerializeField] float crossfadeSpeed = 0.8f;
 
-        [Header("Reactive Stingers")]
-        [SerializeField] AudioClip discoveryStinger;
-        [SerializeField] AudioClip combatStinger;
-        [SerializeField] AudioClip restorationStinger;
-        [SerializeField] AudioClip zoneShiftStinger;
-
-        [Header("Config")]
-        [SerializeField] float crossfadeSpeed = 1.0f;
-        [SerializeField] float bedVolume = 0.5f;
-        [SerializeField] float stingerVolume = 0.7f;
-
-        AudioSource _bedSourceA;
-        AudioSource _bedSourceB;
+        // ─── Layers ───
+        AudioSource _layer0Ambient;
+        AudioSource _layer1Melodic;
+        AudioSource _layer2Orchestral;
+        AudioSource _layer3Triumphant;
+        AudioSource _combatOverlay;
+        AudioSource _bossOverlay;
         AudioSource _stingerSource;
+
+        // ─── State ───
+        float _targetRS;
         float _currentRS;
-        float _targetBlend;  // 0 = low layer, 1 = high layer
+        bool _combatActive;
+        bool _bossActive;
+        float _combatFade;
+        float _bossFade;
+
+        // ─── Zone Motif ───
+        int _currentZone = -1;
+        float _zoneBaseFreq = 432f;
 
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
-            DontDestroyOnLoad(gameObject);
-
-            SetupAudioSources();
-        }
-
-        void SetupAudioSources()
-        {
-            _bedSourceA = gameObject.AddComponent<AudioSource>();
-            _bedSourceA.loop = true;
-            _bedSourceA.clip = bedLayerLow;
-            _bedSourceA.volume = bedVolume;
-            _bedSourceA.playOnAwake = false;
-
-            _bedSourceB = gameObject.AddComponent<AudioSource>();
-            _bedSourceB.loop = true;
-            _bedSourceB.clip = bedLayerHigh;
-            _bedSourceB.volume = 0f;
-            _bedSourceB.playOnAwake = false;
-
-            _stingerSource = gameObject.AddComponent<AudioSource>();
-            _stingerSource.loop = false;
-            _stingerSource.playOnAwake = false;
+            CreateAudioLayers();
         }
 
         void Start()
         {
-            if (bedLayerLow != null) _bedSourceA.Play();
-            if (bedLayerHigh != null) _bedSourceB.Play();
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged += HandleStateChange;
+            StartAllLayers();
+        }
+
+        void OnDestroy()
+        {
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged -= HandleStateChange;
         }
 
         void Update()
         {
-            // Crossfade based on RS
-            _targetBlend = Mathf.Clamp01(_currentRS / 100f);
-
-            float blendA = (1f - _targetBlend) * bedVolume;
-            float blendB = _targetBlend * bedVolume;
-
-            _bedSourceA.volume = Mathf.Lerp(_bedSourceA.volume, blendA,
-                Time.deltaTime * crossfadeSpeed);
-            _bedSourceB.volume = Mathf.Lerp(_bedSourceB.volume, blendB,
-                Time.deltaTime * crossfadeSpeed);
+            _currentRS = Mathf.Lerp(_currentRS, _targetRS, crossfadeSpeed * Time.deltaTime);
+            UpdateLayerVolumes();
+            UpdateCombatOverlay();
+            UpdateBossOverlay();
         }
 
-        // ─── Public API ──────────────────────────────
+        // ─── Public API — RS ─────────────────────────
 
-        public void UpdateResonanceScore(float rs)
+        /// <summary>Update the RS value that drives layer blending.</summary>
+        public void SetResonanceScore(float rs) => _targetRS = Mathf.Clamp(rs, 0f, 100f);
+
+        /// <summary>Legacy API compat — routes to SetResonanceScore.</summary>
+        public void UpdateResonanceScore(float rs) => SetResonanceScore(rs);
+
+        // ─── Public API — Combat ─────────────────────
+
+        public void EnterCombat() { _combatActive = true; }
+        public void ExitCombat() { _combatActive = false; }
+
+        /// <summary>Legacy stinger aliases.</summary>
+        public void PlayCombatStart() => EnterCombat();
+        public void PlayRestoration() => PlayStinger(StingerType.Discovery);
+        public void PlayZoneShift() => PlayStinger(StingerType.ZoneComplete);
+        public void PlayDiscovery() => PlayStinger(StingerType.Discovery);
+
+        // ─── Public API — Boss ───────────────────────
+
+        public void EnterBossEncounter() { _bossActive = true; _combatActive = false; }
+        public void ExitBossEncounter() { _bossActive = false; }
+
+        // ─── Public API — Zone ───────────────────────
+
+        public void SetZone(int zoneIndex)
         {
-            _currentRS = rs;
+            if (_currentZone == zoneIndex) return;
+            _currentZone = zoneIndex;
+            _zoneBaseFreq = 432f * Mathf.Pow(GoldenRatioValidator.PHI, zoneIndex * 0.05f);
+            RegenerateProceduralAudio();
         }
 
-        public void PlayDiscovery()
+        // ─── Public API — Stingers ──────────────────
+
+        public void PlayStinger(StingerType type)
         {
-            PlayStinger(discoveryStinger);
+            float freq, duration;
+            switch (type)
+            {
+                case StingerType.Discovery:      freq = 528f;   duration = 0.8f; break;
+                case StingerType.QuestComplete:   freq = 432f * GoldenRatioValidator.PHI; duration = 1.2f; break;
+                case StingerType.TuningSuccess:   freq = 432f;   duration = 0.6f; break;
+                case StingerType.TuningFail:      freq = 200f;   duration = 0.5f; break;
+                case StingerType.BossPhase:       freq = 180f;   duration = 1.5f; break;
+                case StingerType.BossDefeat:      freq = 1296f;  duration = 2f;   break;
+                case StingerType.ZoneComplete:    freq = 528f * GoldenRatioValidator.PHI; duration = 2f; break;
+                case StingerType.LevelUp:         freq = 864f;   duration = 1f;   break;
+                default:                          freq = 432f;   duration = 0.5f; break;
+            }
+            AudioManager.Instance?.PlayTone(freq, duration);
         }
 
-        public void PlayCombatStart()
+        // ─── State Change Handler ────────────────────
+
+        void HandleStateChange(GameState prev, GameState current)
         {
-            PlayStinger(combatStinger);
+            if (current == GameState.Combat && !_bossActive)
+                EnterCombat();
+            else if (current == GameState.Exploration)
+                ExitCombat();
         }
 
-        public void PlayRestoration()
+        // ─── Layer Volume Control ────────────────────
+
+        void UpdateLayerVolumes()
         {
-            PlayStinger(restorationStinger);
+            float l0 = RS2Volume(0f, 25f, inverse: true);
+            float l1 = RS2Volume(15f, 50f);
+            float l2 = RS2Volume(40f, 75f);
+            float l3 = RS2Volume(65f, 100f);
+
+            SmoothVolume(_layer0Ambient,    l0 * masterVolume);
+            SmoothVolume(_layer1Melodic,    l1 * masterVolume);
+            SmoothVolume(_layer2Orchestral, l2 * masterVolume);
+            SmoothVolume(_layer3Triumphant, l3 * masterVolume);
         }
 
-        public void PlayZoneShift()
+        float RS2Volume(float start, float end, bool inverse = false)
         {
-            PlayStinger(zoneShiftStinger);
+            float t = Mathf.InverseLerp(start, end, _currentRS);
+            return inverse ? (1f - t) : t;
         }
 
-        void PlayStinger(AudioClip clip)
+        void SmoothVolume(AudioSource src, float target)
         {
-            if (clip == null || _stingerSource == null) return;
-            _stingerSource.PlayOneShot(clip, stingerVolume);
+            if (src == null) return;
+            src.volume = Mathf.Lerp(src.volume, target, crossfadeSpeed * Time.deltaTime);
         }
+
+        void UpdateCombatOverlay()
+        {
+            float target = _combatActive ? masterVolume * combatVolumeBoost : 0f;
+            _combatFade = Mathf.Lerp(_combatFade, target, crossfadeSpeed * 2f * Time.deltaTime);
+            if (_combatOverlay != null) _combatOverlay.volume = _combatFade;
+        }
+
+        void UpdateBossOverlay()
+        {
+            float target = _bossActive ? masterVolume * combatVolumeBoost * 1.3f : 0f;
+            _bossFade = Mathf.Lerp(_bossFade, target, crossfadeSpeed * Time.deltaTime);
+            if (_bossOverlay != null) _bossOverlay.volume = _bossFade;
+        }
+
+        // ─── Audio Layer Creation ────────────────────
+
+        void CreateAudioLayers()
+        {
+            _layer0Ambient    = CreateLayer("Music_L0_Ambient");
+            _layer1Melodic    = CreateLayer("Music_L1_Melodic");
+            _layer2Orchestral = CreateLayer("Music_L2_Orchestral");
+            _layer3Triumphant = CreateLayer("Music_L3_Triumphant");
+            _combatOverlay    = CreateLayer("Music_CombatOverlay");
+            _bossOverlay      = CreateLayer("Music_BossOverlay");
+
+            _stingerSource = gameObject.AddComponent<AudioSource>();
+            _stingerSource.loop = false;
+            _stingerSource.playOnAwake = false;
+            _stingerSource.spatialBlend = 0f;
+
+            RegenerateProceduralAudio();
+        }
+
+        AudioSource CreateLayer(string name)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(transform);
+            var src = go.AddComponent<AudioSource>();
+            src.loop = true;
+            src.playOnAwake = false;
+            src.volume = 0f;
+            src.spatialBlend = 0f;
+            return src;
+        }
+
+        void StartAllLayers()
+        {
+            _layer0Ambient?.Play();
+            _layer1Melodic?.Play();
+            _layer2Orchestral?.Play();
+            _layer3Triumphant?.Play();
+            _combatOverlay?.Play();
+            _bossOverlay?.Play();
+        }
+
+        // ─── Procedural Audio Generation ─────────────
+
+        void RegenerateProceduralAudio()
+        {
+            int sr = 44100;
+            int samples = sr * 8; // 8-second loops
+
+            _layer0Ambient.clip = GenTone(samples, sr, _zoneBaseFreq * 0.25f, 0.15f, WaveShape.Sine);
+
+            _layer1Melodic.clip = GenChord(samples, sr,
+                new[] { _zoneBaseFreq, _zoneBaseFreq * 5f / 4f }, 0.1f);
+
+            _layer2Orchestral.clip = GenChord(samples, sr,
+                new[] { _zoneBaseFreq, _zoneBaseFreq * 5f / 4f,
+                        _zoneBaseFreq * 3f / 2f, _zoneBaseFreq * 2f }, 0.08f);
+
+            _layer3Triumphant.clip = GenChord(samples, sr,
+                new[] { _zoneBaseFreq, _zoneBaseFreq * GoldenRatioValidator.PHI,
+                        _zoneBaseFreq * 2f, _zoneBaseFreq * GoldenRatioValidator.PHI * 2f }, 0.06f);
+
+            _combatOverlay.clip = GenTone(samples, sr, 80f, 0.2f, WaveShape.Square);
+
+            _bossOverlay.clip = GenChord(samples, sr,
+                new[] { 180f, 180f * Mathf.Sqrt(2f) }, 0.12f);
+        }
+
+        AudioClip GenTone(int samples, int sr, float freq, float amp, WaveShape shape)
+        {
+            var data = new float[samples];
+            for (int i = 0; i < samples; i++)
+            {
+                float t = (float)i / sr;
+                float v = shape switch
+                {
+                    WaveShape.Sine     => Mathf.Sin(2f * Mathf.PI * freq * t),
+                    WaveShape.Triangle => Mathf.PingPong(t * freq * 2f, 1f) * 2f - 1f,
+                    WaveShape.Square   => Mathf.Sin(2f * Mathf.PI * freq * t) >= 0 ? 1f : -1f,
+                    _ => Mathf.Sin(2f * Mathf.PI * freq * t)
+                };
+                float env = Envelope(i, samples, sr);
+                data[i] = v * amp * env;
+            }
+            var clip = AudioClip.Create($"Proc_{freq:F0}Hz", samples, 1, sr, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
+
+        AudioClip GenChord(int samples, int sr, float[] freqs, float amp)
+        {
+            var data = new float[samples];
+            float per = amp / freqs.Length;
+            for (int i = 0; i < samples; i++)
+            {
+                float t = (float)i / sr;
+                float v = 0f;
+                for (int f = 0; f < freqs.Length; f++)
+                    v += Mathf.Sin(2f * Mathf.PI * freqs[f] * t) * per;
+                data[i] = v * Envelope(i, samples, sr);
+            }
+            var clip = AudioClip.Create($"Chord_{freqs.Length}v", samples, 1, sr, false);
+            clip.SetData(data, 0);
+            return clip;
+        }
+
+        float Envelope(int i, int total, int sr)
+        {
+            int fade = sr / 4;
+            if (i < fade) return (float)i / fade;
+            if (i > total - fade) return (float)(total - i) / fade;
+            return 1f;
+        }
+
+        enum WaveShape { Sine, Triangle, Square }
+    }
+
+    public enum StingerType : byte
+    {
+        Discovery = 0,
+        QuestComplete = 1,
+        TuningSuccess = 2,
+        TuningFail = 3,
+        BossPhase = 4,
+        BossDefeat = 5,
+        ZoneComplete = 6,
+        LevelUp = 7
     }
 }

@@ -148,6 +148,28 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
+        /// Get all completed quest IDs.
+        /// </summary>
+        public List<string> GetCompletedQuestIds()
+        {
+            var result = new List<string>();
+            foreach (var kvp in _questStates)
+            {
+                if (kvp.Value.status == QuestStatus.Completed)
+                    result.Add(kvp.Key);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Get quest definition by ID (for UI display).
+        /// </summary>
+        public QuestDefinition GetQuestDefinition(string questId)
+        {
+            return _questLookup.TryGetValue(questId, out var def) ? def : null;
+        }
+
+        /// <summary>
         /// Check if a quest has been completed.
         /// </summary>
         public bool IsQuestComplete(string questId)

@@ -265,6 +265,112 @@ namespace Tartaria.Integration
                 "Interesting. The corruption density has shifted since yesterday. Something is accelerating the decay.");
             AddLine("cassian_idle", "cassian_idle_03", "Cassian",
                 "Don't mind me. Just... taking measurements. For my own records.");
+
+            // ══════════════ THORNE DIALOGUE ══════════════
+            // Commander Thorne — grizzled veteran of the Resonance Wars, now leads
+            // the Restoration militia. Pragmatic, protective, scarred by betrayal.
+
+            // ── Thorne: Introduction (Moon 3+) ──
+            AddLine("thorne_intro", "thorne_intro_01", "Thorne",
+                "Stand down. Identify yourself. ...A restorer? Haven't seen one of you in decades. I'm Commander Thorne. I kept the militia alive after the Fall.", true);
+            AddLine("thorne_intro", "thorne_intro_02", "Thorne",
+                "You've reawakened the Echohaven bell tower. That signal carried farther than you realize. Both hope and danger follow.");
+
+            // ── Thorne: Combat briefing ──
+            AddLine("thorne_combat_briefing", "thorne_brief_01", "Thorne",
+                "Intel says the corruption is concentrating. Wraith nests, three klicks northeast. We hit them before they harden.");
+            AddLine("thorne_combat_briefing", "thorne_brief_02", "Thorne",
+                "Rule one: never engage a golem pack without shielding. Rule two: the wraiths phase — wait for the solidify window.");
+            AddLine("thorne_combat_briefing", "thorne_brief_03", "Thorne",
+                "Your pulse technique is sloppy. You're leaking Aether with every swing. But you've got heart. We can work with that.");
+
+            // ── Thorne: Combat reactions ──
+            AddLine("combat_start", "thorne_cbt_01", "Thorne",
+                "Contact! Weapons hot. Restorer, pulse formation — I'll draw their fire!");
+            AddLine("combat_victory", "thorne_cbtvic_01", "Thorne",
+                "Sector clear. Good work. The corruption recedes when you purify at the source.");
+            AddLine("combat_victory", "thorne_cbtvic_02", "Thorne",
+                "That's how we did it in the old campaigns. Clean, precise, harmonized. You're learning.");
+
+            // ── Thorne: Trust arc ──
+            AddLine("thorne_guarded", "thorne_guard_01", "Thorne",
+                "I've seen restorers come and go. Most break when they learn how deep the burial goes. Let's see if you're different.");
+            AddLine("thorne_guarded", "thorne_guard_02", "Thorne",
+                "Trust is earned, not given. Especially after what happened at Chronopolis.");
+            AddLine("thorne_trusted", "thorne_trust_01", "Thorne",
+                "I lost my entire platoon defending the Celestial Spire. Only building that survived... until they dynamited it in 1904.", true);
+            AddLine("thorne_trusted", "thorne_trust_02", "Thorne",
+                "You've proven yourself. The militia stands with you. Whatever comes next — the order, the corruption, the truth — we face it together.");
+
+            // ── Thorne: Strategy / exploration ──
+            AddLine("exploration_idle", "thorne_idle_01", "Thorne",
+                "These fortifications aren't medieval — the angle of deflection is too precise. Somebody understood electromagnetic shielding.");
+            AddLine("exploration_idle", "thorne_idle_02", "Thorne",
+                "Every zone has a keystone building. Restore it first and the rest fall into alignment. Military doctrine.");
+            AddLine("thorne_strategy", "thorne_strat_01", "Thorne",
+                "The corruption moves in three patterns: creep, surge, and cascade. Learn to read the field and you'll never be flanked.");
+
+            // ── Thorne: Zone events ──
+            AddLine("zone_complete", "thorne_zc_01", "Thorne",
+                "Zone secured. The ley lines are humming again. Establish a picket line — the corruption will push back.");
+            AddLine("corruption_detected", "thorne_corr_01", "Thorne",
+                "Corruption signature detected. Heavy concentration. This isn't natural decay — someone is feeding it.");
+
+            // ══════════════ KORATH DIALOGUE ══════════════
+            // Korath — mysterious figure connected to the original Tartarian builders.
+            // Speaks in riddles and frequencies. Guardian of the Day Out of Time.
+
+            // ── Korath: Introduction (Moon 5+) ──
+            AddLine("korath_intro", "korath_intro_01", "Korath",
+                "You hear me because you have reached 528. The frequency of transformation. I have waited 1,296 years for this resonance.", true);
+            AddLine("korath_intro", "korath_intro_02", "Korath",
+                "I am Korath, keeper of the Harmonic Archives. What you call 'ruins' — I call sleeping instruments. You are learning to play them.");
+
+            // ── Korath: Mystical guidance ──
+            AddLine("korath_teaching", "korath_teach_01", "Korath",
+                "Three-six-nine. The universe speaks in this pattern. Tesla heard it. The builders encoded it. Now you must feel it.");
+            AddLine("korath_teaching", "korath_teach_02", "Korath",
+                "The golden ratio is not mathematics — it is the shape of consciousness. When you tune to phi, reality bends toward harmony.");
+            AddLine("korath_teaching", "korath_teach_03", "Korath",
+                "Every building you restore adds a voice to the great chorus. When all thirteen zones sing together... the veil lifts.");
+            AddLine("korath_teaching", "korath_teach_04", "Korath",
+                "Aether is not 'energy.' Aether is the medium. Like water carries waves, Aether carries intention.");
+
+            // ── Korath: Frequency revelations ──
+            AddLine("korath_revelation", "korath_rev_01", "Korath",
+                "7.83 Hz — the Earth's heartbeat. 432 Hz — the universe's key signature. 528 Hz — the frequency of miracles. You carry all three now.", true);
+            AddLine("korath_revelation", "korath_rev_02", "Korath",
+                "The star maps in the Grand Dome are not decorative. They are navigation charts. The builders came from... elsewhere.");
+            AddLine("korath_revelation", "korath_rev_03", "Korath",
+                "What was buried was not a civilization. It was a technology. A technology of consciousness itself.");
+
+            // ── Korath: Day Out of Time ──
+            AddLine("day_out_of_time", "korath_dot_01", "Korath",
+                "The Day Out of Time approaches. When all frequencies align. The thirteenth Moon of the galactic calendar... the day between years.", true);
+            AddLine("day_out_of_time", "korath_dot_02", "Korath",
+                "On that day, the veil between buried and revealed becomes... thin. What was hidden for centuries can be seen with eyes unclouded.");
+            AddLine("day_out_of_time", "korath_dot_03", "Korath",
+                "Prepare yourself. The Day Out of Time is both gift and trial. Those who resonate at 1,296 Hz will witness the true history.");
+
+            // ── Korath: Combat (reluctant) ──
+            AddLine("combat_start", "korath_cbt_01", "Korath",
+                "These creatures are pain made manifest. Do not hate them — retune them. They were harmony once.");
+            AddLine("combat_victory", "korath_cbtvic_01", "Korath",
+                "Every purification heals a fracture in the great pattern. You are mending what should never have been broken.");
+
+            // ── Korath: Idle / exploration ──
+            AddLine("exploration_idle", "korath_idle_01", "Korath",
+                "Listen... *eyes close* ...the subsonic hum of this zone is shifting. The buildings are waking faster than I expected.");
+            AddLine("exploration_idle", "korath_idle_02", "Korath",
+                "In the old language, 'Tartaria' means 'the resonant land.' Not a people. Not a place. A state of being.");
+            AddLine("exploration_idle", "korath_idle_03", "Korath",
+                "The rose windows were not for light. They were frequency lenses. Each petal tuned to a different harmonic.");
+
+            // ── Korath: Zone/threshold events ──
+            AddLine("aether_wake", "korath_aw_01", "Korath",
+                "The Aether quickens! The old conduits remember their purpose. Soon the entire network will light.");
+            AddLine("zone_complete", "korath_zc_01", "Korath",
+                "Another voice joins the chorus. *deep breath* Can you hear it? The harmony of the spheres grows louder.");
         }
 
         void AddLine(string context, string id, string speaker, string text, bool oneShot = false)
