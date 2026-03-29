@@ -84,6 +84,139 @@ namespace Tartaria.Integration
             var ana = AnastasiaController.Instance;
             if (ana != null)
                 ana.OnMoteCollected += _ => CheckMoteAchievements();
+
+            // Boss defeated → combat achievements
+            var boss = BossEncounterSystem.Instance;
+            if (boss != null)
+                boss.OnBossDefeated += HandleBossDefeated;
+
+            // Rail network complete → exploration achievement E06
+            var rail = ContinentalRailSystem.Instance;
+            if (rail != null)
+                rail.OnNetworkComplete += HandleNetworkComplete;
+
+            // Companion trust changes → social achievements
+            var comp = CompanionManager.Instance;
+            if (comp != null)
+                comp.OnTrustChanged += HandleTrustChanged;
+
+            // Aquifer purge complete → M05
+            var aquifer = AquiferPurgeMiniGame.Instance;
+            if (aquifer != null)
+                aquifer.OnAllLayersPurged += HandleAquiferPurged;
+
+            // Cosmic convergence complete → M06
+            var cosmic = CosmicConvergenceMiniGame.Instance;
+            if (cosmic != null)
+                cosmic.OnConvergenceComplete += HandleConvergenceComplete;
+
+            // World choice → hidden achievements
+            var wcTracker = WorldChoiceTracker.Instance;
+            if (wcTracker != null)
+                wcTracker.OnChoiceMade += HandleWorldChoice;
+
+            // Giant mode ability usage → H08
+            var giant = GiantModeController.Instance;
+            if (giant != null)
+                giant.OnAbilityUsed += HandleGiantAbility;
+
+            // Campaign moon completion → K01-K13
+            var campaign = CampaignFlowController.Instance;
+            if (campaign != null)
+                campaign.OnMoonCompleted += HandleMoonComplete;
+
+            // Day out of time → H01
+            var dott = DayOutOfTimeController.Instance;
+            if (dott != null)
+                dott.OnEventCompleted += HandleDayOutOfTime;
+        }
+
+        void OnDestroy()
+        {
+            var boss = BossEncounterSystem.Instance;
+            if (boss != null) boss.OnBossDefeated -= HandleBossDefeated;
+
+            var rail = ContinentalRailSystem.Instance;
+            if (rail != null) rail.OnNetworkComplete -= HandleNetworkComplete;
+
+            var comp = CompanionManager.Instance;
+            if (comp != null) comp.OnTrustChanged -= HandleTrustChanged;
+
+            var aquifer = AquiferPurgeMiniGame.Instance;
+            if (aquifer != null) aquifer.OnAllLayersPurged -= HandleAquiferPurged;
+
+            var cosmic = CosmicConvergenceMiniGame.Instance;
+            if (cosmic != null) cosmic.OnConvergenceComplete -= HandleConvergenceComplete;
+
+            var wcTracker = WorldChoiceTracker.Instance;
+            if (wcTracker != null) wcTracker.OnChoiceMade -= HandleWorldChoice;
+
+            var giant = GiantModeController.Instance;
+            if (giant != null) giant.OnAbilityUsed -= HandleGiantAbility;
+
+            var campaign = CampaignFlowController.Instance;
+            if (campaign != null) campaign.OnMoonCompleted -= HandleMoonComplete;
+
+            var dott = DayOutOfTimeController.Instance;
+            if (dott != null) dott.OnEventCompleted -= HandleDayOutOfTime;
+        }
+
+        // ─── Event Handlers (Achievement) ────────────
+
+        void HandleBossDefeated(string bossId)
+        {
+            CheckBossDefeated(bossId);
+        }
+
+        void HandleNetworkComplete()
+        {
+            Unlock("E06");
+        }
+
+        void HandleTrustChanged(string companionId, float newTrust)
+        {
+            CheckCompanionTrust(companionId, newTrust);
+        }
+
+        void HandleAquiferPurged()
+        {
+            Unlock("M05");
+        }
+
+        void HandleConvergenceComplete()
+        {
+            Unlock("M06");
+        }
+
+        void HandleWorldChoice(WorldChoiceTracker.WorldChoiceId choiceId, WorldChoiceTracker.ChoiceOption option)
+        {
+            if (choiceId == WorldChoiceTracker.WorldChoiceId.W5_ZerethPlea
+                && option == WorldChoiceTracker.ChoiceOption.OptionA)
+                CheckZerethRedeemed();
+        }
+
+        void HandleGiantAbility(GiantAbility ability)
+        {
+            if (ability == GiantAbility.BuildingLift)
+            {
+                // Progress toward H08 -- track building lifts toward all zone landmarks
+                string progressKey = "H08";
+                float current = GetProgress(progressKey);
+                float increment = 1f / 13f; // 13 zone landmarks
+                SetProgress(progressKey, Mathf.Min(current + increment, 1f));
+                if (GetProgress(progressKey) >= 1f)
+                    Unlock("H08");
+            }
+        }
+
+        void HandleMoonComplete(int moonNumber)
+        {
+            CheckMoonCompleted(moonNumber);
+        }
+
+        void HandleDayOutOfTime()
+        {
+            CheckDayOutOfTime();
         }
 
         // ─── Registration ────────────────────────────

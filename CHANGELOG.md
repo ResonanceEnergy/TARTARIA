@@ -4,6 +4,46 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [1.8.0] — 2025-07-28
+
+**Roadmap v10 — Save Schema v7, SkillTree Wiring, RS Pipeline & System Integration**  
+*2 new files, 20 modified — all skill modifiers consumed, mini-game rewards centralised, 35 save blocks*
+
+### Added
+- **ColorblindRendererFeature.cs** (UI) — URP ScriptableRendererFeature + ScriptableRenderPass for Protanopia/Deuteranopia/Tritanopia color correction via 3×3 matrix transform, driven by AccessibilityManager
+- **ColorblindCorrection.shader** (Shaders) — Hidden/Tartaria/ColorblindCorrection URP Blit shader applying _ColorMatrix to screen buffer
+
+### Changed
+- **SaveData.cs** (Save) — Schema v6→v7 (35 save blocks): added ContinentalRailSaveBlock, AquiferPurgeSaveBlock, CosmicConvergenceSaveBlock, DotTSaveBlock, CompanionManagerSaveBlock, EconomySaveBlock expanded to 7 currencies with multipliers
+- **SaveManager.cs** (Save) — v6→v7 migration step; CreateNewSave() sets schemaVersion=7, gameVersion="0.7.0"
+- **GameLoopController.cs** (Integration) — OnBeforeSave/OnAfterLoad wired for 8 new v7 save blocks (35 total); economy copy includes all 7 currencies
+- **ContinentalRailSystem.cs** (Integration) — Fixed TrySpend compile error (GetCurrency+SpendCurrency); added full GetSaveData/LoadSaveData + RailSavePayload
+- **AquiferPurgeMiniGame.cs** (Integration) — GetSaveData/LoadSaveData + AquiferSavePayload; wired into GameLoopController.OnMiniGameCompleted
+- **CosmicConvergenceMiniGame.cs** (Integration) — GetSaveData/LoadSaveData + CosmicSavePayload; Phase 6 FinalTuning implemented (ContributeFinalTuning API, accumulator, HUD prompt)
+- **DayOutOfTimeController.cs** (Integration) — GetSaveData/LoadSaveData + DotTSavePayload; OnEventCompleted/OnMemoryZoneChanged events; companion trust grants after all 6 performances
+- **CompanionManager.cs** (Integration) — GetSaveData/LoadSaveData + CompanionManagerSavePayload
+- **AchievementSystem.cs** (Integration) — Start() subscribes to 10 system events (boss/rail/companion/aquifer/cosmic/choice/giant/moon/DotT); 9 handler methods; proper OnDestroy unsubscription
+- **ConsequenceVisuals.cs** (Integration) — W1_CassiansOffer (alliance/independence zone palette) and W3_KorathSacrifice (sacrifice/mercy ambient glow) switch cases implemented
+- **InteractableBuilding.cs** (Integration) — Active-state Interact checks MicroGiantController for micro-mode entry; CompleteRestoration calls EconomySystem.RegisterBuilding; EmergenceSequence duration scaled by SkillTree RepairSpeed modifier
+- **WorldChoiceTracker.cs** (Integration) — All 6 W1-W6 consequence branches filled: W1B RS multiplier, W2B Lirael trust, W4A/B RS+corruption, W5B Zereth imprisonment, W6A/B ending paths
+- **EconomySystem.cs** (Core) — Added _multipliers dictionary, ApplyMultiplier(CurrencyType, float), GetMultiplier(CurrencyType) for skill-driven economy bonuses
+- **CombatBridge.cs** (Integration) — SkillTree modifiers applied: PulseDamage→FireResonancePulse, StrikeRange→FireHarmonicStrike, ShieldDuration→ActivateFrequencyShield, AetherCapacity→MaxAetherCharge; added ApplyCorruptionResistance API
+- **ZerethController.cs** (Integration) — BeginRedemptionArc() (Confrontation phase transition) and Imprison() (Redeemed phase, zero dissonance/presence)
+- **CampaignFlowController.cs** (Integration) — EndingPath enum (None/Restoration/Transcendence), SetEnding() method, OnEndingChosen event
+- **TuningMiniGame.cs** (Gameplay) — TuningSpeed modifier extends time limit; TuningPrecision modifier adds accuracy bonus on completion
+- **AccessibilityManager.cs** (UI) — ApplyColorblindShader now finds ColorblindRendererFeature on active URP renderer and toggles via SetActive
+- **Tartaria.UI.asmdef** — Added Unity.RenderPipelines.Universal.Runtime and Unity.RenderPipelines.Core.Runtime references
+- **AdaptiveMusicController.cs** (Audio) — Schumann layer (8th source): 7.83 Hz AM modulation on 313.2 Hz carrier with 2nd/3rd harmonics; Triumphant chord expanded to 6 frequencies (+528f, +1296f)
+- **ZoneController.cs** (Integration) — FindAnyObjectByType→FindFirstObjectByType (deprecated API fix)
+- **ClimaxSequenceSystem.cs** (Integration) — FindAnyObjectByType→FindFirstObjectByType (deprecated API fix)
+
+### Mini-Game RS Pipeline
+- All 6 mini-games now feed into `GameLoopController.OnMiniGameCompleted(rsReward, type)`:
+  - AetherConduitMiniGame, ChoirHarmonicsMiniGame, OrphanTrainPuzzle (event+centralised)
+  - PipeOrganMiniGame, RailAlignmentMiniGame, HarmonicRockCutting (already had AetherFieldManager, now also centralised)
+
+---
+
 ## [1.7.0] — 2025-07-27
 
 **Roadmap v9 — Core Gameplay Loop, Crafting, Accessibility & Scanner Systems**  

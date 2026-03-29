@@ -43,6 +43,10 @@ namespace Tartaria.Integration
         public bool IsEventCompleted => _eventCompleted;
         public float EventProgress => _eventActive ? Mathf.Clamp01(_eventTimer / eventDurationSeconds) : 0f;
 
+        // ─── Events ─────────────────────────────────
+        public event Action OnEventCompleted;
+        public event Action<int> OnMemoryZoneChanged;
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -124,6 +128,7 @@ namespace Tartaria.Integration
             // Phase 6: True Ending
             _eventActive = false;
             _eventCompleted = true;
+            OnEventCompleted?.Invoke();
 
             HUDController.Instance?.ShowInteractionPrompt(
                 "THE DAY OUT OF TIME\nResonance Restored. The world remembers.");
@@ -220,6 +225,7 @@ namespace Tartaria.Integration
 
             Tartaria.Audio.AdaptiveMusicController.Instance?.PlayRestoration();
             yield return new WaitForSeconds(12f);
+            CompanionManager.Instance?.AddTrust("lirael", 25);
             HUDController.Instance?.HideInteractionPrompt();
         }
 
@@ -234,6 +240,7 @@ namespace Tartaria.Integration
                 fleet.SetFormation(AirshipFleetManager.FleetFormation.Vanguard);
 
             yield return new WaitForSeconds(10f);
+            CompanionManager.Instance?.AddTrust("thorne", 25);
             HUDController.Instance?.HideInteractionPrompt();
         }
 
@@ -244,6 +251,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("dott_korath_symphony");
 
             yield return new WaitForSeconds(10f);
+            CompanionManager.Instance?.AddTrust("korath", 25);
             HUDController.Instance?.HideInteractionPrompt();
         }
 
@@ -255,6 +263,7 @@ namespace Tartaria.Integration
 
             VFXController.Instance?.SpawnPlanetaryBellRing(Vector3.zero);
             yield return new WaitForSeconds(12f);
+            CompanionManager.Instance?.AddTrust("veritas", 25);
             HUDController.Instance?.HideInteractionPrompt();
         }
 
@@ -265,6 +274,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("dott_milo_festival");
 
             yield return new WaitForSeconds(8f);
+            CompanionManager.Instance?.AddTrust("milo", 25);
             HUDController.Instance?.HideInteractionPrompt();
         }
 
@@ -276,6 +286,7 @@ namespace Tartaria.Integration
 
             VFXController.Instance?.SpawnAnastasiaSolidificationEffect(Vector3.zero);
             yield return new WaitForSeconds(15f);
+            CompanionManager.Instance?.AddTrust("anastasia", 50);
             HUDController.Instance?.HideInteractionPrompt();
 
             AchievementSystem.Instance?.CheckSolidification();
@@ -463,6 +474,36 @@ namespace Tartaria.Integration
                 "memory_crystal" => 75,
                 _ => 0
             };
+        }
+
+        // ─── Save / Load ─────────────────────────────
+
+        public DotTSavePayload GetSaveData()
+        {
+            return new DotTSavePayload
+            {
+                eventCompleted = _eventCompleted,
+                festivalCurrency = _festivalCurrency,
+                currentMemoryZone = _currentMemoryZone,
+                bestChallengeScore = _challengeScore
+            };
+        }
+
+        public void LoadSaveData(DotTSavePayload data)
+        {
+            if (data == null) return;
+            _eventCompleted = data.eventCompleted;
+            _festivalCurrency = data.festivalCurrency;
+            _currentMemoryZone = data.currentMemoryZone;
+            _challengeScore = data.bestChallengeScore;
+        }
+
+        public class DotTSavePayload
+        {
+            public bool eventCompleted;
+            public int festivalCurrency;
+            public int currentMemoryZone;
+            public float bestChallengeScore;
         }
     }
 

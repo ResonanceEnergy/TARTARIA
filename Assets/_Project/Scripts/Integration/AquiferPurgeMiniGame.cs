@@ -279,5 +279,39 @@ namespace Tartaria.Integration
         public float GetLayerAccuracy(int layer) =>
             layer >= 0 && layer < TotalCorruptionLayers ? _layerAccuracy[layer] : 0f;
         public bool AllLayersPurged => _currentLayer >= TotalCorruptionLayers;
+
+        // ─── Save / Load ─────────────────────────────
+
+        public AquiferSavePayload GetSaveData()
+        {
+            return new AquiferSavePayload
+            {
+                layerStates = (int[])_layerStates.Clone(),
+                layerPurity = (float[])_layerPurity.Clone(),
+                layerAccuracy = (float[])_layerAccuracy.Clone(),
+                currentLayer = _currentLayer
+            };
+        }
+
+        public void LoadSaveData(AquiferSavePayload data)
+        {
+            if (data == null) return;
+            int count = Mathf.Min(TotalCorruptionLayers, data.layerStates?.Length ?? 0);
+            for (int i = 0; i < count; i++)
+            {
+                _layerStates[i] = data.layerStates[i];
+                _layerPurity[i] = data.layerPurity != null && i < data.layerPurity.Length ? data.layerPurity[i] : 0f;
+                _layerAccuracy[i] = data.layerAccuracy != null && i < data.layerAccuracy.Length ? data.layerAccuracy[i] : 0f;
+            }
+            _currentLayer = data.currentLayer;
+        }
+
+        public class AquiferSavePayload
+        {
+            public int[] layerStates;
+            public float[] layerPurity;
+            public float[] layerAccuracy;
+            public int currentLayer;
+        }
     }
 }

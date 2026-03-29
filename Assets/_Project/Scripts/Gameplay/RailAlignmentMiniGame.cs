@@ -252,6 +252,7 @@ namespace Tartaria.Gameplay
                 float rsReward = baseRSReward * accuracy * multiplier;
                 AetherFieldManager.Instance?.AddResonanceScore(rsReward);
                 OnAlignmentComplete?.Invoke(accuracy);
+                Integration.GameLoopController.Instance?.OnMiniGameCompleted(rsReward, "RailAlignment");
             }
 
             GameStateManager.Instance?.ReturnToPrevious();

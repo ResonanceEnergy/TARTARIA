@@ -315,6 +315,21 @@ namespace Tartaria.Integration
                 }
             };
         }
+
+        // ─── Ending Path ─────────────────────────────
+
+        public enum EndingPath : byte { None = 0, Restoration = 1, Transcendence = 2 }
+
+        EndingPath _ending = EndingPath.None;
+        public EndingPath CurrentEnding => _ending;
+        public event Action<EndingPath> OnEndingChosen;
+
+        public void SetEnding(EndingPath path)
+        {
+            _ending = path;
+            OnEndingChosen?.Invoke(path);
+            Debug.Log($"[Campaign] Ending path set: {path}");
+        }
     }
 
     // ─── Campaign Data Types ─────────────────────

@@ -292,6 +292,7 @@ namespace Tartaria.Gameplay
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             OnPerformanceCompleted?.Invoke(totalRS, tier);
+            Integration.GameLoopController.Instance?.OnMiniGameCompleted(totalRS, "ChoirHarmonics");
         }
     }
 

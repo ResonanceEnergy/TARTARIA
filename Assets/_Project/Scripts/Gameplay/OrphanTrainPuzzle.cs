@@ -237,6 +237,7 @@ namespace Tartaria.Gameplay
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             OnPuzzleCompleted?.Invoke(totalRS);
+            Integration.GameLoopController.Instance?.OnMiniGameCompleted(totalRS, "OrphanTrain");
         }
 
         void FailPuzzle()

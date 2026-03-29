@@ -202,8 +202,8 @@ namespace Tartaria.Save
             {
                 header = new SaveHeader
                 {
-                    schemaVersion = 6,
-                    gameVersion = "0.6.0",
+                    schemaVersion = 7,
+                    gameVersion = "0.7.0",
                     platform = "windows",
                     saveSlot = 0,
                     createdUtc = DateTime.UtcNow.ToString("o"),
@@ -303,6 +303,22 @@ namespace Tartaria.Save
                 if (data.dialogueArcs == null) data.dialogueArcs = new DialogueArcSaveBlock();
                 data.header.schemaVersion = 6;
                 data.header.gameVersion = "0.6.0";
+                MarkDirty();
+            }
+
+            if (data.header.schemaVersion < 7)
+            {
+                // v6 → v7: add excavation, crafting, scanner, rail, aquifer, cosmic, DotT, companion blocks
+                if (data.excavation == null) data.excavation = new ExcavationSaveBlock();
+                if (data.crafting == null) data.crafting = new CraftingSaveBlock();
+                if (data.scanner == null) data.scanner = new ScannerSaveBlock();
+                if (data.rail == null) data.rail = new RailSaveBlock();
+                if (data.aquiferPurge == null) data.aquiferPurge = new AquiferPurgeSaveBlock();
+                if (data.cosmicConvergence == null) data.cosmicConvergence = new CosmicConvergenceSaveBlock();
+                if (data.dayOutOfTime == null) data.dayOutOfTime = new DayOutOfTimeSaveBlock();
+                if (data.companionManager == null) data.companionManager = new CompanionManagerSaveBlock();
+                data.header.schemaVersion = 7;
+                data.header.gameVersion = "0.7.0";
                 MarkDirty();
             }
         }

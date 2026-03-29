@@ -340,6 +340,22 @@ namespace Tartaria.Core
             }
         }
 
+        // ─── Multipliers ───
+
+        readonly Dictionary<CurrencyType, float> _multipliers = new();
+
+        public void ApplyMultiplier(CurrencyType type, float multiplier)
+        {
+            _multipliers[type] = _multipliers.TryGetValue(type, out float existing)
+                ? existing * multiplier : multiplier;
+            Debug.Log($"[Economy] Multiplier for {type} now {_multipliers[type]:F2}x");
+        }
+
+        public float GetMultiplier(CurrencyType type)
+        {
+            return _multipliers.TryGetValue(type, out float m) ? m : 1f;
+        }
+
         // ─── Internal Types ───
 
         struct BuildingIncome

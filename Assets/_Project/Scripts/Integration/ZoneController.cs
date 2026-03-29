@@ -168,7 +168,7 @@ namespace Tartaria.Integration
 
             // Reset idle timer on movement
             if (_playerInputHandler == null)
-                _playerInputHandler = FindAnyObjectByType<Input.PlayerInputHandler>();
+                _playerInputHandler = FindFirstObjectByType<Input.PlayerInputHandler>();
             if (_playerInputHandler != null && _playerInputHandler.IsMoving)
                 _idleTimer = 0f;
         }

@@ -216,6 +216,7 @@ namespace Tartaria.Gameplay
 
                 AetherFieldManager.Instance?.AddResonanceScore(rsReward);
                 OnOrganComplete?.Invoke(accuracy);
+                Integration.GameLoopController.Instance?.OnMiniGameCompleted(rsReward, "PipeOrgan");
             }
 
             GameStateManager.Instance?.ReturnToPrevious();

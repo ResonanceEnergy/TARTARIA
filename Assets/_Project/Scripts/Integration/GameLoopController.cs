@@ -719,6 +719,10 @@ namespace Tartaria.Integration
                 save.economy.aetherShards = econData.aetherShards;
                 save.economy.resonanceCrystals = econData.resonanceCrystals;
                 save.economy.starFragments = econData.starFragments;
+                save.economy.harmonicFragments = econData.harmonicFragments;
+                save.economy.echoMemories = econData.echoMemories;
+                save.economy.crystallineDust = econData.crystallineDust;
+                save.economy.forgeTokens = econData.forgeTokens;
                 var bList = new System.Collections.Generic.List<Save.EconomyBuildingEntry>();
                 if (econData.buildings != null)
                 {
@@ -948,6 +952,119 @@ namespace Tartaria.Integration
                 save.dialogueArcs.trustLevels = dd.trustLevels ?? System.Array.Empty<int>();
                 save.dialogueArcs.seenKeys = dd.seenKeys ?? System.Array.Empty<string>();
             }
+
+            // ─── v7 Save Blocks ──────────────────────────
+
+            // Excavation
+            var exc = Gameplay.ExcavationSystem.Instance;
+            if (exc != null)
+            {
+                var ed = exc.GetSaveData();
+                var siteIds = new System.Collections.Generic.List<string>();
+                var stages = new System.Collections.Generic.List<int>();
+                var progress = new System.Collections.Generic.List<float>();
+                if (ed.sites != null)
+                {
+                    foreach (var s in ed.sites)
+                    {
+                        siteIds.Add(s.siteId);
+                        stages.Add(s.layersCleared);
+                        progress.Add(s.scanAccuracy);
+                    }
+                }
+                save.excavation.discoveredSiteIds = siteIds.ToArray();
+                save.excavation.siteStages = stages.ToArray();
+                save.excavation.siteProgress = progress.ToArray();
+                save.excavation.totalExcavations = siteIds.Count;
+            }
+
+            // Crafting
+            var craft = Gameplay.CraftingSystem.Instance;
+            if (craft != null)
+            {
+                var cd = craft.GetSaveData();
+                save.crafting.knownRecipeIds = cd.discoveredRecipes?.ToArray() ?? System.Array.Empty<string>();
+                var itemIds = new System.Collections.Generic.List<string>();
+                var itemCounts = new System.Collections.Generic.List<int>();
+                if (cd.inventory != null)
+                {
+                    foreach (var inv in cd.inventory)
+                    {
+                        itemIds.Add(inv.itemId);
+                        itemCounts.Add(inv.count);
+                    }
+                }
+                save.crafting.inventoryItemIds = itemIds.ToArray();
+                save.crafting.inventoryItemCounts = itemCounts.ToArray();
+                save.crafting.totalCrafted = cd.inventory?.Count ?? 0;
+            }
+
+            // Scanner
+            var scan = Gameplay.ResonanceScannerSystem.Instance;
+            if (scan != null)
+            {
+                var sd = scan.GetSaveData();
+                save.scanner.scannedObjectIds = sd.revealedPOIs?.ToArray() ?? System.Array.Empty<string>();
+                save.scanner.totalScans = sd.revealedPOIs?.Count ?? 0;
+            }
+
+            // Continental Rail
+            var rail = ContinentalRailSystem.Instance;
+            if (rail != null)
+            {
+                var rd = rail.GetSaveData();
+                save.rail.segmentRestored = rd.segmentRestored ?? System.Array.Empty<bool>();
+                save.rail.segmentHasBoss = rd.segmentHasBoss ?? System.Array.Empty<bool>();
+                save.rail.segmentCorruption = rd.segmentCorruption ?? System.Array.Empty<float>();
+                save.rail.stationsDiscovered = rd.stationsDiscovered ?? System.Array.Empty<bool>();
+                save.rail.segmentsRestored = rd.segmentsRestored;
+                save.rail.networkComplete = rd.networkComplete;
+                save.rail.trainActive = rd.trainActive;
+                save.rail.trainCurrentStation = rd.trainCurrentStation;
+            }
+
+            // Aquifer Purge
+            var aquifer = AquiferPurgeMiniGame.Instance;
+            if (aquifer != null)
+            {
+                var ad2 = aquifer.GetSaveData();
+                save.aquiferPurge.layerStates = ad2.layerStates ?? System.Array.Empty<int>();
+                save.aquiferPurge.layerPurity = ad2.layerPurity ?? System.Array.Empty<float>();
+                save.aquiferPurge.layerAccuracy = ad2.layerAccuracy ?? System.Array.Empty<float>();
+                save.aquiferPurge.currentLayer = ad2.currentLayer;
+            }
+
+            // Cosmic Convergence
+            var cosmic = CosmicConvergenceMiniGame.Instance;
+            if (cosmic != null)
+            {
+                var cd2 = cosmic.GetSaveData();
+                save.cosmicConvergence.currentPhase = cd2.currentPhase;
+                save.cosmicConvergence.phasesComplete = cd2.phasesComplete ?? System.Array.Empty<bool>();
+                save.cosmicConvergence.phaseAccuracy = cd2.phaseAccuracy ?? System.Array.Empty<float>();
+                save.cosmicConvergence.convergenceScore = cd2.convergenceScore;
+            }
+
+            // Day Out of Time
+            var dott = DayOutOfTimeController.Instance;
+            if (dott != null)
+            {
+                var dd2 = dott.GetSaveData();
+                save.dayOutOfTime.eventCompleted = dd2.eventCompleted;
+                save.dayOutOfTime.festivalCurrency = dd2.festivalCurrency;
+                save.dayOutOfTime.currentMemoryZone = dd2.currentMemoryZone;
+                save.dayOutOfTime.bestChallengeScore = dd2.bestChallengeScore;
+            }
+
+            // Companion Manager
+            var comp = CompanionManager.Instance;
+            if (comp != null)
+            {
+                var cmd = comp.GetSaveData();
+                save.companionManager.companionIds = cmd.companionIds ?? System.Array.Empty<string>();
+                save.companionManager.companionUnlocked = cmd.companionUnlocked ?? System.Array.Empty<bool>();
+                save.companionManager.companionTrust = cmd.companionTrust ?? System.Array.Empty<float>();
+            }
         }
 
         void OnAfterLoad(SaveData save)
@@ -1084,6 +1201,10 @@ namespace Tartaria.Integration
                     aetherShards = save.economy.aetherShards,
                     resonanceCrystals = save.economy.resonanceCrystals,
                     starFragments = save.economy.starFragments,
+                    harmonicFragments = save.economy.harmonicFragments,
+                    echoMemories = save.economy.echoMemories,
+                    crystallineDust = save.economy.crystallineDust,
+                    forgeTokens = save.economy.forgeTokens,
                     buildings = buildings
                 });
             }
@@ -1338,6 +1459,133 @@ namespace Tartaria.Integration
                     companionIds = save.dialogueArcs.companionIds,
                     trustLevels = save.dialogueArcs.trustLevels,
                     seenKeys = save.dialogueArcs.seenKeys
+                });
+            }
+
+            // ─── v7 Load Blocks ──────────────────────────
+
+            // Excavation
+            var excLoad = Gameplay.ExcavationSystem.Instance;
+            if (excLoad != null && save.excavation != null)
+            {
+                var sites = new System.Collections.Generic.List<Gameplay.ExcavationSystem.ExcavationSiteEntry>();
+                if (save.excavation.discoveredSiteIds != null)
+                {
+                    for (int i = 0; i < save.excavation.discoveredSiteIds.Length; i++)
+                    {
+                        sites.Add(new Gameplay.ExcavationSystem.ExcavationSiteEntry
+                        {
+                            siteId = save.excavation.discoveredSiteIds[i],
+                            layersCleared = save.excavation.siteStages != null && i < save.excavation.siteStages.Length ? save.excavation.siteStages[i] : 0,
+                            scanAccuracy = save.excavation.siteProgress != null && i < save.excavation.siteProgress.Length ? save.excavation.siteProgress[i] : 0f,
+                            isDiscovered = true
+                        });
+                    }
+                }
+                excLoad.LoadSaveData(new Gameplay.ExcavationSystem.ExcavationSaveData { sites = sites });
+            }
+
+            // Crafting
+            var craftLoad = Gameplay.CraftingSystem.Instance;
+            if (craftLoad != null && save.crafting != null)
+            {
+                var recipes = save.crafting.knownRecipeIds != null
+                    ? new System.Collections.Generic.List<string>(save.crafting.knownRecipeIds)
+                    : new System.Collections.Generic.List<string>();
+                var inventory = new System.Collections.Generic.List<Gameplay.CraftingSystem.CraftingInventoryEntry>();
+                if (save.crafting.inventoryItemIds != null)
+                {
+                    for (int i = 0; i < save.crafting.inventoryItemIds.Length; i++)
+                    {
+                        inventory.Add(new Gameplay.CraftingSystem.CraftingInventoryEntry
+                        {
+                            itemId = save.crafting.inventoryItemIds[i],
+                            count = save.crafting.inventoryItemCounts != null && i < save.crafting.inventoryItemCounts.Length ? save.crafting.inventoryItemCounts[i] : 0
+                        });
+                    }
+                }
+                craftLoad.LoadSaveData(new Gameplay.CraftingSystem.CraftingSaveData
+                {
+                    discoveredRecipes = recipes,
+                    inventory = inventory
+                });
+            }
+
+            // Scanner
+            var scanLoad = Gameplay.ResonanceScannerSystem.Instance;
+            if (scanLoad != null && save.scanner != null)
+            {
+                var pois = save.scanner.scannedObjectIds != null
+                    ? new System.Collections.Generic.List<string>(save.scanner.scannedObjectIds)
+                    : new System.Collections.Generic.List<string>();
+                scanLoad.LoadSaveData(new Gameplay.ResonanceScannerSystem.ScannerSaveData { revealedPOIs = pois });
+            }
+
+            // Continental Rail
+            var railLoad = ContinentalRailSystem.Instance;
+            if (railLoad != null && save.rail != null)
+            {
+                railLoad.LoadSaveData(new ContinentalRailSystem.RailSavePayload
+                {
+                    segmentRestored = save.rail.segmentRestored,
+                    segmentHasBoss = save.rail.segmentHasBoss,
+                    segmentCorruption = save.rail.segmentCorruption,
+                    stationsDiscovered = save.rail.stationsDiscovered,
+                    segmentsRestored = save.rail.segmentsRestored,
+                    networkComplete = save.rail.networkComplete,
+                    trainActive = save.rail.trainActive,
+                    trainCurrentStation = save.rail.trainCurrentStation
+                });
+            }
+
+            // Aquifer Purge
+            var aquiferLoad = AquiferPurgeMiniGame.Instance;
+            if (aquiferLoad != null && save.aquiferPurge != null)
+            {
+                aquiferLoad.LoadSaveData(new AquiferPurgeMiniGame.AquiferSavePayload
+                {
+                    layerStates = save.aquiferPurge.layerStates,
+                    layerPurity = save.aquiferPurge.layerPurity,
+                    layerAccuracy = save.aquiferPurge.layerAccuracy,
+                    currentLayer = save.aquiferPurge.currentLayer
+                });
+            }
+
+            // Cosmic Convergence
+            var cosmicLoad = CosmicConvergenceMiniGame.Instance;
+            if (cosmicLoad != null && save.cosmicConvergence != null)
+            {
+                cosmicLoad.LoadSaveData(new CosmicConvergenceMiniGame.CosmicSavePayload
+                {
+                    currentPhase = save.cosmicConvergence.currentPhase,
+                    phasesComplete = save.cosmicConvergence.phasesComplete,
+                    phaseAccuracy = save.cosmicConvergence.phaseAccuracy,
+                    convergenceScore = save.cosmicConvergence.convergenceScore
+                });
+            }
+
+            // Day Out of Time
+            var dottLoad = DayOutOfTimeController.Instance;
+            if (dottLoad != null && save.dayOutOfTime != null)
+            {
+                dottLoad.LoadSaveData(new DayOutOfTimeController.DotTSavePayload
+                {
+                    eventCompleted = save.dayOutOfTime.eventCompleted,
+                    festivalCurrency = save.dayOutOfTime.festivalCurrency,
+                    currentMemoryZone = save.dayOutOfTime.currentMemoryZone,
+                    bestChallengeScore = save.dayOutOfTime.bestChallengeScore
+                });
+            }
+
+            // Companion Manager
+            var compLoad = CompanionManager.Instance;
+            if (compLoad != null && save.companionManager != null)
+            {
+                compLoad.LoadSaveData(new CompanionManager.CompanionManagerSavePayload
+                {
+                    companionIds = save.companionManager.companionIds,
+                    companionUnlocked = save.companionManager.companionUnlocked,
+                    companionTrust = save.companionManager.companionTrust
                 });
             }
         }
