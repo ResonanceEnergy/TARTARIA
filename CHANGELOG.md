@@ -4,6 +4,32 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [1.7.0] — 2025-07-27
+
+**Roadmap v9 — Core Gameplay Loop, Crafting, Accessibility & Scanner Systems**  
+*4 new C# files, 8 modified — excavation → scan → craft → economy pipeline complete*
+
+### Added
+- **ExcavationSystem.cs** (Gameplay) — Core dig mechanic: site registration, 4-layer progression (Mud→Clay→Rubble→Foundation), RS yield with depth bonus + scan accuracy bonus, VFX/haptic hooks, full save/load
+- **CraftingSystem.cs** (Gameplay) — 7-tier recipe-based crafting: recipe registration, tier-gated discovery, resource-cost validation via EconomySystem, inventory management, 8 default recipes from Common through Mythic
+- **ResonanceScannerSystem.cs** (Gameplay) — Player's first exploration tool: POI registration (7 types), RS-scaled scan radius (30-80m), accuracy calculation, ExcavationSystem integration for site discovery, compass signal feature, aether cost + cooldown
+- **AccessibilityManager.cs** (UI) — WCAG 2.1 AA: ColorblindMode enum (Protanopia/Deuteranopia/Tritanopia) with daltonization matrices, text scale 0.75-2x, subtitle toggles, reduced motion, high contrast, screen shake, haptic intensity scaling, PlayerPrefs persistence
+
+### Changed
+- **SaveManager.cs** (Save) — Schema v5→v6 migration step added to MigrateIfNeeded(); CreateNewSave() now sets schemaVersion=6, gameVersion="0.6.0"
+- **BossEncounterSystem.cs** (Integration) — Added `SpawnBoss(string bossId)` overload with NamedBossLookup dictionary (15 named bosses mapped to Moon indices)
+- **GameLoopController.cs** (Integration) — Wired TutorialSystem.OnTutorialComplete (unlocks echohaven_awakening quest) and BossEncounterSystem.OnBossDefeated (triggers climax, advances Moon, companion notification) with proper unsubscription
+- **EconomySystem.cs** (Core) — 4 secondary currencies (HarmonicFragments, EchoMemories, CrystallineDust, ForgeTokens) added to CurrencyType enum; MaterialTier enum (Common through Mythic, 7 tiers); expanded all balance/spend/afford methods and save data
+- **DayOutOfTimeController.cs** (Integration) — Sandbox mode (EnterSandbox/ExitSandbox), 3 challenge modes (Speedrun 5min / Pacifist 15min / Creative unlimited) via DotTChallengeMode enum, festival economy with 5 shop items
+- **DissonanceLensOverlay.cs** (UI) — ICorruptionWeakPoint interface, frequency-match lock-on targeting via SetFrequency(), FirePurgeBeam() for corruption removal at 10/s with haptic feedback
+- **HapticFeedbackManager.cs** (Input) — PlayMoonHaptic(int moonIndex, HapticContext context) with GetMoonProfile() returning 5 context-specific patterns; intensity scales 0.3+moonIndex*0.05 clamped to 0.95
+- **ZoneTransitionSystem.cs** (Integration) — RS gate check (rsRequirementToUnlock) before zone transition; FadeScreen upgraded from placeholder to SmoothStep CanvasGroup animation; ShowZoneSubtitle() with lore intro + haptic on zone entry
+- **CompanionBehaviorSystem.cs** (AI) — Replaced hardcoded 3.0f dialogue wait with data-driven DialogueDuration from CompanionBehavior component (fallback 5s)
+- **AIComponents.cs** (AI) — Added DialogueDuration field to CompanionBehavior IComponentData
+- **DialogueManager.cs** (Integration) — Added IsPlaying/CurrentLineDuration properties, per-line duration support via DialogueLine.duration field
+
+---
+
 ## [1.6.0] — 2025-07-26
 
 **Roadmap v8 — Full Campaign Systems, Achievements, Dialogue Arcs & Consequence Visuals**  

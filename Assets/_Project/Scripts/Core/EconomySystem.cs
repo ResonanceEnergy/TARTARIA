@@ -29,6 +29,10 @@ namespace Tartaria.Core
         int _aetherShards;
         int _resonanceCrystals;
         int _starFragments;
+        int _harmonicFragments;
+        int _echoMemories;
+        int _crystallineDust;
+        int _forgeTokens;
 
         // ─── Building Income ───
         readonly Dictionary<string, BuildingIncome> _buildings = new();
@@ -43,6 +47,10 @@ namespace Tartaria.Core
         public int AetherShards => _aetherShards;
         public int ResonanceCrystals => _resonanceCrystals;
         public int StarFragments => _starFragments;
+        public int HarmonicFragments => _harmonicFragments;
+        public int EchoMemories => _echoMemories;
+        public int CrystallineDust => _crystallineDust;
+        public int ForgeTokens => _forgeTokens;
 
         void Awake()
         {
@@ -81,8 +89,28 @@ namespace Tartaria.Core
                     break;
                 case CurrencyType.StarFragments:
                     old = _starFragments;
-                    _starFragments += scaled; // star fragments unaffected by multiplier typically, but kept for consistency
+                    _starFragments += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _starFragments);
+                    break;
+                case CurrencyType.HarmonicFragments:
+                    old = _harmonicFragments;
+                    _harmonicFragments += scaled;
+                    OnCurrencyChanged?.Invoke(type, old, _harmonicFragments);
+                    break;
+                case CurrencyType.EchoMemories:
+                    old = _echoMemories;
+                    _echoMemories += scaled;
+                    OnCurrencyChanged?.Invoke(type, old, _echoMemories);
+                    break;
+                case CurrencyType.CrystallineDust:
+                    old = _crystallineDust;
+                    _crystallineDust += scaled;
+                    OnCurrencyChanged?.Invoke(type, old, _crystallineDust);
+                    break;
+                case CurrencyType.ForgeTokens:
+                    old = _forgeTokens;
+                    _forgeTokens += scaled;
+                    OnCurrencyChanged?.Invoke(type, old, _forgeTokens);
                     break;
             }
         }
@@ -110,6 +138,30 @@ namespace Tartaria.Core
                     _starFragments -= amount;
                     OnCurrencyChanged?.Invoke(type, oldS, _starFragments);
                     return true;
+                case CurrencyType.HarmonicFragments:
+                    if (_harmonicFragments < amount) return false;
+                    int oldH = _harmonicFragments;
+                    _harmonicFragments -= amount;
+                    OnCurrencyChanged?.Invoke(type, oldH, _harmonicFragments);
+                    return true;
+                case CurrencyType.EchoMemories:
+                    if (_echoMemories < amount) return false;
+                    int oldE = _echoMemories;
+                    _echoMemories -= amount;
+                    OnCurrencyChanged?.Invoke(type, oldE, _echoMemories);
+                    return true;
+                case CurrencyType.CrystallineDust:
+                    if (_crystallineDust < amount) return false;
+                    int oldC = _crystallineDust;
+                    _crystallineDust -= amount;
+                    OnCurrencyChanged?.Invoke(type, oldC, _crystallineDust);
+                    return true;
+                case CurrencyType.ForgeTokens:
+                    if (_forgeTokens < amount) return false;
+                    int oldF = _forgeTokens;
+                    _forgeTokens -= amount;
+                    OnCurrencyChanged?.Invoke(type, oldF, _forgeTokens);
+                    return true;
                 default:
                     return false;
             }
@@ -122,6 +174,10 @@ namespace Tartaria.Core
                 CurrencyType.AetherShards => _aetherShards >= amount,
                 CurrencyType.ResonanceCrystals => _resonanceCrystals >= amount,
                 CurrencyType.StarFragments => _starFragments >= amount,
+                CurrencyType.HarmonicFragments => _harmonicFragments >= amount,
+                CurrencyType.EchoMemories => _echoMemories >= amount,
+                CurrencyType.CrystallineDust => _crystallineDust >= amount,
+                CurrencyType.ForgeTokens => _forgeTokens >= amount,
                 _ => false
             };
         }
@@ -133,6 +189,10 @@ namespace Tartaria.Core
                 CurrencyType.AetherShards => _aetherShards,
                 CurrencyType.ResonanceCrystals => _resonanceCrystals,
                 CurrencyType.StarFragments => _starFragments,
+                CurrencyType.HarmonicFragments => _harmonicFragments,
+                CurrencyType.EchoMemories => _echoMemories,
+                CurrencyType.CrystallineDust => _crystallineDust,
+                CurrencyType.ForgeTokens => _forgeTokens,
                 _ => 0
             };
         }
@@ -245,6 +305,10 @@ namespace Tartaria.Core
                 aetherShards = _aetherShards,
                 resonanceCrystals = _resonanceCrystals,
                 starFragments = _starFragments,
+                harmonicFragments = _harmonicFragments,
+                echoMemories = _echoMemories,
+                crystallineDust = _crystallineDust,
+                forgeTokens = _forgeTokens,
                 buildings = buildings
             };
         }
@@ -254,6 +318,10 @@ namespace Tartaria.Core
             _aetherShards = data.aetherShards;
             _resonanceCrystals = data.resonanceCrystals;
             _starFragments = data.starFragments;
+            _harmonicFragments = data.harmonicFragments;
+            _echoMemories = data.echoMemories;
+            _crystallineDust = data.crystallineDust;
+            _forgeTokens = data.forgeTokens;
 
             _buildings.Clear();
             if (data.buildings != null)
@@ -290,7 +358,26 @@ namespace Tartaria.Core
     {
         AetherShards = 0,
         ResonanceCrystals = 1,
-        StarFragments = 2
+        StarFragments = 2,
+        HarmonicFragments = 3,
+        EchoMemories = 4,
+        CrystallineDust = 5,
+        ForgeTokens = 6
+    }
+
+    /// <summary>
+    /// Material tier progression — 7 tiers from Common to Mythic.
+    /// Used by CraftingSystem and WorkshopSystem for recipe gating.
+    /// </summary>
+    public enum MaterialTier : byte
+    {
+        Common = 0,      // Found everywhere, basic crafting
+        Uncommon = 1,     // Moon 2-3, improved tools
+        Rare = 2,         // Moon 4-6, ley-line infused
+        Epic = 3,         // Moon 7-9, harmonic resonance
+        Legendary = 4,    // Moon 10-12, void-touched
+        Ascendant = 5,    // Moon 13, true-history artifacts
+        Mythic = 6        // Day Out of Time, ultimate tier
     }
 
     [Serializable]
@@ -299,6 +386,10 @@ namespace Tartaria.Core
         public int aetherShards;
         public int resonanceCrystals;
         public int starFragments;
+        public int harmonicFragments;
+        public int echoMemories;
+        public int crystallineDust;
+        public int forgeTokens;
         public List<BuildingIncomeSave> buildings;
     }
 

@@ -139,9 +139,14 @@ namespace Tartaria.AI
 
         void UpdateSpeak(ref CompanionBehavior behavior, float dt)
         {
-            // Dialogue playing — wait for completion
-            if (behavior.StateTimer > 3.0f) // Placeholder: dialogue duration
+            // Dialogue playing — wait for DialogueManager's reported duration
+            float duration = behavior.DialogueDuration > 0f
+                ? behavior.DialogueDuration
+                : 5.0f; // Fallback to DialogueManager default autoCloseDelay
+
+            if (behavior.StateTimer > duration)
             {
+                behavior.DialogueDuration = 0f; // Reset for next speak
                 TransitionTo(ref behavior, CompanionState.Follow);
             }
         }

@@ -280,5 +280,197 @@ namespace Tartaria.Integration
 
             AchievementSystem.Instance?.CheckSolidification();
         }
+
+        // ─── Sandbox Mode ────────────────────────────
+
+        bool _sandboxActive;
+        public bool IsSandboxActive => _sandboxActive;
+
+        /// <summary>
+        /// Enter sandbox mode after DotT completion — free exploration of all 13 restored zones.
+        /// No timers, no combat, all buildings accessible.
+        /// </summary>
+        public void EnterSandbox()
+        {
+            if (!_eventCompleted)
+            {
+                Debug.LogWarning("[DotT] Sandbox requires DotT completion.");
+                return;
+            }
+
+            _sandboxActive = true;
+            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
+
+            // Disable enemy spawns, remove fog entirely
+            RenderSettings.fog = false;
+            RenderSettings.ambientLight = dottSkyColor;
+
+            HUDController.Instance?.ShowInteractionPrompt(
+                "SANDBOX MODE\nExplore the restored world freely. No enemies, no timers.");
+
+            Debug.Log("[DotT] Sandbox mode activated.");
+        }
+
+        public void ExitSandbox()
+        {
+            _sandboxActive = false;
+            HUDController.Instance?.HideInteractionPrompt();
+            Debug.Log("[DotT] Sandbox mode deactivated.");
+        }
+
+        // ─── Challenge Modes ─────────────────────────
+
+        DotTChallengeMode _activeChallenge = DotTChallengeMode.None;
+        float _challengeTimer;
+        float _challengeTimeLimit;
+        int _challengeScore;
+
+        public DotTChallengeMode ActiveChallenge => _activeChallenge;
+        public float ChallengeTimer => _challengeTimer;
+        public int ChallengeScore => _challengeScore;
+
+        /// <summary>
+        /// Start a challenge mode — replayable content after DotT completion.
+        /// </summary>
+        public bool StartChallenge(DotTChallengeMode mode)
+        {
+            if (!_eventCompleted) return false;
+            if (_activeChallenge != DotTChallengeMode.None) return false;
+
+            _activeChallenge = mode;
+            _challengeTimer = 0f;
+            _challengeScore = 0;
+
+            switch (mode)
+            {
+                case DotTChallengeMode.Speedrun:
+                    // Re-run the memory corridor under 5 minutes
+                    _challengeTimeLimit = 300f;
+                    break;
+                case DotTChallengeMode.Pacifist:
+                    // Complete all 13 memory zones without triggering any combat
+                    _challengeTimeLimit = 900f; // 15 min generous limit
+                    break;
+                case DotTChallengeMode.Creative:
+                    // Build/restore freely with unlimited resources — no time limit
+                    _challengeTimeLimit = float.MaxValue;
+                    break;
+                default:
+                    return false;
+            }
+
+            GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
+            Debug.Log($"[DotT] Challenge started: {mode}");
+            StartCoroutine(ChallengeLoop());
+            return true;
+        }
+
+        IEnumerator ChallengeLoop()
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                $"CHALLENGE: {_activeChallenge}\nTime limit: {(_challengeTimeLimit < float.MaxValue ? $"{_challengeTimeLimit}s" : "None")}");
+            yield return new WaitForSeconds(3f);
+            HUDController.Instance?.HideInteractionPrompt();
+
+            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
+
+            // Tick timer
+            while (_activeChallenge != DotTChallengeMode.None)
+            {
+                _challengeTimer += Time.deltaTime;
+
+                if (_challengeTimer >= _challengeTimeLimit)
+                {
+                    EndChallenge(false);
+                    yield break;
+                }
+
+                yield return null;
+            }
+        }
+
+        public void AddChallengeScore(int points)
+        {
+            if (_activeChallenge == DotTChallengeMode.None) return;
+            _challengeScore += points;
+        }
+
+        public void EndChallenge(bool success)
+        {
+            if (_activeChallenge == DotTChallengeMode.None) return;
+
+            var mode = _activeChallenge;
+            _activeChallenge = DotTChallengeMode.None;
+
+            string result = success ? "COMPLETE" : "FAILED";
+            HUDController.Instance?.ShowInteractionPrompt(
+                $"Challenge {result}: {mode}\nScore: {_challengeScore} | Time: {_challengeTimer:F1}s");
+
+            // Award festival currency on success
+            if (success)
+            {
+                int festivalReward = Mathf.RoundToInt(_challengeScore * 0.1f + 50f);
+                AddFestivalCurrency(festivalReward);
+            }
+
+            Debug.Log($"[DotT] Challenge {mode} {result}: score={_challengeScore}, time={_challengeTimer:F1}s");
+            SaveManager.Instance?.MarkDirty();
+        }
+
+        // ─── Festival Economy ────────────────────────
+
+        int _festivalCurrency;
+        public int FestivalCurrency => _festivalCurrency;
+
+        public void AddFestivalCurrency(int amount)
+        {
+            if (amount <= 0) return;
+            _festivalCurrency += amount;
+            Debug.Log($"[DotT] Festival currency +{amount} (total: {_festivalCurrency})");
+        }
+
+        public bool SpendFestivalCurrency(int amount)
+        {
+            if (amount <= 0 || _festivalCurrency < amount) return false;
+            _festivalCurrency -= amount;
+            return true;
+        }
+
+        /// <summary>
+        /// Festival shop — exclusive cosmetics and items available only during/after DotT.
+        /// </summary>
+        public bool PurchaseFestivalItem(string itemId)
+        {
+            int cost = GetFestivalItemCost(itemId);
+            if (cost <= 0) return false;
+
+            if (!SpendFestivalCurrency(cost)) return false;
+
+            // Grant the item via CraftingSystem inventory
+            Gameplay.CraftingSystem.Instance?.ConsumeItem(itemId, -1); // negative consume = add
+            Debug.Log($"[DotT] Festival purchase: {itemId} for {cost} festival currency");
+            return true;
+        }
+
+        static int GetFestivalItemCost(string itemId)
+        {
+            return itemId switch
+            {
+                "golden_cloak" => 100,
+                "resonance_crown" => 250,
+                "dott_banner" => 50,
+                "celestial_lantern" => 150,
+                "memory_crystal" => 75,
+                _ => 0
+            };
+        }
+    }
+
+    public enum DotTChallengeMode : byte
+    {
+        None = 0,
+        Speedrun = 1,
+        Pacifist = 2,
+        Creative = 3
     }
 }

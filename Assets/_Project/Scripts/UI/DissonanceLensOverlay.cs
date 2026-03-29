@@ -38,6 +38,15 @@ namespace Tartaria.UI
         // Detected corruption data (updated each pulse)
         readonly System.Collections.Generic.List<CorruptionMarker> _markers = new();
 
+        // ─── Frequency Match State ───
+        float _targetFrequency;
+        float _currentFrequency;
+        float _frequencyMatchThreshold = 5f;   // Hz tolerance for a "match"
+        bool _isFrequencyLocked;
+        ICorruptible _purgeTarget;
+        float _purgeBeamTimer;
+        const float PURGE_BEAM_RATE = 10f;     // corruption removed per second when locked
+
         public bool IsActive => _active;
         public bool IsUnlocked => _unlocked;
 
@@ -187,6 +196,91 @@ namespace Tartaria.UI
             if (_overlayTexture != null) Destroy(_overlayTexture);
         }
 
+        // ─── Frequency Match Targeting ───────────────
+
+        /// <summary>
+        /// Set the player's current tuning frequency (from input dial).
+        /// When this matches a corruption source's weak point, the purge beam locks on.
+        /// </summary>
+        public void SetFrequency(float frequency)
+        {
+            _currentFrequency = frequency;
+
+            // Check for lock-on against nearest corruption weak point
+            _isFrequencyLocked = false;
+            _purgeTarget = null;
+
+            if (!_active) return;
+
+            var cam = UnityEngine.Camera.main;
+            if (cam == null) return;
+
+            float bestDist = float.MaxValue;
+            foreach (var marker in _markers)
+            {
+                float screenDist = Vector3.Distance(
+                    cam.WorldToViewportPoint(marker.worldPosition),
+                    new Vector3(0.5f, 0.5f, 0f));
+
+                if (screenDist > 0.3f) continue; // Must be roughly centered
+
+                // Check if this object has a weak point with matching frequency
+                var buildings = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+                foreach (var obj in buildings)
+                {
+                    if (obj is ICorruptionWeakPoint wp && obj is ICorruptible corruptible)
+                    {
+                        if (!wp.IsWeakPointExposed) continue;
+                        if (Mathf.Abs(wp.WeakPointFrequency - _currentFrequency) <= _frequencyMatchThreshold)
+                        {
+                            float dist = Vector3.Distance(cam.transform.position, wp.WeakPointWorldPosition);
+                            if (dist < bestDist)
+                            {
+                                bestDist = dist;
+                                _isFrequencyLocked = true;
+                                _purgeTarget = corruptible;
+                                _targetFrequency = wp.WeakPointFrequency;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fire the purge beam while frequency-locked. Call each frame while player holds purge button.
+        /// </summary>
+        public void FirePurgeBeam(float deltaTime)
+        {
+            if (!_active || !_isFrequencyLocked || _purgeTarget == null) return;
+
+            float purgeAmount = PURGE_BEAM_RATE * deltaTime;
+            _purgeTarget.PurgeCorruption(purgeAmount);
+
+            _purgeBeamTimer += deltaTime;
+
+            // VFX on purge
+            if (_purgeBeamTimer > 0.5f)
+            {
+                _purgeBeamTimer = 0f;
+                Tartaria.Input.HapticFeedbackManager.Instance?.PlayTuningOnFrequency();
+            }
+
+            // Aether drain while purging
+            _aetherCharge -= aetherCostPerSecond * 0.5f * deltaTime; // extra drain
+
+            if (_purgeTarget.CorruptionLevel <= 0f)
+            {
+                _isFrequencyLocked = false;
+                _purgeTarget = null;
+                Tartaria.Input.HapticFeedbackManager.Instance?.PlayPerfectTune();
+                Debug.Log("[DissonanceLens] Corruption purged from target!");
+            }
+        }
+
+        public bool IsFrequencyLocked => _isFrequencyLocked;
+        public float TargetFrequency => _targetFrequency;
+
         struct CorruptionMarker
         {
             public Vector3 worldPosition;
@@ -204,5 +298,16 @@ namespace Tartaria.UI
         float CorruptionLevel { get; }
         void ApplyCorruption(float amount);
         void PurgeCorruption(float amount);
+    }
+
+    /// <summary>
+    /// Frequency-match targeting for purge beam integration.
+    /// Extend ICorruptible objects with weak-point data.
+    /// </summary>
+    public interface ICorruptionWeakPoint
+    {
+        float WeakPointFrequency { get; }
+        Vector3 WeakPointWorldPosition { get; }
+        bool IsWeakPointExposed { get; }
     }
 }

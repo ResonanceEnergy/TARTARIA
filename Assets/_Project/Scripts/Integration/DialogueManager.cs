@@ -22,8 +22,15 @@ namespace Tartaria.Integration
         [SerializeField] float autoCloseDelay = 5f;
 
         float _lastLineTime = -999f;
+        float _currentLineDuration;
         readonly Dictionary<string, List<DialogueLine>> _contextLines = new();
         readonly HashSet<string> _playedOneShots = new();
+
+        /// <summary>True while a dialogue line is displayed on screen.</summary>
+        public bool IsPlaying => Time.time - _lastLineTime < _currentLineDuration;
+
+        /// <summary>Duration of the currently displayed line (autoCloseDelay).</summary>
+        public float CurrentLineDuration => _currentLineDuration;
 
         void Awake()
         {
@@ -95,6 +102,7 @@ namespace Tartaria.Integration
 
         void ShowLine(DialogueLine line)
         {
+            _currentLineDuration = line.duration > 0f ? line.duration : autoCloseDelay;
             _lastLineTime = Time.time;
 
             if (line.oneShot)
@@ -104,7 +112,7 @@ namespace Tartaria.Integration
 
             // Auto-close after delay
             CancelInvoke(nameof(HideLine));
-            Invoke(nameof(HideLine), autoCloseDelay);
+            Invoke(nameof(HideLine), _currentLineDuration);
 
             Debug.Log($"[Dialogue] {line.speaker}: {line.text}");
         }
@@ -397,6 +405,8 @@ namespace Tartaria.Integration
             public string text;
             public string context;
             public bool oneShot;
+            /// <summary>Per-line display duration. 0 = use autoCloseDelay default.</summary>
+            public float duration;
         }
     }
 }
