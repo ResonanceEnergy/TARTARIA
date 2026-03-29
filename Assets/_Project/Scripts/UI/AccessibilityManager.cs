@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 namespace Tartaria.UI
 {
@@ -66,8 +67,23 @@ namespace Tartaria.UI
 
         void ApplyColorblindShader()
         {
-            // In production: enable/disable URP Renderer Feature with colorblind correction LUT
-            // For now, log the change — shader hook point
+            // Toggle the ColorblindRendererFeature on the active URP renderer
+            var urpAsset = UniversalRenderPipeline.asset;
+            if (urpAsset != null)
+            {
+                var rendererData = urpAsset.scriptableRenderer as UniversalRendererData;
+                if (rendererData != null)
+                {
+                    foreach (var feature in rendererData.rendererFeatures)
+                    {
+                        if (feature is ColorblindRendererFeature cbf)
+                        {
+                            cbf.SetActive(_colorblindMode != ColorblindMode.None);
+                            break;
+                        }
+                    }
+                }
+            }
             Debug.Log($"[Accessibility] Colorblind mode: {_colorblindMode}");
         }
 

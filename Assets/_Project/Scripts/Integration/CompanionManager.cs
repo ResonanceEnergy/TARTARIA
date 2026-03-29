@@ -147,6 +147,48 @@ namespace Tartaria.Integration
                 }
             };
         }
+
+        // ─── Save / Load ─────────────────────────────
+
+        public CompanionManagerSavePayload GetSaveData()
+        {
+            var ids = new System.Collections.Generic.List<string>();
+            var unlocked = new System.Collections.Generic.List<bool>();
+            var trust = new System.Collections.Generic.List<float>();
+            foreach (var kvp in _states)
+            {
+                ids.Add(kvp.Key);
+                unlocked.Add(kvp.Value.unlocked);
+                trust.Add(kvp.Value.trustLevel);
+            }
+            return new CompanionManagerSavePayload
+            {
+                companionIds = ids.ToArray(),
+                companionUnlocked = unlocked.ToArray(),
+                companionTrust = trust.ToArray()
+            };
+        }
+
+        public void LoadSaveData(CompanionManagerSavePayload data)
+        {
+            if (data == null || data.companionIds == null) return;
+            _states.Clear();
+            for (int i = 0; i < data.companionIds.Length; i++)
+            {
+                _states[data.companionIds[i]] = new CompanionState
+                {
+                    unlocked = data.companionUnlocked != null && i < data.companionUnlocked.Length && data.companionUnlocked[i],
+                    trustLevel = data.companionTrust != null && i < data.companionTrust.Length ? data.companionTrust[i] : 0f
+                };
+            }
+        }
+
+        public class CompanionManagerSavePayload
+        {
+            public string[] companionIds;
+            public bool[] companionUnlocked;
+            public float[] companionTrust;
+        }
     }
 
     [System.Serializable]

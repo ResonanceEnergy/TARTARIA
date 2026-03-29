@@ -173,11 +173,15 @@ namespace Tartaria.Integration
                 case WorldChoiceId.W1_CassiansOffer:
                     if (option == ChoiceOption.OptionA)
                         CassianNPCController.Instance?.EnableIntelSharing();
+                    else
+                        EconomySystem.Instance?.ApplyMultiplier(Core.CurrencyType.ResonanceShards, 1.15f);
                     break;
 
                 case WorldChoiceId.W2_StarFort:
                     if (option == ChoiceOption.OptionA)
                         ThorneController.Instance?.ActivateMilitia();
+                    else
+                        CompanionManager.Instance?.AddTrust("lirael", 20);
                     break;
 
                 case WorldChoiceId.W3_KorathSacrifice:
@@ -188,16 +192,24 @@ namespace Tartaria.Integration
                     break;
 
                 case WorldChoiceId.W4_AuroraCity:
-                    // ConsequenceVisuals handles the visual shift
+                    if (option == ChoiceOption.OptionA)
+                        EconomySystem.Instance?.ApplyMultiplier(Core.CurrencyType.ResonanceShards, 1.25f);
+                    else
+                        CombatBridge.Instance?.ApplyCorruptionResistance(0.3f);
                     break;
 
                 case WorldChoiceId.W5_ZerethPlea:
                     if (option == ChoiceOption.OptionA)
                         ZerethController.Instance?.BeginRedemptionArc();
+                    else
+                        ZerethController.Instance?.Imprison();
                     break;
 
                 case WorldChoiceId.W6_FinalAlignment:
-                    // Ending path determined
+                    if (option == ChoiceOption.OptionA)
+                        CampaignFlowController.Instance?.SetEnding(CampaignFlowController.EndingPath.Restoration);
+                    else
+                        CampaignFlowController.Instance?.SetEnding(CampaignFlowController.EndingPath.Transcendence);
                     break;
             }
 

@@ -72,7 +72,7 @@ namespace Tartaria.Integration
                 Health = 100f,
                 MaxHealth = 100f,
                 AetherCharge = 0f,
-                MaxAetherCharge = 100f,
+                MaxAetherCharge = 100f * (1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.AetherCapacity) ?? 0f)),
                 CurrentFrequency = 432f, // Harmonic (player)
                 ComboCount = 0,
                 IsGiantMode = false
@@ -113,7 +113,8 @@ namespace Tartaria.Integration
             _pulseTimer = pulseCooldown;
 
             var playerPos = GetPlayerPosition();
-            DamageNearbyEnemies(playerPos, pulseRange, pulseDamage, DamageType.ResonancePulse);
+            float dmgMod = 1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.PulseDamage) ?? 0f);
+            DamageNearbyEnemies(playerPos, pulseRange, pulseDamage * dmgMod, DamageType.ResonancePulse);
 
             // Haptic feedback
             HapticFeedbackManager.Instance?.PlayCombatHit();
@@ -129,7 +130,8 @@ namespace Tartaria.Integration
 
             var playerPos = GetPlayerPosition();
             var forward = GetPlayerForward();
-            DamageEnemiesInCone(playerPos, forward, strikeRange, 60f, strikeDamage, DamageType.HarmonicStrike);
+            float rangeMod = 1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.StrikeRange) ?? 0f);
+            DamageEnemiesInCone(playerPos, forward, strikeRange * rangeMod, 60f, strikeDamage, DamageType.HarmonicStrike);
 
             HapticFeedbackManager.Instance?.PlayCombatHit();
             VFXController.Instance?.PlayHarmonicStrike(playerPos, forward);
@@ -144,7 +146,8 @@ namespace Tartaria.Integration
             {
                 var pcs = _em.GetComponentData<PlayerCombatState>(_playerCombatEntity);
                 pcs.IsShielding = true;
-                pcs.ShieldActiveTime = shieldDuration;
+                float shieldMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.ShieldDuration) ?? 0f;
+                pcs.ShieldActiveTime = shieldDuration + shieldMod;
                 _em.SetComponentData(_playerCombatEntity, pcs);
             }
 
@@ -371,6 +374,18 @@ namespace Tartaria.Integration
             }
             return _playerTransform != null ? _playerTransform.forward : Vector3.forward;
         }
+
+        // ─── World Choice Effects ─────────────────
+
+        float _corruptionResistance;
+
+        public void ApplyCorruptionResistance(float amount)
+        {
+            _corruptionResistance = Mathf.Clamp01(_corruptionResistance + amount);
+            Debug.Log($"[CombatBridge] Corruption resistance: {_corruptionResistance:P0}");
+        }
+
+        public float CorruptionResistance => _corruptionResistance;
 
         void OnDestroy()
         {

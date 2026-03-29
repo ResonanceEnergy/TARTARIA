@@ -58,6 +58,7 @@ namespace Tartaria.Integration
         float _phaseTimer;
         bool _miniGameActive;
         float _convergenceScore;    // 0..1 overall score
+        float _finalTuningAccumulator;
 
         // ─── Events ─────────────────────────────────
 
@@ -235,7 +236,10 @@ namespace Tartaria.Integration
                     break;
 
                 case ConvergencePhase.FinalTuning:
-                    // Player must tune the Planetary Nexus — listen for tuning complete
+                    // Player must tune the Planetary Nexus to golden-ratio 432 Hz
+                    HUDController.Instance?.ShowInteractionPrompt(
+                        "Tune the Planetary Nexus to 432 Hz.\nAlign all harmonic frequencies to the golden ratio.");
+                    _finalTuningAccumulator = 0f;
                     break;
             }
         }
@@ -251,7 +255,9 @@ namespace Tartaria.Integration
             switch (_currentPhase)
             {
                 case ConvergencePhase.FinalTuning:
-                    // Check if player has tuned to golden ratio
+                    // Check if player tuning accumulates to completion (driven by TuningMiniGame)
+                    if (_finalTuningAccumulator >= 1f)
+                        CompleteCurrentPhase(Mathf.Clamp01(_finalTuningAccumulator));
                     break;
             }
         }
@@ -293,5 +299,50 @@ namespace Tartaria.Integration
         public ConvergencePhase CurrentPhase => _currentPhase;
         public float ConvergenceScore => _convergenceScore;
         public bool IsComplete => _currentPhase == ConvergencePhase.Complete;
+
+        /// <summary>
+        /// Called by TuningMiniGame when the player completes a tuning during Phase 6.
+        /// Accuracy 0-1 contributes toward the final tuning threshold.
+        /// </summary>
+        public void ContributeFinalTuning(float accuracy)
+        {
+            if (_currentPhase != ConvergencePhase.FinalTuning) return;
+            _finalTuningAccumulator += accuracy * 0.34f; // ~3 perfect tunes to complete
+            Debug.Log($"[Convergence] Final tuning progress: {_finalTuningAccumulator:P0}");
+        }
+
+        // ─── Save / Load ─────────────────────────────
+
+        public CosmicSavePayload GetSaveData()
+        {
+            return new CosmicSavePayload
+            {
+                currentPhase = (int)_currentPhase,
+                phasesComplete = (bool[])_phasesComplete.Clone(),
+                phaseAccuracy = (float[])_phaseAccuracy.Clone(),
+                convergenceScore = _convergenceScore
+            };
+        }
+
+        public void LoadSaveData(CosmicSavePayload data)
+        {
+            if (data == null) return;
+            _currentPhase = (ConvergencePhase)data.currentPhase;
+            int count = Mathf.Min(TotalPhases, data.phasesComplete?.Length ?? 0);
+            for (int i = 0; i < count; i++)
+            {
+                _phasesComplete[i] = data.phasesComplete[i];
+                _phaseAccuracy[i] = data.phaseAccuracy != null && i < data.phaseAccuracy.Length ? data.phaseAccuracy[i] : 0f;
+            }
+            _convergenceScore = data.convergenceScore;
+        }
+
+        public class CosmicSavePayload
+        {
+            public int currentPhase;
+            public bool[] phasesComplete;
+            public float[] phaseAccuracy;
+            public float convergenceScore;
+        }
     }
 }

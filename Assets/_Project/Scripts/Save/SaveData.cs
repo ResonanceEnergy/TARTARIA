@@ -47,13 +47,23 @@ namespace Tartaria.Save
         public WorldChoiceSaveBlock worldChoice = new();
         public AchievementSaveBlock achievementData = new();
         public DialogueArcSaveBlock dialogueArcs = new();
+
+        // v7 save blocks
+        public ExcavationSaveBlock excavation = new();
+        public CraftingSaveBlock crafting = new();
+        public ScannerSaveBlock scanner = new();
+        public RailSaveBlock rail = new();
+        public AquiferPurgeSaveBlock aquiferPurge = new();
+        public CosmicConvergenceSaveBlock cosmicConvergence = new();
+        public DayOutOfTimeSaveBlock dayOutOfTime = new();
+        public CompanionManagerSaveBlock companionManager = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 6;
-        public string gameVersion = "0.6.0";
+        public int schemaVersion = 7;
+        public string gameVersion = "0.7.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
@@ -226,6 +236,10 @@ namespace Tartaria.Save
         public int aetherShards;
         public int resonanceCrystals;
         public int starFragments;
+        public int harmonicFragments;
+        public int echoMemories;
+        public int crystallineDust;
+        public int forgeTokens;
         public EconomyBuildingEntry[] buildings = Array.Empty<EconomyBuildingEntry>();
     }
 
@@ -404,5 +418,82 @@ namespace Tartaria.Save
         public int[] companionIds = Array.Empty<int>();
         public int[] trustLevels = Array.Empty<int>();
         public string[] seenKeys = Array.Empty<string>();
+    }
+
+    // ─── v7 Save Blocks (Excavation, Crafting, Scanner, Rail, AquiferPurge, CosmicConvergence, DotT, Companion) ──
+
+    [Serializable]
+    public class ExcavationSaveBlock
+    {
+        public string[] discoveredSiteIds = Array.Empty<string>();
+        public int[] siteStages = Array.Empty<int>();
+        public float[] siteProgress = Array.Empty<float>();
+        public int totalExcavations;
+    }
+
+    [Serializable]
+    public class CraftingSaveBlock
+    {
+        public string[] knownRecipeIds = Array.Empty<string>();
+        public string[] inventoryItemIds = Array.Empty<string>();
+        public int[] inventoryItemCounts = Array.Empty<int>();
+        public int totalCrafted;
+    }
+
+    [Serializable]
+    public class ScannerSaveBlock
+    {
+        public string[] scannedObjectIds = Array.Empty<string>();
+        public float scannerRange;
+        public int scannerLevel;
+        public int totalScans;
+    }
+
+    [Serializable]
+    public class RailSaveBlock
+    {
+        public bool[] segmentRestored = Array.Empty<bool>();
+        public bool[] segmentHasBoss = Array.Empty<bool>();
+        public float[] segmentCorruption = Array.Empty<float>();
+        public bool[] stationsDiscovered = Array.Empty<bool>();
+        public int segmentsRestored;
+        public bool networkComplete;
+        public bool trainActive;
+        public int trainCurrentStation;
+    }
+
+    [Serializable]
+    public class AquiferPurgeSaveBlock
+    {
+        public int[] layerStates = Array.Empty<int>();
+        public float[] layerPurity = Array.Empty<float>();
+        public float[] layerAccuracy = Array.Empty<float>();
+        public int currentLayer;
+    }
+
+    [Serializable]
+    public class CosmicConvergenceSaveBlock
+    {
+        public int currentPhase;
+        public bool[] phasesComplete = Array.Empty<bool>();
+        public float[] phaseAccuracy = Array.Empty<float>();
+        public float convergenceScore;
+    }
+
+    [Serializable]
+    public class DayOutOfTimeSaveBlock
+    {
+        public bool eventCompleted;
+        public int festivalCurrency;
+        public int currentMemoryZone;
+        public float bestChallengeScore;
+    }
+
+    [Serializable]
+    public class CompanionManagerSaveBlock
+    {
+        public string[] companionIds = Array.Empty<string>();
+        public bool[] companionUnlocked = Array.Empty<bool>();
+        public float[] companionTrust = Array.Empty<float>();
     }
 }

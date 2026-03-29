@@ -42,6 +42,11 @@ namespace Tartaria.Gameplay
             _currentConfig = config;
             _currentVariant = config.variant;
             _timeRemaining = config.timeLimitSeconds;
+
+            // Apply skill tree tuning speed bonus
+            float speedMod = SkillTreeSystem.Instance?.GetModifier(SkillModifierType.TuningSpeed) ?? 0f;
+            _timeRemaining *= (1f + speedMod);
+
             _currentFrequency = 0f;
             _accuracy = 0f;
             _isActive = true;
@@ -272,6 +277,10 @@ namespace Tartaria.Gameplay
         void CompleteTuning()
         {
             _isActive = false;
+
+            // Apply skill tree tuning precision bonus
+            float precisionMod = SkillTreeSystem.Instance?.GetModifier(SkillModifierType.TuningPrecision) ?? 0f;
+            _accuracy = Mathf.Clamp01(_accuracy + precisionMod);
 
             if (_accuracy >= 0.6f)
             {

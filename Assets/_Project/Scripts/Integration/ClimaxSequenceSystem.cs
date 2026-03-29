@@ -157,7 +157,7 @@ namespace Tartaria.Integration
 
         IEnumerator RunCameraBeat(ClimaxBeat beat)
         {
-            Camera.CameraController cam = FindAnyObjectByType<Camera.CameraController>();
+            Camera.CameraController cam = FindFirstObjectByType<Camera.CameraController>();
             cam?.FocusOnPoint(beat.worldPosition, beat.duration > 0 ? beat.duration : cinematicPanDuration);
             yield return new WaitForSeconds(beat.duration > 0 ? beat.duration : cinematicPanDuration);
         }

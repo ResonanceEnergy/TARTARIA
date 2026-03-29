@@ -99,7 +99,19 @@ namespace Tartaria.Integration
                     break;
 
                 case BuildingRestorationState.Active:
-                    // Fully restored — show lore
+                    // Fully restored — enter micro mode if available, otherwise show lore
+                    if (MicroGiantController.Instance != null && !MicroGiantController.Instance.IsMicro)
+                    {
+                        float aether = EconomySystem.Instance != null
+                            ? EconomySystem.Instance.GetCurrency(Core.CurrencyType.AetherShards)
+                            : 0f;
+                        if (aether > 0f)
+                        {
+                            MicroGiantController.Instance.EnterMicroMode(
+                                buildingId, transform.position, aether);
+                            break;
+                        }
+                    }
                     UIManager.Instance?.ShowDialogue(
                         definition != null ? definition.buildingName : buildingId,
                         definition != null ? definition.loreDescription : "An ancient structure, now restored.");
@@ -205,8 +217,10 @@ namespace Tartaria.Integration
             _state = BuildingRestorationState.Emerging;
             UpdateVisuals();
 
-            // 5-second dissolution sequence
+            // 5-second dissolution sequence (modified by repair speed skill)
             float duration = definition != null ? definition.dissolutionDuration : 5f;
+            float repairMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.RepairSpeed) ?? 0f;
+            duration /= (1f + repairMod); // Higher repair speed = shorter emergence
             StartCoroutine(EmergenceSequence(duration));
         }
 
@@ -242,6 +256,10 @@ namespace Tartaria.Integration
         {
             _state = BuildingRestorationState.Active;
             UpdateVisuals();
+
+            // Register building for passive income
+            EconomySystem.Instance?.RegisterBuilding(
+                buildingId, definition != null ? definition.baseIncome : 10);
 
             bool allPerfect = true;
             for (int i = 0; i < 3; i++)

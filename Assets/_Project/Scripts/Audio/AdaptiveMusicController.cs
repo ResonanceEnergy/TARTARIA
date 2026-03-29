@@ -33,6 +33,7 @@ namespace Tartaria.Audio
         AudioSource _layer3Triumphant;
         AudioSource _combatOverlay;
         AudioSource _bossOverlay;
+        AudioSource _schumannLayer;
         AudioSource _stingerSource;
 
         // ─── State ───
@@ -152,6 +153,10 @@ namespace Tartaria.Audio
             SmoothVolume(_layer1Melodic,    l1 * masterVolume);
             SmoothVolume(_layer2Orchestral, l2 * masterVolume);
             SmoothVolume(_layer3Triumphant, l3 * masterVolume);
+
+            // Schumann layer fades in at RS 50+ (restoration progress)
+            float lSch = RS2Volume(50f, 100f);
+            SmoothVolume(_schumannLayer, lSch * masterVolume * 0.6f);
         }
 
         float RS2Volume(float start, float end, bool inverse = false)
@@ -190,6 +195,7 @@ namespace Tartaria.Audio
             _layer3Triumphant = CreateLayer("Music_L3_Triumphant");
             _combatOverlay    = CreateLayer("Music_CombatOverlay");
             _bossOverlay      = CreateLayer("Music_BossOverlay");
+            _schumannLayer    = CreateLayer("Music_Schumann");
 
             _stingerSource = gameObject.AddComponent<AudioSource>();
             _stingerSource.loop = false;
@@ -219,6 +225,7 @@ namespace Tartaria.Audio
             _layer3Triumphant?.Play();
             _combatOverlay?.Play();
             _bossOverlay?.Play();
+            _schumannLayer?.Play();
         }
 
         // ─── Procedural Audio Generation ─────────────
@@ -239,12 +246,16 @@ namespace Tartaria.Audio
 
             _layer3Triumphant.clip = GenChord(samples, sr,
                 new[] { _zoneBaseFreq, _zoneBaseFreq * GoldenRatioValidator.PHI,
-                        _zoneBaseFreq * 2f, _zoneBaseFreq * GoldenRatioValidator.PHI * 2f }, 0.06f);
+                        _zoneBaseFreq * 2f, _zoneBaseFreq * GoldenRatioValidator.PHI * 2f,
+                        528f, 1296f }, 0.05f);
 
             _combatOverlay.clip = GenTone(samples, sr, 80f, 0.2f, WaveShape.Square);
 
             _bossOverlay.clip = GenChord(samples, sr,
                 new[] { 180f, 180f * Mathf.Sqrt(2f) }, 0.12f);
+
+            // Schumann resonance: 7.83 Hz AM-modulated onto audible carrier (313.2 Hz = 7.83 * 40)
+            _schumannLayer.clip = GenSchumannTone(samples, sr, 7.83f, 313.2f, 0.08f);
         }
 
         AudioClip GenTone(int samples, int sr, float freq, float amp, WaveShape shape)
@@ -291,6 +302,25 @@ namespace Tartaria.Audio
             if (i < fade) return (float)i / fade;
             if (i > total - fade) return (float)(total - i) / fade;
             return 1f;
+        }
+
+        AudioClip GenSchumannTone(int samples, int sr, float modFreq, float carrierFreq, float amp)
+        {
+            var data = new float[samples];
+            for (int i = 0; i < samples; i++)
+            {
+                float t = (float)i / sr;
+                float carrier = Mathf.Sin(2f * Mathf.PI * carrierFreq * t);
+                // AM modulation: (1 + depth * sin(mod)) * carrier
+                float mod = 0.5f * (1f + Mathf.Sin(2f * Mathf.PI * modFreq * t));
+                // Add first 3 Schumann harmonics as subtle carriers
+                float h2 = Mathf.Sin(2f * Mathf.PI * (modFreq * 2f * 40f) * t) * 0.3f;
+                float h3 = Mathf.Sin(2f * Mathf.PI * (modFreq * 3f * 40f) * t) * 0.15f;
+                data[i] = (carrier + h2 + h3) * mod * amp * Envelope(i, samples, sr);
+            }
+            var clip = AudioClip.Create("Schumann_7.83Hz", samples, 1, sr, false);
+            clip.SetData(data, 0);
+            return clip;
         }
 
         enum WaveShape { Sine, Triangle, Square }

@@ -238,6 +238,7 @@ namespace Tartaria.Gameplay
                 // RS reward
                 float rsReward = _config.baseRSReward * finalAccuracy;
                 AetherFieldManager.Instance?.AddResonanceScore(rsReward);
+                Integration.GameLoopController.Instance?.OnMiniGameCompleted(rsReward, "HarmonicRockCutting");
             }
 
             GameStateManager.Instance?.ReturnToPrevious();

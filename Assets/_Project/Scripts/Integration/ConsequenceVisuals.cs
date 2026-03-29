@@ -23,12 +23,18 @@ namespace Tartaria.Integration
         [SerializeField] Color sanctifiedTint = new(0.85f, 0.9f, 1f, 1f);
         [SerializeField] Color openGatesTint = new(0.95f, 0.85f, 0.5f, 1f);
         [SerializeField] Color sealedCityTint = new(0.4f, 0.5f, 0.7f, 1f);
+        [SerializeField] Color allianceTint = new(0.8f, 0.65f, 0.9f, 1f);
+        [SerializeField] Color independenceTint = new(0.6f, 0.85f, 0.65f, 1f);
+        [SerializeField] Color sacrificeGlow = new(0.95f, 0.6f, 0.3f, 1f);
+        [SerializeField] Color mercyGlow = new(0.7f, 0.9f, 0.95f, 1f);
         [SerializeField] Color redemptionGlow = new(0.9f, 0.95f, 0.8f, 1f);
         [SerializeField] Color condemnationGlow = new(0.6f, 0.3f, 0.3f, 1f);
         [SerializeField] Color restorationFinal = new(0.95f, 0.82f, 0.35f, 1f);
         [SerializeField] Color transcendenceFinal = new(0.6f, 0.8f, 1f, 1f);
 
         [Header("Atmosphere")]
+        [SerializeField] float allianceFogDensity = 0.01f;
+        [SerializeField] float independenceFogDensity = 0.007f;
         [SerializeField] float militarizedFogDensity = 0.015f;
         [SerializeField] float sanctifiedFogDensity = 0.005f;
         [SerializeField] float openGatesFogDensity = 0.008f;
@@ -68,6 +74,14 @@ namespace Tartaria.Integration
         {
             switch (id)
             {
+                case WorldChoiceTracker.WorldChoiceId.W1_CassiansOffer:
+                    ApplyZonePalette(
+                        option == WorldChoiceTracker.ChoiceOption.OptionA
+                            ? allianceTint : independenceTint,
+                        option == WorldChoiceTracker.ChoiceOption.OptionA
+                            ? allianceFogDensity : independenceFogDensity);
+                    break;
+
                 case WorldChoiceTracker.WorldChoiceId.W2_StarFort:
                     ApplyZonePalette(
                         option == WorldChoiceTracker.ChoiceOption.OptionA
@@ -82,6 +96,12 @@ namespace Tartaria.Integration
                             ? openGatesTint : sealedCityTint,
                         option == WorldChoiceTracker.ChoiceOption.OptionA
                             ? openGatesFogDensity : sealedFogDensity);
+                    break;
+
+                case WorldChoiceTracker.WorldChoiceId.W3_KorathSacrifice:
+                    ApplyAmbientGlow(
+                        option == WorldChoiceTracker.ChoiceOption.OptionA
+                            ? sacrificeGlow : mercyGlow);
                     break;
 
                 case WorldChoiceTracker.WorldChoiceId.W5_ZerethPlea:

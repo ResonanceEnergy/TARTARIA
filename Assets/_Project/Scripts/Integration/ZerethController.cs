@@ -214,6 +214,24 @@ namespace Tartaria.Integration
             return _presenceLevel * 0.5f; // Up to 50% corruption boost
         }
 
+        public void BeginRedemptionArc()
+        {
+            TransitionToPhase(ZerethPhase.Confrontation);
+            _presenceLevel = Mathf.Max(_presenceLevel, 0.6f);
+            DialogueManager.Instance?.PlayLineById("zereth_redemption_arc_begin");
+            Debug.Log("[Zereth] Redemption arc begun via player plea.");
+        }
+
+        public void Imprison()
+        {
+            _phase = ZerethPhase.Redeemed; // Imprisoned, no longer a threat
+            _dissonanceIntensity = 0f;
+            _presenceLevel = 0f;
+            DialogueManager.Instance?.PlayLineById("zereth_imprisoned");
+            OnPhaseChanged?.Invoke(ZerethPhase.Redeemed);
+            Debug.Log("[Zereth] Imprisoned by player condemnation.");
+        }
+
         // ─── Internal ────────────────────────────────
 
         void TransitionToPhase(ZerethPhase newPhase)

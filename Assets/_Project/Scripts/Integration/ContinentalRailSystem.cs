@@ -172,7 +172,9 @@ namespace Tartaria.Integration
 
             // Check aether cost
             var econ = Core.EconomySystem.Instance;
-            if (econ == null || !econ.TrySpend(seg.repairCost, 0, 0)) return false;
+            if (econ == null) return false;
+            if (econ.GetCurrency(Core.CurrencyType.AetherShards) < seg.repairCost) return false;
+            econ.SpendCurrency(Core.CurrencyType.AetherShards, seg.repairCost);
 
             // Boss check
             if (seg.hasBoss)
@@ -375,5 +377,63 @@ namespace Tartaria.Integration
         public bool IsTrainActive => _trainActive;
         public bool IsStationDiscovered(int idx) =>
             idx >= 0 && idx < TotalStations && _stationsDiscovered[idx];
+
+        // ─── Save / Load ─────────────────────────────
+
+        public RailSavePayload GetSaveData()
+        {
+            var payload = new RailSavePayload
+            {
+                segmentRestored = new bool[_segments.Count],
+                segmentHasBoss = new bool[_segments.Count],
+                segmentCorruption = new float[_segments.Count],
+                stationsDiscovered = (bool[])_stationsDiscovered.Clone(),
+                segmentsRestored = _segmentsRestored,
+                networkComplete = _networkComplete,
+                trainActive = _trainActive,
+                trainCurrentStation = _trainCurrentStation
+            };
+            for (int i = 0; i < _segments.Count; i++)
+            {
+                payload.segmentRestored[i] = _segments[i].restored;
+                payload.segmentHasBoss[i] = _segments[i].hasBoss;
+                payload.segmentCorruption[i] = _segments[i].corruptionLevel;
+            }
+            return payload;
+        }
+
+        public void LoadSaveData(RailSavePayload data)
+        {
+            if (data == null) return;
+            int segCount = Mathf.Min(_segments.Count, data.segmentRestored?.Length ?? 0);
+            for (int i = 0; i < segCount; i++)
+            {
+                _segments[i].restored = data.segmentRestored[i];
+                _segments[i].hasBoss = data.segmentHasBoss != null && i < data.segmentHasBoss.Length && data.segmentHasBoss[i];
+                _segments[i].corruptionLevel = data.segmentCorruption != null && i < data.segmentCorruption.Length ? data.segmentCorruption[i] : 0f;
+            }
+            if (data.stationsDiscovered != null)
+            {
+                int stationCount = Mathf.Min(TotalStations, data.stationsDiscovered.Length);
+                for (int i = 0; i < stationCount; i++)
+                    _stationsDiscovered[i] = data.stationsDiscovered[i];
+            }
+            _segmentsRestored = data.segmentsRestored;
+            _networkComplete = data.networkComplete;
+            _trainActive = data.trainActive;
+            _trainCurrentStation = data.trainCurrentStation;
+        }
+
+        public class RailSavePayload
+        {
+            public bool[] segmentRestored;
+            public bool[] segmentHasBoss;
+            public float[] segmentCorruption;
+            public bool[] stationsDiscovered;
+            public int segmentsRestored;
+            public bool networkComplete;
+            public bool trainActive;
+            public int trainCurrentStation;
+        }
     }
 }
