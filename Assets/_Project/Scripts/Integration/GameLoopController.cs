@@ -817,6 +817,96 @@ namespace Tartaria.Integration
                 save.veritas.bellTowerSyncComplete = vd.bellTowerSyncComplete;
                 save.veritas.finalNoteDelivered = vd.finalNoteDelivered;
             }
+
+            // AirshipFleet
+            var fleet = AirshipFleetManager.Instance;
+            if (fleet != null)
+            {
+                var fd = fleet.GetSaveData();
+                save.airshipFleet.formation = fd.formation;
+                save.airshipFleet.shipsRestored = fd.shipsRestored;
+                save.airshipFleet.totalMercuryOrbsTuned = fd.totalMercuryOrbsTuned;
+                save.airshipFleet.fleetOperational = fd.fleetOperational;
+                if (fd.ships != null)
+                {
+                    int sc = fd.ships.Length;
+                    save.airshipFleet.shipStates = new int[sc];
+                    save.airshipFleet.shipHealth = new float[sc];
+                    save.airshipFleet.shipMercuryOrbs = new int[sc];
+                    save.airshipFleet.shipRestored = new bool[sc];
+                    for (int si = 0; si < sc; si++)
+                    {
+                        save.airshipFleet.shipStates[si] = fd.ships[si].state;
+                        save.airshipFleet.shipHealth[si] = fd.ships[si].health;
+                        save.airshipFleet.shipMercuryOrbs[si] = fd.ships[si].mercuryOrbsTuned;
+                        save.airshipFleet.shipRestored[si] = fd.ships[si].restored;
+                    }
+                }
+            }
+
+            // LeyLineProphecy
+            var ley = LeyLineProphecyMiniGame.Instance;
+            if (ley != null)
+            {
+                var ld = ley.GetSaveData();
+                save.leyLineProphecy.stonesActivated = ld.stonesActivated ?? System.Array.Empty<bool>();
+                save.leyLineProphecy.stonesCompleted = ld.stonesCompleted;
+                save.leyLineProphecy.dreamspellClock = ld.dreamspellClock;
+                save.leyLineProphecy.miniGameActive = ld.miniGameActive;
+            }
+
+            // BellTowerSync
+            var bells = BellTowerSyncMiniGame.Instance;
+            if (bells != null)
+            {
+                var bd = bells.GetSaveData();
+                save.bellTowerSync.towerFrequencies = bd.towerFrequencies ?? System.Array.Empty<float>();
+                save.bellTowerSync.towersSynced = bd.towersSynced;
+                save.bellTowerSync.resonanceScore = bd.resonanceScore;
+                save.bellTowerSync.miniGameActive = bd.miniGameActive;
+                save.bellTowerSync.cascadeTriggered = bd.cascadeTriggered;
+            }
+
+            // GiantMode
+            var giant = GiantModeController.Instance;
+            if (giant != null)
+            {
+                var gd = giant.GetSaveData();
+                save.giantMode.totalActivations = gd.totalActivations;
+                save.giantMode.buildingsLifted = gd.buildingsLifted;
+                save.giantMode.rubbleCleared = gd.rubbleCleared;
+                save.giantMode.totalTimeAsGiant = gd.totalTimeAsGiant;
+            }
+
+            // WorldChoice
+            var wc = WorldChoiceTracker.Instance;
+            if (wc != null)
+            {
+                var wd = wc.GetSaveData();
+                save.worldChoice.choiceIds = wd.choiceIds ?? System.Array.Empty<int>();
+                save.worldChoice.choiceValues = wd.choiceValues ?? System.Array.Empty<int>();
+            }
+
+            // Achievement
+            var ach = AchievementSystem.Instance;
+            if (ach != null)
+            {
+                var ad = ach.GetSaveData();
+                save.achievementData.unlockedIds = ad.unlockedIds ?? System.Array.Empty<string>();
+                save.achievementData.progressKeys = ad.progressKeys ?? System.Array.Empty<string>();
+                save.achievementData.progressValues = ad.progressValues ?? System.Array.Empty<float>();
+                save.achievementData.totalUnlocked = ad.totalUnlocked;
+            }
+
+            // Dialogue Arcs
+            var dia = CompanionDialogueArcs.Instance;
+            if (dia != null)
+            {
+                var dd = dia.GetSaveData();
+                save.dialogueArcs.companionIds = dd.companionIds ?? System.Array.Empty<int>();
+                save.dialogueArcs.trustLevels = dd.trustLevels ?? System.Array.Empty<int>();
+                save.dialogueArcs.seenKeys = dd.seenKeys ?? System.Array.Empty<string>();
+            }
         }
 
         void OnAfterLoad(SaveData save)
@@ -1111,6 +1201,102 @@ namespace Tartaria.Integration
                     requiemPerformed = save.veritas.requiemPerformed,
                     bellTowerSyncComplete = save.veritas.bellTowerSyncComplete,
                     finalNoteDelivered = save.veritas.finalNoteDelivered
+                });
+            }
+
+            // AirshipFleet
+            var fleetLoad = AirshipFleetManager.Instance;
+            if (fleetLoad != null && save.airshipFleet != null)
+            {
+                int sc = save.airshipFleet.shipStates?.Length ?? 0;
+                var ships = new AirshipShipSave[sc];
+                for (int si = 0; si < sc; si++)
+                {
+                    ships[si] = new AirshipShipSave
+                    {
+                        state = save.airshipFleet.shipStates[si],
+                        health = si < (save.airshipFleet.shipHealth?.Length ?? 0) ? save.airshipFleet.shipHealth[si] : 100f,
+                        mercuryOrbsTuned = si < (save.airshipFleet.shipMercuryOrbs?.Length ?? 0) ? save.airshipFleet.shipMercuryOrbs[si] : 0,
+                        restored = si < (save.airshipFleet.shipRestored?.Length ?? 0) && save.airshipFleet.shipRestored[si]
+                    };
+                }
+                fleetLoad.LoadSaveData(new AirshipFleetSaveData
+                {
+                    ships = ships,
+                    formation = save.airshipFleet.formation,
+                    shipsRestored = save.airshipFleet.shipsRestored,
+                    totalMercuryOrbsTuned = save.airshipFleet.totalMercuryOrbsTuned,
+                    fleetOperational = save.airshipFleet.fleetOperational
+                });
+            }
+
+            // LeyLineProphecy
+            var leyLoad = LeyLineProphecyMiniGame.Instance;
+            if (leyLoad != null && save.leyLineProphecy != null)
+            {
+                leyLoad.LoadSaveData(new LeyLineSaveData
+                {
+                    stonesActivated = save.leyLineProphecy.stonesActivated,
+                    stonesCompleted = save.leyLineProphecy.stonesCompleted,
+                    dreamspellClock = save.leyLineProphecy.dreamspellClock,
+                    miniGameActive = save.leyLineProphecy.miniGameActive
+                });
+            }
+
+            // BellTowerSync
+            var bellsLoad = BellTowerSyncMiniGame.Instance;
+            if (bellsLoad != null && save.bellTowerSync != null)
+            {
+                bellsLoad.LoadSaveData(new BellTowerSaveData
+                {
+                    towerFrequencies = save.bellTowerSync.towerFrequencies,
+                    towersSynced = save.bellTowerSync.towersSynced,
+                    resonanceScore = save.bellTowerSync.resonanceScore,
+                    miniGameActive = save.bellTowerSync.miniGameActive,
+                    cascadeTriggered = save.bellTowerSync.cascadeTriggered
+                });
+            }
+
+            // GiantMode
+            var giantLoad = GiantModeController.Instance;
+            if (giantLoad != null && save.giantMode != null)
+            {
+                giantLoad.LoadSaveData(save.giantMode);
+            }
+
+            // WorldChoice
+            var wcLoad = WorldChoiceTracker.Instance;
+            if (wcLoad != null && save.worldChoice != null)
+            {
+                wcLoad.LoadSaveData(new WorldChoiceSaveData
+                {
+                    choiceIds = save.worldChoice.choiceIds,
+                    choiceValues = save.worldChoice.choiceValues
+                });
+            }
+
+            // Achievement
+            var achLoad = AchievementSystem.Instance;
+            if (achLoad != null && save.achievementData != null)
+            {
+                achLoad.LoadSaveData(new AchievementSaveData
+                {
+                    unlockedIds = save.achievementData.unlockedIds,
+                    progressKeys = save.achievementData.progressKeys,
+                    progressValues = save.achievementData.progressValues,
+                    totalUnlocked = save.achievementData.totalUnlocked
+                });
+            }
+
+            // Dialogue Arcs
+            var diaLoad = CompanionDialogueArcs.Instance;
+            if (diaLoad != null && save.dialogueArcs != null)
+            {
+                diaLoad.LoadSaveData(new CompanionDialogueArcs.DialogueArcSaveData
+                {
+                    companionIds = save.dialogueArcs.companionIds,
+                    trustLevels = save.dialogueArcs.trustLevels,
+                    seenKeys = save.dialogueArcs.seenKeys
                 });
             }
         }

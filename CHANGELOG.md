@@ -4,6 +4,30 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [1.6.0] — 2025-07-26
+
+**Roadmap v8 — Full Campaign Systems, Achievements, Dialogue Arcs & Consequence Visuals**  
+*SaveData schema v6, 8 new C# files, 5 modified — all 13 Moons wired end-to-end*
+
+### Added
+- **Moon 8-13 Climax Classes** (ClimaxSequenceSystem.cs) — Armada flyover, Aurora City, Continental Train, Fountain Activation, Bell Tower Ring, True Convergence scripted sequences with RS rewards
+- **AchievementSystem.cs** (Integration) — 52 achievements across 8 categories (Restoration, Combat, Exploration, Lore, Campaign, Social, MiniGames, Hidden) with progress tracking, event-driven unlocks, and RS rewards
+- **WorldChoiceTracker.cs** (Integration) — 6 major branching World Choices W1-W6 gated by Moon progression, consequence application via controller singletons, full save/load
+- **ConsequenceVisuals.cs** (Integration) — Applies zone palette shifts, fog density, and ambient light changes based on World Choice decisions (militarized vs sanctified, open vs sealed, restoration vs transcendence)
+- **CompanionDialogueArcs.cs** (Integration) — 40 dialogue nodes across 6 companions (Lirael, Thorne, Korath, Veritas, Milo, Anastasia), Moon-gated with trust progression (Stranger→Bonded), 4 World Choice-branched dialogues, full save/load
+- **AquiferPurgeMiniGame.cs** (Integration) — Moon 11 fractal purge mini-game: 3 corruption layers, golden ratio pattern tracing, boss spawn at layer 3, VFX cascade on completion
+- **ContinentalRailSystem.cs** (Integration) — Moon 10 rail network: 12 stations, ring+hub graph, A* pathfinding, rail segment repair, train movement, Rail Leviathan boss guard, network completion VFX
+- **CosmicConvergenceMiniGame.cs** (Integration) — Moon 13 meta-game: 6-phase coroutine orchestrating all mini-game types, accuracy scoring, RS rewards, achievement M06
+
+### Changed
+- **SaveData.cs** — Schema v5→v6, gameVersion 0.5.0→0.6.0, added 7 save blocks: AirshipFleet, LeyLineProphecy, BellTowerSync, GiantMode, WorldChoice, Achievement, DialogueArcs
+- **GameLoopController.cs** — OnBeforeSave/OnAfterLoad wired for all 7 new save blocks (27 total blocks)
+- **GiantModeController.cs** — Added tracking fields (totalActivations, buildingsLifted, rubbleCleared, totalTimeAsGiant) and GetSaveData()/LoadSaveData() methods
+- **DayOutOfTimeController.cs** — Added 6 companion performance coroutines between solidification and true ending (LiraelConcert, ThorneFlyover, KorathSymphony, VeritasOrganFinale, MiloCommerceFestival, AnastasiaSolidificationCelebration)
+- **VFXController.cs** — Added 5 spectacle VFX methods: SpawnAnastasiaSolidificationEffect, SpawnPlanetaryBellRing, SpawnContinentalTrainAurora, SpawnAquiferPurificationCascade, SpawnProphecyStoneAlignment
+
+---
+
 ## [1.5.0] — 2025-07-25
 
 **BUILD ALL — Runtime Systems Complete + Gate 1 Readiness**  

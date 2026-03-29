@@ -38,13 +38,22 @@ namespace Tartaria.Save
 
         // v5 save blocks
         public VeritasSaveBlock veritas = new();
+
+        // v6 save blocks
+        public AirshipFleetSaveBlock airshipFleet = new();
+        public LeyLineProphecySaveBlock leyLineProphecy = new();
+        public BellTowerSyncSaveBlock bellTowerSync = new();
+        public GiantModeSaveBlock giantMode = new();
+        public WorldChoiceSaveBlock worldChoice = new();
+        public AchievementSaveBlock achievementData = new();
+        public DialogueArcSaveBlock dialogueArcs = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 5;
-        public string gameVersion = "0.5.0";
+        public int schemaVersion = 6;
+        public string gameVersion = "0.6.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
@@ -328,5 +337,72 @@ namespace Tartaria.Save
         public bool requiemPerformed;
         public bool bellTowerSyncComplete;
         public bool finalNoteDelivered;
+    }
+
+    // ─── v6 Save Blocks (AirshipFleet, LeyLine, BellTower, GiantMode, WorldChoice, Achievement) ──
+
+    [Serializable]
+    public class AirshipFleetSaveBlock
+    {
+        public int[] shipStates = Array.Empty<int>();
+        public float[] shipHealth = Array.Empty<float>();
+        public int[] shipMercuryOrbs = Array.Empty<int>();
+        public bool[] shipRestored = Array.Empty<bool>();
+        public int formation;
+        public int shipsRestored;
+        public int totalMercuryOrbsTuned;
+        public bool fleetOperational;
+    }
+
+    [Serializable]
+    public class LeyLineProphecySaveBlock
+    {
+        public bool[] stonesActivated = Array.Empty<bool>();
+        public int stonesCompleted;
+        public float dreamspellClock;
+        public bool miniGameActive;
+    }
+
+    [Serializable]
+    public class BellTowerSyncSaveBlock
+    {
+        public float[] towerFrequencies = Array.Empty<float>();
+        public int towersSynced;
+        public float resonanceScore;
+        public bool miniGameActive;
+        public bool cascadeTriggered;
+    }
+
+    [Serializable]
+    public class GiantModeSaveBlock
+    {
+        public int totalActivations;
+        public int buildingsLifted;
+        public int rubbleCleared;
+        public float totalTimeAsGiant;
+    }
+
+    [Serializable]
+    public class WorldChoiceSaveBlock
+    {
+        public int[] choiceIds = Array.Empty<int>();
+        public int[] choiceValues = Array.Empty<int>();
+    }
+
+    [Serializable]
+    public class AchievementSaveBlock
+    {
+        public string[] unlockedIds = Array.Empty<string>();
+        public string[] progressKeys = Array.Empty<string>();
+        public float[] progressValues = Array.Empty<float>();
+        public int totalUnlocked;
+    }
+
+    [Serializable]
+    public class DialogueArcSaveBlock
+    {
+        public int[] companionIds = Array.Empty<int>();
+        public int[] trustLevels = Array.Empty<int>();
+        public string[] seenKeys = Array.Empty<string>();
     }
 }

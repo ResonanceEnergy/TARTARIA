@@ -283,5 +283,80 @@ namespace Tartaria.Integration
             shape.radius = shapeRadius;
             ps.Play();
         }
+
+        // ─── Roadmap v8 VFX ─────────────────────────
+
+        /// <summary>Anastasia solidification — golden crystal pillar burst (DotT finale).</summary>
+        public void SpawnAnastasiaSolidificationEffect(Vector3 position)
+        {
+            if (_ambientParticles != null)
+            {
+                _ambientParticles.transform.position = position;
+                var main = _ambientParticles.main;
+                main.startColor = new Color(0.95f, 0.82f, 0.35f, 1f); // gold
+                var shape = _ambientParticles.shape;
+                shape.radius = 8f;
+                _ambientParticles.Emit(500);
+            }
+            Debug.Log("[VFX] Anastasia Solidification Effect spawned.");
+        }
+
+        /// <summary>Planetary bell ring — expanding golden rings (Veritas organ concert).</summary>
+        public void SpawnPlanetaryBellRing(Vector3 position)
+        {
+            if (_tuningRings != null)
+            {
+                PlayAt(_tuningRings, position, 15f);
+                var main = _tuningRings.main;
+                main.startColor = new Color(0.85f, 0.75f, 0.3f, 1f);
+                main.startLifetime = 6f;
+                _tuningRings.Emit(200);
+            }
+            Debug.Log("[VFX] Planetary Bell Ring spawned.");
+        }
+
+        /// <summary>Continental train aurora — trailing ribbon of light along rail network.</summary>
+        public void SpawnContinentalTrainAurora(Vector3 position)
+        {
+            if (_ambientParticles != null)
+            {
+                _ambientParticles.transform.position = position;
+                var main = _ambientParticles.main;
+                main.startColor = new Color(0.4f, 0.9f, 0.7f, 0.8f); // aurora green
+                var shape = _ambientParticles.shape;
+                shape.radius = 20f;
+                _ambientParticles.Emit(400);
+            }
+            Debug.Log("[VFX] Continental Train Aurora spawned.");
+        }
+
+        /// <summary>Aquifer purification cascade — blue-white water cleansing burst.</summary>
+        public void SpawnAquiferPurificationCascade(Vector3 position)
+        {
+            if (_ambientParticles != null)
+            {
+                _ambientParticles.transform.position = position;
+                var main = _ambientParticles.main;
+                main.startColor = new Color(0.6f, 0.85f, 1f, 1f); // purified blue
+                var shape = _ambientParticles.shape;
+                shape.radius = 12f;
+                _ambientParticles.Emit(350);
+            }
+            Debug.Log("[VFX] Aquifer Purification Cascade spawned.");
+        }
+
+        /// <summary>Prophecy stone alignment — ley line energy converging on activated stones.</summary>
+        public void SpawnProphecyStoneAlignment(Vector3 position)
+        {
+            if (_tuningRings != null)
+            {
+                PlayAt(_tuningRings, position, 5f);
+                var main = _tuningRings.main;
+                main.startColor = new Color(0.7f, 0.5f, 1f, 1f); // prophecy violet
+                main.startLifetime = 4f;
+                _tuningRings.Emit(150);
+            }
+            Debug.Log("[VFX] Prophecy Stone Alignment spawned.");
+        }
     }
 }
