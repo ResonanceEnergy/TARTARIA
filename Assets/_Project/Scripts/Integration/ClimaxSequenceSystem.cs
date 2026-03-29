@@ -51,6 +51,12 @@ namespace Tartaria.Integration
             RegisterClimax(Moon5Climax.Build());
             RegisterClimax(Moon6Climax.Build());
             RegisterClimax(Moon7Climax.Build());
+            RegisterClimax(Moon8Climax.Build());
+            RegisterClimax(Moon9Climax.Build());
+            RegisterClimax(Moon10Climax.Build());
+            RegisterClimax(Moon11Climax.Build());
+            RegisterClimax(Moon12Climax.Build());
+            RegisterClimax(Moon13Climax.Build());
         }
 
         // ─── Public API ──────────────────────────────
@@ -1254,6 +1260,835 @@ namespace Tartaria.Integration
                 type = ClimaxBeatType.Wait,
                 duration = 4f,
                 pauseAfter = 2f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 8 Climax: The Armada Flyover ────────
+
+    public static class Moon8Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 7,
+                climaxId = "armada_flyover_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Fleet assembly
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "All hands. This is Captain Thorne... we fly it for Korath. We fly it for everyone who forgot what the sky looked like full of ships.",
+                duration = 6f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 2: Reset Drone wave
+            var droneWave = new WaveEncounterDef
+            {
+                encounterId = "armada_reset_drones",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 8f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.ResetDrone, count = 6, healthMultiplier = 1.0f },
+                            new() { enemyType = EnemyTypeId.ResetDrone, count = 6, healthMultiplier = 1.0f, spawnDelay = 4f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(0, 50, 20),
+                waveEncounter = droneWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 3: Toren navigation
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Toren",
+                dialogueText = "Navigation calibrated, Captain! I sharpened the starboard orb tuning by 0.2 Hz!",
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            // Beat 4: Continental flyover camera pan
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 200, 0),
+                duration = 8f,
+                pauseAfter = 1f
+            });
+
+            // Beat 5: Thorne's grandfather speech
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "My grandfather commanded a fleet of 200 ships. I've got three. But I'd wager mine have more heart.",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 6: Carrier boss encounter
+            var carrierWave = new WaveEncounterDef
+            {
+                encounterId = "armada_carrier_boss",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 15f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.SiegeGolem, count = 1, healthMultiplier = 3.5f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(0, 80, 0),
+                waveEncounter = carrierWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 7: Night run ley lines visible
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 70f,
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            // Beat 8: Milo space buildings
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Milo",
+                dialogueText = "Are those... are those buildings? In SPACE?",
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "The old world built higher than anyone remembers... the fleet used to dock there.",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 9: Landing camera
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 30, 50),
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            // Beat 10: Thorne resolution
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "Look at that. Rivers of light from here to the edge of the world. Makes a captain almost believe in endings that aren't tragic.",
+                duration = 6f,
+                pauseAfter = 2f
+            });
+
+            // Beat 11: VFX zone complete
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "zone_complete",
+                worldPosition = new Vector3(0, 50, 0),
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            // Beat 12: RS reward
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 30f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 9 Climax: The Floating Aurora City ──
+
+    public static class Moon9Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 8,
+                climaxId = "aurora_city_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Prophecy stone alignment complete
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "discovery",
+                worldPosition = new Vector3(0, 0, 0),
+                duration = 5f,
+                pauseAfter = 2f
+            });
+
+            // Beat 2: Aurora City materializes — camera sweeps up
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 300, 0),
+                duration = 10f,
+                pauseAfter = 2f
+            });
+
+            // Beat 3: Lirael remembers
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Lirael",
+                dialogueText = "I remember this street. I used to sing at that fountain...",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 4: Thorne remembers
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "Those docking towers... I used them every day for a hundred years.",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 5: Korath echo
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Korath",
+                dialogueText = "This is what I built. This is what we all built. Together.",
+                duration = 5f,
+                pauseAfter = 2f
+            });
+
+            // Beat 6: Three minutes of pure spectacle — environment shift
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 95f,
+                duration = 15f,
+                pauseAfter = 2f
+            });
+
+            // Beat 7: The Fade begins
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 60f,
+                duration = 12f,
+                pauseAfter = 1f
+            });
+
+            // Beat 8: Milo reacts
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Milo",
+                dialogueText = "That's real, isn't it? Not a sales pitch. That's what we were supposed to have. ...I'm going to need a minute.",
+                duration = 7f,
+                pauseAfter = 3f
+            });
+
+            // Beat 9: Zereth's first direct contact
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Zereth",
+                dialogueText = "You saw it. The world I was trying to save. Do you understand now why the silence hurts?",
+                duration = 6f,
+                pauseAfter = 2f
+            });
+
+            // Beat 10: RS reward (no combat this Moon)
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 20f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 10 Climax: Continental Train Journey ─
+
+    public static class Moon10Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 9,
+                climaxId = "continental_train_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Departure from New Chicago Central
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 20, -30),
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Narrator",
+                dialogueText = "The first continental train in eight hundred years departs New Chicago Central. Children sing from the Silver Passage as bells ring from every restored zone.",
+                duration = 7f,
+                pauseAfter = 2f
+            });
+
+            // Beat 2: Rail Wraith combat
+            var railWave = new WaveEncounterDef
+            {
+                encounterId = "continental_rail_wraiths",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 10f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.FrequencyWraith, count = 4, healthMultiplier = 1.5f },
+                            new() { enemyType = EnemyTypeId.FrequencyWraith, count = 4, healthMultiplier = 1.5f, spawnDelay = 6f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(50, 0, 0),
+                waveEncounter = railWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 3: Korath's bell tower
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Korath",
+                dialogueText = "The rails I laid. The routes I cut. They carry the living now.",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 4: Rail Leviathan boss
+            var leviathanWave = new WaveEncounterDef
+            {
+                encounterId = "rail_leviathan_boss",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 20f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.TitanGolem, count = 1, healthMultiplier = 4.0f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(100, 0, 0),
+                waveEncounter = leviathanWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 5: Trigger Room discovery
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(80, -20, 0),
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Cassian",
+                dialogueText = "The Cabal reversed the polarity? That would require intimate knowledge...",
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Milo",
+                dialogueText = "You seem to know a LOT about how forbidden weapons work, Scholar.",
+                duration = 4f,
+                pauseAfter = 2f
+            });
+
+            // Beat 6: Emergence into light
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 85f,
+                duration = 8f,
+                pauseAfter = 1f
+            });
+
+            // Beat 7: Thorne's monologue
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "I spent 200 years alone in the sky. Today I rode a train with a fox, a ghost, a dead giant's echo, three children, and a world that's remembering how to breathe.",
+                duration = 8f,
+                pauseAfter = 2f
+            });
+
+            // Beat 8: RS reward
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 35f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 11 Climax: Planetary Fountain Activation ─
+
+    public static class Moon11Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 10,
+                climaxId = "fountain_activation_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Deep aquifer cavern
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, -100, 0),
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            // Beat 2: Lirael speaks
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Lirael",
+                dialogueText = "It's not evil. It's DROWNING. The water is trying to remember what it was before the mud!",
+                duration = 6f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 3: Sludge Leviathan boss
+            var sludgeWave = new WaveEncounterDef
+            {
+                encounterId = "sludge_leviathan_boss",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 18f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.TitanGolem, count = 1, healthMultiplier = 5.0f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(0, -80, 0),
+                waveEncounter = sludgeWave,
+                pauseAfter = 2f
+            });
+
+            // Beat 4: Chain reaction begins — fountains activate
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "zone_complete",
+                worldPosition = new Vector3(0, 0, 0),
+                duration = 8f,
+                pauseAfter = 1f
+            });
+
+            // Beat 5: Toren calls out
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Toren",
+                dialogueText = "Fountain One online! Fountain Two! Three! They're all coming on!",
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Aria",
+                dialogueText = "Each fountain has a different note! They're making a chord!",
+                duration = 4f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Syl",
+                dialogueText = "The water came home.",
+                duration = 3f,
+                pauseAfter = 2f
+            });
+
+            // Beat 6: Camera sweeps up through fountain cascade
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 150, 0),
+                duration = 8f,
+                pauseAfter = 1f
+            });
+
+            // Beat 7: Environment shift — world in bloom
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 88f,
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            // Beat 8: RS reward
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 25f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 12 Climax: Planetary Bell-Tower Ring ──
+
+    public static class Moon12Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 11,
+                climaxId = "planetary_bell_ring_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Central tower approach
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 80, 0),
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Veritas",
+                dialogueText = "Twelve towers. Twelve frequencies. One harmony. The Schumann resonance must thread them all — 7.83 Hz, the heartbeat of the planet.",
+                duration = 7f,
+                pauseAfter = 2f
+            });
+
+            // Beat 2: Player rings central tower — VFX cascade
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "zone_complete",
+                worldPosition = new Vector3(0, 60, 0),
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            // Beat 3: Wave propagation — camera follows
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(500, 200, 0),
+                duration = 10f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Lirael",
+                dialogueText = "I can hear them all... every tower, every bell, singing back. The whole world is ringing.",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 4: All 12 towers confirm — massive VFX
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "zone_complete",
+                worldPosition = new Vector3(0, 300, 0),
+                duration = 10f,
+                pauseAfter = 2f
+            });
+
+            // Beat 5: Korath echo from beyond
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Korath",
+                dialogueText = "The mathematics hold. Every frequency locks into the next. This is the cascade I calculated eight hundred years ago... and it is more beautiful than the numbers suggested.",
+                duration = 7f,
+                pauseAfter = 2f
+            });
+
+            // Beat 6: Environment shift — near-complete resonance
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 95f,
+                duration = 8f,
+                pauseAfter = 1f
+            });
+
+            // Beat 7: Thorne's reaction
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "I can feel it in the deck plates. Every ship in the fleet is humming. The sky itself is singing.",
+                duration = 5f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 8: RS reward
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 30f,
+                duration = 2f,
+                pauseAfter = 1f
+            });
+
+            return def;
+        }
+    }
+
+    // ─── Moon 13 Climax: True Timeline Convergence ─
+
+    public static class Moon13Climax
+    {
+        public static ClimaxDefinition Build()
+        {
+            var def = new ClimaxDefinition
+            {
+                moonIndex = 12,
+                climaxId = "true_convergence_climax",
+                beats = new List<ClimaxBeat>()
+            };
+
+            // Beat 1: Zereth confrontation at the edge of the known world
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CameraPan,
+                worldPosition = new Vector3(0, 50, 100),
+                duration = 6f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Zereth",
+                dialogueText = "You stand where I stood eight hundred years ago. The device is behind me. The Cabal's fingerprints are on it — and so are mine. I activated it for transcendence. They reversed the polarity while it was running.",
+                duration = 9f,
+                pauseAfter = 2f
+            });
+
+            // Beat 2: Cassian revelation
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Cassian",
+                dialogueText = "The Council archives... they recorded everything. Zereth isn't lying. The Parasite Cabal used his work against him — against all of us.",
+                duration = 6f,
+                pauseAfter = 1.5f
+            });
+
+            // Beat 3: Final boss — Dissonance manifestation
+            var finalWave = new WaveEncounterDef
+            {
+                encounterId = "final_dissonance_boss",
+                waves = new List<WaveDefinition>
+                {
+                    new()
+                    {
+                        waveIndex = 0,
+                        rsReward = 10f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.MirrorWraith, count = 4, healthMultiplier = 2.0f },
+                            new() { enemyType = EnemyTypeId.FrequencyWraith, count = 4, healthMultiplier = 2.0f }
+                        }
+                    },
+                    new()
+                    {
+                        waveIndex = 1,
+                        rsReward = 15f,
+                        spawns = new List<WaveSpawn>
+                        {
+                            new() { enemyType = EnemyTypeId.TitanGolem, count = 1, healthMultiplier = 6.0f }
+                        }
+                    }
+                }
+            };
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.CombatWave,
+                worldPosition = new Vector3(0, 0, 80),
+                waveEncounter = finalWave,
+                pauseAfter = 3f
+            });
+
+            // Beat 4: Zereth's redemption dialogue
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Zereth",
+                dialogueText = "I have waited eight centuries for someone to understand. Not forgive — understand. The Flood was not my intent. The silence that followed was my prison.",
+                duration = 8f,
+                pauseAfter = 2f
+            });
+
+            // Beat 5: Anastasia speaks
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Anastasia",
+                dialogueText = "The resonance holds all of it — the pain, the beauty, the silence, and the singing. It always has. Forgiveness is not forgetting. It is choosing to carry the memory forward.",
+                duration = 8f,
+                pauseAfter = 2f
+            });
+
+            // Beat 6: All 12 bells ring — final planetary cascade
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.VFXBurst,
+                vfxType = "zone_complete",
+                worldPosition = new Vector3(0, 200, 0),
+                duration = 12f,
+                pauseAfter = 2f
+            });
+
+            // Beat 7: Environment shift to 100% RS
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.EnvironmentShift,
+                floatParam = 100f,
+                duration = 10f,
+                pauseAfter = 2f
+            });
+
+            // Beat 8: Milo's final words
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Milo",
+                dialogueText = "So... what do we do now? The world's restored. The bad guys are dealt with. Do we just... live?",
+                duration = 5f,
+                pauseAfter = 1f
+            });
+
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Dialogue,
+                speaker = "Thorne",
+                dialogueText = "We live. That's the whole point, fox.",
+                duration = 4f,
+                pauseAfter = 2f
+            });
+
+            // Beat 9: RS reward — 100% completion
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.RSReward,
+                floatParam = 40f,
+                duration = 3f,
+                pauseAfter = 2f
+            });
+
+            // Beat 10: Silence — the world breathes
+            def.beats.Add(new ClimaxBeat
+            {
+                type = ClimaxBeatType.Wait,
+                duration = 5f,
+                pauseAfter = 3f
             });
 
             return def;

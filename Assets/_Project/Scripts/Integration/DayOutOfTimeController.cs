@@ -118,6 +118,9 @@ namespace Tartaria.Integration
                 yield return new WaitForSeconds(5f);
             }
 
+            // Phase 5b: Companion Performances
+            yield return StartCoroutine(CompanionPerformances());
+
             // Phase 6: True Ending
             _eventActive = false;
             _eventCompleted = true;
@@ -175,6 +178,107 @@ namespace Tartaria.Integration
             }
 
             HUDController.Instance?.HideInteractionPrompt();
+        }
+
+        // ─── Companion Performances ──────────────────
+
+        /// <summary>
+        /// 6 companion performances during the DotT event.
+        /// Each companion delivers a unique tribute to the restored world.
+        /// </summary>
+        IEnumerator CompanionPerformances()
+        {
+            Debug.Log("[DotT] Companion performances begin.");
+
+            // 1. Lirael's Concert — crystal resonance song reverberates through all 13 zones
+            yield return StartCoroutine(LiraelConcert());
+
+            // 2. Thorne's Flyover — militia airship salute over the restored skyline
+            yield return StartCoroutine(ThorneFlyover());
+
+            // 3. Korath's Celestial Symphony — star patterns align, constellation map projected
+            yield return StartCoroutine(KorathSymphony());
+
+            // 4. Veritas's Organ Finale — 12 bell towers ring in perfect Schumann harmony
+            yield return StartCoroutine(VeritasOrganFinale());
+
+            // 5. Milo's Commerce Festival — the fox leads a parade of restored shopkeepers
+            yield return StartCoroutine(MiloCommerceFestival());
+
+            // 6. Anastasia's Solidification Celebration — golden motes converge, she becomes fully real
+            yield return StartCoroutine(AnastasiaSolidificationCelebration());
+
+            Debug.Log("[DotT] All companion performances complete.");
+        }
+
+        IEnumerator LiraelConcert()
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                "Lirael sings the Song of Restoration.\nCrystal harmonics ripple through all 13 zones.");
+            DialogueManager.Instance?.PlayContextDialogue("dott_lirael_concert");
+            LiraelController.Instance?.NotifyZoneComplete(); // triggers celebration state
+
+            Tartaria.Audio.AdaptiveMusicController.Instance?.PlayRestoration();
+            yield return new WaitForSeconds(12f);
+            HUDController.Instance?.HideInteractionPrompt();
+        }
+
+        IEnumerator ThorneFlyover()
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                "Thorne leads the militia fleet in a skyward salute.\n\"For those who stood when the world knelt.\"");
+            DialogueManager.Instance?.PlayContextDialogue("dott_thorne_flyover");
+
+            var fleet = AirshipFleetManager.Instance;
+            if (fleet != null)
+                fleet.SetFormation(AirshipFleetManager.FleetFormation.Vanguard);
+
+            yield return new WaitForSeconds(10f);
+            HUDController.Instance?.HideInteractionPrompt();
+        }
+
+        IEnumerator KorathSymphony()
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                "Korath projects the true star map onto the sky.\nConstellations the old world once navigated by.");
+            DialogueManager.Instance?.PlayContextDialogue("dott_korath_symphony");
+
+            yield return new WaitForSeconds(10f);
+            HUDController.Instance?.HideInteractionPrompt();
+        }
+
+        IEnumerator VeritasOrganFinale()
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                "Veritas rings all 12 bell towers simultaneously.\n7.83 Hz -- the Earth's heartbeat restored.");
+            DialogueManager.Instance?.PlayContextDialogue("dott_veritas_organ");
+
+            VFXController.Instance?.SpawnPlanetaryBellRing(Vector3.zero);
+            yield return new WaitForSeconds(12f);
+            HUDController.Instance?.HideInteractionPrompt();
+        }
+
+        IEnumerator MiloCommerceFestival()
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                "Milo darts between stalls, tail blazing gold.\n\"Best deals in a thousand years! Everything must go!\"");
+            DialogueManager.Instance?.PlayContextDialogue("dott_milo_festival");
+
+            yield return new WaitForSeconds(8f);
+            HUDController.Instance?.HideInteractionPrompt();
+        }
+
+        IEnumerator AnastasiaSolidificationCelebration()
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                "Golden motes spiral inward. Anastasia steps forward, fully solid.\n\"I remember everything now. Every stone. Every name.\"");
+            DialogueManager.Instance?.PlayContextDialogue("dott_anastasia_solid");
+
+            VFXController.Instance?.SpawnAnastasiaSolidificationEffect(Vector3.zero);
+            yield return new WaitForSeconds(15f);
+            HUDController.Instance?.HideInteractionPrompt();
+
+            AchievementSystem.Instance?.CheckSolidification();
         }
     }
 }

@@ -264,6 +264,33 @@ namespace Tartaria.Integration
                 _liftedBuilding.position, targetPos,
                 buildingLiftSpeed * Time.deltaTime);
         }
+
+        // ─── Save/Load ──────────────────────────────
+
+        int _totalActivations;
+        int _buildingsLifted;
+        int _rubbleCleared;
+        float _totalTimeAsGiant;
+
+        public Save.GiantModeSaveBlock GetSaveData()
+        {
+            return new Save.GiantModeSaveBlock
+            {
+                totalActivations = _totalActivations,
+                buildingsLifted = _buildingsLifted,
+                rubbleCleared = _rubbleCleared,
+                totalTimeAsGiant = _totalTimeAsGiant
+            };
+        }
+
+        public void LoadSaveData(Save.GiantModeSaveBlock data)
+        {
+            if (data == null) return;
+            _totalActivations = data.totalActivations;
+            _buildingsLifted = data.buildingsLifted;
+            _rubbleCleared = data.rubbleCleared;
+            _totalTimeAsGiant = data.totalTimeAsGiant;
+        }
     }
 
     public enum GiantAbility : byte
