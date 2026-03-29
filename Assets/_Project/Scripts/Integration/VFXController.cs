@@ -22,7 +22,7 @@ namespace Tartaria.Integration
     ///   - World palette shift (ambient particles reflecting RS)
     /// </summary>
     [DisallowMultipleComponent]
-    public class VFXController : MonoBehaviour
+    public class VFXController : MonoBehaviour, IVFXService
     {
         public static VFXController Instance { get; private set; }
 
@@ -47,6 +47,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            ServiceLocator.VFX = this;
             CreateParticleSystems();
         }
 
@@ -156,6 +157,24 @@ namespace Tartaria.Integration
             return ps;
         }
 
+        // ─── IVFXService ─────────────────────────────
+
+        public void PlayEffect(VFXEffect effect, Vector3 position)
+        {
+            switch (effect)
+            {
+                case VFXEffect.Spark:           PlayAt(_discoveryBurst, position, 1f); break;
+                case VFXEffect.AetherVortex:    PlayAt(_resonancePulseVFX, position, 3f); break;
+                case VFXEffect.DiscoveryBurst:  PlayDiscoveryBurst(position); break;
+                case VFXEffect.BuildingEmergence: PlayBuildingEmergence(position); break;
+                case VFXEffect.HarmonicStrike:  PlayHarmonicStrike(position, Vector3.forward); break;
+                case VFXEffect.ShieldActivation: PlayShieldActivation(position); break;
+                case VFXEffect.EnemyDissolution: PlayEnemyDissolution(position); break;
+                case VFXEffect.ResonancePulse:  PlayAt(_resonancePulseVFX, position, 5f); break;
+                default: PlayAt(_discoveryBurst, position, 1f); break;
+            }
+        }
+
         // ─── Public Effect Triggers ──────────────────
 
         public void PlayDiscoveryBurst(Vector3 position)
@@ -182,6 +201,14 @@ namespace Tartaria.Integration
             _emergenceParticles.transform.position = position;
             var shape = _emergenceParticles.shape;
             shape.radius = 10f; // Large area for building
+            _emergenceParticles.Play();
+        }
+
+        public void PlayBuildingUpgrade(Vector3 position, int tier)
+        {
+            _emergenceParticles.transform.position = position;
+            var main = _emergenceParticles.main;
+            main.startSize = 2f + tier * 0.5f;
             _emergenceParticles.Play();
         }
 
@@ -212,6 +239,21 @@ namespace Tartaria.Integration
         public void PlayEnemyDissolution(Vector3 position)
         {
             PlayAt(_dissolutionVFX, position, 5f);
+        }
+
+        /// <summary>
+        /// Plays a dissonance corruption pulse at the given world position.
+        /// Used by ZerethController during dissonance events.
+        /// </summary>
+        public void PlayDissonancePulse(Vector3 position, float radius)
+        {
+            // Reuse the resonance pulse system with inverted aesthetics
+            _resonancePulseVFX.transform.position = position;
+            var shape = _resonancePulseVFX.shape;
+            shape.radius = radius;
+            var main = _resonancePulseVFX.main;
+            main.startColor = new Color(0.6f, 0.1f, 0.3f); // dark dissonance red-violet
+            _resonancePulseVFX.Play();
         }
 
         // ─── World Palette ───────────────────────────

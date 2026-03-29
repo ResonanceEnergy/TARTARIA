@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
@@ -163,9 +164,9 @@ namespace Tartaria.Integration
 
         // ─── Event Handlers (Achievement) ────────────
 
-        void HandleBossDefeated(string bossId)
+        void HandleBossDefeated(BossResult result)
         {
-            CheckBossDefeated(bossId);
+            CheckBossDefeated(result.bossName);
         }
 
         void HandleNetworkComplete()
@@ -183,7 +184,7 @@ namespace Tartaria.Integration
             Unlock("M05");
         }
 
-        void HandleConvergenceComplete()
+        void HandleConvergenceComplete(float score)
         {
             Unlock("M06");
         }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using Tartaria.Core;
@@ -112,13 +113,13 @@ namespace Tartaria.Integration
 
             // Phase 5: Solidification
             var ana = AnastasiaController.Instance;
-            if (ana != null && ana.CurrentSolidPhase == AnastasiaController.SolidificationPhase.NotTriggered)
+            if (ana != null && ana.CurrentSolidPhase == SolidificationPhase.NotTriggered)
             {
                 ana.TriggerSolidification();
                 // Wait for solidification to complete (~30s based on AnastasiaController)
                 yield return new WaitUntil(() =>
-                    ana.CurrentSolidPhase == AnastasiaController.SolidificationPhase.Return ||
-                    ana.CurrentSolidPhase == AnastasiaController.SolidificationPhase.NotTriggered);
+                    ana.CurrentSolidPhase == SolidificationPhase.Return ||
+                    ana.CurrentSolidPhase == SolidificationPhase.NotTriggered);
                 yield return new WaitForSeconds(5f);
             }
 
@@ -495,7 +496,7 @@ namespace Tartaria.Integration
             _eventCompleted = data.eventCompleted;
             _festivalCurrency = data.festivalCurrency;
             _currentMemoryZone = data.currentMemoryZone;
-            _challengeScore = data.bestChallengeScore;
+            _challengeScore = (int)data.bestChallengeScore;
         }
 
         public class DotTSavePayload

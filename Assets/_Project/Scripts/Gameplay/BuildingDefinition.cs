@@ -46,6 +46,9 @@ namespace Tartaria.Gameplay
         [Header("Mud Dissolution")]
         public float dissolutionDuration = 5.0f;
 
+        [Header("Economy")]
+        public int baseIncome = 10;
+
         /// <summary>
         /// Returns the golden ratio accuracy for this building's proportions.
         /// </summary>

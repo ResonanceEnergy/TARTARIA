@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -281,7 +282,7 @@ namespace Tartaria.Integration
                         break;
 
                     case ConsequenceType.AddTrust:
-                        CassianNPCController.Instance?.ModifyTrust(c.floatValue);
+                        CassianNPCController.Instance?.AdjustTrust(c.floatValue);
                         break;
 
                     case ConsequenceType.ActivateQuest:

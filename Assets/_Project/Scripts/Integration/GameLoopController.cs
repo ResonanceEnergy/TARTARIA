@@ -24,7 +24,7 @@ namespace Tartaria.Integration
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-50)] // Run before most MonoBehaviours
-    public class GameLoopController : MonoBehaviour
+    public class GameLoopController : MonoBehaviour, IGameLoopService
     {
         public static GameLoopController Instance { get; private set; }
 
@@ -56,6 +56,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            ServiceLocator.GameLoop = this;
         }
 
         void Start()
@@ -88,7 +89,31 @@ namespace Tartaria.Integration
 
             // Wire boss defeated → climax trigger + quest advancement
             if (BossEncounterSystem.Instance != null)
+            {
                 BossEncounterSystem.Instance.OnBossDefeated += HandleBossDefeated;
+                BossEncounterSystem.Instance.OnBossHealthChanged += HandleBossHealthChanged;
+            }
+
+            // Wire climax events → HUD + state
+            if (ClimaxSequenceSystem.Instance != null)
+                ClimaxSequenceSystem.Instance.OnClimaxCompleted += HandleClimaxCompleted;
+
+            // Wire combat wave events → HUD + state
+            var waveManager = CombatWaveManager.Instance;
+            if (waveManager != null)
+            {
+                waveManager.OnWaveStarted += HandleWaveStarted;
+                waveManager.OnWaveCleared += HandleWaveCleared;
+                waveManager.OnAllWavesCleared += HandleAllWavesCleared;
+            }
+
+            // Wire achievement events → HUD toast + notifications
+            if (AchievementSystem.Instance != null)
+                AchievementSystem.Instance.OnAchievementUnlocked += HandleAchievementUnlocked;
+
+            // Wire companion trust changes → notifications
+            if (CompanionManager.Instance != null)
+                CompanionManager.Instance.OnTrustChanged += HandleCompanionTrustChanged;
 
             // Deferred ECS init (world may not be ready in Awake)
             InitECS();
@@ -113,7 +138,23 @@ namespace Tartaria.Integration
             if (TutorialSystem.Instance != null)
                 TutorialSystem.Instance.OnTutorialComplete -= HandleTutorialComplete;
             if (BossEncounterSystem.Instance != null)
+            {
                 BossEncounterSystem.Instance.OnBossDefeated -= HandleBossDefeated;
+                BossEncounterSystem.Instance.OnBossHealthChanged -= HandleBossHealthChanged;
+            }
+            if (ClimaxSequenceSystem.Instance != null)
+                ClimaxSequenceSystem.Instance.OnClimaxCompleted -= HandleClimaxCompleted;
+            var waveManager = CombatWaveManager.Instance;
+            if (waveManager != null)
+            {
+                waveManager.OnWaveStarted -= HandleWaveStarted;
+                waveManager.OnWaveCleared -= HandleWaveCleared;
+                waveManager.OnAllWavesCleared -= HandleAllWavesCleared;
+            }
+            if (AchievementSystem.Instance != null)
+                AchievementSystem.Instance.OnAchievementUnlocked -= HandleAchievementUnlocked;
+            if (CompanionManager.Instance != null)
+                CompanionManager.Instance.OnTrustChanged -= HandleCompanionTrustChanged;
         }
 
         void InitECS()
@@ -314,18 +355,89 @@ namespace Tartaria.Integration
             Debug.Log($"[GameLoop] Boss defeated: {result.bossName} — Score {result.performanceScore:P0}");
 
             // Trigger climax sequence for the current Moon
-            ClimaxSequenceSystem.Instance?.TriggerClimax();
+            int moonIdx = CampaignFlowController.Instance?.CurrentMoonIndex ?? 0;
+            ClimaxSequenceSystem.Instance?.TriggerClimax(moonIdx);
 
             // Advance Moon campaign
-            MoonCampaignManager.Instance?.AdvanceToNextMoon();
+            CampaignFlowController.Instance?.AdvanceToNextMoon();
 
             // Companion celebration
             MiloController.Instance?.NotifyCombatVictory();
             LiraelController.Instance?.NotifyZoneComplete();
 
+            // Hide boss health bar
+            HUDController.Instance?.HideBossHealth();
+
             // Return to exploration after cinematic
             GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
             SaveManager.Instance?.MarkDirty();
+        }
+
+        void HandleBossHealthChanged(float normalizedHealth)
+        {
+            HUDController.Instance?.UpdateBossHealth(normalizedHealth);
+        }
+
+        void HandleClimaxCompleted(int moonIndex)
+        {
+            Debug.Log($"[GameLoop] Climax sequence completed for Moon {moonIndex + 1} — triggering rewards.");
+
+            // Show moon trophy banner
+            string moonName = ZoneTransitionSystem.Instance?.CurrentZone?.zoneName ?? $"Moon {moonIndex + 1}";
+            HUDController.Instance?.ShowMoonTrophy(
+                $"{moonName} Restored!",
+                "The resonance deepens. A new path opens.");
+
+            // Achievement progress notification
+            NotificationSystem.Instance?.Show("Moon climax complete!", NotificationType.Achievement);
+
+            // RS bonus for climax completion
+            QueueRSReward(25f, "climax_bonus");
+
+            // Flash the RS gauge
+            HUDController.Instance?.FlashRSGain(25f);
+
+            SaveManager.Instance?.MarkDirty();
+        }
+
+        void HandleWaveStarted(int waveIndex)
+        {
+            var wm = CombatWaveManager.Instance;
+            int totalWaves = wm != null ? wm.TotalWaves : 0;
+            int enemies = wm != null ? wm.EnemiesRemaining : 0;
+            HUDController.Instance?.ShowWaveCounter(waveIndex, totalWaves, enemies);
+
+            // Show boss health bar when boss encounters start
+            if (BossEncounterSystem.Instance != null && BossEncounterSystem.Instance.IsActive)
+                HUDController.Instance?.ShowBossHealth(
+                    BossEncounterSystem.Instance.CurrentBoss?.bossName ?? "Boss", 1f);
+        }
+
+        void HandleWaveCleared(int waveIndex)
+        {
+            HUDController.Instance?.UpdateWaveEnemies(0);
+            NotificationSystem.Instance?.Show($"Wave {waveIndex + 1} cleared!", NotificationType.Combat);
+        }
+
+        void HandleAllWavesCleared()
+        {
+            Debug.Log("[GameLoop] All combat waves cleared.");
+            HUDController.Instance?.HideWaveCounter();
+            HUDController.Instance?.HideBossHealth();
+            NotificationSystem.Instance?.Show("All waves eliminated! Victory!", NotificationType.Combat);
+            SaveManager.Instance?.MarkDirty();
+        }
+
+        void HandleAchievementUnlocked(AchievementSystem.AchievementDef def)
+        {
+            HUDController.Instance?.ShowAchievementToast(def.title);
+            NotificationSystem.Instance?.Show($"Achievement: {def.title}", NotificationType.Achievement);
+            Debug.Log($"[GameLoop] Achievement unlocked: {def.id} — {def.title}");
+        }
+
+        void HandleCompanionTrustChanged(string companionId, float newTrust)
+        {
+            NotificationSystem.Instance?.ShowTrustChange(companionId, Mathf.RoundToInt(newTrust).ToString());
         }
 
         // ─── Combat Input Forwarding to ECS ──────────
@@ -824,7 +936,7 @@ namespace Tartaria.Integration
             }
 
             // Codex
-            var codex = UI.WorldMapUI.Instance;
+            var codex = UI.CodexSystem.Instance;
             if (codex != null)
             {
                 var cd = codex.GetSaveData();
@@ -1065,6 +1177,19 @@ namespace Tartaria.Integration
                 save.companionManager.companionUnlocked = cmd.companionUnlocked ?? System.Array.Empty<bool>();
                 save.companionManager.companionTrust = cmd.companionTrust ?? System.Array.Empty<float>();
             }
+
+            // ─── v8 Save Blocks ──────────────────────────
+
+            // CombatWave
+            var wave = CombatWaveManager.Instance;
+            if (wave != null)
+            {
+                var wd = wave.GetSaveData();
+                save.combatWave.encounterActive = wd.encounterActive;
+                save.combatWave.currentWaveIndex = wd.currentWaveIndex;
+                save.combatWave.enemiesRemaining = wd.enemiesRemaining;
+                save.combatWave.totalWaves = wd.totalWaves;
+            }
         }
 
         void OnAfterLoad(SaveData save)
@@ -1123,14 +1248,14 @@ namespace Tartaria.Integration
             var cs = CorruptionSystem.Instance;
             if (cs != null && save.corruption?.entries != null)
             {
-                var cStates = new System.Collections.Generic.List<CorruptionSystem.CorruptionState>();
+                var cStates = new System.Collections.Generic.List<CorruptionState>();
                 foreach (var e in save.corruption.entries)
                 {
-                    cStates.Add(new CorruptionSystem.CorruptionState
+                    cStates.Add(new CorruptionState
                     {
                         buildingId = e.buildingId,
                         corruptionLevel = e.corruptionLevel,
-                        stage = (CorruptionSystem.PurgeStage)e.stage,
+                        stage = (PurgeStage)e.stage,
                         identified = e.identified,
                         isolated = e.isolated,
                         purged = e.purged
@@ -1320,7 +1445,7 @@ namespace Tartaria.Integration
             }
 
             // Codex
-            var codex = UI.WorldMapUI.Instance;
+            var codex = UI.CodexSystem.Instance;
             if (codex != null && save.codex != null)
             {
                 codex.LoadSaveData(new UI.CodexSaveData
@@ -1357,7 +1482,7 @@ namespace Tartaria.Integration
                 {
                     trust = save.veritas.trust,
                     introduced = save.veritas.introduced,
-                    trustTier = (VeritasTrustTier)save.veritas.trustTier,
+                    trustTier = (int)save.veritas.trustTier,
                     registersRestored = save.veritas.registersRestored,
                     performanceAccuracy = save.veritas.performanceAccuracy,
                     requiemPerformed = save.veritas.requiemPerformed,
@@ -1468,12 +1593,12 @@ namespace Tartaria.Integration
             var excLoad = Gameplay.ExcavationSystem.Instance;
             if (excLoad != null && save.excavation != null)
             {
-                var sites = new System.Collections.Generic.List<Gameplay.ExcavationSystem.ExcavationSiteEntry>();
+                var sites = new System.Collections.Generic.List<Gameplay.ExcavationSiteEntry>();
                 if (save.excavation.discoveredSiteIds != null)
                 {
                     for (int i = 0; i < save.excavation.discoveredSiteIds.Length; i++)
                     {
-                        sites.Add(new Gameplay.ExcavationSystem.ExcavationSiteEntry
+                        sites.Add(new Gameplay.ExcavationSiteEntry
                         {
                             siteId = save.excavation.discoveredSiteIds[i],
                             layersCleared = save.excavation.siteStages != null && i < save.excavation.siteStages.Length ? save.excavation.siteStages[i] : 0,
@@ -1482,7 +1607,7 @@ namespace Tartaria.Integration
                         });
                     }
                 }
-                excLoad.LoadSaveData(new Gameplay.ExcavationSystem.ExcavationSaveData { sites = sites });
+                excLoad.LoadSaveData(new Gameplay.ExcavationSaveData { sites = sites });
             }
 
             // Crafting
@@ -1492,19 +1617,19 @@ namespace Tartaria.Integration
                 var recipes = save.crafting.knownRecipeIds != null
                     ? new System.Collections.Generic.List<string>(save.crafting.knownRecipeIds)
                     : new System.Collections.Generic.List<string>();
-                var inventory = new System.Collections.Generic.List<Gameplay.CraftingSystem.CraftingInventoryEntry>();
+                var inventory = new System.Collections.Generic.List<Gameplay.CraftingInventoryEntry>();
                 if (save.crafting.inventoryItemIds != null)
                 {
                     for (int i = 0; i < save.crafting.inventoryItemIds.Length; i++)
                     {
-                        inventory.Add(new Gameplay.CraftingSystem.CraftingInventoryEntry
+                        inventory.Add(new Gameplay.CraftingInventoryEntry
                         {
                             itemId = save.crafting.inventoryItemIds[i],
                             count = save.crafting.inventoryItemCounts != null && i < save.crafting.inventoryItemCounts.Length ? save.crafting.inventoryItemCounts[i] : 0
                         });
                     }
                 }
-                craftLoad.LoadSaveData(new Gameplay.CraftingSystem.CraftingSaveData
+                craftLoad.LoadSaveData(new Gameplay.CraftingSaveData
                 {
                     discoveredRecipes = recipes,
                     inventory = inventory
@@ -1518,7 +1643,7 @@ namespace Tartaria.Integration
                 var pois = save.scanner.scannedObjectIds != null
                     ? new System.Collections.Generic.List<string>(save.scanner.scannedObjectIds)
                     : new System.Collections.Generic.List<string>();
-                scanLoad.LoadSaveData(new Gameplay.ResonanceScannerSystem.ScannerSaveData { revealedPOIs = pois });
+                scanLoad.LoadSaveData(new Gameplay.ScannerSaveData { revealedPOIs = pois });
             }
 
             // Continental Rail
@@ -1586,6 +1711,21 @@ namespace Tartaria.Integration
                     companionIds = save.companionManager.companionIds,
                     companionUnlocked = save.companionManager.companionUnlocked,
                     companionTrust = save.companionManager.companionTrust
+                });
+            }
+
+            // ─── v8 Load Blocks ──────────────────────────
+
+            // CombatWave
+            var waveLoad = CombatWaveManager.Instance;
+            if (waveLoad != null && save.combatWave != null)
+            {
+                waveLoad.LoadSaveData(new CombatWaveManager.CombatWaveSaveData
+                {
+                    encounterActive = save.combatWave.encounterActive,
+                    currentWaveIndex = save.combatWave.currentWaveIndex,
+                    enemiesRemaining = save.combatWave.enemiesRemaining,
+                    totalWaves = save.combatWave.totalWaves
                 });
             }
         }

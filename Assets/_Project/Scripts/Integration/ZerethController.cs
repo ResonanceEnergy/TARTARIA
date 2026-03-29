@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -304,7 +305,8 @@ namespace Tartaria.Integration
         Voice = 2,         // Moon 9: Active voice responses
         Evidence = 3,      // Moon 12: Physical evidence found
         Manifested = 4,    // Moon 13: Full physical form
-        Redeemed = 5       // Post-confrontation redemption
+        Redeemed = 5,      // Post-confrontation redemption
+        Confrontation = 6  // Redemption arc confrontation phase
     }
 
     [System.Serializable]

@@ -4,6 +4,23 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [1.9.0] — 2025-07-28
+
+**Roadmap v11 — HUD Combat Panels, Event Wiring, Wave Persistence & Companion Fixes**  
+*7 modified files — 4 HUD panels, 7 event subscriptions, save schema v8, Veritas/Korath fixes*
+
+### Changed
+- **HUDController.cs** (UI) — 4 new combat HUD panels: boss health bar (color shift at low HP), wave counter (wave/total + enemy count), achievement toast (3s auto-fade), moon trophy banner (5s auto-fade); all panels hidden on Start(), PulseScale animations
+- **GameLoopController.cs** (Integration) — 7 new event subscriptions in Start()/OnDestroy(): BossEncounterSystem.OnBossHealthChanged, CombatWaveManager.OnWaveStarted/OnWaveCleared/OnAllWavesCleared, ClimaxSequenceSystem.OnClimaxCompleted, AchievementSystem.OnAchievementUnlocked, CompanionManager.OnTrustChanged; handler methods wire to HUD + NotificationSystem; OnBeforeSave/OnAfterLoad wired for CombatWave v8 save block (36 total)
+- **QuestLogUI.cs** (UI) — NotificationType.Achievement (=8) added; icon prefix "<*>" and bright gold background color for achievement notifications
+- **CombatWaveManager.cs** (Integration) — TotalWaves property; GetSaveData/LoadSaveData + CombatWaveSaveData nested class for encounter persistence
+- **SaveData.cs** (Save) — Schema v7→v8: CombatWaveSaveBlock (encounterActive, currentWaveIndex, enemiesRemaining, totalWaves); 36 save blocks total
+- **SaveManager.cs** (Save) — v7→v8 migration step; gameVersion "0.8.0"
+- **VeritasController.cs** (Integration) — Fixed save data alignment: VeritasSaveData now includes trustTier/performanceAccuracy/bellTowerSyncComplete/finalNoteDelivered bridge fields consumed by GameLoopController; GetSaveData() populates them; LoadSaveData() merges both field sets; added VeritasTrustTier enum alias
+- **KorathController.cs** (Integration) — RequestRevelation() now uses 7 specific revelation dialogue lines (aether origin, mud flood truth, antenna network, frequency war, archive access, cosmic convergence, player role) instead of generic "korath_revelation" context
+
+---
+
 ## [1.8.0] — 2025-07-28
 
 **Roadmap v10 — Save Schema v7, SkillTree Wiring, RS Pipeline & System Integration**  

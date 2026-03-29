@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Audio;
+using Tartaria.Input;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -1301,8 +1304,8 @@ namespace Tartaria.Integration
                         rsReward = 8f,
                         spawns = new List<WaveSpawn>
                         {
-                            new() { enemyType = EnemyTypeId.ResetDrone, count = 6, healthMultiplier = 1.0f },
-                            new() { enemyType = EnemyTypeId.ResetDrone, count = 6, healthMultiplier = 1.0f, spawnDelay = 4f }
+                            new() { enemyType = EnemyTypeId.ResetSeeker, count = 6, healthMultiplier = 1.0f },
+                            new() { enemyType = EnemyTypeId.ResetSeeker, count = 6, healthMultiplier = 1.0f, spawnDelay = 4f }
                         }
                     }
                 }

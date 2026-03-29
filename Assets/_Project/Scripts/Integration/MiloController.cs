@@ -15,7 +15,7 @@ namespace Tartaria.Integration
     ///
     /// Design refs: GDD §05 (Characters §2.2), §03A (Main Storyline)
     /// </summary>
-    public class MiloController : MonoBehaviour
+    public class MiloController : MonoBehaviour, IMiloService
     {
         public static MiloController Instance { get; private set; }
 
@@ -52,6 +52,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            ServiceLocator.Milo = this;
             _trust = initialTrust;
         }
 

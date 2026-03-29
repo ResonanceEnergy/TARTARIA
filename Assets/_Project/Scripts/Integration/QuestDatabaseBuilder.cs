@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Tartaria.Core;
 
 namespace Tartaria.Integration
 {
@@ -19,7 +20,7 @@ namespace Tartaria.Integration
             // ─── Moon 1: Magnetic Moon — Echohaven ───────
             quests.Add(Build("echo_main_discover", "Echoes of the Buried City",
                 "Discover and restore three buildings in Echohaven.",
-                isMain: true, autoActivate: true, rsReward: 10f,
+                isMain: true, autoActivate: true, rsReward: 10f, rsRequirement: 0f, followUp: null,
                 new QuestObjective { description = "Discover buildings", type = QuestObjectiveType.DiscoverBuilding, targetCount = 3 },
                 new QuestObjective { description = "Restore buildings", type = QuestObjectiveType.RestoreBuilding, targetCount = 3 }));
 
@@ -36,7 +37,7 @@ namespace Tartaria.Integration
             // ─── Moon 2: Lunar Moon — Crystal Caverns ────
             quests.Add(Build("lunar_main_caverns", "The Crystal Frequency",
                 "Tune the resonance crystals in the underground caverns.",
-                isMain: true, rsReward: 12f, rsRequirement: 10f,
+                isMain: true, autoActivate: false, rsReward: 12f, rsRequirement: 10f,
                 followUp: new[] { "lunar_side_lirael" },
                 new QuestObjective { description = "Complete crystal tuning nodes", type = QuestObjectiveType.CompleteTuning, targetCount = 5 },
                 new QuestObjective { description = "Reach RS 25", type = QuestObjectiveType.ReachRS, targetCount = 25 }));
@@ -49,7 +50,7 @@ namespace Tartaria.Integration
             // ─── Moon 3: Electric Moon — The Orphan Train ─
             quests.Add(Build("orphan_train_main", "The Orphan Train",
                 "Uncover the orphan train route and the children's fate.",
-                isMain: true, rsReward: 15f, rsRequirement: 20f,
+                isMain: true, autoActivate: false, rsReward: 15f, rsRequirement: 20f, followUp: null,
                 new QuestObjective { description = "Discover rail stations", type = QuestObjectiveType.DiscoverBuilding, targetCount = 4 },
                 new QuestObjective { description = "Restore telegraph office", type = QuestObjectiveType.RestoreBuilding, targetId = "telegraph_office", targetCount = 1 },
                 new QuestObjective { description = "Defeat corruption guardians", type = QuestObjectiveType.DefeatEnemies, targetCount = 8 }));
@@ -62,7 +63,7 @@ namespace Tartaria.Integration
             // ─── Moon 4: Self-Existing Moon — Star Fort ───
             quests.Add(Build("star_fort_main", "Star Fort Siege",
                 "Defend the star fort against the corruption siege.",
-                isMain: true, rsReward: 18f, rsRequirement: 30f,
+                isMain: true, autoActivate: false, rsReward: 18f, rsRequirement: 30f, followUp: null,
                 new QuestObjective { description = "Restore five star points", type = QuestObjectiveType.RestoreBuilding, targetCount = 5 },
                 new QuestObjective { description = "Defeat Siege Golems", type = QuestObjectiveType.DefeatBoss, targetId = "siege_golem_alpha", targetCount = 1 },
                 new QuestObjective { description = "Synchronize bell towers", type = QuestObjectiveType.CompleteTuning, targetCount = 3 }));
@@ -75,7 +76,7 @@ namespace Tartaria.Integration
             // ─── Moon 5: Overtone Moon — White City ───────
             quests.Add(Build("white_city_main", "The White City Revelation",
                 "Explore the ruins of the demolished White City and restore the intercontinental relay.",
-                isMain: true, rsReward: 20f, rsRequirement: 40f,
+                isMain: true, autoActivate: false, rsReward: 20f, rsRequirement: 40f, followUp: null,
                 new QuestObjective { description = "Discover White City foundations", type = QuestObjectiveType.DiscoverBuilding, targetCount = 3 },
                 new QuestObjective { description = "Activate underground telegraph", type = QuestObjectiveType.RestoreBuilding, targetId = "telegraph_relay", targetCount = 1 },
                 new QuestObjective { description = "Complete intercontinental bridge", type = QuestObjectiveType.CompleteTuning, targetCount = 5 }));
@@ -88,7 +89,7 @@ namespace Tartaria.Integration
             // ─── Moon 6: Rhythmic Moon — Cymatic Cathedral ─
             quests.Add(Build("cathedral_main", "The Cymatic Requiem",
                 "Restore the five organ registers and perform the Requiem.",
-                isMain: true, rsReward: 22f, rsRequirement: 50f,
+                isMain: true, autoActivate: false, rsReward: 22f, rsRequirement: 50f, followUp: null,
                 new QuestObjective { description = "Restore organ registers", type = QuestObjectiveType.RestoreBuilding, targetCount = 5 },
                 new QuestObjective { description = "Complete performance mini-game", type = QuestObjectiveType.CompleteMiniGame, targetId = "requiem_performance", targetCount = 1 },
                 new QuestObjective { description = "Defeat Dissonant Conductor", type = QuestObjectiveType.DefeatBoss, targetId = "dissonant_conductor", targetCount = 1 }));
@@ -106,7 +107,7 @@ namespace Tartaria.Integration
             // ─── Moon 7: Resonant Moon — Giant's Awakening ─
             quests.Add(Build("giants_awakening_main", "Giant's Awakening",
                 "Free the last giant from stasis beneath the citadel.",
-                isMain: true, rsReward: 25f, rsRequirement: 60f,
+                isMain: true, autoActivate: false, rsReward: 25f, rsRequirement: 60f, followUp: null,
                 new QuestObjective { description = "Thaw stasis chambers", type = QuestObjectiveType.RestoreBuilding, targetCount = 3 },
                 new QuestObjective { description = "Defeat Titan Golem", type = QuestObjectiveType.DefeatBoss, targetId = "titan_golem", targetCount = 1 },
                 new QuestObjective { description = "Witness Korath's sacrifice", type = QuestObjectiveType.CompanionMilestone, targetId = "korath_sacrifice", targetCount = 1 }));
@@ -124,7 +125,7 @@ namespace Tartaria.Integration
             // ─── Moon 8: Galactic Moon — Airship Armada ───
             quests.Add(Build("airship_armada_main", "The Airship Armada",
                 "Restore the fleet and establish aerial supply lines.",
-                isMain: true, rsReward: 22f, rsRequirement: 65f,
+                isMain: true, autoActivate: false, rsReward: 22f, rsRequirement: 65f, followUp: null,
                 new QuestObjective { description = "Restore airships", type = QuestObjectiveType.RestoreBuilding, targetCount = 3 },
                 new QuestObjective { description = "Complete mercury orb tuning", type = QuestObjectiveType.CompleteTuning, targetCount = 4 },
                 new QuestObjective { description = "Defeat Sky Reavers", type = QuestObjectiveType.DefeatEnemies, targetCount = 12 }));
@@ -142,7 +143,7 @@ namespace Tartaria.Integration
             // ─── Moon 9: Solar Moon — Ley Line Prophecy ───
             quests.Add(Build("ley_line_prophecy_main", "The Ley Line Prophecy",
                 "Activate the 12 prophecy stones and decode Zereth's messages.",
-                isMain: true, rsReward: 25f, rsRequirement: 70f,
+                isMain: true, autoActivate: false, rsReward: 25f, rsRequirement: 70f, followUp: null,
                 new QuestObjective { description = "Activate prophecy stones", type = QuestObjectiveType.CompleteMiniGame, targetId = "prophecy_stone", targetCount = 12 },
                 new QuestObjective { description = "Decode Zereth's ciphers", type = QuestObjectiveType.CollectItem, targetId = "zereth_cipher", targetCount = 5 }));
 
@@ -159,7 +160,7 @@ namespace Tartaria.Integration
             // ─── Moon 10: Planetary Moon — The Living Grid ─
             quests.Add(Build("living_grid_main", "The Living Grid",
                 "Connect the continental rail network and power the Trigger Room.",
-                isMain: true, rsReward: 25f, rsRequirement: 75f,
+                isMain: true, autoActivate: false, rsReward: 25f, rsRequirement: 75f, followUp: null,
                 new QuestObjective { description = "Restore rail segments", type = QuestObjectiveType.RestoreBuilding, targetCount = 6 },
                 new QuestObjective { description = "Activate Trigger Room", type = QuestObjectiveType.CompleteTuning, targetId = "trigger_room", targetCount = 1 }));
 
@@ -177,7 +178,7 @@ namespace Tartaria.Integration
             // ─── Moon 11: Spectral Moon — Veil Between Worlds ─
             quests.Add(Build("veil_main", "Veil Between Worlds",
                 "Purify the aquifer and restore the Fountain of Youth.",
-                isMain: true, rsReward: 28f, rsRequirement: 80f,
+                isMain: true, autoActivate: false, rsReward: 28f, rsRequirement: 80f, followUp: null,
                 new QuestObjective { description = "Purify aquifer sections", type = QuestObjectiveType.RestoreBuilding, targetCount = 5 },
                 new QuestObjective { description = "Cleanse the fountain", type = QuestObjectiveType.CompleteTuning, targetId = "fountain_of_youth", targetCount = 1 },
                 new QuestObjective { description = "Defeat Sludge Leviathan", type = QuestObjectiveType.DefeatBoss, targetId = "sludge_leviathan", targetCount = 1 }));
@@ -195,7 +196,7 @@ namespace Tartaria.Integration
             // ─── Moon 12: Crystal Moon — Bell-Tower Ring ───
             quests.Add(Build("bell_tower_ring_main", "Planetary Bell-Tower Ring",
                 "Synchronize all 12 bell towers for the planetary resonance cascade.",
-                isMain: true, rsReward: 30f, rsRequirement: 85f,
+                isMain: true, autoActivate: false, rsReward: 30f, rsRequirement: 85f, followUp: null,
                 new QuestObjective { description = "Synchronize bell towers", type = QuestObjectiveType.CompleteMiniGame, targetId = "bell_tower_sync", targetCount = 12 },
                 new QuestObjective { description = "Complete synchronization mini-game", type = QuestObjectiveType.CompleteMiniGame, targetId = "bell_tower_sync_game", targetCount = 1 }));
 
@@ -212,7 +213,7 @@ namespace Tartaria.Integration
             // ─── Moon 13: Cosmic Moon — True Timeline ─────
             quests.Add(Build("convergence_final", "True Timeline Convergence",
                 "Unite all companions and restore the true timeline.",
-                isMain: true, rsReward: 50f, rsRequirement: 90f,
+                isMain: true, autoActivate: false, rsReward: 50f, rsRequirement: 90f, followUp: null,
                 new QuestObjective { description = "Gather all 7 companions", type = QuestObjectiveType.CompanionMilestone, targetId = "all_companions", targetCount = 7 },
                 new QuestObjective { description = "Defeat the Echo of Reset", type = QuestObjectiveType.DefeatBoss, targetId = "echo_of_reset", targetCount = 1 },
                 new QuestObjective { description = "Activate the True Timeline", type = QuestObjectiveType.CompleteTuning, targetId = "true_timeline", targetCount = 1 }));

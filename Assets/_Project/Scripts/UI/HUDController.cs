@@ -7,13 +7,17 @@ namespace Tartaria.UI
     /// HUD Controller — manages the in-game overlay:
     ///   - RS gauge (bottom-center, circular with golden ratio spiral)
     ///   - Aether charge bar (top-right)
+    ///   - Boss health bar (top-center, shown during boss encounters)
+    ///   - Wave counter (top-center-left, shown during combat waves)
+    ///   - Achievement toast (top-right stacked, fades after 3s)
+    ///   - Moon-complete trophy banner (center, shown on zone victory)
     ///   - Interaction prompt (contextual, center-bottom)
     ///   - Tuning mini-game overlay
     ///   - Compass / zone indicator (top-center)
     ///
     /// Uses Unity UI Toolkit (retained mode) as specified in tech spec.
     /// </summary>
-    public class HUDController : MonoBehaviour
+    public class HUDController : MonoBehaviour, IHUDService
     {
         public static HUDController Instance { get; private set; }
 
@@ -26,6 +30,29 @@ namespace Tartaria.UI
         [SerializeField] RectTransform interactionPrompt;
         [SerializeField] TMPro.TextMeshProUGUI interactionText;
         [SerializeField] TMPro.TextMeshProUGUI zoneNameText;
+
+        [Header("Boss Health Bar")]
+        [SerializeField] RectTransform bossHealthPanel;
+        [SerializeField] UnityEngine.UI.Image bossHealthFill;
+        [SerializeField] TMPro.TextMeshProUGUI bossNameText;
+        [SerializeField] Color bossHealthColor = new Color(0.8f, 0.15f, 0.1f);
+        [SerializeField] Color bossHealthLowColor = new Color(0.9f, 0.3f, 0.05f);
+
+        [Header("Wave Counter")]
+        [SerializeField] RectTransform waveCounterPanel;
+        [SerializeField] TMPro.TextMeshProUGUI waveCounterText;
+        [SerializeField] TMPro.TextMeshProUGUI waveEnemiesText;
+
+        [Header("Achievement Toast")]
+        [SerializeField] RectTransform achievementToastPanel;
+        [SerializeField] TMPro.TextMeshProUGUI achievementToastText;
+        [SerializeField] float achievementDisplayDuration = 3f;
+
+        [Header("Moon Trophy Banner")]
+        [SerializeField] RectTransform moonTrophyPanel;
+        [SerializeField] TMPro.TextMeshProUGUI moonTrophyText;
+        [SerializeField] TMPro.TextMeshProUGUI moonTrophySubtext;
+        [SerializeField] float trophyDisplayDuration = 5f;
 
         [Header("RS Threshold Markers")]
         [SerializeField] GameObject[] thresholdMarkers; // 4 markers at 25/50/75/100
@@ -42,10 +69,38 @@ namespace Tartaria.UI
         float _promptFadeTimer;
         bool _promptVisible;
 
+        // Boss health state
+        float _bossHealthTarget;
+        bool _bossBarVisible;
+
+        // Wave counter state
+        int _currentWave;
+        int _totalWaves;
+        int _enemiesRemaining;
+        bool _waveCounterVisible;
+
+        // Achievement toast state
+        float _achievementTimer;
+        bool _achievementVisible;
+
+        // Moon trophy state
+        float _trophyTimer;
+        bool _trophyVisible;
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            ServiceLocator.HUD = this;
+        }
+
+        void Start()
+        {
+            // Hide combat/achievement/trophy panels on start
+            if (bossHealthPanel != null) bossHealthPanel.gameObject.SetActive(false);
+            if (waveCounterPanel != null) waveCounterPanel.gameObject.SetActive(false);
+            if (achievementToastPanel != null) achievementToastPanel.gameObject.SetActive(false);
+            if (moonTrophyPanel != null) moonTrophyPanel.gameObject.SetActive(false);
         }
 
         void Update()
@@ -53,6 +108,9 @@ namespace Tartaria.UI
             UpdateRSDisplay();
             UpdateAetherDisplay();
             UpdatePromptFade();
+            UpdateBossHealthBar();
+            UpdateAchievementToast();
+            UpdateMoonTrophy();
         }
 
         // ─── RS Gauge ──────────────────────────────
@@ -158,6 +216,142 @@ namespace Tartaria.UI
             if (rsGauge != null)
                 StartCoroutine(PulseScale(rsGauge, 1.15f, 0.3f));
         }
+
+        // ─── Boss Health Bar ─────────────────────────
+
+        public void ShowBossHealth(string bossName, float normalizedHealth)
+        {
+            _bossBarVisible = true;
+            _bossHealthTarget = Mathf.Clamp01(normalizedHealth);
+            if (bossHealthPanel != null)
+                bossHealthPanel.gameObject.SetActive(true);
+            if (bossNameText != null)
+                bossNameText.text = bossName;
+        }
+
+        public void UpdateBossHealth(float normalizedHealth)
+        {
+            _bossHealthTarget = Mathf.Clamp01(normalizedHealth);
+        }
+
+        public void HideBossHealth()
+        {
+            _bossBarVisible = false;
+            if (bossHealthPanel != null)
+                bossHealthPanel.gameObject.SetActive(false);
+        }
+
+        void UpdateBossHealthBar()
+        {
+            if (!_bossBarVisible || bossHealthFill == null) return;
+
+            bossHealthFill.fillAmount = Mathf.Lerp(bossHealthFill.fillAmount,
+                _bossHealthTarget, Time.deltaTime * 5f);
+
+            // Color shifts to orange-red at low health
+            bossHealthFill.color = _bossHealthTarget < 0.25f
+                ? Color.Lerp(bossHealthLowColor, bossHealthColor, _bossHealthTarget / 0.25f)
+                : bossHealthColor;
+        }
+
+        // ─── Wave Counter ────────────────────────────
+
+        public void ShowWaveCounter(int currentWave, int totalWaves, int enemiesRemaining)
+        {
+            _currentWave = currentWave;
+            _totalWaves = totalWaves;
+            _enemiesRemaining = enemiesRemaining;
+            _waveCounterVisible = true;
+            if (waveCounterPanel != null)
+                waveCounterPanel.gameObject.SetActive(true);
+            RefreshWaveText();
+        }
+
+        public void UpdateWaveEnemies(int remaining)
+        {
+            _enemiesRemaining = remaining;
+            RefreshWaveText();
+        }
+
+        public void AdvanceWave(int newWave)
+        {
+            _currentWave = newWave;
+            RefreshWaveText();
+            if (waveCounterPanel != null)
+                StartCoroutine(PulseScale(waveCounterPanel, 1.2f, 0.25f));
+        }
+
+        public void HideWaveCounter()
+        {
+            _waveCounterVisible = false;
+            if (waveCounterPanel != null)
+                waveCounterPanel.gameObject.SetActive(false);
+        }
+
+        void RefreshWaveText()
+        {
+            if (waveCounterText != null)
+                waveCounterText.text = $"Wave {_currentWave + 1}/{_totalWaves}";
+            if (waveEnemiesText != null)
+                waveEnemiesText.text = $"{_enemiesRemaining} remaining";
+        }
+
+        // ─── Achievement Toast ───────────────────────
+
+        public void ShowAchievementToast(string title)
+        {
+            _achievementVisible = true;
+            _achievementTimer = achievementDisplayDuration;
+            if (achievementToastPanel != null)
+                achievementToastPanel.gameObject.SetActive(true);
+            if (achievementToastText != null)
+                achievementToastText.text = title;
+            if (achievementToastPanel != null)
+                StartCoroutine(PulseScale(achievementToastPanel, 1.1f, 0.2f));
+        }
+
+        void UpdateAchievementToast()
+        {
+            if (!_achievementVisible) return;
+            _achievementTimer -= Time.deltaTime;
+            if (_achievementTimer <= 0f)
+            {
+                _achievementVisible = false;
+                if (achievementToastPanel != null)
+                    achievementToastPanel.gameObject.SetActive(false);
+            }
+        }
+
+        // ─── Moon Trophy Banner ──────────────────────
+
+        public void ShowMoonTrophy(string moonName, string subtitle)
+        {
+            _trophyVisible = true;
+            _trophyTimer = trophyDisplayDuration;
+            if (moonTrophyPanel != null)
+            {
+                moonTrophyPanel.gameObject.SetActive(true);
+                StartCoroutine(PulseScale(moonTrophyPanel, 1.15f, 0.4f));
+            }
+            if (moonTrophyText != null)
+                moonTrophyText.text = moonName;
+            if (moonTrophySubtext != null)
+                moonTrophySubtext.text = subtitle;
+        }
+
+        void UpdateMoonTrophy()
+        {
+            if (!_trophyVisible) return;
+            _trophyTimer -= Time.deltaTime;
+            if (_trophyTimer <= 0f)
+            {
+                _trophyVisible = false;
+                if (moonTrophyPanel != null)
+                    moonTrophyPanel.gameObject.SetActive(false);
+            }
+        }
+
+        // ─── Animation Utility ───────────────────────
 
         System.Collections.IEnumerator PulseScale(RectTransform target, float peakScale, float duration)
         {

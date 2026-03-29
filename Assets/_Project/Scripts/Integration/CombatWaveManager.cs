@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Audio;
+using Tartaria.Input;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -42,6 +45,7 @@ namespace Tartaria.Integration
         public bool IsEncounterActive => _encounterActive;
         public int CurrentWaveIndex => _currentWaveIndex;
         public int EnemiesRemaining => _enemiesRemaining;
+        public int TotalWaves => _waves.Count;
 
         void Awake()
         {
@@ -296,6 +300,39 @@ namespace Tartaria.Integration
 
             Debug.Log("[CombatWave] Encounter complete!");
         }
+
+        // ─── Save / Load ────────────────────────────
+
+        public CombatWaveSaveData GetSaveData()
+        {
+            return new CombatWaveSaveData
+            {
+                encounterActive = _encounterActive,
+                currentWaveIndex = _currentWaveIndex,
+                enemiesRemaining = _enemiesRemaining,
+                totalWaves = _waves.Count,
+                encounterCenter = new Save.SerializableVector3(_encounterCenter)
+            };
+        }
+
+        public void LoadSaveData(CombatWaveSaveData data)
+        {
+            _encounterActive = data.encounterActive;
+            _currentWaveIndex = data.currentWaveIndex;
+            _enemiesRemaining = data.enemiesRemaining;
+            if (data.encounterCenter.x != 0 || data.encounterCenter.y != 0 || data.encounterCenter.z != 0)
+                _encounterCenter = data.encounterCenter.ToVector3();
+        }
+
+        [Serializable]
+        public class CombatWaveSaveData
+        {
+            public bool encounterActive;
+            public int currentWaveIndex;
+            public int enemiesRemaining;
+            public int totalWaves;
+            public Save.SerializableVector3 encounterCenter;
+        }
     }
 
     // ─── Data Structures ─────────────────────────
@@ -318,7 +355,8 @@ namespace Tartaria.Integration
         TemporalWraith = 13,
         LivingSludge = 14,
         SludgeLeviathan = 15,
-        TitanGolem = 16
+        TitanGolem = 16,
+        FrequencyWraith = 17
     }
 
     [Serializable]

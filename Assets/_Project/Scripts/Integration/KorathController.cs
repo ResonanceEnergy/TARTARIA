@@ -124,7 +124,21 @@ namespace Tartaria.Integration
                 return;
             }
 
-            DialogueManager.Instance?.PlayContextDialogue("korath_revelation");
+            // Each revelation unlocks progressively deeper cosmological truths
+            string[] revelationLines = new[]
+            {
+                "korath_revelation_aether_origin",      // 1: Aether is not energy -- it is memory
+                "korath_revelation_mud_flood_truth",     // 2: The Flood was not water -- it was forgetting
+                "korath_revelation_antenna_network",     // 3: Every spire was a node in a planetary mind
+                "korath_revelation_frequency_war",       // 4: The old world fell to a war of frequencies
+                "korath_revelation_archive_access",      // 5: The Archive is not a place -- it is a state
+                "korath_revelation_cosmic_convergence",  // 6: Thirteen moons align once per epoch
+                "korath_revelation_player_role",         // 7: You are not restoring Tartaria -- you ARE Tartaria
+            };
+
+            int index = Mathf.Min(_revelationsUnlocked, revelationLines.Length - 1);
+            DialogueManager.Instance?.PlayLineById(revelationLines[index]);
+
             _revelationsUnlocked++;
             OnRevelationUnlocked?.Invoke(_revelationsUnlocked);
             AddTrust(5f);
@@ -184,6 +198,20 @@ namespace Tartaria.Integration
         public void NotifyBuildingRestored()
         {
             AddTrust(2f);
+        }
+
+        /// <summary>World Choice W3: Player allows Korath's sacrifice ritual.</summary>
+        public void CompleteSacrificeRitual()
+        {
+            AddTrust(15f);
+            Debug.Log("[Korath] Sacrifice ritual completed by player choice.");
+        }
+
+        /// <summary>World Choice W3: Player prevents the sacrifice.</summary>
+        public void PreventSacrifice()
+        {
+            AddTrust(-10f);
+            Debug.Log("[Korath] Sacrifice prevented by player choice.");
         }
 
         // ─── Save / Load ────────────────────────────

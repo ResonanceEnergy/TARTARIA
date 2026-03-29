@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.UI
 {
@@ -263,7 +264,7 @@ namespace Tartaria.UI
             if (_purgeBeamTimer > 0.5f)
             {
                 _purgeBeamTimer = 0f;
-                Tartaria.Input.HapticFeedbackManager.Instance?.PlayTuningOnFrequency();
+                HapticFeedbackManager.Instance?.PlayTuningOnFrequency();
             }
 
             // Aether drain while purging
@@ -273,7 +274,7 @@ namespace Tartaria.UI
             {
                 _isFrequencyLocked = false;
                 _purgeTarget = null;
-                Tartaria.Input.HapticFeedbackManager.Instance?.PlayPerfectTune();
+                HapticFeedbackManager.Instance?.PlayPerfectTune();
                 Debug.Log("[DissonanceLens] Corruption purged from target!");
             }
         }

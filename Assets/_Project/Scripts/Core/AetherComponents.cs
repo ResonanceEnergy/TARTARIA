@@ -10,7 +10,9 @@ namespace Tartaria.Core
     {
         Telluric  = 3,  // 7.83 Hz — Schumann Resonance — deep amber
         Harmonic  = 6,  // 432 Hz  — universal healing  — bright gold
-        Celestial = 9   // 1296 Hz — 3×432             — white-gold
+        Celestial = 9,  // 1296 Hz — 3×432             — white-gold
+        Ethereal  = 12, // 3888 Hz — transcendent       — violet-white
+        Resonant  = 15  // 5832 Hz — planetary resonance — deep violet
     }
 
     // ─────────────────────────────────────────────

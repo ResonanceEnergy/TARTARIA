@@ -57,6 +57,9 @@ namespace Tartaria.Save
         public CosmicConvergenceSaveBlock cosmicConvergence = new();
         public DayOutOfTimeSaveBlock dayOutOfTime = new();
         public CompanionManagerSaveBlock companionManager = new();
+
+        // v8 save blocks
+        public CombatWaveSaveBlock combatWave = new();
     }
 
     [Serializable]
@@ -495,5 +498,16 @@ namespace Tartaria.Save
         public string[] companionIds = Array.Empty<string>();
         public bool[] companionUnlocked = Array.Empty<bool>();
         public float[] companionTrust = Array.Empty<float>();
+    }
+
+    // ─── v8 Save Blocks (CombatWave) ─────────────
+
+    [Serializable]
+    public class CombatWaveSaveBlock
+    {
+        public bool encounterActive;
+        public int currentWaveIndex;
+        public int enemiesRemaining;
+        public int totalWaves;
     }
 }

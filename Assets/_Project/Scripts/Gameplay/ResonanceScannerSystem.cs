@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Gameplay
 {
@@ -143,22 +145,21 @@ namespace Tartaria.Gameplay
             }
 
             // VFX + Haptics
-            VFXController.Instance?.PlayEffect(
-                VFXController.ParticleEffect.AetherVortex, playerPosition);
-            Input.HapticFeedbackManager.Instance?.PlayDiscovery();
+            ServiceLocator.VFX?.PlayEffect(VFXEffect.AetherVortex, playerPosition);
+            HapticFeedbackManager.Instance?.PlayDiscovery();
 
             // Audio ping
-            Audio.AudioManager.Instance?.PlayTone(432f, 0.3f);
+            AudioManager.Instance?.PlayTone(432f, 0.3f);
 
             OnScanComplete?.Invoke(_lastResults);
 
             if (_lastResults.Count == 0)
             {
-                HUDController.Instance?.ShowInteractionPrompt("No resonance signals detected nearby.");
+                ServiceLocator.HUD?.ShowInteractionPrompt("No resonance signals detected nearby.");
             }
             else
             {
-                HUDController.Instance?.ShowInteractionPrompt(
+                ServiceLocator.HUD?.ShowInteractionPrompt(
                     $"Scan complete: {_lastResults.Count} signal{(_lastResults.Count > 1 ? "s" : "")} detected.");
             }
 

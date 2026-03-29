@@ -10,6 +10,7 @@
         "Tartaria.Input",
         "Tartaria.UI",
         "Tartaria.Save",
+        "Unity.InputSystem",
         "Unity.Entities",
         "Unity.Collections",
         "Unity.Mathematics",

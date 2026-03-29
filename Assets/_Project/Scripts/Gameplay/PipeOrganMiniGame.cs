@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Core;
+using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Gameplay
 {
@@ -139,7 +141,7 @@ namespace Tartaria.Gameplay
 
             // Play the pipe tone
             float freq = PipeFrequencies[pipePressed];
-            Audio.AudioManager.Instance?.PlayTone(freq, 0.4f);
+            AudioManager.Instance?.PlayTone(freq, 0.4f);
 
             _totalNotes++;
 
@@ -216,7 +218,7 @@ namespace Tartaria.Gameplay
 
                 AetherFieldManager.Instance?.AddResonanceScore(rsReward);
                 OnOrganComplete?.Invoke(accuracy);
-                Integration.GameLoopController.Instance?.OnMiniGameCompleted(rsReward, "PipeOrgan");
+                ServiceLocator.GameLoop?.OnMiniGameCompleted(rsReward, "PipeOrgan");
             }
 
             GameStateManager.Instance?.ReturnToPrevious();

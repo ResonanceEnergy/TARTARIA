@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Tartaria.Core;
 
 namespace Tartaria.Gameplay
 {
@@ -42,10 +43,10 @@ namespace Tartaria.Gameplay
             if (node == null || node.isUnlocked) return false;
             if (!ArePrereqsMet(node)) return false;
 
-            float currentRS = Core.AetherFieldManager.Instance?.ResonanceScore ?? 0f;
+            float currentRS = AetherFieldManager.Instance?.ResonanceScore ?? 0f;
             if (currentRS < node.rsCost) return false;
 
-            Core.AetherFieldManager.Instance?.AddResonanceScore(-node.rsCost);
+            AetherFieldManager.Instance?.AddResonanceScore(-node.rsCost);
             node.isUnlocked = true;
             ApplySkillEffect(node);
             OnSkillUnlocked?.Invoke(id);

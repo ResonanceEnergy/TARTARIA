@@ -113,6 +113,19 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
+        /// Alias for AdjustTrust — used by dialogue consequence system.
+        /// </summary>
+        public void ModifyTrust(float amount) => AdjustTrust(amount);
+
+        /// <summary>
+        /// Enable permanent intel sharing (World Choice W1 consequence).
+        /// </summary>
+        public void EnableIntelSharing()
+        {
+            Debug.Log("[Cassian] Intel sharing permanently enabled by player choice.");
+        }
+
+        /// <summary>
         /// Share corruption intel with the player. Some true, some false.
         /// Returns the intel text.
         /// </summary>
@@ -233,7 +246,7 @@ namespace Tartaria.Integration
         {
             if (accurate)
             {
-                return _interactionCount % 3 switch
+                return (_interactionCount % 3) switch
                 {
                     0 => $"The corruption in {zoneId} spreads from the northwest. Focus your purification there.",
                     1 => "Fractal Wraiths materialise for exactly 1.5 seconds. That's your window.",
@@ -242,7 +255,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                return _interactionCount % 3 switch
+                return (_interactionCount % 3) switch
                 {
                     0 => $"I've heard {zoneId} has corruption resistant buildings to the east. No need to check the west.",
                     1 => "Wraiths are weakest when phased. Hit them then for maximum damage.",

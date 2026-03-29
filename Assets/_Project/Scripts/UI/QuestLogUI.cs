@@ -59,22 +59,22 @@ namespace Tartaria.UI
 
         void Start()
         {
-            // Subscribe to QuestManager events
-            var qm = FindQuestManager();
-            if (qm != null)
+            // Subscribe to QuestManager events via Core interface
+            var qp = QuestProviderLocator.Current;
+            if (qp != null)
             {
-                qm.OnQuestStatusChanged += OnQuestStatusChanged;
-                qm.OnObjectiveProgressed += OnObjectiveProgressed;
+                qp.OnQuestStatusChanged += OnQuestStatusChanged;
+                qp.OnObjectiveProgressed += OnObjectiveProgressed;
             }
         }
 
         void OnDestroy()
         {
-            var qm = FindQuestManager();
-            if (qm != null)
+            var qp = QuestProviderLocator.Current;
+            if (qp != null)
             {
-                qm.OnQuestStatusChanged -= OnQuestStatusChanged;
-                qm.OnObjectiveProgressed -= OnObjectiveProgressed;
+                qp.OnQuestStatusChanged -= OnQuestStatusChanged;
+                qp.OnObjectiveProgressed -= OnObjectiveProgressed;
             }
         }
 
@@ -122,28 +122,28 @@ namespace Tartaria.UI
             ClearListItems();
             _entries.Clear();
 
-            var qm = FindQuestManager();
-            if (qm == null) return;
+            var qp = QuestProviderLocator.Current;
+            if (qp == null) return;
 
             // Gather quests matching current tab
-            var activeIds = qm.GetActiveQuestIds();
-            var completedIds = qm.GetCompletedQuestIds();
+            var activeIds = qp.GetActiveQuestIds();
+            var completedIds = qp.GetCompletedQuestIds();
 
             switch (_currentTab)
             {
                 case QuestLogTab.Active:
                     foreach (var id in activeIds)
-                        AddEntry(qm, id, false);
+                        AddEntry(qp, id, false);
                     break;
                 case QuestLogTab.Completed:
                     foreach (var id in completedIds)
-                        AddEntry(qm, id, true);
+                        AddEntry(qp, id, true);
                     break;
                 case QuestLogTab.All:
                     foreach (var id in activeIds)
-                        AddEntry(qm, id, false);
+                        AddEntry(qp, id, false);
                     foreach (var id in completedIds)
-                        AddEntry(qm, id, true);
+                        AddEntry(qp, id, true);
                     break;
             }
 
@@ -154,10 +154,10 @@ namespace Tartaria.UI
                 ShowDetail(_selectedQuestId);
         }
 
-        void AddEntry(Integration.QuestManager qm, string questId, bool completed)
+        void AddEntry(IQuestProvider qp, string questId, bool completed)
         {
-            var state = qm.GetQuestState(questId);
-            var def = qm.GetQuestDefinition(questId);
+            var state = qp.GetQuestState(questId);
+            var def = qp.GetQuestDefinition(questId);
             if (def == null) return;
 
             var data = new QuestEntryData
@@ -219,11 +219,11 @@ namespace Tartaria.UI
 
         void ShowDetail(string questId)
         {
-            var qm = FindQuestManager();
-            if (qm == null) return;
+            var qp = QuestProviderLocator.Current;
+            if (qp == null) return;
 
-            var def = qm.GetQuestDefinition(questId);
-            var state = qm.GetQuestState(questId);
+            var def = qp.GetQuestDefinition(questId);
+            var state = qp.GetQuestState(questId);
             if (def == null) return;
 
             if (detailTitle != null)
@@ -262,15 +262,15 @@ namespace Tartaria.UI
 
         // ─── Event Handlers ──────────────────────────
 
-        void OnQuestStatusChanged(string questId, Integration.QuestStatus status)
+        void OnQuestStatusChanged(string questId, QuestStatus status)
         {
             if (!_isOpen) return;
             RefreshList();
 
             // Fire notification
-            if (status == Integration.QuestStatus.Active)
+            if (status == QuestStatus.Active)
                 NotificationSystem.Instance?.Show($"New Quest: {GetQuestName(questId)}", NotificationType.Quest);
-            else if (status == Integration.QuestStatus.Completed)
+            else if (status == QuestStatus.Completed)
                 NotificationSystem.Instance?.Show($"Quest Complete: {GetQuestName(questId)}", NotificationType.QuestComplete);
         }
 
@@ -282,8 +282,8 @@ namespace Tartaria.UI
 
         string GetQuestName(string questId)
         {
-            var qm = FindQuestManager();
-            var def = qm?.GetQuestDefinition(questId);
+            var qp = QuestProviderLocator.Current;
+            var def = qp?.GetQuestDefinition(questId);
             return def != null ? def.displayName : questId;
         }
 
@@ -301,12 +301,6 @@ namespace Tartaria.UI
             _objectiveItems.Clear();
         }
 
-        // ─── QuestManager Lookup (cross-assembly) ───
-
-        static Integration.QuestManager FindQuestManager()
-        {
-            return Integration.QuestManager.Instance;
-        }
 
         // ─── Data ────────────────────────────────────
 
@@ -488,6 +482,7 @@ namespace Tartaria.UI
                 NotificationType.Trust          => "<> ",
                 NotificationType.Combat         => "!! ",
                 NotificationType.Warning        => "/!\\ ",
+                NotificationType.Achievement    => "<*> ",
                 _ => ""
             };
             tmp.text = icon + data.message;
@@ -513,6 +508,7 @@ namespace Tartaria.UI
                 NotificationType.Trust          => new Color(0.3f, 0.6f, 0.6f, 0.85f), // Teal
                 NotificationType.Combat         => new Color(0.7f, 0.2f, 0.2f, 0.85f), // Red
                 NotificationType.Warning        => new Color(0.8f, 0.5f, 0.1f, 0.85f), // Orange
+                NotificationType.Achievement    => new Color(0.85f, 0.75f, 0.2f, 0.85f), // Bright Gold
                 _                               => new Color(0.3f, 0.3f, 0.3f, 0.85f), // Gray
             };
         }
@@ -545,6 +541,7 @@ namespace Tartaria.UI
         Codex = 4,
         Trust = 5,
         Combat = 6,
-        Warning = 7
+        Warning = 7,
+        Achievement = 8
     }
 }

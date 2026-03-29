@@ -13,7 +13,9 @@
         "Tartaria.Integration",
         "Unity.Entities",
         "Unity.Mathematics",
-        "Unity.Collections"
+        "Unity.Collections",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro"
     ],
     "includePlatforms": [
         "Editor"

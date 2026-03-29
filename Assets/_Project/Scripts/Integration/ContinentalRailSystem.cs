@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
@@ -173,7 +174,7 @@ namespace Tartaria.Integration
             // Check aether cost
             var econ = Core.EconomySystem.Instance;
             if (econ == null) return false;
-            if (econ.GetCurrency(Core.CurrencyType.AetherShards) < seg.repairCost) return false;
+            if (econ.GetBalance(Core.CurrencyType.AetherShards) < seg.repairCost) return false;
             econ.SpendCurrency(Core.CurrencyType.AetherShards, seg.repairCost);
 
             // Boss check

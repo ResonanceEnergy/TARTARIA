@@ -13,7 +13,7 @@ namespace Tartaria.Integration
     /// Future: Ley Line Map for non-linear zone selection.
     /// </summary>
     [DisallowMultipleComponent]
-    public class ZoneTransitionSystem : MonoBehaviour
+    public class ZoneTransitionSystem : MonoBehaviour, IZoneTransitionService
     {
         public static ZoneTransitionSystem Instance { get; private set; }
 
@@ -39,6 +39,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            ServiceLocator.ZoneTransition = this;
         }
 
         void Start()
@@ -64,7 +65,7 @@ namespace Tartaria.Integration
             if (nextZone.rsRequirementToUnlock > 0f)
             {
                 float currentRS = AetherFieldManager.Instance != null
-                    ? AetherFieldManager.Instance.CurrentRS : 0f;
+                    ? AetherFieldManager.Instance.ResonanceScore : 0f;
                 if (currentRS < nextZone.rsRequirementToUnlock)
                 {
                     HUDController.Instance?.ShowInteractionPrompt(

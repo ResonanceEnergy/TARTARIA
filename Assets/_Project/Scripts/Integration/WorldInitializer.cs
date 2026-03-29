@@ -79,8 +79,8 @@ namespace Tartaria.Integration
             em.AddComponentData(milo, new CompanionTag { CompanionId = 0 });
             em.AddComponentData(milo, new CompanionBehavior
             {
-                State = CompanionState.Follow,
-                PreviousState = CompanionState.Follow,
+                State = Tartaria.AI.CompanionState.Follow,
+                PreviousState = Tartaria.AI.CompanionState.Follow,
                 StateTimer = 0f,
                 FollowDistance = 3f,
                 IdleThreshold = 5f,

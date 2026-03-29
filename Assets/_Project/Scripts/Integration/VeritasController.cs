@@ -216,7 +216,13 @@ namespace Tartaria.Integration
                 registersRestored = _registersRestored,
                 requiemPerformed = _requiemPerformed,
                 bellTowerAssisted = _bellTowerAssisted,
-                finalNoteCompleted = _finalNoteCompleted
+                finalNoteCompleted = _finalNoteCompleted,
+
+                // GLC bridge fields
+                trustTier = (int)TrustLevel,
+                performanceAccuracy = _performancesCompleted > 0 ? 1f : 0f,
+                bellTowerSyncComplete = _bellTowerAssisted,
+                finalNoteDelivered = _finalNoteCompleted
             };
         }
 
@@ -228,12 +234,21 @@ namespace Tartaria.Integration
             _performancesCompleted = data.performancesCompleted;
             _registersRestored = data.registersRestored;
             _requiemPerformed = data.requiemPerformed;
-            _bellTowerAssisted = data.bellTowerAssisted;
-            _finalNoteCompleted = data.finalNoteCompleted;
+            _bellTowerAssisted = data.bellTowerAssisted || data.bellTowerSyncComplete;
+            _finalNoteCompleted = data.finalNoteCompleted || data.finalNoteDelivered;
         }
     }
 
     public enum VeritasTrustLevel : byte
+    {
+        Fragment = 0,
+        Passage = 1,
+        Harmony = 2,
+        Transcendent = 3
+    }
+
+    /// <summary>Alias used by GameLoopController save/load code.</summary>
+    public enum VeritasTrustTier : byte
     {
         Fragment = 0,
         Passage = 1,
@@ -252,5 +267,11 @@ namespace Tartaria.Integration
         public bool requiemPerformed;
         public bool bellTowerAssisted;
         public bool finalNoteCompleted;
+
+        // Bridge fields consumed by GameLoopController save/load
+        public int trustTier;
+        public float performanceAccuracy;
+        public bool bellTowerSyncComplete;
+        public bool finalNoteDelivered;
     }
 }
