@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Core;
+using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Gameplay
 {
@@ -168,8 +170,8 @@ namespace Tartaria.Gameplay
                 // VFX sparks along trace
                 if (_veinSamples % 3 == 0)
                 {
-                    Integration.VFXController.Instance?.PlayEffect(
-                        Integration.VFXController.ParticleEffect.Spark,
+                    ServiceLocator.VFX?.PlayEffect(
+                        VFXEffect.Spark,
                         new Vector3(mousePos.x * 10f - 5f, mousePos.y * 6f - 3f, 0f));
                 }
             }
@@ -204,7 +206,7 @@ namespace Tartaria.Gameplay
 
             // Audio: pitch rises with combo
             float pitch = 432f + _combo * 50f;
-            Audio.AudioManager.Instance?.PlayTone(pitch, 0.3f);
+            AudioManager.Instance?.PlayTone(pitch, 0.3f);
 
             _currentVein++;
         }
@@ -238,7 +240,7 @@ namespace Tartaria.Gameplay
                 // RS reward
                 float rsReward = _config.baseRSReward * finalAccuracy;
                 AetherFieldManager.Instance?.AddResonanceScore(rsReward);
-                Integration.GameLoopController.Instance?.OnMiniGameCompleted(rsReward, "HarmonicRockCutting");
+                ServiceLocator.GameLoop?.OnMiniGameCompleted(rsReward, "HarmonicRockCutting");
             }
 
             GameStateManager.Instance?.ReturnToPrevious();

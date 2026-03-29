@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Gameplay
 {
@@ -287,12 +288,12 @@ namespace Tartaria.Gameplay
             Debug.Log($"[ChoirHarmonics] Performance complete! Score {score:P0}, Tier {tier}, RS {totalRS:F1}");
 
             // Companion reactions
-            LiraelController.Instance?.ConductChildrenChoir();
-            MiloController.Instance?.AddTrust(5f);
+            ServiceLocator.Lirael?.ConductChildrenChoir();
+            ServiceLocator.Milo?.AddTrust(5f);
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             OnPerformanceCompleted?.Invoke(totalRS, tier);
-            Integration.GameLoopController.Instance?.OnMiniGameCompleted(totalRS, "ChoirHarmonics");
+            ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "ChoirHarmonics");
         }
     }
 

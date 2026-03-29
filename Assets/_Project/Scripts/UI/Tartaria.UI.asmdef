@@ -3,6 +3,8 @@
     "rootNamespace": "Tartaria.UI",
     "references": [
         "Tartaria.Core",
+        "Tartaria.Gameplay",
+        "Tartaria.Input",
         "Unity.TextMeshPro",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime"

@@ -378,7 +378,8 @@ namespace Tartaria.Core
         HarmonicFragments = 3,
         EchoMemories = 4,
         CrystallineDust = 5,
-        ForgeTokens = 6
+        ForgeTokens = 6,
+        ResonanceShards = 7
     }
 
     /// <summary>

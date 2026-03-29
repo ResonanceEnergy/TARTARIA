@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Gameplay
 {
@@ -228,16 +229,16 @@ namespace Tartaria.Gameplay
                        $"chain {_bestChain}, RS reward {totalRS:F1}");
 
             // Notify companions
-            MiloController.Instance?.AddTrust(2f);
-            LiraelController.Instance?.AddTrust(3f);
+            ServiceLocator.Milo?.AddTrust(2f);
+            ServiceLocator.Lirael?.AddTrust(3f);
 
             // Trigger story beat if first completion on this zone
-            MiloController.Instance?.WitnessOrphanTrain();
-            LiraelController.Instance?.RememberOrphanTrain();
+            ServiceLocator.Milo?.WitnessOrphanTrain();
+            ServiceLocator.Lirael?.RememberOrphanTrain();
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             OnPuzzleCompleted?.Invoke(totalRS);
-            Integration.GameLoopController.Instance?.OnMiniGameCompleted(totalRS, "OrphanTrain");
+            ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "OrphanTrain");
         }
 
         void FailPuzzle()

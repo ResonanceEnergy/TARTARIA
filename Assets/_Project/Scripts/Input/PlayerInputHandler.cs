@@ -17,6 +17,8 @@ namespace Tartaria.Input
     [RequireComponent(typeof(CharacterController))]
     public class PlayerInputHandler : MonoBehaviour
     {
+        public static PlayerInputHandler Instance { get; private set; }
+
         [Header("Input")]
         [SerializeField] InputActionAsset inputActions;
 
@@ -55,6 +57,8 @@ namespace Tartaria.Input
 
         void Awake()
         {
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
             _controller = GetComponent<CharacterController>();
             _mainCamera = Camera.main;
         }
@@ -176,12 +180,12 @@ namespace Tartaria.Input
         {
             if (!GameStateManager.Instance.IsPlaying) return;
             AetherVisionActive = !AetherVisionActive;
-            UI.UIManager.Instance?.ToggleAetherVision();
+            GameEvents.OnToggleAetherVision?.Invoke();
         }
 
         void OnPausePerformed(InputAction.CallbackContext ctx)
         {
-            UI.UIManager.Instance?.TogglePause();
+            GameEvents.OnTogglePause?.Invoke();
         }
 
         void OnResonancePulsePerformed(InputAction.CallbackContext ctx)

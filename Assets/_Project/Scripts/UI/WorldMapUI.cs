@@ -131,7 +131,7 @@ namespace Tartaria.UI
                 if (w.go != null) Destroy(w.go);
             _zoneWidgets.Clear();
 
-            var campaign = CampaignFlowController.Instance;
+            var campaign = ServiceLocator.Campaign;
             int currentMoon = campaign?.CurrentMoonIndex ?? 0;
 
             for (int i = 0; i < 13; i++)
@@ -229,7 +229,7 @@ namespace Tartaria.UI
         void SelectZone(int index)
         {
             _selectedZone = index;
-            var campaign = CampaignFlowController.Instance;
+            var campaign = ServiceLocator.Campaign;
             int currentMoon = campaign?.CurrentMoonIndex ?? 0;
 
             if (zoneName != null) zoneName.text = ZoneNames[index];
@@ -252,7 +252,7 @@ namespace Tartaria.UI
         void OnTravelClicked()
         {
             if (_selectedZone < 0) return;
-            ZoneTransitionSystem.Instance?.TransitionToZone(_selectedZone);
+            ServiceLocator.ZoneTransition?.TransitionToZone(_selectedZone);
             Close();
         }
 

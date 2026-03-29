@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Gameplay
 {
@@ -311,7 +312,7 @@ namespace Tartaria.Gameplay
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             OnPuzzleCompleted?.Invoke(totalRS);
-            Integration.GameLoopController.Instance?.OnMiniGameCompleted(totalRS, "AetherConduit");
+            ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "AetherConduit");
         }
 
         void FailPuzzle()

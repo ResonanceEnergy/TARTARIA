@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Core;
+using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Gameplay
 {
@@ -41,7 +43,7 @@ namespace Tartaria.Gameplay
         bool _isActive;
         float _timeRemaining;
         int _selectedSegment = -1;
-        RailSegment[] _segments;
+        RailAlignmentSegment[] _segments;
         int _gridWidth;
         int _gridHeight;
         int _startIndex;
@@ -112,7 +114,7 @@ namespace Tartaria.Gameplay
                 if (idx >= 0 && idx < _segments.Length)
                 {
                     _selectedSegment = idx;
-                    Audio.AudioManager.Instance?.PlayTone(
+                    AudioManager.Instance?.PlayTone(
                         432f + idx * 50f, 0.15f);
                 }
             }
@@ -252,7 +254,7 @@ namespace Tartaria.Gameplay
                 float rsReward = baseRSReward * accuracy * multiplier;
                 AetherFieldManager.Instance?.AddResonanceScore(rsReward);
                 OnAlignmentComplete?.Invoke(accuracy);
-                Integration.GameLoopController.Instance?.OnMiniGameCompleted(rsReward, "RailAlignment");
+                ServiceLocator.GameLoop?.OnMiniGameCompleted(rsReward, "RailAlignment");
             }
 
             GameStateManager.Instance?.ReturnToPrevious();
@@ -263,7 +265,7 @@ namespace Tartaria.Gameplay
         void GenerateGrid(RailAlignmentConfig config)
         {
             int total = config.gridWidth * config.gridHeight;
-            _segments = new RailSegment[total];
+            _segments = new RailAlignmentSegment[total];
 
             _startIndex = 0;
             _endIndex = total - 1;
@@ -271,10 +273,10 @@ namespace Tartaria.Gameplay
             // Generate a valid solution path first, then randomize rotations
             for (int i = 0; i < total; i++)
             {
-                _segments[i] = new RailSegment
+                _segments[i] = new RailAlignmentSegment
                 {
                     angle = Random.Range(0, 8) * 45,
-                    segmentType = (RailSegmentType)(i % 3)
+                    segmentType = (RailAlignmentSegmentType)(i % 3)
                 };
             }
         }
@@ -293,13 +295,13 @@ namespace Tartaria.Gameplay
 
     // ─── Data Types ──────────────────────────────
 
-    struct RailSegment
+    struct RailAlignmentSegment
     {
         public int angle;              // 0-360 in 45° increments
-        public RailSegmentType segmentType;
+        public RailAlignmentSegmentType segmentType;
     }
 
-    enum RailSegmentType : byte
+    enum RailAlignmentSegmentType : byte
     {
         Straight = 0,
         Curve = 1,

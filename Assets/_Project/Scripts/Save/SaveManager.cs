@@ -321,6 +321,15 @@ namespace Tartaria.Save
                 data.header.gameVersion = "0.7.0";
                 MarkDirty();
             }
+
+            if (data.header.schemaVersion < 8)
+            {
+                // v7 → v8: add combat wave persistence
+                if (data.combatWave == null) data.combatWave = new CombatWaveSaveBlock();
+                data.header.schemaVersion = 8;
+                data.header.gameVersion = "0.8.0";
+                MarkDirty();
+            }
         }
 
         static string ComputeChecksum(string content)

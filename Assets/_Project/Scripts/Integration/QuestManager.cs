@@ -17,7 +17,7 @@ namespace Tartaria.Integration
     ///   - Side: "Golem Graveyard" (defeat all wave enemies)
     /// </summary>
     [DisallowMultipleComponent]
-    public class QuestManager : MonoBehaviour
+    public class QuestManager : MonoBehaviour, IQuestProvider
     {
         public static QuestManager Instance { get; private set; }
 
@@ -34,6 +34,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            QuestProviderLocator.Current = this;
         }
 
         void Start()
@@ -63,6 +64,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void ActivateQuest(string questId)
         {
+
             if (!_questStates.TryGetValue(questId, out var state)) return;
             if (state.status != QuestStatus.Locked) return;
 
@@ -78,6 +80,11 @@ namespace Tartaria.Integration
 
             Debug.Log($"[QuestManager] Quest activated: {questId}");
         }
+
+        /// <summary>
+        /// Alias for ActivateQuest — used by tutorial/gameloop triggers.
+        /// </summary>
+        public void UnlockQuest(string questId) => ActivateQuest(questId);
 
         /// <summary>
         /// Progress an objective within an active quest.
@@ -239,71 +246,5 @@ namespace Tartaria.Integration
         }
     }
 
-    // ─── Data Structures ─────────────────────────────
-
-    public enum QuestStatus : byte
-    {
-        Locked = 0,
-        Active = 1,
-        Completed = 2,
-        Failed = 3
-    }
-
-    public enum QuestObjectiveType : byte
-    {
-        DiscoverBuilding = 0,
-        RestoreBuilding = 1,
-        DefeatEnemies = 2,
-        ReachRS = 3,
-        CompleteZone = 4,
-        TalkToNPC = 5,
-        CollectItem = 6,
-        CompleteTuning = 7,
-        CompleteMiniGame = 8,
-        DefeatBoss = 9,
-        CompanionMilestone = 10,
-    }
-
-    [Serializable]
-    public struct QuestState
-    {
-        public QuestStatus status;
-        public int[] objectiveProgress;
-    }
-
-    [Serializable]
-    public class QuestObjective
-    {
-        public string description;
-        public QuestObjectiveType type;
-        public string targetId;
-        public int targetCount = 1;
-    }
-
-    /// <summary>
-    /// ScriptableObject defining a single quest.
-    /// </summary>
-    [CreateAssetMenu(menuName = "Tartaria/Quest Definition")]
-    public class QuestDefinition : ScriptableObject
-    {
-        [Header("Identity")]
-        public string questId;
-        public string displayName;
-        [TextArea(2, 5)]
-        public string description;
-
-        [Header("Type")]
-        public bool isMainQuest;
-        public bool autoActivate;
-        public float rsRequirement; // RS needed to unlock (0 = no requirement)
-
-        [Header("Objectives")]
-        public QuestObjective[] objectives;
-
-        [Header("Rewards")]
-        public float rsReward;
-
-        [Header("Chain")]
-        public string[] followUpQuestIds;
-    }
+    // Quest types (QuestStatus, QuestState, QuestDefinition, etc.) are defined in Tartaria.Core.QuestTypes
 }

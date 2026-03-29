@@ -286,7 +286,7 @@ namespace Tartaria.Integration
         {
             return new AquiferSavePayload
             {
-                layerStates = (int[])_layerStates.Clone(),
+                layerStates = System.Array.ConvertAll(_layerStates, s => (int)s),
                 layerPurity = (float[])_layerPurity.Clone(),
                 layerAccuracy = (float[])_layerAccuracy.Clone(),
                 currentLayer = _currentLayer
@@ -299,7 +299,7 @@ namespace Tartaria.Integration
             int count = Mathf.Min(TotalCorruptionLayers, data.layerStates?.Length ?? 0);
             for (int i = 0; i < count; i++)
             {
-                _layerStates[i] = data.layerStates[i];
+                _layerStates[i] = (LayerState)data.layerStates[i];
                 _layerPurity[i] = data.layerPurity != null && i < data.layerPurity.Length ? data.layerPurity[i] : 0f;
                 _layerAccuracy[i] = data.layerAccuracy != null && i < data.layerAccuracy.Length ? data.layerAccuracy[i] : 0f;
             }

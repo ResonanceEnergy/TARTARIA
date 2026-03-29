@@ -51,12 +51,16 @@ namespace Tartaria.UI
         void OnEnable()
         {
             GameStateManager.Instance.OnStateChanged += HandleStateChange;
+            GameEvents.OnToggleAetherVision += ToggleAetherVision;
+            GameEvents.OnTogglePause += TogglePause;
         }
 
         void OnDisable()
         {
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChanged -= HandleStateChange;
+            GameEvents.OnToggleAetherVision -= ToggleAetherVision;
+            GameEvents.OnTogglePause -= TogglePause;
         }
 
         void Update()
@@ -149,6 +153,19 @@ namespace Tartaria.UI
         {
             SetPanelActive(settingsPanel, false);
             SetPanelActive(pauseMenuPanel, true);
+        }
+
+        /// <summary>
+        /// Sets the alpha of the full-screen fade CanvasGroup (used by zone transitions).
+        /// </summary>
+        public void SetFadeAlpha(float alpha)
+        {
+            // CanvasGroup-based fade — look for a CanvasGroup on the loading panel
+            if (loadingPanel != null)
+            {
+                var cg = loadingPanel.GetComponent<CanvasGroup>();
+                if (cg != null) cg.alpha = alpha;
+            }
         }
     }
 }

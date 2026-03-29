@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -216,14 +217,14 @@ namespace Tartaria.Integration
                 case BossAttackPattern.Sweep:
                     // Wide 180° cone attack
                     combat?.DamagePlayer(baseDamage, "boss_sweep");
-                    VFXController.Instance?.PlayEffect(VFXController.ParticleEffect.Spark, transform.position);
+                    VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
                     HapticFeedbackManager.Instance?.PlayGolemSpawn();
                     break;
 
                 case BossAttackPattern.Slam:
                     // AOE ground slam centered on boss
                     combat?.DamagePlayer(baseDamage * 1.5f, "boss_slam");
-                    VFXController.Instance?.PlayEffect(VFXController.ParticleEffect.Spark, transform.position);
+                    VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
                     HapticFeedbackManager.Instance?.PlayBuildingEmergence();
                     break;
 
@@ -233,21 +234,21 @@ namespace Tartaria.Integration
                     CorruptionSystem.Instance?.ApplyCorruption(
                         "boss_arena", _currentPhase * 5f);
                     VFXController.Instance?.PlayEffect(
-                        VFXController.ParticleEffect.CorruptionPulse, transform.position);
+                        VFXEffect.CorruptionPulse, transform.position);
                     break;
 
                 case BossAttackPattern.MirrorClone:
                     // Spawns a decoy — reduced damage but disorients
                     combat?.DamagePlayer(baseDamage * 0.5f, "mirror_clone");
                     VFXController.Instance?.PlayEffect(
-                        VFXController.ParticleEffect.HarmonicCascade, transform.position);
+                        VFXEffect.HarmonicCascade, transform.position);
                     break;
 
                 case BossAttackPattern.VoidRift:
                     // Opens a rift that pulls player and deals DOT
                     combat?.DamagePlayer(baseDamage * 1.2f, "void_rift");
                     VFXController.Instance?.PlayEffect(
-                        VFXController.ParticleEffect.AetherVortex, transform.position);
+                        VFXEffect.AetherVortex, transform.position);
                     break;
 
                 case BossAttackPattern.FrequencyJam:
@@ -260,14 +261,14 @@ namespace Tartaria.Integration
                     combat?.DamagePlayer(baseDamage * 0.6f, "ley_sever");
                     Core.LeyLineManager.Instance?.SeverNode(0);
                     VFXController.Instance?.PlayEffect(
-                        VFXController.ParticleEffect.Spark, transform.position);
+                        VFXEffect.Spark, transform.position);
                     break;
 
                 case BossAttackPattern.Enrage:
                     // Boss speeds up — halve attack interval for this phase
                     _attackCooldown *= 0.5f;
                     VFXController.Instance?.PlayEffect(
-                        VFXController.ParticleEffect.CorruptionPulse, transform.position);
+                        VFXEffect.CorruptionPulse, transform.position);
                     break;
             }
 
@@ -324,7 +325,7 @@ namespace Tartaria.Integration
 
                 // VFX burst on phase change
                 VFXController.Instance?.PlayEffect(
-                    VFXController.ParticleEffect.HarmonicCascade, transform.position);
+                    VFXEffect.HarmonicCascade, transform.position);
 
                 Debug.Log($"[Boss] Phase {_currentPhase + 1}: {newPhase.phaseName}");
             }

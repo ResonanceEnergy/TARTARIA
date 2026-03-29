@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
+using Tartaria.Save;
 using Tartaria.UI;
 
 namespace Tartaria.Integration

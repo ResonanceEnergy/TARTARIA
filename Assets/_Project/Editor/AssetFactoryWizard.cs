@@ -31,8 +31,8 @@ namespace Tartaria.Editor
             CreateUICanvas();
 
             // Invoke sub-factory scripts
-            AnastasiaDialoguePopulator.BuildDatabase();
-            ZoneDefinitionFactory.BuildAllZones();
+            AnastasiaDialoguePopulator.BuildDialogueDatabase();
+            ZoneDefinitionFactory.BuildZoneDefinitions();
             QuestDefinitionFactory.BuildAllQuests();
             AnastasiaPrefabFactory.BuildAnastasiaPrefab();
             GoldenMotePrefabFactory.BuildMotePrefab();

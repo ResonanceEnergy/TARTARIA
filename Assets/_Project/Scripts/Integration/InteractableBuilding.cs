@@ -103,7 +103,7 @@ namespace Tartaria.Integration
                     if (MicroGiantController.Instance != null && !MicroGiantController.Instance.IsMicro)
                     {
                         float aether = EconomySystem.Instance != null
-                            ? EconomySystem.Instance.GetCurrency(Core.CurrencyType.AetherShards)
+                            ? EconomySystem.Instance.GetBalance(Core.CurrencyType.AetherShards)
                             : 0f;
                         if (aether > 0f)
                         {

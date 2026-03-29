@@ -71,15 +71,21 @@ namespace Tartaria.UI
             var urpAsset = UniversalRenderPipeline.asset;
             if (urpAsset != null)
             {
-                var rendererData = urpAsset.scriptableRenderer as UniversalRendererData;
-                if (rendererData != null)
+                // URP doesn't publicly expose ScriptableRendererData; access via reflection
+                var field = urpAsset.GetType().GetField("m_RendererDataList",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (field?.GetValue(urpAsset) is ScriptableRendererData[] dataList && dataList.Length > 0)
                 {
-                    foreach (var feature in rendererData.rendererFeatures)
+                    var rendererData = dataList[0] as UniversalRendererData;
+                    if (rendererData != null)
                     {
-                        if (feature is ColorblindRendererFeature cbf)
+                        foreach (var feature in rendererData.rendererFeatures)
                         {
-                            cbf.SetActive(_colorblindMode != ColorblindMode.None);
-                            break;
+                            if (feature is ColorblindRendererFeature cbf)
+                            {
+                                cbf.SetActive(_colorblindMode != ColorblindMode.None);
+                                break;
+                            }
                         }
                     }
                 }

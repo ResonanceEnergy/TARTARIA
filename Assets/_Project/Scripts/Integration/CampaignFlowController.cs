@@ -21,7 +21,7 @@ namespace Tartaria.Integration
     ///   ...through Moon 13: The Hidden Moon
     /// </summary>
     [DisallowMultipleComponent]
-    public class CampaignFlowController : MonoBehaviour
+    public class CampaignFlowController : MonoBehaviour, ICampaignService
     {
         public static CampaignFlowController Instance { get; private set; }
 
@@ -32,6 +32,7 @@ namespace Tartaria.Integration
         readonly Dictionary<int, MoonProgress> _moonProgress = new();
 
         public int CurrentMoon => _currentMoon;
+        public int CurrentMoonIndex => _currentMoon;
         public MoonDefinition CurrentMoonDef =>
             _currentMoon >= 0 && _currentMoon < (moons?.Length ?? 0)
                 ? moons[_currentMoon] : null;
@@ -43,6 +44,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            ServiceLocator.Campaign = this;
         }
 
         void Start()

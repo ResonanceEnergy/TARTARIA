@@ -131,7 +131,7 @@ namespace Tartaria.Integration
             AddTrust(3f);
         }
 
-        void ActivateMilitia()
+        public void ActivateMilitia()
         {
             if (_militiaActive) return;
             _militiaActive = true;
