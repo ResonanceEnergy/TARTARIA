@@ -32,6 +32,7 @@ namespace Tartaria.AI
         public float ReactRadius;             // 20m for POI detection
         public float HideRadius;              // 10m for finding cover
         public float CelebrateTimer;          // 3s celebration
+        public float DialogueDuration;        // Set by managed code from DialogueManager
         public float3 TargetPosition;
     }
 

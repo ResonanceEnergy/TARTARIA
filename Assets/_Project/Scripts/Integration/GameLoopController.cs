@@ -82,6 +82,14 @@ namespace Tartaria.Integration
             if (WorkshopUIPanel.Instance != null)
                 WorkshopUIPanel.Instance.OnUpgradeRequested += HandleWorkshopUpgrade;
 
+            // Wire tutorial completion → first quest unlock
+            if (TutorialSystem.Instance != null)
+                TutorialSystem.Instance.OnTutorialComplete += HandleTutorialComplete;
+
+            // Wire boss defeated → climax trigger + quest advancement
+            if (BossEncounterSystem.Instance != null)
+                BossEncounterSystem.Instance.OnBossDefeated += HandleBossDefeated;
+
             // Deferred ECS init (world may not be ready in Awake)
             InitECS();
         }
@@ -102,6 +110,10 @@ namespace Tartaria.Integration
             }
             if (WorkshopUIPanel.Instance != null)
                 WorkshopUIPanel.Instance.OnUpgradeRequested -= HandleWorkshopUpgrade;
+            if (TutorialSystem.Instance != null)
+                TutorialSystem.Instance.OnTutorialComplete -= HandleTutorialComplete;
+            if (BossEncounterSystem.Instance != null)
+                BossEncounterSystem.Instance.OnBossDefeated -= HandleBossDefeated;
         }
 
         void InitECS()
@@ -285,6 +297,35 @@ namespace Tartaria.Integration
             // Save on meaningful transitions
             if (newState == GameState.Exploration)
                 SaveManager.Instance?.MarkDirty();
+        }
+
+        // ─── Tutorial / Boss Event Handlers ─────────
+
+        void HandleTutorialComplete()
+        {
+            Debug.Log("[GameLoop] Tutorial complete — unlocking first quest.");
+            QuestManager.Instance?.UnlockQuest("echohaven_awakening");
+            HUDController.Instance?.ShowInteractionPrompt(
+                "Tutorial complete! Open your Quest Log (J) to begin.");
+        }
+
+        void HandleBossDefeated(BossResult result)
+        {
+            Debug.Log($"[GameLoop] Boss defeated: {result.bossName} — Score {result.performanceScore:P0}");
+
+            // Trigger climax sequence for the current Moon
+            ClimaxSequenceSystem.Instance?.TriggerClimax();
+
+            // Advance Moon campaign
+            MoonCampaignManager.Instance?.AdvanceToNextMoon();
+
+            // Companion celebration
+            MiloController.Instance?.NotifyCombatVictory();
+            LiraelController.Instance?.NotifyZoneComplete();
+
+            // Return to exploration after cinematic
+            GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
+            SaveManager.Instance?.MarkDirty();
         }
 
         // ─── Combat Input Forwarding to ECS ──────────

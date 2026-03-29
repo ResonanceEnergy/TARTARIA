@@ -58,6 +58,22 @@ namespace Tartaria.Integration
                 Debug.Log("[ZoneTransition] No more zones -- game complete!");
                 return;
             }
+
+            // RS gate check — ensure player has enough RS to unlock next zone
+            var nextZone = zones[next];
+            if (nextZone.rsRequirementToUnlock > 0f)
+            {
+                float currentRS = AetherFieldManager.Instance != null
+                    ? AetherFieldManager.Instance.CurrentRS : 0f;
+                if (currentRS < nextZone.rsRequirementToUnlock)
+                {
+                    HUDController.Instance?.ShowInteractionPrompt(
+                        $"Zone locked. Requires RS {nextZone.rsRequirementToUnlock:F0}. Current: {currentRS:F0}");
+                    Debug.Log($"[ZoneTransition] RS gate failed: need {nextZone.rsRequirementToUnlock}, have {currentRS}");
+                    return;
+                }
+            }
+
             StartCoroutine(TransitionSequence(next));
         }
 
@@ -131,9 +147,8 @@ namespace Tartaria.Integration
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
             _transitioning = false;
 
-            // Show zone name
-            HUDController.Instance?.SetZoneName(
-                $"{targetZone.zoneName} -- {targetZone.subtitle}");
+            // Show zone subtitle + lore intro + haptic
+            ShowZoneSubtitle(targetZone);
         }
 
         void LoadZone(int index)
@@ -176,15 +191,42 @@ namespace Tartaria.Integration
 
         System.Collections.IEnumerator FadeScreen(float targetAlpha, float duration)
         {
-            // Placeholder -- in production, animate a CanvasGroup alpha
+            // Animate fade via UIManager CanvasGroup
+            float startAlpha = targetAlpha > 0.5f ? 0f : 1f;
             float elapsed = 0f;
+
             while (elapsed < duration)
             {
                 elapsed += Time.unscaledDeltaTime;
-                float progress = Mathf.Clamp01(elapsed / duration);
-                UIManager.Instance?.UpdateLoadingProgress(progress);
+                float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+                float alpha = Mathf.Lerp(startAlpha, targetAlpha, t);
+                UIManager.Instance?.SetFadeAlpha(alpha);
+                UIManager.Instance?.UpdateLoadingProgress(t);
                 yield return null;
             }
+
+            UIManager.Instance?.SetFadeAlpha(targetAlpha);
+        }
+
+        /// <summary>
+        /// Show zone subtitle with lore intro after transition completes.
+        /// </summary>
+        void ShowZoneSubtitle(ZoneDefinition zone)
+        {
+            if (zone == null) return;
+
+            string subtitle = $"{zone.zoneName} -- {zone.subtitle}";
+            HUDController.Instance?.SetZoneName(subtitle);
+
+            if (!string.IsNullOrEmpty(zone.loreIntro))
+            {
+                DialogueManager.Instance?.PlayContextDialogue(
+                    $"zone_{zone.zoneName.ToLowerInvariant().Replace(' ', '_')}");
+            }
+
+            // Moon-specific haptic on zone entry
+            Input.HapticFeedbackManager.Instance?.PlayMoonHaptic(
+                zone.zoneIndex, Input.HapticContext.ZoneTransition);
         }
     }
 

@@ -202,8 +202,8 @@ namespace Tartaria.Save
             {
                 header = new SaveHeader
                 {
-                    schemaVersion = 2,
-                    gameVersion = Application.version,
+                    schemaVersion = 6,
+                    gameVersion = "0.6.0",
                     platform = "windows",
                     saveSlot = 0,
                     createdUtc = DateTime.UtcNow.ToString("o"),
@@ -288,6 +288,21 @@ namespace Tartaria.Save
                 if (data.veritas == null) data.veritas = new VeritasSaveBlock();
                 data.header.schemaVersion = 5;
                 data.header.gameVersion = "0.5.0";
+                MarkDirty();
+            }
+
+            if (data.header.schemaVersion < 6)
+            {
+                // v5 → v6: add v8 system blocks
+                if (data.airshipFleet == null) data.airshipFleet = new AirshipFleetSaveBlock();
+                if (data.leyLineProphecy == null) data.leyLineProphecy = new LeyLineProphecySaveBlock();
+                if (data.bellTowerSync == null) data.bellTowerSync = new BellTowerSyncSaveBlock();
+                if (data.giantMode == null) data.giantMode = new GiantModeSaveBlock();
+                if (data.worldChoice == null) data.worldChoice = new WorldChoiceSaveBlock();
+                if (data.achievementData == null) data.achievementData = new AchievementSaveBlock();
+                if (data.dialogueArcs == null) data.dialogueArcs = new DialogueArcSaveBlock();
+                data.header.schemaVersion = 6;
+                data.header.gameVersion = "0.6.0";
                 MarkDirty();
             }
         }

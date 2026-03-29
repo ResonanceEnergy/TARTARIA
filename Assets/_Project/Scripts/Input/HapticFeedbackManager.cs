@@ -211,5 +211,85 @@ namespace Tartaria.Input
             public float HighMotorEnd;
             public bool IsCascade;
         }
+
+        // ─── Moon-Specific Haptic Profiles ───────────
+
+        /// <summary>
+        /// Play a context-sensitive haptic for a specific Moon.
+        /// Each Moon has unique rumble signatures for its boss, environment, and climax.
+        /// </summary>
+        public void PlayMoonHaptic(int moonIndex, HapticContext context)
+        {
+            if (_activeGamepad == null) return;
+
+            var profile = GetMoonProfile(moonIndex, context);
+            _currentPattern = profile;
+            _patternTime = 0f;
+        }
+
+        static HapticPattern GetMoonProfile(int moonIndex, HapticContext context)
+        {
+            // Base intensity scales with Moon progression
+            float baseIntensity = 0.3f + moonIndex * 0.05f;
+            baseIntensity = Mathf.Clamp(baseIntensity, 0.3f, 0.95f);
+
+            return context switch
+            {
+                HapticContext.BossEntrance => new HapticPattern
+                {
+                    Duration = 2.5f,
+                    LowMotorStart = baseIntensity,
+                    LowMotorEnd = baseIntensity * 0.5f,
+                    HighMotorStart = 0.2f,
+                    HighMotorEnd = baseIntensity,
+                    IsCascade = true
+                },
+                HapticContext.BossPhaseShift => new HapticPattern
+                {
+                    Duration = 1.5f,
+                    LowMotorStart = baseIntensity * 0.8f,
+                    LowMotorEnd = 0f,
+                    HighMotorStart = baseIntensity,
+                    HighMotorEnd = 0f,
+                    IsCascade = false
+                },
+                HapticContext.EnvironmentShake => new HapticPattern
+                {
+                    Duration = 1.0f + moonIndex * 0.1f,
+                    LowMotorStart = baseIntensity * 0.6f,
+                    LowMotorEnd = 0f,
+                    HighMotorStart = 0.1f,
+                    HighMotorEnd = 0f,
+                    IsCascade = false
+                },
+                HapticContext.ClimaxCinematic => new HapticPattern
+                {
+                    Duration = 5.0f,
+                    LowMotorStart = 0.1f,
+                    LowMotorEnd = 0f,
+                    HighMotorStart = baseIntensity * 0.3f,
+                    HighMotorEnd = baseIntensity,
+                    IsCascade = true
+                },
+                _ => new HapticPattern
+                {
+                    Duration = 0.5f,
+                    LowMotorStart = baseIntensity * 0.5f,
+                    LowMotorEnd = 0f,
+                    HighMotorStart = baseIntensity * 0.3f,
+                    HighMotorEnd = 0f,
+                    IsCascade = false
+                }
+            };
+        }
+    }
+
+    public enum HapticContext : byte
+    {
+        BossEntrance = 0,
+        BossPhaseShift = 1,
+        EnvironmentShake = 2,
+        ClimaxCinematic = 3,
+        ZoneTransition = 4
     }
 }

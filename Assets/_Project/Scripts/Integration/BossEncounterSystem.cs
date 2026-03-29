@@ -65,7 +65,48 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        // ─── Named Boss Lookup ────────────────────────
+        static readonly Dictionary<string, int> NamedBossLookup = new()
+        {
+            { "mud_colossus", 0 },
+            { "quartz_defiler", 1 },
+            { "spire_breaker", 2 },
+            { "iron_corruptor", 3 },
+            { "echo_sovereign", 4 },
+            { "crystal_phantom", 5 },
+            { "fractal_tyrant", 6 },
+            { "mirror_empress", 7 },
+            { "void_shaper", 8 },
+            { "rail_leviathan", 9 },
+            { "sludge_leviathan", 10 },
+            { "anti_resonance", 11 },
+            { "guardian_of_true_history", 12 },
+            { "rift_walker", 9 },
+            { "ley_devourer", 10 }
+        };
+
         // ─── Start / Stop ────────────────────────────
+
+        /// <summary>Begin a boss encounter by string ID (e.g. "sludge_leviathan").</summary>
+        public void SpawnBoss(string bossId)
+        {
+            if (string.IsNullOrEmpty(bossId))
+            {
+                Debug.LogWarning("[Boss] SpawnBoss called with null/empty bossId.");
+                return;
+            }
+
+            string key = bossId.ToLowerInvariant().Replace(' ', '_');
+            if (NamedBossLookup.TryGetValue(key, out int moonIndex))
+            {
+                StartBoss(moonIndex);
+            }
+            else
+            {
+                Debug.LogWarning($"[Boss] Unknown bossId: {bossId}. Spawning default.");
+                StartBoss(-1); // triggers default case in BuildBossForMoon
+            }
+        }
 
         /// <summary>Begin a boss encounter for the given Moon.</summary>
         public void StartBoss(int moonIndex)
