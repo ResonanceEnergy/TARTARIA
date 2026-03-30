@@ -59,6 +59,7 @@ namespace Tartaria.Integration
         readonly Dictionary<string, float> _progress = new(); // 0..1 for progressive achievements
         readonly List<AchievementDef> _definitions = new();
         int _totalUnlocked;
+        Action<int> _onMoteCollected;
 
         // ─── Events ─────────────────────────────────
 
@@ -84,7 +85,10 @@ namespace Tartaria.Integration
 
             var ana = AnastasiaController.Instance;
             if (ana != null)
-                ana.OnMoteCollected += _ => CheckMoteAchievements();
+            {
+                _onMoteCollected = _ => CheckMoteAchievements();
+                ana.OnMoteCollected += _onMoteCollected;
+            }
 
             // Boss defeated → combat achievements
             var boss = BossEncounterSystem.Instance;
@@ -134,6 +138,12 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            if (_onMoteCollected != null)
+            {
+                var ana = AnastasiaController.Instance;
+                if (ana != null) ana.OnMoteCollected -= _onMoteCollected;
+            }
+
             var boss = BossEncounterSystem.Instance;
             if (boss != null) boss.OnBossDefeated -= HandleBossDefeated;
 

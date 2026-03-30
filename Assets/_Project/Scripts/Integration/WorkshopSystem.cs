@@ -30,6 +30,7 @@ namespace Tartaria.Integration
         [SerializeField] UpgradeTier[] upgradeTiers;
 
         readonly Dictionary<string, int> _buildingTiers = new();
+        readonly Dictionary<string, InteractableBuilding> _buildingCache = new();
 
         // Cached ECS references to avoid per-call EntityQuery allocation
         World _ecsWorld;
@@ -147,12 +148,16 @@ namespace Tartaria.Integration
 
         InteractableBuilding FindBuilding(string buildingId)
         {
+            if (_buildingCache.TryGetValue(buildingId, out var cached) && cached != null)
+                return cached;
+
             var buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
             foreach (var b in buildings)
             {
-                if (b.BuildingId == buildingId) return b;
+                _buildingCache[b.BuildingId] = b;
+                if (b.BuildingId == buildingId) cached = b;
             }
-            return null;
+            return cached;
         }
 
         float GetCurrentRS()

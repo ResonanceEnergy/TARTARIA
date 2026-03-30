@@ -229,6 +229,8 @@ namespace Tartaria.Core
             }
         }
 
+        EntityQuery _leyLineQuery;
+
         public float GetPlayerBoost()
         {
             // Query the ECS LeyLineProximity component
@@ -236,10 +238,11 @@ namespace Tartaria.Core
             if (world == null) return 1f;
             var em = world.EntityManager;
 
-            var query = em.CreateEntityQuery(typeof(LeyLineProximity), typeof(PlayerTag));
-            if (query.CalculateEntityCount() == 0) return 1f;
+            if (!_leyLineQuery.IsValid)
+                _leyLineQuery = em.CreateEntityQuery(typeof(LeyLineProximity), typeof(PlayerTag));
+            if (_leyLineQuery.CalculateEntityCount() == 0) return 1f;
 
-            var entity = query.GetSingletonEntity();
+            var entity = _leyLineQuery.GetSingletonEntity();
             var prox = em.GetComponentData<LeyLineProximity>(entity);
             return prox.BoostMultiplier;
         }

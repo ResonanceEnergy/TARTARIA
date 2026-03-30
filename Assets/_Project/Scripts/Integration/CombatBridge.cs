@@ -100,6 +100,17 @@ namespace Tartaria.Integration
             // Re-init if ECS world was rebuilt (e.g., scene reload)
             if (_world == null || !_world.IsCreated) { _initialized = false; return; }
 
+            // Retry player transform lookup if it failed during init
+            if (_playerTransform == null)
+            {
+                var playerObj = GameObject.FindWithTag("Player");
+                if (playerObj != null) _playerTransform = playerObj.transform;
+            }
+
+            // Re-create enemy query if it went stale
+            if (!_enemyQuery.IsValid)
+                _enemyQuery = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
+
             // Update cooldown timers
             _pulseTimer = Mathf.Max(0, _pulseTimer - Time.deltaTime);
             _strikeTimer = Mathf.Max(0, _strikeTimer - Time.deltaTime);

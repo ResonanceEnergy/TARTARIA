@@ -16,9 +16,12 @@ namespace Tartaria.Audio
 
         [Header("SFX Pools")]
         [SerializeField] int sfxPoolSize = 16;
+        [SerializeField] int tonePoolSize = 4;
 
         AudioSource[] _sfxPool;
         int _sfxPoolIndex;
+        AudioSource[] _tonePool;
+        int _tonePoolIndex;
 
         void Awake()
         {
@@ -27,6 +30,7 @@ namespace Tartaria.Audio
             DontDestroyOnLoad(gameObject);
 
             InitializeSFXPool();
+            InitializeTonePool();
         }
 
         void InitializeSFXPool()
@@ -39,6 +43,20 @@ namespace Tartaria.Audio
                 _sfxPool[i] = go.AddComponent<AudioSource>();
                 _sfxPool[i].playOnAwake = false;
                 _sfxPool[i].spatialBlend = 1.0f; // 3D
+            }
+        }
+
+        void InitializeTonePool()
+        {
+            _tonePool = new AudioSource[tonePoolSize];
+            for (int i = 0; i < tonePoolSize; i++)
+            {
+                var go = new GameObject($"Tone_Pool_{i}");
+                go.transform.SetParent(transform);
+                _tonePool[i] = go.AddComponent<AudioSource>();
+                _tonePool[i].playOnAwake = false;
+                _tonePool[i].loop = true;
+                _tonePool[i].spatialBlend = 0f;
             }
         }
 
@@ -75,14 +93,12 @@ namespace Tartaria.Audio
         /// </summary>
         public AudioSource PlayTone(float frequencyHz, float volume = 0.3f)
         {
-            var go = new GameObject("ToneGenerator");
-            go.transform.SetParent(transform);
+            var source = _tonePool[_tonePoolIndex];
+            _tonePoolIndex = (_tonePoolIndex + 1) % _tonePool.Length;
 
-            var source = go.AddComponent<AudioSource>();
-            source.playOnAwake = false;
-            source.loop = true;
+            // Stop previous tone on this slot
+            source.Stop();
             source.volume = volume;
-            source.spatialBlend = 0f;
 
             // Generate sine wave clip at specified frequency
             int sampleRate = AudioSettings.outputSampleRate;
@@ -103,7 +119,7 @@ namespace Tartaria.Audio
         }
 
         /// <summary>
-        /// Plays a named voice line at the given volume (stub — clips loaded from Resources/VoiceLines).
+        /// Plays a named voice line at the given volume. Clips loaded from Resources/VoiceLines.
         /// </summary>
         public void PlayVoiceLine(string lineId, float volume = 1f)
         {
