@@ -277,6 +277,10 @@ namespace Tartaria.Integration
                         if (moonIdx < cond.intValue)
                             return false;
                         break;
+
+                    default:
+                        Debug.LogWarning($"[DialogueTree] Unhandled condition type: {cond.type}");
+                        break;
                 }
             }
             return true;
@@ -327,6 +331,10 @@ namespace Tartaria.Integration
 
                     case ConsequenceType.FailQuest:
                         QuestManager.Instance?.FailQuest(c.stringValue);
+                        break;
+
+                    default:
+                        Debug.LogWarning($"[DialogueTree] Unhandled consequence type: {c.type}");
                         break;
                 }
             }

@@ -40,6 +40,10 @@ namespace Tartaria.Integration
         float _spreadCheckTimer;
         float _tickTimer;
 
+        InteractableBuilding[] _cachedBuildings = System.Array.Empty<InteractableBuilding>();
+        float _buildingCacheTimer;
+        const float BuildingCacheInterval = 2f;
+
         readonly Dictionary<string, CorruptionState> _states = new();
 
         public event System.Action<string, float> OnCorruptionChanged;
@@ -54,6 +58,13 @@ namespace Tartaria.Integration
 
         void Update()
         {
+            _buildingCacheTimer += Time.deltaTime;
+            if (_buildingCacheTimer >= BuildingCacheInterval)
+            {
+                _buildingCacheTimer = 0f;
+                _cachedBuildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            }
+
             _tickTimer += Time.deltaTime;
             if (_tickTimer >= corruptionTickInterval)
             {
@@ -239,9 +250,7 @@ namespace Tartaria.Integration
                 Vector3 origin = GetBuildingPosition(key);
                 if (origin == Vector3.zero) continue;
 
-                var buildings = FindObjectsByType<InteractableBuilding>(
-                    FindObjectsSortMode.None);
-                foreach (var b in buildings)
+                foreach (var b in _cachedBuildings)
                 {
                     if (b.BuildingId == key) continue;
                     float dist = Vector3.Distance(origin, b.transform.position);
@@ -272,10 +281,8 @@ namespace Tartaria.Integration
 
         Vector3 GetBuildingPosition(string buildingId)
         {
-            var buildings = FindObjectsByType<InteractableBuilding>(
-                FindObjectsSortMode.None);
-            foreach (var b in buildings)
-                if (b.BuildingId == buildingId) return b.transform.position;
+            foreach (var b in _cachedBuildings)
+                if (b != null && b.BuildingId == buildingId) return b.transform.position;
             return Vector3.zero;
         }
     }

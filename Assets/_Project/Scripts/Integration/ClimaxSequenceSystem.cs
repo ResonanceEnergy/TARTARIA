@@ -38,6 +38,7 @@ namespace Tartaria.Integration
         bool _isPlaying;
         int _activeMoonIndex = -1;
         Coroutine _activeSequence;
+        Camera.CameraController _cachedCam;
 
         readonly Dictionary<int, ClimaxDefinition> _climaxes = new();
 
@@ -141,6 +142,10 @@ namespace Tartaria.Integration
                     case ClimaxBeatType.Wait:
                         yield return new WaitForSeconds(beat.duration);
                         break;
+
+                    default:
+                        Debug.LogWarning($"[ClimaxSequence] Unhandled beat type: {beat.type}");
+                        break;
                 }
 
                 // Pause between beats (per-beat override or default)
@@ -160,8 +165,9 @@ namespace Tartaria.Integration
 
         IEnumerator RunCameraBeat(ClimaxBeat beat)
         {
-            Camera.CameraController cam = FindFirstObjectByType<Camera.CameraController>();
-            cam?.FocusOnPoint(beat.worldPosition, beat.duration > 0 ? beat.duration : cinematicPanDuration);
+            if (_cachedCam == null)
+                _cachedCam = FindFirstObjectByType<Camera.CameraController>();
+            _cachedCam?.FocusOnPoint(beat.worldPosition, beat.duration > 0 ? beat.duration : cinematicPanDuration);
             yield return new WaitForSeconds(beat.duration > 0 ? beat.duration : cinematicPanDuration);
         }
 
@@ -206,6 +212,9 @@ namespace Tartaria.Integration
                     break;
                 case "zone_complete":
                     VFXController.Instance?.TriggerZoneComplete();
+                    break;
+                default:
+                    Debug.LogWarning($"[ClimaxSequence] Unknown VFX type: {beat.vfxType}");
                     break;
             }
             yield return new WaitForSeconds(beat.duration > 0 ? beat.duration : 2f);

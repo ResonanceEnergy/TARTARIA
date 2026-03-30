@@ -5,7 +5,7 @@ namespace Tartaria.Save
 {
     /// <summary>
     /// Save Data schema — serialized to JSON at Application.persistentDataPath.
-    /// Schema v2 — adds Anastasia, quest, workshop, and zone persistence.
+    /// Schema v8 — see version blocks below for incremental additions.
     /// Forward-compatible: v1.0 saves must load in v5.0.
     /// </summary>
     [Serializable]
@@ -65,8 +65,8 @@ namespace Tartaria.Save
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 7;
-        public string gameVersion = "0.7.0";
+        public int schemaVersion = 8;
+        public string gameVersion = "0.8.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
