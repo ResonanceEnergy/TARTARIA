@@ -97,7 +97,9 @@ namespace Tartaria.Integration
         float _targetOpacity;
         float _currentOpacity;
         bool _hasManifested;
+#pragma warning disable CS0414
         bool _zoneFirstAppearanceDone;
+#pragma warning restore CS0414
 
         // Dialogue bitmask (128-bit as two ulongs)
         ulong _bitmaskLow;   // bits 0–63

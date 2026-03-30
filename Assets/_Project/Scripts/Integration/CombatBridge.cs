@@ -44,6 +44,10 @@ namespace Tartaria.Integration
         float _strikeTimer;
         float _shieldTimer;
 
+        // Combo system — ComboDuration skill extends the window
+        float _comboTimer;
+        const float BaseComboWindow = 2f;
+
         // Enemy tracking for state transitions
         int _activeEnemyCount;
         bool _inCombat;
@@ -98,6 +102,18 @@ namespace Tartaria.Integration
             _strikeTimer = Mathf.Max(0, _strikeTimer - Time.deltaTime);
             _shieldTimer = Mathf.Max(0, _shieldTimer - Time.deltaTime);
 
+            // Decay combo timer — reset combo count when window expires
+            if (_comboTimer > 0)
+            {
+                _comboTimer -= Time.deltaTime;
+                if (_comboTimer <= 0 && _em.Exists(_playerCombatEntity))
+                {
+                    var c = _em.GetComponentData<HarmonicCombatant>(_playerCombatEntity);
+                    c.ComboCount = 0;
+                    _em.SetComponentData(_playerCombatEntity, c);
+                }
+            }
+
             // Monitor enemies for combat state transitions
             MonitorEnemies();
 
@@ -117,6 +133,7 @@ namespace Tartaria.Integration
             DamageNearbyEnemies(playerPos, pulseRange, pulseDamage * dmgMod, DamageType.ResonancePulse);
 
             // Haptic feedback
+            AdvanceCombo();
             HapticFeedbackManager.Instance?.PlayCombatHit();
 
             // VFX
@@ -133,6 +150,7 @@ namespace Tartaria.Integration
             float rangeMod = 1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.StrikeRange) ?? 0f);
             DamageEnemiesInCone(playerPos, forward, strikeRange * rangeMod, 60f, strikeDamage, DamageType.HarmonicStrike);
 
+            AdvanceCombo();
             HapticFeedbackManager.Instance?.PlayCombatHit();
             VFXController.Instance?.PlayHarmonicStrike(playerPos, forward);
         }
@@ -336,8 +354,7 @@ namespace Tartaria.Integration
             var combatant = _em.GetComponentData<HarmonicCombatant>(_playerCombatEntity);
             if (active)
             {
-                combatant.AetherCharge = combatant.AetherCharge; // preserve
-                // Store original values would need extra fields; keep it simple — just scale damage via flag
+                // Giant mode preserves current aether charge; damage scaling handled via _giantModeActive flag
             }
             _em.SetComponentData(_playerCombatEntity, combatant);
 
@@ -352,6 +369,22 @@ namespace Tartaria.Integration
 
         float GetGiantModeDamageMultiplier() => _giantModeActive ? 3f : 1f;
         float GetGiantModeRangeMultiplier() => _giantModeActive ? 5f : 1f;
+
+        // ─── Combo System ─────────────────────────────
+
+        void AdvanceCombo()
+        {
+            if (!_em.Exists(_playerCombatEntity)) return;
+
+            var c = _em.GetComponentData<HarmonicCombatant>(_playerCombatEntity);
+            c.ComboCount = Mathf.Min(c.ComboCount + 1, 12);
+            _em.SetComponentData(_playerCombatEntity, c);
+
+            // Reset combo window — ComboDuration skill extends it
+            float comboDurMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(
+                Gameplay.SkillModifierType.ComboDuration) ?? 0f;
+            _comboTimer = BaseComboWindow * (1f + comboDurMod);
+        }
 
         // ─── Utility ─────────────────────────────────
 

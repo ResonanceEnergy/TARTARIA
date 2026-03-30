@@ -31,7 +31,9 @@ namespace Tartaria.Integration
         // ─── Presence System ───
         [Header("Presence")]
         [SerializeField] float dissonanceRadius = 30f;
+#pragma warning disable CS0414
         [SerializeField] float voiceVolumeCurve = 0.3f;
+#pragma warning restore CS0414
 
         float _presenceLevel;        // 0=dormant, 1=full manifestation
         int _prophecyStonesTriggered;

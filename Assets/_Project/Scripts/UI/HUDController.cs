@@ -77,7 +77,9 @@ namespace Tartaria.UI
         int _currentWave;
         int _totalWaves;
         int _enemiesRemaining;
+#pragma warning disable CS0414
         bool _waveCounterVisible;
+#pragma warning restore CS0414
 
         // Achievement toast state
         float _achievementTimer;

@@ -18,7 +18,9 @@ namespace Tartaria.Gameplay
     public class TuningMiniGameController : MonoBehaviour
     {
         [Header("Configuration")]
+#pragma warning disable CS0414
         [SerializeField] float baseTargetFrequency = 432f;
+#pragma warning restore CS0414
 
         // Current game state
         TuningPuzzleConfig _currentConfig;

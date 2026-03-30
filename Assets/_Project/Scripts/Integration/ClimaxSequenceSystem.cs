@@ -32,7 +32,9 @@ namespace Tartaria.Integration
         public event Action<int> OnClimaxCompleted;   // moonIndex
 
         [Header("Timing")]
+#pragma warning disable CS0414
         [SerializeField] float beatPauseDuration = 2f;
+#pragma warning restore CS0414
         [SerializeField] float cinematicPanDuration = 4f;
 
         bool _isPlaying;
