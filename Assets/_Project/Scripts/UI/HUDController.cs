@@ -101,6 +101,16 @@ namespace Tartaria.UI
             if (waveCounterPanel != null) waveCounterPanel.gameObject.SetActive(false);
             if (achievementToastPanel != null) achievementToastPanel.gameObject.SetActive(false);
             if (moonTrophyPanel != null) moonTrophyPanel.gameObject.SetActive(false);
+
+            // Subscribe to accessibility changes for text scale / high contrast
+            if (AccessibilityManager.Instance != null)
+                AccessibilityManager.Instance.OnSettingsChanged += HandleAccessibilityChanged;
+        }
+
+        void OnDestroy()
+        {
+            if (AccessibilityManager.Instance != null)
+                AccessibilityManager.Instance.OnSettingsChanged -= HandleAccessibilityChanged;
         }
 
         void Update()
@@ -375,6 +385,49 @@ namespace Tartaria.UI
                 yield return null;
             }
             target.localScale = original;
+        }
+
+        // ─── Accessibility Refresh ───────────────────
+
+        void HandleAccessibilityChanged()
+        {
+            var am = AccessibilityManager.Instance;
+            if (am == null) return;
+
+            float scale = am.TextScale;
+
+            // Apply text scale to all TMP text components
+            if (rsValueText != null) rsValueText.fontSize = 24f * scale;
+            if (aetherValueText != null) aetherValueText.fontSize = 18f * scale;
+            if (zoneNameText != null) zoneNameText.fontSize = 20f * scale;
+            if (interactionText != null) interactionText.fontSize = 18f * scale;
+            if (bossNameText != null) bossNameText.fontSize = 22f * scale;
+            if (waveCounterText != null) waveCounterText.fontSize = 20f * scale;
+            if (waveEnemiesText != null) waveEnemiesText.fontSize = 16f * scale;
+            if (achievementToastText != null) achievementToastText.fontSize = 18f * scale;
+            if (moonTrophyText != null) moonTrophyText.fontSize = 28f * scale;
+            if (moonTrophySubtext != null) moonTrophySubtext.fontSize = 18f * scale;
+
+            // High contrast mode — boost text alpha if needed
+            if (am.HighContrast)
+            {
+                ApplyHighContrast(rsValueText);
+                ApplyHighContrast(aetherValueText);
+                ApplyHighContrast(zoneNameText);
+                ApplyHighContrast(bossNameText);
+                ApplyHighContrast(achievementToastText);
+                ApplyHighContrast(moonTrophyText);
+            }
+
+            Debug.Log($"[HUD] Accessibility refreshed: scale={scale}, highContrast={am.HighContrast}");
+        }
+
+        static void ApplyHighContrast(TMPro.TextMeshProUGUI text)
+        {
+            if (text == null) return;
+            var c = text.color;
+            text.color = new Color(c.r, c.g, c.b, 1f);
+            text.fontStyle |= TMPro.FontStyles.Bold;
         }
     }
 }

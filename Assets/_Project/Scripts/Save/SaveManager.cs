@@ -202,8 +202,8 @@ namespace Tartaria.Save
             {
                 header = new SaveHeader
                 {
-                    schemaVersion = 7,
-                    gameVersion = "0.7.0",
+                    schemaVersion = 8,
+                    gameVersion = "0.8.0",
                     platform = "windows",
                     saveSlot = 0,
                     createdUtc = DateTime.UtcNow.ToString("o"),
