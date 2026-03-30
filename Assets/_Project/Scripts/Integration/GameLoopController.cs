@@ -37,6 +37,8 @@ namespace Tartaria.Integration
         EntityManager _em;
         Entity _rsEntity;
         Entity _playerEntity;
+        EntityQuery _rsQuery;
+        EntityQuery _playerQuery;
         bool _ecsReady;
 
         // RS tracking
@@ -54,9 +56,15 @@ namespace Tartaria.Integration
 
         // Cached non-singleton mini-games
         AetherConduitMiniGame _conduitMiniGame;
+        OrphanTrainPuzzle _orphanTrainPuzzle;
 
         // Victory
         bool _zoneVictoryTriggered;
+
+        // Buff tracking
+        float _rsBuffTimer;
+        const float RS_BUFF_MULTIPLIER = 1.25f;
+        const float RS_BUFF_DURATION = 60f;
 
         void Awake()
         {
@@ -209,7 +217,12 @@ namespace Tartaria.Integration
             {
                 AnastasiaController.Instance.OnModeChanged += HandleAnastasiaMode;
                 AnastasiaController.Instance.OnSolidificationPhaseChanged += HandleAnastasiaSolidification;
+                AnastasiaController.Instance.OnLineDelivered += HandleAnastasiaLine;
             }
+
+            // Wire world map codex unlock → achievement + HUD
+            if (WorldMapUI.Instance != null)
+                WorldMapUI.Instance.OnEntryUnlocked += HandleCodexEntryUnlocked;
 
             // Wire Cassian intel events → quest + HUD
             if (CassianNPCController.Instance != null)
@@ -273,6 +286,35 @@ namespace Tartaria.Integration
                 _conduitMiniGame.OnBastionPlaced += HandleBastionPlaced;
                 _conduitMiniGame.OnRockCut += HandleRockCut;
                 _conduitMiniGame.OnResonancePeak += HandleConduitResonancePeak;
+            }
+
+            // Wire orphan train puzzle (no singleton — find by type)
+            _orphanTrainPuzzle = FindAnyObjectByType<OrphanTrainPuzzle>();
+            if (_orphanTrainPuzzle != null)
+            {
+                _orphanTrainPuzzle.OnSegmentAligned += HandleTrainSegmentAligned;
+                _orphanTrainPuzzle.OnChainBroken += HandleTrainChainBroken;
+            }
+
+            // Wire harmonic rock cutting mini-game
+            if (HarmonicRockCutting.Instance != null)
+            {
+                HarmonicRockCutting.Instance.OnVeinTraced += HandleVeinTraced;
+                HarmonicRockCutting.Instance.OnComboChanged += HandleRockComboChanged;
+            }
+
+            // Wire rail alignment mini-game
+            if (RailAlignmentMiniGame.Instance != null)
+            {
+                RailAlignmentMiniGame.Instance.OnSegmentRotated += HandleSegmentRotated;
+                RailAlignmentMiniGame.Instance.OnFlowChanged += HandleFlowChanged;
+            }
+
+            // Wire pipe organ mini-game
+            if (PipeOrganMiniGame.Instance != null)
+            {
+                PipeOrganMiniGame.Instance.OnPipePlayed += HandlePipePlayed;
+                PipeOrganMiniGame.Instance.OnChordAdvanced += HandleChordAdvanced;
             }
 
             // Deferred ECS init (world may not be ready in Awake)
@@ -378,7 +420,10 @@ namespace Tartaria.Integration
             {
                 AnastasiaController.Instance.OnModeChanged -= HandleAnastasiaMode;
                 AnastasiaController.Instance.OnSolidificationPhaseChanged -= HandleAnastasiaSolidification;
+                AnastasiaController.Instance.OnLineDelivered -= HandleAnastasiaLine;
             }
+            if (WorldMapUI.Instance != null)
+                WorldMapUI.Instance.OnEntryUnlocked -= HandleCodexEntryUnlocked;
             if (CassianNPCController.Instance != null)
                 CassianNPCController.Instance.OnIntelShared -= HandleCassianIntel;
             if (LeyLineManager.Instance != null)
@@ -420,6 +465,26 @@ namespace Tartaria.Integration
                 _conduitMiniGame.OnRockCut -= HandleRockCut;
                 _conduitMiniGame.OnResonancePeak -= HandleConduitResonancePeak;
             }
+            if (_orphanTrainPuzzle != null)
+            {
+                _orphanTrainPuzzle.OnSegmentAligned -= HandleTrainSegmentAligned;
+                _orphanTrainPuzzle.OnChainBroken -= HandleTrainChainBroken;
+            }
+            if (HarmonicRockCutting.Instance != null)
+            {
+                HarmonicRockCutting.Instance.OnVeinTraced -= HandleVeinTraced;
+                HarmonicRockCutting.Instance.OnComboChanged -= HandleRockComboChanged;
+            }
+            if (RailAlignmentMiniGame.Instance != null)
+            {
+                RailAlignmentMiniGame.Instance.OnSegmentRotated -= HandleSegmentRotated;
+                RailAlignmentMiniGame.Instance.OnFlowChanged -= HandleFlowChanged;
+            }
+            if (PipeOrganMiniGame.Instance != null)
+            {
+                PipeOrganMiniGame.Instance.OnPipePlayed -= HandlePipePlayed;
+                PipeOrganMiniGame.Instance.OnChordAdvanced -= HandleChordAdvanced;
+            }
         }
 
         void InitECS()
@@ -428,18 +493,22 @@ namespace Tartaria.Integration
             if (_ecsWorld == null) return;
             _em = _ecsWorld.EntityManager;
 
+            // Create queries once and reuse
+            if (!_rsQuery.IsValid)
+                _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
+            if (!_playerQuery.IsValid)
+                _playerQuery = _em.CreateEntityQuery(typeof(PlayerTag), typeof(LocalTransform));
+
             // Find ResonanceScore singleton
-            var query = _em.CreateEntityQuery(typeof(ResonanceScore));
-            if (query.CalculateEntityCount() > 0)
+            if (_rsQuery.CalculateEntityCount() > 0)
             {
-                _rsEntity = query.GetSingletonEntity();
+                _rsEntity = _rsQuery.GetSingletonEntity();
                 _ecsReady = true;
             }
 
             // Find player entity for position sync
-            var playerQuery = _em.CreateEntityQuery(typeof(PlayerTag), typeof(LocalTransform));
-            if (playerQuery.CalculateEntityCount() > 0)
-                _playerEntity = playerQuery.GetSingletonEntity();
+            if (_playerQuery.CalculateEntityCount() > 0)
+                _playerEntity = _playerQuery.GetSingletonEntity();
         }
 
         void Update()
@@ -472,11 +541,26 @@ namespace Tartaria.Integration
             // Moon campaign RS multiplier
             float moonMod = MoonModifierProvider.Active.rsGainMultiplier;
 
+            // Buff timer countdown
+            float buffMod = 1f;
+            if (_rsBuffTimer > 0f)
+            {
+                _rsBuffTimer -= Time.deltaTime;
+                buffMod = RS_BUFF_MULTIPLIER;
+                if (_rsBuffTimer <= 0f)
+                {
+                    _rsBuffTimer = 0f;
+                    HUDController.Instance?.ShowInteractionPrompt("Resonance Amplifier expired.");
+                }
+            }
+
             if (Mathf.Abs(rs.SkillRSMultiplier - skillMod) > 0.001f
-                || Mathf.Abs(rs.MoonRSMultiplier - moonMod) > 0.001f)
+                || Mathf.Abs(rs.MoonRSMultiplier - moonMod) > 0.001f
+                || Mathf.Abs(rs.BuffRSMultiplier - buffMod) > 0.001f)
             {
                 rs.SkillRSMultiplier = skillMod;
                 rs.MoonRSMultiplier = moonMod;
+                rs.BuffRSMultiplier = buffMod;
                 _em.SetComponentData(_rsEntity, rs);
             }
         }
@@ -883,6 +967,13 @@ namespace Tartaria.Integration
                 Multiplier = 1f,
                 GoldenRatioMatch = 0f
             });
+        }
+
+        public void ActivateRSBuff(float duration = RS_BUFF_DURATION)
+        {
+            _rsBuffTimer = duration;
+            HUDController.Instance?.ShowInteractionPrompt($"Resonance Amplifier active! +25% RS for {duration:F0}s");
+            Debug.Log($"[GameLoop] RS buff activated for {duration}s");
         }
 
         // ─── Mini-Game → Building Bonus Bridge ───────
@@ -2543,6 +2634,103 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayPerfectTune();
             HUDController.Instance?.ShowInteractionPrompt("Resonance peak!");
             Debug.Log("[GameLoop] Conduit resonance peak");
+        }
+
+        // ─── Harmonic Rock Cutting Handlers ──────────
+
+        void HandleVeinTraced(int veinIndex, float accuracy)
+        {
+            VFXController.Instance?.PlayHarmonicStrike(Vector3.up * veinIndex, Vector3.forward);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            QueueRSReward(accuracy * 3f, $"vein_traced_{veinIndex}");
+            Debug.Log($"[GameLoop] Vein traced: {veinIndex}, accuracy={accuracy:F2}");
+        }
+
+        void HandleRockComboChanged(int combo)
+        {
+            if (combo >= 3)
+                HUDController.Instance?.ShowInteractionPrompt($"Combo x{combo}!");
+            if (combo >= 5)
+                AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+            Debug.Log($"[GameLoop] Rock cutting combo: {combo}");
+        }
+
+        // ─── Orphan Train Puzzle Handlers ────────────
+
+        void HandleTrainSegmentAligned(int index, float accuracy)
+        {
+            VFXController.Instance?.PlayTuningSuccess(Vector3.right * index * 5f, accuracy > 0.9f);
+            HapticFeedbackManager.Instance?.PlayTuningOnFrequency();
+            QueueRSReward(accuracy * 2f, $"train_segment_{index}");
+            Debug.Log($"[GameLoop] Train segment aligned: {index}, accuracy={accuracy:F2}");
+        }
+
+        void HandleTrainChainBroken(int segmentIndex)
+        {
+            VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 5f);
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            HUDController.Instance?.ShowInteractionPrompt("Chain broken! Re-align segments.");
+            Debug.Log($"[GameLoop] Train chain broken at segment {segmentIndex}");
+        }
+
+        // ─── Rail Alignment Handlers ─────────────────
+
+        void HandleSegmentRotated(int segIndex, int newAngle)
+        {
+            HapticFeedbackManager.Instance?.PlayTuningOnFrequency();
+            Debug.Log($"[GameLoop] Rail segment rotated: {segIndex} → {newAngle}°");
+        }
+
+        void HandleFlowChanged(float flowStrength)
+        {
+            HUDController.Instance?.UpdateRS(flowStrength * 100f); // Visual flow meter
+            if (flowStrength >= 1f)
+            {
+                AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+                VFXController.Instance?.PlayResonancePulse(Vector3.zero, 15f);
+            }
+            Debug.Log($"[GameLoop] Rail flow changed: {flowStrength:F2}");
+        }
+
+        // ─── Pipe Organ Handlers ─────────────────────
+
+        void HandlePipePlayed(int pipeIndex, bool correct)
+        {
+            if (correct)
+            {
+                HapticFeedbackManager.Instance?.PlayTuningOnFrequency();
+                VFXController.Instance?.PlayTuningSuccess(Vector3.up * pipeIndex, false);
+            }
+            else
+            {
+                HapticFeedbackManager.Instance?.PlayTuningOffFrequency();
+                VFXController.Instance?.PlayDissonancePulse(Vector3.up * pipeIndex, 3f);
+            }
+            Debug.Log($"[GameLoop] Pipe played: {pipeIndex}, correct={correct}");
+        }
+
+        void HandleChordAdvanced(int chordIndex)
+        {
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+            HUDController.Instance?.ShowInteractionPrompt($"Chord {chordIndex + 1} complete!");
+            QueueRSReward(5f, $"chord_{chordIndex}");
+            Debug.Log($"[GameLoop] Chord advanced: {chordIndex}");
+        }
+
+        // ─── Anastasia Line + Codex Entry Handlers ──
+
+        void HandleAnastasiaLine(AnastasiaLine line)
+        {
+            HUDController.Instance?.ShowInteractionPrompt(line.text);
+            Debug.Log($"[GameLoop] Anastasia line delivered: #{line.id} [{line.category}]");
+        }
+
+        void HandleCodexEntryUnlocked(string entryId)
+        {
+            HUDController.Instance?.ShowAchievementToast($"Codex entry unlocked: {entryId}");
+            AdaptiveMusicController.Instance?.PlayDiscovery();
+            HapticFeedbackManager.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] Codex entry unlocked: {entryId}");
         }
     }
 }

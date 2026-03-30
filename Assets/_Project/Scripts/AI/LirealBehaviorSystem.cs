@@ -40,6 +40,10 @@ namespace Tartaria.AI
     [UpdateAfter(typeof(CompanionBehaviorSystem))]
     public partial struct LirealBehaviorSystem : ISystem
     {
+        const float DefaultMaxHealth = 100f;
+        const float HealThreshold = 50f;
+        const float HealRange = 5f;
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PlayerTag>();
@@ -52,15 +56,19 @@ namespace Tartaria.AI
 
             // Get player position and health
             float3 playerPos = float3.zero;
-            float playerHealth = 100f;
+            float playerHealth = DefaultMaxHealth;
+            bool playerFound = false;
             foreach (var (transform, combatant) in
                 SystemAPI.Query<RefRO<LocalTransform>, RefRO<HarmonicCombatant>>()
                 .WithAll<PlayerTag>())
             {
                 playerPos = transform.ValueRO.Position;
                 playerHealth = combatant.ValueRO.Health;
+                playerFound = true;
                 break;
             }
+
+            if (!playerFound) return;
 
             // Check for corruption (any FractalWraith entities nearby)
             bool corruptionNearby = false;
@@ -82,7 +90,7 @@ namespace Tartaria.AI
                 {
                     case CompanionState.Follow:
                         // While following, check for special triggers
-                        if (playerHealth < 50f && dist < 5f)
+                        if (playerHealth < HealThreshold && dist < HealRange)
                         {
                             // Healing mode: stay close, boost regen
                             float3 healPos = playerPos + new float3(1.5f, 0, 1.5f);

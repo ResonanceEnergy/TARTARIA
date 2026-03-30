@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Gameplay;
 using Tartaria.Input;
 
 namespace Tartaria.Integration
@@ -264,6 +265,18 @@ namespace Tartaria.Integration
                         if (!_choiceHistory.TryGetValue(cond.stringValue, out int prev) || prev != cond.intValue)
                             return false;
                         break;
+
+                    case ConditionType.HasItem:
+                        if (CraftingSystem.Instance == null) break;
+                        if (CraftingSystem.Instance.GetItemCount(cond.stringValue) < Mathf.Max(1, cond.intValue))
+                            return false;
+                        break;
+
+                    case ConditionType.MinLevel:
+                        int moonIdx = CampaignFlowController.Instance?.CurrentMoonIndex ?? 0;
+                        if (moonIdx < cond.intValue)
+                            return false;
+                        break;
                 }
             }
             return true;
@@ -302,6 +315,18 @@ namespace Tartaria.Integration
 
                     case ConsequenceType.SetFlag:
                         _visitedNodes.Add(c.stringValue); // Reuse visited set as flag store
+                        break;
+
+                    case ConsequenceType.RemoveItem:
+                        CraftingSystem.Instance?.ConsumeItem(c.stringValue, Mathf.Max(1, (int)c.floatValue));
+                        break;
+
+                    case ConsequenceType.GiveItem:
+                        CraftingSystem.Instance?.AddItem(c.stringValue, Mathf.Max(1, (int)c.floatValue));
+                        break;
+
+                    case ConsequenceType.FailQuest:
+                        QuestManager.Instance?.FailQuest(c.stringValue);
                         break;
                 }
             }
@@ -367,7 +392,9 @@ namespace Tartaria.Integration
         MinTrust = 3,
         NodeVisited = 4,
         NodeNotVisited = 5,
-        ChoiceWas = 6
+        ChoiceWas = 6,
+        HasItem = 7,
+        MinLevel = 8
     }
 
     public enum ConsequenceType
@@ -377,7 +404,10 @@ namespace Tartaria.Integration
         ActivateQuest = 2,
         PlayVFX = 3,
         PlayDialogue = 4,
-        SetFlag = 5
+        SetFlag = 5,
+        RemoveItem = 6,
+        GiveItem = 7,
+        FailQuest = 8
     }
 
     [Serializable]

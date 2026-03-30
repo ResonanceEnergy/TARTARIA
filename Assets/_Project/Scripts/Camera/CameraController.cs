@@ -95,6 +95,17 @@ namespace Tartaria.Camera
                     _currentPitch = Mathf.Lerp(_currentPitch, tuningPitch, Time.deltaTime * smoothSpeed);
                     _targetFOV = closeUpFOV;
                     break;
+
+                case GameState.Cinematic:
+                    // Lock camera during cinematics — hold current position, no lerp
+                    break;
+
+                case GameState.Paused:
+                case GameState.Menu:
+                case GameState.Boot:
+                case GameState.Loading:
+                    // Freeze camera movement during non-gameplay states
+                    break;
             }
         }
 

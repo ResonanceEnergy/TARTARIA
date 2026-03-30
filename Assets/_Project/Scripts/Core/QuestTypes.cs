@@ -24,6 +24,10 @@ namespace Tartaria.Core
         CompleteMiniGame = 8,
         DefeatBoss = 9,
         CompanionMilestone = 10,
+        CraftItem = 11,
+        ExcavateRuin = 12,
+        ReachAirshipDestination = 13,
+        RaiseCompanionTrust = 14,
     }
 
     [Serializable]

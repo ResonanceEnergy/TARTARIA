@@ -185,6 +185,17 @@ namespace Tartaria.Integration
                 && state.status == QuestStatus.Completed;
         }
 
+        public void FailQuest(string questId)
+        {
+            if (!_questStates.TryGetValue(questId, out var state)) return;
+            if (state.status != QuestStatus.Active) return;
+
+            state.status = QuestStatus.Failed;
+            _questStates[questId] = state;
+            OnQuestStatusChanged?.Invoke(questId, QuestStatus.Failed);
+            Debug.Log($"[QuestManager] Quest failed: {questId}");
+        }
+
         // ─── Internal ────────────────────────────────
 
         void CompleteQuest(string questId)

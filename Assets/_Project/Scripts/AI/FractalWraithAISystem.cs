@@ -22,6 +22,8 @@ namespace Tartaria.AI
     [UpdateAfter(typeof(CompanionBehaviorSystem))]
     public partial struct FractalWraithAISystem : ISystem
     {
+        const float FleeSpeedMultiplier = 0.8f;
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PlayerTag>();
@@ -105,7 +107,7 @@ namespace Tartaria.AI
                         float3 toPlayer = math.normalizesafe(
                             playerPos - transform.ValueRO.Position);
                         transform.ValueRW.Position += toPlayer
-                            * wraith.ValueRO.MoveSpeed * 0.8f * dt;
+                            * wraith.ValueRO.MoveSpeed * FleeSpeedMultiplier * dt;
                     }
                 }
 

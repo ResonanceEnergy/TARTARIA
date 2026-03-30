@@ -150,6 +150,14 @@ namespace Tartaria.Gameplay
             return true;
         }
 
+        public void AddItem(string itemId, int amount = 1)
+        {
+            if (string.IsNullOrEmpty(itemId) || amount <= 0) return;
+            if (!_inventory.ContainsKey(itemId))
+                _inventory[itemId] = 0;
+            _inventory[itemId] += amount;
+        }
+
         /// <summary>
         /// Use a consumable item, applying its gameplay effect and consuming 1 from inventory.
         /// Returns true if the item was used successfully.
@@ -182,9 +190,13 @@ namespace Tartaria.Gameplay
                     break;
 
                 case "resonance_amplifier":
-                    // Boost RS gain by 25% for 60 seconds (tracked via GameLoop)
-                    applied = true; // Effect applied via buff system when implemented
-                    Debug.Log("[Crafting] Resonance Amplifier active — +25% RS for 60s");
+                    // Boost RS gain by 25% for 60 seconds
+                    var loop = Integration.GameLoopController.Instance;
+                    if (loop != null)
+                    {
+                        loop.ActivateRSBuff();
+                        applied = true;
+                    }
                     break;
 
                 case "echo_lens":

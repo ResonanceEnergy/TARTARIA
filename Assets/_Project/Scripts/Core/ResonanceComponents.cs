@@ -14,6 +14,7 @@ namespace Tartaria.Core
         public int ThresholdReached;     // 0, 25, 50, 75, 100
         public float SkillRSMultiplier;  // Set from SkillTreeSystem.GetModifier(RSMultiplier)
         public float MoonRSMultiplier;   // Set from MoonModifierProvider.Active.rsGainMultiplier
+        public float BuffRSMultiplier;   // Temporary 1.0 = no buff; set from consumables
     }
 
     // ─────────────────────────────────────────────
