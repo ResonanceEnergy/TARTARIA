@@ -101,11 +101,17 @@ namespace Tartaria.Save
             _currentSave.header.checksum = ComputeChecksum(json);
             json = JsonUtility.ToJson(_currentSave, true);
 
-            // Double-write: backup first, then primary
+            // Safe double-write: primary first, then backup.
+            // If primary write fails, backup still holds the previous good save.
             try
             {
-                WriteFile(_backupPath, json);
-                WriteFile(_savePath, json);
+                string tempPath = _savePath + ".tmp";
+                WriteFile(tempPath, json);
+                if (File.Exists(_savePath))
+                    File.Copy(_savePath, _backupPath, overwrite: true);
+                if (File.Exists(_savePath))
+                    File.Delete(_savePath);
+                File.Move(tempPath, _savePath);
                 _isDirty = false;
             }
             catch (Exception e)
@@ -174,6 +180,12 @@ namespace Tartaria.Save
             {
                 string json = File.ReadAllText(path);
                 var data = JsonUtility.FromJson<SaveData>(json);
+
+                if (data == null || data.header == null || data.header.schemaVersion < 1)
+                {
+                    Debug.LogWarning($"[SaveManager] Invalid save structure in {path}");
+                    return null;
+                }
 
                 // Validate checksum
                 string savedChecksum = data.header.checksum;

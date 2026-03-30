@@ -21,6 +21,9 @@ namespace Tartaria.Gameplay
         public static SkillTreeSystem Instance { get; private set; }
 
         readonly Dictionary<SkillTreeType, SkillTree> _trees = new();
+        readonly Dictionary<SkillId, SkillNode> _nodeLookup = new();
+        readonly Dictionary<SkillModifierType, float> _modifierCache = new();
+        bool _modifierCacheDirty = true;
 
         public event Action<SkillId> OnSkillUnlocked;
 
@@ -29,6 +32,15 @@ namespace Tartaria.Gameplay
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             BuildTrees();
+            BuildNodeLookup();
+        }
+
+        void BuildNodeLookup()
+        {
+            _nodeLookup.Clear();
+            foreach (var tree in _trees.Values)
+                foreach (var node in tree.nodes)
+                    _nodeLookup[node.id] = node;
         }
 
         // ─── Public API ──────────────────────────────
@@ -48,6 +60,7 @@ namespace Tartaria.Gameplay
 
             AetherFieldManager.Instance?.AddResonanceScore(-node.rsCost);
             node.isUnlocked = true;
+            _modifierCacheDirty = true;
             ApplySkillEffect(node);
             OnSkillUnlocked?.Invoke(id);
             return true;
@@ -77,12 +90,23 @@ namespace Tartaria.Gameplay
         /// </summary>
         public float GetModifier(SkillModifierType mod)
         {
-            float total = 0f;
+            if (_modifierCacheDirty)
+                RebuildModifierCache();
+            return _modifierCache.TryGetValue(mod, out float val) ? val : 0f;
+        }
+
+        void RebuildModifierCache()
+        {
+            _modifierCache.Clear();
             foreach (var tree in _trees.Values)
                 foreach (var node in tree.nodes)
-                    if (node.isUnlocked && node.modifierType == mod)
-                        total += node.modifierValue;
-            return total;
+                    if (node.isUnlocked)
+                    {
+                        if (!_modifierCache.ContainsKey(node.modifierType))
+                            _modifierCache[node.modifierType] = 0f;
+                        _modifierCache[node.modifierType] += node.modifierValue;
+                    }
+            _modifierCacheDirty = false;
         }
 
         // ─── Save / Restore ─────────────────────────
@@ -114,6 +138,7 @@ namespace Tartaria.Gameplay
                     ApplySkillEffect(node);
                 }
             }
+            _modifierCacheDirty = true;
         }
 
         // ─── Tree Construction ───────────────────────
@@ -230,10 +255,7 @@ namespace Tartaria.Gameplay
 
         SkillNode FindNode(SkillId id)
         {
-            foreach (var tree in _trees.Values)
-                foreach (var node in tree.nodes)
-                    if (node.id == id) return node;
-            return null;
+            return _nodeLookup.TryGetValue(id, out var node) ? node : null;
         }
 
         bool ArePrereqsMet(SkillNode node)

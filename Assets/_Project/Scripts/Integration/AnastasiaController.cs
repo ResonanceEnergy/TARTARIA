@@ -166,7 +166,8 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
-            GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
         }
 
         void Update()
@@ -759,7 +760,9 @@ namespace Tartaria.Integration
             _currentMoon = data.currentMoon;
             _hasManifested = data.hasManifested;
             _postSolidificationWarmGlow = data.postSolidWarmGlow;
-            _solidPhase = (SolidificationPhase)data.solidPhase;
+            _solidPhase = Enum.IsDefined(typeof(SolidificationPhase), data.solidPhase)
+                ? (SolidificationPhase)data.solidPhase
+                : SolidificationPhase.NotTriggered;
 
             if (_hasManifested && _solidPhase == SolidificationPhase.NotTriggered)
                 SetMode(AnastasiaMode.Silent);
