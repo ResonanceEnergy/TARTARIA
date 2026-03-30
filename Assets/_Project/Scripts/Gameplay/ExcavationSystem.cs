@@ -107,6 +107,23 @@ namespace Tartaria.Gameplay
             Debug.Log($"[Excavation] Site discovered: {siteId} ({site.totalLayers} layers)");
         }
 
+        /// <summary>
+        /// Reveal all undiscovered sites — triggered by Echo Lens consumable.
+        /// </summary>
+        public void RevealHiddenSites()
+        {
+            int revealed = 0;
+            foreach (var siteId in new List<string>(_sites.Keys))
+            {
+                if (!_sites[siteId].isDiscovered)
+                {
+                    DiscoverSite(siteId);
+                    revealed++;
+                }
+            }
+            Debug.Log($"[Excavation] Echo Lens revealed {revealed} hidden sites");
+        }
+
         // ─── Dig Mechanic ───
 
         public void BeginDig(string siteId)

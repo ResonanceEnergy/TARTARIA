@@ -49,6 +49,12 @@ namespace Tartaria.Integration
         float _saveSyncTimer;
         const float SAVE_SYNC_INTERVAL = 5f;
 
+        // Moon tracking
+        int _currentMoonIndex;
+
+        // Cached non-singleton mini-games
+        AetherConduitMiniGame _conduitMiniGame;
+
         // Victory
         bool _zoneVictoryTriggered;
 
@@ -129,6 +135,146 @@ namespace Tartaria.Integration
             if (DayOutOfTimeController.Instance != null)
                 DayOutOfTimeController.Instance.OnMemoryZoneChanged += HandleMemoryZoneChanged;
 
+            // Wire economy events → HUD currency display
+            if (EconomySystem.Instance != null)
+                EconomySystem.Instance.OnCurrencyChanged += HandleCurrencyChanged;
+
+            // Wire crafting events → HUD toast + VFX + audio stinger
+            if (CraftingSystem.Instance != null)
+            {
+                CraftingSystem.Instance.OnItemCrafted += HandleItemCrafted;
+                CraftingSystem.Instance.OnRecipeDiscovered += HandleRecipeDiscovered;
+                CraftingSystem.Instance.OnCraftFailed += HandleCraftFailed;
+                CraftingSystem.Instance.OnItemUsed += HandleItemUsed;
+            }
+
+            // Wire corruption events → VFX + HUD + haptic
+            if (CorruptionSystem.Instance != null)
+            {
+                CorruptionSystem.Instance.OnCorruptionChanged += HandleCorruptionChanged;
+                CorruptionSystem.Instance.OnCorruptionPurged += HandleCorruptionPurged;
+                CorruptionSystem.Instance.OnCorruptionSpread += HandleCorruptionSpread;
+            }
+
+            // Wire excavation events → VFX + HUD + audio + quest
+            if (ExcavationSystem.Instance != null)
+            {
+                ExcavationSystem.Instance.OnSiteDiscovered += HandleSiteDiscovered;
+                ExcavationSystem.Instance.OnLayerCleared += HandleLayerCleared;
+                ExcavationSystem.Instance.OnExcavationComplete += HandleExcavationComplete;
+                ExcavationSystem.Instance.OnRSYielded += HandleExcavationRS;
+            }
+
+            // Wire dialogue tree events → camera + music + quest state
+            if (DialogueTreeRunner.Instance != null)
+            {
+                DialogueTreeRunner.Instance.OnDialogueStarted += HandleDialogueStarted;
+                DialogueTreeRunner.Instance.OnDialogueEnded += HandleDialogueEnded;
+                DialogueTreeRunner.Instance.OnChoiceMade += HandleChoiceMade;
+            }
+
+            // Wire boss spawn/phase/dialogue events → HUD + VFX + music + haptic
+            if (BossEncounterSystem.Instance != null)
+            {
+                BossEncounterSystem.Instance.OnBossSpawned += HandleBossSpawned;
+                BossEncounterSystem.Instance.OnPhaseChanged += HandleBossPhaseChanged;
+                BossEncounterSystem.Instance.OnBossDialogue += HandleBossDialogue;
+            }
+
+            // Wire mini-game completion events → RS rewards + VFX + achievement
+            if (HarmonicRockCutting.Instance != null)
+            {
+                HarmonicRockCutting.Instance.OnCutComplete += HandleRockCutComplete;
+                HarmonicRockCutting.Instance.OnCutFailed += HandleRockCutFailed;
+            }
+            if (PipeOrganMiniGame.Instance != null)
+            {
+                PipeOrganMiniGame.Instance.OnOrganComplete += HandleOrganComplete;
+                PipeOrganMiniGame.Instance.OnOrganFailed += HandleOrganFailed;
+            }
+
+            // Wire workshop upgrade completion → VFX + economy + achievement
+            if (WorkshopSystem.Instance != null)
+                WorkshopSystem.Instance.OnBuildingUpgraded += HandleBuildingUpgraded;
+
+            // Wire campaign moon start + ending → zone setup + music + save
+            if (CampaignFlowController.Instance != null)
+            {
+                CampaignFlowController.Instance.OnMoonStarted += HandleMoonStarted;
+                CampaignFlowController.Instance.OnEndingChosen += HandleEndingChosen;
+            }
+
+            // Wire Anastasia narrative events → camera + music + VFX
+            if (AnastasiaController.Instance != null)
+            {
+                AnastasiaController.Instance.OnModeChanged += HandleAnastasiaMode;
+                AnastasiaController.Instance.OnSolidificationPhaseChanged += HandleAnastasiaSolidification;
+            }
+
+            // Wire Cassian intel events → quest + HUD
+            if (CassianNPCController.Instance != null)
+                CassianNPCController.Instance.OnIntelShared += HandleCassianIntel;
+
+            // Wire ley line node events → per-node VFX
+            if (LeyLineManager.Instance != null)
+            {
+                LeyLineManager.Instance.OnNodeActivated += HandleNodeActivated;
+                LeyLineManager.Instance.OnNodeSevered += HandleNodeSevered;
+            }
+
+            // Wire airship fleet events → HUD + VFX + music
+            if (AirshipFleetManager.Instance != null)
+            {
+                AirshipFleetManager.Instance.OnAirshipRestored += HandleAirshipRestored;
+                AirshipFleetManager.Instance.OnMercuryOrbTuned += HandleMercuryOrbTuned;
+                AirshipFleetManager.Instance.OnFormationChanged += HandleFormationChanged;
+                AirshipFleetManager.Instance.OnFleetOperational += HandleFleetOperational;
+            }
+
+            // Wire choir harmonics events → haptic + music + VFX
+            if (ChoirHarmonicsMiniGame.Instance != null)
+            {
+                ChoirHarmonicsMiniGame.Instance.OnVoiceEntered += HandleVoiceEntered;
+                ChoirHarmonicsMiniGame.Instance.OnVoiceDrifted += HandleVoiceDrifted;
+                ChoirHarmonicsMiniGame.Instance.OnFullHarmonyAchieved += HandleFullHarmony;
+                ChoirHarmonicsMiniGame.Instance.OnTranscendentMoment += HandleTranscendentMoment;
+            }
+
+            // Wire aquifer purge events → VFX + haptic
+            if (AquiferPurgeMiniGame.Instance != null)
+            {
+                AquiferPurgeMiniGame.Instance.OnLayerPurged += HandleAquiferLayerPurged;
+                AquiferPurgeMiniGame.Instance.OnBossSpawned += HandleAquiferBossSpawned;
+            }
+
+            // Wire Aether field RS changes → HUD sync
+            if (AetherFieldManager.Instance != null)
+                AetherFieldManager.Instance.OnResonanceScoreChanged += HandleAetherRSChanged;
+
+            // Wire economy building income → HUD toast
+            if (EconomySystem.Instance != null)
+                EconomySystem.Instance.OnBuildingIncomeCollected += HandleBuildingIncome;
+
+            // Wire achievement progress → HUD
+            if (AchievementSystem.Instance != null)
+                AchievementSystem.Instance.OnProgressUpdated += HandleAchievementProgress;
+
+            // Wire localization changes (static class) → UI refresh
+            LocalizationManager.OnLanguageChanged += HandleLanguageChanged;
+
+            // Wire dissonance lens toggle → music + VFX
+            if (DissonanceLensOverlay.Instance != null)
+                DissonanceLensOverlay.Instance.OnLensToggled += HandleLensToggled;
+
+            // Wire aether conduit mini-game (no singleton — find by type)
+            _conduitMiniGame = FindAnyObjectByType<AetherConduitMiniGame>();
+            if (_conduitMiniGame != null)
+            {
+                _conduitMiniGame.OnBastionPlaced += HandleBastionPlaced;
+                _conduitMiniGame.OnRockCut += HandleRockCut;
+                _conduitMiniGame.OnResonancePeak += HandleConduitResonancePeak;
+            }
+
             // Deferred ECS init (world may not be ready in Awake)
             InitECS();
         }
@@ -177,6 +323,103 @@ namespace Tartaria.Integration
                 LeyLineManager.Instance.OnLineRestored -= HandleLeyLineRestored;
             if (DayOutOfTimeController.Instance != null)
                 DayOutOfTimeController.Instance.OnMemoryZoneChanged -= HandleMemoryZoneChanged;
+            if (EconomySystem.Instance != null)
+                EconomySystem.Instance.OnCurrencyChanged -= HandleCurrencyChanged;
+            if (CraftingSystem.Instance != null)
+            {
+                CraftingSystem.Instance.OnItemCrafted -= HandleItemCrafted;
+                CraftingSystem.Instance.OnRecipeDiscovered -= HandleRecipeDiscovered;
+                CraftingSystem.Instance.OnCraftFailed -= HandleCraftFailed;
+                CraftingSystem.Instance.OnItemUsed -= HandleItemUsed;
+            }
+            if (CorruptionSystem.Instance != null)
+            {
+                CorruptionSystem.Instance.OnCorruptionChanged -= HandleCorruptionChanged;
+                CorruptionSystem.Instance.OnCorruptionPurged -= HandleCorruptionPurged;
+                CorruptionSystem.Instance.OnCorruptionSpread -= HandleCorruptionSpread;
+            }
+            if (ExcavationSystem.Instance != null)
+            {
+                ExcavationSystem.Instance.OnSiteDiscovered -= HandleSiteDiscovered;
+                ExcavationSystem.Instance.OnLayerCleared -= HandleLayerCleared;
+                ExcavationSystem.Instance.OnExcavationComplete -= HandleExcavationComplete;
+                ExcavationSystem.Instance.OnRSYielded -= HandleExcavationRS;
+            }
+            if (DialogueTreeRunner.Instance != null)
+            {
+                DialogueTreeRunner.Instance.OnDialogueStarted -= HandleDialogueStarted;
+                DialogueTreeRunner.Instance.OnDialogueEnded -= HandleDialogueEnded;
+                DialogueTreeRunner.Instance.OnChoiceMade -= HandleChoiceMade;
+            }
+            if (BossEncounterSystem.Instance != null)
+            {
+                BossEncounterSystem.Instance.OnBossSpawned -= HandleBossSpawned;
+                BossEncounterSystem.Instance.OnPhaseChanged -= HandleBossPhaseChanged;
+                BossEncounterSystem.Instance.OnBossDialogue -= HandleBossDialogue;
+            }
+            if (HarmonicRockCutting.Instance != null)
+            {
+                HarmonicRockCutting.Instance.OnCutComplete -= HandleRockCutComplete;
+                HarmonicRockCutting.Instance.OnCutFailed -= HandleRockCutFailed;
+            }
+            if (PipeOrganMiniGame.Instance != null)
+            {
+                PipeOrganMiniGame.Instance.OnOrganComplete -= HandleOrganComplete;
+                PipeOrganMiniGame.Instance.OnOrganFailed -= HandleOrganFailed;
+            }
+            if (WorkshopSystem.Instance != null)
+                WorkshopSystem.Instance.OnBuildingUpgraded -= HandleBuildingUpgraded;
+            if (CampaignFlowController.Instance != null)
+            {
+                CampaignFlowController.Instance.OnMoonStarted -= HandleMoonStarted;
+                CampaignFlowController.Instance.OnEndingChosen -= HandleEndingChosen;
+            }
+            if (AnastasiaController.Instance != null)
+            {
+                AnastasiaController.Instance.OnModeChanged -= HandleAnastasiaMode;
+                AnastasiaController.Instance.OnSolidificationPhaseChanged -= HandleAnastasiaSolidification;
+            }
+            if (CassianNPCController.Instance != null)
+                CassianNPCController.Instance.OnIntelShared -= HandleCassianIntel;
+            if (LeyLineManager.Instance != null)
+            {
+                LeyLineManager.Instance.OnNodeActivated -= HandleNodeActivated;
+                LeyLineManager.Instance.OnNodeSevered -= HandleNodeSevered;
+            }
+            if (AirshipFleetManager.Instance != null)
+            {
+                AirshipFleetManager.Instance.OnAirshipRestored -= HandleAirshipRestored;
+                AirshipFleetManager.Instance.OnMercuryOrbTuned -= HandleMercuryOrbTuned;
+                AirshipFleetManager.Instance.OnFormationChanged -= HandleFormationChanged;
+                AirshipFleetManager.Instance.OnFleetOperational -= HandleFleetOperational;
+            }
+            if (ChoirHarmonicsMiniGame.Instance != null)
+            {
+                ChoirHarmonicsMiniGame.Instance.OnVoiceEntered -= HandleVoiceEntered;
+                ChoirHarmonicsMiniGame.Instance.OnVoiceDrifted -= HandleVoiceDrifted;
+                ChoirHarmonicsMiniGame.Instance.OnFullHarmonyAchieved -= HandleFullHarmony;
+                ChoirHarmonicsMiniGame.Instance.OnTranscendentMoment -= HandleTranscendentMoment;
+            }
+            if (AquiferPurgeMiniGame.Instance != null)
+            {
+                AquiferPurgeMiniGame.Instance.OnLayerPurged -= HandleAquiferLayerPurged;
+                AquiferPurgeMiniGame.Instance.OnBossSpawned -= HandleAquiferBossSpawned;
+            }
+            if (AetherFieldManager.Instance != null)
+                AetherFieldManager.Instance.OnResonanceScoreChanged -= HandleAetherRSChanged;
+            if (EconomySystem.Instance != null)
+                EconomySystem.Instance.OnBuildingIncomeCollected -= HandleBuildingIncome;
+            if (AchievementSystem.Instance != null)
+                AchievementSystem.Instance.OnProgressUpdated -= HandleAchievementProgress;
+            LocalizationManager.OnLanguageChanged -= HandleLanguageChanged;
+            if (DissonanceLensOverlay.Instance != null)
+                DissonanceLensOverlay.Instance.OnLensToggled -= HandleLensToggled;
+            if (_conduitMiniGame != null)
+            {
+                _conduitMiniGame.OnBastionPlaced -= HandleBastionPlaced;
+                _conduitMiniGame.OnRockCut -= HandleRockCut;
+                _conduitMiniGame.OnResonancePeak -= HandleConduitResonancePeak;
+            }
         }
 
         void InitECS()
@@ -1879,6 +2122,427 @@ namespace Tartaria.Integration
             string zoneName = zoneIndex < zoneNames.Length ? zoneNames[zoneIndex] : $"Zone {zoneIndex}";
             HUDController.Instance?.ShowInteractionPrompt($"Memory: {zoneName}");
             Debug.Log($"[GameLoop] Memory zone changed to: {zoneName} ({zoneIndex})");
+        }
+
+        // ─── Economy Event Handlers ──────────────────
+
+        void HandleCurrencyChanged(CurrencyType type, int oldAmt, int newAmt)
+        {
+            int delta = newAmt - oldAmt;
+            string sign = delta > 0 ? "+" : "";
+            HUDController.Instance?.ShowInteractionPrompt($"{type}: {sign}{delta} (now {newAmt})");
+            if (delta > 0)
+                AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
+            Debug.Log($"[GameLoop] Currency {type}: {oldAmt} → {newAmt}");
+        }
+
+        // ─── Crafting Event Handlers ─────────────────
+
+        void HandleItemCrafted(string recipeId)
+        {
+            HUDController.Instance?.ShowAchievementToast($"Crafted: {recipeId}");
+            VFXController.Instance?.PlayDiscoveryBurst(
+                _playerEntity != Entity.Null && _ecsReady
+                    ? _em.GetComponentData<LocalTransform>(_playerEntity).Position
+                    : Vector3.zero);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            OnMiniGameCompleted(15f, "crafting");
+            Debug.Log($"[GameLoop] Item crafted: {recipeId}");
+        }
+
+        void HandleRecipeDiscovered(string recipeId)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"New recipe discovered: {recipeId}");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
+            Debug.Log($"[GameLoop] Recipe discovered: {recipeId}");
+        }
+
+        void HandleCraftFailed(string recipeId, string reason)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Craft failed: {reason}");
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            Debug.Log($"[GameLoop] Craft failed: {recipeId} — {reason}");
+        }
+
+        void HandleItemUsed(string itemId)
+        {
+            HUDController.Instance?.ShowAchievementToast($"Used: {itemId}");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
+            Debug.Log($"[GameLoop] Item used: {itemId}");
+        }
+
+        // ─── Corruption Event Handlers ───────────────
+
+        void HandleCorruptionChanged(string buildingId, float newLevel)
+        {
+            if (newLevel > 0.7f)
+                HUDController.Instance?.ShowInteractionPrompt($"Warning: {buildingId} corruption critical!");
+            Debug.Log($"[GameLoop] Corruption changed: {buildingId} → {newLevel:F2}");
+        }
+
+        void HandleCorruptionPurged(string buildingId)
+        {
+            HUDController.Instance?.ShowAchievementToast($"Purified: {buildingId}");
+            VFXController.Instance?.PlayResonancePulse(Vector3.zero, 15f);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.QuestComplete);
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            QueueRSReward(20f, $"purify_{buildingId}");
+            Debug.Log($"[GameLoop] Corruption purged: {buildingId}");
+        }
+
+        void HandleCorruptionSpread(string from, string to)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Corruption spreading from {from}!");
+            VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 10f);
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            Debug.Log($"[GameLoop] Corruption spread: {from} → {to}");
+        }
+
+        // ─── Excavation Event Handlers ───────────────
+
+        void HandleSiteDiscovered(ExcavationSite site)
+        {
+            HUDController.Instance?.ShowAchievementToast($"Site discovered: {site.siteId}");
+            VFXController.Instance?.PlayDiscoveryBurst(site.position);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
+            HapticFeedbackManager.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] Excavation site discovered: {site.siteId}");
+        }
+
+        void HandleLayerCleared(ExcavationSite site, int layerIndex)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Layer {layerIndex + 1} cleared at {site.siteId}");
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            Debug.Log($"[GameLoop] Layer {layerIndex} cleared at {site.siteId}");
+        }
+
+        void HandleExcavationComplete(ExcavationSite site)
+        {
+            HUDController.Instance?.ShowAchievementToast($"Excavation complete: {site.siteId}");
+            VFXController.Instance?.PlayBuildingEmergence(site.position);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.QuestComplete);
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            Debug.Log($"[GameLoop] Excavation complete: {site.siteId}");
+        }
+
+        void HandleExcavationRS(ExcavationSite site, float rsAmount)
+        {
+            QueueRSReward(rsAmount, $"excavation_{site.siteId}");
+            HUDController.Instance?.FlashRSGain(rsAmount);
+            Debug.Log($"[GameLoop] Excavation RS yield: +{rsAmount} from {site.siteId}");
+        }
+
+        // ─── Dialogue Tree Handlers ──────────────────
+
+        void HandleDialogueStarted(string treeId, string speaker)
+        {
+            AdaptiveMusicController.Instance?.ExitCombat();
+            Debug.Log($"[GameLoop] Dialogue started: {treeId} with {speaker}");
+        }
+
+        void HandleDialogueEnded(string treeId)
+        {
+            Debug.Log($"[GameLoop] Dialogue ended: {treeId}");
+        }
+
+        void HandleChoiceMade(string nodeId, int choiceIndex)
+        {
+            Debug.Log($"[GameLoop] Dialogue choice: node={nodeId}, choice={choiceIndex}");
+        }
+
+        // ─── Boss Spawn / Phase / Dialogue Handlers ─
+
+        void HandleBossSpawned(BossDefinition boss)
+        {
+            HUDController.Instance?.ShowBossHealth(boss.bossName, 1f);
+            AdaptiveMusicController.Instance?.EnterBossEncounter();
+            HapticFeedbackManager.Instance?.PlayGolemSpawn();
+            VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 20f);
+            Debug.Log($"[GameLoop] Boss spawned: {boss.bossName}");
+        }
+
+        void HandleBossPhaseChanged(int phase)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Boss entering phase {phase + 1}!");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.BossPhase);
+            HapticFeedbackManager.Instance?.PlayMoonHaptic(_currentMoonIndex, HapticContext.BossPhaseShift);
+            Debug.Log($"[GameLoop] Boss phase changed: {phase}");
+        }
+
+        void HandleBossDialogue(string line)
+        {
+            UIManager.Instance?.ShowDialogue("???", line);
+            Debug.Log($"[GameLoop] Boss dialogue: {line}");
+        }
+
+        // ─── Mini-Game Completion Handlers ───────────
+
+        void HandleRockCutComplete(float accuracy)
+        {
+            float reward = 30f * accuracy;
+            OnMiniGameCompleted(reward, "harmonic_rock_cutting");
+            VFXController.Instance?.PlayTuningSuccess(Vector3.zero, accuracy > 0.9f);
+            AdaptiveMusicController.Instance?.PlayStinger(
+                accuracy > 0.9f ? StingerType.TuningSuccess : StingerType.Discovery);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            Debug.Log($"[GameLoop] Rock cutting complete: accuracy={accuracy:F2}, +{reward:F0} RS");
+        }
+
+        void HandleRockCutFailed()
+        {
+            HUDController.Instance?.ShowInteractionPrompt("The rock shattered... resonance lost.");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningFail);
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            Debug.Log("[GameLoop] Rock cutting failed.");
+        }
+
+        void HandleOrganComplete(float accuracy)
+        {
+            float reward = 35f * accuracy;
+            OnMiniGameCompleted(reward, "pipe_organ");
+            VFXController.Instance?.PlayTuningSuccess(Vector3.zero, accuracy > 0.9f);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            Debug.Log($"[GameLoop] Pipe organ complete: accuracy={accuracy:F2}, +{reward:F0} RS");
+        }
+
+        void HandleOrganFailed()
+        {
+            HUDController.Instance?.ShowInteractionPrompt("The organ pipes fell silent...");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningFail);
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            Debug.Log("[GameLoop] Pipe organ failed.");
+        }
+
+        // ─── Workshop Upgrade Handler ────────────────
+
+        void HandleBuildingUpgraded(string buildingId, int newTier)
+        {
+            HUDController.Instance?.ShowAchievementToast(
+                $"{buildingId} upgraded to {GetTierName(newTier)}!");
+            VFXController.Instance?.PlayBuildingUpgrade(Vector3.zero, newTier);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.QuestComplete);
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            Debug.Log($"[GameLoop] Building upgraded: {buildingId} → tier {newTier}");
+        }
+
+        // ─── Campaign Flow Handlers ──────────────────
+
+        void HandleMoonStarted(int moonIndex)
+        {
+            _currentMoonIndex = moonIndex;
+            HUDController.Instance?.SetZoneName($"Moon {moonIndex + 1}");
+            AdaptiveMusicController.Instance?.SetZone(moonIndex);
+            VFXController.Instance?.TriggerZoneShift();
+            HapticFeedbackManager.Instance?.PlayMoonHaptic(moonIndex, HapticContext.ZoneTransition);
+            Debug.Log($"[GameLoop] Moon started: {moonIndex}");
+        }
+
+        void HandleEndingChosen(EndingPath ending)
+        {
+            HUDController.Instance?.ShowMoonTrophy("THE END",
+                $"Path: {ending}");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.ZoneComplete);
+            Debug.Log($"[GameLoop] Ending chosen: {ending}");
+        }
+
+        // ─── Anastasia Narrative Handlers ────────────
+
+        void HandleAnastasiaMode(AnastasiaMode oldMode, AnastasiaMode newMode)
+        {
+            if (newMode == AnastasiaMode.FullyManifest)
+            {
+                VFXController.Instance?.SpawnAnastasiaSolidificationEffect(Vector3.zero);
+                AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
+            }
+            Debug.Log($"[GameLoop] Anastasia mode: {oldMode} → {newMode}");
+        }
+
+        void HandleAnastasiaSolidification(SolidificationPhase phase)
+        {
+            HUDController.Instance?.ShowInteractionPrompt(
+                $"Anastasia solidification: phase {(int)phase}");
+            Debug.Log($"[GameLoop] Anastasia solidification phase: {phase}");
+        }
+
+        // ─── Cassian Intel Handler ───────────────────
+
+        void HandleCassianIntel(string intel)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Cassian: \"{intel}\"");
+            DialogueManager.Instance?.PlayContextDialogue("discovery");
+            Debug.Log($"[GameLoop] Cassian shared intel: {intel}");
+        }
+
+        // ─── Ley Line Node Handlers ──────────────────
+
+        void HandleNodeActivated(int nodeIndex)
+        {
+            VFXController.Instance?.PlayResonancePulse(Vector3.zero, 8f);
+            HUDController.Instance?.ShowInteractionPrompt($"Ley node {nodeIndex} activated!");
+            QueueRSReward(10f, $"ley_node_{nodeIndex}");
+            Debug.Log($"[GameLoop] Ley node activated: {nodeIndex}");
+        }
+
+        void HandleNodeSevered(int nodeIndex)
+        {
+            VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 8f);
+            HUDController.Instance?.ShowInteractionPrompt($"Ley node {nodeIndex} severed!");
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            Debug.Log($"[GameLoop] Ley node severed: {nodeIndex}");
+        }
+
+        // ─── Airship Fleet Handlers ──────────────────
+
+        void HandleAirshipRestored(int shipIndex)
+        {
+            HUDController.Instance?.ShowAchievementToast($"Airship {shipIndex + 1} restored!");
+            VFXController.Instance?.PlayBuildingEmergence(Vector3.up * 50f);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.QuestComplete);
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            Debug.Log($"[GameLoop] Airship restored: {shipIndex}");
+        }
+
+        void HandleMercuryOrbTuned(int shipIndex, int orbCount)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Mercury orb {orbCount} tuned on airship {shipIndex + 1}");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            Debug.Log($"[GameLoop] Mercury orb tuned: ship={shipIndex}, orbs={orbCount}");
+        }
+
+        void HandleFormationChanged(FleetFormation formation)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Fleet formation: {formation}");
+            Debug.Log($"[GameLoop] Fleet formation changed: {formation}");
+        }
+
+        void HandleFleetOperational()
+        {
+            HUDController.Instance?.ShowAchievementToast("Fleet fully operational!");
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.ZoneComplete);
+            VFXController.Instance?.TriggerAetherWake(Vector3.up * 100f);
+            Debug.Log("[GameLoop] Fleet fully operational");
+        }
+
+        // ─── Choir Harmonics Handlers ────────────────
+
+        void HandleVoiceEntered(int voiceIndex)
+        {
+            HapticFeedbackManager.Instance?.PlayTuningOnFrequency();
+            Debug.Log($"[GameLoop] Choir voice entered: {voiceIndex}");
+        }
+
+        void HandleVoiceDrifted(int voiceIndex)
+        {
+            HapticFeedbackManager.Instance?.PlayTuningOffFrequency();
+            Debug.Log($"[GameLoop] Choir voice drifted: {voiceIndex}");
+        }
+
+        void HandleFullHarmony()
+        {
+            HUDController.Instance?.ShowAchievementToast("Full harmony achieved!");
+            VFXController.Instance?.PlayResonancePulse(Vector3.zero, 15f);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            QueueRSReward(30f, "choir_harmony");
+            Debug.Log("[GameLoop] Full choir harmony achieved");
+        }
+
+        void HandleTranscendentMoment()
+        {
+            HUDController.Instance?.ShowAchievementToast("Transcendent moment!");
+            VFXController.Instance?.TriggerAetherWake(Vector3.zero);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.ZoneComplete);
+            QueueRSReward(50f, "choir_transcendent");
+            Debug.Log("[GameLoop] Choir transcendent moment");
+        }
+
+        // ─── Aquifer Purge Handlers ──────────────────
+
+        void HandleAquiferLayerPurged(int layer, float accuracy)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Aquifer layer {layer + 1} purged ({accuracy:P0})");
+            VFXController.Instance?.PlayResonancePulse(Vector3.down * layer * 5f, 10f);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            QueueRSReward(15f * accuracy, $"aquifer_layer_{layer}");
+            Debug.Log($"[GameLoop] Aquifer layer purged: {layer}, accuracy={accuracy:F2}");
+        }
+
+        void HandleAquiferBossSpawned()
+        {
+            HUDController.Instance?.ShowBossHealth("Sludge Leviathan", 1f);
+            AdaptiveMusicController.Instance?.EnterBossEncounter();
+            HapticFeedbackManager.Instance?.PlayGolemSpawn();
+            Debug.Log("[GameLoop] Aquifer boss spawned: Sludge Leviathan");
+        }
+
+        // ─── Aether / Economy / Achievement Handlers ─
+
+        void HandleAetherRSChanged(float newRS)
+        {
+            HUDController.Instance?.UpdateRS(newRS);
+        }
+
+        void HandleBuildingIncome(string buildingId, int income)
+        {
+            HUDController.Instance?.FlashRSGain(income);
+            Debug.Log($"[GameLoop] Building income: {buildingId} → +{income}");
+        }
+
+        void HandleAchievementProgress(string achievementId, float progress)
+        {
+            if (progress >= 0.5f && progress < 0.51f) // halfway milestone
+                HUDController.Instance?.ShowInteractionPrompt($"Achievement progress: {achievementId} 50%");
+            Debug.Log($"[GameLoop] Achievement progress: {achievementId} → {progress:P0}");
+        }
+
+        // ─── Localization / UI Handlers ──────────────
+
+        void HandleLanguageChanged(Language lang)
+        {
+            HUDController.Instance?.SetZoneName(LocalizationManager.Get("hud_zone_name"));
+            Debug.Log($"[GameLoop] Language changed: {lang}");
+        }
+
+        void HandleLensToggled(bool active)
+        {
+            if (active)
+            {
+                AdaptiveMusicController.Instance?.PlayDiscovery();
+                HapticFeedbackManager.Instance?.PlayDiscovery();
+            }
+            Debug.Log($"[GameLoop] Dissonance lens toggled: {active}");
+        }
+
+        // ─── Aether Conduit Mini-Game Handlers ──────
+
+        void HandleBastionPlaced(int index, float accuracy)
+        {
+            VFXController.Instance?.PlayBuildingEmergence(Vector3.up * index * 3f);
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            if (accuracy > 0.95f)
+                AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+            QueueRSReward(accuracy * 4f, $"bastion_{index}");
+            Debug.Log($"[GameLoop] Bastion placed: index={index}, accuracy={accuracy:F2}");
+        }
+
+        void HandleRockCut(int index, float cutQuality)
+        {
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            VFXController.Instance?.PlayHarmonicStrike(Vector3.up * index * 3f, Vector3.down);
+            QueueRSReward(cutQuality * 2f, $"rock_cut_{index}");
+            Debug.Log($"[GameLoop] Rock cut: index={index}, quality={cutQuality:F2}");
+        }
+
+        void HandleConduitResonancePeak()
+        {
+            VFXController.Instance?.PlayResonancePulse(Vector3.zero, 20f);
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            HUDController.Instance?.ShowInteractionPrompt("Resonance peak!");
+            Debug.Log("[GameLoop] Conduit resonance peak");
         }
     }
 }

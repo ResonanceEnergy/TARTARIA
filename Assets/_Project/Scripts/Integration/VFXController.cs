@@ -163,14 +163,17 @@ namespace Tartaria.Integration
         {
             switch (effect)
             {
-                case VFXEffect.Spark:           PlayAt(_discoveryBurst, position, 1f); break;
-                case VFXEffect.AetherVortex:    PlayAt(_resonancePulseVFX, position, 3f); break;
-                case VFXEffect.DiscoveryBurst:  PlayDiscoveryBurst(position); break;
+                case VFXEffect.Spark:            PlayAt(_discoveryBurst, position, 1f); break;
+                case VFXEffect.AetherVortex:     PlayAt(_resonancePulseVFX, position, 3f); break;
+                case VFXEffect.CorruptionPulse:  PlayDissonancePulse(position, 6f); break;
+                case VFXEffect.HarmonicCascade:  PlayResonancePulse(position, 12f); break;
+                case VFXEffect.DiscoveryBurst:   PlayDiscoveryBurst(position); break;
+                case VFXEffect.TuningSuccess:    PlayTuningSuccess(position, false); break;
                 case VFXEffect.BuildingEmergence: PlayBuildingEmergence(position); break;
-                case VFXEffect.HarmonicStrike:  PlayHarmonicStrike(position, Vector3.forward); break;
+                case VFXEffect.HarmonicStrike:   PlayHarmonicStrike(position, Vector3.forward); break;
                 case VFXEffect.ShieldActivation: PlayShieldActivation(position); break;
                 case VFXEffect.EnemyDissolution: PlayEnemyDissolution(position); break;
-                case VFXEffect.ResonancePulse:  PlayAt(_resonancePulseVFX, position, 5f); break;
+                case VFXEffect.ResonancePulse:   PlayAt(_resonancePulseVFX, position, 5f); break;
                 default: PlayAt(_discoveryBurst, position, 1f); break;
             }
         }
