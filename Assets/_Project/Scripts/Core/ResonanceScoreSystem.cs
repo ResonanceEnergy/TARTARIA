@@ -31,7 +31,8 @@ namespace Tartaria.Core
                 HighestZoneRS = 0f,
                 ThresholdReached = 0,
                 SkillRSMultiplier = 1f,
-                MoonRSMultiplier = 1f
+                MoonRSMultiplier = 1f,
+                BuffRSMultiplier = 1f
             });
             state.EntityManager.AddBuffer<ResonanceEvent>(rsEntity);
         }
@@ -55,7 +56,8 @@ namespace Tartaria.Core
 
                     float finalReward = evt.BaseReward * evt.Multiplier * goldenMultiplier
                         * score.ValueRO.SkillRSMultiplier
-                        * score.ValueRO.MoonRSMultiplier;
+                        * score.ValueRO.MoonRSMultiplier
+                        * math.max(1f, score.ValueRO.BuffRSMultiplier);
                     score.ValueRW.CurrentRS = math.min(100f,
                         score.ValueRO.CurrentRS + finalReward);
                     score.ValueRW.GlobalRS += finalReward;

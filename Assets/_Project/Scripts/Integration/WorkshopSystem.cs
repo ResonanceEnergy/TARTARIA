@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Entities;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.UI;
@@ -29,6 +30,11 @@ namespace Tartaria.Integration
         [SerializeField] UpgradeTier[] upgradeTiers;
 
         readonly Dictionary<string, int> _buildingTiers = new();
+
+        // Cached ECS references to avoid per-call EntityQuery allocation
+        World _ecsWorld;
+        EntityManager _em;
+        EntityQuery _rsQuery;
 
         public event Action<string, int> OnBuildingUpgraded;
 
@@ -151,13 +157,16 @@ namespace Tartaria.Integration
 
         float GetCurrentRS()
         {
-            // Read from ECS via cached world
-            var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
-            if (world == null) return 0f;
-            var em = world.EntityManager;
-            var query = em.CreateEntityQuery(typeof(ResonanceScore));
-            if (query.CalculateEntityCount() == 0) return 0f;
-            return em.GetComponentData<ResonanceScore>(query.GetSingletonEntity()).CurrentRS;
+            // Lazy-init cached ECS references
+            if (_ecsWorld == null || !_ecsWorld.IsCreated)
+            {
+                _ecsWorld = World.DefaultGameObjectInjectionWorld;
+                if (_ecsWorld == null) return 0f;
+                _em = _ecsWorld.EntityManager;
+                _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
+            }
+            if (!_rsQuery.IsValid || _rsQuery.CalculateEntityCount() == 0) return 0f;
+            return _em.GetComponentData<ResonanceScore>(_rsQuery.GetSingletonEntity()).CurrentRS;
         }
 
         static UpgradeTier[] CreateDefaultTiers()

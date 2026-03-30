@@ -97,6 +97,9 @@ namespace Tartaria.Integration
         {
             if (!_initialized) { InitECS(); return; }
 
+            // Re-init if ECS world was rebuilt (e.g., scene reload)
+            if (_world == null || !_world.IsCreated) { _initialized = false; return; }
+
             // Update cooldown timers
             _pulseTimer = Mathf.Max(0, _pulseTimer - Time.deltaTime);
             _strikeTimer = Mathf.Max(0, _strikeTimer - Time.deltaTime);

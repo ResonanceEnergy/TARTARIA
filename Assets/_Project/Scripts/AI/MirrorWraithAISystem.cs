@@ -25,6 +25,9 @@ namespace Tartaria.AI
     [UpdateAfter(typeof(FractalWraithAISystem))]
     public partial struct MirrorWraithAISystem : ISystem
     {
+        const float ChaseWeight = 0.3f;
+        const float StrafeWeight = 0.7f;
+
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PlayerTag>();
@@ -113,7 +116,7 @@ namespace Tartaria.AI
                     // Strafe: perpendicular to player direction
                     float3 toPlayer = math.normalizesafe(playerPos - transform.ValueRO.Position);
                     float3 strafe = math.cross(toPlayer, math.up());
-                    float3 moveDir = math.normalizesafe(toPlayer * 0.3f + strafe * 0.7f);
+                    float3 moveDir = math.normalizesafe(toPlayer * ChaseWeight + strafe * StrafeWeight);
 
                     transform.ValueRW.Position += moveDir * wraith.ValueRO.MoveSpeed * dt;
                     transform.ValueRW.Rotation = quaternion.LookRotation(toPlayer, math.up());

@@ -34,6 +34,7 @@ namespace Tartaria.Integration
         World _world;
         EntityManager _em;
         Entity _rsEntity;
+        EntityQuery _rsQuery;
         bool _ecsReady;
 
         // Player cache
@@ -73,12 +74,12 @@ namespace Tartaria.Integration
                 if (_world != null)
                 {
                     _em = _world.EntityManager;
-                    var query = _em.CreateEntityQuery(typeof(ResonanceScore));
-                    if (query.CalculateEntityCount() > 0)
-                    {
-                        _rsEntity = query.GetSingletonEntity();
-                        _ecsReady = true;
-                    }
+                    _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
+                }
+                if (_rsQuery.IsValid && _rsQuery.CalculateEntityCount() > 0)
+                {
+                    _rsEntity = _rsQuery.GetSingletonEntity();
+                    _ecsReady = true;
                 }
             }
         }
