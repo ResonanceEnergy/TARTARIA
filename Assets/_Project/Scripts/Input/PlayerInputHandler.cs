@@ -114,7 +114,7 @@ namespace Tartaria.Input
 
         void Update()
         {
-            if (!GameStateManager.Instance.IsPlaying) return;
+            if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
 
             HandleMovementInput();
 
@@ -163,7 +163,7 @@ namespace Tartaria.Input
 
         void OnInteractPerformed(InputAction.CallbackContext ctx)
         {
-            if (!GameStateManager.Instance.IsPlaying) return;
+            if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
 
             if (GameStateManager.Instance.CurrentState == GameState.Combat)
             {
@@ -178,7 +178,7 @@ namespace Tartaria.Input
 
         void OnAetherVisionPerformed(InputAction.CallbackContext ctx)
         {
-            if (!GameStateManager.Instance.IsPlaying) return;
+            if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
             AetherVisionActive = !AetherVisionActive;
             GameEvents.OnToggleAetherVision?.Invoke();
         }
@@ -190,19 +190,19 @@ namespace Tartaria.Input
 
         void OnResonancePulsePerformed(InputAction.CallbackContext ctx)
         {
-            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+            if (GameStateManager.Instance?.CurrentState == GameState.Combat)
                 OnResonancePulse?.Invoke();
         }
 
         void OnFrequencyShieldPerformed(InputAction.CallbackContext ctx)
         {
-            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+            if (GameStateManager.Instance?.CurrentState == GameState.Combat)
                 OnFrequencyShield?.Invoke();
         }
 
         void OnHarmonicStrikePerformed(InputAction.CallbackContext ctx)
         {
-            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+            if (GameStateManager.Instance?.CurrentState == GameState.Combat)
                 OnHarmonicStrike?.Invoke();
         }
 

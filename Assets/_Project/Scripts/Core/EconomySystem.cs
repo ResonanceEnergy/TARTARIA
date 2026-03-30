@@ -33,6 +33,7 @@ namespace Tartaria.Core
         int _echoMemories;
         int _crystallineDust;
         int _forgeTokens;
+        int _resonanceShards;
 
         // ─── Building Income ───
         readonly Dictionary<string, BuildingIncome> _buildings = new();
@@ -51,6 +52,7 @@ namespace Tartaria.Core
         public int EchoMemories => _echoMemories;
         public int CrystallineDust => _crystallineDust;
         public int ForgeTokens => _forgeTokens;
+        public int ResonanceShards => _resonanceShards;
 
         void Awake()
         {
@@ -112,6 +114,14 @@ namespace Tartaria.Core
                     _forgeTokens += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _forgeTokens);
                     break;
+                case CurrencyType.ResonanceShards:
+                    old = _resonanceShards;
+                    _resonanceShards += scaled;
+                    OnCurrencyChanged?.Invoke(type, old, _resonanceShards);
+                    break;
+                default:
+                    Debug.LogWarning($"[Economy] AddCurrency: unhandled type {type}");
+                    break;
             }
         }
 
@@ -162,6 +172,12 @@ namespace Tartaria.Core
                     _forgeTokens -= amount;
                     OnCurrencyChanged?.Invoke(type, oldF, _forgeTokens);
                     return true;
+                case CurrencyType.ResonanceShards:
+                    if (_resonanceShards < amount) return false;
+                    int oldRS = _resonanceShards;
+                    _resonanceShards -= amount;
+                    OnCurrencyChanged?.Invoke(type, oldRS, _resonanceShards);
+                    return true;
                 default:
                     return false;
             }
@@ -178,6 +194,7 @@ namespace Tartaria.Core
                 CurrencyType.EchoMemories => _echoMemories >= amount,
                 CurrencyType.CrystallineDust => _crystallineDust >= amount,
                 CurrencyType.ForgeTokens => _forgeTokens >= amount,
+                CurrencyType.ResonanceShards => _resonanceShards >= amount,
                 _ => false
             };
         }
@@ -193,6 +210,7 @@ namespace Tartaria.Core
                 CurrencyType.EchoMemories => _echoMemories,
                 CurrencyType.CrystallineDust => _crystallineDust,
                 CurrencyType.ForgeTokens => _forgeTokens,
+                CurrencyType.ResonanceShards => _resonanceShards,
                 _ => 0
             };
         }
@@ -309,6 +327,7 @@ namespace Tartaria.Core
                 echoMemories = _echoMemories,
                 crystallineDust = _crystallineDust,
                 forgeTokens = _forgeTokens,
+                resonanceShards = _resonanceShards,
                 buildings = buildings
             };
         }
@@ -322,6 +341,7 @@ namespace Tartaria.Core
             _echoMemories = data.echoMemories;
             _crystallineDust = data.crystallineDust;
             _forgeTokens = data.forgeTokens;
+            _resonanceShards = data.resonanceShards;
 
             _buildings.Clear();
             if (data.buildings != null)
@@ -407,6 +427,7 @@ namespace Tartaria.Core
         public int echoMemories;
         public int crystallineDust;
         public int forgeTokens;
+        public int resonanceShards;
         public List<BuildingIncomeSave> buildings;
     }
 

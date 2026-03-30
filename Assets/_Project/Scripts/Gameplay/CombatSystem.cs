@@ -76,7 +76,33 @@ namespace Tartaria.Gameplay
 
                     if (!absorbed)
                     {
-                        combatant.ValueRW.Health -= dmg.Amount;
+                        // Damage type modifiers
+                        float finalDamage = dmg.Amount;
+                        switch (dmg.Type)
+                        {
+                            case DamageType.ResonancePulse:
+                                // AOE: base damage, bonus if frequency near target's
+                                float freqDelta = math.abs(dmg.Frequency - combatant.ValueRO.CurrentFrequency);
+                                if (freqDelta < 20f)
+                                    finalDamage *= 1.5f; // Frequency-matched bonus
+                                break;
+                            case DamageType.HarmonicStrike:
+                                // Directed: 1.25x base, 2x if frequency-matched
+                                finalDamage *= 1.25f;
+                                float hsDelta = math.abs(dmg.Frequency - combatant.ValueRO.CurrentFrequency);
+                                if (hsDelta < 10f)
+                                    finalDamage *= 1.6f; // Tight frequency match
+                                break;
+                            case DamageType.GolemSlam:
+                                // Enemy melee: flat damage, ignores frequency
+                                break;
+                            case DamageType.Environmental:
+                                // Environmental: bypasses armor entirely
+                                break;
+                            default:
+                                break;
+                        }
+                        combatant.ValueRW.Health -= finalDamage;
                     }
                 }
                 damageBuffer.Clear();
@@ -139,25 +165,100 @@ namespace Tartaria.Gameplay
 
             em.AddComponentData(entity, new EnemyTag { Type = trigger.EnemyToSpawn });
 
+            // Per-type stats: HP, frequency, move speed, and type-specific component
+            float hp = 100f;
+            float freq = 174f; // default dissonant
+            float moveSpeed = 4f;
+            float attackRange = 3f;
+
+            switch (trigger.EnemyToSpawn)
+            {
+                case EnemyType.MudGolem:
+                    hp = 100f; moveSpeed = 3.5f;
+                    em.AddComponentData(entity, new MudGolem { AttackWindup = 1f, AttackDamage = 20f, StunDuration = 2f, PatrolRadius = 20f });
+                    break;
+                case EnemyType.FractalWraith:
+                    hp = 60f; moveSpeed = 3.2f; freq = 220f;
+                    em.AddComponentData(entity, new FractalWraith { PhaseCycleDuration = 4f, MaterialiseWindow = 1.5f, AttackDamage = 12f, MoveSpeed = 3.2f, AetherDrainPerSecond = 5f });
+                    break;
+                case EnemyType.MirrorWraith:
+                    hp = 80f; moveSpeed = 2.8f; freq = 256f;
+                    em.AddComponentData(entity, new MirrorWraith { AttackDamage = 18f, MoveSpeed = 2.8f, ReflectDamageMultiplier = 0.75f, ReflectCooldown = 2f, TeleportCooldown = 5f });
+                    break;
+                case EnemyType.RailWraith:
+                    hp = 90f; moveSpeed = 6f; freq = 190f;
+                    em.AddComponentData(entity, new RailWraith { RailSpeed = 6f, AttackDamage = 22f, TunedRailDamage = 40f });
+                    break;
+                case EnemyType.DissonanceHarvester:
+                    hp = 70f; moveSpeed = 3.6f; freq = 200f;
+                    em.AddComponentData(entity, new DissonanceHarvester { DrainRate = 8f, AttackDamage = 14f, MoveSpeed = 3.6f, DetectionRadius = 30f });
+                    break;
+                case EnemyType.DissonanceLeviathan:
+                    hp = 500f; moveSpeed = 5f; freq = 160f; attackRange = 8f;
+                    em.AddComponentData(entity, new DissonanceLeviathan { TotalHP = 500f, AttackDamage = 30f, BodyLength = 12f, ChargeSpeed = 8f, LullabySusceptibility = 2f });
+                    break;
+                case EnemyType.SiegeGolem:
+                    hp = 250f; moveSpeed = 3f; freq = 174f;
+                    em.AddComponentData(entity, new SiegeGolem { AttackDamage = 35f, ChargeSpeed = 8f, ChargeCooldown = 6f, ArmorReduction = 0.5f, WallBreachDamage = 50f });
+                    break;
+                case EnemyType.HarmonicParasite:
+                    hp = 30f; moveSpeed = 4.4f; freq = 300f;
+                    em.AddComponentData(entity, new HarmonicParasite { FeedRate = 3f, AttackDamage = 10f, MoveSpeed = 4.4f, SpawnCooldown = 4f });
+                    break;
+                case EnemyType.DissonantConductor:
+                    hp = 120f; moveSpeed = 2.5f; freq = 180f;
+                    em.AddComponentData(entity, new DissonantConductor { CommandRadius = 25f, AttackDamage = 20f, MaxControlledParasites = 6, CompositionWindow = 10f });
+                    break;
+                case EnemyType.CorruptedCraft:
+                    hp = 40f; moveSpeed = 6f; freq = 240f;
+                    em.AddComponentData(entity, new CorruptedCraft { FlightSpeed = 6f, AttackDamage = 8f, BombCooldown = 3f });
+                    break;
+                case EnemyType.SkyReaver:
+                    hp = 110f; moveSpeed = 4.8f; freq = 270f;
+                    em.AddComponentData(entity, new SkyReaver { AttackDamage = 25f, MoveSpeed = 4.8f, PhaseDuration = 3f, LeyLineDamageMultiplier = 1.5f });
+                    break;
+                case EnemyType.ProphecyGuardian:
+                    hp = 200f; moveSpeed = 2f; freq = 432f;
+                    em.AddComponentData(entity, new ProphecyGuardian { AttackDamage = 28f, HarmonicTestThreshold = 60f, TestTimer = 15f, ArmorReduction = 0.4f });
+                    break;
+                case EnemyType.ResetSeeker:
+                    hp = 65f; moveSpeed = 5.2f; freq = 210f;
+                    em.AddComponentData(entity, new ResetSeeker { AttackDamage = 16f, MoveSpeed = 5.2f, GrenadeCooldown = 4f, GrenadeRadius = 8f, DissonanceDuration = 3f, SquadSize = 3 });
+                    break;
+                case EnemyType.TemporalWraith:
+                    hp = 85f; moveSpeed = 4f; freq = 0f;
+                    em.AddComponentData(entity, new TemporalWraith { AttackDamage = 22f, PhaseInDuration = 1.5f, PhaseOutDuration = 3f, FrequencyShift = 50f });
+                    break;
+                case EnemyType.LivingSludge:
+                    hp = 80f; moveSpeed = 2f; freq = 150f;
+                    em.AddComponentData(entity, new LivingSludge { AttackDamage = 12f, RegenerationRate = 5f, MoveSpeed = 2f, TendrilRange = 5f, PurificationVulnerability = 2f });
+                    break;
+                case EnemyType.SludgeLeviathan:
+                    hp = 600f; moveSpeed = 3f; freq = 140f; attackRange = 10f;
+                    em.AddComponentData(entity, new SludgeLeviathan { TotalHP = 600f, AttackDamage = 40f, WaterPressureDamage = 30f, GiantModeDamageMultiplier = 1.5f, PurificationThreshold = 100f });
+                    break;
+                case EnemyType.TitanGolem:
+                    hp = 400f; moveSpeed = 2.5f; freq = 174f; attackRange = 10f;
+                    em.AddComponentData(entity, new TitanGolem { AttackDamage = 45f, ArmorReduction = 0.6f, Height = 20f, StompRadius = 10f, StompCooldown = 8f, RequiresGiantMode = true });
+                    break;
+                case EnemyType.FrequencyWraith:
+                    hp = 75f; moveSpeed = 3.6f; freq = 200f;
+                    em.AddComponentData(entity, new FrequencyWraith { AttackDamage = 20f, MoveSpeed = 3.6f, FrequencyShiftInterval = 5f, FrequencyTolerance = 15f });
+                    break;
+                default:
+                    em.AddComponentData(entity, new MudGolem { AttackWindup = 1f, AttackDamage = 20f, StunDuration = 2f, PatrolRadius = 20f });
+                    break;
+            }
+
             em.AddComponentData(entity, new HarmonicCombatant
             {
-                Health = 100f,
-                MaxHealth = 100f,
+                Health = hp,
+                MaxHealth = hp,
                 AetherCharge = 0f,
                 MaxAetherCharge = 50f,
-                CurrentFrequency = 174f, // Dissonant
+                CurrentFrequency = freq,
                 ComboCount = 0,
                 IsGiantMode = false
-            });
-
-            em.AddComponentData(entity, new MudGolem
-            {
-                AttackWindup = 1.0f,
-                AttackDamage = 20f,
-                StunDuration = 2.0f,
-                ConsecutivePulseHits = 0,
-                StunTimer = 0f,
-                PatrolRadius = 20f
             });
 
             em.AddComponentData(entity, new EnemyAI
@@ -166,9 +267,9 @@ namespace Tartaria.Gameplay
                 StateTimer = 0f,
                 PatrolTarget = trigger.SpawnPosition,
                 EngageRadius = 50f,
-                AttackRange = 3f,
+                AttackRange = attackRange,
                 SpawnGracePeriod = 3f,
-                MoveSpeed = 4f,
+                MoveSpeed = moveSpeed,
                 AttackCooldown = 0f
             });
 

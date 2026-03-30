@@ -41,6 +41,11 @@ namespace Tartaria.Integration
         EntityQuery _playerQuery;
         bool _ecsReady;
 
+        // Cached scene queries
+        InteractableBuilding[] _cachedBuildings = System.Array.Empty<InteractableBuilding>();
+        float _buildingCacheAge = float.MaxValue;
+        const float BUILDING_CACHE_TTL = 2f;
+
         // RS tracking
         float _lastRS;
         int _lastThreshold;
@@ -317,6 +322,41 @@ namespace Tartaria.Integration
                 PipeOrganMiniGame.Instance.OnChordAdvanced += HandleChordAdvanced;
             }
 
+            // Wire boss-fail event
+            if (BossEncounterSystem.Instance != null)
+                BossEncounterSystem.Instance.OnBossFailed += HandleBossFailed;
+
+            // Wire climax-start event
+            if (ClimaxSequenceSystem.Instance != null)
+                ClimaxSequenceSystem.Instance.OnClimaxStarted += HandleClimaxStarted;
+
+            // Wire resonance scanner events → HUD + map markers + sound
+            if (ResonanceScannerSystem.Instance != null)
+            {
+                ResonanceScannerSystem.Instance.OnScanStarted += HandleScanStarted;
+                ResonanceScannerSystem.Instance.OnScanComplete += HandleScanComplete;
+                ResonanceScannerSystem.Instance.OnPOIRevealed += HandlePOIRevealed;
+            }
+
+            // Wire continental rail events → quest + music + haptic
+            if (ContinentalRailSystem.Instance != null)
+            {
+                ContinentalRailSystem.Instance.OnSegmentRestored += HandleRailSegmentRestored;
+                ContinentalRailSystem.Instance.OnStationDiscovered += HandleStationDiscovered;
+                ContinentalRailSystem.Instance.OnTrainDeparted += HandleTrainDeparted;
+                ContinentalRailSystem.Instance.OnTrainArrived += HandleTrainArrived;
+                ContinentalRailSystem.Instance.OnRailLeviathan += HandleRailLeviathan;
+            }
+
+            // Wire bell tower sync mini-game events → RS + VFX + haptic
+            if (BellTowerSyncMiniGame.Instance != null)
+            {
+                BellTowerSyncMiniGame.Instance.OnTowerTuned += HandleTowerTuned;
+                BellTowerSyncMiniGame.Instance.OnTowerSynced += HandleTowerSynced;
+                BellTowerSyncMiniGame.Instance.OnTowerDesynced += HandleTowerDesynced;
+                BellTowerSyncMiniGame.Instance.OnResonanceScoreChanged += HandleBellTowerRSChanged;
+            }
+
             // Deferred ECS init (world may not be ready in Awake)
             InitECS();
         }
@@ -484,6 +524,31 @@ namespace Tartaria.Integration
             {
                 PipeOrganMiniGame.Instance.OnPipePlayed -= HandlePipePlayed;
                 PipeOrganMiniGame.Instance.OnChordAdvanced -= HandleChordAdvanced;
+            }
+            if (BossEncounterSystem.Instance != null)
+                BossEncounterSystem.Instance.OnBossFailed -= HandleBossFailed;
+            if (ClimaxSequenceSystem.Instance != null)
+                ClimaxSequenceSystem.Instance.OnClimaxStarted -= HandleClimaxStarted;
+            if (ResonanceScannerSystem.Instance != null)
+            {
+                ResonanceScannerSystem.Instance.OnScanStarted -= HandleScanStarted;
+                ResonanceScannerSystem.Instance.OnScanComplete -= HandleScanComplete;
+                ResonanceScannerSystem.Instance.OnPOIRevealed -= HandlePOIRevealed;
+            }
+            if (ContinentalRailSystem.Instance != null)
+            {
+                ContinentalRailSystem.Instance.OnSegmentRestored -= HandleRailSegmentRestored;
+                ContinentalRailSystem.Instance.OnStationDiscovered -= HandleStationDiscovered;
+                ContinentalRailSystem.Instance.OnTrainDeparted -= HandleTrainDeparted;
+                ContinentalRailSystem.Instance.OnTrainArrived -= HandleTrainArrived;
+                ContinentalRailSystem.Instance.OnRailLeviathan -= HandleRailLeviathan;
+            }
+            if (BellTowerSyncMiniGame.Instance != null)
+            {
+                BellTowerSyncMiniGame.Instance.OnTowerTuned -= HandleTowerTuned;
+                BellTowerSyncMiniGame.Instance.OnTowerSynced -= HandleTowerSynced;
+                BellTowerSyncMiniGame.Instance.OnTowerDesynced -= HandleTowerDesynced;
+                BellTowerSyncMiniGame.Instance.OnResonanceScoreChanged -= HandleBellTowerRSChanged;
             }
         }
 
@@ -989,9 +1054,19 @@ namespace Tartaria.Integration
             QueueRSReward(rsReward, miniGameType);
 
             // Broadcast to all buildings
-            var buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
-            foreach (var b in buildings)
+            RefreshBuildingCache();
+            foreach (var b in _cachedBuildings)
                 b.ReceiveMiniGameBonus(rsReward, miniGameType);
+        }
+
+        void RefreshBuildingCache()
+        {
+            _buildingCacheAge += Time.deltaTime;
+            if (_buildingCacheAge >= BUILDING_CACHE_TTL)
+            {
+                _buildingCacheAge = 0f;
+                _cachedBuildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            }
         }
 
         // ─── Player ECS Position Sync ────────────────
@@ -2112,10 +2187,10 @@ namespace Tartaria.Integration
             var panel = WorkshopUIPanel.Instance;
             if (ws == null || panel == null) return;
 
-            var buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            RefreshBuildingCache();
             var displayList = new System.Collections.Generic.List<BuildingDisplayData>();
 
-            foreach (var b in buildings)
+            foreach (var b in _cachedBuildings)
             {
                 if (b.State != BuildingRestorationState.Active) continue;
                 displayList.Add(CreateBuildingDisplayData(b.BuildingId, ws));
@@ -2156,9 +2231,9 @@ namespace Tartaria.Integration
 
         InteractableBuilding FindBuilding(string buildingId)
         {
-            var buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
-            foreach (var b in buildings)
-                if (b.BuildingId == buildingId) return b;
+            RefreshBuildingCache();
+            foreach (var b in _cachedBuildings)
+                if (b != null && b.BuildingId == buildingId) return b;
             return null;
         }
 
@@ -2731,6 +2806,120 @@ namespace Tartaria.Integration
             AdaptiveMusicController.Instance?.PlayDiscovery();
             HapticFeedbackManager.Instance?.PlayDiscovery();
             Debug.Log($"[GameLoop] Codex entry unlocked: {entryId}");
+        }
+
+        // ─── Boss / Climax / Scanner / Rail / BellTower Handlers ──
+
+        void HandleBossFailed()
+        {
+            HUDController.Instance?.ShowInteractionPrompt("Boss encounter failed — regroup and try again.");
+            AdaptiveMusicController.Instance?.TransitionToExploration();
+            HapticFeedbackManager.Instance?.PlayDamage();
+            Debug.Log("[GameLoop] Boss encounter failed.");
+        }
+
+        void HandleClimaxStarted(int moonIndex)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Climax sequence beginning for Moon {moonIndex + 1}!");
+            AdaptiveMusicController.Instance?.TransitionToCombat();
+            HapticFeedbackManager.Instance?.PlayMoonHaptic(moonIndex, HapticContext.BossPhaseShift);
+            Debug.Log($"[GameLoop] Climax started: Moon {moonIndex}");
+        }
+
+        void HandleScanStarted()
+        {
+            HUDController.Instance?.ShowInteractionPrompt("Resonance scan initiated...");
+            HapticFeedbackManager.Instance?.PlayDiscovery();
+            Debug.Log("[GameLoop] Resonance scan started.");
+        }
+
+        void HandleScanComplete(System.Collections.Generic.List<ScanResult> results)
+        {
+            int count = results?.Count ?? 0;
+            HUDController.Instance?.ShowInteractionPrompt($"Scan complete — {count} signal(s) detected.");
+            if (count > 0)
+                AdaptiveMusicController.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] Scan complete: {count} results.");
+        }
+
+        void HandlePOIRevealed(ScanResult result)
+        {
+            HUDController.Instance?.ShowAchievementToast($"POI revealed: {result.poiId}");
+            VFXController.Instance?.PlayDiscoveryBurst(result.worldPosition);
+            HapticFeedbackManager.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] POI revealed: {result.poiId} at distance {result.distance:F1}m");
+        }
+
+        void HandleRailSegmentRestored(int from, int to)
+        {
+            QueueRSReward(15f, "rail_segment");
+            HUDController.Instance?.ShowAchievementToast($"Rail segment restored: {from} → {to}");
+            AdaptiveMusicController.Instance?.PlayDiscovery();
+            HapticFeedbackManager.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] Rail segment restored: {from} → {to}");
+        }
+
+        void HandleStationDiscovered(int stationIndex)
+        {
+            QueueRSReward(20f, "station_discovered");
+            HUDController.Instance?.ShowAchievementToast($"Station discovered: #{stationIndex}");
+            AdaptiveMusicController.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] Station discovered: {stationIndex}");
+        }
+
+        void HandleTrainDeparted(int from, int to)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Train departing: station {from} → {to}");
+            HapticFeedbackManager.Instance?.PlayMoonHaptic(_currentMoonIndex, HapticContext.ZoneTransition);
+            Debug.Log($"[GameLoop] Train departed: {from} → {to}");
+        }
+
+        void HandleTrainArrived(int stationIndex)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Arrived at station {stationIndex}");
+            AdaptiveMusicController.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] Train arrived: station {stationIndex}");
+        }
+
+        void HandleRailLeviathan()
+        {
+            HUDController.Instance?.ShowInteractionPrompt("Rail Leviathan approaches!");
+            AdaptiveMusicController.Instance?.TransitionToCombat();
+            HapticFeedbackManager.Instance?.PlayDamage();
+            Debug.Log("[GameLoop] Rail Leviathan encounter triggered.");
+        }
+
+        void HandleTowerTuned(int towerIndex, float accuracy)
+        {
+            QueueRSReward(5f * accuracy, "tower_tuned");
+            HUDController.Instance?.ShowInteractionPrompt($"Tower {towerIndex} tuned — accuracy {accuracy:P0}");
+            HapticFeedbackManager.Instance?.PlayDiscovery();
+            Debug.Log($"[GameLoop] Tower tuned: {towerIndex}, accuracy {accuracy:F2}");
+        }
+
+        void HandleTowerSynced(int towerIndex)
+        {
+            QueueRSReward(10f, "tower_synced");
+            HUDController.Instance?.ShowAchievementToast($"Tower {towerIndex} synchronized!");
+            AdaptiveMusicController.Instance?.PlayDiscovery();
+            VFXController.Instance?.PlayDiscoveryBurst(
+                PlayerInputHandler.Instance != null
+                    ? PlayerInputHandler.Instance.transform.position
+                    : Vector3.zero);
+            Debug.Log($"[GameLoop] Tower synced: {towerIndex}");
+        }
+
+        void HandleTowerDesynced(int towerIndex)
+        {
+            HUDController.Instance?.ShowInteractionPrompt($"Tower {towerIndex} lost synchronization!");
+            HapticFeedbackManager.Instance?.PlayDamage();
+            Debug.Log($"[GameLoop] Tower desynced: {towerIndex}");
+        }
+
+        void HandleBellTowerRSChanged(float newScore)
+        {
+            HUDController.Instance?.UpdateRS(newScore);
+            Debug.Log($"[GameLoop] Bell tower RS changed: {newScore:F1}");
         }
     }
 }
