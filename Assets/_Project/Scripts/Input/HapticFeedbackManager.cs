@@ -79,6 +79,11 @@ namespace Tartaria.Input
             PlayRamp(0.8f, 0.0f, 1.5f);
         }
 
+        public void PlayDissonanceAlert()
+        {
+            PlayPulse(0.6f, 0.15f);
+        }
+
         public void StopAll()
         {
             if (_activeGamepad != null)

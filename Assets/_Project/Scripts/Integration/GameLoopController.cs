@@ -115,6 +115,20 @@ namespace Tartaria.Integration
             if (CompanionManager.Instance != null)
                 CompanionManager.Instance.OnTrustChanged += HandleCompanionTrustChanged;
 
+            // Wire mini-game failure events → HUD feedback
+            if (ChoirHarmonicsMiniGame.Instance != null)
+                ChoirHarmonicsMiniGame.Instance.OnPerformanceFailed += HandleChoirFailed;
+            if (CosmicConvergenceMiniGame.Instance != null)
+                CosmicConvergenceMiniGame.Instance.OnConvergenceFailed += HandleConvergenceFailed;
+
+            // Wire ley line restoration → RS reward + VFX
+            if (LeyLineManager.Instance != null)
+                LeyLineManager.Instance.OnLineRestored += HandleLeyLineRestored;
+
+            // Wire Day Out of Time memory zone transitions → HUD + atmosphere
+            if (DayOutOfTimeController.Instance != null)
+                DayOutOfTimeController.Instance.OnMemoryZoneChanged += HandleMemoryZoneChanged;
+
             // Deferred ECS init (world may not be ready in Awake)
             InitECS();
         }
@@ -155,6 +169,14 @@ namespace Tartaria.Integration
                 AchievementSystem.Instance.OnAchievementUnlocked -= HandleAchievementUnlocked;
             if (CompanionManager.Instance != null)
                 CompanionManager.Instance.OnTrustChanged -= HandleCompanionTrustChanged;
+            if (ChoirHarmonicsMiniGame.Instance != null)
+                ChoirHarmonicsMiniGame.Instance.OnPerformanceFailed -= HandleChoirFailed;
+            if (CosmicConvergenceMiniGame.Instance != null)
+                CosmicConvergenceMiniGame.Instance.OnConvergenceFailed -= HandleConvergenceFailed;
+            if (LeyLineManager.Instance != null)
+                LeyLineManager.Instance.OnLineRestored -= HandleLeyLineRestored;
+            if (DayOutOfTimeController.Instance != null)
+                DayOutOfTimeController.Instance.OnMemoryZoneChanged -= HandleMemoryZoneChanged;
         }
 
         void InitECS()
@@ -1817,6 +1839,46 @@ namespace Tartaria.Integration
                 5 => "Perfected",
                 _ => "Unknown"
             };
+        }
+
+        // ─── Mini-Game Failure / Event Handlers ──────
+
+        void HandleChoirFailed()
+        {
+            HUDController.Instance?.ShowInteractionPrompt("The choir's harmony collapsed...");
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            Debug.Log("[GameLoop] Choir Harmonics performance failed.");
+        }
+
+        void HandleConvergenceFailed()
+        {
+            HUDController.Instance?.ShowInteractionPrompt("The cosmic alignment slipped away...");
+            HapticFeedbackManager.Instance?.PlayDissonanceAlert();
+            Debug.Log("[GameLoop] Cosmic Convergence failed.");
+        }
+
+        void HandleLeyLineRestored(int nodeA, int nodeB)
+        {
+            float rsReward = 25f;
+            QueueRSReward(rsReward, $"ley_line_{nodeA}_{nodeB}");
+            VFXController.Instance?.PlayLeyLineRestore(
+                UnityEngine.Vector3.Lerp(
+                    UnityEngine.Vector3.zero, UnityEngine.Vector3.one, 0.5f));
+            HUDController.Instance?.ShowInteractionPrompt($"Ley line restored between nodes {nodeA} and {nodeB}!");
+            Debug.Log($"[GameLoop] Ley line restored: {nodeA} ↔ {nodeB}, +{rsReward} RS");
+        }
+
+        void HandleMemoryZoneChanged(int zoneIndex)
+        {
+            string[] zoneNames = {
+                "Origin", "Paradise", "Granite City", "Amber Coast",
+                "Iron Steppe", "Convergence", "Crystal Cavern",
+                "Obsidian Reach", "Frozen Archive", "Prophecy Spire",
+                "Twilight Garden", "Titan's Breach", "Resonance Peak"
+            };
+            string zoneName = zoneIndex < zoneNames.Length ? zoneNames[zoneIndex] : $"Zone {zoneIndex}";
+            HUDController.Instance?.ShowInteractionPrompt($"Memory: {zoneName}");
+            Debug.Log($"[GameLoop] Memory zone changed to: {zoneName} ({zoneIndex})");
         }
     }
 }

@@ -256,6 +256,17 @@ namespace Tartaria.Integration
             _resonancePulseVFX.Play();
         }
 
+        /// <summary>
+        /// Plays a ley line restoration visual at the midpoint between restored nodes.
+        /// </summary>
+        public void PlayLeyLineRestore(Vector3 midpoint)
+        {
+            _resonancePulseVFX.transform.position = midpoint;
+            var main = _resonancePulseVFX.main;
+            main.startColor = new Color(0.2f, 0.9f, 0.4f); // restoration green
+            _resonancePulseVFX.Play();
+        }
+
         // ─── World Palette ───────────────────────────
 
         /// <summary>

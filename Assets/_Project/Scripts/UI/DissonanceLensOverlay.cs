@@ -25,9 +25,7 @@ namespace Tartaria.UI
         [Header("Lens Settings")]
         [SerializeField] float aetherCostPerSecond = 2f;
         [SerializeField] float scanPulseInterval = 1.5f;
-#pragma warning disable CS0414
-        [SerializeField] float scanRadius = 50f;
-#pragma warning restore CS0414
+[SerializeField] float scanRadius = 50f;
         [SerializeField] Color corruptionTint = new(0.6f, 0.1f, 0.4f, 0.3f);
         [SerializeField] Color cleanTint = new(0.2f, 0.8f, 0.6f, 0.15f);
 
@@ -124,10 +122,16 @@ namespace Tartaria.UI
         {
             _markers.Clear();
 
+            var playerPos = Camera.main != null ? Camera.main.transform.position : Vector3.zero;
+
             // Find all buildings and check corruption levels
             var buildings = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
             foreach (var obj in buildings)
             {
+                // Range check — only scan within scanRadius
+                if (Vector3.Distance(obj.transform.position, playerPos) > scanRadius)
+                    continue;
+
                 // Check for corruption component (added by CorruptionSystem)
                 var corruptible = obj as ICorruptible;
                 if (corruptible != null && corruptible.CorruptionLevel > 0f)

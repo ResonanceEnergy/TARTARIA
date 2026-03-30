@@ -31,9 +31,7 @@ namespace Tartaria.Integration
         [SerializeField] float spreadRadius = 30f;
         [SerializeField] float maxCorruption = 100f;
         [SerializeField] float identifyThreshold = 0.1f;
-#pragma warning disable CS0414
-        [SerializeField] float isolateThreshold = 0.5f;
-#pragma warning restore CS0414
+[SerializeField] float isolateThreshold = 0.5f;
 
         [Header("Timing")]
         [SerializeField] float spreadCheckInterval = 5f;
@@ -248,9 +246,14 @@ namespace Tartaria.Integration
                     if (b.BuildingId == key) continue;
                     float dist = Vector3.Distance(origin, b.transform.position);
 
+                    float targetLevel = GetCorruptionLevel(b.BuildingId);
                     if (dist <= spreadRadius
-                        && GetCorruptionLevel(b.BuildingId) < identifyThreshold * maxCorruption)
+                        && targetLevel < identifyThreshold * maxCorruption)
                     {
+                        // Heavily corrupted sources can overwhelm isolation
+                        if (targetLevel >= isolateThreshold * maxCorruption
+                            && _states.TryGetValue(b.BuildingId, out var ts) && ts.isolated)
+                            continue;
                         ApplyCorruption(b.BuildingId, rate * 2f);
                         Debug.Log($"[Corruption] Spread from {key} to {b.BuildingId}");
                         OnCorruptionSpread?.Invoke(key, b.BuildingId);

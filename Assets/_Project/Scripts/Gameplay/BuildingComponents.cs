@@ -23,7 +23,13 @@ namespace Tartaria.Gameplay
         Spire      = 2,
         StarFort   = 3,
         Cathedral  = 4,
-        Tower      = 5
+        Tower      = 5,
+        Archive    = 6,
+        Forge      = 7,
+        Observatory= 8,
+        Gate       = 9,
+        Obelisk    = 10,
+        Amphitheatre = 11
     }
 
     // ─────────────────────────────────────────────

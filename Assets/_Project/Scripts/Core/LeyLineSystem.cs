@@ -214,9 +214,7 @@ namespace Tartaria.Core
 
         public event System.Action<int> OnNodeActivated;     // nodeIndex
         public event System.Action<int> OnNodeSevered;       // nodeIndex
-#pragma warning disable CS0067
         public event System.Action<int, int> OnLineRestored; // nodeA, nodeB
-#pragma warning restore CS0067
 
         readonly System.Collections.Generic.List<LeyLineNodeInfo> _nodes = new();
 
@@ -300,6 +298,15 @@ namespace Tartaria.Core
                     n.active = true;
                     _nodes[i] = n;
                     OnNodeActivated?.Invoke(nodeIndex);
+
+                    // Fire OnLineRestored for each adjacent active node
+                    for (int j = 0; j < _nodes.Count; j++)
+                    {
+                        if (j == i || !_nodes[j].active) continue;
+                        float dist = UnityEngine.Vector3.Distance(n.position, _nodes[j].position);
+                        if (dist < 50f) // connection range
+                            OnLineRestored?.Invoke(nodeIndex, _nodes[j].index);
+                    }
                     return;
                 }
             }

@@ -77,9 +77,7 @@ namespace Tartaria.UI
         int _currentWave;
         int _totalWaves;
         int _enemiesRemaining;
-#pragma warning disable CS0414
         bool _waveCounterVisible;
-#pragma warning restore CS0414
 
         // Achievement toast state
         float _achievementTimer;
@@ -292,10 +290,11 @@ namespace Tartaria.UI
 
         void RefreshWaveText()
         {
+            if (!_waveCounterVisible) return;
             if (waveCounterText != null)
-                waveCounterText.text = $"Wave {_currentWave + 1}/{_totalWaves}";
+                waveCounterText.text = LocalizationManager.Get("hud_wave", _currentWave + 1, _totalWaves);
             if (waveEnemiesText != null)
-                waveEnemiesText.text = $"{_enemiesRemaining} remaining";
+                waveEnemiesText.text = LocalizationManager.Get("hud_enemies_remaining", _enemiesRemaining);
         }
 
         // ─── Achievement Toast ───────────────────────

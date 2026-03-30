@@ -38,9 +38,7 @@ namespace Tartaria.Gameplay
         public static HarmonicRockCutting Instance { get; private set; }
 
         [Header("Configuration")]
-#pragma warning disable CS0414
-        [SerializeField] float baseTimeLimit = 20f;
-#pragma warning restore CS0414
+[SerializeField] float baseTimeLimit = 20f;
 
         // ─── Events ───
         public event System.Action<float> OnCutComplete;     // total accuracy 0-1
@@ -85,7 +83,7 @@ namespace Tartaria.Gameplay
         public void StartCutting(RockCuttingConfig config)
         {
             _config = config;
-            _timeRemaining = config.timeLimit;
+            _timeRemaining = config.timeLimit > 0 ? config.timeLimit : baseTimeLimit;
             _currentVein = 0;
             _totalAccuracy = 0f;
             _veinsCompleted = 0;

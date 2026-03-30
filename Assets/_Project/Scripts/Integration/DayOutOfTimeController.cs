@@ -30,9 +30,7 @@ namespace Tartaria.Integration
 
         [Header("DotT Configuration")]
         [SerializeField] float eventDurationSeconds = 600f; // 10 minutes
-#pragma warning disable CS0414
-        [SerializeField] float memoryCorridorSpeed = 12f;
-#pragma warning restore CS0414
+[SerializeField] float memoryCorridorSpeed = 12f;
         [SerializeField] Color dottSkyColor = new(0.95f, 0.85f, 0.5f, 1f);
         [SerializeField] Color dottFogColor = new(0.9f, 0.8f, 0.4f, 1f);
         [SerializeField] float dottFogDensity = 0.005f;
@@ -48,9 +46,7 @@ namespace Tartaria.Integration
 
         // ─── Events ─────────────────────────────────
         public event Action OnEventCompleted;
-#pragma warning disable CS0067
         public event Action<int> OnMemoryZoneChanged;
-#pragma warning restore CS0067
 
         void Awake()
         {
@@ -175,15 +171,22 @@ namespace Tartaria.Integration
             // Each zone gets ~35 seconds of the corridor (13 zones * ~35s = ~7.5 minutes)
             float zoneDuration = (eventDurationSeconds - 150f) / 13f; // minus transformation + ending time
 
+            _currentMemoryZone = zoneIndex;
+            OnMemoryZoneChanged?.Invoke(zoneIndex);
+
             HUDController.Instance?.ShowInteractionPrompt(
                 $"Memory {zoneIndex + 1} of 13");
 
-            // Zone atmosphere flash
+            // Scroll corridor — memoryCorridorSpeed controls transition rate
             float elapsed = 0f;
             while (elapsed < zoneDuration)
             {
                 elapsed += Time.deltaTime;
                 _eventTimer += Time.deltaTime;
+                // Advance camera through corridor at configured speed
+                var cam = UnityEngine.Camera.main;
+                if (cam != null)
+                    cam.transform.Translate(Vector3.forward * memoryCorridorSpeed * Time.deltaTime, Space.Self);
                 yield return null;
             }
 
