@@ -25,6 +25,7 @@ namespace Tartaria.Integration
         float _lastLineTime = -999f;
         float _currentLineDuration;
         readonly Dictionary<string, List<DialogueLine>> _contextLines = new();
+        readonly Dictionary<string, DialogueLine> _lineById = new();
         readonly HashSet<string> _playedOneShots = new();
 
         /// <summary>True while a dialogue line is displayed on screen.</summary>
@@ -94,17 +95,8 @@ namespace Tartaria.Integration
         /// </summary>
         public void PlayLineById(string lineId, float volume)
         {
-            foreach (var contextPair in _contextLines)
-            {
-                foreach (var line in contextPair.Value)
-                {
-                    if (line.id == lineId)
-                    {
-                        ShowLine(line, volume);
-                        return;
-                    }
-                }
-            }
+            if (_lineById.TryGetValue(lineId, out var line))
+                ShowLine(line, volume);
         }
 
         // ─── Display ─────────────────────────────────
@@ -513,14 +505,16 @@ namespace Tartaria.Integration
             if (!_contextLines.ContainsKey(context))
                 _contextLines[context] = new List<DialogueLine>();
 
-            _contextLines[context].Add(new DialogueLine
+            var line = new DialogueLine
             {
                 id = id,
                 speaker = speaker,
                 text = text,
                 context = context,
                 oneShot = oneShot
-            });
+            };
+            _contextLines[context].Add(line);
+            _lineById[id] = line;
         }
 
         // ─── Data Types ──────────────────────────────

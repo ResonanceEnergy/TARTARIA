@@ -57,6 +57,8 @@ namespace Tartaria.Camera
             _camera = GetComponent<UnityEngine.Camera>();
             if (_camera == null)
                 _camera = GetComponentInChildren<UnityEngine.Camera>();
+            if (_camera == null)
+                Debug.LogError("[Camera] No Camera component found on CameraController or children.");
 
             _currentDistance = exploreDistance;
             _currentPitch = explorePitch;

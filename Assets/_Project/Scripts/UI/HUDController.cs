@@ -68,6 +68,8 @@ namespace Tartaria.UI
         float _displayAether;
         float _promptFadeTimer;
         bool _promptVisible;
+        int _lastRSInt = -1;
+        int _lastAetherInt = -1;
 
         // Boss health state
         float _bossHealthTarget;
@@ -135,17 +137,22 @@ namespace Tartaria.UI
                 rsFillImage.color = GetRSColor(targetRS);
             }
 
-            if (rsValueText != null)
-                rsValueText.text = Mathf.RoundToInt(targetRS).ToString();
-
-            // Threshold markers glow when reached
-            if (thresholdMarkers != null)
+            int rsInt = Mathf.RoundToInt(targetRS);
+            if (rsInt != _lastRSInt)
             {
-                for (int i = 0; i < thresholdMarkers.Length && i < 4; i++)
+                _lastRSInt = rsInt;
+                if (rsValueText != null)
+                    rsValueText.text = rsInt.ToString();
+
+                // Threshold markers glow when reached
+                if (thresholdMarkers != null)
                 {
-                    float threshold = (i + 1) * 25f;
-                    if (thresholdMarkers[i] != null)
-                        thresholdMarkers[i].SetActive(targetRS >= threshold);
+                    for (int i = 0; i < thresholdMarkers.Length && i < 4; i++)
+                    {
+                        float threshold = (i + 1) * 25f;
+                        if (thresholdMarkers[i] != null)
+                            thresholdMarkers[i].SetActive(targetRS >= threshold);
+                    }
                 }
             }
         }
@@ -169,8 +176,13 @@ namespace Tartaria.UI
                 aetherChargeBar.color = aetherColor;
             }
 
-            if (aetherValueText != null)
-                aetherValueText.text = $"{Mathf.RoundToInt(_displayAether)}%";
+            int aetherInt = Mathf.RoundToInt(_displayAether);
+            if (aetherInt != _lastAetherInt)
+            {
+                _lastAetherInt = aetherInt;
+                if (aetherValueText != null)
+                    aetherValueText.text = $"{aetherInt}%";
+            }
         }
 
         // ─── Interaction Prompt ──────────────────────

@@ -34,6 +34,10 @@ namespace Tartaria.AI
         public float CelebrateTimer;          // 3s celebration
         public float DialogueDuration;        // Set by managed code from DialogueManager
         public float3 TargetPosition;
+        public float WalkSpeed;               // 3 m/s default
+        public float SprintSpeed;             // 5 m/s default
+        public float SprintDistanceThreshold; // 8m — sprint if further than this
+        public float MaxIdleTime;             // 10s — return to follow after this
     }
 
     /// <summary>

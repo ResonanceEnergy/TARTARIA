@@ -90,7 +90,11 @@ namespace Tartaria.Integration
                 ReactRadius = 20f,
                 HideRadius = 10f,
                 CelebrateTimer = 3f,
-                TargetPosition = playerPos
+                TargetPosition = playerPos,
+                WalkSpeed = 3f,
+                SprintSpeed = 5f,
+                SprintDistanceThreshold = 8f,
+                MaxIdleTime = 10f
             });
             em.AddComponentData(milo, new MiloPersonality
             {

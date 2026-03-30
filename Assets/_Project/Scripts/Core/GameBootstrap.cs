@@ -23,17 +23,31 @@ namespace Tartaria.Core
 
         void Start()
         {
-            InitializeECSWorld();
+            if (!InitializeECSWorld())
+            {
+                Debug.LogError("[Tartaria] ECS world initialization failed — cannot proceed.");
+                return;
+            }
             GameStateManager.Instance.TransitionTo(GameState.Loading);
 
             // Proceed to main scene load
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
         }
 
-        void InitializeECSWorld()
+        bool InitializeECSWorld()
         {
             var world = World.DefaultGameObjectInjectionWorld;
-            if (world == null) return;
+            if (world == null)
+            {
+                Debug.LogError("[Tartaria] DefaultGameObjectInjectionWorld is null — Entities package may not be initialized.");
+                return false;
+            }
+
+            if (aetherGridX <= 0 || aetherGridY <= 0 || aetherGridZ <= 0)
+            {
+                Debug.LogError($"[Tartaria] Invalid Aether grid dimensions: {aetherGridX}x{aetherGridY}x{aetherGridZ}");
+                return false;
+            }
 
             var em = world.EntityManager;
 
@@ -60,6 +74,7 @@ namespace Tartaria.Core
             });
 
             Debug.Log("[Tartaria] ECS world initialized. Aether field configured.");
+            return true;
         }
     }
 }

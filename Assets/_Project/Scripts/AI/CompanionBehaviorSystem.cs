@@ -103,7 +103,8 @@ namespace Tartaria.AI
             {
                 // Move toward player
                 float3 direction = math.normalize(playerPos - transform.Position);
-                float speed = math.select(3.0f, 5.0f, dist > 8.0f); // Sprint if far
+                float speed = math.select(behavior.WalkSpeed, behavior.SprintSpeed,
+                    dist > behavior.SprintDistanceThreshold);
                 transform.Position += direction * speed * dt;
                 transform.Rotation = quaternion.LookRotation(direction, math.up());
             }
@@ -121,7 +122,7 @@ namespace Tartaria.AI
         {
             // If player moves, return to Follow
             // (Checked externally via player velocity; simplified here)
-            if (behavior.StateTimer > 10f) // Return to follow after 10s idle
+            if (behavior.StateTimer > behavior.MaxIdleTime)
             {
                 TransitionTo(ref behavior, CompanionState.Follow);
             }
