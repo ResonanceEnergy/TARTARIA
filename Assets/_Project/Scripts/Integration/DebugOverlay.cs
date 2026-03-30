@@ -40,6 +40,10 @@ namespace Tartaria.Integration
         // Player cache
         Transform _cachedPlayer;
 
+        // GUI cache
+        GUIStyle _boxStyle;
+        GUIStyle _labelStyle;
+
         void Start()
         {
             _visible = showOnStart;
@@ -88,25 +92,31 @@ namespace Tartaria.Integration
         {
             if (!_visible) return;
 
-            // Style
-            var style = new GUIStyle(GUI.skin.box)
+            // Style (cached)
+            if (_boxStyle == null)
             {
-                fontSize = 14,
-                alignment = TextAnchor.UpperLeft,
-                richText = true
-            };
-            var labelStyle = new GUIStyle(GUI.skin.label)
+                _boxStyle = new GUIStyle(GUI.skin.box)
+                {
+                    fontSize = 14,
+                    alignment = TextAnchor.UpperLeft,
+                    richText = true
+                };
+            }
+            if (_labelStyle == null)
             {
-                fontSize = 13,
-                richText = true
-            };
+                _labelStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 13,
+                    richText = true
+                };
+            }
 
             float w = 320f;
             float h = 340f;
             float x = Screen.width - w - 10f;
             float y = 10f;
 
-            GUI.Box(new Rect(x, y, w, h), "<b>TARTARIA DEBUG [F1]</b>", style);
+            GUI.Box(new Rect(x, y, w, h), "<b>TARTARIA DEBUG [F1]</b>", _boxStyle);
 
             float lineHeight = 20f;
             float cx = x + 10f;
@@ -114,12 +124,12 @@ namespace Tartaria.Integration
 
             // FPS
             Color fpsColor = _fps >= 60 ? Color.green : _fps >= 30 ? Color.yellow : Color.red;
-            DrawLabel(labelStyle, cx, cy, $"FPS: <color=#{ColorUtility.ToHtmlStringRGB(fpsColor)}>{_fps:F0}</color>");
+            DrawLabel(cx, cy, $"FPS: <color=#{ColorUtility.ToHtmlStringRGB(fpsColor)}>{_fps:F0}</color>");
             cy += lineHeight;
 
             // Game State
             var gs = GameStateManager.Instance;
-            DrawLabel(labelStyle, cx, cy, $"State: <color=yellow>{gs.CurrentState}</color> (prev: {gs.PreviousState})");
+            DrawLabel(cx, cy, $"State: <color=yellow>{gs.CurrentState}</color> (prev: {gs.PreviousState})");
             cy += lineHeight;
 
             // RS
@@ -128,15 +138,15 @@ namespace Tartaria.Integration
             {
                 var rsData = _em.GetComponentData<ResonanceScore>(_rsEntity);
                 rs = rsData.CurrentRS;
-                DrawLabel(labelStyle, cx, cy, $"RS: <color=#F4C542>{rs:F1}</color>/100  Threshold: {rsData.ThresholdReached}");
+                DrawLabel(cx, cy, $"RS: <color=#F4C542>{rs:F1}</color>/100  Threshold: {rsData.ThresholdReached}");
                 cy += lineHeight;
-                DrawLabel(labelStyle, cx, cy, $"Global RS: {rsData.GlobalRS:F1}  Best Zone: {rsData.HighestZoneRS:F1}");
+                DrawLabel(cx, cy, $"Global RS: {rsData.GlobalRS:F1}  Best Zone: {rsData.HighestZoneRS:F1}");
             }
             else
             {
-                DrawLabel(labelStyle, cx, cy, "RS: <color=red>ECS not ready</color>");
+                DrawLabel(cx, cy, "RS: <color=red>ECS not ready</color>");
                 cy += lineHeight;
-                DrawLabel(labelStyle, cx, cy, "");
+                DrawLabel(cx, cy, "");
             }
             cy += lineHeight;
 
@@ -144,7 +154,7 @@ namespace Tartaria.Integration
             if (_world != null)
             {
                 int entityCount = _world.IsCreated ? _em.UniversalQuery.CalculateEntityCount() : 0;
-                DrawLabel(labelStyle, cx, cy, $"Entities: {entityCount}");
+                DrawLabel(cx, cy, $"Entities: {entityCount}");
             }
             cy += lineHeight;
 
@@ -157,7 +167,7 @@ namespace Tartaria.Integration
             if (_cachedPlayer != null)
             {
                 var pos = _cachedPlayer.position;
-                DrawLabel(labelStyle, cx, cy, $"Player: ({pos.x:F1}, {pos.y:F1}, {pos.z:F1})");
+                DrawLabel(cx, cy, $"Player: ({pos.x:F1}, {pos.y:F1}, {pos.z:F1})");
             }
             cy += lineHeight;
 
@@ -165,13 +175,13 @@ namespace Tartaria.Integration
             var zone = ZoneController.Instance;
             if (zone != null)
             {
-                DrawLabel(labelStyle, cx, cy, $"Zone: {zone.ZoneName}  Buildings: {zone.GetRestoredBuildingCount()}/{zone.GetTotalBuildingCount()}");
+                DrawLabel(cx, cy, $"Zone: {zone.ZoneName}  Buildings: {zone.GetRestoredBuildingCount()}/{zone.GetTotalBuildingCount()}");
             }
             cy += lineHeight;
 
             // Combat
             var combat = CombatBridge.Instance;
-            DrawLabel(labelStyle, cx, cy, $"Combat: {(combat != null ? "Ready" : "N/A")}  " +
+            DrawLabel(cx, cy, $"Combat: {(combat != null ? "Ready" : "N/A")}  " +
                 $"InCombat: {(gs.CurrentState == GameState.Combat)}");
             cy += lineHeight;
 
@@ -182,22 +192,22 @@ namespace Tartaria.Integration
                 float playTime = save.CurrentSave.header.playTimeSeconds;
                 int mins = (int)(playTime / 60);
                 int secs = (int)(playTime % 60);
-                DrawLabel(labelStyle, cx, cy, $"Save: v{save.CurrentSave.header.gameVersion}  Play: {mins}m {secs}s");
+                DrawLabel(cx, cy, $"Save: v{save.CurrentSave.header.gameVersion}  Play: {mins}m {secs}s");
             }
             cy += lineHeight;
 
             // Memory
             long mem = System.GC.GetTotalMemory(false) / (1024 * 1024);
-            DrawLabel(labelStyle, cx, cy, $"Memory: {mem} MB (managed)");
+            DrawLabel(cx, cy, $"Memory: {mem} MB (managed)");
             cy += lineHeight;
 
             // Controls hint
-            DrawLabel(labelStyle, cx, cy, "<color=#888>WASD=Move  Tab=Aether  Click=Interact  Esc=Pause</color>");
+            DrawLabel(cx, cy, "<color=#888>WASD=Move  Tab=Aether  Click=Interact  Esc=Pause</color>");
         }
 
-        void DrawLabel(GUIStyle style, float x, float y, string text)
+        void DrawLabel(float x, float y, string text)
         {
-            GUI.Label(new Rect(x, y, 300f, 20f), text, style);
+            GUI.Label(new Rect(x, y, 300f, 20f), text, _labelStyle);
         }
     }
 }

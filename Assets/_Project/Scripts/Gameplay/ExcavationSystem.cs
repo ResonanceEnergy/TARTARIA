@@ -42,6 +42,7 @@ namespace Tartaria.Gameplay
         ExcavationSite _activeSite;
         float _digProgress;
         bool _isDigging;
+        Transform _cachedPlayer;
 
         public bool IsDigging => _isDigging;
         public ExcavationSite ActiveSite => _activeSite;
@@ -133,8 +134,12 @@ namespace Tartaria.Gameplay
             if (site.isComplete) return;
 
             // Range check — player must be within interactionRadius
-            var player = GameObject.FindWithTag("Player");
-            if (player != null && Vector3.Distance(player.transform.position, site.position) > interactionRadius)
+            if (_cachedPlayer == null)
+            {
+                var playerObj = GameObject.FindWithTag("Player");
+                if (playerObj != null) _cachedPlayer = playerObj.transform;
+            }
+            if (_cachedPlayer != null && Vector3.Distance(_cachedPlayer.position, site.position) > interactionRadius)
             {
                 ServiceLocator.HUD?.ShowInteractionPrompt("Too far to dig here.");
                 return;

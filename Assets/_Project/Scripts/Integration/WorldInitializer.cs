@@ -35,6 +35,7 @@ namespace Tartaria.Integration
         [SerializeField] Vector3 spirePosition = new(0f, 0f, -30f);
 
         bool _initialized;
+        EntityQuery _rsQuery;
 
         void Update()
         {
@@ -46,8 +47,9 @@ namespace Tartaria.Integration
             var em = world.EntityManager;
 
             // Verify GameBootstrap has run (RS singleton exists)
-            var rsQuery = em.CreateEntityQuery(typeof(ResonanceScore));
-            if (rsQuery.CalculateEntityCount() == 0) return;
+            if (!_rsQuery.IsValid)
+                _rsQuery = em.CreateEntityQuery(typeof(ResonanceScore));
+            if (_rsQuery.CalculateEntityCount() == 0) return;
 
             _initialized = true;
             InitializeWorldEntities(em);
@@ -74,6 +76,7 @@ namespace Tartaria.Integration
                 var playerEntity = playerQuery.GetSingletonEntity();
                 playerPos = em.GetComponentData<LocalTransform>(playerEntity).Position;
             }
+            playerQuery.Dispose();
 
             var milo = em.CreateEntity();
             em.AddComponentData(milo, new CompanionTag { CompanionId = 0 });

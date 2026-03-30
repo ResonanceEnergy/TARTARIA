@@ -38,6 +38,7 @@ namespace Tartaria.Integration
 
         // World palette
         float _currentRS;
+        Material _particleMaterial;
         static readonly Color GoldenGlow = new(0.95f, 0.82f, 0.35f);
         static readonly Color AetherBlue = new(0.2f, 0.6f, 0.95f);
         static readonly Color MudBrown = new(0.4f, 0.3f, 0.2f);
@@ -55,6 +56,14 @@ namespace Tartaria.Integration
 
         void CreateParticleSystems()
         {
+            var shader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+            if (shader == null)
+            {
+                Debug.LogError("[VFX] Particle shader not found – ensure URP Particles/Unlit is included in build.");
+                return;
+            }
+            _particleMaterial = new Material(shader);
+
             _discoveryBurst = CreateSystem("VFX_Discovery", GoldenGlow, 50, 0.3f, 1.5f, burst: true);
             _tuningRings = CreateSystem("VFX_Tuning", AetherBlue, 30, 0.2f, 1f, burst: true);
             _emergenceParticles = CreateSystem("VFX_Emergence", GoldenGlow, 100, 0.5f, 5f, burst: false);
@@ -120,7 +129,7 @@ namespace Tartaria.Integration
 
             // Renderer setup
             var renderer = go.GetComponent<ParticleSystemRenderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            renderer.material = new Material(_particleMaterial);
             renderer.material.color = color;
 
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
@@ -151,7 +160,7 @@ namespace Tartaria.Integration
             shape.scale = new Vector3(80f, 20f, 80f);
 
             var renderer = go.GetComponent<ParticleSystemRenderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            renderer.material = new Material(_particleMaterial);
             renderer.material.color = new Color(0.8f, 0.7f, 0.4f, 0.3f);
 
             return ps;

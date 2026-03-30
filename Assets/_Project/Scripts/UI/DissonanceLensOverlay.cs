@@ -48,6 +48,13 @@ namespace Tartaria.UI
         float _purgeBeamTimer;
         const float PURGE_BEAM_RATE = 10f;     // corruption removed per second when locked
 
+        // Cached references
+        UnityEngine.Camera _cachedCam;
+        GUIStyle _markerStyle;
+        MonoBehaviour[] _cachedSceneObjects = System.Array.Empty<MonoBehaviour>();
+        float _sceneCacheTimer;
+        const float SCENE_CACHE_INTERVAL = 3f;
+
         public bool IsActive => _active;
         public bool IsUnlocked => _unlocked;
 
@@ -122,11 +129,11 @@ namespace Tartaria.UI
         {
             _markers.Clear();
 
-            var playerPos = Camera.main != null ? Camera.main.transform.position : Vector3.zero;
+            if (_cachedCam == null) _cachedCam = UnityEngine.Camera.main;
+            var playerPos = _cachedCam != null ? _cachedCam.transform.position : Vector3.zero;
 
-            // Find all buildings and check corruption levels
-            var buildings = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            foreach (var obj in buildings)
+            RefreshSceneCache();
+            foreach (var obj in _cachedSceneObjects)
             {
                 // Range check — only scan within scanRadius
                 if (Vector3.Distance(obj.transform.position, playerPos) > scanRadius)
@@ -156,15 +163,19 @@ namespace Tartaria.UI
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _overlayTexture);
 
             // Draw corruption markers
-            var cam = Camera.main;
+            if (_cachedCam == null) _cachedCam = UnityEngine.Camera.main;
+            var cam = _cachedCam;
             if (cam == null) return;
 
-            var markerStyle = new GUIStyle(GUI.skin.label)
+            if (_markerStyle == null)
             {
-                fontSize = 12,
-                alignment = TextAnchor.MiddleCenter,
-                richText = true
-            };
+                _markerStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 12,
+                    alignment = TextAnchor.MiddleCenter,
+                    richText = true
+                };
+            }
 
             foreach (var marker in _markers)
             {
@@ -186,7 +197,7 @@ namespace Tartaria.UI
                 GUI.Label(
                     new Rect(screenPos.x - 80f, screenY + size * 0.5f, 160f, 20f),
                     $"<b>{marker.name}</b> [{marker.corruptionLevel:P0}]",
-                    markerStyle);
+                    _markerStyle);
             }
 
             // Reset GUI color
@@ -195,12 +206,22 @@ namespace Tartaria.UI
             // HUD indicator
             GUI.Label(new Rect(10, Screen.height - 30, 300, 25),
                 $"<color=#FF66AA><b>DISSONANCE LENS</b> Aether: {_aetherCharge:F0}</color>",
-                markerStyle);
+                _markerStyle);
         }
 
         void OnDestroy()
         {
             if (_overlayTexture != null) Destroy(_overlayTexture);
+        }
+
+        void RefreshSceneCache()
+        {
+            _sceneCacheTimer += Time.deltaTime;
+            if (_sceneCacheTimer >= SCENE_CACHE_INTERVAL || _cachedSceneObjects.Length == 0)
+            {
+                _sceneCacheTimer = 0f;
+                _cachedSceneObjects = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+            }
         }
 
         // ─── Frequency Match Targeting ───────────────
@@ -219,36 +240,27 @@ namespace Tartaria.UI
 
             if (!_active) return;
 
-            var cam = UnityEngine.Camera.main;
+            if (_cachedCam == null) _cachedCam = UnityEngine.Camera.main;
+            var cam = _cachedCam;
             if (cam == null) return;
 
             float bestDist = float.MaxValue;
-            foreach (var marker in _markers)
+            RefreshSceneCache();
+            foreach (var obj in _cachedSceneObjects)
             {
-                float screenDist = Vector3.Distance(
-                    cam.WorldToViewportPoint(marker.worldPosition),
-                    new Vector3(0.5f, 0.5f, 0f));
-
-                if (screenDist > 0.3f) continue; // Must be roughly centered
-
-                // Check if this object has a weak point with matching frequency
-                var buildings = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-                foreach (var obj in buildings)
+                if (obj is ICorruptionWeakPoint wp && obj is ICorruptible corruptible)
                 {
-                    if (obj is ICorruptionWeakPoint wp && obj is ICorruptible corruptible)
+                    if (!wp.IsWeakPointExposed) continue;
+                    if (Mathf.Abs(wp.WeakPointFrequency - _currentFrequency) > _frequencyMatchThreshold)
+                        continue;
+
+                    float dist = Vector3.Distance(cam.transform.position, wp.WeakPointWorldPosition);
+                    if (dist < bestDist)
                     {
-                        if (!wp.IsWeakPointExposed) continue;
-                        if (Mathf.Abs(wp.WeakPointFrequency - _currentFrequency) <= _frequencyMatchThreshold)
-                        {
-                            float dist = Vector3.Distance(cam.transform.position, wp.WeakPointWorldPosition);
-                            if (dist < bestDist)
-                            {
-                                bestDist = dist;
-                                _isFrequencyLocked = true;
-                                _purgeTarget = corruptible;
-                                _targetFrequency = wp.WeakPointFrequency;
-                            }
-                        }
+                        bestDist = dist;
+                        _isFrequencyLocked = true;
+                        _purgeTarget = corruptible;
+                        _targetFrequency = wp.WeakPointFrequency;
                     }
                 }
             }
