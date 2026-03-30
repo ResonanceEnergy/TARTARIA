@@ -25,7 +25,9 @@ namespace Tartaria.UI
         [Header("Lens Settings")]
         [SerializeField] float aetherCostPerSecond = 2f;
         [SerializeField] float scanPulseInterval = 1.5f;
+#pragma warning disable CS0414
         [SerializeField] float scanRadius = 50f;
+#pragma warning restore CS0414
         [SerializeField] Color corruptionTint = new(0.6f, 0.1f, 0.4f, 0.3f);
         [SerializeField] Color cleanTint = new(0.2f, 0.8f, 0.6f, 0.15f);
 

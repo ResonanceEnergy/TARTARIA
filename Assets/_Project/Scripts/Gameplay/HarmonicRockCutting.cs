@@ -38,7 +38,9 @@ namespace Tartaria.Gameplay
         public static HarmonicRockCutting Instance { get; private set; }
 
         [Header("Configuration")]
+#pragma warning disable CS0414
         [SerializeField] float baseTimeLimit = 20f;
+#pragma warning restore CS0414
 
         // ─── Events ───
         public event System.Action<float> OnCutComplete;     // total accuracy 0-1

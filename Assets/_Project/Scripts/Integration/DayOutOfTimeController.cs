@@ -30,7 +30,9 @@ namespace Tartaria.Integration
 
         [Header("DotT Configuration")]
         [SerializeField] float eventDurationSeconds = 600f; // 10 minutes
+#pragma warning disable CS0414
         [SerializeField] float memoryCorridorSpeed = 12f;
+#pragma warning restore CS0414
         [SerializeField] Color dottSkyColor = new(0.95f, 0.85f, 0.5f, 1f);
         [SerializeField] Color dottFogColor = new(0.9f, 0.8f, 0.4f, 1f);
         [SerializeField] float dottFogDensity = 0.005f;
@@ -46,7 +48,9 @@ namespace Tartaria.Integration
 
         // ─── Events ─────────────────────────────────
         public event Action OnEventCompleted;
+#pragma warning disable CS0067
         public event Action<int> OnMemoryZoneChanged;
+#pragma warning restore CS0067
 
         void Awake()
         {

@@ -35,7 +35,9 @@ namespace Tartaria.Gameplay
         [SerializeField] float baseRSPerLayer = 3f;
         [SerializeField] float depthRSMultiplier = 0.5f;
         [SerializeField] float scanAccuracyBonus = 1.5f;  // multiplier at 100% scan accuracy
+#pragma warning disable CS0414
         [SerializeField] float interactionRadius = 3f;
+#pragma warning restore CS0414
 
         // ─── Active Sites ───
         readonly Dictionary<string, ExcavationSite> _sites = new();

@@ -65,7 +65,9 @@ namespace Tartaria.Integration
         public event Action<ConvergencePhase> OnPhaseStarted;
         public event Action<ConvergencePhase, float> OnPhaseCompleted; // phase, accuracy
         public event Action<float> OnConvergenceComplete;              // final score
+#pragma warning disable CS0067
         public event Action OnConvergenceFailed;
+#pragma warning restore CS0067
 
         // ─── Lifecycle ───────────────────────────────
 

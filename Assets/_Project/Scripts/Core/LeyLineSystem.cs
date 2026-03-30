@@ -214,7 +214,9 @@ namespace Tartaria.Core
 
         public event System.Action<int> OnNodeActivated;     // nodeIndex
         public event System.Action<int> OnNodeSevered;       // nodeIndex
+#pragma warning disable CS0067
         public event System.Action<int, int> OnLineRestored; // nodeA, nodeB
+#pragma warning restore CS0067
 
         readonly System.Collections.Generic.List<LeyLineNodeInfo> _nodes = new();
 

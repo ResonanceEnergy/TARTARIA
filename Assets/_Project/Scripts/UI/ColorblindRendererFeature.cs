@@ -91,6 +91,7 @@ namespace Tartaria.UI
             return _material;
         }
 
+        [System.Obsolete]
         public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
         {
             var mat = GetMaterial();
@@ -107,7 +108,9 @@ namespace Tartaria.UI
             mat.SetMatrix(s_ColorMatrix, correction);
 
             var cmd = CommandBufferPool.Get("ColorblindCorrection");
+#pragma warning disable CS0618
             var source = renderingData.cameraData.renderer.cameraColorTargetHandle;
+#pragma warning restore CS0618
             Blitter.BlitCameraTexture(cmd, source, source, mat, 0);
             context.ExecuteCommandBuffer(cmd);
             CommandBufferPool.Release(cmd);

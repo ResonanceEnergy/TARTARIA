@@ -31,7 +31,9 @@ namespace Tartaria.Integration
         [SerializeField] float spreadRadius = 30f;
         [SerializeField] float maxCorruption = 100f;
         [SerializeField] float identifyThreshold = 0.1f;
+#pragma warning disable CS0414
         [SerializeField] float isolateThreshold = 0.5f;
+#pragma warning restore CS0414
 
         [Header("Timing")]
         [SerializeField] float spreadCheckInterval = 5f;
@@ -81,6 +83,11 @@ namespace Tartaria.Integration
                 state = new CorruptionState { buildingId = buildingId };
                 _states[buildingId] = state;
             }
+
+            // BuildingResistance skill reduces incoming corruption
+            float resistMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(
+                Gameplay.SkillModifierType.BuildingResistance) ?? 0f;
+            amount *= Mathf.Max(0f, 1f - resistMod);
 
             state.corruptionLevel = Mathf.Min(maxCorruption,
                 state.corruptionLevel + amount);

@@ -23,7 +23,9 @@ namespace Tartaria.Integration
     public class DebugOverlay : MonoBehaviour
     {
         [SerializeField] bool showOnStart;
+#pragma warning disable CS0414
         [SerializeField] KeyCode toggleKey = KeyCode.F1;
+#pragma warning restore CS0414
 
         bool _visible;
         float _fps;
