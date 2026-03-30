@@ -32,9 +32,7 @@ namespace Tartaria.Integration
         public event Action<int> OnClimaxCompleted;   // moonIndex
 
         [Header("Timing")]
-#pragma warning disable CS0414
-        [SerializeField] float beatPauseDuration = 2f;
-#pragma warning restore CS0414
+[SerializeField] float beatPauseDuration = 2f;
         [SerializeField] float cinematicPanDuration = 4f;
 
         bool _isPlaying;
@@ -145,9 +143,9 @@ namespace Tartaria.Integration
                         break;
                 }
 
-                // Pause between beats
-                if (beat.pauseAfter > 0)
-                    yield return new WaitForSeconds(beat.pauseAfter);
+                // Pause between beats (per-beat override or default)
+                float pause = beat.pauseAfter > 0 ? beat.pauseAfter : beatPauseDuration;
+                yield return new WaitForSeconds(pause);
             }
 
             FinishClimax();

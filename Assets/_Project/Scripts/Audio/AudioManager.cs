@@ -102,6 +102,16 @@ namespace Tartaria.Audio
             return source;
         }
 
+        /// <summary>
+        /// Plays a named voice line at the given volume (stub — clips loaded from Resources/VoiceLines).
+        /// </summary>
+        public void PlayVoiceLine(string lineId, float volume = 1f)
+        {
+            var clip = Resources.Load<AudioClip>($"VoiceLines/{lineId}");
+            if (clip != null)
+                PlaySFX2D(clip, volume);
+        }
+
         AudioSource GetNextPooledSource()
         {
             var source = _sfxPool[_sfxPoolIndex];

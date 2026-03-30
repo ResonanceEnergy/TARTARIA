@@ -31,15 +31,18 @@ namespace Tartaria.Editor
             CreateUICanvas();
 
             // Invoke sub-factory scripts
+            AudioStubFactory.BuildAudioStubs();
             AnastasiaDialoguePopulator.BuildDialogueDatabase();
             ZoneDefinitionFactory.BuildZoneDefinitions();
             QuestDefinitionFactory.BuildAllQuests();
             AnastasiaPrefabFactory.BuildAnastasiaPrefab();
             GoldenMotePrefabFactory.BuildMotePrefab();
+            Moon2ZoneScaffold.BuildBuildingDefinitions();
+            MoonBuildingFactory.BuildAllMoonBuildings();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("[Tartaria] All assets built (including Anastasia, Zones, Quests, Prefabs).");
+            Debug.Log("[Tartaria] All assets built (Audio, Anastasia, Zones, Quests, Prefabs, Moon2).");
         }
 
         [MenuItem("Tartaria/Build Assets/Materials", false, 11)]
@@ -473,6 +476,178 @@ namespace Tartaria.Editor
                 new Vector2(100f, 20f), 12);
             saveIndicator.gameObject.SetActive(false);
 
+            // ─── Boss Health Bar (top-center, below zone name) ───
+            var bossPanel = CreateUIElement(hudPanel.transform, "BossHealthPanel",
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, -80f),
+                new Vector2(400f, 40f));
+            bossPanel.gameObject.SetActive(false);
+            CreateImage(bossPanel.transform, "BossBarBg",
+                UnityEngine.UI.Image.Type.Sliced, new Color(0.1f, 0.05f, 0.05f, 0.7f));
+            var bossFill = CreateImage(bossPanel.transform, "BossBarFill",
+                UnityEngine.UI.Image.Type.Filled, new Color(0.8f, 0.15f, 0.1f, 0.9f));
+            var bossName = CreateText(bossPanel.transform, "BossName", "Corruption Entity",
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0f, 5f),
+                new Vector2(300f, 24f), 16);
+
+            // ─── Wave Counter (top-left) ───
+            var wavePanel = CreateUIElement(hudPanel.transform, "WaveCounterPanel",
+                new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(120f, -40f),
+                new Vector2(200f, 50f));
+            wavePanel.gameObject.SetActive(false);
+            var waveText = CreateText(wavePanel.transform, "WaveCounter", "Wave 1/5",
+                new Vector2(0.5f, 0.7f), new Vector2(0.5f, 0.7f), Vector2.zero,
+                new Vector2(180f, 24f), 18);
+            var waveEnemies = CreateText(wavePanel.transform, "WaveEnemies", "8 remaining",
+                new Vector2(0.5f, 0.3f), new Vector2(0.5f, 0.3f), Vector2.zero,
+                new Vector2(180f, 20f), 14);
+
+            // ─── Achievement Toast (top-right corner) ───
+            var achievePanel = CreateUIElement(hudPanel.transform, "AchievementToastPanel",
+                new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-160f, -100f),
+                new Vector2(280f, 60f));
+            achievePanel.gameObject.SetActive(false);
+            CreateImage(achievePanel.transform, "ToastBg",
+                UnityEngine.UI.Image.Type.Sliced, new Color(0.1f, 0.08f, 0.14f, 0.85f));
+            var achieveText = CreateText(achievePanel.transform, "AchievementText", "Achievement Unlocked!",
+                new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(260f, 40f), 16);
+
+            // ─── Moon Trophy Banner (center screen) ───
+            var trophyPanel = CreateUIElement(hudPanel.transform, "MoonTrophyPanel",
+                new Vector2(0.5f, 0.6f), new Vector2(0.5f, 0.6f), Vector2.zero,
+                new Vector2(500f, 100f));
+            trophyPanel.gameObject.SetActive(false);
+            CreateImage(trophyPanel.transform, "TrophyBg",
+                UnityEngine.UI.Image.Type.Sliced, new Color(0.08f, 0.06f, 0.12f, 0.9f));
+            var trophyText = CreateText(trophyPanel.transform, "MoonTrophyText", "MOON COMPLETE",
+                new Vector2(0.5f, 0.65f), new Vector2(0.5f, 0.65f), Vector2.zero,
+                new Vector2(450f, 40f), 32);
+            var trophySub = CreateText(trophyPanel.transform, "MoonTrophySubtext", "Echohaven Restored",
+                new Vector2(0.5f, 0.35f), new Vector2(0.5f, 0.35f), Vector2.zero,
+                new Vector2(400f, 30f), 18);
+
+            // ─── World Map Panel ───
+            var worldMapPanel = CreatePanel(canvasGO.transform, "WorldMapPanel", false);
+            CreateImage(worldMapPanel.transform, "MapBg",
+                UnityEngine.UI.Image.Type.Sliced, new Color(0.03f, 0.02f, 0.06f, 0.95f));
+            CreateText(worldMapPanel.transform, "MapTitle", "WORLD MAP",
+                new Vector2(0.5f, 0.95f), new Vector2(0.5f, 0.95f), Vector2.zero,
+                new Vector2(300f, 40f), 28);
+            var mapZoneName = CreateText(worldMapPanel.transform, "ZoneName", "",
+                new Vector2(0.7f, 0.6f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(300f, 30f), 22);
+            var mapZoneDesc = CreateText(worldMapPanel.transform, "ZoneDescription", "",
+                new Vector2(0.7f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(300f, 60f), 14);
+            var mapZoneStatus = CreateText(worldMapPanel.transform, "ZoneStatus", "",
+                new Vector2(0.7f, 0.42f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 14);
+            var mapZoneMoon = CreateText(worldMapPanel.transform, "ZoneMoonIndex", "",
+                new Vector2(0.7f, 0.38f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 14);
+            CreateButton(worldMapPanel.transform, "TravelButton", "TRAVEL",
+                new Vector2(0.7f, 0.28f), Vector2.zero);
+            CreateButton(worldMapPanel.transform, "MapTabButton", "MAP",
+                new Vector2(0.2f, 0.95f), Vector2.zero);
+            CreateButton(worldMapPanel.transform, "CodexTabButton", "CODEX",
+                new Vector2(0.35f, 0.95f), Vector2.zero);
+            CreateButton(worldMapPanel.transform, "CloseMapButton", "CLOSE",
+                new Vector2(0.95f, 0.95f), Vector2.zero);
+
+            // ─── Skill Tree Panel ───
+            var skillTreePanel = CreatePanel(canvasGO.transform, "SkillTreePanel", false);
+            CreateImage(skillTreePanel.transform, "SkillBg",
+                UnityEngine.UI.Image.Type.Sliced, new Color(0.04f, 0.03f, 0.07f, 0.95f));
+            CreateText(skillTreePanel.transform, "TreeTitle", "SKILL TREE",
+                new Vector2(0.5f, 0.95f), new Vector2(0.5f, 0.95f), Vector2.zero,
+                new Vector2(300f, 40f), 28);
+            CreateText(skillTreePanel.transform, "RSDisplay", "RS: 0",
+                new Vector2(0.85f, 0.95f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(120f, 30f), 18);
+            CreateButton(skillTreePanel.transform, "ResonatorTab", "RESONATOR",
+                new Vector2(0.15f, 0.88f), Vector2.zero);
+            CreateButton(skillTreePanel.transform, "ArchitectTab", "ARCHITECT",
+                new Vector2(0.35f, 0.88f), Vector2.zero);
+            CreateButton(skillTreePanel.transform, "GuardianTab", "GUARDIAN",
+                new Vector2(0.55f, 0.88f), Vector2.zero);
+            CreateButton(skillTreePanel.transform, "HistorianTab", "HISTORIAN",
+                new Vector2(0.75f, 0.88f), Vector2.zero);
+            var skillDetailName = CreateText(skillTreePanel.transform, "DetailName", "",
+                new Vector2(0.75f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(250f, 30f), 20);
+            var skillDetailDesc = CreateText(skillTreePanel.transform, "DetailDescription", "",
+                new Vector2(0.75f, 0.42f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(250f, 60f), 14);
+            var skillDetailCost = CreateText(skillTreePanel.transform, "DetailCost", "",
+                new Vector2(0.75f, 0.34f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 14);
+            var skillDetailMod = CreateText(skillTreePanel.transform, "DetailModifier", "",
+                new Vector2(0.75f, 0.30f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 14);
+            CreateButton(skillTreePanel.transform, "UnlockButton", "UNLOCK",
+                new Vector2(0.75f, 0.22f), Vector2.zero);
+            CreateButton(skillTreePanel.transform, "CloseSkillButton", "CLOSE",
+                new Vector2(0.95f, 0.95f), Vector2.zero);
+
+            // ─── Quest Log Panel ───
+            var questLogPanel = CreatePanel(canvasGO.transform, "QuestLogPanel", false);
+            CreateImage(questLogPanel.transform, "QuestBg",
+                UnityEngine.UI.Image.Type.Sliced, new Color(0.03f, 0.03f, 0.06f, 0.95f));
+            CreateText(questLogPanel.transform, "QuestTitle", "QUEST LOG",
+                new Vector2(0.5f, 0.95f), new Vector2(0.5f, 0.95f), Vector2.zero,
+                new Vector2(300f, 40f), 28);
+            CreateButton(questLogPanel.transform, "TabActive", "ACTIVE",
+                new Vector2(0.2f, 0.88f), Vector2.zero);
+            CreateButton(questLogPanel.transform, "TabCompleted", "COMPLETED",
+                new Vector2(0.4f, 0.88f), Vector2.zero);
+            CreateButton(questLogPanel.transform, "TabAll", "ALL",
+                new Vector2(0.6f, 0.88f), Vector2.zero);
+            var questDetailTitle = CreateText(questLogPanel.transform, "DetailTitle", "",
+                new Vector2(0.65f, 0.65f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(300f, 30f), 20);
+            var questDetailDesc = CreateText(questLogPanel.transform, "DetailDescription", "",
+                new Vector2(0.65f, 0.55f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(300f, 80f), 14);
+            var questReward = CreateText(questLogPanel.transform, "RewardText", "",
+                new Vector2(0.65f, 0.40f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 14);
+
+            // ─── Workshop Panel ───
+            var workshopPanel = CreatePanel(canvasGO.transform, "WorkshopPanel", false);
+            CreateImage(workshopPanel.transform, "WorkshopBg",
+                UnityEngine.UI.Image.Type.Sliced, new Color(0.04f, 0.03f, 0.06f, 0.95f));
+            CreateText(workshopPanel.transform, "WorkshopTitle", "WORKSHOP",
+                new Vector2(0.5f, 0.95f), new Vector2(0.5f, 0.95f), Vector2.zero,
+                new Vector2(300f, 40f), 28);
+            var workshopList = CreateUIElement(workshopPanel.transform, "BuildingListContainer",
+                new Vector2(0.2f, 0.5f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(250f, 500f));
+            var workshopName = CreateText(workshopPanel.transform, "BuildingName", "",
+                new Vector2(0.65f, 0.75f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(300f, 30f), 22);
+            var workshopTier = CreateText(workshopPanel.transform, "CurrentTier", "Tier 0",
+                new Vector2(0.65f, 0.68f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 16);
+            var workshopNextTier = CreateText(workshopPanel.transform, "NextTier", "",
+                new Vector2(0.65f, 0.62f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 16);
+            var workshopReq = CreateText(workshopPanel.transform, "RSRequirement", "",
+                new Vector2(0.65f, 0.56f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 14);
+            var workshopOutput = CreateText(workshopPanel.transform, "OutputMultiplier", "",
+                new Vector2(0.65f, 0.50f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(200f, 24f), 14);
+            var workshopDesc = CreateText(workshopPanel.transform, "Description", "",
+                new Vector2(0.65f, 0.40f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(300f, 60f), 14);
+            var workshopProgress = CreateUIElement(workshopPanel.transform, "TierProgress",
+                new Vector2(0.65f, 0.32f), new Vector2(0.5f, 0.5f), Vector2.zero,
+                new Vector2(250f, 16f));
+            CreateImage(workshopProgress.transform, "ProgressFill",
+                UnityEngine.UI.Image.Type.Filled, new Color(0.9f, 0.85f, 0.3f, 0.8f));
+            CreateButton(workshopPanel.transform, "UpgradeButton", "UPGRADE",
+                new Vector2(0.65f, 0.22f), Vector2.zero);
+
             // ─── Wire UIManager references ───
             var uiManager = canvasGO.AddComponent<UI.UIManager>();
             var uiSO = new SerializedObject(uiManager);
@@ -511,14 +686,98 @@ namespace Tartaria.Editor
                 promptRT.GetComponent<TMPro.TextMeshProUGUI>();
             hudSO.FindProperty("zoneNameText").objectReferenceValue =
                 zoneNameRT.GetComponent<TMPro.TextMeshProUGUI>();
+            hudSO.FindProperty("bossHealthPanel").objectReferenceValue =
+                bossPanel.GetComponent<RectTransform>();
+            hudSO.FindProperty("bossHealthFill").objectReferenceValue =
+                bossFill.GetComponent<UnityEngine.UI.Image>();
+            hudSO.FindProperty("bossNameText").objectReferenceValue =
+                bossName.GetComponent<TMPro.TextMeshProUGUI>();
+            hudSO.FindProperty("waveCounterPanel").objectReferenceValue =
+                wavePanel.GetComponent<RectTransform>();
+            hudSO.FindProperty("waveCounterText").objectReferenceValue =
+                waveText.GetComponent<TMPro.TextMeshProUGUI>();
+            hudSO.FindProperty("waveEnemiesText").objectReferenceValue =
+                waveEnemies.GetComponent<TMPro.TextMeshProUGUI>();
+            hudSO.FindProperty("achievementToastPanel").objectReferenceValue =
+                achievePanel.GetComponent<RectTransform>();
+            hudSO.FindProperty("achievementToastText").objectReferenceValue =
+                achieveText.GetComponent<TMPro.TextMeshProUGUI>();
+            hudSO.FindProperty("moonTrophyPanel").objectReferenceValue =
+                trophyPanel.GetComponent<RectTransform>();
+            hudSO.FindProperty("moonTrophyText").objectReferenceValue =
+                trophyText.GetComponent<TMPro.TextMeshProUGUI>();
+            hudSO.FindProperty("moonTrophySubtext").objectReferenceValue =
+                trophySub.GetComponent<TMPro.TextMeshProUGUI>();
             hudSO.ApplyModifiedProperties();
+
+            // ─── Wire WorldMapUI ───
+            var worldMap = canvasGO.AddComponent<UI.WorldMapUI>();
+            var wmSO = new SerializedObject(worldMap);
+            wmSO.FindProperty("mapPanel").objectReferenceValue = worldMapPanel;
+            wmSO.FindProperty("zoneName").objectReferenceValue =
+                mapZoneName.GetComponent<TMPro.TextMeshProUGUI>();
+            wmSO.FindProperty("zoneDescription").objectReferenceValue =
+                mapZoneDesc.GetComponent<TMPro.TextMeshProUGUI>();
+            wmSO.FindProperty("zoneStatus").objectReferenceValue =
+                mapZoneStatus.GetComponent<TMPro.TextMeshProUGUI>();
+            wmSO.FindProperty("zoneMoonIndex").objectReferenceValue =
+                mapZoneMoon.GetComponent<TMPro.TextMeshProUGUI>();
+            wmSO.ApplyModifiedProperties();
+
+            // ─── Wire SkillTreeUI ───
+            var skillTree = canvasGO.AddComponent<UI.SkillTreeUI>();
+            var stSO = new SerializedObject(skillTree);
+            stSO.FindProperty("skillTreePanel").objectReferenceValue = skillTreePanel;
+            stSO.FindProperty("detailName").objectReferenceValue =
+                skillDetailName.GetComponent<TMPro.TextMeshProUGUI>();
+            stSO.FindProperty("detailDescription").objectReferenceValue =
+                skillDetailDesc.GetComponent<TMPro.TextMeshProUGUI>();
+            stSO.FindProperty("detailCost").objectReferenceValue =
+                skillDetailCost.GetComponent<TMPro.TextMeshProUGUI>();
+            stSO.FindProperty("detailModifier").objectReferenceValue =
+                skillDetailMod.GetComponent<TMPro.TextMeshProUGUI>();
+            stSO.ApplyModifiedProperties();
+
+            // ─── Wire QuestLogUI ───
+            var questLog = canvasGO.AddComponent<UI.QuestLogUI>();
+            var qlSO = new SerializedObject(questLog);
+            qlSO.FindProperty("questLogPanel").objectReferenceValue = questLogPanel;
+            qlSO.FindProperty("detailTitle").objectReferenceValue =
+                questDetailTitle.GetComponent<TMPro.TextMeshProUGUI>();
+            qlSO.FindProperty("detailDescription").objectReferenceValue =
+                questDetailDesc.GetComponent<TMPro.TextMeshProUGUI>();
+            qlSO.FindProperty("rewardText").objectReferenceValue =
+                questReward.GetComponent<TMPro.TextMeshProUGUI>();
+            qlSO.ApplyModifiedProperties();
+
+            // ─── Wire WorkshopUIPanel ───
+            var workshop = canvasGO.AddComponent<UI.WorkshopUIPanel>();
+            var wsSO = new SerializedObject(workshop);
+            wsSO.FindProperty("panelRoot").objectReferenceValue = workshopPanel;
+            wsSO.FindProperty("buildingListContainer").objectReferenceValue =
+                workshopList.GetComponent<RectTransform>();
+            wsSO.FindProperty("buildingNameText").objectReferenceValue =
+                workshopName.GetComponent<TMPro.TextMeshProUGUI>();
+            wsSO.FindProperty("currentTierText").objectReferenceValue =
+                workshopTier.GetComponent<TMPro.TextMeshProUGUI>();
+            wsSO.FindProperty("nextTierText").objectReferenceValue =
+                workshopNextTier.GetComponent<TMPro.TextMeshProUGUI>();
+            wsSO.FindProperty("rsRequirementText").objectReferenceValue =
+                workshopReq.GetComponent<TMPro.TextMeshProUGUI>();
+            wsSO.FindProperty("outputMultiplierText").objectReferenceValue =
+                workshopOutput.GetComponent<TMPro.TextMeshProUGUI>();
+            wsSO.FindProperty("descriptionText").objectReferenceValue =
+                workshopDesc.GetComponent<TMPro.TextMeshProUGUI>();
+            wsSO.FindProperty("tierProgressBar").objectReferenceValue =
+                workshopProgress.GetComponentInChildren<UnityEngine.UI.Image>();
+            wsSO.ApplyModifiedProperties();
 
             // Save as prefab
             string dir = Path.Combine(Application.dataPath, "..", "Assets/_Project/Prefabs/UI");
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
             PrefabUtility.SaveAsPrefabAsset(canvasGO, prefabPath);
             Object.DestroyImmediate(canvasGO);
-            Debug.Log("[Tartaria] UI Canvas prefab created with HUD, Pause, Settings, Dialogue, Loading, AetherVision, SaveIndicator panels.");
+            Debug.Log("[Tartaria] UI Canvas prefab created with HUD, Pause, Settings, Dialogue, Loading, AetherVision, SaveIndicator, WorldMap, SkillTree, QuestLog, Workshop panels.");
         }
 
         // ─── UI Helpers ──────────────────────────────

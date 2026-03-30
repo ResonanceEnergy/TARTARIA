@@ -97,9 +97,7 @@ namespace Tartaria.Integration
         float _targetOpacity;
         float _currentOpacity;
         bool _hasManifested;
-#pragma warning disable CS0414
         bool _zoneFirstAppearanceDone;
-#pragma warning restore CS0414
 
         // Dialogue bitmask (128-bit as two ulongs)
         ulong _bitmaskLow;   // bits 0–63
@@ -189,6 +187,9 @@ namespace Tartaria.Integration
 
         void UpdateModeTransitions()
         {
+            // Block mode changes until initial zone manifestation finishes
+            if (!_zoneFirstAppearanceDone) return;
+
             // Priority 1: Combat → Invisible
             if (GameStateManager.Instance.CurrentState == GameState.Combat)
             {

@@ -30,6 +30,8 @@ namespace Tartaria.Gameplay
     /// </summary>
     public class ChoirHarmonicsMiniGame : MonoBehaviour
     {
+        public static ChoirHarmonicsMiniGame Instance { get; private set; }
+
         [Header("Choir Config")]
         [SerializeField] int voiceCount = 4;
         [SerializeField] float performanceDuration = 40f;
@@ -74,6 +76,12 @@ namespace Tartaria.Gameplay
         public event System.Action<int> OnVoiceDrifted;               // voice index
         public event System.Action OnFullHarmonyAchieved;
         public event System.Action OnTranscendentMoment;              // 98%+ threshold hit
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
+        }
 
         void Update()
         {
@@ -294,6 +302,10 @@ namespace Tartaria.Gameplay
             ServiceLocator.Milo?.AddTrust(5f);
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+
+            if (tier == PerformanceTier.Failed)
+                OnPerformanceFailed?.Invoke();
+
             OnPerformanceCompleted?.Invoke(totalRS, tier);
             ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "ChoirHarmonics");
         }

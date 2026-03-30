@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.UI;
 
@@ -85,13 +86,21 @@ namespace Tartaria.Integration
         /// </summary>
         public void PlayLineById(string lineId)
         {
+            PlayLineById(lineId, 1f);
+        }
+
+        /// <summary>
+        /// Play a specific line by ID at a given volume.
+        /// </summary>
+        public void PlayLineById(string lineId, float volume)
+        {
             foreach (var contextPair in _contextLines)
             {
                 foreach (var line in contextPair.Value)
                 {
                     if (line.id == lineId)
                     {
-                        ShowLine(line);
+                        ShowLine(line, volume);
                         return;
                     }
                 }
@@ -100,7 +109,9 @@ namespace Tartaria.Integration
 
         // ─── Display ─────────────────────────────────
 
-        void ShowLine(DialogueLine line)
+        void ShowLine(DialogueLine line) => ShowLine(line, 1f);
+
+        void ShowLine(DialogueLine line, float volume)
         {
             _currentLineDuration = line.duration > 0f ? line.duration : autoCloseDelay;
             _lastLineTime = Time.time;
@@ -109,6 +120,9 @@ namespace Tartaria.Integration
                 _playedOneShots.Add(line.id);
 
             UIManager.Instance?.ShowDialogue(line.speaker, line.text);
+
+            // Voice audio at requested volume
+            AudioManager.Instance?.PlayVoiceLine(line.id, volume);
 
             // Auto-close after delay
             CancelInvoke(nameof(HideLine));
@@ -379,6 +393,119 @@ namespace Tartaria.Integration
                 "The Aether quickens! The old conduits remember their purpose. Soon the entire network will light.");
             AddLine("zone_complete", "korath_zc_01", "Korath",
                 "Another voice joins the chorus. *deep breath* Can you hear it? The harmony of the spheres grows louder.");
+
+            // ══════════════ VERITAS DIALOGUE ══════════════
+            // Veritas — Ancient echo of the cathedral organist, trapped mid-performance.
+            // Speaks in musical metaphors. Unlocks Moon 6 (Living Library).
+
+            // ── Veritas: Introduction ──
+            AddLine("veritas_intro", "veritas_intro_01", "Veritas",
+                "You hear the organ? No... you hear what remains of me. I have been playing this unfinished passage for seven hundred years. My name is Veritas.", true);
+            AddLine("veritas_intro", "veritas_intro_02", "Veritas",
+                "Every pipe in this cathedral is a frequency conduit. They silenced me by filling them with mud. But you... you're clearing the pipes.");
+
+            // ── Veritas: Teaching ──
+            AddLine("veritas_teaching", "veritas_teach_01", "Veritas",
+                "Music is mathematics made audible. The golden ratio is the interval between creation and destruction.");
+            AddLine("veritas_teaching", "veritas_teach_02", "Veritas",
+                "A chord is three frequencies in agreement. A civilization is a million frequencies in harmony. Tartaria was the greatest chord ever played.");
+            AddLine("veritas_teaching", "veritas_teach_03", "Veritas",
+                "Listen to the overtones, not the fundamental. The truth of any structure hides in its harmonics.");
+
+            // ── Veritas: Performance / Tuning ──
+            AddLine("tuning_start", "veritas_tune_01", "Veritas",
+                "Feel the keys beneath your fingers. Each one connects to a pipe that connects to the Aether. You're not playing music — you're shaping reality.");
+            AddLine("tuning_success", "veritas_tunesuc_01", "Veritas",
+                "Magnificent! That register hasn't sounded in centuries. Can you hear the cathedral weeping with joy?");
+            AddLine("tuning_fail", "veritas_tunefail_01", "Veritas",
+                "The interval collapsed. In music, as in restoration, patience is the only teacher that never lies.");
+
+            // ── Veritas: Combat ──
+            AddLine("combat_start", "veritas_cbt_01", "Veritas",
+                "The dissonant ones approach! Let me harmonise a counter-frequency. Every battle is a duet — play your part!");
+            AddLine("combat_victory", "veritas_cbtvic_01", "Veritas",
+                "Silence after the storm. The purest passage is the rest between notes.");
+
+            // ── Veritas: Trust arc ──
+            AddLine("veritas_fragment", "veritas_trust_low_01", "Veritas",
+                "I am... incomplete. Fragments of memory, fragments of melody. Each register you restore returns a piece of who I was.");
+            AddLine("veritas_harmony", "veritas_trust_mid_01", "Veritas",
+                "Three registers restored. I can feel the lower octaves again. There was a piece I was playing when they came... a requiem.");
+            AddLine("veritas_transcendent", "veritas_trust_high_01", "Veritas",
+                "I remember now. The Requiem was not for the dead — it was an activation sequence. The cathedral IS the instrument. We ARE the music.", true);
+
+            // ── Veritas: Idle ──
+            AddLine("exploration_idle", "veritas_idle_01", "Veritas",
+                "Each rose window in Tartaria was tuned to a different frequency. When sunlight struck them all at once... the buildings sang.");
+            AddLine("exploration_idle", "veritas_idle_02", "Veritas",
+                "*plays a phantom chord* Forgive me. My fingers still reach for keys that aren't there. Old habits of the incorporeal.");
+            AddLine("exploration_idle", "veritas_idle_03", "Veritas",
+                "The children's choir, the pipe organ, the crystal bells — three voices of one instrument. Lirael, me, and someone still to awaken.");
+
+            // ══════════════ ANASTASIA DIALOGUE ══════════════
+            // Princess Anastasia — spectral companion, appears across all 13 moons.
+            // Speaks in whispers initially, becomes more present as trust grows.
+            // Modes: Silent → ReactiveWhisper → Conversational.
+
+            // ── Anastasia: First Manifestation ──
+            AddLine("anastasia_manifest", "anastasia_manifest_01", "Anastasia",
+                "...can you see me? No one has seen me since the night they came for my family. The frequency of this place... it lets me exist again.", true);
+            AddLine("anastasia_manifest", "anastasia_manifest_02", "Anastasia",
+                "I am... I was... Anastasia. Not the girl from the stories they tell. The real one. The one who understood the Aether.");
+
+            // ── Anastasia: Lore Whispers ──
+            AddLine("anastasia_whisper", "anastasia_whisper_01", "Anastasia",
+                "*barely audible* The palace wasn't just where we lived. It was a resonance amplifier. Father knew. Mother knew. They all knew.");
+            AddLine("anastasia_whisper", "anastasia_whisper_02", "Anastasia",
+                "The eggs... Faberge's eggs. They weren't jewellery. Each one was a frequency key to a different chamber beneath the palace.");
+            AddLine("anastasia_whisper", "anastasia_whisper_03", "Anastasia",
+                "They buried Tartaria because it proved everything they wanted forgotten. Free energy. Harmonic healing. The truth about our history.");
+
+            // ── Anastasia: Memory Fragments ──
+            AddLine("anastasia_memory", "anastasia_mem_01", "Anastasia",
+                "I remember the crystal ballroom. When we danced, the floor generated light. Every footstep powered the chandeliers. That was normal for us.", true);
+            AddLine("anastasia_memory", "anastasia_mem_02", "Anastasia",
+                "My sisters and I used to tune the palace each morning. Like tuning an instrument. Olga took the east wing, Tatiana the west. I always took the spire.");
+            AddLine("anastasia_memory", "anastasia_mem_03", "Anastasia",
+                "The night they came, the palace was still singing. They couldn't silence it with guns. So they buried it instead.");
+
+            // ── Anastasia: Discovery reactions ──
+            AddLine("discovery", "anastasia_disc_01", "Anastasia",
+                "*gasps* This architecture... I recognise it. The proportions are identical to the Winter Palace sub-levels.");
+            AddLine("discovery", "anastasia_disc_02", "Anastasia",
+                "Golden ratio in the archway. Fibonacci in the floor tiles. This was built by the same hands that built my home.");
+
+            // ── Anastasia: Tuning ──
+            AddLine("tuning_start", "anastasia_tune_01", "Anastasia",
+                "432 Hertz. That was the frequency my music box played. Father said it was the key to everything.");
+            AddLine("tuning_success", "anastasia_tunesuc_01", "Anastasia",
+                "*smiles* That sound... I heard it every morning when the dome opened. You're bringing it all back.");
+
+            // ── Anastasia: Combat (fades during combat) ──
+            AddLine("combat_start", "anastasia_cbt_01", "Anastasia",
+                "*flickering* I can't stay solid when there's this much dissonance. Be careful. I'll be here when it's safe.");
+            AddLine("combat_victory", "anastasia_cbtvic_01", "Anastasia",
+                "*rematerialises* The violence disturbs the Aether terribly. But you purify, not destroy. That matters.");
+
+            // ── Anastasia: Idle / Exploration ──
+            AddLine("exploration_idle", "anastasia_idle_01", "Anastasia",
+                "Sometimes I wonder if I'm a ghost or a frequency. Perhaps there's no difference.");
+            AddLine("exploration_idle", "anastasia_idle_02", "Anastasia",
+                "The maps say this land was always empty. The maps are lies. I lived in a civilization that spanned the world.");
+            AddLine("exploration_idle", "anastasia_idle_03", "Anastasia",
+                "*touching a wall* Still warm. After all this time. The Aether remembers being shaped by loving hands.");
+
+            // ── Anastasia: Solidification arc ──
+            AddLine("anastasia_solidify", "anastasia_solid_01", "Anastasia",
+                "Something is happening. I can feel my hands again. Really feel them. The Aether density here... it's giving me substance.", true);
+            AddLine("anastasia_solidify", "anastasia_solid_02", "Anastasia",
+                "I am neither alive nor dead. I am resonant. And for the first time in a century, that feels like enough.");
+
+            // ── Anastasia: Zone/threshold events ──
+            AddLine("aether_wake", "anastasia_aw_01", "Anastasia",
+                "*eyes wide* The golden mist! I haven't seen it since I was alive. The field is remembering how to flow!");
+            AddLine("zone_complete", "anastasia_zc_01", "Anastasia",
+                "*tears* This zone is singing the way the world used to sing. You're not just restoring buildings. You're restoring truth.", true);
         }
 
         void AddLine(string context, string id, string speaker, string text, bool oneShot = false)

@@ -35,9 +35,7 @@ namespace Tartaria.Gameplay
         [SerializeField] float baseRSPerLayer = 3f;
         [SerializeField] float depthRSMultiplier = 0.5f;
         [SerializeField] float scanAccuracyBonus = 1.5f;  // multiplier at 100% scan accuracy
-#pragma warning disable CS0414
-        [SerializeField] float interactionRadius = 3f;
-#pragma warning restore CS0414
+[SerializeField] float interactionRadius = 3f;
 
         // ─── Active Sites ───
         readonly Dictionary<string, ExcavationSite> _sites = new();
@@ -116,6 +114,14 @@ namespace Tartaria.Gameplay
             if (_isDigging) return;
             if (!_sites.TryGetValue(siteId, out var site)) return;
             if (site.isComplete) return;
+
+            // Range check — player must be within interactionRadius
+            var player = GameObject.FindWithTag("Player");
+            if (player != null && Vector3.Distance(player.transform.position, site.position) > interactionRadius)
+            {
+                ServiceLocator.HUD?.ShowInteractionPrompt("Too far to dig here.");
+                return;
+            }
 
             _activeSite = site;
             _digProgress = 0f;

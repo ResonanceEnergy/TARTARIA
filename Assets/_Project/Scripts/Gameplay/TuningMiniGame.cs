@@ -18,9 +18,7 @@ namespace Tartaria.Gameplay
     public class TuningMiniGameController : MonoBehaviour
     {
         [Header("Configuration")]
-#pragma warning disable CS0414
-        [SerializeField] float baseTargetFrequency = 432f;
-#pragma warning restore CS0414
+[SerializeField] float baseTargetFrequency = 432f;
 
         // Current game state
         TuningPuzzleConfig _currentConfig;
@@ -49,7 +47,7 @@ namespace Tartaria.Gameplay
             float speedMod = SkillTreeSystem.Instance?.GetModifier(SkillModifierType.TuningSpeed) ?? 0f;
             _timeRemaining *= (1f + speedMod);
 
-            _currentFrequency = 0f;
+            _currentFrequency = config.targetFrequency > 0 ? 0f : baseTargetFrequency * 0.5f;
             _accuracy = 0f;
             _isActive = true;
             _patternIndex = 0;
