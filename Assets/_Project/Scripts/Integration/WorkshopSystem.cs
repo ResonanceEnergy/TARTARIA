@@ -49,6 +49,11 @@ namespace Tartaria.Integration
                 upgradeTiers = CreateDefaultTiers();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Public API ──────────────────────────────
 
         /// <summary>

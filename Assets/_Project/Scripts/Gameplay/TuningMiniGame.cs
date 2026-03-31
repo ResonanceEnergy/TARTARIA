@@ -56,7 +56,7 @@ namespace Tartaria.Gameplay
             _traceAccumulatedAccuracy = 0f;
             _traceSamples = 0;
 
-            GameStateManager.Instance.TransitionTo(GameState.Tuning);
+            GameStateManager.Instance?.TransitionTo(GameState.Tuning);
         }
 
         void Update()
@@ -282,28 +282,33 @@ namespace Tartaria.Gameplay
             float precisionMod = SkillTreeSystem.Instance?.GetModifier(SkillModifierType.TuningPrecision) ?? 0f;
             _accuracy = Mathf.Clamp01(_accuracy + precisionMod);
 
-            if (_accuracy >= 0.6f)
+            try
             {
-                // Success! Return to exploration
-                OnTuningComplete?.Invoke(_accuracy);
-
-                // Haptic feedback for success
-                if (HapticFeedbackManager.Instance != null)
+                if (_accuracy >= 0.6f)
                 {
-                    if (_accuracy >= 0.95f)
-                        HapticFeedbackManager.Instance.PlayPerfectTune();
-                    else
-                        HapticFeedbackManager.Instance.StopAll();
+                    // Success! Return to exploration
+                    OnTuningComplete?.Invoke(_accuracy);
+
+                    // Haptic feedback for success
+                    if (HapticFeedbackManager.Instance != null)
+                    {
+                        if (_accuracy >= 0.95f)
+                            HapticFeedbackManager.Instance.PlayPerfectTune();
+                        else
+                            HapticFeedbackManager.Instance.StopAll();
+                    }
+                }
+                else
+                {
+                    // Fail — reset for retry
+                    OnTuningFailed?.Invoke();
                 }
             }
-            else
+            finally
             {
-                // Fail — reset for retry
-                OnTuningFailed?.Invoke();
+                HapticFeedbackManager.Instance?.StopAll();
+                GameStateManager.Instance?.TransitionTo(GameState.Exploration);
             }
-
-            HapticFeedbackManager.Instance?.StopAll();
-            GameStateManager.Instance.TransitionTo(GameState.Exploration);
         }
 
         /// <summary>
