@@ -54,6 +54,21 @@ namespace Tartaria.Gameplay
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                if (_isDigging) CancelDig();
+                Instance = null;
+            }
+        }
+
+        void Start()
+        {
+            var playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null) _cachedPlayer = playerObj.transform;
+        }
+
         // ─── Site Registration ───
 
         public void RegisterSite(string siteId, Vector3 position, int totalLayers,

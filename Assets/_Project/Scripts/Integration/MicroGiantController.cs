@@ -70,6 +70,21 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                if (_isMicro) ExitMicroMode();
+                Instance = null;
+            }
+        }
+
+        void Start()
+        {
+            var playerObj = GameObject.FindWithTag("Player");
+            if (playerObj != null) _playerTransform = playerObj.transform;
+        }
+
         void Update()
         {
             if (!_isMicro) return;
@@ -108,10 +123,12 @@ namespace Tartaria.Integration
         {
             if (_isMicro) return;
 
-            var player = GameObject.FindWithTag("Player");
-            if (player == null) return;
-
-            _playerTransform = player.transform;
+            if (_playerTransform == null)
+            {
+                var player = GameObject.FindWithTag("Player");
+                if (player == null) return;
+                _playerTransform = player.transform;
+            }
             _activeBuildingId = buildingId;
             _entryPosition = _playerTransform.position;
             _aetherCharge = currentAether;

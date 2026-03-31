@@ -89,6 +89,8 @@ namespace Tartaria.Gameplay
         /// <summary>Start with a specific config.</summary>
         public void StartPuzzle(OrphanTrainPuzzleConfig config)
         {
+            if (_isActive) return;
+
             segmentCount = config.segmentCount;
             timeLimitSeconds = config.timeLimit;
             perfectThresholdHz = config.perfectThreshold;

@@ -55,6 +55,11 @@ namespace Tartaria.UI
             LoadSettings();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Colorblind Mode ───
 
         public void SetColorblindMode(ColorblindMode mode)

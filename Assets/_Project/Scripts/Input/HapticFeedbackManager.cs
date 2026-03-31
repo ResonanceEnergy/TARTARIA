@@ -21,6 +21,12 @@ namespace Tartaria.Input
             DontDestroyOnLoad(gameObject);
         }
 
+        void OnDestroy()
+        {
+            StopAll();
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             _activeGamepad = Gamepad.current;
