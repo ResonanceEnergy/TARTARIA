@@ -67,6 +67,6 @@ namespace Tartaria.Core
         public float rsReward;
 
         [Header("Chain")]
-        public string[] followUpQuestIds;
+        public string[] followUpQuestIds = System.Array.Empty<string>();
     }
 }

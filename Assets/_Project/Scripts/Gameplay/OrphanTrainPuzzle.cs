@@ -220,7 +220,7 @@ namespace Tartaria.Gameplay
             totalRS += _bestChain * chainBonusMultiplier * perfectSegmentRS;
 
             // Time bonus (proportional to remaining time)
-            float timeRatio = 1f - (_timer / timeLimitSeconds);
+            float timeRatio = timeLimitSeconds > 0f ? 1f - (_timer / timeLimitSeconds) : 0f;
             totalRS += timeBonusMaxRS * timeRatio;
 
             // Golden ratio bonus: if all segments perfect
