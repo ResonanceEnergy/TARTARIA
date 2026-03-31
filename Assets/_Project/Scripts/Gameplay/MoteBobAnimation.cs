@@ -12,16 +12,16 @@ namespace Tartaria.Gameplay
         [SerializeField] float bobSpeed = 2f;
         [SerializeField] float rotateSpeed = 90f;
 
-        Vector3 _startPos;
+        Vector3 _startLocalPos;
 
         void Start()
         {
-            _startPos = transform.position;
+            _startLocalPos = transform.localPosition;
         }
 
         void Update()
         {
-            transform.position = _startPos + Vector3.up * (Mathf.Sin(Time.time * bobSpeed) * bobHeight);
+            transform.localPosition = _startLocalPos + Vector3.up * (Mathf.Sin(Time.time * bobSpeed) * bobHeight);
             transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
         }
     }

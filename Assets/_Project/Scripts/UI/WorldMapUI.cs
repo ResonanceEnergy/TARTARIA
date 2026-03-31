@@ -338,6 +338,11 @@ namespace Tartaria.UI
             BuildCodex();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Public API ──────────────────────────────
 
         public void UnlockEntry(string entryId)

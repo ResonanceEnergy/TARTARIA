@@ -212,6 +212,7 @@ namespace Tartaria.UI
         void OnDestroy()
         {
             if (_overlayTexture != null) Destroy(_overlayTexture);
+            if (Instance == this) Instance = null;
         }
 
         void RefreshSceneCache()
