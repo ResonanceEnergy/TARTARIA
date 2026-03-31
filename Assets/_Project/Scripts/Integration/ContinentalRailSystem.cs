@@ -171,13 +171,7 @@ namespace Tartaria.Integration
             var seg = FindSegment(fromStation, toStation);
             if (seg == null || seg.restored) return false;
 
-            // Check aether cost
-            var econ = Core.EconomySystem.Instance;
-            if (econ == null) return false;
-            if (econ.GetBalance(Core.CurrencyType.AetherShards) < seg.repairCost) return false;
-            econ.SpendCurrency(Core.CurrencyType.AetherShards, seg.repairCost);
-
-            // Boss check
+            // Boss check first — don't spend currency if boss blocks repair
             if (seg.hasBoss)
             {
                 OnRailLeviathan?.Invoke();
@@ -185,6 +179,12 @@ namespace Tartaria.Integration
                 Debug.Log("[ContinentalRail] Rail Leviathan guards this segment!");
                 return false; // Boss must be defeated first
             }
+
+            // Check aether cost
+            var econ = Core.EconomySystem.Instance;
+            if (econ == null) return false;
+            if (econ.GetBalance(Core.CurrencyType.AetherShards) < seg.repairCost) return false;
+            econ.SpendCurrency(Core.CurrencyType.AetherShards, seg.repairCost);
 
             seg.restored = true;
             seg.corruptionLevel = 0f;

@@ -50,7 +50,8 @@ namespace Tartaria.UI
 
         void OnEnable()
         {
-            GameStateManager.Instance.OnStateChanged += HandleStateChange;
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged += HandleStateChange;
             GameEvents.OnToggleAetherVision += ToggleAetherVision;
             GameEvents.OnTogglePause += TogglePause;
         }
