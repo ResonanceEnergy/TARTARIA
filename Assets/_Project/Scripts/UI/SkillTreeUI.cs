@@ -61,6 +61,7 @@ namespace Tartaria.UI
         SkillId _selectedSkill = SkillId.None;
         readonly Dictionary<SkillId, SkillNodeUI> _nodeWidgets = new();
         bool _isOpen;
+        int _lastRSInt = -1;
 
         readonly string[] TreeNames = { "RESONATOR", "ARCHITECT", "GUARDIAN", "HISTORIAN" };
         readonly string[] TreeIcons = { "\u266B", "\u2302", "\u2694", "\u270D" }; // ♫ ⌂ ⚔ ✍
@@ -354,7 +355,10 @@ namespace Tartaria.UI
         {
             if (rsDisplay == null) return;
             float rs = AetherFieldManager.Instance?.ResonanceScore ?? 0f;
-            rsDisplay.text = $"RS: {rs:F0}";
+            int rsInt = Mathf.RoundToInt(rs);
+            if (rsInt == _lastRSInt) return;
+            _lastRSInt = rsInt;
+            rsDisplay.text = $"RS: {rsInt}";
         }
 
         string FormatModType(SkillModifierType mod)
