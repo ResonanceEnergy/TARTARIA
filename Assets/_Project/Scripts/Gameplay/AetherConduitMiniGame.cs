@@ -294,7 +294,7 @@ namespace Tartaria.Gameplay
             }
 
             // Time bonus
-            float timeRatio = 1f - (_timer / timeLimitSeconds);
+            float timeRatio = timeLimitSeconds > 0f ? 1f - (_timer / timeLimitSeconds) : 0f;
             totalRS += timeBonusMaxRS * timeRatio;
 
             // Korath echo bonus: all bastions ≥ 90%

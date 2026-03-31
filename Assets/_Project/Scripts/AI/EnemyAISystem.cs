@@ -103,9 +103,10 @@ namespace Tartaria.AI
             float3 playerPos, float dt)
         {
             // Move toward patrol target (nearest restored building)
-            float3 direction = math.normalize(ai.PatrolTarget - transform.Position);
+            float3 direction = math.normalizesafe(ai.PatrolTarget - transform.Position);
             transform.Position += direction * ai.MoveSpeed * dt;
-            transform.Rotation = quaternion.LookRotation(direction, math.up());
+            if (!direction.Equals(float3.zero))
+                transform.Rotation = quaternion.LookRotation(direction, math.up());
 
             // Check if player is within engagement radius
             float distToPlayer = math.distance(transform.Position, playerPos);
@@ -124,9 +125,10 @@ namespace Tartaria.AI
             // Move toward player
             if (distToPlayer > ai.AttackRange)
             {
-                float3 direction = math.normalize(playerPos - transform.Position);
+                float3 direction = math.normalizesafe(playerPos - transform.Position);
                 transform.Position += direction * ai.MoveSpeed * dt;
-                transform.Rotation = quaternion.LookRotation(direction, math.up());
+                if (!direction.Equals(float3.zero))
+                    transform.Rotation = quaternion.LookRotation(direction, math.up());
             }
 
             // Attack when in range and cooldown expired
