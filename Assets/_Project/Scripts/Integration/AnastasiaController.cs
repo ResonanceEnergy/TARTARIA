@@ -116,6 +116,10 @@ namespace Tartaria.Integration
         // Proximity
         Collider[] _proximityBuffer = new Collider[8];
 
+        // Cached component references
+        Renderer[] _cachedRenderers;
+        Rigidbody _cachedPlayerRb;
+
         // Golden Motes (13-bit packed into ushort)
         ushort _motesCollected;
 
@@ -166,8 +170,10 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if (Instance == this) Instance = null;
         }
 
         void Update()
@@ -332,8 +338,8 @@ namespace Tartaria.Integration
                 opacityLerpSpeed * Time.deltaTime);
 
             // Apply to renderers (particle system alpha, mesh alpha, etc.)
-            var renderers = GetComponentsInChildren<Renderer>();
-            foreach (var r in renderers)
+            if (_cachedRenderers == null) return;
+            foreach (var r in _cachedRenderers)
             {
                 if (r.material.HasProperty("_BaseColor"))
                 {
@@ -363,10 +369,8 @@ namespace Tartaria.Integration
         bool IsPlayerIdle()
         {
             if (_playerTransform == null) return false;
-            // Check velocity via Rigidbody if available, otherwise position delta
-            var rb = _playerTransform.GetComponent<Rigidbody>();
-            if (rb != null)
-                return rb.linearVelocity.magnitude < 1.5f;
+            if (_cachedPlayerRb != null)
+                return _cachedPlayerRb.linearVelocity.magnitude < 1.5f;
             return true; // Conservative: assume idle if no rigidbody
         }
 
@@ -388,6 +392,9 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(2f);
 
             _hasManifested = true;
+            _cachedRenderers = GetComponentsInChildren<Renderer>();
+            if (_playerTransform != null)
+                _cachedPlayerRb = _playerTransform.GetComponent<Rigidbody>();
 
             // Position 10 meters from player
             if (_playerTransform != null)

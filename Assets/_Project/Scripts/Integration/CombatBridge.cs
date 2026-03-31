@@ -259,8 +259,9 @@ namespace Tartaria.Integration
             }
 
             // Update HUD with player health-as-aether
+            float maxAether = Mathf.Max(combatant.MaxAetherCharge, 1f);
             UI.HUDController.Instance?.UpdateAetherCharge(
-                combatant.AetherCharge / combatant.MaxAetherCharge * 100f);
+                combatant.AetherCharge / maxAether * 100f);
         }
 
         // ─── Damage Helpers ──────────────────────────
@@ -441,8 +442,10 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            if (_enemyQuery.IsValid) _enemyQuery.Dispose();
             if (_initialized && _world != null && _world.IsCreated && _em.Exists(_playerCombatEntity))
                 _em.DestroyEntity(_playerCombatEntity);
+            if (Instance == this) Instance = null;
         }
     }
 }
