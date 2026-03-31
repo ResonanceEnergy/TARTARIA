@@ -214,6 +214,7 @@ namespace Tartaria.Integration
             if (state != AirshipState.InFlight && state != AirshipState.Transporting) return false;
 
             _ships[shipIndex].state = AirshipState.Idle;
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.ReachAirshipDestination, _ships[shipIndex].shipId);
             return true;
         }
 

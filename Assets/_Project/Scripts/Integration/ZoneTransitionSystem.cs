@@ -117,39 +117,50 @@ namespace Tartaria.Integration
             var prevState = GameStateManager.Instance.CurrentState;
             GameStateManager.Instance.TransitionTo(GameState.Loading);
 
-            // Fade out
-            UIManager.Instance?.UpdateLoadingProgress(0f, targetZone.loadingTip);
-            yield return FadeScreen(1f, fadeOutDuration);
+            bool success = false;
+            try
+            {
+                // Fade out
+                UIManager.Instance?.UpdateLoadingProgress(0f, targetZone.loadingTip);
+                yield return FadeScreen(1f, fadeOutDuration);
 
-            // Auto-save before zone switch
-            SaveManager.Instance?.MarkDirty();
+                // Auto-save before zone switch
+                SaveManager.Instance?.MarkDirty();
 
-            float loadStart = Time.realtimeSinceStartup;
+                float loadStart = Time.realtimeSinceStartup;
 
-            // Unload current zone
-            if (_currentZoneIndex >= 0 && CurrentZone != null)
-                UnloadZone(_currentZoneIndex);
+                // Unload current zone
+                if (_currentZoneIndex >= 0 && CurrentZone != null)
+                    UnloadZone(_currentZoneIndex);
 
-            // Load new zone
-            LoadZone(targetZoneIndex);
-            UIManager.Instance?.UpdateLoadingProgress(0.5f, targetZone.loadingTip);
+                // Load new zone
+                LoadZone(targetZoneIndex);
+                UIManager.Instance?.UpdateLoadingProgress(0.5f, targetZone.loadingTip);
 
-            // Ensure minimum loading time (so tip is readable)
-            float elapsed = Time.realtimeSinceStartup - loadStart;
-            if (elapsed < minimumLoadingTime)
-                yield return new WaitForSecondsRealtime(minimumLoadingTime - elapsed);
+                // Ensure minimum loading time (so tip is readable)
+                float elapsed = Time.realtimeSinceStartup - loadStart;
+                if (elapsed < minimumLoadingTime)
+                    yield return new WaitForSecondsRealtime(minimumLoadingTime - elapsed);
 
-            UIManager.Instance?.UpdateLoadingProgress(1f);
+                UIManager.Instance?.UpdateLoadingProgress(1f);
 
-            // Fade in
-            yield return FadeScreen(0f, fadeInDuration);
+                // Fade in
+                yield return FadeScreen(0f, fadeInDuration);
 
-            // Return to exploration
-            GameStateManager.Instance.TransitionTo(GameState.Exploration);
-            _transitioning = false;
+                success = true;
+            }
+            finally
+            {
+                _transitioning = false;
+                // Return to exploration
+                GameStateManager.Instance.TransitionTo(GameState.Exploration);
+            }
 
-            // Show zone subtitle + lore intro + haptic
-            ShowZoneSubtitle(targetZone);
+            if (success)
+            {
+                // Show zone subtitle + lore intro + haptic
+                ShowZoneSubtitle(targetZone);
+            }
         }
 
         void LoadZone(int index)

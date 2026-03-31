@@ -65,9 +65,19 @@ namespace Tartaria.Integration
             if (!_states.TryGetValue(companionId, out var state)) return;
             if (!state.unlocked) return;
 
+            float oldTrust = state.trustLevel;
             state.trustLevel = Mathf.Clamp(state.trustLevel + amount, 0f, 100f);
             _states[companionId] = state;
             OnTrustChanged?.Invoke(companionId, state.trustLevel);
+
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.RaiseCompanionTrust, companionId);
+
+            // Check milestone boundaries (25/50/75/100)
+            foreach (float milestone in new[] { 25f, 50f, 75f, 100f })
+            {
+                if (oldTrust < milestone && state.trustLevel >= milestone)
+                    QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, companionId);
+            }
         }
 
         /// <summary>

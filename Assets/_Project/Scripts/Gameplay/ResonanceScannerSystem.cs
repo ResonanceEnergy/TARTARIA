@@ -175,20 +175,22 @@ namespace Tartaria.Gameplay
             direction = Vector3.zero;
             strength = 0f;
 
+            var player = GameObject.FindWithTag("Player");
+            if (player == null) return false;
+
+            Vector3 playerPos = player.transform.position;
+
             foreach (var poi in _registeredPOIs)
             {
                 if (poi.isRevealed) continue;
 
-                var player = GameObject.FindWithTag("Player");
-                if (player == null) continue;
-
-                float dist = Vector3.Distance(player.transform.position, poi.position);
+                float dist = Vector3.Distance(playerPos, poi.position);
                 float sig = 1f / Mathf.Max(dist, 1f);
 
                 if (sig > strength)
                 {
                     strength = sig;
-                    direction = (poi.position - player.transform.position).normalized;
+                    direction = (poi.position - playerPos).normalized;
                 }
             }
 

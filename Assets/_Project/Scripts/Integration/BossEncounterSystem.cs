@@ -357,6 +357,7 @@ namespace Tartaria.Integration
             };
 
             OnBossDefeated?.Invoke(result);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.DefeatBoss, _currentBoss.bossName);
             Debug.Log($"[Boss] {_currentBoss.bossName} DEFEATED! Score: {performanceScore:P0}, RS: {rsReward:F0}");
 
             // Restore ley lines severed during fight
