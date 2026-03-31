@@ -220,7 +220,16 @@ namespace Tartaria.UI
             if (_sceneCacheTimer >= SCENE_CACHE_INTERVAL || _cachedSceneObjects.Length == 0)
             {
                 _sceneCacheTimer = 0f;
-                _cachedSceneObjects = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+                var all = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+                // Filter to only objects implementing ICorruptionWeakPoint to avoid caching entire scene
+                int count = 0;
+                foreach (var obj in all)
+                    if (obj is ICorruptionWeakPoint) count++;
+                var filtered = new MonoBehaviour[count];
+                int idx = 0;
+                foreach (var obj in all)
+                    if (obj is ICorruptionWeakPoint) filtered[idx++] = obj;
+                _cachedSceneObjects = filtered;
             }
         }
 
