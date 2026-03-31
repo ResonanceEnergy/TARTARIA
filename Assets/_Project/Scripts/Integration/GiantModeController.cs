@@ -49,6 +49,9 @@ namespace Tartaria.Integration
         Transform _liftedBuilding;
         float _aetherCharge;
 
+        // Pre-allocated buffer for Physics.OverlapSphereNonAlloc
+        static readonly Collider[] _overlapBuffer = new Collider[32];
+
         public bool IsGiant => _isGiant;
         public GiantAbility ActiveAbility => _activeAbility;
 
@@ -160,10 +163,10 @@ namespace Tartaria.Integration
 
             _activeAbility = GiantAbility.PrecisionRockCut;
 
-            var colliders = Physics.OverlapSphere(targetPoint, rockCutRange);
-            foreach (var col in colliders)
+            int count = Physics.OverlapSphereNonAlloc(targetPoint, rockCutRange, _overlapBuffer);
+            for (int i = 0; i < count; i++)
             {
-                var building = col.GetComponent<InteractableBuilding>();
+                var building = _overlapBuffer[i].GetComponent<InteractableBuilding>();
                 if (building != null)
                 {
                     // Apply corruption removal
@@ -189,11 +192,12 @@ namespace Tartaria.Integration
 
             _activeAbility = GiantAbility.RubbleClear;
 
-            var colliders = Physics.OverlapSphere(playerTransform.position, rubbleClearRadius);
+            int count = Physics.OverlapSphereNonAlloc(playerTransform.position, rubbleClearRadius, _overlapBuffer);
             int cleared = 0;
 
-            foreach (var col in colliders)
+            for (int i = 0; i < count; i++)
             {
+                var col = _overlapBuffer[i];
                 if (col.CompareTag("Rubble"))
                 {
                     // Launch rubble away with force
@@ -225,10 +229,10 @@ namespace Tartaria.Integration
 
             _activeAbility = GiantAbility.BuildingLift;
 
-            var colliders = Physics.OverlapSphere(targetPoint, buildingLiftRange);
-            foreach (var col in colliders)
+            int count = Physics.OverlapSphereNonAlloc(targetPoint, buildingLiftRange, _overlapBuffer);
+            for (int i = 0; i < count; i++)
             {
-                var building = col.GetComponent<InteractableBuilding>();
+                var building = _overlapBuffer[i].GetComponent<InteractableBuilding>();
                 if (building != null && building.State == BuildingRestorationState.Active)
                 {
                     _liftedBuilding = building.transform;
