@@ -51,6 +51,7 @@ namespace Tartaria.Integration
         // Enemy tracking for state transitions
         int _activeEnemyCount;
         bool _inCombat;
+        float _playerLookupRetryTimer;
 
         void Awake()
         {
@@ -100,11 +101,16 @@ namespace Tartaria.Integration
             // Re-init if ECS world was rebuilt (e.g., scene reload)
             if (_world == null || !_world.IsCreated) { _initialized = false; return; }
 
-            // Retry player transform lookup if it failed during init
+            // Retry player transform lookup if it failed during init (throttled)
             if (_playerTransform == null)
             {
-                var playerObj = GameObject.FindWithTag("Player");
-                if (playerObj != null) _playerTransform = playerObj.transform;
+                _playerLookupRetryTimer -= Time.deltaTime;
+                if (_playerLookupRetryTimer <= 0f)
+                {
+                    _playerLookupRetryTimer = 0.5f;
+                    var playerObj = GameObject.FindWithTag("Player");
+                    if (playerObj != null) _playerTransform = playerObj.transform;
+                }
             }
 
             // Re-create enemy query if it went stale
@@ -218,8 +224,7 @@ namespace Tartaria.Integration
             if (count > 0 && !_inCombat)
             {
                 _inCombat = true;
-                if (GameStateManager.Instance.CurrentState == GameState.Exploration)
-                    GameStateManager.Instance.TransitionTo(GameState.Combat);
+                GameStateManager.Instance?.TransitionTo(GameState.Combat);
             }
             else if (count == 0 && _inCombat)
             {
@@ -229,9 +234,9 @@ namespace Tartaria.Integration
                     GameLoopController.Instance?.OnEnemyDefeated(deathPos);
             }
 
-            if (anyEnemyDied && count > 0)
+            if (anyEnemyDied)
             {
-                // Enemy died but combat continues
+                // Death feedback for any enemy kill (including the last one)
                 HapticFeedbackManager.Instance?.PlayGolemDeath();
                 VFXController.Instance?.PlayEnemyDissolution(deathPos);
             }

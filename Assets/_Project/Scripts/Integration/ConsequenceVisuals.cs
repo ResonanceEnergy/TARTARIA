@@ -57,12 +57,20 @@ namespace Tartaria.Integration
             var wc = WorldChoiceTracker.Instance;
             if (wc == null) return;
 
+            wc.OnChoiceMade += OnWorldChoiceChanged;
+
             foreach (var def in wc.Definitions)
             {
                 var opt = wc.GetChoice(def.id);
                 if (opt != WorldChoiceTracker.ChoiceOption.NotChosen)
                     OnWorldChoiceChanged(def.id, opt);
             }
+        }
+
+        void OnDestroy()
+        {
+            if (WorldChoiceTracker.Instance != null)
+                WorldChoiceTracker.Instance.OnChoiceMade -= OnWorldChoiceChanged;
         }
 
         /// <summary>

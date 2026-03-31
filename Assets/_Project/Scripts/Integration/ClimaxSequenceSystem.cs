@@ -111,49 +111,54 @@ namespace Tartaria.Integration
             // Phase 0: Transition to Cinematic
             GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
 
-            foreach (var beat in def.beats)
+            try
             {
-                switch (beat.type)
+                foreach (var beat in def.beats)
                 {
-                    case ClimaxBeatType.Dialogue:
-                        yield return RunDialogueBeat(beat);
-                        break;
+                    switch (beat.type)
+                    {
+                        case ClimaxBeatType.Dialogue:
+                            yield return RunDialogueBeat(beat);
+                            break;
 
-                    case ClimaxBeatType.CameraPan:
-                        yield return RunCameraBeat(beat);
-                        break;
+                        case ClimaxBeatType.CameraPan:
+                            yield return RunCameraBeat(beat);
+                            break;
 
-                    case ClimaxBeatType.CombatWave:
-                        yield return RunCombatBeat(beat);
-                        break;
+                        case ClimaxBeatType.CombatWave:
+                            yield return RunCombatBeat(beat);
+                            break;
 
-                    case ClimaxBeatType.VFXBurst:
-                        yield return RunVFXBeat(beat);
-                        break;
+                        case ClimaxBeatType.VFXBurst:
+                            yield return RunVFXBeat(beat);
+                            break;
 
-                    case ClimaxBeatType.EnvironmentShift:
-                        yield return RunEnvironmentBeat(beat);
-                        break;
+                        case ClimaxBeatType.EnvironmentShift:
+                            yield return RunEnvironmentBeat(beat);
+                            break;
 
-                    case ClimaxBeatType.RSReward:
-                        yield return RunRSRewardBeat(beat);
-                        break;
+                        case ClimaxBeatType.RSReward:
+                            yield return RunRSRewardBeat(beat);
+                            break;
 
-                    case ClimaxBeatType.Wait:
-                        yield return new WaitForSeconds(beat.duration);
-                        break;
+                        case ClimaxBeatType.Wait:
+                            yield return new WaitForSeconds(beat.duration);
+                            break;
 
-                    default:
-                        Debug.LogWarning($"[ClimaxSequence] Unhandled beat type: {beat.type}");
-                        break;
+                        default:
+                            Debug.LogWarning($"[ClimaxSequence] Unhandled beat type: {beat.type}");
+                            break;
+                    }
+
+                    // Pause between beats (per-beat override or default)
+                    float pause = beat.pauseAfter > 0 ? beat.pauseAfter : beatPauseDuration;
+                    yield return new WaitForSeconds(pause);
                 }
-
-                // Pause between beats (per-beat override or default)
-                float pause = beat.pauseAfter > 0 ? beat.pauseAfter : beatPauseDuration;
-                yield return new WaitForSeconds(pause);
             }
-
-            FinishClimax();
+            finally
+            {
+                FinishClimax();
+            }
         }
 
         IEnumerator RunDialogueBeat(ClimaxBeat beat)

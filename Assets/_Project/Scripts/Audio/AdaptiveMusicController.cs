@@ -235,27 +235,34 @@ namespace Tartaria.Audio
             int sr = 44100;
             int samples = sr * 8; // 8-second loops
 
-            _layer0Ambient.clip = GenTone(samples, sr, _zoneBaseFreq * 0.25f, 0.15f, WaveShape.Sine);
+            AssignClip(_layer0Ambient, GenTone(samples, sr, _zoneBaseFreq * 0.25f, 0.15f, WaveShape.Sine));
 
-            _layer1Melodic.clip = GenChord(samples, sr,
-                new[] { _zoneBaseFreq, _zoneBaseFreq * 5f / 4f }, 0.1f);
+            AssignClip(_layer1Melodic, GenChord(samples, sr,
+                new[] { _zoneBaseFreq, _zoneBaseFreq * 5f / 4f }, 0.1f));
 
-            _layer2Orchestral.clip = GenChord(samples, sr,
+            AssignClip(_layer2Orchestral, GenChord(samples, sr,
                 new[] { _zoneBaseFreq, _zoneBaseFreq * 5f / 4f,
-                        _zoneBaseFreq * 3f / 2f, _zoneBaseFreq * 2f }, 0.08f);
+                        _zoneBaseFreq * 3f / 2f, _zoneBaseFreq * 2f }, 0.08f));
 
-            _layer3Triumphant.clip = GenChord(samples, sr,
+            AssignClip(_layer3Triumphant, GenChord(samples, sr,
                 new[] { _zoneBaseFreq, _zoneBaseFreq * GoldenRatioValidator.PHI,
                         _zoneBaseFreq * 2f, _zoneBaseFreq * GoldenRatioValidator.PHI * 2f,
-                        528f, 1296f }, 0.05f);
+                        528f, 1296f }, 0.05f));
 
-            _combatOverlay.clip = GenTone(samples, sr, 80f, 0.2f, WaveShape.Square);
+            AssignClip(_combatOverlay, GenTone(samples, sr, 80f, 0.2f, WaveShape.Square));
 
-            _bossOverlay.clip = GenChord(samples, sr,
-                new[] { 180f, 180f * Mathf.Sqrt(2f) }, 0.12f);
+            AssignClip(_bossOverlay, GenChord(samples, sr,
+                new[] { 180f, 180f * Mathf.Sqrt(2f) }, 0.12f));
 
             // Schumann resonance: 7.83 Hz AM-modulated onto audible carrier (313.2 Hz = 7.83 * 40)
-            _schumannLayer.clip = GenSchumannTone(samples, sr, 7.83f, 313.2f, 0.08f);
+            AssignClip(_schumannLayer, GenSchumannTone(samples, sr, 7.83f, 313.2f, 0.08f));
+        }
+
+        void AssignClip(AudioSource source, AudioClip newClip)
+        {
+            if (source == null) return;
+            if (source.clip != null) Destroy(source.clip);
+            source.clip = newClip;
         }
 
         AudioClip GenTone(int samples, int sr, float freq, float amp, WaveShape shape)
