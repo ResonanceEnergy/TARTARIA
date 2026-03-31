@@ -65,6 +65,15 @@ namespace Tartaria.Integration
             _solidity = 0.1f;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+                if (ServiceLocator.Lirael == (object)this) ServiceLocator.Lirael = null;
+            }
+        }
+
         // ─── Public API ──────────────────────────────
 
         /// <summary>Trigger Lirael's introduction at the first Aether node.</summary>

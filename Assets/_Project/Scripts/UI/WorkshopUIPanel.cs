@@ -45,6 +45,7 @@ namespace Tartaria.UI
 
         readonly List<BuildingDisplayData> _buildings = new();
         readonly Dictionary<string, GameObject> _entryObjects = new();
+        readonly List<GameObject> _entryPool = new();
         string _selectedBuildingId;
         bool _isOpen;
 
@@ -118,38 +119,56 @@ namespace Tartaria.UI
 
         void RebuildList()
         {
-            // Clear old entries
+            // Deactivate all pooled entries
             foreach (var kvp in _entryObjects)
             {
-                if (kvp.Value != null) Destroy(kvp.Value);
+                if (kvp.Value != null) kvp.Value.SetActive(false);
             }
             _entryObjects.Clear();
 
             if (buildingListContainer == null || buildingEntryPrefab == null) return;
 
+            int poolIdx = 0;
             foreach (var data in _buildings)
             {
-                var entry = Instantiate(buildingEntryPrefab, buildingListContainer);
-                entry.SetActive(true);
+                GameObject entry;
+                if (poolIdx < _entryPool.Count && _entryPool[poolIdx] != null)
+                {
+                    entry = _entryPool[poolIdx];
+                    entry.SetActive(true);
+                }
+                else
+                {
+                    entry = Instantiate(buildingEntryPrefab, buildingListContainer);
+                    if (poolIdx < _entryPool.Count)
+                        _entryPool[poolIdx] = entry;
+                    else
+                        _entryPool.Add(entry);
+                }
+                poolIdx++;
 
-                // Configure entry text
-                var label = entry.GetComponentInChildren<TMPro.TextMeshProUGUI>();
-                if (label != null)
-                    label.text = $"{data.buildingName}  [Tier {data.currentTier}]";
-
-                // Color by state
-                var img = entry.GetComponent<Image>();
-                if (img != null)
-                    img.color = data.isMaxTier ? maxTierColor : (data.canUpgrade ? canUpgradeColor : cannotUpgradeColor);
-
-                // Click handler
-                var btn = entry.GetComponent<Button>();
-                if (btn == null) btn = entry.AddComponent<Button>();
-                string capturedId = data.buildingId;
-                btn.onClick.AddListener(() => SelectBuilding(capturedId));
-
+                UpdateEntryVisuals(entry, data);
                 _entryObjects[data.buildingId] = entry;
             }
+        }
+
+        void UpdateEntryVisuals(GameObject entry, BuildingDisplayData data)
+        {
+            entry.SetActive(true);
+
+            var label = entry.GetComponentInChildren<TMPro.TextMeshProUGUI>();
+            if (label != null)
+                label.text = $"{data.buildingName}  [Tier {data.currentTier}]";
+
+            var img = entry.GetComponent<Image>();
+            if (img != null)
+                img.color = data.isMaxTier ? maxTierColor : (data.canUpgrade ? canUpgradeColor : cannotUpgradeColor);
+
+            var btn = entry.GetComponent<Button>();
+            if (btn == null) btn = entry.AddComponent<Button>();
+            btn.onClick.RemoveAllListeners();
+            string capturedId = data.buildingId;
+            btn.onClick.AddListener(() => SelectBuilding(capturedId));
         }
 
         void SelectBuilding(string buildingId)

@@ -66,6 +66,11 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Start()
         {
             // Initialize towers to random frequencies (detuned)

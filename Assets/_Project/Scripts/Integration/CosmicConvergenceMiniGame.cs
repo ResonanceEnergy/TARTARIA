@@ -67,12 +67,24 @@ namespace Tartaria.Integration
         public event Action<float> OnConvergenceComplete;              // final score
         public event Action OnConvergenceFailed;
 
+        // ─── Stored delegates for unsubscription ────
+        Action _bellHandler;
+        Action _leyHandler;
+        Action _aquiferHandler;
+        Action _fleetHandler;
+
         // ─── Lifecycle ───────────────────────────────
 
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+        }
+
+        void OnDestroy()
+        {
+            UnsubscribePhaseHandlers();
+            if (Instance == this) Instance = null;
         }
 
         void Update()
@@ -112,59 +124,69 @@ namespace Tartaria.Integration
 
         public void StopConvergence()
         {
+            UnsubscribePhaseHandlers();
             _miniGameActive = false;
             _currentPhase = ConvergencePhase.NotStarted;
             StopAllCoroutines();
+            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
         }
 
         // ─── Convergence Sequence ────────────────────
 
         IEnumerator ConvergenceSequence()
         {
-            // Phase 1: Bell Tower Cascade
-            yield return StartCoroutine(RunPhase(ConvergencePhase.BellTowerCascade));
+            try
+            {
+                // Phase 1: Bell Tower Cascade
+                yield return StartCoroutine(RunPhase(ConvergencePhase.BellTowerCascade));
 
-            // Phase 2: Prophecy Alignment
-            yield return StartCoroutine(RunPhase(ConvergencePhase.ProphecyAlignment));
+                // Phase 2: Prophecy Alignment
+                yield return StartCoroutine(RunPhase(ConvergencePhase.ProphecyAlignment));
 
-            // Phase 3: Aquifer Harmony
-            yield return StartCoroutine(RunPhase(ConvergencePhase.AquiferHarmony));
+                // Phase 3: Aquifer Harmony
+                yield return StartCoroutine(RunPhase(ConvergencePhase.AquiferHarmony));
 
-            // Phase 4: Fleet Formation
-            yield return StartCoroutine(RunPhase(ConvergencePhase.FleetFormation));
+                // Phase 4: Fleet Formation
+                yield return StartCoroutine(RunPhase(ConvergencePhase.FleetFormation));
 
-            // Phase 5: Rail Pulse
-            yield return StartCoroutine(RunPhase(ConvergencePhase.RailPulse));
+                // Phase 5: Rail Pulse
+                yield return StartCoroutine(RunPhase(ConvergencePhase.RailPulse));
 
-            // Phase 6: Final Tuning
-            yield return StartCoroutine(RunPhase(ConvergencePhase.FinalTuning));
+                // Phase 6: Final Tuning
+                yield return StartCoroutine(RunPhase(ConvergencePhase.FinalTuning));
 
-            // Calculate final score
-            float totalAccuracy = 0f;
-            for (int i = 0; i < TotalPhases; i++)
-                totalAccuracy += _phaseAccuracy[i];
-            _convergenceScore = totalAccuracy / TotalPhases;
+                // Calculate final score
+                float totalAccuracy = 0f;
+                for (int i = 0; i < TotalPhases; i++)
+                    totalAccuracy += _phaseAccuracy[i];
+                _convergenceScore = totalAccuracy / TotalPhases;
 
-            _currentPhase = ConvergencePhase.Complete;
-            _miniGameActive = false;
+                _currentPhase = ConvergencePhase.Complete;
+                _miniGameActive = false;
 
-            float totalReward = RSRewardCompletion * _convergenceScore;
-            GameLoopController.Instance?.OnMiniGameCompleted(totalReward, "cosmic_convergence");
-            AchievementSystem.Instance?.Unlock("M06");
+                float totalReward = RSRewardCompletion * _convergenceScore;
+                GameLoopController.Instance?.OnMiniGameCompleted(totalReward, "cosmic_convergence");
+                AchievementSystem.Instance?.Unlock("M06");
 
-            HUDController.Instance?.ShowInteractionPrompt(
-                $"COSMIC CONVERGENCE COMPLETE\nScore: {_convergenceScore:P0}");
+                HUDController.Instance?.ShowInteractionPrompt(
+                    $"COSMIC CONVERGENCE COMPLETE\nScore: {_convergenceScore:P0}");
 
-            OnConvergenceComplete?.Invoke(_convergenceScore);
+                OnConvergenceComplete?.Invoke(_convergenceScore);
 
-            if (_convergenceScore < 0.5f)
-                OnConvergenceFailed?.Invoke();
+                if (_convergenceScore < 0.5f)
+                    OnConvergenceFailed?.Invoke();
 
-            Debug.Log($"[CosmicConvergence] Complete! Score: {_convergenceScore:P0}");
+                Debug.Log($"[CosmicConvergence] Complete! Score: {_convergenceScore:P0}");
 
-            yield return new WaitForSeconds(5f);
-            HUDController.Instance?.HideInteractionPrompt();
-            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
+                yield return new WaitForSeconds(5f);
+                HUDController.Instance?.HideInteractionPrompt();
+            }
+            finally
+            {
+                UnsubscribePhaseHandlers();
+                _miniGameActive = false;
+                GameStateManager.Instance?.TransitionTo(GameState.Exploration);
+            }
         }
 
         IEnumerator RunPhase(ConvergencePhase phase)
@@ -194,15 +216,46 @@ namespace Tartaria.Integration
 
         // ─── Phase System Activation ─────────────────
 
+        void UnsubscribePhaseHandlers()
+        {
+            if (_bellHandler != null)
+            {
+                if (BellTowerSyncMiniGame.Instance != null)
+                    BellTowerSyncMiniGame.Instance.OnCascadeTriggered -= _bellHandler;
+                _bellHandler = null;
+            }
+            if (_leyHandler != null)
+            {
+                if (LeyLineProphecyMiniGame.Instance != null)
+                    LeyLineProphecyMiniGame.Instance.OnAllStonesComplete -= _leyHandler;
+                _leyHandler = null;
+            }
+            if (_aquiferHandler != null)
+            {
+                if (AquiferPurgeMiniGame.Instance != null)
+                    AquiferPurgeMiniGame.Instance.OnAllLayersPurged -= _aquiferHandler;
+                _aquiferHandler = null;
+            }
+            if (_fleetHandler != null)
+            {
+                if (AirshipFleetManager.Instance != null)
+                    AirshipFleetManager.Instance.OnFleetOperational -= _fleetHandler;
+                _fleetHandler = null;
+            }
+        }
+
         void ActivatePhaseSystem(ConvergencePhase phase)
         {
+            UnsubscribePhaseHandlers();
+
             switch (phase)
             {
                 case ConvergencePhase.BellTowerCascade:
                     var bells = BellTowerSyncMiniGame.Instance;
                     if (bells != null)
                     {
-                        bells.OnCascadeTriggered += () => CompleteCurrentPhase(1f);
+                        _bellHandler = () => CompleteCurrentPhase(1f);
+                        bells.OnCascadeTriggered += _bellHandler;
                         bells.StartMiniGame();
                     }
                     break;
@@ -211,7 +264,8 @@ namespace Tartaria.Integration
                     var ley = LeyLineProphecyMiniGame.Instance;
                     if (ley != null)
                     {
-                        ley.OnAllStonesComplete += () => CompleteCurrentPhase(1f);
+                        _leyHandler = () => CompleteCurrentPhase(1f);
+                        ley.OnAllStonesComplete += _leyHandler;
                         ley.StartMiniGame();
                     }
                     break;
@@ -220,7 +274,8 @@ namespace Tartaria.Integration
                     var aquifer = AquiferPurgeMiniGame.Instance;
                     if (aquifer != null)
                     {
-                        aquifer.OnAllLayersPurged += () => CompleteCurrentPhase(1f);
+                        _aquiferHandler = () => CompleteCurrentPhase(1f);
+                        aquifer.OnAllLayersPurged += _aquiferHandler;
                         aquifer.StartMiniGame();
                     }
                     break;
@@ -229,7 +284,8 @@ namespace Tartaria.Integration
                     var fleet = AirshipFleetManager.Instance;
                     if (fleet != null)
                     {
-                        fleet.OnFleetOperational += () => CompleteCurrentPhase(0.9f);
+                        _fleetHandler = () => CompleteCurrentPhase(0.9f);
+                        fleet.OnFleetOperational += _fleetHandler;
                     }
                     break;
 

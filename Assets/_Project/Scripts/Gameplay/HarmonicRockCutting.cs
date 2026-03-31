@@ -78,6 +78,11 @@ namespace Tartaria.Gameplay
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Start / Stop ────────────────────────────
 
         public void StartCutting(RockCuttingConfig config)

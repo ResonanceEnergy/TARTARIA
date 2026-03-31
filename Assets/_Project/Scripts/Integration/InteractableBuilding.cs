@@ -36,6 +36,10 @@ namespace Tartaria.Integration
         bool _isDiscovered;
         TuningMiniGameController _tuningController;
 
+        string _promptCache;
+        BuildingRestorationState _promptState = (BuildingRestorationState)(-1);
+        int _promptNodes = -1;
+
         public string BuildingId => buildingId;
         public BuildingRestorationState State => _state;
         public BuildingDefinition Definition => definition;
@@ -121,7 +125,12 @@ namespace Tartaria.Integration
 
         public string GetInteractPrompt()
         {
-            return _state switch
+            if (_state == _promptState && _nodesCompleted == _promptNodes)
+                return _promptCache;
+
+            _promptState = _state;
+            _promptNodes = _nodesCompleted;
+            _promptCache = _state switch
             {
                 BuildingRestorationState.Buried => "",
                 BuildingRestorationState.Revealed => $"[E] Tune {GetDisplayName()} (Node {_nodesCompleted + 1}/3)",
@@ -130,6 +139,7 @@ namespace Tartaria.Integration
                 BuildingRestorationState.Active => $"[E] Examine {GetDisplayName()}",
                 _ => ""
             };
+            return _promptCache;
         }
 
         // ─── Discovery ───────────────────────────────
