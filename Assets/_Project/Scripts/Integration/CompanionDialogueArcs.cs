@@ -203,7 +203,8 @@ namespace Tartaria.Integration
 
         public void LoadSaveData(DialogueArcSaveData data)
         {
-            if (data.companionIds != null)
+            if (data.companionIds != null && data.trustLevels != null &&
+                data.trustLevels.Length == data.companionIds.Length)
             {
                 for (int i = 0; i < data.companionIds.Length; i++)
                     _trust[(CompanionId)data.companionIds[i]] = (TrustLevel)data.trustLevels[i];

@@ -44,10 +44,13 @@ namespace Tartaria.Core
 
         /// <summary>
         /// Returns to the previous state (e.g., unpause → exploration).
+        /// Clears the previous state after use to prevent toggle oscillation.
         /// </summary>
         public void ReturnToPrevious()
         {
-            TransitionTo(PreviousState);
+            var target = PreviousState;
+            TransitionTo(target);
+            PreviousState = target; // Pin so double-call is a no-op
         }
 
         public bool IsPlaying =>

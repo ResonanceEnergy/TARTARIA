@@ -127,17 +127,39 @@ namespace Tartaria.UI
 
         void RebuildMap()
         {
+            var campaign = ServiceLocator.Campaign;
+            int currentMoon = campaign?.CurrentMoonIndex ?? 0;
+
+            // Create widgets once, then just refresh state on subsequent opens
+            if (_zoneWidgets.Count == 13)
+            {
+                RefreshWidgetStates(currentMoon);
+                return;
+            }
+
             foreach (var w in _zoneWidgets.Values)
                 if (w.go != null) Destroy(w.go);
             _zoneWidgets.Clear();
-
-            var campaign = ServiceLocator.Campaign;
-            int currentMoon = campaign?.CurrentMoonIndex ?? 0;
 
             for (int i = 0; i < 13; i++)
             {
                 var widget = CreateZoneNode(i, currentMoon);
                 _zoneWidgets[i] = widget;
+            }
+        }
+
+        void RefreshWidgetStates(int currentMoon)
+        {
+            for (int i = 0; i < 13; i++)
+            {
+                if (!_zoneWidgets.TryGetValue(i, out var widget)) continue;
+                ZoneState state;
+                if (i < currentMoon) state = ZoneState.Completed;
+                else if (i == currentMoon) state = ZoneState.Active;
+                else if (i == currentMoon + 1) state = ZoneState.Available;
+                else state = ZoneState.Locked;
+                widget.state = state;
+                ApplyNodeVisuals(widget, i, state);
             }
         }
 
@@ -191,7 +213,17 @@ namespace Tartaria.UI
                 widget.label.alignment = TextAlignmentOptions.Center;
             }
 
-            // Color by state
+            ApplyNodeVisuals(widget, index, state);
+
+            int zoneIndex = index;
+            var btn = widget.go.GetComponent<Button>();
+            btn?.onClick.AddListener(() => SelectZone(zoneIndex));
+
+            return widget;
+        }
+
+        void ApplyNodeVisuals(ZoneNodeWidget widget, int index, ZoneState state)
+        {
             if (widget.image != null)
             {
                 widget.image.color = state switch
@@ -202,12 +234,6 @@ namespace Tartaria.UI
                     _ => lockedColor
                 };
             }
-
-            int zoneIndex = index;
-            var btn = widget.go.GetComponent<Button>();
-            btn?.onClick.AddListener(() => SelectZone(zoneIndex));
-
-            return widget;
         }
 
         void PulseActiveZone()

@@ -140,7 +140,8 @@ namespace Tartaria.Integration
             if (data.completedSteps != null)
             {
                 foreach (var id in data.completedSteps)
-                    _completed.Add((TutorialStep)id);
+                    if (System.Enum.IsDefined(typeof(TutorialStep), id))
+                        _completed.Add((TutorialStep)id);
             }
             _currentIndex = data.currentIndex;
             _tutorialFinished = data.finished;

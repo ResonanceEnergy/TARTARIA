@@ -126,6 +126,10 @@ namespace Tartaria.Input
             _moveInput = _moveAction != null ? _moveAction.ReadValue<Vector2>() : Vector2.zero;
             _isSprinting = _sprintAction != null && _sprintAction.IsPressed();
 
+            // Refresh camera ref if lost (zone transition, cutscene swap)
+            if (_mainCamera == null)
+                _mainCamera = Camera.main;
+
             // Camera-relative movement
             if (_mainCamera != null && _moveInput.sqrMagnitude > 0.01f)
             {

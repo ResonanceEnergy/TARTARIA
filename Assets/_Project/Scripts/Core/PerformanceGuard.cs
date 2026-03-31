@@ -95,12 +95,15 @@ namespace Tartaria.Core
             // Track worst
             if (frameMs > _worstFrameMs) _worstFrameMs = frameMs;
 
+            // Tick alert cooldown regardless of budget status
+            if (_alertCooldown > 0f)
+                _alertCooldown -= Time.unscaledDeltaTime;
+
             // Budget check
             if (frameMs > targetFrameTimeMs)
             {
                 _budgetExceededCount++;
 
-                _alertCooldown -= Time.unscaledDeltaTime;
                 if (_alertCooldown <= 0f)
                 {
                     _alertCooldown = alertCooldownSeconds;
