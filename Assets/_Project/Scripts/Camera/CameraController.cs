@@ -51,6 +51,8 @@ namespace Tartaria.Camera
         float _currentYaw;
         float _targetFOV;
         float _zoomOffset;
+        Coroutine _closeUpCoroutine;
+        GameState _preCloseUpState;
 
         void Awake()
         {
@@ -63,6 +65,15 @@ namespace Tartaria.Camera
             _currentDistance = exploreDistance;
             _currentPitch = explorePitch;
             _targetFOV = exploreFOV;
+        }
+
+        void OnDestroy()
+        {
+            if (_closeUpCoroutine != null)
+            {
+                StopCoroutine(_closeUpCoroutine);
+                GameStateManager.Instance?.TransitionTo(_preCloseUpState);
+            }
         }
 
         void LateUpdate()
@@ -217,12 +228,12 @@ namespace Tartaria.Camera
         public void FocusOnPoint(Vector3 worldPoint, float duration = 2f)
         {
             // Will integrate with Cinemachine virtual cameras
-            StartCoroutine(CloseUpSequence(worldPoint, duration));
+            _closeUpCoroutine = StartCoroutine(CloseUpSequence(worldPoint, duration));
         }
 
         System.Collections.IEnumerator CloseUpSequence(Vector3 point, float duration)
         {
-            var previousState = GameStateManager.Instance.CurrentState;
+            _preCloseUpState = GameStateManager.Instance.CurrentState;
             GameStateManager.Instance.TransitionTo(GameState.Cinematic);
 
             float elapsed = 0f;
@@ -255,7 +266,8 @@ namespace Tartaria.Camera
                 yield return null;
             }
 
-            GameStateManager.Instance.TransitionTo(previousState);
+            GameStateManager.Instance.TransitionTo(_preCloseUpState);
+            _closeUpCoroutine = null;
         }
     }
 }

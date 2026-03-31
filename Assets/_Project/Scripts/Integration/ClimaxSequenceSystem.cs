@@ -63,6 +63,16 @@ namespace Tartaria.Integration
             RegisterClimax(Moon13Climax.Build());
         }
 
+        void OnDestroy()
+        {
+            if (_isPlaying)
+            {
+                if (_activeSequence != null) StopCoroutine(_activeSequence);
+                FinishClimax();
+            }
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Public API ──────────────────────────────
 
         /// <summary>

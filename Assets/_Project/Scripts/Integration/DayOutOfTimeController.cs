@@ -54,6 +54,16 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (_eventActive)
+            {
+                StopAllCoroutines();
+                _eventActive = false;
+            }
+            if (Instance == this) Instance = null;
+        }
+
         /// <summary>
         /// Check if DotT can be triggered (all 13 motes collected + Moon 13 complete).
         /// </summary>
