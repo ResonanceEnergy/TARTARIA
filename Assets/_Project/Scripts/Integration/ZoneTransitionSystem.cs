@@ -44,6 +44,8 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            StopAllCoroutines();
+            _transitioning = false;
             if (Instance == this) Instance = null;
         }
 

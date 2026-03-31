@@ -364,6 +364,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             if (Instance == this) Instance = null;
             if (_rsQuery.IsValid) _rsQuery.Dispose();
             if (_playerQuery.IsValid) _playerQuery.Dispose();
@@ -1149,7 +1150,7 @@ namespace Tartaria.Integration
             HUDController.Instance?.HideInteractionPrompt();
 
             // Return to exploration — in full game this would advance to next zone
-            GameStateManager.Instance.TransitionTo(GameState.Exploration);
+            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
             Debug.Log("[GameLoop] Zone victory sequence complete. Vertical slice finished!");
         }

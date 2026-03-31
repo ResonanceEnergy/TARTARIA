@@ -67,6 +67,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             if (_tuningController != null)
             {
                 _tuningController.OnTuningComplete -= OnTuningComplete;
