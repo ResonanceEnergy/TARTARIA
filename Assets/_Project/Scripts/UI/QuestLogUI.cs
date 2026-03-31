@@ -377,6 +377,11 @@ namespace Tartaria.UI
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             // Process pending queue
