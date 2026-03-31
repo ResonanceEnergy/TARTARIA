@@ -43,6 +43,11 @@ namespace Tartaria.Integration
             BuildLibrary();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Public API ──────────────────────────────
 
         /// <summary>Play an effect at a world position.</summary>

@@ -253,6 +253,12 @@ namespace Tartaria.Core
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (_leyLineQuery.IsValid) _leyLineQuery.Dispose();
+            if (Instance == this) Instance = null;
+        }
+
         /// <summary>
         /// Register a ley line node (called during zone setup).
         /// </summary>
