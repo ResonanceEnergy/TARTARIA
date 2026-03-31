@@ -43,6 +43,7 @@ namespace Tartaria.Editor
                     existing.rsReward = quest.rsReward;
                     existing.objectives = quest.objectives;
                     existing.followUpQuestIds = quest.followUpQuestIds;
+                    Object.DestroyImmediate(quest);
                     updated++;
                 }
                 else
