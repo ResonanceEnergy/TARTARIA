@@ -35,6 +35,11 @@ namespace Tartaria.Gameplay
             BuildNodeLookup();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void BuildNodeLookup()
         {
             _nodeLookup.Clear();

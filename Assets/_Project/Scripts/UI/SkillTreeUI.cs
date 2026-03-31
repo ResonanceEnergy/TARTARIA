@@ -89,6 +89,7 @@ namespace Tartaria.UI
 
         void OnDestroy()
         {
+            if (Instance == this) Instance = null;
             if (SkillTreeSystem.Instance != null)
                 SkillTreeSystem.Instance.OnSkillUnlocked -= HandleSkillUnlocked;
         }

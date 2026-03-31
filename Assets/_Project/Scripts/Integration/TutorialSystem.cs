@@ -47,6 +47,11 @@ namespace Tartaria.Integration
             BuildSteps();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Start()
         {
             if (!_tutorialFinished)

@@ -49,6 +49,11 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Start()
         {
             // Find all buildings in zone

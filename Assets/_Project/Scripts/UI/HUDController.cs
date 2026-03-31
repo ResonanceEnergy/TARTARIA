@@ -111,6 +111,7 @@ namespace Tartaria.UI
 
         void OnDestroy()
         {
+            if (Instance == this) Instance = null;
             if (AccessibilityManager.Instance != null)
                 AccessibilityManager.Instance.OnSettingsChanged -= HandleAccessibilityChanged;
         }

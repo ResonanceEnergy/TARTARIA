@@ -30,6 +30,11 @@ namespace Tartaria.Core
             _resonanceScore = startingRS;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         public void AddResonanceScore(float amount)
         {
             _resonanceScore = Mathf.Clamp(_resonanceScore + amount, 0f, 100f);

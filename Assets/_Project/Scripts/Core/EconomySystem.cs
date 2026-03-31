@@ -60,6 +60,11 @@ namespace Tartaria.Core
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             _incomeTimer += Time.deltaTime;

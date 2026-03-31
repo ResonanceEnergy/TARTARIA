@@ -41,6 +41,11 @@ namespace Tartaria.Integration
             BuildDatabase();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Public API ──────────────────────────────
 
         /// <summary>

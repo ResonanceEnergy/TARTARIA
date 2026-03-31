@@ -63,6 +63,11 @@ namespace Tartaria.Input
             _mainCamera = Camera.main;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void OnEnable()
         {
             SetupInputActions();

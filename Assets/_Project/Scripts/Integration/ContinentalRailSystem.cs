@@ -94,6 +94,11 @@ namespace Tartaria.Integration
             BuildDefaultNetwork();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             if (_trainActive)

@@ -66,6 +66,11 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Named Boss Lookup ────────────────────────
         static readonly Dictionary<string, int> NamedBossLookup = new()
         {

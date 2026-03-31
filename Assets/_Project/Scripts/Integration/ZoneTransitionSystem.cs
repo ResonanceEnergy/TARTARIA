@@ -42,6 +42,11 @@ namespace Tartaria.Integration
             ServiceLocator.ZoneTransition = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Start()
         {
             if (zones != null && zones.Length > 0)
