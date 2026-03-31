@@ -142,7 +142,8 @@ namespace Tartaria.Core
             if (!node.Active)
             {
                 // Inactive nodes slowly recover if not severed
-                node.Strength = math.max(0f, node.Strength - Config.CorruptionDamageRate * DeltaTime);
+                node.Strength = math.min(node.NaturalStrength,
+                    node.Strength + Config.RepairRate * DeltaTime);
                 if (node.Strength >= Config.NodeActivationThreshold)
                     node.Active = true;
                 return;
