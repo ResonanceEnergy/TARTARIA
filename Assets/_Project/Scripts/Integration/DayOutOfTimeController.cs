@@ -130,6 +130,7 @@ namespace Tartaria.Integration
                     ana.TriggerSolidification();
                     // Wait for solidification to complete (~30s based on AnastasiaController)
                     yield return new WaitUntil(() =>
+                        ana == null ||
                         ana.CurrentSolidPhase == SolidificationPhase.Return ||
                         ana.CurrentSolidPhase == SolidificationPhase.NotTriggered);
                     yield return new WaitForSeconds(5f);
@@ -195,12 +196,12 @@ namespace Tartaria.Integration
 
             // Scroll corridor — memoryCorridorSpeed controls transition rate
             float elapsed = 0f;
+            var cam = UnityEngine.Camera.main;
             while (elapsed < zoneDuration)
             {
                 elapsed += Time.deltaTime;
                 _eventTimer += Time.deltaTime;
                 // Advance camera through corridor at configured speed
-                var cam = UnityEngine.Camera.main;
                 if (cam != null)
                     cam.transform.Translate(Vector3.forward * memoryCorridorSpeed * Time.deltaTime, Space.Self);
                 yield return null;
