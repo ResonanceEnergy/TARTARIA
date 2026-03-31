@@ -119,7 +119,6 @@ namespace Tartaria.UI
 
         void RefreshList()
         {
-            ClearListItems();
             _entries.Clear();
 
             var qp = QuestProviderLocator.Current;
@@ -133,18 +132,39 @@ namespace Tartaria.UI
             {
                 case QuestLogTab.Active:
                     foreach (var id in activeIds)
-                        AddEntry(qp, id, false);
+                        AddEntryData(qp, id, false);
                     break;
                 case QuestLogTab.Completed:
                     foreach (var id in completedIds)
-                        AddEntry(qp, id, true);
+                        AddEntryData(qp, id, true);
                     break;
                 case QuestLogTab.All:
                     foreach (var id in activeIds)
-                        AddEntry(qp, id, false);
+                        AddEntryData(qp, id, false);
                     foreach (var id in completedIds)
-                        AddEntry(qp, id, true);
+                        AddEntryData(qp, id, true);
                     break;
+            }
+
+            // Pool: reuse existing GameObjects, create only if needed, hide excess
+            for (int i = 0; i < _entries.Count; i++)
+            {
+                GameObject go;
+                if (i < _listItems.Count)
+                {
+                    go = _listItems[i];
+                    go.SetActive(true);
+                }
+                else
+                {
+                    go = CreateListEntry(_entries[i]);
+                    _listItems.Add(go);
+                }
+                UpdateListEntry(go, _entries[i]);
+            }
+            for (int i = _entries.Count; i < _listItems.Count; i++)
+            {
+                if (_listItems[i] != null) _listItems[i].SetActive(false);
             }
 
             // Auto-select first entry
@@ -154,24 +174,36 @@ namespace Tartaria.UI
                 ShowDetail(_selectedQuestId);
         }
 
-        void AddEntry(IQuestProvider qp, string questId, bool completed)
+        void AddEntryData(IQuestProvider qp, string questId, bool completed)
         {
-            var state = qp.GetQuestState(questId);
             var def = qp.GetQuestDefinition(questId);
             if (def == null) return;
 
-            var data = new QuestEntryData
+            _entries.Add(new QuestEntryData
             {
                 questId = questId,
                 displayName = def.displayName,
                 isMain = def.isMainQuest,
                 completed = completed
-            };
-            _entries.Add(data);
+            });
+        }
 
-            // Create UI row
-            var go = CreateListEntry(data);
-            _listItems.Add(go);
+        void UpdateListEntry(GameObject go, QuestEntryData data)
+        {
+            var txt = go.GetComponentInChildren<TextMeshProUGUI>();
+            if (txt != null)
+            {
+                string prefix = data.isMain ? "[MAIN] " : "";
+                string suffix = data.completed ? " <color=#888>DONE</color>" : "";
+                txt.text = $"{prefix}{data.displayName}{suffix}";
+            }
+            var btn = go.GetComponent<Button>();
+            if (btn != null)
+            {
+                btn.onClick.RemoveAllListeners();
+                string capturedId = data.questId;
+                btn.onClick.AddListener(() => SelectQuest(capturedId));
+            }
         }
 
         GameObject CreateListEntry(QuestEntryData data)
@@ -187,7 +219,7 @@ namespace Tartaria.UI
                 if (questListContent != null) go.transform.SetParent(questListContent, false);
             }
 
-            // Label
+            // Ensure label exists
             var txt = go.GetComponentInChildren<TextMeshProUGUI>();
             if (txt == null)
             {
@@ -196,15 +228,8 @@ namespace Tartaria.UI
                 txt.alignment = TextAlignmentOptions.Left;
             }
 
-            string prefix = data.isMain ? "[MAIN] " : "";
-            string suffix = data.completed ? " <color=#888>DONE</color>" : "";
-            txt.text = $"{prefix}{data.displayName}{suffix}";
-
-            // Button
-            var btn = go.GetComponent<Button>();
-            if (btn == null) btn = go.AddComponent<Button>();
-            string capturedId = data.questId;
-            btn.onClick.AddListener(() => SelectQuest(capturedId));
+            // Ensure button exists
+            if (go.GetComponent<Button>() == null) go.AddComponent<Button>();
 
             return go;
         }

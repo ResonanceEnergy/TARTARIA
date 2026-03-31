@@ -252,6 +252,7 @@ namespace Tartaria.Integration
 
                 foreach (var b in _cachedBuildings)
                 {
+                    if (b == null) continue;
                     if (b.BuildingId == key) continue;
                     float dist = Vector3.Distance(origin, b.transform.position);
 

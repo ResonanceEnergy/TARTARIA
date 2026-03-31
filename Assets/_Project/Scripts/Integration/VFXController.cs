@@ -39,6 +39,7 @@ namespace Tartaria.Integration
         // World palette
         float _currentRS;
         Material _particleMaterial;
+        readonly System.Collections.Generic.List<Material> _instancedMaterials = new();
         static readonly Color GoldenGlow = new(0.95f, 0.82f, 0.35f);
         static readonly Color AetherBlue = new(0.2f, 0.6f, 0.95f);
         static readonly Color MudBrown = new(0.4f, 0.3f, 0.2f);
@@ -50,6 +51,14 @@ namespace Tartaria.Integration
             Instance = this;
             ServiceLocator.VFX = this;
             CreateParticleSystems();
+        }
+
+        void OnDestroy()
+        {
+            foreach (var mat in _instancedMaterials)
+                if (mat != null) Destroy(mat);
+            _instancedMaterials.Clear();
+            if (_particleMaterial != null) Destroy(_particleMaterial);
         }
 
         // ─── Initialization ──────────────────────────
@@ -129,8 +138,10 @@ namespace Tartaria.Integration
 
             // Renderer setup
             var renderer = go.GetComponent<ParticleSystemRenderer>();
-            renderer.material = new Material(_particleMaterial);
-            renderer.material.color = color;
+            var mat = new Material(_particleMaterial);
+            mat.color = color;
+            _instancedMaterials.Add(mat);
+            renderer.material = mat;
 
             ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             return ps;
@@ -160,8 +171,10 @@ namespace Tartaria.Integration
             shape.scale = new Vector3(80f, 20f, 80f);
 
             var renderer = go.GetComponent<ParticleSystemRenderer>();
-            renderer.material = new Material(_particleMaterial);
-            renderer.material.color = new Color(0.8f, 0.7f, 0.4f, 0.3f);
+            var mat = new Material(_particleMaterial);
+            mat.color = new Color(0.8f, 0.7f, 0.4f, 0.3f);
+            _instancedMaterials.Add(mat);
+            renderer.material = mat;
 
             return ps;
         }
@@ -255,28 +268,32 @@ namespace Tartaria.Integration
 
         /// <summary>
         /// Plays a dissonance corruption pulse at the given world position.
-        /// Used by ZerethController during dissonance events.
+        /// Uses a snapshot/restore pattern to avoid permanently mutating the resonance pulse system.
         /// </summary>
         public void PlayDissonancePulse(Vector3 position, float radius)
         {
-            // Reuse the resonance pulse system with inverted aesthetics
             _resonancePulseVFX.transform.position = position;
             var shape = _resonancePulseVFX.shape;
             shape.radius = radius;
             var main = _resonancePulseVFX.main;
+            var savedColor = main.startColor;
             main.startColor = new Color(0.6f, 0.1f, 0.3f); // dark dissonance red-violet
             _resonancePulseVFX.Play();
+            main.startColor = savedColor;
         }
 
         /// <summary>
         /// Plays a ley line restoration visual at the midpoint between restored nodes.
+        /// Uses a snapshot/restore pattern to avoid permanently mutating the resonance pulse system.
         /// </summary>
         public void PlayLeyLineRestore(Vector3 midpoint)
         {
             _resonancePulseVFX.transform.position = midpoint;
             var main = _resonancePulseVFX.main;
+            var savedColor = main.startColor;
             main.startColor = new Color(0.2f, 0.9f, 0.4f); // restoration green
             _resonancePulseVFX.Play();
+            main.startColor = savedColor;
         }
 
         // ─── World Palette ───────────────────────────
@@ -373,9 +390,13 @@ namespace Tartaria.Integration
             {
                 PlayAt(_tuningRings, position, 15f);
                 var main = _tuningRings.main;
+                var savedColor = main.startColor;
+                var savedLifetime = main.startLifetime;
                 main.startColor = new Color(0.85f, 0.75f, 0.3f, 1f);
                 main.startLifetime = 6f;
                 _tuningRings.Emit(200);
+                main.startColor = savedColor;
+                main.startLifetime = savedLifetime;
             }
             Debug.Log("[VFX] Planetary Bell Ring spawned.");
         }
@@ -417,9 +438,13 @@ namespace Tartaria.Integration
             {
                 PlayAt(_tuningRings, position, 5f);
                 var main = _tuningRings.main;
+                var savedColor = main.startColor;
+                var savedLifetime = main.startLifetime;
                 main.startColor = new Color(0.7f, 0.5f, 1f, 1f); // prophecy violet
                 main.startLifetime = 4f;
                 _tuningRings.Emit(150);
+                main.startColor = savedColor;
+                main.startLifetime = savedLifetime;
             }
             Debug.Log("[VFX] Prophecy Stone Alignment spawned.");
         }

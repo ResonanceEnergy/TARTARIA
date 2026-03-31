@@ -155,10 +155,11 @@ namespace Tartaria.Integration
 
         float _idleTimer;
         const float IDLE_DIALOGUE_INTERVAL = 45f; // Milo speaks every ~45s when idle
+        float _playerInputRetryTimer;
 
         void CheckIdleDialogue()
         {
-            if (GameStateManager.Instance.CurrentState != GameState.Exploration) return;
+            if (GameStateManager.Instance?.CurrentState != GameState.Exploration) return;
 
             _idleTimer += Time.deltaTime;
             if (_idleTimer >= IDLE_DIALOGUE_INTERVAL)
@@ -169,7 +170,14 @@ namespace Tartaria.Integration
 
             // Reset idle timer on movement
             if (_playerInputHandler == null)
-                _playerInputHandler = FindFirstObjectByType<Input.PlayerInputHandler>();
+            {
+                _playerInputRetryTimer += Time.deltaTime;
+                if (_playerInputRetryTimer >= 2f)
+                {
+                    _playerInputRetryTimer = 0f;
+                    _playerInputHandler = FindFirstObjectByType<Input.PlayerInputHandler>();
+                }
+            }
             if (_playerInputHandler != null && _playerInputHandler.IsMoving)
                 _idleTimer = 0f;
         }

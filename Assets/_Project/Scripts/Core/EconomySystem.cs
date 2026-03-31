@@ -75,7 +75,9 @@ namespace Tartaria.Core
         public void AddCurrency(CurrencyType type, int amount)
         {
             if (amount <= 0) return;
-            int scaled = Mathf.RoundToInt(amount * _rsMultiplier * _moonMultiplier);
+            // Premium currencies (StarFragments) bypass RS/moon multipliers
+            bool isPremium = type == CurrencyType.StarFragments;
+            int scaled = isPremium ? amount : Mathf.RoundToInt(amount * _rsMultiplier * _moonMultiplier);
             int old;
             switch (type)
             {
@@ -258,9 +260,11 @@ namespace Tartaria.Core
 
         void CollectAllBuildingIncome()
         {
-            foreach (var kvp in _buildings)
+            // Snapshot values to avoid InvalidOperationException if AddCurrency
+            // handlers modify _buildings during iteration
+            var snapshot = new System.Collections.Generic.List<BuildingIncome>(_buildings.Values);
+            foreach (var b in snapshot)
             {
-                var b = kvp.Value;
                 if (!b.active) continue;
 
                 // Income = base × level × 0.5 (level scaling: diminishing)
