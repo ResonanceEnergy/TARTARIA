@@ -83,6 +83,11 @@ namespace Tartaria.Core
             _frameTimes = new float[sampleWindowFrames];
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             float frameMs = Time.unscaledDeltaTime * 1000f;

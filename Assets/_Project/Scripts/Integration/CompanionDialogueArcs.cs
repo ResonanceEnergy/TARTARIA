@@ -122,6 +122,11 @@ namespace Tartaria.Integration
                 _trust[c] = TrustLevel.Stranger;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Public API ──────────────────────────────
 
         public TrustLevel GetTrust(CompanionId companion) =>

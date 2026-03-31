@@ -69,6 +69,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            if (Instance == this) Instance = null;
             if (WorldChoiceTracker.Instance != null)
                 WorldChoiceTracker.Instance.OnChoiceMade -= OnWorldChoiceChanged;
         }

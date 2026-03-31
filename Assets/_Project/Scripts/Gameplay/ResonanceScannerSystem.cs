@@ -52,6 +52,11 @@ namespace Tartaria.Gameplay
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             if (_cooldownTimer > 0f)

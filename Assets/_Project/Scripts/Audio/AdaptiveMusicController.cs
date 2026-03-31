@@ -64,6 +64,7 @@ namespace Tartaria.Audio
 
         void OnDestroy()
         {
+            if (Instance == this) Instance = null;
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChanged -= HandleStateChange;
         }

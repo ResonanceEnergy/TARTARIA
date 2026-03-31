@@ -43,6 +43,11 @@ namespace Tartaria.Integration
                 _states[c.companionId] = new CompanionState { unlocked = false, trustLevel = 0f };
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         /// <summary>
         /// Unlock a companion (called when player reaches their unlock moon).
         /// </summary>

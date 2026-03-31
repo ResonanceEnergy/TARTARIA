@@ -42,6 +42,11 @@ namespace Tartaria.Integration
             QuestProviderLocator.Current = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Start()
         {
             // Index quest database

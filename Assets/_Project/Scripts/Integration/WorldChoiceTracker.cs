@@ -75,6 +75,11 @@ namespace Tartaria.Integration
             RegisterChoices();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void RegisterChoices()
         {
             Reg(WorldChoiceId.W1_CassiansOffer, 2, "Cassian's Offer",

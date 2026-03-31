@@ -71,6 +71,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            if (Instance == this) Instance = null;
             if (QuestManager.Instance != null)
                 QuestManager.Instance.OnQuestStatusChanged -= OnQuestStatusChanged;
         }

@@ -40,6 +40,11 @@ namespace Tartaria.Gameplay
             RegisterDefaultRecipes();
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Recipe Management ───
 
         public void RegisterRecipe(CraftingRecipe recipe)

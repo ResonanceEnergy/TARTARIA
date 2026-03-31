@@ -48,6 +48,11 @@ namespace Tartaria.UI
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void OnEnable()
         {
             if (GameStateManager.Instance != null)

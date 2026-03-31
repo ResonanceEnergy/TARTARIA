@@ -364,6 +364,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            if (Instance == this) Instance = null;
             if (_rsQuery.IsValid) _rsQuery.Dispose();
             if (_playerQuery.IsValid) _playerQuery.Dispose();
 
