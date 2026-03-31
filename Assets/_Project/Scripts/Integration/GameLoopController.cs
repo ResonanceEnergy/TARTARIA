@@ -159,6 +159,7 @@ namespace Tartaria.Integration
                 CraftingSystem.Instance.OnRecipeDiscovered += HandleRecipeDiscovered;
                 CraftingSystem.Instance.OnCraftFailed += HandleCraftFailed;
                 CraftingSystem.Instance.OnItemUsed += HandleItemUsed;
+                CraftingSystem.Instance.OnItemCollected += HandleItemCollected;
             }
 
             // Wire corruption events → VFX + HUD + haptic
@@ -413,6 +414,7 @@ namespace Tartaria.Integration
                 CraftingSystem.Instance.OnRecipeDiscovered -= HandleRecipeDiscovered;
                 CraftingSystem.Instance.OnCraftFailed -= HandleCraftFailed;
                 CraftingSystem.Instance.OnItemUsed -= HandleItemUsed;
+                CraftingSystem.Instance.OnItemCollected -= HandleItemCollected;
             }
             if (CorruptionSystem.Instance != null)
             {
@@ -716,6 +718,8 @@ namespace Tartaria.Integration
                     break;
             }
 
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.ReachRS, threshold.ToString());
+
             // Mark dirty for save
             SaveManager.Instance?.MarkDirty();
         }
@@ -930,6 +934,8 @@ namespace Tartaria.Integration
 
             // Anastasia: lore whisper on discovery
             AnastasiaController.Instance?.TryDeliverLine("discovery");
+
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.DiscoverBuilding, buildingName);
         }
 
         /// <summary>
@@ -1005,6 +1011,8 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayGolemDeath();
             VFXController.Instance?.PlayEnemyDissolution(position);
             DialogueManager.Instance?.PlayContextDialogue("combat_victory");
+
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.DefeatEnemies);
 
             // Companion notifications
             MiloController.Instance?.NotifyCombatVictory();
@@ -1097,6 +1105,9 @@ namespace Tartaria.Integration
         {
             if (_zoneVictoryTriggered) return;
             _zoneVictoryTriggered = true;
+
+            string zoneName = ZoneTransitionSystem.Instance?.CurrentZone?.zoneName ?? $"Moon {_currentMoonIndex + 1}";
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteZone, zoneName);
 
             StartCoroutine(ZoneVictoryCoroutine());
         }
@@ -2313,6 +2324,7 @@ namespace Tartaria.Integration
                     : Vector3.zero);
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
             HapticFeedbackManager.Instance?.PlayPerfectTune();
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CraftItem, recipeId);
             OnMiniGameCompleted(15f, "crafting");
             Debug.Log($"[GameLoop] Item crafted: {recipeId}");
         }
@@ -2336,6 +2348,12 @@ namespace Tartaria.Integration
             HUDController.Instance?.ShowAchievementToast($"Used: {itemId}");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
             Debug.Log($"[GameLoop] Item used: {itemId}");
+        }
+
+        void HandleItemCollected(string itemId, int amount)
+        {
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CollectItem, itemId, amount);
+            Debug.Log($"[GameLoop] Item collected: {itemId} x{amount}");
         }
 
         // ─── Corruption Event Handlers ───────────────
@@ -2389,6 +2407,7 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayBuildingEmergence(site.position);
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.QuestComplete);
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.ExcavateRuin, site.siteId);
             Debug.Log($"[GameLoop] Excavation complete: {site.siteId}");
         }
 
@@ -2409,6 +2428,7 @@ namespace Tartaria.Integration
 
         void HandleDialogueEnded(string treeId)
         {
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC, treeId);
             Debug.Log($"[GameLoop] Dialogue ended: {treeId}");
         }
 

@@ -32,8 +32,7 @@ namespace Tartaria.Core
 
         public void AddResonanceScore(float amount)
         {
-            _resonanceScore += amount;
-            if (_resonanceScore < 0f) _resonanceScore = 0f;
+            _resonanceScore = Mathf.Clamp(_resonanceScore + amount, 0f, 100f);
             OnResonanceScoreChanged?.Invoke(_resonanceScore);
         }
 

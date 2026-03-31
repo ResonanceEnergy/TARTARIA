@@ -27,6 +27,7 @@ namespace Tartaria.Gameplay
         public event Action<string> OnItemCrafted;            // recipeId
         public event Action<string, string> OnCraftFailed;    // recipeId, reason
         public event Action<string> OnItemUsed;               // itemId
+        public event Action<string, int> OnItemCollected;     // itemId, amount
 
         readonly Dictionary<string, CraftingRecipe> _recipes = new();
         readonly HashSet<string> _discoveredRecipes = new();
@@ -156,6 +157,7 @@ namespace Tartaria.Gameplay
             if (!_inventory.ContainsKey(itemId))
                 _inventory[itemId] = 0;
             _inventory[itemId] += amount;
+            OnItemCollected?.Invoke(itemId, amount);
         }
 
         /// <summary>
@@ -181,10 +183,9 @@ namespace Tartaria.Gameplay
 
                 case "aether_potion":
                     // Refill 50 Aether charge to player
-                    var gameLoop = Integration.GameLoopController.Instance;
-                    if (gameLoop != null)
+                    if (AetherFieldManager.Instance != null)
                     {
-                        gameLoop.QueueRSReward(50f, "aether_potion");
+                        AetherFieldManager.Instance.AddFieldEnergy(50f);
                         applied = true;
                     }
                     break;

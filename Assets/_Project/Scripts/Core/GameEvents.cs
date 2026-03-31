@@ -8,7 +8,10 @@ namespace Tartaria.Core
     /// </summary>
     public static class GameEvents
     {
-        public static Action OnToggleAetherVision;
-        public static Action OnTogglePause;
+        public static event Action OnToggleAetherVision;
+        public static event Action OnTogglePause;
+
+        public static void FireToggleAetherVision() => OnToggleAetherVision?.Invoke();
+        public static void FireTogglePause() => OnTogglePause?.Invoke();
     }
 }

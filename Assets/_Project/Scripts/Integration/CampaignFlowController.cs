@@ -152,6 +152,14 @@ namespace Tartaria.Integration
                 foreach (int m in data.completedMoons)
                     if (_moonProgress.ContainsKey(m))
                         _moonProgress[m].completed = true;
+
+            // Reapply Moon modifiers and zone state for the current moon
+            if (_currentMoon >= 0 && _currentMoon < moons.Length)
+            {
+                var moon = moons[_currentMoon];
+                MoonModifierProvider.Apply(moon.modifiers);
+                Debug.Log($"[Campaign] Restored to Moon {_currentMoon + 1}: {moon.moonName}");
+            }
         }
 
         // ─── Internal ────────────────────────────────

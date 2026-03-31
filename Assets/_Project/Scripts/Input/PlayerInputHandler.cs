@@ -180,12 +180,12 @@ namespace Tartaria.Input
         {
             if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
             AetherVisionActive = !AetherVisionActive;
-            GameEvents.OnToggleAetherVision?.Invoke();
+            GameEvents.FireToggleAetherVision();
         }
 
         void OnPausePerformed(InputAction.CallbackContext ctx)
         {
-            GameEvents.OnTogglePause?.Invoke();
+            GameEvents.FireTogglePause();
         }
 
         void OnResonancePulsePerformed(InputAction.CallbackContext ctx)

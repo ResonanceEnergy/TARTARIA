@@ -31,6 +31,7 @@ namespace Tartaria.Integration
 
         readonly HashSet<string> _visitedNodes = new();
         readonly Dictionary<string, int> _choiceHistory = new();
+        Dictionary<string, DialogueNode> _nodeLookup = new();
 
         public bool IsRunning => _isRunning;
         public DialogueNode CurrentNode => _currentNode;
@@ -53,12 +54,20 @@ namespace Tartaria.Integration
 
             _activeTree = tree;
             _isRunning = true;
+
+            // Build O(1) node lookup
+            _nodeLookup.Clear();
+            foreach (var node in tree.nodes)
+                _nodeLookup[node.nodeId] = node;
+
             OnDialogueStarted?.Invoke(tree.treeId, tree.speakerName);
 
             // Find the root node (first node or explicit rootNodeId)
-            var root = string.IsNullOrEmpty(tree.rootNodeId)
-                ? tree.nodes[0]
-                : tree.nodes.Find(n => n.nodeId == tree.rootNodeId);
+            DialogueNode root;
+            if (string.IsNullOrEmpty(tree.rootNodeId))
+                root = tree.nodes[0];
+            else
+                _nodeLookup.TryGetValue(tree.rootNodeId, out root);
 
             if (root != null)
                 EnterNode(root);
@@ -90,8 +99,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                var nextNode = _activeTree.nodes.Find(n => n.nodeId == choice.nextNodeId);
-                if (nextNode != null)
+                if (_nodeLookup.TryGetValue(choice.nextNodeId, out var nextNode))
                     EnterNode(nextNode);
                 else
                     EndTree();
@@ -111,8 +119,8 @@ namespace Tartaria.Integration
             // Follow default next
             if (!string.IsNullOrEmpty(_currentNode.defaultNextNodeId))
             {
-                var next = _activeTree.nodes.Find(n => n.nodeId == _currentNode.defaultNextNodeId);
-                if (next != null) { EnterNode(next); return; }
+                if (_nodeLookup.TryGetValue(_currentNode.defaultNextNodeId, out var next))
+                { EnterNode(next); return; }
             }
 
             EndTree();
@@ -191,11 +199,9 @@ namespace Tartaria.Integration
             // Check conditions — skip to fallback if not met
             if (!EvaluateConditions(node.conditions))
             {
-                if (!string.IsNullOrEmpty(node.fallbackNodeId))
-                {
-                    var fallback = _activeTree.nodes.Find(n => n.nodeId == node.fallbackNodeId);
-                    if (fallback != null) { EnterNode(fallback); return; }
-                }
+                if (!string.IsNullOrEmpty(node.fallbackNodeId) &&
+                    _nodeLookup.TryGetValue(node.fallbackNodeId, out var fallback))
+                { EnterNode(fallback); return; }
                 EndTree();
                 return;
             }
@@ -227,26 +233,26 @@ namespace Tartaria.Integration
                 switch (cond.type)
                 {
                     case ConditionType.MinRS:
-                        if (AetherFieldManager.Instance == null) break;
+                        if (AetherFieldManager.Instance == null) return false;
                         if (AetherFieldManager.Instance.ResonanceScore < cond.floatValue)
                             return false;
                         break;
 
                     case ConditionType.QuestComplete:
-                        if (QuestManager.Instance == null) break;
+                        if (QuestManager.Instance == null) return false;
                         if (!QuestManager.Instance.IsQuestComplete(cond.stringValue))
                             return false;
                         break;
 
                     case ConditionType.QuestActive:
-                        if (QuestManager.Instance == null) break;
+                        if (QuestManager.Instance == null) return false;
                         var state = QuestManager.Instance.GetQuestState(cond.stringValue);
                         if (state.status != QuestStatus.Active)
                             return false;
                         break;
 
                     case ConditionType.MinTrust:
-                        if (CassianNPCController.Instance == null) break;
+                        if (CassianNPCController.Instance == null) return false;
                         if (CassianNPCController.Instance.TrustLevel < cond.floatValue)
                             return false;
                         break;
@@ -267,7 +273,7 @@ namespace Tartaria.Integration
                         break;
 
                     case ConditionType.HasItem:
-                        if (CraftingSystem.Instance == null) break;
+                        if (CraftingSystem.Instance == null) return false;
                         if (CraftingSystem.Instance.GetItemCount(cond.stringValue) < Mathf.Max(1, cond.intValue))
                             return false;
                         break;

@@ -111,8 +111,8 @@ namespace Tartaria.Integration
         {
             if (!_encounterActive) return;
 
-            if (_spawnCoroutine != null)
-                StopCoroutine(_spawnCoroutine);
+            StopAllCoroutines();
+            _spawnCoroutine = null;
 
             _encounterActive = false;
             _currentWaveIndex = -1;
