@@ -115,6 +115,11 @@ namespace Tartaria.Integration
             }
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             for (int i = 0; i < MaxAirships; i++)

@@ -66,6 +66,11 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             if (_phase == ZerethPhase.Dormant) return;
@@ -217,6 +222,7 @@ namespace Tartaria.Integration
 
         public void BeginRedemptionArc()
         {
+            if (_redeemed) return;
             TransitionToPhase(ZerethPhase.Confrontation);
             _presenceLevel = Mathf.Max(_presenceLevel, 0.6f);
             DialogueManager.Instance?.PlayLineById("zereth_redemption_arc_begin");
@@ -225,7 +231,9 @@ namespace Tartaria.Integration
 
         public void Imprison()
         {
+            if (_redeemed) return;
             _phase = ZerethPhase.Redeemed; // Imprisoned, no longer a threat
+            _redeemed = true;
             _dissonanceIntensity = 0f;
             _presenceLevel = 0f;
             DialogueManager.Instance?.PlayLineById("zereth_imprisoned");

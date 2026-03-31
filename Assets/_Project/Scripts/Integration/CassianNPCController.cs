@@ -39,6 +39,9 @@ namespace Tartaria.Integration
         // Track what intel has been shared
         readonly System.Collections.Generic.HashSet<string> _sharedIntel = new();
 
+        string _promptCache;
+        bool _promptDirty = true;
+
         public float TrustLevel => _trustLevel;
         public bool HasBeenIntroduced => _introduced;
 
@@ -49,6 +52,11 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
 
         void Update()
@@ -91,7 +99,12 @@ namespace Tartaria.Integration
         public string GetInteractPrompt()
         {
             if (!_introduced) return "Talk to the stranger";
-            return $"Talk to Cassian [Trust: {_trustLevel:F0}%]";
+            if (_promptDirty)
+            {
+                _promptCache = $"Talk to Cassian [Trust: {_trustLevel:F0}%]";
+                _promptDirty = false;
+            }
+            return _promptCache;
         }
 
         // ─── Public API ──────────────────────────────
@@ -102,6 +115,7 @@ namespace Tartaria.Integration
         public void AdjustTrust(float amount)
         {
             _trustLevel = Mathf.Clamp(_trustLevel + amount, 0f, 100f);
+            _promptDirty = true;
             _mood = _trustLevel switch
             {
                 < 20f => CassianMood.Suspicious,
@@ -164,6 +178,7 @@ namespace Tartaria.Integration
         public void RestoreFromSave(CassianSaveData data)
         {
             _trustLevel = data.trustLevel;
+            _promptDirty = true;
             _interactionCount = data.interactionCount;
             _introduced = data.introduced;
             _sharedIntel.Clear();
@@ -178,6 +193,7 @@ namespace Tartaria.Integration
         {
             _introduced = true;
             _trustLevel = 15f;
+            _promptDirty = true;
 
             DialogueManager.Instance?.PlayLineById("cassian_intro_01");
             AdjustTrust(5f);
@@ -231,7 +247,7 @@ namespace Tartaria.Integration
 
         void TryIdleDialogue()
         {
-            if (!GameStateManager.Instance.IsPlaying) return;
+            if (!(GameStateManager.Instance?.IsPlaying ?? false)) return;
 
             string[] idleLines = {
                 "cassian_idle_01",

@@ -56,6 +56,15 @@ namespace Tartaria.Integration
             _trust = initialTrust;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Instance = null;
+                if (ServiceLocator.Milo == (object)this) ServiceLocator.Milo = null;
+            }
+        }
+
         // ─── Public API ──────────────────────────────
 
         /// <summary>Trigger Milo's introduction in Echohaven.</summary>

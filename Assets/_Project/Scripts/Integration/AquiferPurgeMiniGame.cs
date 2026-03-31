@@ -67,7 +67,6 @@ namespace Tartaria.Integration
         float _traceTimer;
         float _traceAccuracySum;
         int _traceSamples;
-        readonly List<Vector2> _playerTrace = new();
         FractalPattern[] _patterns;
 
         // ─── Events ─────────────────────────────────
@@ -83,6 +82,11 @@ namespace Tartaria.Integration
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             GenerateFractalPatterns();
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
         }
 
         void Update()
@@ -141,7 +145,6 @@ namespace Tartaria.Integration
             _traceTimer = 0f;
             _traceAccuracySum = 0f;
             _traceSamples = 0;
-            _playerTrace.Clear();
 
             // Spawn boss at layer 3
             if (_currentLayer == 2)
@@ -199,7 +202,6 @@ namespace Tartaria.Integration
 
             if (mouse.leftButton.isPressed)
             {
-                _playerTrace.Add(normalized);
 
                 // Compare against fractal pattern
                 float dist = GetNearestPatternDistance(normalized, _currentLayer);

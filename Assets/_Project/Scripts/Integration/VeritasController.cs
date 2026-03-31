@@ -55,6 +55,11 @@ namespace Tartaria.Integration
             _trust = initialTrust;
         }
 
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
+
         // ─── Public API ──────────────────────────────
 
         /// <summary>Trigger Veritas manifestation at the organ bench.</summary>
