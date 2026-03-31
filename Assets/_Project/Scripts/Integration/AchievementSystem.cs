@@ -170,6 +170,8 @@ namespace Tartaria.Integration
 
             var dott = DayOutOfTimeController.Instance;
             if (dott != null) dott.OnEventCompleted -= HandleDayOutOfTime;
+
+            if (Instance == this) Instance = null;
         }
 
         // ─── Event Handlers (Achievement) ────────────
