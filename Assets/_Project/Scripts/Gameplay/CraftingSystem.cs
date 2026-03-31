@@ -114,14 +114,19 @@ namespace Tartaria.Gameplay
             var recipe = _recipes[recipeId];
             var economy = EconomySystem.Instance;
 
-            // Spend resources
+            // Spend resources (with rollback on partial failure)
+            var spent = new System.Collections.Generic.List<(CurrencyType currency, int amount)>();
             foreach (var cost in recipe.costs)
             {
                 if (!economy.SpendCurrency(cost.currency, cost.amount))
                 {
+                    // Rollback already-spent currencies
+                    foreach (var s in spent)
+                        economy.AddCurrency(s.currency, s.amount);
                     OnCraftFailed?.Invoke(recipeId, "Currency spend failed");
                     return false;
                 }
+                spent.Add((cost.currency, cost.amount));
             }
 
             // Add to inventory

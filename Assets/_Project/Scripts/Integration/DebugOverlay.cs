@@ -44,6 +44,15 @@ namespace Tartaria.Integration
         GUIStyle _boxStyle;
         GUIStyle _labelStyle;
 
+        // String cache (rebuilt when values change)
+        string _fpsString = "";
+        float _lastFpsDisplay;
+        string _stateString = "";
+        GameState _lastState;
+        GameState _lastPrevState;
+        string _memString = "";
+        long _lastMemMB;
+
         void Start()
         {
             _visible = showOnStart;
@@ -122,14 +131,25 @@ namespace Tartaria.Integration
             float cx = x + 10f;
             float cy = y + 28f;
 
-            // FPS
-            Color fpsColor = _fps >= 60 ? Color.green : _fps >= 30 ? Color.yellow : Color.red;
-            DrawLabel(cx, cy, $"FPS: <color=#{ColorUtility.ToHtmlStringRGB(fpsColor)}>{_fps:F0}</color>");
+            // FPS (cached — only reformats every 0.5s when _fps changes)
+            if (_fps != _lastFpsDisplay)
+            {
+                _lastFpsDisplay = _fps;
+                Color fpsColor = _fps >= 60 ? Color.green : _fps >= 30 ? Color.yellow : Color.red;
+                _fpsString = $"FPS: <color=#{ColorUtility.ToHtmlStringRGB(fpsColor)}>{_fps:F0}</color>";
+            }
+            DrawLabel(cx, cy, _fpsString);
             cy += lineHeight;
 
-            // Game State
+            // Game State (cached)
             var gs = GameStateManager.Instance;
-            DrawLabel(cx, cy, $"State: <color=yellow>{gs.CurrentState}</color> (prev: {gs.PreviousState})");
+            if (gs.CurrentState != _lastState || gs.PreviousState != _lastPrevState)
+            {
+                _lastState = gs.CurrentState;
+                _lastPrevState = gs.PreviousState;
+                _stateString = $"State: <color=yellow>{gs.CurrentState}</color> (prev: {gs.PreviousState})";
+            }
+            DrawLabel(cx, cy, _stateString);
             cy += lineHeight;
 
             // RS
@@ -196,9 +216,14 @@ namespace Tartaria.Integration
             }
             cy += lineHeight;
 
-            // Memory
+            // Memory (cached)
             long mem = System.GC.GetTotalMemory(false) / (1024 * 1024);
-            DrawLabel(cx, cy, $"Memory: {mem} MB (managed)");
+            if (mem != _lastMemMB)
+            {
+                _lastMemMB = mem;
+                _memString = $"Memory: {mem} MB (managed)";
+            }
+            DrawLabel(cx, cy, _memString);
             cy += lineHeight;
 
             // Controls hint

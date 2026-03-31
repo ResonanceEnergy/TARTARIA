@@ -27,6 +27,11 @@ namespace Tartaria.Integration
         readonly Dictionary<string, QuestState> _questStates = new();
         readonly Dictionary<string, QuestDefinition> _questLookup = new();
 
+        // Cached ID lists — rebuilt only when quest status changes
+        readonly List<string> _cachedActiveIds = new();
+        readonly List<string> _cachedCompletedIds = new();
+        bool _questListsDirty = true;
+
         public event Action<string, QuestStatus> OnQuestStatusChanged;
         public event Action<string, int> OnObjectiveProgressed;
 
@@ -70,6 +75,7 @@ namespace Tartaria.Integration
 
             state.status = QuestStatus.Active;
             _questStates[questId] = state;
+            _questListsDirty = true;
             OnQuestStatusChanged?.Invoke(questId, QuestStatus.Active);
 
             if (_questLookup.TryGetValue(questId, out var def))
@@ -145,13 +151,8 @@ namespace Tartaria.Integration
         /// </summary>
         public List<string> GetActiveQuestIds()
         {
-            var result = new List<string>();
-            foreach (var kvp in _questStates)
-            {
-                if (kvp.Value.status == QuestStatus.Active)
-                    result.Add(kvp.Key);
-            }
-            return result;
+            RebuildCachedListsIfDirty();
+            return _cachedActiveIds;
         }
 
         /// <summary>
@@ -159,13 +160,23 @@ namespace Tartaria.Integration
         /// </summary>
         public List<string> GetCompletedQuestIds()
         {
-            var result = new List<string>();
+            RebuildCachedListsIfDirty();
+            return _cachedCompletedIds;
+        }
+
+        void RebuildCachedListsIfDirty()
+        {
+            if (!_questListsDirty) return;
+            _questListsDirty = false;
+            _cachedActiveIds.Clear();
+            _cachedCompletedIds.Clear();
             foreach (var kvp in _questStates)
             {
-                if (kvp.Value.status == QuestStatus.Completed)
-                    result.Add(kvp.Key);
+                if (kvp.Value.status == QuestStatus.Active)
+                    _cachedActiveIds.Add(kvp.Key);
+                else if (kvp.Value.status == QuestStatus.Completed)
+                    _cachedCompletedIds.Add(kvp.Key);
             }
-            return result;
         }
 
         /// <summary>
@@ -192,6 +203,7 @@ namespace Tartaria.Integration
 
             state.status = QuestStatus.Failed;
             _questStates[questId] = state;
+            _questListsDirty = true;
             OnQuestStatusChanged?.Invoke(questId, QuestStatus.Failed);
             Debug.Log($"[QuestManager] Quest failed: {questId}");
         }
@@ -203,6 +215,7 @@ namespace Tartaria.Integration
             if (!_questStates.TryGetValue(questId, out var state)) return;
             state.status = QuestStatus.Completed;
             _questStates[questId] = state;
+            _questListsDirty = true;
 
             OnQuestStatusChanged?.Invoke(questId, QuestStatus.Completed);
 

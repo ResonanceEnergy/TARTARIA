@@ -272,7 +272,9 @@ namespace Tartaria.Integration
                     break;
             }
 
-            RegisterPlayerHit();
+            bool dealtDamage = pattern != BossAttackPattern.Enrage;
+            if (dealtDamage)
+                RegisterPlayerHit();
 
             // Audio
             Audio.AudioManager.Instance?.PlayTone(180f, 0.5f);

@@ -27,6 +27,7 @@ namespace Tartaria.Integration
         [SerializeField] CompanionData[] companions;
 
         readonly System.Collections.Generic.Dictionary<string, CompanionState> _states = new();
+        static readonly float[] _trustMilestones = { 25f, 50f, 75f, 100f };
 
         public event System.Action<string, float> OnTrustChanged;
 
@@ -73,7 +74,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.RaiseCompanionTrust, companionId);
 
             // Check milestone boundaries (25/50/75/100)
-            foreach (float milestone in new[] { 25f, 50f, 75f, 100f })
+            foreach (float milestone in _trustMilestones)
             {
                 if (oldTrust < milestone && state.trustLevel >= milestone)
                     QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, companionId);
