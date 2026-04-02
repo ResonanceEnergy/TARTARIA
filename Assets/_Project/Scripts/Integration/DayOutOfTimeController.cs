@@ -42,7 +42,8 @@ namespace Tartaria.Integration
 
         public bool IsEventActive => _eventActive;
         public bool IsEventCompleted => _eventCompleted;
-        public float EventProgress => _eventActive ? Mathf.Clamp01(_eventTimer / eventDurationSeconds) : 0f;
+        public float EventProgress => _eventActive && eventDurationSeconds > 0f
+            ? Mathf.Clamp01(_eventTimer / eventDurationSeconds) : 0f;
 
         // ─── Events ─────────────────────────────────
         public event Action OnEventCompleted;
