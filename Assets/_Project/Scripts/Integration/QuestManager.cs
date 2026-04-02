@@ -39,6 +39,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            DontDestroyOnLoad(gameObject);
             QuestProviderLocator.Current = this;
         }
 
@@ -91,6 +92,9 @@ namespace Tartaria.Integration
             }
 
             Debug.Log($"[QuestManager] Quest activated: {questId}");
+
+            // Tutorial: first quest accepted
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.QuestAccept);
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
@@ -75,6 +76,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            DontDestroyOnLoad(gameObject);
             ServiceLocator.GameLoop = this;
         }
 
@@ -869,18 +871,21 @@ namespace Tartaria.Integration
         {
             if (!_ecsReady) return;
             CombatBridge.Instance?.FireResonancePulse();
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.ResonancePulse);
         }
 
         void HandleHarmonicStrike()
         {
             if (!_ecsReady) return;
             CombatBridge.Instance?.FireHarmonicStrike();
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.HarmonicStrike);
         }
 
         void HandleFrequencyShield()
         {
             if (!_ecsReady) return;
             CombatBridge.Instance?.ActivateFrequencyShield();
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.FrequencyShield);
         }
 
         // ─── Save Sync ──────────────────────────────
@@ -919,6 +924,7 @@ namespace Tartaria.Integration
         public void OnBuildingDiscovered(string buildingName, Vector3 position)
         {
             Debug.Log($"[GameLoop] Building discovered: {buildingName}");
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.Discovery);
 
             // Queue RS reward via ECS
             if (_ecsReady)
@@ -2175,6 +2181,81 @@ namespace Tartaria.Integration
                     totalWaves = save.combatWave.totalWaves
                 });
             }
+
+            // ─── ECS World State Restore ────────────────
+
+            RestoreECSWorldState(save);
+        }
+
+        void RestoreECSWorldState(SaveData save)
+        {
+            if (!_ecsReady || save == null) return;
+
+            // Restore Resonance Score
+            if (save.world != null && _rsQuery.CalculateEntityCount() > 0)
+            {
+                var rsEntity = _rsQuery.GetSingletonEntity();
+                var rs = _em.GetComponentData<ResonanceScore>(rsEntity);
+                rs.Current = save.world.resonanceScore;
+                _em.SetComponentData(rsEntity, rs);
+                _lastRS = save.world.resonanceScore;
+                Debug.Log($"[GameLoop] RS restored: {save.world.resonanceScore:F1}");
+            }
+
+            // Restore Player ECS position
+            if (save.player != null && _playerQuery.CalculateEntityCount() > 0)
+            {
+                var playerEntity = _playerQuery.GetSingletonEntity();
+                var lt = _em.GetComponentData<LocalTransform>(playerEntity);
+                lt.Position = new float3(save.player.position.x, save.player.position.y, save.player.position.z);
+                _em.SetComponentData(playerEntity, lt);
+
+                // Sync MonoBehaviour player too
+                var playerGO = GameObject.FindWithTag("Player");
+                if (playerGO != null)
+                    playerGO.transform.position = new Vector3(save.player.position.x, save.player.position.y, save.player.position.z);
+            }
+
+            // Restore Building ECS states
+            if (save.world?.buildings != null)
+            {
+                var buildingQuery = _em.CreateEntityQuery(typeof(TartarianBuilding));
+                var buildings = buildingQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+                for (int i = 0; i < buildings.Length && i < save.world.buildings.Length; i++)
+                {
+                    var building = _em.GetComponentData<TartarianBuilding>(buildings[i]);
+                    building.State = (BuildingRestorationState)save.world.buildings[i].state;
+                    building.NodesCompleted = save.world.buildings[i].nodesComplete != null
+                        ? CountTrue(save.world.buildings[i].nodesComplete) : 0;
+                    building.RestorationProgress = save.world.buildings[i].restorationProgress;
+                    _em.SetComponentData(buildings[i], building);
+                }
+                buildings.Dispose();
+                buildingQuery.Dispose();
+            }
+
+            // Restore Enemy spawn states
+            if (save.world?.enemySpawns != null)
+            {
+                var spawnQuery = _em.CreateEntityQuery(typeof(EnemySpawnTrigger));
+                var spawns = spawnQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+                for (int i = 0; i < spawns.Length && i < save.world.enemySpawns.Length; i++)
+                {
+                    var trigger = _em.GetComponentData<EnemySpawnTrigger>(spawns[i]);
+                    trigger.HasSpawned = save.world.enemySpawns[i].hasSpawned;
+                    _em.SetComponentData(spawns[i], trigger);
+                }
+                spawns.Dispose();
+                spawnQuery.Dispose();
+            }
+        }
+
+        static int CountTrue(bool[] arr)
+        {
+            int count = 0;
+            for (int i = 0; i < arr.Length; i++)
+                if (arr[i]) count++;
+            return count;
         }
 
         // ─── Workshop UI Bridge ──────────────────────
@@ -2186,6 +2267,8 @@ namespace Tartaria.Integration
 
             if (ws.TryUpgrade(buildingId))
             {
+                TutorialSystem.Instance?.ForceComplete(TutorialStep.WorkshopUpgrade);
+
                 // Refresh the UI with updated data
                 var panel = WorkshopUIPanel.Instance;
                 if (panel != null)

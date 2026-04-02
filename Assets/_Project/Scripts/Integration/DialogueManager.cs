@@ -64,6 +64,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            DontDestroyOnLoad(gameObject);
             BuildDatabase();
             LoadExternalDialogue();
         }

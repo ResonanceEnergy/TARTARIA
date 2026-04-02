@@ -78,7 +78,14 @@ namespace Tartaria.Camera
 
         void LateUpdate()
         {
-            if (followTarget == null) return;
+            if (followTarget == null)
+            {
+                var player = GameObject.FindWithTag("Player");
+                if (player != null)
+                    followTarget = player.transform;
+                else
+                    return;
+            }
 
             UpdateCameraMode();
             HandleInput();
