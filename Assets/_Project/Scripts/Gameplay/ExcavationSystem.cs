@@ -30,12 +30,12 @@ namespace Tartaria.Gameplay
         public event Action<ExcavationSite, float> OnRSYielded;      // site, rsAmount
 
         [Header("Excavation Settings")]
-        [SerializeField, Min(0.1f)] float baseDigTime = 2f;
-        [SerializeField, Min(0f)] float layerDigTimeScale = 0.3f;  // each deeper layer adds this
-        [SerializeField, Min(0f)] float baseRSPerLayer = 3f;
-        [SerializeField, Range(0f, 2f)] float depthRSMultiplier = 0.5f;
-        [SerializeField, Min(1f)] float scanAccuracyBonus = 1.5f;  // multiplier at 100% scan accuracy
-        [SerializeField, Min(0.1f)] float interactionRadius = 3f;
+        [SerializeField, Min(0.1f), Tooltip("Base time in seconds to dig one layer")] float baseDigTime = 2f;
+        [SerializeField, Min(0f), Tooltip("Extra dig time added per deeper layer")] float layerDigTimeScale = 0.3f;  // each deeper layer adds this
+        [SerializeField, Min(0f), Tooltip("Base RS reward per excavated layer")] float baseRSPerLayer = 3f;
+        [SerializeField, Range(0f, 2f), Tooltip("RS multiplier increase per layer depth")] float depthRSMultiplier = 0.5f;
+        [SerializeField, Min(1f), Tooltip("RS reward multiplier at 100% scan accuracy")] float scanAccuracyBonus = 1.5f;  // multiplier at 100% scan accuracy
+        [SerializeField, Min(0.1f), Tooltip("Max distance to begin digging")] float interactionRadius = 3f;
 
         // ─── Active Sites ───
         readonly Dictionary<string, ExcavationSite> _sites = new();
@@ -74,6 +74,7 @@ namespace Tartaria.Gameplay
         public void RegisterSite(string siteId, Vector3 position, int totalLayers,
             bool isGiantMode = false, string buildingId = null)
         {
+            if (string.IsNullOrEmpty(siteId)) return;
             if (_sites.ContainsKey(siteId)) return;
 
             var site = new ExcavationSite
@@ -102,6 +103,7 @@ namespace Tartaria.Gameplay
 
         public void SetScanAccuracy(string siteId, float accuracy)
         {
+            if (string.IsNullOrEmpty(siteId)) return;
             if (!_sites.TryGetValue(siteId, out var site)) return;
             site.scanAccuracy = Mathf.Clamp01(accuracy);
             _sites[siteId] = site;
@@ -109,6 +111,7 @@ namespace Tartaria.Gameplay
 
         public void DiscoverSite(string siteId)
         {
+            if (string.IsNullOrEmpty(siteId)) return;
             if (!_sites.TryGetValue(siteId, out var site)) return;
             if (site.isDiscovered) return;
 
@@ -144,6 +147,7 @@ namespace Tartaria.Gameplay
 
         public void BeginDig(string siteId)
         {
+            if (string.IsNullOrEmpty(siteId)) return;
             if (_isDigging) return;
             if (!_sites.TryGetValue(siteId, out var site)) return;
             if (site.isComplete) return;

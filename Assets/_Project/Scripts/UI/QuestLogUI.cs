@@ -16,6 +16,7 @@ namespace Tartaria.UI
     /// Wired to QuestManager events for live updates.
     /// Toggle via Tab key (InputSystem) or HUD button.
     /// </summary>
+    [DisallowMultipleComponent]
     public class QuestLogUI : MonoBehaviour
     {
         public static QuestLogUI Instance { get; private set; }
@@ -355,6 +356,7 @@ namespace Tartaria.UI
     ///
     /// Usage: NotificationSystem.Instance.Show("text", NotificationType.Quest);
     /// </summary>
+    [DisallowMultipleComponent]
     public class NotificationSystem : MonoBehaviour
     {
         public static NotificationSystem Instance { get; private set; }
@@ -428,12 +430,14 @@ namespace Tartaria.UI
         /// <summary>Show a notification toast.</summary>
         public void Show(string message, NotificationType type = NotificationType.Info)
         {
+            if (string.IsNullOrEmpty(message)) return;
             Show(message, type, defaultDuration);
         }
 
         /// <summary>Show a notification toast with custom duration.</summary>
         public void Show(string message, NotificationType type, float duration)
         {
+            if (string.IsNullOrEmpty(message)) return;
             var data = new NotificationData
             {
                 message = message,
@@ -450,18 +454,21 @@ namespace Tartaria.UI
         /// <summary>Convenience: currency gain notification.</summary>
         public void ShowCurrency(string currencyName, int amount)
         {
+            if (string.IsNullOrEmpty(currencyName)) return;
             Show($"+{amount} {currencyName}", NotificationType.Currency);
         }
 
         /// <summary>Convenience: codex unlock notification.</summary>
         public void ShowCodexUnlock(string entryTitle)
         {
+            if (string.IsNullOrEmpty(entryTitle)) return;
             Show($"Codex: {entryTitle}", NotificationType.Codex);
         }
 
         /// <summary>Convenience: trust change notification.</summary>
         public void ShowTrustChange(string npcName, string newLevel)
         {
+            if (string.IsNullOrEmpty(npcName) || string.IsNullOrEmpty(newLevel)) return;
             Show($"{npcName}: Trust -> {newLevel}", NotificationType.Trust);
         }
 

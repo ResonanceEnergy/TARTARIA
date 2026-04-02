@@ -22,8 +22,8 @@ namespace Tartaria.Integration
     /// </summary>
     public class DebugOverlay : MonoBehaviour
     {
-        [SerializeField] bool showOnStart;
-[SerializeField] KeyCode toggleKey = KeyCode.F1;
+        [SerializeField, Tooltip("Show debug overlay when scene loads")] bool showOnStart;
+[SerializeField, Tooltip("Key to toggle debug overlay visibility")] KeyCode toggleKey = KeyCode.F1;
 
         bool _visible;
         float _fps;

@@ -18,32 +18,32 @@ namespace Tartaria.Camera
     public class CameraController : MonoBehaviour
     {
         [Header("Target")]
-        [SerializeField] Transform followTarget;
+        [SerializeField, Tooltip("Transform to follow and orbit around")] Transform followTarget;
 
         [Header("Exploration Mode")]
-        [SerializeField] float exploreDistance = 15f;
-        [SerializeField] float explorePitch = 45f;
-        [SerializeField] float exploreFOV = 50f;
+        [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 15f;
+        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 45f;
+        [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 50f;
 
         [Header("Combat Mode")]
-        [SerializeField] float combatDistance = 20f;
-        [SerializeField] float combatPitch = 50f;
-        [SerializeField] float combatFOV = 60f;
+        [SerializeField, Tooltip("Camera distance in combat mode")] float combatDistance = 20f;
+        [SerializeField, Tooltip("Camera pitch angle in combat mode")] float combatPitch = 50f;
+        [SerializeField, Tooltip("Field of view in combat mode")] float combatFOV = 60f;
 
         [Header("Close-Up Mode")]
-        [SerializeField] float closeUpDistance = 5f;
-        [SerializeField] float closeUpFOV = 40f;
+        [SerializeField, Tooltip("Camera distance for close-up inspections")] float closeUpDistance = 5f;
+        [SerializeField, Tooltip("Field of view for close-up inspections")] float closeUpFOV = 40f;
 
         [Header("Tuning Mode")]
-        [SerializeField] float tuningDistance = 8f;
-        [SerializeField] float tuningPitch = 70f;
+        [SerializeField, Tooltip("Camera distance during building tuning")] float tuningDistance = 8f;
+        [SerializeField, Tooltip("Camera pitch angle during building tuning")] float tuningPitch = 70f;
 
         [Header("Controls")]
-        [SerializeField] float zoomSpeed = 3f;
-        [SerializeField] float zoomMin = 5f;
-        [SerializeField] float zoomMax = 25f;
-        [SerializeField] float orbitSpeed = 120f;
-        [SerializeField] float smoothSpeed = 8f;
+        [SerializeField, Tooltip("Mouse scroll zoom speed")] float zoomSpeed = 3f;
+        [SerializeField, Tooltip("Minimum allowed zoom distance")] float zoomMin = 5f;
+        [SerializeField, Tooltip("Maximum allowed zoom distance")] float zoomMax = 25f;
+        [SerializeField, Tooltip("Camera orbit rotation speed (degrees/sec)")] float orbitSpeed = 120f;
+        [SerializeField, Tooltip("Camera movement interpolation speed")] float smoothSpeed = 8f;
 
         UnityEngine.Camera _camera;
         float _currentDistance;

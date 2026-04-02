@@ -23,11 +23,11 @@ namespace Tartaria.UI
         public static DissonanceLensOverlay Instance { get; private set; }
 
         [Header("Lens Settings")]
-        [SerializeField] float aetherCostPerSecond = 2f;
-        [SerializeField] float scanPulseInterval = 1.5f;
-[SerializeField] float scanRadius = 50f;
-        [SerializeField] Color corruptionTint = new(0.6f, 0.1f, 0.4f, 0.3f);
-        [SerializeField] Color cleanTint = new(0.2f, 0.8f, 0.6f, 0.15f);
+        [SerializeField, Tooltip("Aether drain rate while lens is active")] float aetherCostPerSecond = 2f;
+        [SerializeField, Tooltip("Interval between corruption scan pulses")] float scanPulseInterval = 1.5f;
+[SerializeField, Tooltip("Max detection range for corruption sources")] float scanRadius = 50f;
+        [SerializeField, Tooltip("Overlay tint colour for corrupted areas")] Color corruptionTint = new(0.6f, 0.1f, 0.4f, 0.3f);
+        [SerializeField, Tooltip("Overlay tint colour for clean areas")] Color cleanTint = new(0.2f, 0.8f, 0.6f, 0.15f);
 
         bool _active;
         bool _unlocked;

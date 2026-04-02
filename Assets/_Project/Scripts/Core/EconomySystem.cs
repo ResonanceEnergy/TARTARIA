@@ -17,6 +17,7 @@ namespace Tartaria.Core
     ///
     /// Singleton MonoBehaviour — lives on GameLoop object.
     /// </summary>
+    [DisallowMultipleComponent]
     public class EconomySystem : MonoBehaviour
     {
         public static EconomySystem Instance { get; private set; }
@@ -239,6 +240,7 @@ namespace Tartaria.Core
 
         public void RegisterBuilding(string buildingId, int baseIncome, CurrencyType outputType = CurrencyType.AetherShards)
         {
+            if (string.IsNullOrEmpty(buildingId)) return;
             _buildings[buildingId] = new BuildingIncome
             {
                 buildingId = buildingId,
@@ -251,6 +253,7 @@ namespace Tartaria.Core
 
         public void UpgradeBuilding(string buildingId)
         {
+            if (string.IsNullOrEmpty(buildingId)) return;
             if (!_buildings.TryGetValue(buildingId, out var b)) return;
             b.level++;
             _buildings[buildingId] = b;
@@ -258,6 +261,7 @@ namespace Tartaria.Core
 
         public void SetBuildingActive(string buildingId, bool active)
         {
+            if (string.IsNullOrEmpty(buildingId)) return;
             if (!_buildings.TryGetValue(buildingId, out var b)) return;
             b.active = active;
             _buildings[buildingId] = b;

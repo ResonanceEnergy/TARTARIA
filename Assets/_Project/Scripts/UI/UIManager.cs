@@ -116,6 +116,7 @@ namespace Tartaria.UI
 
         public void ShowDialogue(string speaker, string text, Sprite portrait = null)
         {
+            if (string.IsNullOrEmpty(speaker) || string.IsNullOrEmpty(text)) return;
             SetPanelActive(dialoguePanel, true);
             if (dialogueSpeakerText != null) dialogueSpeakerText.text = speaker;
             if (dialogueBodyText != null) dialogueBodyText.text = text;

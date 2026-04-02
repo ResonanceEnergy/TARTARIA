@@ -17,14 +17,15 @@ namespace Tartaria.Audio
     /// Zone-specific motifs via golden-ratio frequency stepping.
     /// Budget: 0.5ms per frame.
     /// </summary>
+    [DisallowMultipleComponent]
     public class AdaptiveMusicController : MonoBehaviour
     {
         public static AdaptiveMusicController Instance { get; private set; }
 
         [Header("Volume Settings")]
-        [SerializeField] float masterVolume = 0.6f;
-        [SerializeField] float combatVolumeBoost = 1.2f;
-        [SerializeField] float crossfadeSpeed = 0.8f;
+        [SerializeField, Tooltip("Master volume for all music layers")] float masterVolume = 0.6f;
+        [SerializeField, Tooltip("Volume boost multiplier during combat")] float combatVolumeBoost = 1.2f;
+        [SerializeField, Tooltip("Speed of layer crossfade transitions")] float crossfadeSpeed = 0.8f;
 
         // ─── Layers ───
         AudioSource _layer0Ambient;

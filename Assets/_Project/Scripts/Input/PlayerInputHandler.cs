@@ -20,18 +20,18 @@ namespace Tartaria.Input
         public static PlayerInputHandler Instance { get; private set; }
 
         [Header("Input")]
-        [SerializeField] InputActionAsset inputActions;
+        [SerializeField, Tooltip("Unity Input System action asset")] InputActionAsset inputActions;
 
         [Header("Movement")]
-        [SerializeField, Min(0.1f)] float moveSpeed = 6.0f;
-        [SerializeField, Min(1f)] float sprintMultiplier = 1.6f;
-        [SerializeField, Min(0f)] float rotationSpeed = 720f;
-        [SerializeField, Range(-50f, -1f)] float gravity = -20f;
+        [SerializeField, Min(0.1f), Tooltip("Base movement speed (m/s)")] float moveSpeed = 6.0f;
+        [SerializeField, Min(1f), Tooltip("Multiplier applied while sprinting")] float sprintMultiplier = 1.6f;
+        [SerializeField, Min(0f), Tooltip("Character turn speed (degrees/sec)")] float rotationSpeed = 720f;
+        [SerializeField, Range(-50f, -1f), Tooltip("Gravity acceleration applied each frame")] float gravity = -20f;
 
         [Header("Interaction")]
-        [SerializeField, Min(0.1f)] float interactRadius = 3.0f;
-        [SerializeField] LayerMask interactableLayer;
-        [SerializeField] LayerMask enemyLayer;
+        [SerializeField, Min(0.1f), Tooltip("Max distance to interact with objects")] float interactRadius = 3.0f;
+        [SerializeField, Tooltip("Layers that can receive interactions")] LayerMask interactableLayer;
+        [SerializeField, Tooltip("Layers that identify enemies for combat")] LayerMask enemyLayer;
 
         CharacterController _controller;
         Camera _mainCamera;

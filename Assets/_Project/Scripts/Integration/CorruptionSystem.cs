@@ -92,6 +92,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void ApplyCorruption(string buildingId, float amount)
         {
+            if (string.IsNullOrEmpty(buildingId)) return;
             if (!_states.TryGetValue(buildingId, out var state))
             {
                 state = new CorruptionState { buildingId = buildingId };
@@ -117,6 +118,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void PurgeCorruption(string buildingId, float amount)
         {
+            if (string.IsNullOrEmpty(buildingId)) return;
             if (!_states.TryGetValue(buildingId, out var state)) return;
 
             state.corruptionLevel = Mathf.Max(0f, state.corruptionLevel - amount);
@@ -150,6 +152,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void MarkIdentified(string buildingId)
         {
+            if (string.IsNullOrEmpty(buildingId)) return;
             if (!_states.TryGetValue(buildingId, out var state)) return;
             state.identified = true;
             _states[buildingId] = state;
@@ -162,6 +165,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void MarkIsolated(string buildingId)
         {
+            if (string.IsNullOrEmpty(buildingId)) return;
             if (!_states.TryGetValue(buildingId, out var state)) return;
             state.isolated = true;
             _states[buildingId] = state;
@@ -173,6 +177,7 @@ namespace Tartaria.Integration
         /// </summary>
         public float GetCorruptionLevel(string buildingId)
         {
+            if (string.IsNullOrEmpty(buildingId)) return 0f;
             return _states.TryGetValue(buildingId, out var state)
                 ? state.corruptionLevel : 0f;
         }
@@ -182,6 +187,7 @@ namespace Tartaria.Integration
         /// </summary>
         public PurgeStage GetPurgeStage(string buildingId)
         {
+            if (string.IsNullOrEmpty(buildingId)) return PurgeStage.Clean;
             return _states.TryGetValue(buildingId, out var state)
                 ? state.stage : PurgeStage.Clean;
         }
