@@ -14,6 +14,26 @@ namespace Tartaria.Gameplay
     /// Combat philosophy: retune, don't destroy. Enemies dissolve into
     /// purified Aether when their dissonant frequency is corrected.
     /// </summary>
+    /// <summary>Combat balance constants — single source of truth for tuning values.</summary>
+    public static class CombatBalance
+    {
+        // Resonance Pulse — AOE frequency-matched attack
+        public const float PulseFreqTolerance = 20f;
+        public const float PulseFreqMatchBonus = 1.5f;
+
+        // Harmonic Strike — directed frequency-matched attack
+        public const float StrikeBaseMultiplier = 1.25f;
+        public const float StrikeFreqTolerance = 10f;
+        public const float StrikeTightMatchBonus = 1.6f;
+
+        // Enemy defaults
+        public const float DefaultEnemyHP = 100f;
+        public const float DefaultDissonantFreq = 174f;
+        public const float DefaultMoveSpeed = 4f;
+        public const float DefaultAttackRange = 3f;
+        public const float BossAttackRange = 8f;
+    }
+
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct HarmonicCombatSystem : ISystem
     {
@@ -83,15 +103,15 @@ namespace Tartaria.Gameplay
                             case DamageType.ResonancePulse:
                                 // AOE: base damage, bonus if frequency near target's
                                 float freqDelta = math.abs(dmg.Frequency - combatant.ValueRO.CurrentFrequency);
-                                if (freqDelta < 20f)
-                                    finalDamage *= 1.5f; // Frequency-matched bonus
+                                if (freqDelta < CombatBalance.PulseFreqTolerance)
+                                    finalDamage *= CombatBalance.PulseFreqMatchBonus;
                                 break;
                             case DamageType.HarmonicStrike:
                                 // Directed: 1.25x base, 2x if frequency-matched
-                                finalDamage *= 1.25f;
+                                finalDamage *= CombatBalance.StrikeBaseMultiplier;
                                 float hsDelta = math.abs(dmg.Frequency - combatant.ValueRO.CurrentFrequency);
-                                if (hsDelta < 10f)
-                                    finalDamage *= 1.6f; // Tight frequency match
+                                if (hsDelta < CombatBalance.StrikeFreqTolerance)
+                                    finalDamage *= CombatBalance.StrikeTightMatchBonus;
                                 break;
                             case DamageType.GolemSlam:
                                 // Enemy melee: flat damage, ignores frequency
@@ -166,10 +186,10 @@ namespace Tartaria.Gameplay
             em.AddComponentData(entity, new EnemyTag { Type = trigger.EnemyToSpawn });
 
             // Per-type stats: HP, frequency, move speed, and type-specific component
-            float hp = 100f;
-            float freq = 174f; // default dissonant
-            float moveSpeed = 4f;
-            float attackRange = 3f;
+            float hp = CombatBalance.DefaultEnemyHP;
+            float freq = CombatBalance.DefaultDissonantFreq;
+            float moveSpeed = CombatBalance.DefaultMoveSpeed;
+            float attackRange = CombatBalance.DefaultAttackRange;
 
             switch (trigger.EnemyToSpawn)
             {

@@ -14,6 +14,7 @@ namespace Tartaria.UI
     ///
     /// Responds to GameStateManager transitions.
     /// </summary>
+    [DisallowMultipleComponent]
     public class UIManager : MonoBehaviour
     {
         public static UIManager Instance { get; private set; }
@@ -37,7 +38,7 @@ namespace Tartaria.UI
 
         [Header("Save Indicator")]
         [SerializeField] GameObject saveIndicator;
-        [SerializeField] float saveIndicatorDuration = 2f;
+        [SerializeField, Min(0.1f)] float saveIndicatorDuration = 2f;
 
         float _saveIndicatorTimer;
         bool _aetherVisionActive;

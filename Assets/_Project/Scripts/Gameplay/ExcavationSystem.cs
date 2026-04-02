@@ -30,12 +30,12 @@ namespace Tartaria.Gameplay
         public event Action<ExcavationSite, float> OnRSYielded;      // site, rsAmount
 
         [Header("Excavation Settings")]
-        [SerializeField] float baseDigTime = 2f;
-        [SerializeField] float layerDigTimeScale = 0.3f;  // each deeper layer adds this
-        [SerializeField] float baseRSPerLayer = 3f;
-        [SerializeField] float depthRSMultiplier = 0.5f;
-        [SerializeField] float scanAccuracyBonus = 1.5f;  // multiplier at 100% scan accuracy
-[SerializeField] float interactionRadius = 3f;
+        [SerializeField, Min(0.1f)] float baseDigTime = 2f;
+        [SerializeField, Min(0f)] float layerDigTimeScale = 0.3f;  // each deeper layer adds this
+        [SerializeField, Min(0f)] float baseRSPerLayer = 3f;
+        [SerializeField, Range(0f, 2f)] float depthRSMultiplier = 0.5f;
+        [SerializeField, Min(1f)] float scanAccuracyBonus = 1.5f;  // multiplier at 100% scan accuracy
+        [SerializeField, Min(0.1f)] float interactionRadius = 3f;
 
         // ─── Active Sites ───
         readonly Dictionary<string, ExcavationSite> _sites = new();

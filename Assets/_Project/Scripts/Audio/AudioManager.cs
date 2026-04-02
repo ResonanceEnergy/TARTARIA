@@ -10,13 +10,14 @@ namespace Tartaria.Audio
     /// Key frequencies: 7.83 Hz (Telluric), 432 Hz (Harmonic),
     ///                  528 Hz (Healing), 1296 Hz (Celestial)
     /// </summary>
+    [DisallowMultipleComponent]
     public class AudioManager : MonoBehaviour
     {
         public static AudioManager Instance { get; private set; }
 
         [Header("SFX Pools")]
-        [SerializeField] int sfxPoolSize = 16;
-        [SerializeField] int tonePoolSize = 4;
+        [SerializeField, Min(1)] int sfxPoolSize = 16;
+        [SerializeField, Min(1)] int tonePoolSize = 4;
 
         AudioSource[] _sfxPool;
         int _sfxPoolIndex;

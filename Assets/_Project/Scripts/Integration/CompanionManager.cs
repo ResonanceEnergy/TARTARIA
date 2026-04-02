@@ -68,6 +68,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void AddTrust(string companionId, float amount)
         {
+            if (string.IsNullOrEmpty(companionId)) return;
             if (!_states.TryGetValue(companionId, out var state)) return;
             if (!state.unlocked) return;
 
