@@ -28,10 +28,19 @@ namespace Tartaria.Core
                 Debug.LogError("[Tartaria] ECS world initialization failed — cannot proceed.");
                 return;
             }
-            GameStateManager.Instance.TransitionTo(GameState.Loading);
 
-            // Proceed to main scene load
-            GameStateManager.Instance.TransitionTo(GameState.Exploration);
+            // Hand off to SceneLoader for async scene loading
+            var sceneLoader = FindAnyObjectByType<SceneLoader>();
+            if (sceneLoader != null)
+            {
+                sceneLoader.LoadGameplayScenes();
+            }
+            else
+            {
+                Debug.LogWarning("[Tartaria] No SceneLoader found — falling back to direct state transition.");
+                GameStateManager.Instance.TransitionTo(GameState.Loading);
+                GameStateManager.Instance.TransitionTo(GameState.Exploration);
+            }
         }
 
         bool InitializeECSWorld()

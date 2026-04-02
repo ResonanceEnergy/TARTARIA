@@ -190,6 +190,8 @@ namespace Tartaria.Input
             if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
             AetherVisionActive = !AetherVisionActive;
             GameEvents.FireToggleAetherVision();
+            if (AetherVisionActive)
+                Integration.TutorialSystem.Instance?.ForceComplete(Integration.TutorialStep.AetherVision);
         }
 
         void OnPausePerformed(InputAction.CallbackContext ctx)

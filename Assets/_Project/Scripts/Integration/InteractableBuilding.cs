@@ -63,6 +63,7 @@ namespace Tartaria.Integration
 
             UpdateVisuals();
             RestoreFromSave();
+            RegisterWithScanner();
         }
 
         void OnDestroy()
@@ -73,6 +74,23 @@ namespace Tartaria.Integration
                 _tuningController.OnTuningComplete -= OnTuningComplete;
                 _tuningController.OnTuningFailed -= OnTuningFailed;
             }
+            // Unregister scanner POI
+            Gameplay.ResonanceScannerSystem.Instance?.UnregisterPOI(buildingId);
+        }
+
+        void RegisterWithScanner()
+        {
+            var scanner = Gameplay.ResonanceScannerSystem.Instance;
+            if (scanner == null || string.IsNullOrEmpty(buildingId)) return;
+
+            scanner.RegisterPOI(new Gameplay.ScanPOI
+            {
+                poiId = buildingId,
+                poiType = Gameplay.ScanPOIType.BuriedStructure,
+                position = transform.position,
+                isRevealed = _isDiscovered
+            });
+        }
         }
 
         // ─── IInteractable Implementation ────────────
@@ -205,6 +223,9 @@ namespace Tartaria.Integration
             // Notify game loop
             GameLoopController.Instance?.OnTuningNodeComplete(buildingId, _nodesCompleted - 1, accuracy);
 
+            // Tutorial: first tuning completion
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.Tuning);
+
             // All nodes done?
             if (_nodesCompleted >= 3)
                 BeginEmergence();
@@ -280,6 +301,9 @@ namespace Tartaria.Integration
 
             GameLoopController.Instance?.OnBuildingRestored(
                 GetDisplayName(), transform.position, allPerfect);
+
+            // Tutorial: first building fully restored
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.BuildingRestore);
         }
 
         // ─── Visuals ─────────────────────────────────

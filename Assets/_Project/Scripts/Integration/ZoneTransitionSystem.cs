@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Tartaria.Core;
 using Tartaria.UI;
 using Tartaria.Save;
@@ -39,6 +40,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            DontDestroyOnLoad(gameObject);
             ServiceLocator.ZoneTransition = this;
         }
 
@@ -175,12 +177,12 @@ namespace Tartaria.Integration
             _currentZoneIndex = index;
             var zone = zones[index];
 
-            // Configure ZoneController
-            if (ZoneController.Instance != null)
+            // Load zone scene additively if specified
+            if (!string.IsNullOrEmpty(zone.sceneName))
             {
-                var so = ZoneController.Instance;
-                // ZoneController will read from its own serialized fields
-                // In a full implementation, we'd load the scene additively
+                var scene = SceneManager.GetSceneByName(zone.sceneName);
+                if (!scene.isLoaded)
+                    SceneManager.LoadSceneAsync(zone.sceneName, LoadSceneMode.Additive);
             }
 
             // Configure atmosphere from zone definition
@@ -203,9 +205,14 @@ namespace Tartaria.Integration
 
         void UnloadZone(int index)
         {
-            // Clean up zone-specific entities and objects
-            // In a full implementation, we'd unload the additively-loaded scene
-            Debug.Log($"[ZoneTransition] Unloaded zone: {zones[index].zoneName}");
+            var zone = zones[index];
+            if (!string.IsNullOrEmpty(zone.sceneName))
+            {
+                var scene = SceneManager.GetSceneByName(zone.sceneName);
+                if (scene.isLoaded)
+                    SceneManager.UnloadSceneAsync(zone.sceneName);
+            }
+            Debug.Log($"[ZoneTransition] Unloaded zone: {zone.zoneName}");
         }
 
         System.Collections.IEnumerator FadeScreen(float targetAlpha, float duration)
@@ -257,6 +264,7 @@ namespace Tartaria.Integration
     {
         [Header("Identity")]
         public string zoneName;
+        public string sceneName; // Scene to load for this zone
         public string subtitle;
         [TextArea(2, 4)]
         public string loreIntro;
