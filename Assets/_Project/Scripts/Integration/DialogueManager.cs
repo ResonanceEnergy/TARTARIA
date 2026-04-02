@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using Tartaria.Audio;
 using Tartaria.Core;
@@ -43,6 +44,10 @@ namespace Tartaria.Integration
         [SerializeField, Min(0f)] float minTimeBetweenLines = 8f;
         [SerializeField, Min(1f)] float autoCloseDelay = 5f;
 
+        [Header("External Data")]
+        [Tooltip("Optional JSON dialogue files loaded from StreamingAssets/Dialogue/ at startup")]
+        [SerializeField] string[] externalDialogueFiles;
+
         float _lastLineTime = -999f;
         float _currentLineDuration;
         readonly Dictionary<string, List<DialogueLine>> _contextLines = new();
@@ -60,6 +65,7 @@ namespace Tartaria.Integration
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             BuildDatabase();
+            LoadExternalDialogue();
         }
 
         void OnDestroy()
@@ -557,6 +563,84 @@ namespace Tartaria.Integration
             public string context;
             public bool oneShot;
             /// <summary>Per-line display duration. 0 = use autoCloseDelay default.</summary>
+            public float duration;
+        }
+
+        // ─── External JSON Loading ───────────────────
+
+        /// <summary>
+        /// Loads dialogue lines from JSON files in StreamingAssets/Dialogue/.
+        /// Falls back to Application.dataPath/_Project/Data/ in editor.
+        /// JSON format: { "lines": [ { "id", "speaker", "context", "text", "oneShot", "duration" } ] }
+        /// External lines override built-in lines with the same ID.
+        /// </summary>
+        void LoadExternalDialogue()
+        {
+            string[] searchPaths = {
+                Path.Combine(Application.streamingAssetsPath, "Dialogue"),
+#if UNITY_EDITOR
+                Path.Combine(Application.dataPath, "_Project", "Data"),
+#endif
+            };
+
+            foreach (var folder in searchPaths)
+            {
+                if (!Directory.Exists(folder)) continue;
+
+                string[] files = externalDialogueFiles != null && externalDialogueFiles.Length > 0
+                    ? externalDialogueFiles
+                    : null;
+
+                string[] jsonFiles = files != null
+                    ? System.Array.ConvertAll(files, f => Path.Combine(folder, f))
+                    : Directory.GetFiles(folder, "*.json");
+
+                foreach (var filePath in jsonFiles)
+                {
+                    if (!File.Exists(filePath)) continue;
+                    try
+                    {
+                        string json = File.ReadAllText(filePath);
+                        var data = JsonUtility.FromJson<DialogueFileData>(json);
+                        if (data?.lines == null) continue;
+
+                        int loaded = 0;
+                        foreach (var entry in data.lines)
+                        {
+                            if (string.IsNullOrEmpty(entry.id) || string.IsNullOrEmpty(entry.context))
+                                continue;
+                            AddLine(entry.context, entry.id, entry.speaker, entry.text, entry.oneShot);
+                            if (entry.duration > 0f && _lineById.TryGetValue(entry.id, out var line))
+                                line.duration = entry.duration;
+                            loaded++;
+                        }
+
+                        Debug.Log($"[Dialogue] Loaded {loaded} lines from {Path.GetFileName(filePath)}");
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"[Dialogue] Failed to load {filePath}: {ex.Message}");
+                    }
+                }
+            }
+        }
+
+        [System.Serializable]
+        class DialogueFileData
+        {
+            public int version;
+            public string description;
+            public DialogueEntry[] lines;
+        }
+
+        [System.Serializable]
+        class DialogueEntry
+        {
+            public string id;
+            public string speaker;
+            public string context;
+            public string text;
+            public bool oneShot;
             public float duration;
         }
     }

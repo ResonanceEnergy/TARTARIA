@@ -37,6 +37,7 @@ namespace Tartaria.Editor
             QuestDefinitionFactory.BuildAllQuests();
             AnastasiaPrefabFactory.BuildAnastasiaPrefab();
             GoldenMotePrefabFactory.BuildMotePrefab();
+            CharacterPrefabFactory.BuildAllCharacters();
             Moon2ZoneScaffold.BuildBuildingDefinitions();
             MoonBuildingFactory.BuildAllMoonBuildings();
 
