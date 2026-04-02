@@ -77,6 +77,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void PlayContextDialogue(string context)
         {
+            if (string.IsNullOrEmpty(context)) return;
             if (Time.time - _lastLineTime < minTimeBetweenLines) return;
 
             if (!_contextLines.TryGetValue(context, out var lines) || lines.Count == 0)
@@ -114,6 +115,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void PlayLineById(string lineId)
         {
+            if (string.IsNullOrEmpty(lineId)) return;
             PlayLineById(lineId, 1f);
         }
 
@@ -122,6 +124,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void PlayLineById(string lineId, float volume)
         {
+            if (string.IsNullOrEmpty(lineId)) return;
             if (_lineById.TryGetValue(lineId, out var line))
                 ShowLine(line, volume);
         }

@@ -53,6 +53,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void UnlockCompanion(string companionId)
         {
+            if (string.IsNullOrEmpty(companionId)) return;
             if (!_states.TryGetValue(companionId, out var state)) return;
             if (state.unlocked) return;
 
@@ -92,6 +93,7 @@ namespace Tartaria.Integration
         /// </summary>
         public float GetBuffMultiplier(string companionId)
         {
+            if (string.IsNullOrEmpty(companionId)) return 1f;
             if (!_states.TryGetValue(companionId, out var state)) return 1f;
             if (!state.unlocked) return 1f;
 
@@ -101,11 +103,13 @@ namespace Tartaria.Integration
 
         public bool IsUnlocked(string companionId)
         {
+            if (string.IsNullOrEmpty(companionId)) return false;
             return _states.TryGetValue(companionId, out var state) && state.unlocked;
         }
 
         public float GetTrust(string companionId)
         {
+            if (string.IsNullOrEmpty(companionId)) return 0f;
             return _states.TryGetValue(companionId, out var state) ? state.trustLevel : 0f;
         }
 

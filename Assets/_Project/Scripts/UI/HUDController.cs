@@ -213,6 +213,7 @@ namespace Tartaria.UI
 
         public void ShowInteractionPrompt(string text)
         {
+            if (string.IsNullOrEmpty(text)) return;
             if (interactionPrompt != null)
             {
                 interactionPrompt.gameObject.SetActive(true);
@@ -230,6 +231,7 @@ namespace Tartaria.UI
 
         public void SetZoneName(string zoneName)
         {
+            if (string.IsNullOrEmpty(zoneName)) return;
             if (zoneNameText != null)
                 zoneNameText.text = zoneName;
         }
@@ -245,6 +247,7 @@ namespace Tartaria.UI
 
         public void ShowBossHealth(string bossName, float normalizedHealth)
         {
+            if (string.IsNullOrEmpty(bossName)) return;
             _bossBarVisible = true;
             _bossHealthTarget = Mathf.Clamp01(normalizedHealth);
             if (bossHealthPanel != null)
@@ -325,6 +328,7 @@ namespace Tartaria.UI
 
         public void ShowAchievementToast(string title)
         {
+            if (string.IsNullOrEmpty(title)) return;
             _achievementVisible = true;
             _achievementTimer = achievementDisplayDuration;
             if (achievementToastPanel != null)
@@ -351,6 +355,7 @@ namespace Tartaria.UI
 
         public void ShowMoonTrophy(string moonName, string subtitle)
         {
+            if (string.IsNullOrEmpty(moonName) || string.IsNullOrEmpty(subtitle)) return;
             _trophyVisible = true;
             _trophyTimer = trophyDisplayDuration;
             if (moonTrophyPanel != null)

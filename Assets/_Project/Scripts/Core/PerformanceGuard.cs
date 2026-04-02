@@ -24,15 +24,15 @@ namespace Tartaria.Core
         public static PerformanceGuard Instance { get; private set; }
 
         [Header("Budget Targets (ms)")]
-        [SerializeField, Min(1f)] float targetFrameTimeMs = 16.67f;
-        [SerializeField, Min(0.1f)] float aetherBudgetMs = 2.0f;
-        [SerializeField, Min(0.1f)] float combatBudgetMs = 2.0f;
-        [SerializeField, Min(0.1f)] float aiBudgetMs = 1.5f;
-        [SerializeField, Min(0.1f)] float corruptionBudgetMs = 1.0f;
+        [SerializeField, Min(1f), Tooltip("Target frame time in ms (16.67 = 60fps)")] float targetFrameTimeMs = 16.67f;
+        [SerializeField, Min(0.1f), Tooltip("Max ms budget for Aether field tick")] float aetherBudgetMs = 2.0f;
+        [SerializeField, Min(0.1f), Tooltip("Max ms budget for combat ECS systems")] float combatBudgetMs = 2.0f;
+        [SerializeField, Min(0.1f), Tooltip("Max ms budget for AI decision making")] float aiBudgetMs = 1.5f;
+        [SerializeField, Min(0.1f), Tooltip("Max ms budget for corruption tick")] float corruptionBudgetMs = 1.0f;
 
         [Header("Monitoring")]
-        [SerializeField, Min(10)] int sampleWindowFrames = 120;
-        [SerializeField, Min(1f)] float alertCooldownSeconds = 10f;
+        [SerializeField, Min(10), Tooltip("Frames to average for performance stats")] int sampleWindowFrames = 120;
+        [SerializeField, Min(1f), Tooltip("Seconds between budget-exceeded alerts")] float alertCooldownSeconds = 10f;
 
         // Frame time tracking
         float[] _frameTimes;

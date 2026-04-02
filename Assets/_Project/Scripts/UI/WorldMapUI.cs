@@ -19,6 +19,7 @@ namespace Tartaria.UI
     ///
     /// Also includes the Codex viewer for collected lore entries.
     /// </summary>
+    [DisallowMultipleComponent]
     public class WorldMapUI : MonoBehaviour
     {
         public static WorldMapUI Instance { get; private set; }
@@ -322,6 +323,7 @@ namespace Tartaria.UI
     /// Categories: History, Technology, Characters, Frequencies, Locations, Artifacts
     /// Entries unlock through gameplay: discovering buildings, NPC dialogue, quest rewards.
     /// </summary>
+    [DisallowMultipleComponent]
     public class CodexSystem : MonoBehaviour
     {
         public static CodexSystem Instance { get; private set; }
@@ -347,6 +349,7 @@ namespace Tartaria.UI
 
         public void UnlockEntry(string entryId)
         {
+            if (string.IsNullOrEmpty(entryId)) return;
             if (_unlockedIds.Contains(entryId)) return;
             if (!_entries.ContainsKey(entryId)) return;
             _unlockedIds.Add(entryId);
@@ -354,10 +357,10 @@ namespace Tartaria.UI
             Debug.Log($"[Codex] Unlocked: {_entries[entryId].title}");
         }
 
-        public bool IsUnlocked(string entryId) => _unlockedIds.Contains(entryId);
+        public bool IsUnlocked(string entryId) => !string.IsNullOrEmpty(entryId) && _unlockedIds.Contains(entryId);
 
         public CodexEntry GetEntry(string entryId) =>
-            _entries.TryGetValue(entryId, out var e) ? e : null;
+            !string.IsNullOrEmpty(entryId) && _entries.TryGetValue(entryId, out var e) ? e : null;
 
         public int TotalEntries => _entries.Count;
         public int UnlockedCount => _unlockedIds.Count;

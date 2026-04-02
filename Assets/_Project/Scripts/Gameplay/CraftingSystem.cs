@@ -55,6 +55,7 @@ namespace Tartaria.Gameplay
 
         public void DiscoverRecipe(string recipeId)
         {
+            if (string.IsNullOrEmpty(recipeId)) return;
             if (_discoveredRecipes.Contains(recipeId)) return;
             if (!_recipes.ContainsKey(recipeId)) return;
 
@@ -72,10 +73,11 @@ namespace Tartaria.Gameplay
             }
         }
 
-        public bool IsRecipeDiscovered(string recipeId) => _discoveredRecipes.Contains(recipeId);
+        public bool IsRecipeDiscovered(string recipeId) => !string.IsNullOrEmpty(recipeId) && _discoveredRecipes.Contains(recipeId);
 
         public CraftingRecipe GetRecipe(string recipeId)
         {
+            if (string.IsNullOrEmpty(recipeId)) return null;
             return _recipes.TryGetValue(recipeId, out var r) ? r : null;
         }
 
@@ -94,6 +96,7 @@ namespace Tartaria.Gameplay
 
         public bool CanCraft(string recipeId)
         {
+            if (string.IsNullOrEmpty(recipeId)) return false;
             if (!_discoveredRecipes.Contains(recipeId)) return false;
             if (!_recipes.TryGetValue(recipeId, out var recipe)) return false;
 
@@ -110,6 +113,7 @@ namespace Tartaria.Gameplay
 
         public bool Craft(string recipeId)
         {
+            if (string.IsNullOrEmpty(recipeId)) return false;
             if (!CanCraft(recipeId))
             {
                 OnCraftFailed?.Invoke(recipeId, "Insufficient resources");
@@ -148,11 +152,13 @@ namespace Tartaria.Gameplay
 
         public int GetItemCount(string itemId)
         {
+            if (string.IsNullOrEmpty(itemId)) return 0;
             return _inventory.TryGetValue(itemId, out int count) ? count : 0;
         }
 
         public bool ConsumeItem(string itemId, int amount = 1)
         {
+            if (string.IsNullOrEmpty(itemId)) return false;
             if (!_inventory.TryGetValue(itemId, out int count) || count < amount)
                 return false;
             _inventory[itemId] -= amount;
@@ -176,6 +182,7 @@ namespace Tartaria.Gameplay
         /// </summary>
         public bool UseItem(string itemId)
         {
+            if (string.IsNullOrEmpty(itemId)) return false;
             if (GetItemCount(itemId) <= 0) return false;
 
             bool applied = false;

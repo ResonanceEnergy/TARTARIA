@@ -343,6 +343,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void Unlock(string achievementId)
         {
+            if (string.IsNullOrEmpty(achievementId)) return;
             if (!_unlocked.ContainsKey(achievementId)) return;
             if (_unlocked[achievementId]) return;
 
@@ -372,6 +373,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void SetProgress(string achievementId, float progress)
         {
+            if (string.IsNullOrEmpty(achievementId)) return;
             if (!_progress.ContainsKey(achievementId)) return;
             if (_unlocked[achievementId]) return;
 
@@ -382,8 +384,8 @@ namespace Tartaria.Integration
                 Unlock(achievementId);
         }
 
-        public bool IsUnlocked(string id) => _unlocked.TryGetValue(id, out bool v) && v;
-        public float GetProgress(string id) => _progress.TryGetValue(id, out float v) ? v : 0f;
+        public bool IsUnlocked(string id) => !string.IsNullOrEmpty(id) && _unlocked.TryGetValue(id, out bool v) && v;
+        public float GetProgress(string id) => !string.IsNullOrEmpty(id) && _progress.TryGetValue(id, out float v) ? v : 0f;
         public int TotalUnlocked => _totalUnlocked;
         public int TotalAchievements => _definitions.Count;
         public IReadOnlyList<AchievementDef> Definitions => _definitions;
@@ -407,6 +409,7 @@ namespace Tartaria.Integration
 
         public void CheckBossDefeated(string bossId)
         {
+            if (string.IsNullOrEmpty(bossId)) return;
             Unlock("C03");
             if (bossId == "reset_drone_carrier") Unlock("C07");
             if (bossId == "final_guardian")       Unlock("C08");
@@ -436,6 +439,7 @@ namespace Tartaria.Integration
 
         public void CheckCompanionTrust(string companionId, float trust)
         {
+            if (string.IsNullOrEmpty(companionId)) return;
             if (trust < 100f) return;
             switch (companionId)
             {
