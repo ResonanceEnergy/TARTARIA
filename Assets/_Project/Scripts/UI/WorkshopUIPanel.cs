@@ -213,7 +213,9 @@ namespace Tartaria.UI
                 descriptionText.text = data.nextTierDescription;
 
             if (tierProgressBar != null)
-                tierProgressBar.fillAmount = data.currentTier / (float)data.maxTier;
+                tierProgressBar.fillAmount = data.maxTier > 0
+                    ? data.currentTier / (float)data.maxTier
+                    : 1f;
 
             // Upgrade button state
             if (upgradeButton != null)

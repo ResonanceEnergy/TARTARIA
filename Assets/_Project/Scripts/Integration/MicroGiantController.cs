@@ -92,8 +92,11 @@ namespace Tartaria.Integration
             // Scale transition
             if (Mathf.Abs(_currentScale - _targetScale) > 0.001f)
             {
+                float scaleSpeed = scaleTransitionDuration > 0f
+                    ? 1f / scaleTransitionDuration
+                    : 100f;
                 _currentScale = Mathf.MoveTowards(_currentScale, _targetScale,
-                    (1f / scaleTransitionDuration) * Time.deltaTime);
+                    scaleSpeed * Time.deltaTime);
 
                 if (_playerTransform != null)
                     _playerTransform.localScale = Vector3.one * _currentScale;

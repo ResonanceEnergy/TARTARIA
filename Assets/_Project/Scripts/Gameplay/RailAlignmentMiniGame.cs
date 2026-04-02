@@ -288,6 +288,7 @@ namespace Tartaria.Gameplay
 
         int ScreenPosToSegmentIndex(Vector2 screenPos)
         {
+            if (_gridWidth <= 0 || _gridHeight <= 0) return -1;
             // Map screen position to grid cell
             float cellW = Screen.width / (float)_gridWidth;
             float cellH = Screen.height / (float)_gridHeight;
