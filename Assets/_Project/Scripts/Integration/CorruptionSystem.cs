@@ -27,15 +27,15 @@ namespace Tartaria.Integration
         public static CorruptionSystem Instance { get; private set; }
 
         [Header("Corruption Settings")]
-        [SerializeField] float spreadRatePerSecond = 0.5f;
-        [SerializeField] float spreadRadius = 30f;
-        [SerializeField] float maxCorruption = 100f;
-        [SerializeField] float identifyThreshold = 0.1f;
-[SerializeField] float isolateThreshold = 0.5f;
+        [SerializeField, Min(0f)] float spreadRatePerSecond = 0.5f;
+        [SerializeField, Min(1f)] float spreadRadius = 30f;
+        [SerializeField, Min(1f)] float maxCorruption = 100f;
+        [SerializeField, Range(0f, 1f)] float identifyThreshold = 0.1f;
+        [SerializeField, Range(0f, 1f)] float isolateThreshold = 0.5f;
 
         [Header("Timing")]
-        [SerializeField] float spreadCheckInterval = 5f;
-        [SerializeField] float corruptionTickInterval = 1f;
+        [SerializeField, Min(0.1f)] float spreadCheckInterval = 5f;
+        [SerializeField, Min(0.1f)] float corruptionTickInterval = 1f;
 
         float _spreadCheckTimer;
         float _tickTimer;

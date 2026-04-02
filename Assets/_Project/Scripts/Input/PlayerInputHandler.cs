@@ -23,13 +23,13 @@ namespace Tartaria.Input
         [SerializeField] InputActionAsset inputActions;
 
         [Header("Movement")]
-        [SerializeField] float moveSpeed = 6.0f;
-        [SerializeField] float sprintMultiplier = 1.6f;
-        [SerializeField] float rotationSpeed = 720f;
-        [SerializeField] float gravity = -20f;
+        [SerializeField, Min(0.1f)] float moveSpeed = 6.0f;
+        [SerializeField, Min(1f)] float sprintMultiplier = 1.6f;
+        [SerializeField, Min(0f)] float rotationSpeed = 720f;
+        [SerializeField, Range(-50f, -1f)] float gravity = -20f;
 
         [Header("Interaction")]
-        [SerializeField] float interactRadius = 3.0f;
+        [SerializeField, Min(0.1f)] float interactRadius = 3.0f;
         [SerializeField] LayerMask interactableLayer;
         [SerializeField] LayerMask enemyLayer;
 

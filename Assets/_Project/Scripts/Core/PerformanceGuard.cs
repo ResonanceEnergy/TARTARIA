@@ -24,15 +24,15 @@ namespace Tartaria.Core
         public static PerformanceGuard Instance { get; private set; }
 
         [Header("Budget Targets (ms)")]
-        [SerializeField] float targetFrameTimeMs = 16.67f;
-        [SerializeField] float aetherBudgetMs = 2.0f;
-        [SerializeField] float combatBudgetMs = 2.0f;
-        [SerializeField] float aiBudgetMs = 1.5f;
-        [SerializeField] float corruptionBudgetMs = 1.0f;
+        [SerializeField, Min(1f)] float targetFrameTimeMs = 16.67f;
+        [SerializeField, Min(0.1f)] float aetherBudgetMs = 2.0f;
+        [SerializeField, Min(0.1f)] float combatBudgetMs = 2.0f;
+        [SerializeField, Min(0.1f)] float aiBudgetMs = 1.5f;
+        [SerializeField, Min(0.1f)] float corruptionBudgetMs = 1.0f;
 
         [Header("Monitoring")]
-        [SerializeField] int sampleWindowFrames = 120;
-        [SerializeField] float alertCooldownSeconds = 10f;
+        [SerializeField, Min(10)] int sampleWindowFrames = 120;
+        [SerializeField, Min(1f)] float alertCooldownSeconds = 10f;
 
         // Frame time tracking
         float[] _frameTimes;

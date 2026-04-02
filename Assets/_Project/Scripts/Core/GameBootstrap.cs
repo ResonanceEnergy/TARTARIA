@@ -14,12 +14,12 @@ namespace Tartaria.Core
     public class GameBootstrap : MonoBehaviour
     {
         [Header("Aether Field Configuration")]
-        [SerializeField] int aetherGridX = 64;
-        [SerializeField] int aetherGridY = 64;
-        [SerializeField] int aetherGridZ = 32;
-        [SerializeField] float aetherCellSize = 2.0f;
-        [SerializeField] float aetherDissipation = 0.05f;
-        [SerializeField] float aetherAdvectionSpeed = 1.0f;
+        [SerializeField, Min(1)] int aetherGridX = 64;
+        [SerializeField, Min(1)] int aetherGridY = 64;
+        [SerializeField, Min(1)] int aetherGridZ = 32;
+        [SerializeField, Min(0.1f)] float aetherCellSize = 2.0f;
+        [SerializeField, Range(0f, 1f)] float aetherDissipation = 0.05f;
+        [SerializeField, Min(0f)] float aetherAdvectionSpeed = 1.0f;
 
         void Start()
         {

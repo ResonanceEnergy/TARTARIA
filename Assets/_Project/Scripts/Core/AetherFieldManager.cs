@@ -15,7 +15,7 @@ namespace Tartaria.Core
         public static AetherFieldManager Instance { get; private set; }
 
         [Header("Resonance Score")]
-        [SerializeField] float startingRS = 0f;
+        [SerializeField, Range(0f, 100f)] float startingRS = 0f;
 
         float _resonanceScore;
 

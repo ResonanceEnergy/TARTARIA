@@ -117,7 +117,7 @@ namespace Tartaria.Integration
                 _choices[def.id] = ChoiceOption.NotChosen;
         }
 
-        void Reg(WorldChoiceId id, int moon, string title, string a, string b, string ca, string cb)
+        private void Reg(WorldChoiceId id, int moon, string title, string a, string b, string ca, string cb)
         {
             _definitions.Add(new WorldChoiceDef
             {

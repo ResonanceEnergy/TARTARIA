@@ -74,6 +74,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void ActivateQuest(string questId)
         {
+            if (string.IsNullOrEmpty(questId)) return;
 
             if (!_questStates.TryGetValue(questId, out var state)) return;
             if (state.status != QuestStatus.Locked) return;
@@ -102,6 +103,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void ProgressObjective(string questId, int objectiveIndex, int amount = 1)
         {
+            if (string.IsNullOrEmpty(questId)) return;
             if (!_questStates.TryGetValue(questId, out var state)) return;
             if (state.status != QuestStatus.Active) return;
             if (!_questLookup.TryGetValue(questId, out var def)) return;

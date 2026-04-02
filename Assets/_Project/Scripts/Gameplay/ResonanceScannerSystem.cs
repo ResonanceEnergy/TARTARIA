@@ -31,13 +31,14 @@ namespace Tartaria.Gameplay
         public event Action<ScanResult> OnPOIRevealed;
 
         [Header("Scanner Settings")]
-        [SerializeField] float baseScanRadius = 30f;
-        [SerializeField] float maxScanRadius = 80f;
-        [SerializeField] float scanCooldown = 5f;
-        [SerializeField] float aetherCostPerScan = 5f;
-        [SerializeField] int maxPingsPerScan = 10;
+        [SerializeField, Min(1f)] float baseScanRadius = 30f;
+        [SerializeField, Min(1f)] float maxScanRadius = 80f;
+        [SerializeField, Min(0f)] float scanCooldown = 5f;
+        [SerializeField, Min(0f)] float aetherCostPerScan = 5f;
+        [SerializeField, Min(1)] int maxPingsPerScan = 10;
 
         float _cooldownTimer;
+        Transform _cachedPlayerTransform;
         bool _scannerUnlocked = true; // Available from game start
         readonly List<ScanResult> _lastResults = new();
         readonly List<ScanPOI> _registeredPOIs = new();
@@ -180,8 +181,9 @@ namespace Tartaria.Gameplay
             direction = Vector3.zero;
             strength = 0f;
 
-            var player = GameObject.FindWithTag("Player");
+            var player = _cachedPlayerTransform != null ? _cachedPlayerTransform.gameObject : GameObject.FindWithTag("Player");
             if (player == null) return false;
+            _cachedPlayerTransform = player.transform;
 
             Vector3 playerPos = player.transform.position;
 
