@@ -283,7 +283,38 @@ function Watch-EditorLog {
 
     if ($compileErrors.Count -eq 0 -and $tartariaErrors.Count -eq 0 -and $pipelineFinished) {
         Write-Host ""
-        Write-Host "  ALL CLEAR -- Game should be running in Unity" -ForegroundColor Green
+        Write-Host "  RUNTIME VALIDATION (waiting for canary files)..." -ForegroundColor Cyan
+
+        # Wait for BootValidator canary (runtime writes it after all checks pass)
+        $bootCanary = Join-Path $ProjectRoot "Assets/_Project/Logs/boot-validator-canary.txt"
+        $sceneCanary = Join-Path $ProjectRoot "Assets/_Project/Logs/sceneloader-canary.txt"
+        $canaryTimeout = 30
+        $canaryStart = Get-Date
+        while (-not (Test-Path $bootCanary) -and ((Get-Date) - $canaryStart).TotalSeconds -lt $canaryTimeout) {
+            Start-Sleep -Milliseconds 500
+        }
+
+        if (Test-Path $sceneCanary) {
+            Write-Host "  SCENE LOADER:" -ForegroundColor DarkCyan
+            Get-Content $sceneCanary | ForEach-Object { Write-Host "    $_" -ForegroundColor DarkGray }
+        }
+
+        if (Test-Path $bootCanary) {
+            $canaryContent = Get-Content $bootCanary -Raw
+            if ($canaryContent -match "ALL SYSTEMS GO") {
+                Write-Host "  BOOT VALIDATOR: ALL SYSTEMS GO" -ForegroundColor Green
+            } else {
+                Write-Host "  BOOT VALIDATOR:" -ForegroundColor Yellow
+                Get-Content $bootCanary | ForEach-Object { Write-Host "    $_" -ForegroundColor Yellow }
+            }
+        } else {
+            Write-Host "  BOOT VALIDATOR: canary not found (timeout ${canaryTimeout}s)" -ForegroundColor Yellow
+            Write-Host "    Runtime may still be loading. Check Unity Console." -ForegroundColor Yellow
+        }
+
+        # Clean canary files for next run
+        Remove-Item $bootCanary -ErrorAction SilentlyContinue
+        Remove-Item $sceneCanary -ErrorAction SilentlyContinue
     } elseif (-not $pipelineStarted) {
         Write-Host ""
         Write-Host "  Pipeline never started. Possible causes:" -ForegroundColor Yellow

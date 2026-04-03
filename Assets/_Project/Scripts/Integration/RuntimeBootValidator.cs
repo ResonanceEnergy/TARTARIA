@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.IO;
 using System.Text;
 using Tartaria.Core;
 
@@ -128,6 +129,18 @@ namespace Tartaria.Integration
                 Debug.Log($"[BootValidator] {_report}");
             else
                 Debug.LogWarning($"[BootValidator] {_report}");
+
+            // Write canary file for pipeline monitoring (bypasses Unity log buffering)
+            try
+            {
+                string dir = Path.Combine(Application.dataPath, "_Project/Logs");
+                Directory.CreateDirectory(dir);
+                File.WriteAllText(Path.Combine(dir, "boot-validator-canary.txt"),
+                    $"passed={_passed}\nfailed={_failed}\ntimestamp={Time.realtimeSinceStartup:F2}\n" +
+                    (_failed == 0 ? "ALL SYSTEMS GO\n" : $"WARNING: {_failed} system(s) missing\n") +
+                    _report);
+            }
+            catch { /* ignore IO errors during diagnostics */ }
         }
 
         void Check(StringBuilder sb, string name, bool present)
