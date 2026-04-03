@@ -152,16 +152,19 @@ function Invoke-BatchMode {
 function Watch-EditorLog {
     Write-Host ""
     Write-Host "  Monitoring Unity Editor.log for pipeline output..." -ForegroundColor DarkGray
-    Write-Host "  Timeout: ${MonitorTimeout}s | Report: $BuildReport" -ForegroundColor DarkGray
+    Write-Host "  Pipeline timeout: ${MonitorTimeout}s | Unity load timeout: 600s" -ForegroundColor DarkGray
+    Write-Host "  Report: $BuildReport" -ForegroundColor DarkGray
     Write-Host ""
 
     $startTime = Get-Date
+    $pipelineStartTime = $null
     $lastPos = 0
     $pipelineStarted = $false
     $pipelineFinished = $false
     $compileErrors = @()
     $tartariaErrors = @()
     $phasesSeen = 0
+    $unityLoadTimeout = 600  # 10 minutes for Unity to load project
 
     # Find current end of Editor.log so we only watch new content
     if (Test-Path $EditorLog) {
@@ -170,11 +173,21 @@ function Watch-EditorLog {
 
     while (-not $pipelineFinished) {
         $elapsed = ((Get-Date) - $startTime).TotalSeconds
-        if ($elapsed -gt $MonitorTimeout) {
+        # Before pipeline starts: use generous load timeout
+        if (-not $pipelineStarted -and $elapsed -gt $unityLoadTimeout) {
             Write-Host ""
-            Write-Host "  TIMEOUT: Pipeline did not complete within ${MonitorTimeout}s" -ForegroundColor Red
-            Write-Host "  Unity may still be compiling or importing. Check Unity Console." -ForegroundColor Yellow
+            Write-Host "  TIMEOUT: Unity did not start pipeline within ${unityLoadTimeout}s" -ForegroundColor Red
+            Write-Host "  Unity may still be importing. Check Unity Console." -ForegroundColor Yellow
             break
+        }
+        # After pipeline starts: use pipeline timeout
+        if ($pipelineStarted -and $pipelineStartTime) {
+            $pipelineElapsed = ((Get-Date) - $pipelineStartTime).TotalSeconds
+            if ($pipelineElapsed -gt $MonitorTimeout) {
+                Write-Host ""
+                Write-Host "  TIMEOUT: Pipeline did not complete within ${MonitorTimeout}s" -ForegroundColor Red
+                break
+            }
         }
 
         # Check if Unity process died
@@ -187,6 +200,11 @@ function Watch-EditorLog {
         }
 
         Start-Sleep -Milliseconds 500
+
+        # Show periodic "still loading" message before pipeline starts
+        if (-not $pipelineStarted -and [int]$elapsed % 30 -eq 0 -and $elapsed -gt 29) {
+            Write-Host "  ... Unity still loading ($([int]$elapsed)s)" -ForegroundColor DarkGray
+        }
 
         if (-not (Test-Path $EditorLog)) { continue }
 
@@ -220,7 +238,10 @@ function Watch-EditorLog {
 
             # Tartaria pipeline messages
             if ($trimmed -match "\[Tartaria\]") {
-                $pipelineStarted = $true
+                if (-not $pipelineStarted) {
+                    $pipelineStarted = $true
+                    $pipelineStartTime = Get-Date
+                }
 
                 if ($trimmed -match "SENTINEL DETECTED|AUTO-PLAY SENTINEL") {
                     Write-Host "  >> Pipeline started" -ForegroundColor Cyan
