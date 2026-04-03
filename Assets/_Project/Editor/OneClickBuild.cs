@@ -8,6 +8,10 @@ namespace Tartaria.Editor
     /// Master build-everything script. Runs all factories and scene builders
     /// in the correct dependency order, then opens the Boot scene ready for Play.
     ///
+    /// Every phase is isolated: a failure in one phase logs the error and
+    /// continues to the next. Results are tracked via BuildReport for
+    /// post-mortem analysis by both the Unity console and PowerShell launcher.
+    ///
     /// Menu: Tartaria > BUILD EVERYTHING
     /// Also available as batch mode entry point.
     /// </summary>
@@ -33,20 +37,15 @@ namespace Tartaria.Editor
                     return;
             }
 
-            var timer = System.Diagnostics.Stopwatch.StartNew();
-
             RunBuild();
-
-            timer.Stop();
-            float seconds = timer.ElapsedMilliseconds / 1000f;
-            Debug.Log($"[Tartaria] BUILD EVERYTHING complete in {seconds:F1}s");
 
             if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
             {
-                EditorUtility.DisplayDialog("Build Complete",
-                    $"All assets built in {seconds:F1}s.\n\n" +
-                    "Boot scene is ready. Press Play to test!",
-                    "OK");
+                string msg = BuildReport.HasFailures
+                    ? $"{BuildReport.FailCount} phase(s) failed. Check Console for details."
+                    : $"All {BuildReport.PassCount} phases completed. Boot scene is ready!";
+
+                EditorUtility.DisplayDialog("Build Complete", msg, "OK");
             }
         }
 
@@ -56,46 +55,80 @@ namespace Tartaria.Editor
         /// </summary>
         public static void RunBuild()
         {
+            BuildReport.Begin("BUILD EVERYTHING");
+            RunBuildPhases();
+            BuildReport.Finish();
+        }
+
+        /// <summary>
+        /// Raw build phases WITHOUT owning the BuildReport lifecycle.
+        /// Call this from AutoPlayBoot (which owns Begin/Finish) to avoid
+        /// resetting the outer report.
+        /// </summary>
+        public static void RunBuildPhases()
+        {
+
             // ── Phase 1: Directories ──
-            Debug.Log("[Tartaria] Phase 1/8: Ensuring directories...");
-            EnsureDirectories();
+            BuildReport.RunPhase("Phase 1/8: Directories", () =>
+            {
+                EnsureDirectories();
+            });
 
             // ── Phase 2: ScriptableObjects ──
-            Debug.Log("[Tartaria] Phase 2/8: Building ScriptableObjects...");
-            ProjectSetupWizard.RunSetup(); // Creates Echohaven scene + building defs + constants
+            BuildReport.RunPhase("Phase 2/8: ScriptableObjects", () =>
+            {
+                ProjectSetupWizard.RunSetup();
+            });
 
             // ── Phase 3: Zone Definitions ──
-            Debug.Log("[Tartaria] Phase 3/8: Building Zone Definitions...");
-            ZoneDefinitionFactory.BuildZoneDefinitions();
+            BuildReport.RunPhase("Phase 3/8: Zone Definitions", () =>
+            {
+                ZoneDefinitionFactory.BuildZoneDefinitions();
+            });
 
             // ── Phase 4: Quest Definitions ──
-            Debug.Log("[Tartaria] Phase 4/8: Building Quest Definitions...");
-            QuestDefinitionFactory.BuildAllQuests();
+            BuildReport.RunPhase("Phase 4/8: Quest Definitions", () =>
+            {
+                QuestDefinitionFactory.BuildAllQuests();
+            });
 
             // ── Phase 5: Character Prefabs ──
-            Debug.Log("[Tartaria] Phase 5/8: Building Character Prefabs...");
-            CharacterPrefabFactory.BuildAllCharacters();
+            BuildReport.RunPhase("Phase 5/8: Character Prefabs", () =>
+            {
+                CharacterPrefabFactory.BuildAllCharacters();
+            });
 
             // ── Phase 6: Scenes (Boot + UI_Overlay) ──
-            Debug.Log("[Tartaria] Phase 6/8: Creating missing scenes...");
-            SceneFactory.CreateAllMissingScenes();
+            BuildReport.RunPhase("Phase 6/8: Scenes (Boot + UI_Overlay)", () =>
+            {
+                SceneFactory.CreateAllMissingScenes();
+            });
 
-            // ── Phase 7: Open Echohaven and scaffold all managers ──
-            Debug.Log("[Tartaria] Phase 7/8: Scaffolding managers + populating Echohaven...");
+            // ── Phase 7: Scaffold managers + populate Echohaven ──
             string echohavenPath = "Assets/_Project/Scenes/Echohaven_VerticalSlice.unity";
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
             {
-                EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
-                MasterSceneScaffold.ScaffoldAll();
-                EchohavenScenePopulator.Populate();
-                EditorSceneManager.SaveOpenScenes();
+                BuildReport.RunPhase("Phase 7/8: Scaffold Managers", () =>
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    MasterSceneScaffold.ScaffoldAll();
+                    EchohavenScenePopulator.Populate();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+            else
+            {
+                BuildReport.Skip("Phase 7/8: Scaffold Managers", "Echohaven scene not found");
             }
 
             // ── Phase 8: Input + Build Settings ──
-            Debug.Log("[Tartaria] Phase 8/8: Assigning input actions + updating build settings...");
-            InputActionsAssigner.AssignInputActions();
-            ConfigureBuildSettings();
+            BuildReport.RunPhase("Phase 8/8: Input + Build Settings", () =>
+            {
+                InputActionsAssigner.AssignInputActions();
+                ConfigureBuildSettings();
+            });
 
+            // ── Finalize ──
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
 
