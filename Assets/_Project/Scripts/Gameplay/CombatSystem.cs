@@ -141,6 +141,7 @@ namespace Tartaria.Gameplay
     /// <summary>
     /// Enemy Spawn System — spawns enemies when RS thresholds are crossed.
     /// Phase 1: 1 Mud Golem each at RS 25, 50, 75.
+    /// Uses deferred structural changes to avoid modifying entities mid-iteration.
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct EnemySpawnSystem : ISystem
@@ -160,15 +161,25 @@ namespace Tartaria.Gameplay
                 break;
             }
 
-            // Check spawn triggers
+            // Collect triggers that need spawning (cannot do structural changes mid-iteration)
+            var pendingSpawns = new NativeList<EnemySpawnTrigger>(4, Allocator.Temp);
+
             foreach (var trigger in SystemAPI.Query<RefRW<EnemySpawnTrigger>>())
             {
                 if (!trigger.ValueRO.HasSpawned && currentRS >= trigger.ValueRO.RSThreshold)
                 {
                     trigger.ValueRW.HasSpawned = true;
-                    SpawnEnemy(ref state, trigger.ValueRO);
+                    pendingSpawns.Add(trigger.ValueRO);
                 }
             }
+
+            // Now perform structural changes outside the query iteration
+            for (int i = 0; i < pendingSpawns.Length; i++)
+            {
+                SpawnEnemy(ref state, pendingSpawns[i]);
+            }
+
+            pendingSpawns.Dispose();
         }
 
         void SpawnEnemy(ref SystemState state, EnemySpawnTrigger trigger)

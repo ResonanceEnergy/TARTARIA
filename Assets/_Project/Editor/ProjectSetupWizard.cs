@@ -420,8 +420,9 @@ namespace Tartaria.Editor
                 so.ApplyModifiedProperties();
             }
 
-            // Audio Listener
-            cameraRigGO.AddComponent<AudioListener>();
+            // Audio Listener — only if none exists yet
+            if (Object.FindAnyObjectByType<AudioListener>() == null)
+                cameraRigGO.AddComponent<AudioListener>();
 
             return cameraRigGO;
         }

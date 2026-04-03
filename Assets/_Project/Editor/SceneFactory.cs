@@ -51,7 +51,8 @@ namespace Tartaria.Editor
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.02f, 0.02f, 0.05f);
             cam.orthographic = true;
-            camGO.AddComponent<AudioListener>();
+            if (Object.FindAnyObjectByType<AudioListener>() == null)
+                camGO.AddComponent<AudioListener>();
 
             // ── ECS Bootstrap ──
             var bootstrap = new GameObject("GameBootstrap");
