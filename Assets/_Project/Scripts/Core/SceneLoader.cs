@@ -1,4 +1,5 @@
 using System.Collections;
+using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -23,12 +24,33 @@ namespace Tartaria.Core
 
         bool _loaded;
 
+        static void Canary(string msg)
+        {
+            try
+            {
+                string dir = Path.Combine(Application.dataPath, "_Project/Logs");
+                Directory.CreateDirectory(dir);
+                File.AppendAllText(Path.Combine(dir, "sceneloader-canary.txt"),
+                    $"[{Time.realtimeSinceStartup:F2}] {msg}\n");
+            }
+            catch { /* ignore IO errors during diagnostics */ }
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                Debug.LogWarning("[SceneLoader] Instance destroyed — coroutines will stop!");
+                Instance = null;
+            }
         }
 
         /// <summary>
@@ -43,39 +65,77 @@ namespace Tartaria.Core
 
         IEnumerator LoadSequence()
         {
+            Debug.Log("[SceneLoader] LoadSequence started.");
+
+            // Wrap in exception-safe helper to detect silent coroutine death
+            IEnumerator inner = LoadSequenceInner();
+            while (true)
+            {
+                bool hasNext;
+                try { hasNext = inner.MoveNext(); }
+                catch (System.Exception ex)
+                {
+                    Canary($"EXCEPTION: {ex}");
+                    Debug.LogError($"[SceneLoader] Coroutine exception: {ex}");
+                    yield break;
+                }
+                if (!hasNext) yield break;
+                yield return inner.Current;
+            }
+        }
+
+        IEnumerator LoadSequenceInner()
+        {
+            Canary("LoadSequenceInner START");
             GameStateManager.Instance.TransitionTo(GameState.Loading);
             float startTime = Time.realtimeSinceStartup;
 
             // Load gameplay scene
+            Canary($"Loading gameplay scene: {gameplayScene}");
+            Debug.Log($"[SceneLoader] Loading gameplay scene: {gameplayScene}");
             var gameplayOp = SceneManager.LoadSceneAsync(gameplayScene, LoadSceneMode.Additive);
+            Canary($"gameplayOp null? {gameplayOp == null}");
             if (gameplayOp != null)
             {
                 gameplayOp.allowSceneActivation = true;
                 while (!gameplayOp.isDone)
                     yield return null;
+                Canary($"Gameplay scene loaded OK ({Time.realtimeSinceStartup - startTime:F1}s)");
+                Debug.Log($"[SceneLoader] Gameplay scene loaded OK ({Time.realtimeSinceStartup - startTime:F1}s).");
             }
             else
             {
+                Canary("FAILED to load gameplay scene");
                 Debug.LogError($"[SceneLoader] Failed to load scene: {gameplayScene}");
             }
 
             // Load UI overlay additively
+            Canary($"Loading UI overlay: {uiOverlayScene}");
+            Debug.Log($"[SceneLoader] Loading UI overlay: {uiOverlayScene}");
             var uiOp = SceneManager.LoadSceneAsync(uiOverlayScene, LoadSceneMode.Additive);
+            Canary($"uiOp null? {uiOp == null}");
             if (uiOp != null)
             {
                 uiOp.allowSceneActivation = true;
                 while (!uiOp.isDone)
                     yield return null;
+                Canary($"UI overlay loaded OK ({Time.realtimeSinceStartup - startTime:F1}s)");
+                Debug.Log($"[SceneLoader] UI overlay loaded OK ({Time.realtimeSinceStartup - startTime:F1}s).");
             }
             else
             {
+                Canary("UI overlay scene not found");
                 Debug.LogWarning($"[SceneLoader] UI overlay scene not found: {uiOverlayScene}");
             }
 
             // Minimum loading time
             float elapsed = Time.realtimeSinceStartup - startTime;
             if (elapsed < minimumLoadTime)
+            {
+                Canary($"Waiting min load time ({minimumLoadTime - elapsed:F1}s)");
+                Debug.Log($"[SceneLoader] Waiting minimum load time ({minimumLoadTime - elapsed:F1}s remaining).");
                 yield return new WaitForSecondsRealtime(minimumLoadTime - elapsed);
+            }
 
             // Enforce exactly one AudioListener — gameplay camera takes priority
             var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
@@ -87,6 +147,8 @@ namespace Tartaria.Core
             }
 
             // Transition to exploration
+            Canary("Transitioning to Exploration");
+            Debug.Log("[SceneLoader] Transitioning to Exploration...");
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
             Debug.Log("[SceneLoader] Gameplay + UI scenes loaded. Entering Exploration.");
         }
