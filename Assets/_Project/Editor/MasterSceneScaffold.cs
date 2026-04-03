@@ -53,7 +53,7 @@ namespace Tartaria.Editor
         {
             var parent = FindOrCreateParent("--- GAME MANAGERS ---").transform;
             int n = 0;
-            if (Ensure<Core.GameBootstrap>(parent)) n++;
+            // GameBootstrap lives in Boot.unity only — do NOT scaffold here
             if (Ensure<Core.AetherFieldManager>(parent)) n++;
             if (Ensure<Core.EconomySystem>(parent)) n++;
             if (Ensure<Core.PerformanceGuard>(parent)) n++;
@@ -128,7 +128,7 @@ namespace Tartaria.Editor
             if (Ensure<Integration.BossEncounterSystem>(parent)) n++;
             if (Ensure<Integration.PlayerSpawner>(parent)) n++;
             if (Ensure<Integration.BuildingSpawner>(parent)) n++;
-            if (Ensure<Core.SceneLoader>(parent)) n++;
+            // SceneLoader lives in Boot.unity only — do NOT scaffold here
             if (Ensure<Integration.RuntimeGlueBridge>(parent)) n++;
             if (Ensure<Integration.RuntimeBootValidator>(parent)) n++;
             if (Ensure<Integration.DebugCheatConsole>(parent)) n++;
