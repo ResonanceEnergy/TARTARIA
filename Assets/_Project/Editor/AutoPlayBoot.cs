@@ -17,25 +17,51 @@ namespace Tartaria.Editor
     public static class AutoPlayBoot
     {
         const string SentinelPath = "Temp/TARTARIA_AUTOPLAY";
+        static int _retryCount;
 
         static AutoPlayBoot()
         {
-            // Check on next editor update (after domain reload completes)
-            EditorApplication.delayCall += CheckSentinel;
+            _retryCount = 0;
+            // Use update loop instead of single delayCall — more reliable after long imports
+            EditorApplication.update += CheckSentinelUpdate;
         }
 
-        static void CheckSentinel()
+        static void CheckSentinelUpdate()
         {
+            // Only try during first 30 update ticks after domain reload
+            _retryCount++;
+            if (_retryCount > 30)
+            {
+                EditorApplication.update -= CheckSentinelUpdate;
+                return;
+            }
+
+            // Wait until editor is fully ready (not compiling, not importing)
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+                return;
+
             string fullPath = System.IO.Path.Combine(
                 System.IO.Path.GetDirectoryName(Application.dataPath), SentinelPath);
 
-            if (!System.IO.File.Exists(fullPath)) return;
+            if (!System.IO.File.Exists(fullPath))
+            {
+                EditorApplication.update -= CheckSentinelUpdate;
+                return;
+            }
 
             // Consume sentinel
+            EditorApplication.update -= CheckSentinelUpdate;
             System.IO.File.Delete(fullPath);
             Debug.Log("[Tartaria] AutoPlay sentinel detected -- running full pipeline");
 
-            RunBuildValidatePlay();
+            try
+            {
+                RunBuildValidatePlay();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[Tartaria] AutoPlay pipeline failed: {ex}");
+            }
         }
 
         [MenuItem("Tartaria/Build + Validate + Play", false, -90)]
