@@ -13,6 +13,24 @@ namespace Tartaria.Editor
     /// </summary>
     public static class TartariaSceneGizmos
     {
+        // Cached GUIStyles — avoid GC alloc every gizmo draw call
+        static GUIStyle s_discoveryStyle;
+        static GUIStyle s_spawnStyle;
+
+        static GUIStyle DiscoveryStyle => s_discoveryStyle ??= new GUIStyle
+        {
+            fontSize = 10,
+            alignment = TextAnchor.MiddleCenter,
+            normal = { textColor = new Color(0.9f, 0.75f, 0.2f) }
+        };
+
+        static GUIStyle SpawnStyle => s_spawnStyle ??= new GUIStyle
+        {
+            fontSize = 10,
+            alignment = TextAnchor.MiddleCenter,
+            normal = { textColor = new Color(0.8f, 0.2f, 0.1f) }
+        };
+
         [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected)]
         static void DrawDiscoveryRadius(SphereCollider collider, GizmoType type)
         {
@@ -22,12 +40,8 @@ namespace Tartaria.Editor
             Gizmos.color = new Color(0.9f, 0.75f, 0.2f, 0.15f);
             Gizmos.DrawWireSphere(collider.transform.position, collider.radius);
 
-            var style = new GUIStyle();
-            style.normal.textColor = new Color(0.9f, 0.75f, 0.2f);
-            style.fontSize = 10;
-            style.alignment = TextAnchor.MiddleCenter;
             Handles.Label(collider.transform.position + Vector3.up * 2f,
-                $"Discovery: {collider.radius:F0}m", style);
+                $"Discovery: {collider.radius:F0}m", DiscoveryStyle);
         }
 
         [DrawGizmo(GizmoType.Selected | GizmoType.NonSelected)]
@@ -38,13 +52,8 @@ namespace Tartaria.Editor
             Gizmos.color = new Color(0.8f, 0.2f, 0.1f, 0.3f);
             Gizmos.DrawWireSphere(transform.position, 5f);
 
-            var style = new GUIStyle();
-            style.normal.textColor = new Color(0.8f, 0.2f, 0.1f);
-            style.fontSize = 10;
-            style.alignment = TextAnchor.MiddleCenter;
-
             string label = transform.gameObject.name.Replace("GolemSpawn_", "Spawn @ ");
-            Handles.Label(transform.position + Vector3.up * 3f, label, style);
+            Handles.Label(transform.position + Vector3.up * 3f, label, SpawnStyle);
         }
     }
 }
