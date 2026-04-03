@@ -47,6 +47,7 @@ namespace Tartaria.Editor
                 so.ambientLow = z.ambientLow;
                 so.ambientHigh = z.ambientHigh;
                 so.loadingTip = z.loadingTip;
+                so.sceneName = z.sceneName;
                 so.npcSpawnPoints = z.npcSpawns ?? System.Array.Empty<NPCSpawnPoint>();
 
                 AssetDatabase.CreateAsset(so, assetPath);
@@ -60,7 +61,7 @@ namespace Tartaria.Editor
 
         struct ZoneData
         {
-            public string assetName, zoneName, subtitle, loreIntro, loadingTip;
+            public string assetName, zoneName, subtitle, loreIntro, loadingTip, sceneName;
             public float rsUnlock, fogDensity;
             public int buildingCount;
             public Vector3 spawnPos;
@@ -78,6 +79,7 @@ namespace Tartaria.Editor
                     assetName = "Echohaven",
                     zoneName = "Echohaven",
                     subtitle = "New Chicago",
+                    sceneName = "Echohaven_VerticalSlice",
                     loreIntro = "A once-great city buried under centuries of mud. The domes still hum beneath the earth, waiting to be remembered.",
                     rsUnlock = 0f,
                     buildingCount = 3,
@@ -101,6 +103,7 @@ namespace Tartaria.Editor
                     assetName = "CrystallineCaverns",
                     zoneName = "Crystalline Caverns",
                     subtitle = "The First Antenna",
+                    sceneName = "CrystallineCaverns",
                     loreIntro = "Subterranean crystal formations that once amplified the planet's resonance network. The deepest chamber holds the first antenna.",
                     rsUnlock = 100f,
                     buildingCount = 3,
@@ -122,6 +125,7 @@ namespace Tartaria.Editor
                     assetName = "WindsweptHighlands",
                     zoneName = "Windswept Highlands",
                     subtitle = "The Orphan Route",
+                    sceneName = "WindsweptHighlands",
                     loreIntro = "Highland plateaus carved by wind and time. The orphan train tracks still lead somewhere -- if you know where to look.",
                     rsUnlock = 200f,
                     buildingCount = 3,
@@ -143,6 +147,7 @@ namespace Tartaria.Editor
                     assetName = "StarFortBastion",
                     zoneName = "Star Fort Bastion",
                     subtitle = "The Royal Amplifier",
+                    sceneName = "StarFortBastion",
                     loreIntro = "A pentagonal star fort -- not military, but a five-point frequency amplifier. The Star Chamber within once accessed the Archive itself.",
                     rsUnlock = 300f,
                     buildingCount = 4,
@@ -165,6 +170,7 @@ namespace Tartaria.Editor
                     assetName = "SunkenColosseum",
                     zoneName = "Sunken Colosseum",
                     subtitle = "The Resonance Stage",
+                    sceneName = "SunkenColosseum",
                     loreIntro = "A partially submerged colosseum built for resonance performances, not combat. Five thousand echo imprints linger in the seats.",
                     rsUnlock = 400f,
                     buildingCount = 3,
@@ -188,6 +194,7 @@ namespace Tartaria.Editor
                     assetName = "LivingLibrary",
                     zoneName = "Living Library",
                     subtitle = "The Archive Interface",
+                    sceneName = "LivingLibrary",
                     loreIntro = "The Living Library was not mere storage -- it was a direct interface to the planetary Archive. Rhythmic knowledge encoded in every shelf.",
                     rsUnlock = 500f,
                     buildingCount = 4,
@@ -210,6 +217,7 @@ namespace Tartaria.Editor
                     assetName = "ClockworkCitadel",
                     zoneName = "Clockwork Citadel",
                     subtitle = "Mechanical Prophecy",
+                    sceneName = "ClockworkCitadel",
                     loreIntro = "A citadel of gears and orreries. The grand clockwork predicted the Mud Flood four hours before it came. The builders had three hours to archive what mattered.",
                     rsUnlock = 600f,
                     buildingCount = 3,
@@ -231,6 +239,7 @@ namespace Tartaria.Editor
                     assetName = "VerdantCanopy",
                     zoneName = "Verdant Canopy",
                     subtitle = "Where Life Refuses to Yield",
+                    sceneName = "VerdantCanopy",
                     loreIntro = "An ancient forest where roots push through stone and bioluminescence traces the ley lines. Nature copied the architects -- or perhaps it was the other way around.",
                     rsUnlock = 700f,
                     buildingCount = 3,
@@ -252,6 +261,7 @@ namespace Tartaria.Editor
                     assetName = "AuroralSpire",
                     zoneName = "Auroral Spire",
                     subtitle = "Where Light Sings",
+                    sceneName = "AuroralSpire",
                     loreIntro = "A towering antenna that channels solar energy into Aether. At the apex, the aurora touches the metal and sings in color.",
                     rsUnlock = 800f,
                     buildingCount = 3,
@@ -273,6 +283,7 @@ namespace Tartaria.Editor
                     assetName = "DeepForge",
                     zoneName = "Deep Forge",
                     subtitle = "The Universe's Bass Note",
+                    sceneName = "DeepForge",
                     loreIntro = "Beneath the mountains, Tartarian smiths shaped metal with sound. The anvil rings at B flat -- the note of transformation.",
                     rsUnlock = 900f,
                     buildingCount = 3,
@@ -294,6 +305,7 @@ namespace Tartaria.Editor
                     assetName = "TidalArchive",
                     zoneName = "Tidal Archive",
                     subtitle = "Memory in Water",
+                    sceneName = "TidalArchive",
                     loreIntro = "A coastal archive older than the planetary one. The tide writes in light, preserving what was beneath its surface.",
                     rsUnlock = 1000f,
                     buildingCount = 3,
@@ -316,6 +328,7 @@ namespace Tartaria.Editor
                     assetName = "CelestialObservatory",
                     zoneName = "Celestial Observatory",
                     subtitle = "Geometry at Sufficient Distance",
+                    sceneName = "CelestialObservatory",
                     loreIntro = "The Observatory mapped every star with twelve-decimal precision. Now the planet can see the sky again -- and the sky can see us.",
                     rsUnlock = 1100f,
                     buildingCount = 3,
@@ -338,6 +351,7 @@ namespace Tartaria.Editor
                     assetName = "PlanetaryNexus",
                     zoneName = "Planetary Nexus",
                     subtitle = "All Lines Converge",
+                    sceneName = "PlanetaryNexus",
                     loreIntro = "Every ley line. Every frequency. Connected. The veil is thinnest here. The planet is awake -- and it's singing.",
                     rsUnlock = 1200f,
                     buildingCount = 5,

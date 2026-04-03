@@ -27,12 +27,47 @@ namespace Tartaria.Editor
             added += CreateLighting();
             added += CreateCameraRig();
             added += CreateBoundary();
+            added += EnsureV37Managers();
 
             if (added > 0)
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
                     UnityEngine.SceneManagement.SceneManager.GetActiveScene());
 
             Debug.Log($"[Tartaria] Echohaven populated — {added} objects added.");
+        }
+
+        // ─── v37 Manager Wiring ──────────────────────
+
+        static int EnsureV37Managers()
+        {
+            int n = 0;
+            var parent = FindOrCreate("--- GAME MANAGERS ---").transform;
+
+            if (Object.FindFirstObjectByType<Tartaria.Integration.PlayerSpawner>() == null)
+            {
+                var go = new GameObject("PlayerSpawner");
+                go.transform.SetParent(parent);
+                go.AddComponent<Tartaria.Integration.PlayerSpawner>();
+                n++;
+            }
+
+            if (Object.FindFirstObjectByType<Tartaria.Integration.BuildingSpawner>() == null)
+            {
+                var go = new GameObject("BuildingSpawner");
+                go.transform.SetParent(parent);
+                go.AddComponent<Tartaria.Integration.BuildingSpawner>();
+                n++;
+            }
+
+            if (Object.FindFirstObjectByType<Tartaria.Core.SceneLoader>() == null)
+            {
+                var go = new GameObject("SceneLoader");
+                go.transform.SetParent(parent);
+                go.AddComponent<Tartaria.Core.SceneLoader>();
+                n++;
+            }
+
+            return n;
         }
 
         // ─── Terrain ─────────────────────────────────

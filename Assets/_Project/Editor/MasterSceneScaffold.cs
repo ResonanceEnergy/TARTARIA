@@ -126,6 +126,12 @@ namespace Tartaria.Editor
             if (Ensure<Integration.WorkshopSystem>(parent)) n++;
             if (Ensure<Integration.WorldChoiceTracker>(parent)) n++;
             if (Ensure<Integration.BossEncounterSystem>(parent)) n++;
+            if (Ensure<Integration.PlayerSpawner>(parent)) n++;
+            if (Ensure<Integration.BuildingSpawner>(parent)) n++;
+            if (Ensure<Core.SceneLoader>(parent)) n++;
+            if (Ensure<Integration.RuntimeGlueBridge>(parent)) n++;
+            if (Ensure<Integration.RuntimeBootValidator>(parent)) n++;
+            if (Ensure<Integration.DebugCheatConsole>(parent)) n++;
             // Audio
             if (Ensure<Audio.AudioManager>(parent)) n++;
             if (Ensure<Audio.AdaptiveMusicController>(parent)) n++;

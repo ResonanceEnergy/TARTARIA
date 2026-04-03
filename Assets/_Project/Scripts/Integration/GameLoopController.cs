@@ -1060,6 +1060,48 @@ namespace Tartaria.Integration
             Debug.Log($"[GameLoop] RS buff activated for {duration}s");
         }
 
+        // ─── Debug / Cheat API ───────────────────────
+
+        /// <summary>Set RS to an absolute value (debug console).</summary>
+        public void SetResonanceScore(float amount)
+        {
+            if (!_ecsReady || !_em.Exists(_rsEntity)) return;
+            var rs = _em.GetComponentData<ResonanceScore>(_rsEntity);
+            rs.CurrentRS = Mathf.Max(0f, amount);
+            _em.SetComponentData(_rsEntity, rs);
+            _lastRS = rs.CurrentRS;
+        }
+
+        /// <summary>Add to current RS (debug console).</summary>
+        public void AddResonanceScore(float amount)
+        {
+            QueueRSReward(amount, "debug_console");
+        }
+
+        /// <summary>Set Aether charge display (debug console). 0-100 range.</summary>
+        public void SetAetherCharge(float amount)
+        {
+            HUDController.Instance?.UpdateAetherCharge(Mathf.Clamp(amount, 0f, 100f));
+        }
+
+        /// <summary>Spawn a fallback enemy at position (debug console).</summary>
+        public void SpawnEnemyAt(Vector3 position)
+        {
+            // Try CombatWaveManager first
+            if (CombatWaveManager.Instance != null)
+            {
+                CombatWaveManager.Instance.SpawnSingleEnemy(position);
+                return;
+            }
+            // Fallback: create greybox golem
+            var golem = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            golem.name = "DebugEnemy_MudGolem";
+            golem.transform.position = position;
+            golem.transform.localScale = Vector3.one * 1.8f;
+            golem.GetComponent<Renderer>().material.color = new Color(0.45f, 0.3f, 0.2f);
+            golem.tag = "Enemy";
+        }
+
         // ─── Mini-Game → Building Bonus Bridge ───────
 
         /// <summary>

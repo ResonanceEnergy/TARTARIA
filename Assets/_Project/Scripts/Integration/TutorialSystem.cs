@@ -122,6 +122,18 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
+        /// Reset tutorial to the beginning (debug console).
+        /// </summary>
+        public void ResetTutorial()
+        {
+            _completed.Clear();
+            _currentIndex = 0;
+            _tutorialFinished = false;
+            _state = TutorialState.Idle;
+            BeginStep(0);
+        }
+
+        /// <summary>
         /// Get save-friendly data for persistence.
         /// </summary>
         public TutorialSaveData GetSaveData()
