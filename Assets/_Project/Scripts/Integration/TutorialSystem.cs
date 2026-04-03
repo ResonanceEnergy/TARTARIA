@@ -46,11 +46,18 @@ namespace Tartaria.Integration
             Instance = this;
             DontDestroyOnLoad(gameObject);
             BuildSteps();
+            GameEvents.OnToggleAetherVision += HandleAetherVisionToggle;
         }
 
         void OnDestroy()
         {
+            GameEvents.OnToggleAetherVision -= HandleAetherVisionToggle;
             if (Instance == this) Instance = null;
+        }
+
+        void HandleAetherVisionToggle()
+        {
+            ForceComplete(TutorialStep.AetherVision);
         }
 
         void Start()

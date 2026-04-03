@@ -75,7 +75,7 @@ namespace Tartaria.Editor
             {
                 EditorSceneManager.OpenScene(echoPath, OpenSceneMode.Single);
                 CheckComponent<Core.GameBootstrap>("GameBootstrap");
-                CheckComponent<Core.GameStateManager>("GameStateManager");
+                Check("GameStateManager", Core.GameStateManager.Instance != null);
                 CheckComponent<Integration.GameLoopController>("GameLoopController");
                 CheckComponent<Core.SceneLoader>("SceneLoader");
                 CheckComponent<Integration.PlayerSpawner>("PlayerSpawner");

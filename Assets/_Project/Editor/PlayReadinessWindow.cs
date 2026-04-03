@@ -224,7 +224,7 @@ namespace Tartaria.Editor
 
             // Check for key managers in open scene
             CheckComponentInScene<Core.GameBootstrap>("GameBootstrap");
-            CheckComponentInScene<Core.GameStateManager>("GameStateManager");
+            Add("GameStateManager", Core.GameStateManager.Instance != null);
             CheckComponentInScene<Integration.GameLoopController>("GameLoopController");
             CheckComponentInScene<Core.SceneLoader>("SceneLoader");
             CheckComponentInScene<Integration.PlayerSpawner>("PlayerSpawner");

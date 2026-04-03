@@ -36,6 +36,7 @@ namespace Tartaria.Integration
 
         bool _initialized;
         EntityQuery _rsQuery;
+        bool _rsQueryCreated;
 
         void Update()
         {
@@ -47,8 +48,11 @@ namespace Tartaria.Integration
             var em = world.EntityManager;
 
             // Verify GameBootstrap has run (RS singleton exists)
-            if (!_rsQuery.IsValid)
+            if (!_rsQueryCreated)
+            {
                 _rsQuery = em.CreateEntityQuery(typeof(ResonanceScore));
+                _rsQueryCreated = true;
+            }
             if (_rsQuery.CalculateEntityCount() == 0) return;
 
             _initialized = true;

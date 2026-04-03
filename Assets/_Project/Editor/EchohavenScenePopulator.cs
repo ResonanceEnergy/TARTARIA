@@ -309,7 +309,7 @@ namespace Tartaria.Editor
             camGO.transform.SetParent(rig.transform);
             camGO.transform.localPosition = Vector3.zero;
             camGO.transform.localRotation = Quaternion.identity;
-            var cam = camGO.AddComponent<Camera>();
+            var cam = camGO.AddComponent<UnityEngine.Camera>();
             cam.clearFlags = CameraClearFlags.Skybox;
             cam.fieldOfView = 55f;
             cam.nearClipPlane = 0.3f;

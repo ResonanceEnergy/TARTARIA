@@ -54,11 +54,18 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            GameEvents.OnRequestPurgeCorruption += HandleRequestPurgeCorruption;
         }
 
         void OnDestroy()
         {
+            GameEvents.OnRequestPurgeCorruption -= HandleRequestPurgeCorruption;
             if (Instance == this) Instance = null;
+        }
+
+        void HandleRequestPurgeCorruption(string buildingId, float amount)
+        {
+            PurgeCorruption(buildingId, amount);
         }
 
         void Update()

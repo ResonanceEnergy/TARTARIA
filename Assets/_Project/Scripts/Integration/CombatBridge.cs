@@ -37,6 +37,7 @@ namespace Tartaria.Integration
         EntityManager _em;
         Entity _playerCombatEntity;
         EntityQuery _enemyQuery;
+        bool _enemyQueryCreated;
         Transform _playerTransform;
         bool _initialized;
 
@@ -86,6 +87,7 @@ namespace Tartaria.Integration
             _em.AddBuffer<DamageEvent>(_playerCombatEntity);
             // Cache enemy query for reuse in MonitorEnemies/DamageNearbyEnemies/DamageEnemiesInCone
             _enemyQuery = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
+            _enemyQueryCreated = true;
 
             // Cache player transform
             var playerObj = GameObject.FindWithTag("Player");
@@ -114,8 +116,11 @@ namespace Tartaria.Integration
             }
 
             // Re-create enemy query if it went stale
-            if (!_enemyQuery.IsValid)
+            if (!_enemyQueryCreated)
+            {
                 _enemyQuery = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
+                _enemyQueryCreated = true;
+            }
 
             // Update cooldown timers
             _pulseTimer = Mathf.Max(0, _pulseTimer - Time.deltaTime);
@@ -442,7 +447,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
-            if (_enemyQuery.IsValid) _enemyQuery.Dispose();
+            if (_enemyQueryCreated) { _enemyQuery.Dispose(); _enemyQueryCreated = false; }
             if (_initialized && _world != null && _world.IsCreated && _em.Exists(_playerCombatEntity))
                 _em.DestroyEntity(_playerCombatEntity);
             if (Instance == this) Instance = null;
