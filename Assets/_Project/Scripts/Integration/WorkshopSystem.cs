@@ -36,6 +36,7 @@ namespace Tartaria.Integration
         World _ecsWorld;
         EntityManager _em;
         EntityQuery _rsQuery;
+        bool _rsQueryCreated;
 
         public event Action<string, int> OnBuildingUpgraded;
 
@@ -174,8 +175,9 @@ namespace Tartaria.Integration
                 if (_ecsWorld == null) return 0f;
                 _em = _ecsWorld.EntityManager;
                 _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
+                _rsQueryCreated = true;
             }
-            if (!_rsQuery.IsValid || _rsQuery.CalculateEntityCount() == 0) return 0f;
+            if (!_rsQueryCreated || _rsQuery.CalculateEntityCount() == 0) return 0f;
             return _em.GetComponentData<ResonanceScore>(_rsQuery.GetSingletonEntity()).CurrentRS;
         }
 

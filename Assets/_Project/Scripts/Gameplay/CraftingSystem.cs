@@ -190,12 +190,8 @@ namespace Tartaria.Gameplay
             {
                 case "repair_kit":
                     // Restore 30 HP to nearest damaged building via CorruptionSystem
-                    var corruption = Integration.CorruptionSystem.Instance;
-                    if (corruption != null)
-                    {
-                        corruption.PurgeCorruption("nearest", 30f);
-                        applied = true;
-                    }
+                    GameEvents.FireRequestPurgeCorruption("nearest", 30f);
+                    applied = true;
                     break;
 
                 case "aether_potion":
@@ -209,12 +205,8 @@ namespace Tartaria.Gameplay
 
                 case "resonance_amplifier":
                     // Boost RS gain by 25% for 60 seconds
-                    var loop = Integration.GameLoopController.Instance;
-                    if (loop != null)
-                    {
-                        loop.ActivateRSBuff();
-                        applied = true;
-                    }
+                    GameEvents.FireRequestActivateRSBuff();
+                    applied = true;
                     break;
 
                 case "echo_lens":

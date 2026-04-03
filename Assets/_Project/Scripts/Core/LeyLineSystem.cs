@@ -231,6 +231,7 @@ namespace Tartaria.Core
         }
 
         EntityQuery _leyLineQuery;
+        bool _leyLineQueryCreated;
 
         public float GetPlayerBoost()
         {
@@ -239,8 +240,11 @@ namespace Tartaria.Core
             if (world == null) return 1f;
             var em = world.EntityManager;
 
-            if (!_leyLineQuery.IsValid)
+            if (!_leyLineQueryCreated)
+            {
                 _leyLineQuery = em.CreateEntityQuery(typeof(LeyLineProximity), typeof(PlayerTag));
+                _leyLineQueryCreated = true;
+            }
             if (_leyLineQuery.CalculateEntityCount() == 0) return 1f;
 
             var entity = _leyLineQuery.GetSingletonEntity();
@@ -256,7 +260,7 @@ namespace Tartaria.Core
 
         void OnDestroy()
         {
-            if (_leyLineQuery.IsValid) _leyLineQuery.Dispose();
+            if (_leyLineQueryCreated) { _leyLineQuery.Dispose(); _leyLineQueryCreated = false; }
             if (Instance == this) Instance = null;
         }
 

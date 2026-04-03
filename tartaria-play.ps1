@@ -128,7 +128,7 @@ if ($BatchFirst -or $BatchOnly) {
         if ($validOK) {
             Write-Host "All checks passed. Ready to play." -ForegroundColor Green
         }
-        exit ($validOK ? 0 : 1)
+        if ($validOK) { exit 0 } else { exit 1 }
     }
 }
 

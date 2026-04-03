@@ -47,7 +47,7 @@ namespace Tartaria.Editor
 
             // ── Camera (splash) ──
             var camGO = new GameObject("BootCamera");
-            var cam = camGO.AddComponent<Camera>();
+            var cam = camGO.AddComponent<UnityEngine.Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.02f, 0.02f, 0.05f);
             cam.orthographic = true;

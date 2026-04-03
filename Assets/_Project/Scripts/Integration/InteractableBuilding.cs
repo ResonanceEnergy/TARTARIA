@@ -37,7 +37,7 @@ namespace Tartaria.Integration
         TuningMiniGameController _tuningController;
 
         string _promptCache;
-        BuildingRestorationState _promptState = (BuildingRestorationState)(-1);
+        BuildingRestorationState _promptState = (BuildingRestorationState)255;
         int _promptNodes = -1;
 
         public string BuildingId => buildingId;
@@ -90,7 +90,6 @@ namespace Tartaria.Integration
                 position = transform.position,
                 isRevealed = _isDiscovered
             });
-        }
         }
 
         // ─── IInteractable Implementation ────────────

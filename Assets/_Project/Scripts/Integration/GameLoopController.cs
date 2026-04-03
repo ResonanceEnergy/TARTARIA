@@ -40,6 +40,8 @@ namespace Tartaria.Integration
         Entity _playerEntity;
         EntityQuery _rsQuery;
         EntityQuery _playerQuery;
+        bool _rsQueryCreated;
+        bool _playerQueryCreated;
         bool _ecsReady;
 
         // Cached scene queries
@@ -78,6 +80,7 @@ namespace Tartaria.Integration
             Instance = this;
             DontDestroyOnLoad(gameObject);
             ServiceLocator.GameLoop = this;
+            GameEvents.OnRequestActivateRSBuff += HandleRequestActivateRSBuff;
         }
 
         void Start()
@@ -229,8 +232,8 @@ namespace Tartaria.Integration
             }
 
             // Wire world map codex unlock → achievement + HUD
-            if (WorldMapUI.Instance != null)
-                WorldMapUI.Instance.OnEntryUnlocked += HandleCodexEntryUnlocked;
+            if (CodexSystem.Instance != null)
+                CodexSystem.Instance.OnEntryUnlocked += HandleCodexEntryUnlocked;
 
             // Wire Cassian intel events → quest + HUD
             if (CassianNPCController.Instance != null)
@@ -368,9 +371,10 @@ namespace Tartaria.Integration
         {
             StopAllCoroutines();
             if (Instance == this) Instance = null;
-            if (_rsQuery.IsValid) _rsQuery.Dispose();
-            if (_playerQuery.IsValid) _playerQuery.Dispose();
+            if (_rsQueryCreated) { _rsQuery.Dispose(); _rsQueryCreated = false; }
+            if (_playerQueryCreated) { _playerQuery.Dispose(); _playerQueryCreated = false; }
 
+            GameEvents.OnRequestActivateRSBuff -= HandleRequestActivateRSBuff;
             GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
             if (playerInput != null)
             {
@@ -471,8 +475,8 @@ namespace Tartaria.Integration
                 AnastasiaController.Instance.OnSolidificationPhaseChanged -= HandleAnastasiaSolidification;
                 AnastasiaController.Instance.OnLineDelivered -= HandleAnastasiaLine;
             }
-            if (WorldMapUI.Instance != null)
-                WorldMapUI.Instance.OnEntryUnlocked -= HandleCodexEntryUnlocked;
+            if (CodexSystem.Instance != null)
+                CodexSystem.Instance.OnEntryUnlocked -= HandleCodexEntryUnlocked;
             if (CassianNPCController.Instance != null)
                 CassianNPCController.Instance.OnIntelShared -= HandleCassianIntel;
             if (LeyLineManager.Instance != null)
@@ -568,10 +572,16 @@ namespace Tartaria.Integration
             _em = _ecsWorld.EntityManager;
 
             // Create queries once and reuse
-            if (!_rsQuery.IsValid)
+            if (!_rsQueryCreated)
+            {
                 _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
-            if (!_playerQuery.IsValid)
+                _rsQueryCreated = true;
+            }
+            if (!_playerQueryCreated)
+            {
                 _playerQuery = _em.CreateEntityQuery(typeof(PlayerTag), typeof(LocalTransform));
+                _playerQueryCreated = true;
+            }
 
             // Find ResonanceScore singleton
             if (_rsQuery.CalculateEntityCount() > 0)
@@ -1059,6 +1069,8 @@ namespace Tartaria.Integration
             HUDController.Instance?.ShowInteractionPrompt($"Resonance Amplifier active! +25% RS for {duration:F0}s");
             Debug.Log($"[GameLoop] RS buff activated for {duration}s");
         }
+
+        void HandleRequestActivateRSBuff() => ActivateRSBuff();
 
         // ─── Debug / Cheat API ───────────────────────
 
@@ -2238,7 +2250,7 @@ namespace Tartaria.Integration
             {
                 var rsEntity = _rsQuery.GetSingletonEntity();
                 var rs = _em.GetComponentData<ResonanceScore>(rsEntity);
-                rs.Current = save.world.resonanceScore;
+                rs.CurrentRS = save.world.resonanceScore;
                 _em.SetComponentData(rsEntity, rs);
                 _lastRS = save.world.resonanceScore;
                 Debug.Log($"[GameLoop] RS restored: {save.world.resonanceScore:F1}");
@@ -2655,7 +2667,7 @@ namespace Tartaria.Integration
             Debug.Log($"[GameLoop] Moon started: {moonIndex}");
         }
 
-        void HandleEndingChosen(EndingPath ending)
+        void HandleEndingChosen(CampaignFlowController.EndingPath ending)
         {
             HUDController.Instance?.ShowMoonTrophy("THE END",
                 $"Path: {ending}");
@@ -2667,7 +2679,7 @@ namespace Tartaria.Integration
 
         void HandleAnastasiaMode(AnastasiaMode oldMode, AnastasiaMode newMode)
         {
-            if (newMode == AnastasiaMode.FullyManifest)
+            if (newMode == AnastasiaMode.Invisible)
             {
                 VFXController.Instance?.SpawnAnastasiaSolidificationEffect(Vector3.zero);
                 AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
@@ -2728,7 +2740,7 @@ namespace Tartaria.Integration
             Debug.Log($"[GameLoop] Mercury orb tuned: ship={shipIndex}, orbs={orbCount}");
         }
 
-        void HandleFormationChanged(FleetFormation formation)
+        void HandleFormationChanged(AirshipFleetManager.FleetFormation formation)
         {
             HUDController.Instance?.ShowInteractionPrompt($"Fleet formation: {formation}");
             Debug.Log($"[GameLoop] Fleet formation changed: {formation}");
@@ -2738,7 +2750,7 @@ namespace Tartaria.Integration
         {
             HUDController.Instance?.ShowAchievementToast("Fleet fully operational!");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.ZoneComplete);
-            VFXController.Instance?.TriggerAetherWake(Vector3.up * 100f);
+            VFXController.Instance?.TriggerAetherWake();
             Debug.Log("[GameLoop] Fleet fully operational");
         }
 
@@ -2769,7 +2781,7 @@ namespace Tartaria.Integration
         void HandleTranscendentMoment()
         {
             HUDController.Instance?.ShowAchievementToast("Transcendent moment!");
-            VFXController.Instance?.TriggerAetherWake(Vector3.zero);
+            VFXController.Instance?.TriggerAetherWake();
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.ZoneComplete);
             QueueRSReward(50f, "choir_transcendent");
             Debug.Log("[GameLoop] Choir transcendent moment");
@@ -2816,7 +2828,7 @@ namespace Tartaria.Integration
 
         // ─── Localization / UI Handlers ──────────────
 
-        void HandleLanguageChanged(Language lang)
+        void HandleLanguageChanged(LocalizationManager.Language lang)
         {
             HUDController.Instance?.SetZoneName(LocalizationManager.Get("hud_zone_name"));
             Debug.Log($"[GameLoop] Language changed: {lang}");
@@ -2963,15 +2975,15 @@ namespace Tartaria.Integration
         void HandleBossFailed()
         {
             HUDController.Instance?.ShowInteractionPrompt("Boss encounter failed — regroup and try again.");
-            AdaptiveMusicController.Instance?.TransitionToExploration();
-            HapticFeedbackManager.Instance?.PlayDamage();
+            AdaptiveMusicController.Instance?.ExitCombat();
+            HapticFeedbackManager.Instance?.PlayCombatHit();
             Debug.Log("[GameLoop] Boss encounter failed.");
         }
 
         void HandleClimaxStarted(int moonIndex)
         {
             HUDController.Instance?.ShowInteractionPrompt($"Climax sequence beginning for Moon {moonIndex + 1}!");
-            AdaptiveMusicController.Instance?.TransitionToCombat();
+            AdaptiveMusicController.Instance?.EnterCombat();
             HapticFeedbackManager.Instance?.PlayMoonHaptic(moonIndex, HapticContext.BossPhaseShift);
             Debug.Log($"[GameLoop] Climax started: Moon {moonIndex}");
         }
@@ -3034,8 +3046,8 @@ namespace Tartaria.Integration
         void HandleRailLeviathan()
         {
             HUDController.Instance?.ShowInteractionPrompt("Rail Leviathan approaches!");
-            AdaptiveMusicController.Instance?.TransitionToCombat();
-            HapticFeedbackManager.Instance?.PlayDamage();
+            AdaptiveMusicController.Instance?.EnterCombat();
+            HapticFeedbackManager.Instance?.PlayCombatHit();
             Debug.Log("[GameLoop] Rail Leviathan encounter triggered.");
         }
 
@@ -3062,7 +3074,7 @@ namespace Tartaria.Integration
         void HandleTowerDesynced(int towerIndex)
         {
             HUDController.Instance?.ShowInteractionPrompt($"Tower {towerIndex} lost synchronization!");
-            HapticFeedbackManager.Instance?.PlayDamage();
+            HapticFeedbackManager.Instance?.PlayCombatHit();
             Debug.Log($"[GameLoop] Tower desynced: {towerIndex}");
         }
 

@@ -82,11 +82,11 @@ namespace Tartaria.Integration
             }
 
             // Camera
-            var cam = Camera.main;
+            var cam = UnityEngine.Camera.main;
             Check(sb, "Main Camera", cam != null);
             if (cam != null)
-                Check(sb, "CameraController", cam.GetComponent<Camera.CameraController>() != null
-                    || cam.GetComponentInParent<Camera.CameraController>() != null);
+                Check(sb, "CameraController", cam.GetComponent<Tartaria.Camera.CameraController>() != null
+                    || cam.GetComponentInParent<Tartaria.Camera.CameraController>() != null);
 
             sb.AppendLine();
             sb.AppendLine($"RESULT: {_passed} passed, {_failed} failed");
