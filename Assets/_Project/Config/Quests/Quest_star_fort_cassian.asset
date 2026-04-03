@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_star_fort_cassian
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: star_fort_cassian
+  displayName: Cassian's Reconnaissance
+  description: Join Cassian's scouting mission beyond the walls.
+  isMainQuest: 0
+  autoActivate: 0
+  rsRequirement: 0
+  objectives:
+  - description: Complete reconnaissance route
+    type: 4
+    targetId: star_fort_outer
+    targetCount: 1
+  rsReward: 6
+  followUpQuestIds: []

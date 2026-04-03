@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_cathedral_lirael
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: cathedral_lirael
+  displayName: Lirael Sings the Silver Passage
+  description: Help Lirael perform the vocal solo during the Requiem.
+  isMainQuest: 0
+  autoActivate: 0
+  rsRequirement: 0
+  objectives:
+  - description: Lirael's solo performance
+    type: 10
+    targetId: lirael_silver_passage
+    targetCount: 1
+  rsReward: 6
+  followUpQuestIds: []

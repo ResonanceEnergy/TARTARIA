@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Zone_05_SunkenColosseum
+  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:ZoneDefinition
+  zoneName: Sunken Colosseum
+  sceneName: SunkenColosseum
+  subtitle: The Resonance Stage
+  loreIntro: A partially submerged colosseum built for resonance performances, not
+    combat. Five thousand echo imprints linger in the seats.
+  zoneIndex: 4
+  rsRequirementToUnlock: 400
+  buildingCount: 3
+  playerSpawnPosition: {x: 0, y: 1, z: 0}
+  npcSpawnPoints:
+  - npcId: milo
+    position: {x: 6, y: 1, z: 4}
+    yRotation: 225
+    requiresIntroduction: 0
+  - npcId: lirael
+    position: {x: -8, y: 1, z: 10}
+    yRotation: 90
+    requiresIntroduction: 0
+  - npcId: thorne
+    position: {x: 14, y: 1, z: -4}
+    yRotation: 270
+    requiresIntroduction: 0
+  fogColorLow: {r: 0.2, g: 0.25, b: 0.3, a: 1}
+  fogColorHigh: {r: 0.5, g: 0.6, b: 0.7, a: 1}
+  startingFogDensity: 0.03
+  ambientLow: {r: 0.12, g: 0.15, b: 0.2, a: 1}
+  ambientHigh: {r: 0.45, g: 0.55, b: 0.65, a: 1}
+  loadingTip: Water doesn't corrupt -- it preserves.

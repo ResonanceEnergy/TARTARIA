@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Zone_13_PlanetaryNexus
+  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:ZoneDefinition
+  zoneName: Planetary Nexus
+  sceneName: PlanetaryNexus
+  subtitle: All Lines Converge
+  loreIntro: Every ley line. Every frequency. Connected. The veil is thinnest here.
+    The planet is awake -- and it's singing.
+  zoneIndex: 12
+  rsRequirementToUnlock: 1200
+  buildingCount: 5
+  playerSpawnPosition: {x: 0, y: 1, z: 0}
+  npcSpawnPoints:
+  - npcId: milo
+    position: {x: 5, y: 1, z: 3}
+    yRotation: 180
+    requiresIntroduction: 0
+  - npcId: lirael
+    position: {x: -4, y: 1, z: 6}
+    yRotation: 90
+    requiresIntroduction: 0
+  - npcId: thorne
+    position: {x: 12, y: 1, z: -2}
+    yRotation: 270
+    requiresIntroduction: 0
+  - npcId: cassian
+    position: {x: -10, y: 1, z: -5}
+    yRotation: 0
+    requiresIntroduction: 0
+  - npcId: korath
+    position: {x: 0, y: 1, z: 20}
+    yRotation: 180
+    requiresIntroduction: 0
+  - npcId: veritas
+    position: {x: 8, y: 1, z: 15}
+    yRotation: 225
+    requiresIntroduction: 0
+  - npcId: zereth
+    position: {x: 0, y: 3, z: 25}
+    yRotation: 180
+    requiresIntroduction: 0
+  fogColorLow: {r: 0.15, g: 0.12, b: 0.08, a: 1}
+  fogColorHigh: {r: 0.9, g: 0.85, b: 0.6, a: 1}
+  startingFogDensity: 0.01
+  ambientLow: {r: 0.1, g: 0.08, b: 0.05, a: 1}
+  ambientHigh: {r: 0.85, g: 0.8, b: 0.55, a: 1}
+  loadingTip: After eight hundred years of silence... it's singing.

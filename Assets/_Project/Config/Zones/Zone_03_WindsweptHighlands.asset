@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Zone_03_WindsweptHighlands
+  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:ZoneDefinition
+  zoneName: Windswept Highlands
+  sceneName: WindsweptHighlands
+  subtitle: The Orphan Route
+  loreIntro: Highland plateaus carved by wind and time. The orphan train tracks still
+    lead somewhere -- if you know where to look.
+  zoneIndex: 2
+  rsRequirementToUnlock: 200
+  buildingCount: 3
+  playerSpawnPosition: {x: 0, y: 1, z: 0}
+  npcSpawnPoints:
+  - npcId: lirael
+    position: {x: -3, y: 1, z: 8}
+    yRotation: 120
+    requiresIntroduction: 0
+  fogColorLow: {r: 0.4, g: 0.42, b: 0.45, a: 1}
+  fogColorHigh: {r: 0.7, g: 0.75, b: 0.8, a: 1}
+  startingFogDensity: 0.015
+  ambientLow: {r: 0.2, g: 0.2, b: 0.22, a: 1}
+  ambientHigh: {r: 0.65, g: 0.65, b: 0.7, a: 1}
+  loadingTip: Highland architecture bends but never breaks. Like reeds.

@@ -60,6 +60,14 @@ namespace Tartaria.Core
 
             var em = world.EntityManager;
 
+            // Guard: skip if AetherFieldConfig singleton already exists (re-enter Play mode)
+            var configQuery = em.CreateEntityQuery(typeof(AetherFieldConfig));
+            if (configQuery.CalculateEntityCount() > 0)
+            {
+                Debug.Log("[Tartaria] ECS world already initialized — skipping duplicate creation.");
+                return true;
+            }
+
             // Create Aether field configuration singleton
             var configEntity = em.CreateEntity();
             em.AddComponentData(configEntity, new AetherFieldConfig
