@@ -96,6 +96,8 @@ namespace Tartaria.Save
             _currentSave.header.modifiedUtc = DateTime.UtcNow.ToString("o");
             _currentSave.header.playTimeSeconds += _autoSaveTimer;
 
+            // Zero checksum before computing so hash matches load-time recomputation
+            _currentSave.header.checksum = "";
             string json = JsonUtility.ToJson(_currentSave, true);
 
             // Compute integrity checksum

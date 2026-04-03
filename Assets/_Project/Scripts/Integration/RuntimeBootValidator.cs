@@ -28,8 +28,20 @@ namespace Tartaria.Integration
 
         void Start()
         {
-            // Delay validation by one frame to let all Awake/Start calls complete
-            Invoke(nameof(RunValidation), 0.1f);
+            // Wait for scene loading to complete before validating
+            StartCoroutine(WaitThenValidate());
+        }
+
+        System.Collections.IEnumerator WaitThenValidate()
+        {
+            // Wait until SceneLoader transitions to Exploration (all scenes loaded)
+            while (GameStateManager.Instance == null ||
+                   GameStateManager.Instance.CurrentState != GameState.Exploration)
+                yield return null;
+
+            // Extra frame for spawners/controllers to initialize
+            yield return null;
+            RunValidation();
         }
 
         void RunValidation()
