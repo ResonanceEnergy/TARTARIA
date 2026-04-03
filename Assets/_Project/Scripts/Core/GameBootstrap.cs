@@ -13,6 +13,8 @@ namespace Tartaria.Core
     [DisallowMultipleComponent]
     public class GameBootstrap : MonoBehaviour
     {
+        public static GameBootstrap Instance { get; private set; }
+
         [Header("Aether Field Configuration")]
         [SerializeField, Min(1)] int aetherGridX = 64;
         [SerializeField, Min(1)] int aetherGridY = 64;
@@ -20,6 +22,19 @@ namespace Tartaria.Core
         [SerializeField, Min(0.1f)] float aetherCellSize = 2.0f;
         [SerializeField, Range(0f, 1f)] float aetherDissipation = 0.05f;
         [SerializeField, Min(0f)] float aetherAdvectionSpeed = 1.0f;
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
 
         void Start()
         {

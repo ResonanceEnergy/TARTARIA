@@ -14,6 +14,8 @@ namespace Tartaria.Integration
     [DefaultExecutionOrder(-200)]
     public class RuntimeBootValidator : MonoBehaviour
     {
+        public static RuntimeBootValidator Instance { get; private set; }
+
         [SerializeField, Tooltip("Show on-screen validation overlay in dev builds")]
         bool showOverlay = true;
 
@@ -25,6 +27,17 @@ namespace Tartaria.Integration
         int _passed;
         int _failed;
         bool _validated;
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+        }
 
         void Start()
         {
