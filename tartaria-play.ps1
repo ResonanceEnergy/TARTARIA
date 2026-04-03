@@ -76,7 +76,18 @@ function Close-UnityForProject {
             Select-Object -ExpandProperty ProcessId
         if ($unityPids) {
             $unityPids | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
-            Start-Sleep -Seconds 2
+        }
+        # Wait until old Unity fully exits to avoid race with new launch
+        $exitWait = 0
+        while ($exitWait -lt 30) {
+            $still = Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue |
+                Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" }
+            if (-not $still) { break }
+            Start-Sleep -Seconds 1
+            $exitWait++
+        }
+        if ($exitWait -ge 30) {
+            Write-Host "WARNING: Old Unity did not exit within 30s" -ForegroundColor Red
         }
     }
 }
@@ -163,6 +174,15 @@ function Watch-EditorLog {
             Write-Host ""
             Write-Host "  TIMEOUT: Pipeline did not complete within ${MonitorTimeout}s" -ForegroundColor Red
             Write-Host "  Unity may still be compiling or importing. Check Unity Console." -ForegroundColor Yellow
+            break
+        }
+
+        # Check if Unity process died
+        $unityAlive = Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue |
+            Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" }
+        if (-not $unityAlive) {
+            Write-Host ""
+            Write-Host "  ABORT: Unity process exited unexpectedly" -ForegroundColor Red
             break
         }
 
