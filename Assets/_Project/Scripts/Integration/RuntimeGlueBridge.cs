@@ -23,6 +23,7 @@ namespace Tartaria.Integration
 
         void Awake()
         {
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
 

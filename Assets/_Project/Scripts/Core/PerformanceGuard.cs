@@ -90,7 +90,9 @@ namespace Tartaria.Core
 
         void Update()
         {
-            float frameMs = Time.unscaledDeltaTime * 1000f;
+            float rawMs = Time.unscaledDeltaTime * 1000f;
+            // Clamp to 1 second — anything larger is an editor pause, not real gameplay
+            float frameMs = Mathf.Min(rawMs, 1000f);
 
             // Record frame time
             _frameTimes[_frameIndex] = frameMs;
