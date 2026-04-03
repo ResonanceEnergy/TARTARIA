@@ -76,6 +76,15 @@ namespace Tartaria.Core
             if (elapsed < minimumLoadTime)
                 yield return new WaitForSecondsRealtime(minimumLoadTime - elapsed);
 
+            // Enforce exactly one AudioListener — gameplay camera takes priority
+            var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
+            if (listeners.Length > 1)
+            {
+                for (int i = 1; i < listeners.Length; i++)
+                    Destroy(listeners[i]);
+                Debug.Log($"[SceneLoader] Removed {listeners.Length - 1} duplicate AudioListener(s).");
+            }
+
             // Transition to exploration
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
             Debug.Log("[SceneLoader] Gameplay + UI scenes loaded. Entering Exploration.");
