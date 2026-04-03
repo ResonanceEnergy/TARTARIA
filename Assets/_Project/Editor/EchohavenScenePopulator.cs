@@ -314,7 +314,8 @@ namespace Tartaria.Editor
             cam.fieldOfView = 55f;
             cam.nearClipPlane = 0.3f;
             cam.farClipPlane = 300f;
-            camGO.AddComponent<AudioListener>();
+            if (Object.FindAnyObjectByType<AudioListener>() == null)
+                camGO.AddComponent<AudioListener>();
 
             // Camera controller (if exists)
             var ccType = typeof(Tartaria.Camera.CameraController);
