@@ -44,3 +44,7 @@ crashlytics-build.properties
 
 # IL2CPP
 /[Aa]ssets/Plugins/*/libil2cpp-codegen*.a
+Assets/_Recovery/
+Assets/_Recovery.meta
+Assets/_Project/Logs/
+Assets/_Project/Logs.meta
