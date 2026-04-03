@@ -19,7 +19,8 @@ namespace Tartaria.Editor
     [InitializeOnLoad]
     public static class AutoPlayBoot
     {
-        const string SentinelPath = "Temp/TARTARIA_AUTOPLAY";
+        // Sentinel lives in Library/ — Temp/ gets wiped on project open!
+        const string SentinelPath = "Library/TARTARIA_AUTOPLAY";
 
         // Retry budget: ~5 seconds of update ticks (editor usually ticks ~10/s during load)
         const int MaxRetries = 50;

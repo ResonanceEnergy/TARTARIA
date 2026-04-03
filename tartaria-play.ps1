@@ -327,9 +327,8 @@ if ($BatchFirst -or $BatchOnly) {
 }
 
 # ── Drop sentinel file for AutoPlayBoot ──
-$sentinelPath = Join-Path $ProjectPath "Temp\TARTARIA_AUTOPLAY"
-$tempDir = Join-Path $ProjectPath "Temp"
-if (-not (Test-Path $tempDir)) { New-Item -ItemType Directory -Path $tempDir -Force | Out-Null }
+# Sentinel goes in Library/ — Unity wipes Temp/ on project open!
+$sentinelPath = Join-Path $ProjectPath "Library\TARTARIA_AUTOPLAY"
 "autoplay" | Set-Content -Path $sentinelPath -NoNewline
 Write-Host "Sentinel file created" -ForegroundColor Green
 
