@@ -238,15 +238,9 @@ namespace Tartaria.Editor
 
         void CheckComponentInScene<T>(string label) where T : Component
         {
-            var found = FindAnyObjectByType<T>();
-            Add(label, found != null, found != null ? found.gameObject.name : "MISSING in scene");
-        }
-
-        T FindAnyObjectByType<T>() where T : Component
-        {
-            // FindObjectsByType is Editor-safe
             var all = Object.FindObjectsByType<T>(FindObjectsSortMode.None);
-            return all.Length > 0 ? all[0] : null;
+            var found = all.Length > 0 ? all[0] : null;
+            Add(label, found != null, found != null ? found.gameObject.name : "MISSING in scene");
         }
 
         static bool AssetExists(string path)

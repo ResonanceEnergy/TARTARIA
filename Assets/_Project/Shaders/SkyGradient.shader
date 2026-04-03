@@ -74,7 +74,7 @@ Shader "Tartaria/SkyGradient"
             CBUFFER_END
 
             static const float PHI = 1.6180339887;
-            static const float PI = 3.14159265;
+            // PI is already defined by URP Core.hlsl — use it directly
 
             // Simple hash for procedural stars
             float hash21(float2 p)
