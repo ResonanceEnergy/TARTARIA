@@ -76,10 +76,9 @@ namespace Tartaria.Editor
             hapticMgr.transform.SetParent(persist.transform);
             hapticMgr.AddComponent<Input.HapticFeedbackManager>();
 
-            // ── Scene Loader stub ──
+            // ── Scene Loader ──
             var loader = new GameObject("SceneLoader");
-            // SceneLoader component will be added when the class exists.
-            // For now this GO marks the intent.
+            loader.AddComponent<Core.SceneLoader>();
 
             // ── Light ──
             var light = new GameObject("DirectionalLight");

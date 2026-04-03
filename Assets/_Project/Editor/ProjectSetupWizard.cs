@@ -314,6 +314,21 @@ namespace Tartaria.Editor
             worldInitGO.transform.SetParent(managersGO.transform);
             worldInitGO.AddComponent<WorldInitializer>();
 
+            // PlayerSpawner (runtime player instantiation with greybox fallback)
+            var playerSpawnerGO = new GameObject("PlayerSpawner");
+            playerSpawnerGO.transform.SetParent(managersGO.transform);
+            playerSpawnerGO.AddComponent<PlayerSpawner>();
+
+            // BuildingSpawner (creates building GameObjects from ECS entities)
+            var buildingSpawnerGO = new GameObject("BuildingSpawner");
+            buildingSpawnerGO.transform.SetParent(managersGO.transform);
+            buildingSpawnerGO.AddComponent<BuildingSpawner>();
+
+            // SceneLoader (async scene loading after boot)
+            var sceneLoaderGO = new GameObject("SceneLoader");
+            sceneLoaderGO.transform.SetParent(managersGO.transform);
+            sceneLoaderGO.AddComponent<Core.SceneLoader>();
+
             // === Player ===
             var playerGO = CreatePlayer();
 

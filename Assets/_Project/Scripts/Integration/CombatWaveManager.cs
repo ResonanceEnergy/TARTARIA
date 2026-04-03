@@ -272,6 +272,12 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayEnemyDissolution(position);
         }
 
+        /// <summary>Spawn a single enemy at position (debug console).</summary>
+        public void SpawnSingleEnemy(Vector3 position)
+        {
+            SpawnEnemy(EnemyTypeId.MudGolem, position, 1f);
+        }
+
         void DistributeWaveReward()
         {
             if (_currentWaveIndex < 0 || _currentWaveIndex >= _waves.Count) return;

@@ -1,0 +1,257 @@
+using System.Collections.Generic;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+namespace Tartaria.Editor
+{
+    /// <summary>
+    /// Editor window that validates everything needed to press Play.
+    /// Menu: Tartaria > Readiness Check
+    /// Shows green/yellow/red indicators for scenes, assets, managers, etc.
+    /// </summary>
+    public class PlayReadinessWindow : EditorWindow
+    {
+        struct CheckResult
+        {
+            public string label;
+            public bool passed;
+            public string detail;
+        }
+
+        List<CheckResult> _results = new();
+        Vector2 _scrollPos;
+        int _passCount;
+        int _failCount;
+        bool _hasRun;
+
+        [MenuItem("Tartaria/Readiness Check", false, -50)]
+        static void Open()
+        {
+            var w = GetWindow<PlayReadinessWindow>("Tartaria Readiness");
+            w.minSize = new Vector2(420, 500);
+            w.RunChecks();
+        }
+
+        void OnGUI()
+        {
+            GUILayout.Space(6);
+            EditorGUILayout.LabelField("TARTARIA — Play Readiness", EditorStyles.boldLabel);
+            GUILayout.Space(4);
+
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Run Checks", GUILayout.Height(28)))
+                RunChecks();
+            if (GUILayout.Button("BUILD EVERYTHING", GUILayout.Height(28)))
+            {
+                OneClickBuild.RunBuild();
+                RunChecks();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            if (!_hasRun)
+            {
+                EditorGUILayout.HelpBox("Click 'Run Checks' to scan the project.", MessageType.Info);
+                return;
+            }
+
+            GUILayout.Space(6);
+
+            // Summary bar
+            var summaryStyle = new GUIStyle(EditorStyles.boldLabel) { fontSize = 13 };
+            if (_failCount == 0)
+            {
+                summaryStyle.normal.textColor = new Color(0.1f, 0.7f, 0.1f);
+                EditorGUILayout.LabelField($"ALL {_passCount} CHECKS PASSED", summaryStyle);
+            }
+            else
+            {
+                summaryStyle.normal.textColor = new Color(0.9f, 0.2f, 0.1f);
+                EditorGUILayout.LabelField($"{_failCount} FAILED / {_passCount} PASSED", summaryStyle);
+            }
+
+            GUILayout.Space(4);
+
+            _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+            foreach (var r in _results)
+            {
+                EditorGUILayout.BeginHorizontal();
+
+                // Icon
+                var icon = r.passed
+                    ? EditorGUIUtility.IconContent("d_GreenCheckmark")
+                    : EditorGUIUtility.IconContent("console.erroricon.sml");
+                GUILayout.Label(icon, GUILayout.Width(20), GUILayout.Height(18));
+
+                // Label + detail
+                EditorGUILayout.LabelField(r.label, GUILayout.Width(240));
+                var detailStyle = new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
+                detailStyle.normal.textColor = r.passed ? Color.gray : new Color(0.9f, 0.3f, 0.2f);
+                EditorGUILayout.LabelField(r.detail, detailStyle);
+
+                EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.EndScrollView();
+        }
+
+        void RunChecks()
+        {
+            _results.Clear();
+            _passCount = 0;
+            _failCount = 0;
+            _hasRun = true;
+
+            CheckScenes();
+            CheckPrefabs();
+            CheckScriptableObjects();
+            CheckInputActions();
+            CheckBuildSettings();
+            CheckActiveSceneManagers();
+
+            Repaint();
+        }
+
+        void Add(string label, bool passed, string detail = "")
+        {
+            _results.Add(new CheckResult { label = label, passed = passed, detail = detail });
+            if (passed) _passCount++;
+            else _failCount++;
+        }
+
+        // ─── Scene Checks ─────────────────────────────
+
+        void CheckScenes()
+        {
+            Add("Boot.unity exists",
+                AssetExists("Assets/_Project/Scenes/Boot.unity"),
+                "Run BUILD EVERYTHING to create");
+
+            Add("Echohaven scene exists",
+                AssetExists("Assets/_Project/Scenes/Echohaven_VerticalSlice.unity"),
+                "Core gameplay scene");
+
+            Add("UI_Overlay.unity exists",
+                AssetExists("Assets/_Project/Scenes/UI_Overlay.unity"),
+                "Run BUILD EVERYTHING to create");
+        }
+
+        // ─── Prefab Checks ────────────────────────────
+
+        void CheckPrefabs()
+        {
+            Add("Player prefab",
+                AssetExists("Assets/_Project/Prefabs/Characters/Player.prefab"),
+                "Run BUILD EVERYTHING");
+
+            Add("Milo prefab",
+                AssetExists("Assets/_Project/Prefabs/Characters/Milo.prefab"),
+                "Companion NPC");
+
+            Add("MudGolem prefab",
+                AssetExists("Assets/_Project/Prefabs/Characters/MudGolem.prefab"),
+                "Enemy prefab");
+        }
+
+        // ─── ScriptableObject Checks ──────────────────
+
+        void CheckScriptableObjects()
+        {
+            // Zones
+            string zonePath = "Assets/_Project/Config/Zones";
+            var zoneGuids = AssetDatabase.FindAssets("t:ZoneDefinition", new[] { zonePath });
+            Add($"Zone definitions ({zoneGuids.Length}/13)",
+                zoneGuids.Length >= 13,
+                zoneGuids.Length < 13 ? "Run BUILD EVERYTHING" : "OK");
+
+            // Quests
+            string questPath = "Assets/_Project/Config/Quests";
+            var questGuids = AssetDatabase.FindAssets("t:QuestDefinition", new[] { questPath });
+            bool hasQuests = questGuids.Length > 0;
+            Add($"Quest definitions ({questGuids.Length})",
+                hasQuests,
+                hasQuests ? "OK" : "Run BUILD EVERYTHING");
+
+            // Building defs
+            string buildingPath = "Assets/_Project/Config";
+            var buildingGuids = AssetDatabase.FindAssets("t:BuildingDefinition", new[] { buildingPath });
+            bool hasBuildingDefs = buildingGuids.Length > 0;
+            Add($"Building definitions ({buildingGuids.Length})",
+                hasBuildingDefs,
+                hasBuildingDefs ? "OK" : "Run BUILD EVERYTHING");
+        }
+
+        // ─── Input Checks ─────────────────────────────
+
+        void CheckInputActions()
+        {
+            Add("Input actions asset",
+                AssetExists("Assets/_Project/Input/TartariaInputActions.inputactions"),
+                "Input bindings");
+        }
+
+        // ─── Build Settings ───────────────────────────
+
+        void CheckBuildSettings()
+        {
+            var scenes = EditorBuildSettings.scenes;
+            bool hasThree = scenes != null && scenes.Length >= 3;
+            bool bootFirst = hasThree && scenes[0].path.Contains("Boot");
+            bool echoSecond = hasThree && scenes[1].path.Contains("Echohaven");
+            bool uiThird = hasThree && scenes[2].path.Contains("UI_Overlay");
+
+            Add("Build settings: 3+ scenes",
+                hasThree,
+                hasThree ? $"{scenes.Length} scenes" : "Run BUILD EVERYTHING");
+
+            Add("Build settings: Boot → Echohaven → UI",
+                bootFirst && echoSecond && uiThird,
+                (bootFirst && echoSecond && uiThird) ? "Correct order" : "Wrong scene order");
+        }
+
+        // ─── Active Scene Manager Checks ──────────────
+
+        void CheckActiveSceneManagers()
+        {
+            // Only check if a relevant scene is open
+            var scene = EditorSceneManager.GetActiveScene();
+            if (!scene.IsValid() || !scene.isLoaded)
+            {
+                Add("Active scene loaded", false, "No scene open");
+                return;
+            }
+
+            Add($"Active scene: {scene.name}", true, scene.path);
+
+            // Check for key managers in open scene
+            CheckComponentInScene<Core.GameBootstrap>("GameBootstrap");
+            CheckComponentInScene<Core.GameStateManager>("GameStateManager");
+            CheckComponentInScene<Integration.GameLoopController>("GameLoopController");
+            CheckComponentInScene<Core.SceneLoader>("SceneLoader");
+            CheckComponentInScene<Integration.PlayerSpawner>("PlayerSpawner");
+            CheckComponentInScene<Integration.BuildingSpawner>("BuildingSpawner");
+            CheckComponentInScene<Integration.TutorialSystem>("TutorialSystem");
+            CheckComponentInScene<Integration.QuestManager>("QuestManager");
+            CheckComponentInScene<Audio.AudioManager>("AudioManager");
+            CheckComponentInScene<UI.UIManager>("UIManager");
+            CheckComponentInScene<UI.HUDController>("HUDController");
+        }
+
+        void CheckComponentInScene<T>(string label) where T : Component
+        {
+            var found = FindAnyObjectByType<T>();
+            Add(label, found != null, found != null ? found.gameObject.name : "MISSING in scene");
+        }
+
+        T FindAnyObjectByType<T>() where T : Component
+        {
+            // FindObjectsByType is Editor-safe
+            var all = Object.FindObjectsByType<T>(FindObjectsSortMode.None);
+            return all.Length > 0 ? all[0] : null;
+        }
+
+        static bool AssetExists(string path)
+        {
+            return AssetDatabase.LoadMainAssetAtPath(path) != null;
+        }
+    }
+}
