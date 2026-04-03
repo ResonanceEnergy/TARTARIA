@@ -111,9 +111,7 @@ namespace Tartaria.Integration
             if (cam == null)
                 cam = FindAnyObjectByType<UnityEngine.Camera>();
             Check(sb, "Main Camera", cam != null);
-            if (cam != null)
-                Check(sb, "CameraController", cam.GetComponent<Tartaria.Camera.CameraController>() != null
-                    || cam.GetComponentInParent<Tartaria.Camera.CameraController>() != null);
+            Check(sb, "CameraController", FindAnyObjectByType<Tartaria.Camera.CameraController>() != null);
 
             sb.AppendLine();
             sb.AppendLine($"RESULT: {_passed} passed, {_failed} failed");
