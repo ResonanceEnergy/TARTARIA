@@ -45,7 +45,9 @@ namespace Tartaria.Editor
             CreateScriptableObjects();
             CreateScene();
 
-            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+            bool autoPlay = File.Exists(Path.Combine(Application.dataPath,
+                "..", "Library", "TARTARIA_AUTOPLAY"));
+            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode && !autoPlay)
             {
                 EditorUtility.DisplayDialog("Tartaria Setup Complete",
                     "Echohaven vertical slice is ready!\n\n" +
