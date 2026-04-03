@@ -213,9 +213,6 @@ function Watch-EditorLog {
                     $tartariaErrors += $trimmed
                     Write-Host "  $trimmed" -ForegroundColor Red
                 }
-                elseif ($trimmed -match "OK\s|PASSED|complete") {
-                    Write-Host "  $trimmed" -ForegroundColor Green
-                }
                 elseif ($trimmed -match "RESULT:|ALL.*PHASES|entering Play") {
                     Write-Host "  $trimmed" -ForegroundColor Green
                     $pipelineFinished = $true
@@ -223,6 +220,9 @@ function Watch-EditorLog {
                 elseif ($trimmed -match "NOT entering Play") {
                     Write-Host "  $trimmed" -ForegroundColor Yellow
                     $pipelineFinished = $true
+                }
+                elseif ($trimmed -match "OK\s|PASSED|complete") {
+                    Write-Host "  $trimmed" -ForegroundColor Green
                 }
                 elseif ($trimmed -match "SKIP") {
                     Write-Host "  $trimmed" -ForegroundColor Yellow
