@@ -6,10 +6,13 @@ namespace Tartaria.Editor
 {
     /// <summary>
     /// Auto-play trigger: when Unity opens and finds the sentinel file
-    /// "Temp/TARTARIA_AUTOPLAY", it runs BUILD EVERYTHING → Validate → Enter Play Mode.
+    /// "Temp/TARTARIA_AUTOPLAY", it runs BUILD EVERYTHING -> Validate -> Enter Play Mode.
     ///
     /// The sentinel file is created by the PowerShell launcher script
     /// and deleted after consumption.
+    ///
+    /// Hardened: waits for editor readiness, per-phase error isolation,
+    /// writes build report for PowerShell to parse, cleans up Device Simulator.
     ///
     /// Also available manually: Tartaria > Build + Validate + Play
     /// </summary>
@@ -17,26 +20,29 @@ namespace Tartaria.Editor
     public static class AutoPlayBoot
     {
         const string SentinelPath = "Temp/TARTARIA_AUTOPLAY";
+
+        // Retry budget: ~5 seconds of update ticks (editor usually ticks ~10/s during load)
+        const int MaxRetries = 50;
         static int _retryCount;
 
         static AutoPlayBoot()
         {
             _retryCount = 0;
-            // Use update loop instead of single delayCall — more reliable after long imports
-            EditorApplication.update += CheckSentinelUpdate;
+            EditorApplication.update += WaitForEditorReady;
         }
 
-        static void CheckSentinelUpdate()
+        static void WaitForEditorReady()
         {
-            // Only try during first 30 update ticks after domain reload
             _retryCount++;
-            if (_retryCount > 30)
+
+            // Give up after budget exhausted
+            if (_retryCount > MaxRetries)
             {
-                EditorApplication.update -= CheckSentinelUpdate;
+                EditorApplication.update -= WaitForEditorReady;
                 return;
             }
 
-            // Wait until editor is fully ready (not compiling, not importing)
+            // Must not be compiling, importing, or still in a domain reload
             if (EditorApplication.isCompiling || EditorApplication.isUpdating)
                 return;
 
@@ -45,55 +51,123 @@ namespace Tartaria.Editor
 
             if (!System.IO.File.Exists(fullPath))
             {
-                EditorApplication.update -= CheckSentinelUpdate;
+                EditorApplication.update -= WaitForEditorReady;
                 return;
             }
 
-            // Consume sentinel
-            EditorApplication.update -= CheckSentinelUpdate;
-            System.IO.File.Delete(fullPath);
-            Debug.Log("[Tartaria] AutoPlay sentinel detected -- running full pipeline");
+            // Found sentinel — consume it and run
+            EditorApplication.update -= WaitForEditorReady;
 
+            try
+            {
+                System.IO.File.Delete(fullPath);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[Tartaria] Could not delete sentinel: {ex.Message}");
+            }
+
+            Debug.Log("[Tartaria] ============================================");
+            Debug.Log("[Tartaria] AUTO-PLAY SENTINEL DETECTED");
+            Debug.Log("[Tartaria] ============================================");
+
+            // Clean up Device Simulator to avoid its internal NullRef
+            CloseDeviceSimulator();
+
+            // Run the full pipeline
             try
             {
                 RunBuildValidatePlay();
             }
             catch (System.Exception ex)
             {
-                Debug.LogError($"[Tartaria] AutoPlay pipeline failed: {ex}");
+                Debug.LogError($"[Tartaria] AUTO-PLAY PIPELINE CRASHED: {ex}");
+                // Still write a report so PowerShell can detect the failure
+                BuildReport.Begin("AUTO-PLAY (crashed)");
+                BuildReport.RunPhase("Pipeline", () => throw ex);
+                BuildReport.Finish();
+            }
+        }
+
+        /// <summary>
+        /// Close any open Device Simulator windows to prevent
+        /// Unity's internal NullReferenceException during serialization.
+        /// </summary>
+        static void CloseDeviceSimulator()
+        {
+            try
+            {
+                var simType = System.Type.GetType(
+                    "UnityEditor.DeviceSimulation.SimulatorWindow, UnityEditor");
+                if (simType == null) return;
+
+                var windows = Resources.FindObjectsOfTypeAll(simType);
+                foreach (var w in windows)
+                {
+                    if (w is EditorWindow ew)
+                    {
+                        Debug.Log("[Tartaria] Closing Device Simulator window (prevents NullRef)");
+                        ew.Close();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[Tartaria] Could not close Device Simulator: {ex.Message}");
             }
         }
 
         [MenuItem("Tartaria/Build + Validate + Play", false, -90)]
         public static void RunBuildValidatePlay()
         {
-            var timer = System.Diagnostics.Stopwatch.StartNew();
+            BuildReport.Begin("BUILD + VALIDATE + PLAY");
 
             // Phase 1: Build Everything
-            Debug.Log("[Tartaria] ══ AUTO-PLAY: Phase 1/3 -- BUILD EVERYTHING ══");
-            OneClickBuild.RunBuild();
+            Debug.Log("[Tartaria] === AUTO-PLAY: Phase 1/3 -- BUILD EVERYTHING ===");
+            OneClickBuild.RunBuildPhases();
 
-            // Phase 2: Validate
-            Debug.Log("[Tartaria] ══ AUTO-PLAY: Phase 2/3 -- READINESS CHECK ══");
-            BatchReadinessValidator.Validate();
+            // Phase 2: Validate (run even if build had partial failures)
+            Debug.Log("[Tartaria] === AUTO-PLAY: Phase 2/3 -- READINESS CHECK ===");
+            BuildReport.RunPhase("READINESS VALIDATION", () =>
+            {
+                BatchReadinessValidator.Validate();
+            });
 
             // Phase 3: Open Boot scene and enter Play mode
-            Debug.Log("[Tartaria] ══ AUTO-PLAY: Phase 3/3 -- ENTERING PLAY MODE ══");
+            Debug.Log("[Tartaria] === AUTO-PLAY: Phase 3/3 -- ENTERING PLAY MODE ===");
             string bootPath = "Assets/_Project/Scenes/Boot.unity";
+
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(bootPath) != null)
             {
-                EditorSceneManager.OpenScene(bootPath, OpenSceneMode.Single);
-                EditorSceneManager.SaveOpenScenes();
+                BuildReport.RunPhase("Open Boot Scene", () =>
+                {
+                    EditorSceneManager.OpenScene(bootPath, OpenSceneMode.Single);
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+            else
+            {
+                BuildReport.Skip("Open Boot Scene", "Boot.unity not found after build");
+                Debug.LogError("[Tartaria] Boot.unity was not created by BUILD EVERYTHING");
             }
 
-            timer.Stop();
-            Debug.Log($"[Tartaria] Full pipeline completed in {timer.ElapsedMilliseconds / 1000f:F1}s -- entering Play mode");
+            BuildReport.Finish();
 
-            // Enter play mode on next frame (must not be in the middle of domain reload)
-            EditorApplication.delayCall += () =>
+            // Only enter Play if there were no critical failures
+            if (!BuildReport.HasFailures)
             {
-                EditorApplication.isPlaying = true;
-            };
+                Debug.Log("[Tartaria] Pipeline complete -- entering Play mode on next frame");
+                EditorApplication.delayCall += () =>
+                {
+                    EditorApplication.isPlaying = true;
+                };
+            }
+            else
+            {
+                Debug.LogWarning(
+                    $"[Tartaria] Pipeline had {BuildReport.FailCount} failure(s) -- NOT entering Play mode.\n" +
+                    "[Tartaria] Fix errors above, then: Tartaria > Build + Validate + Play");
+            }
         }
     }
 }
