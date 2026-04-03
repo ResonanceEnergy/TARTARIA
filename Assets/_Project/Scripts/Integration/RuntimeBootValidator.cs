@@ -83,6 +83,8 @@ namespace Tartaria.Integration
 
             // Camera
             var cam = UnityEngine.Camera.main;
+            if (cam == null)
+                cam = FindAnyObjectByType<UnityEngine.Camera>();
             Check(sb, "Main Camera", cam != null);
             if (cam != null)
                 Check(sb, "CameraController", cam.GetComponent<Tartaria.Camera.CameraController>() != null

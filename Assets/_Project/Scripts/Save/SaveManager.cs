@@ -39,6 +39,7 @@ namespace Tartaria.Save
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
             _savePath = Path.Combine(Application.persistentDataPath, "save_slot_0.json");
