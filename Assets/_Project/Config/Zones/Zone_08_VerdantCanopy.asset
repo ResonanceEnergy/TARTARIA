@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Zone_08_VerdantCanopy
+  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:ZoneDefinition
+  zoneName: Verdant Canopy
+  sceneName: VerdantCanopy
+  subtitle: Where Life Refuses to Yield
+  loreIntro: An ancient forest where roots push through stone and bioluminescence
+    traces the ley lines. Nature copied the architects -- or perhaps it was the other
+    way around.
+  zoneIndex: 7
+  rsRequirementToUnlock: 700
+  buildingCount: 3
+  playerSpawnPosition: {x: 0, y: 1, z: 0}
+  npcSpawnPoints:
+  - npcId: thorne
+    position: {x: 8, y: 1, z: 6}
+    yRotation: 200
+    requiresIntroduction: 0
+  fogColorLow: {r: 0.12, g: 0.22, b: 0.12, a: 1}
+  fogColorHigh: {r: 0.35, g: 0.65, b: 0.35, a: 1}
+  startingFogDensity: 0.04
+  ambientLow: {r: 0.08, g: 0.15, b: 0.08, a: 1}
+  ambientHigh: {r: 0.3, g: 0.55, b: 0.3, a: 1}
+  loadingTip: The strongest structures let life grow through them.

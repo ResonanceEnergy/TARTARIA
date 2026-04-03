@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_cassian_confrontation
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: cassian_confrontation
+  displayName: Cassian's Choice
+  description: Confront Cassian about the giant awakening decision.
+  isMainQuest: 0
+  autoActivate: 0
+  rsRequirement: 0
+  objectives:
+  - description: Cassian confrontation
+    type: 10
+    targetId: cassian_confrontation
+    targetCount: 1
+  rsReward: 6
+  followUpQuestIds: []

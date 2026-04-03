@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_lunar_main_caverns
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: lunar_main_caverns
+  displayName: The Crystal Frequency
+  description: Tune the resonance crystals in the underground caverns.
+  isMainQuest: 1
+  autoActivate: 0
+  rsRequirement: 10
+  objectives:
+  - description: Complete crystal tuning nodes
+    type: 7
+    targetId: 
+    targetCount: 5
+  - description: Reach RS 25
+    type: 3
+    targetId: 
+    targetCount: 25
+  rsReward: 12
+  followUpQuestIds:
+  - lunar_side_lirael

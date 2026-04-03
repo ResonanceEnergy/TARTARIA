@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_cathedral_main
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: cathedral_main
+  displayName: The Cymatic Requiem
+  description: Restore the five organ registers and perform the Requiem.
+  isMainQuest: 1
+  autoActivate: 0
+  rsRequirement: 50
+  objectives:
+  - description: Restore organ registers
+    type: 1
+    targetId: 
+    targetCount: 5
+  - description: Complete performance mini-game
+    type: 8
+    targetId: requiem_performance
+    targetCount: 1
+  - description: Defeat Dissonant Conductor
+    type: 9
+    targetId: dissonant_conductor
+    targetCount: 1
+  rsReward: 22
+  followUpQuestIds: []

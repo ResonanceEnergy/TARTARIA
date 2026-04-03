@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Zone_06_LivingLibrary
+  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:ZoneDefinition
+  zoneName: Living Library
+  sceneName: LivingLibrary
+  subtitle: The Archive Interface
+  loreIntro: The Living Library was not mere storage -- it was a direct interface
+    to the planetary Archive. Rhythmic knowledge encoded in every shelf.
+  zoneIndex: 5
+  rsRequirementToUnlock: 500
+  buildingCount: 4
+  playerSpawnPosition: {x: 0, y: 1, z: 0}
+  npcSpawnPoints:
+  - npcId: veritas
+    position: {x: 0, y: 1, z: 15}
+    yRotation: 0
+    requiresIntroduction: 1
+  - npcId: lirael
+    position: {x: -5, y: 1, z: 12}
+    yRotation: 45
+    requiresIntroduction: 0
+  fogColorLow: {r: 0.18, g: 0.15, b: 0.12, a: 1}
+  fogColorHigh: {r: 0.55, g: 0.48, b: 0.35, a: 1}
+  startingFogDensity: 0.02
+  ambientLow: {r: 0.12, g: 0.1, b: 0.08, a: 1}
+  ambientHigh: {r: 0.5, g: 0.42, b: 0.3, a: 1}
+  loadingTip: Read with your ears, not your eyes.

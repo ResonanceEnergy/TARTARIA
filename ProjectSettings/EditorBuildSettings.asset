@@ -6,6 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/_Project/Scenes/Boot.unity
+    guid: e239cbf810d53fa4aae6a52d6b675175
+  - enabled: 1
     path: Assets/_Project/Scenes/Echohaven_VerticalSlice.unity
     guid: a0000000000000000000000000000001
+  - enabled: 1
+    path: Assets/_Project/Scenes/UI_Overlay.unity
+    guid: 72361e3ec0adc8646acb56b8a486c1e9
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

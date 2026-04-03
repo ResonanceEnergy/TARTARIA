@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_veil_main
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: veil_main
+  displayName: Veil Between Worlds
+  description: Purify the aquifer and restore the Fountain of Youth.
+  isMainQuest: 1
+  autoActivate: 0
+  rsRequirement: 80
+  objectives:
+  - description: Purify aquifer sections
+    type: 1
+    targetId: 
+    targetCount: 5
+  - description: Cleanse the fountain
+    type: 7
+    targetId: fountain_of_youth
+    targetCount: 1
+  - description: Defeat Sludge Leviathan
+    type: 9
+    targetId: sludge_leviathan
+    targetCount: 1
+  rsReward: 28
+  followUpQuestIds: []

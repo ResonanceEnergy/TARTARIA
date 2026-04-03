@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_prophecy_stones
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: prophecy_stones
+  displayName: Stones of Sight
+  description: Locate and cleanse the scattered prophecy stones.
+  isMainQuest: 0
+  autoActivate: 0
+  rsRequirement: 0
+  objectives:
+  - description: Discover prophecy stones
+    type: 0
+    targetId: 
+    targetCount: 6
+  rsReward: 8
+  followUpQuestIds: []

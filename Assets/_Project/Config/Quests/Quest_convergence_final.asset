@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Quest_convergence_final
+  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  questId: convergence_final
+  displayName: True Timeline Convergence
+  description: Unite all companions and restore the true timeline.
+  isMainQuest: 1
+  autoActivate: 0
+  rsRequirement: 90
+  objectives:
+  - description: Gather all 7 companions
+    type: 10
+    targetId: all_companions
+    targetCount: 7
+  - description: Defeat the Echo of Reset
+    type: 9
+    targetId: echo_of_reset
+    targetCount: 1
+  - description: Activate the True Timeline
+    type: 7
+    targetId: true_timeline
+    targetCount: 1
+  rsReward: 50
+  followUpQuestIds: []

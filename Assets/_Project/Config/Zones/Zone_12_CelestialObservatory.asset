@@ -1,0 +1,38 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: Zone_12_CelestialObservatory
+  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:ZoneDefinition
+  zoneName: Celestial Observatory
+  sceneName: CelestialObservatory
+  subtitle: Geometry at Sufficient Distance
+  loreIntro: The Observatory mapped every star with twelve-decimal precision. Now
+    the planet can see the sky again -- and the sky can see us.
+  zoneIndex: 11
+  rsRequirementToUnlock: 1100
+  buildingCount: 3
+  playerSpawnPosition: {x: 0, y: 1, z: 0}
+  npcSpawnPoints:
+  - npcId: veritas
+    position: {x: 0, y: 1, z: 18}
+    yRotation: 0
+    requiresIntroduction: 0
+  - npcId: thorne
+    position: {x: 12, y: 1, z: -6}
+    yRotation: 270
+    requiresIntroduction: 0
+  fogColorLow: {r: 0.08, g: 0.08, b: 0.15, a: 1}
+  fogColorHigh: {r: 0.2, g: 0.2, b: 0.4, a: 1}
+  startingFogDensity: 0.008
+  ambientLow: {r: 0.05, g: 0.05, b: 0.1, a: 1}
+  ambientHigh: {r: 0.2, g: 0.2, b: 0.35, a: 1}
+  loadingTip: Everything is geometry at sufficient distance.

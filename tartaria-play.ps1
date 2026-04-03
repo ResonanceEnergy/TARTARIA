@@ -61,16 +61,21 @@ if (-not (Test-Path $ProjectPath)) {
 
 # ── Kill any running Unity instance for this project ──
 function Close-UnityForProject {
-    $unityProcs = Get-Process -Name Unity -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" }
-    if ($unityProcs) {
+    $unityPids = Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" } |
+        Select-Object -ExpandProperty ProcessId
+    if ($unityPids) {
         Write-Host "Closing existing Unity instance..." -ForegroundColor Yellow
-        $unityProcs | ForEach-Object { $_.CloseMainWindow() | Out-Null }
+        $unityPids | ForEach-Object {
+            $p = Get-Process -Id $_ -ErrorAction SilentlyContinue
+            if ($p) { $p.CloseMainWindow() | Out-Null }
+        }
         Start-Sleep -Seconds 3
-        $unityProcs = Get-Process -Name Unity -ErrorAction SilentlyContinue |
-            Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" }
-        if ($unityProcs) {
-            $unityProcs | Stop-Process -Force
+        $unityPids = Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue |
+            Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" } |
+            Select-Object -ExpandProperty ProcessId
+        if ($unityPids) {
+            $unityPids | ForEach-Object { Stop-Process -Id $_ -Force -ErrorAction SilentlyContinue }
             Start-Sleep -Seconds 2
         }
     }
@@ -356,10 +361,14 @@ $waitStart = Get-Date
 $unityReady = $false
 while (-not $unityReady -and ((Get-Date) - $waitStart).TotalSeconds -lt 60) {
     Start-Sleep -Seconds 2
-    $unityProc = Get-Process -Name Unity -ErrorAction SilentlyContinue |
-        Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" }
-    if ($unityProc -and $unityProc.MainWindowHandle -ne 0) {
-        $unityReady = $true
+    $cimProc = Get-CimInstance Win32_Process -Filter "Name='Unity.exe'" -ErrorAction SilentlyContinue |
+        Where-Object { $_.CommandLine -and $_.CommandLine -like "*TARTARIA_new*" } |
+        Select-Object -First 1
+    if ($cimProc) {
+        $unityProc = Get-Process -Id $cimProc.ProcessId -ErrorAction SilentlyContinue
+        if ($unityProc -and $unityProc.MainWindowHandle -ne 0) {
+            $unityReady = $true
+        }
     }
 }
 
