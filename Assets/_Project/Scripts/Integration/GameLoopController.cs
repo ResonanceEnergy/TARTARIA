@@ -69,6 +69,10 @@ namespace Tartaria.Integration
         // Victory
         bool _zoneVictoryTriggered;
 
+        // Scene-load grace period — suppress cinematic close-ups during initial load
+        float _sceneLoadTime;
+        const float DISCOVERY_GRACE_PERIOD = 3f;
+
         // Buff tracking
         float _rsBuffTimer;
         const float RS_BUFF_MULTIPLIER = 1.25f;
@@ -86,6 +90,8 @@ namespace Tartaria.Integration
 
         void Start()
         {
+            _sceneLoadTime = Time.time;
+
             // Subscribe to state changes
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
@@ -947,8 +953,9 @@ namespace Tartaria.Integration
             AdaptiveMusicController.Instance?.PlayDiscovery();
             HapticFeedbackManager.Instance?.PlayDiscovery();
 
-            // Camera close-up
-            cameraController?.FocusOnPoint(position, 3f);
+            // Camera close-up (suppress during scene-load grace period to prevent snap-back)
+            if (Time.time - _sceneLoadTime > DISCOVERY_GRACE_PERIOD)
+                cameraController?.FocusOnPoint(position, 3f);
 
             // VFX
             VFXController.Instance?.PlayDiscoveryBurst(position);
