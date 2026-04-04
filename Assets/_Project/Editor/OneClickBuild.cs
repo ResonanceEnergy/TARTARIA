@@ -68,10 +68,11 @@ namespace Tartaria.Editor
         public static void RunBuildPhases()
         {
 
-            // ── Phase 1: Directories ──
+            // ── Phase 1: Directories + URP ──
             BuildReport.RunPhase("Phase 1/8: Directories", () =>
             {
                 EnsureDirectories();
+                URPSetup.EnsureURPPipeline();
             });
 
             // ── Phase 2: ScriptableObjects ──

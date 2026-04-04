@@ -147,6 +147,14 @@ namespace Tartaria.Core
                 Debug.Log($"[SceneLoader] Removed {listeners.Length - 1} duplicate AudioListener(s).");
             }
 
+            // Disable Boot scene camera — gameplay CameraRig takes over
+            var bootCam = GameObject.Find("BootCamera");
+            if (bootCam != null)
+            {
+                bootCam.SetActive(false);
+                Debug.Log("[SceneLoader] Disabled BootCamera — CameraRig takes over.");
+            }
+
             // Transition to exploration
             Canary("Transitioning to Exploration");
             Debug.Log("[SceneLoader] Transitioning to Exploration...");
