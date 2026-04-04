@@ -26,6 +26,7 @@ namespace Tartaria.Editor
                     "This will create/update:\n\n" +
                     "  1. Directory structure\n" +
                     "  2. ScriptableObjects (Buildings, Zones, Quests, Constants)\n" +
+                    "  2b. Visual Upgrade (procedural meshes + shader materials)\n" +
                     "  3. Character prefabs (Player, Milo, MudGolem)\n" +
                     "  4. Scenes (Boot, UI_Overlay)\n" +
                     "  5. Echohaven scene population\n" +
@@ -69,38 +70,44 @@ namespace Tartaria.Editor
         {
 
             // ── Phase 1: Directories + URP ──
-            BuildReport.RunPhase("Phase 1/8: Directories", () =>
+            BuildReport.RunPhase("Phase 1/10: Directories", () =>
             {
                 EnsureDirectories();
                 URPSetup.EnsureURPPipeline();
             });
 
             // ── Phase 2: ScriptableObjects ──
-            BuildReport.RunPhase("Phase 2/8: ScriptableObjects", () =>
+            BuildReport.RunPhase("Phase 2/10: ScriptableObjects", () =>
             {
                 ProjectSetupWizard.RunSetup();
             });
 
+            // ── Phase 2b: Visual Upgrade (procedural meshes + shader materials) ──
+            BuildReport.RunPhase("Phase 2b/10: Visual Upgrade", () =>
+            {
+                VisualUpgradeBuilder.BuildVisualUpgrade();
+            });
+
             // ── Phase 3: Zone Definitions ──
-            BuildReport.RunPhase("Phase 3/8: Zone Definitions", () =>
+            BuildReport.RunPhase("Phase 3/10: Zone Definitions", () =>
             {
                 ZoneDefinitionFactory.BuildZoneDefinitions();
             });
 
             // ── Phase 4: Quest Definitions ──
-            BuildReport.RunPhase("Phase 4/8: Quest Definitions", () =>
+            BuildReport.RunPhase("Phase 4/10: Quest Definitions", () =>
             {
                 QuestDefinitionFactory.BuildAllQuests();
             });
 
             // ── Phase 5: Character Prefabs ──
-            BuildReport.RunPhase("Phase 5/8: Character Prefabs", () =>
+            BuildReport.RunPhase("Phase 5/10: Character Prefabs", () =>
             {
                 CharacterPrefabFactory.BuildAllCharacters();
             });
 
             // ── Phase 6: Scenes (Boot + UI_Overlay) ──
-            BuildReport.RunPhase("Phase 6/8: Scenes (Boot + UI_Overlay)", () =>
+            BuildReport.RunPhase("Phase 6/10: Scenes (Boot + UI_Overlay)", () =>
             {
                 SceneFactory.CreateAllMissingScenes();
             });
@@ -109,7 +116,7 @@ namespace Tartaria.Editor
             string echohavenPath = "Assets/_Project/Scenes/Echohaven_VerticalSlice.unity";
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
             {
-                BuildReport.RunPhase("Phase 7/8: Scaffold Managers", () =>
+                BuildReport.RunPhase("Phase 7/10: Scaffold Managers", () =>
                 {
                     EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
                     MasterSceneScaffold.ScaffoldAll();
@@ -119,11 +126,11 @@ namespace Tartaria.Editor
             }
             else
             {
-                BuildReport.Skip("Phase 7/8: Scaffold Managers", "Echohaven scene not found");
+                BuildReport.Skip("Phase 7/10: Scaffold Managers", "Echohaven scene not found");
             }
 
             // ── Phase 8: Input + Build Settings ──
-            BuildReport.RunPhase("Phase 8/8: Input + Build Settings", () =>
+            BuildReport.RunPhase("Phase 8/10: Input + Build Settings", () =>
             {
                 InputActionsAssigner.AssignInputActions();
                 ConfigureBuildSettings();

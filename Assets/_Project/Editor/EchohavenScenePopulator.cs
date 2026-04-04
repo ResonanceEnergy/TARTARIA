@@ -78,12 +78,26 @@ namespace Tartaria.Editor
 
             var parent = new GameObject("EchohavenTerrain");
 
-            // Main ground plane (200×200 units)
-            var ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            // Main ground — use procedural terrain mesh if available
+            var terrainMesh = AssetDatabase.LoadAssetAtPath<Mesh>(
+                "Assets/_Project/Models/Generated/Terrain.asset");
+            GameObject ground;
+            if (terrainMesh != null)
+            {
+                ground = new GameObject("GroundPlane");
+                ground.AddComponent<MeshFilter>().sharedMesh = terrainMesh;
+                ground.AddComponent<MeshRenderer>();
+                ground.AddComponent<MeshCollider>().sharedMesh = terrainMesh;
+                ground.transform.localScale = Vector3.one;
+            }
+            else
+            {
+                ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                ground.transform.localScale = new Vector3(20f, 1f, 20f);
+            }
             ground.name = "GroundPlane";
             ground.transform.SetParent(parent.transform);
             ground.transform.localPosition = Vector3.zero;
-            ground.transform.localScale = new Vector3(20f, 1f, 20f);
             ground.isStatic = true;
             AssignMaterial(ground, "Ground_Plaza");
 
