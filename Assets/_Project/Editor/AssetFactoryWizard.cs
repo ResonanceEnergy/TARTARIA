@@ -94,44 +94,125 @@ namespace Tartaria.Editor
 
         static void CreateMaterials()
         {
-            var urpLit = Shader.Find("Universal Render Pipeline/Lit");
-            if (urpLit == null)
+            // Use custom Tartaria shaders when available, URP/Lit as fallback
+            var stoneSh = Shader.Find("Tartaria/TartarianStone");
+            var mudSh = Shader.Find("Tartaria/MudDissolution");
+            var aetherSh = Shader.Find("Tartaria/AetherFlow");
+            var urpLit = Shader.Find("Universal Render Pipeline/Lit")
+                      ?? Shader.Find("Standard");
+
+            // Building state materials — MudDissolution shader
+            if (mudSh != null)
             {
-                Debug.LogWarning("[Tartaria] URP/Lit shader not found, falling back to Standard.");
-                urpLit = Shader.Find("Standard");
+                CreateMudMaterial("Mud_Buried", mudSh, new Color(0.35f, 0.25f, 0.15f), 0f);
+                CreateMudMaterial("Mud_Revealed", mudSh, new Color(0.50f, 0.40f, 0.25f), 0.35f);
+            }
+            else
+            {
+                CreateMaterialIfMissing("Mud_Buried", urpLit,
+                    new Color(0.35f, 0.25f, 0.15f), 0.6f, 0.0f);
+                CreateMaterialIfMissing("Mud_Revealed", urpLit,
+                    new Color(0.5f, 0.4f, 0.25f), 0.4f, 0.1f);
             }
 
-            // Building state materials
-            CreateMaterialIfMissing("Mud_Buried", urpLit,
-                new Color(0.35f, 0.25f, 0.15f), 0.6f, 0.0f);
-            CreateMaterialIfMissing("Mud_Revealed", urpLit,
-                new Color(0.5f, 0.4f, 0.25f), 0.4f, 0.1f);
-            CreateMaterialIfMissing("Stone_Active", urpLit,
-                new Color(0.7f, 0.65f, 0.55f), 0.2f, 0.5f);
-            CreateMaterialIfMissing("Crystal_Active", urpLit,
-                new Color(0.85f, 0.82f, 0.95f), 0.0f, 0.9f);
+            // TartarianStone for buildings
+            if (stoneSh != null)
+            {
+                CreateStoneMaterial("Stone_Active", stoneSh,
+                    new Color(0.72f, 0.68f, 0.58f), 0.2f, 0.3f, 0.2f);
+                CreateStoneMaterial("Gold_Accent", stoneSh,
+                    new Color(0.9f, 0.78f, 0.3f), 0f, 1f, 1.2f);
+                CreateStoneMaterial("Ground_Plaza", stoneSh,
+                    new Color(0.60f, 0.56f, 0.48f), 0.5f, 0.1f, 0.05f);
+            }
+            else
+            {
+                CreateMaterialIfMissing("Stone_Active", urpLit,
+                    new Color(0.7f, 0.65f, 0.55f), 0.2f, 0.5f);
+                CreateMaterialIfMissing("Gold_Accent", urpLit,
+                    new Color(0.9f, 0.8f, 0.3f), 0.0f, 0.95f);
+                CreateMaterialIfMissing("Ground_Plaza", urpLit,
+                    new Color(0.45f, 0.4f, 0.35f), 0.7f, 0.0f);
+            }
 
-            // Aether glow
-            CreateMaterialIfMissing("Aether_Glow", urpLit,
-                new Color(0.2f, 0.6f, 0.9f), 0.0f, 0.8f, true);
+            // AetherFlow for glowing elements
+            if (aetherSh != null)
+            {
+                CreateAetherMaterial("Crystal_Active", aetherSh,
+                    new Color(0.7f, 0.8f, 1f, 0.6f), 2f);
+                CreateAetherMaterial("Aether_Glow", aetherSh,
+                    new Color(0.2f, 0.5f, 0.9f, 0.3f), 1.5f);
+                CreateAetherMaterial("Player_Aether", aetherSh,
+                    new Color(0.2f, 0.6f, 0.9f, 0.4f), 1.2f);
+            }
+            else
+            {
+                CreateMaterialIfMissing("Crystal_Active", urpLit,
+                    new Color(0.85f, 0.82f, 0.95f), 0.0f, 0.9f);
+                CreateMaterialIfMissing("Aether_Glow", urpLit,
+                    new Color(0.2f, 0.6f, 0.9f), 0.0f, 0.8f, true);
+                CreateMaterialIfMissing("Player_Aether", urpLit,
+                    new Color(0.2f, 0.6f, 0.9f), 0.1f, 0.6f);
+            }
 
-            // Gold accent (for restored ornamental detail)
-            CreateMaterialIfMissing("Gold_Accent", urpLit,
-                new Color(0.9f, 0.8f, 0.3f), 0.0f, 0.95f);
+            // Enemy — MudDissolution for golem
+            if (mudSh != null)
+                CreateMudMaterial("MudGolem_Body", mudSh, new Color(0.30f, 0.20f, 0.10f), 0f);
+            else
+                CreateMaterialIfMissing("MudGolem_Body", urpLit,
+                    new Color(0.3f, 0.2f, 0.1f), 0.8f, 0.0f);
 
-            // Ground
-            CreateMaterialIfMissing("Ground_Plaza", urpLit,
-                new Color(0.45f, 0.4f, 0.35f), 0.7f, 0.0f);
+            Debug.Log("[Tartaria] Materials created (9 custom-shader materials).");
+        }
 
-            // Player
-            CreateMaterialIfMissing("Player_Aether", urpLit,
-                new Color(0.2f, 0.6f, 0.9f), 0.1f, 0.6f);
+        static void CreateStoneMaterial(string name, Shader shader,
+            Color baseColor, float weathering, float goldenStr, float emissionStr)
+        {
+            string path = $"{MaterialsPath}/{name}.mat";
+            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
 
-            // Enemy
-            CreateMaterialIfMissing("MudGolem_Body", urpLit,
-                new Color(0.3f, 0.2f, 0.1f), 0.8f, 0.0f);
+            var mat = new Material(shader);
+            mat.name = name;
+            mat.SetColor("_BaseColor", baseColor);
+            mat.SetFloat("_Smoothness", 0.3f);
+            mat.SetFloat("_WeatheringAmount", weathering);
+            mat.SetFloat("_GoldenStrength", goldenStr);
+            mat.SetFloat("_EmissionStrength", emissionStr);
+            mat.SetFloat("_AetherPulse", 1.618f);
+            mat.SetFloat("_RestorationProgress", 1f);
+            AssetDatabase.CreateAsset(mat, path);
+        }
 
-            Debug.Log("[Tartaria] Materials created (9 URP/Lit materials).");
+        static void CreateMudMaterial(string name, Shader shader,
+            Color baseColor, float dissolution)
+        {
+            string path = $"{MaterialsPath}/{name}.mat";
+            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
+
+            var mat = new Material(shader);
+            mat.name = name;
+            mat.SetColor("_BaseColor", baseColor);
+            mat.SetFloat("_DissolutionProgress", dissolution);
+            mat.SetFloat("_EdgeWidth", 0.03f);
+            mat.SetColor("_EdgeColor", new Color(0.9f, 0.75f, 0.3f));
+            mat.SetFloat("_RumbleIntensity", 0.05f);
+            AssetDatabase.CreateAsset(mat, path);
+        }
+
+        static void CreateAetherMaterial(string name, Shader shader,
+            Color baseColor, float intensity)
+        {
+            string path = $"{MaterialsPath}/{name}.mat";
+            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
+
+            var mat = new Material(shader);
+            mat.name = name;
+            mat.SetColor("_BaseColor", baseColor);
+            mat.SetFloat("_Intensity", intensity);
+            mat.SetFloat("_FlowSpeed", 1f);
+            mat.SetFloat("_PulseSpeed", 1.618f);
+            mat.SetFloat("_FresnelPower", 3f);
+            AssetDatabase.CreateAsset(mat, path);
         }
 
         static void CreateMaterialIfMissing(string name, Shader shader,
@@ -194,22 +275,59 @@ namespace Tartaria.Editor
                 so.FindProperty("definition").objectReferenceValue = def;
                 so.FindProperty("buildingId").stringValue = defName;
 
-                // Main body mesh
+                // Main body mesh — use procedural meshes when available
+                const string MeshDir = "Assets/_Project/Models/Generated";
                 GameObject body;
                 switch (def.archetype)
                 {
                     case BuildingArchetype.Dome:
-                        body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    {
+                        var domeMesh = AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshDir}/Dome.asset");
+                        if (domeMesh != null)
+                        {
+                            body = new GameObject("Body");
+                            body.AddComponent<MeshFilter>().sharedMesh = domeMesh;
+                            body.AddComponent<MeshRenderer>();
+                        }
+                        else
+                        {
+                            body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                        }
                         body.transform.localScale = new Vector3(def.width, def.height * 0.5f, def.width);
                         break;
+                    }
                     case BuildingArchetype.Fountain:
-                        body = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    {
+                        var fountainMesh = AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshDir}/Fountain.asset");
+                        if (fountainMesh != null)
+                        {
+                            body = new GameObject("Body");
+                            body.AddComponent<MeshFilter>().sharedMesh = fountainMesh;
+                            body.AddComponent<MeshRenderer>();
+                        }
+                        else
+                        {
+                            body = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                        }
                         body.transform.localScale = new Vector3(def.width, def.height * 0.5f, def.width);
                         break;
+                    }
                     case BuildingArchetype.Spire:
-                        body = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    {
+                        var spireMesh = AssetDatabase.LoadAssetAtPath<Mesh>($"{MeshDir}/Spire.asset");
+                        if (spireMesh != null)
+                        {
+                            body = new GameObject("Body");
+                            body.AddComponent<MeshFilter>().sharedMesh = spireMesh;
+                            body.AddComponent<MeshRenderer>();
+                        }
+                        else
+                        {
+                            body = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                        }
                         body.transform.localScale = new Vector3(def.width, def.height, def.width);
                         break;
+                    }
                     default:
                         body = GameObject.CreatePrimitive(PrimitiveType.Cube);
                         body.transform.localScale = new Vector3(def.width, def.height, def.width);
