@@ -21,15 +21,37 @@ namespace Tartaria.Editor
         [MenuItem("Tartaria/Build Assets/Visual Upgrade", false, 9)]
         public static void BuildVisualUpgrade()
         {
+            BuildVisualAssets();
+            ApplyVisualUpgrade();
+            Debug.Log("[Tartaria] Visual Upgrade complete — procedural meshes, shader materials, skybox applied.");
+        }
+
+        /// <summary>
+        /// Phase 2b: Generate procedural meshes, shader materials, and skybox.
+        /// Safe to run before scene geometry exists.
+        /// </summary>
+        public static void BuildVisualAssets()
+        {
             EnsureDirs();
             BuildMeshAssets();
             BuildShaderMaterials();
             BuildSkyboxMaterial();
-            UpgradeScene();
-            UpgradePrefabs();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("[Tartaria] Visual Upgrade complete — procedural meshes, shader materials, skybox applied.");
+        }
+
+        /// <summary>
+        /// Phase 7b: Apply generated meshes and materials to scene objects and prefabs.
+        /// Must run AFTER EchohavenScenePopulator has populated the scene.
+        /// Also builds building prefabs using the procedural meshes.
+        /// </summary>
+        public static void ApplyVisualUpgrade()
+        {
+            UpgradeScene();
+            UpgradePrefabs();
+            AssetFactoryWizard.BuildBuildingPrefabs();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
         }
 
         // ═══════════════════════════════════════════════

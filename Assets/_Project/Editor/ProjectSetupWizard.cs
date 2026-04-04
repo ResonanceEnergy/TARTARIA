@@ -45,7 +45,7 @@ namespace Tartaria.Editor
             CreateScriptableObjects();
             CreateScene();
 
-            bool autoPlay = File.Exists(Path.Combine(Application.dataPath,
+            bool autoPlay = BuildReport.IsRunning || File.Exists(Path.Combine(Application.dataPath,
                 "..", "Library", "TARTARIA_AUTOPLAY"));
             if (!UnityEditorInternal.InternalEditorUtility.inBatchMode && !autoPlay)
             {
@@ -232,6 +232,14 @@ namespace Tartaria.Editor
 
         static void CreateScene()
         {
+            // Skip if scene already exists — geometry is managed by
+            // EchohavenScenePopulator (Phase 8) and VisualUpgradeBuilder (Phase 9)
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(ScenePath) != null)
+            {
+                Debug.Log($"[Tartaria] Scene already exists: {ScenePath} — skipping creation.");
+                return;
+            }
+
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             // === Directional Light (warm golden sunlight) ===
@@ -351,8 +359,8 @@ namespace Tartaria.Editor
                 loopSO.ApplyModifiedProperties();
             }
 
-            // === Echohaven Test Geometry ===
-            CreateEchohavenGeometry();
+            // Geometry is created by EchohavenScenePopulator (Phase 7)
+            // and upgraded by VisualUpgradeBuilder (Phase 7b).
 
             // Save scene
             string dir = Path.GetDirectoryName(ScenePath);

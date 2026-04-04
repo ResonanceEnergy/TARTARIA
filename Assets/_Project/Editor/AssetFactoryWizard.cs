@@ -64,6 +64,16 @@ namespace Tartaria.Editor
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// Public entry point for pipeline — creates building prefabs using
+        /// procedural meshes (must be called after BuildVisualAssets).
+        /// </summary>
+        public static void BuildBuildingPrefabs()
+        {
+            EnsureDirectories();
+            CreateBuildingPrefabs();
+        }
+
         [MenuItem("Tartaria/Build Assets/UI Canvas", false, 13)]
         public static void BuildUICanvas()
         {
@@ -263,14 +273,25 @@ namespace Tartaria.Editor
                 }
 
                 string prefabPath = $"{PrefabsPath}/{defName}.prefab";
+                // Always recreate to pick up latest procedural meshes
                 if (AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath) != null)
-                    continue;
+                    AssetDatabase.DeleteAsset(prefabPath);
 
                 // Create building GameObject hierarchy
                 var root = new GameObject(def.buildingName);
 
+                // Add BoxCollider first to satisfy RequireComponent(typeof(Collider))
+                root.AddComponent<BoxCollider>();
+
                 // Add InteractableBuilding
                 var interactable = root.AddComponent<InteractableBuilding>();
+                if (interactable == null)
+                {
+                    Debug.LogWarning($"[Tartaria] AddComponent<InteractableBuilding> returned null for {def.buildingName} — saving basic prefab.");
+                    PrefabUtility.SaveAsPrefabAsset(root, prefabPath);
+                    Object.DestroyImmediate(root);
+                    continue;
+                }
                 var so = new SerializedObject(interactable);
                 so.FindProperty("definition").objectReferenceValue = def;
                 so.FindProperty("buildingId").stringValue = defName;
@@ -378,8 +399,9 @@ namespace Tartaria.Editor
                     }
                 }
 
-                // Collider for interaction
-                var boxCollider = root.AddComponent<BoxCollider>();
+                // Collider for interaction (reuse one added for RequireComponent)
+                var boxCollider = root.GetComponent<BoxCollider>();
+                if (boxCollider == null) boxCollider = root.AddComponent<BoxCollider>();
                 boxCollider.center = new Vector3(0f, body.transform.localScale.y * 0.5f, 0f);
                 boxCollider.size = new Vector3(def.width, body.transform.localScale.y, def.width);
 

@@ -24,15 +24,15 @@ namespace Tartaria.Editor
             {
                 if (!EditorUtility.DisplayDialog("Tartaria: Build Everything",
                     "This will create/update:\n\n" +
-                    "  1. Directory structure\n" +
-                    "  2. ScriptableObjects (Buildings, Zones, Quests, Constants)\n" +
-                    "  2b. Visual Upgrade (procedural meshes + shader materials)\n" +
-                    "  3. Character prefabs (Player, Milo, MudGolem)\n" +
-                    "  4. Scenes (Boot, UI_Overlay)\n" +
-                    "  5. Echohaven scene population\n" +
-                    "  6. All singleton managers scaffolded\n" +
-                    "  7. Input actions assigned\n" +
-                    "  8. Build settings configured\n\n" +
+                    "  1. Directory structure + URP\n" +
+                    "  2. ScriptableObjects (Buildings, Constants)\n" +
+                    "  3. Visual Assets (procedural meshes + shader materials)\n" +
+                    "  4-5. Zone + Quest Definitions\n" +
+                    "  6. Character prefabs (Player, Milo, MudGolem)\n" +
+                    "  7. Scenes (Boot, UI_Overlay)\n" +
+                    "  8. Echohaven scene population\n" +
+                    "  9. Apply Visual Upgrade (materials + building prefabs)\n" +
+                    "  10. Input actions + Build settings\n\n" +
                     "Existing assets are preserved (idempotent).",
                     "Build It!", "Cancel"))
                     return;
@@ -76,47 +76,47 @@ namespace Tartaria.Editor
                 URPSetup.EnsureURPPipeline();
             });
 
-            // ── Phase 2: ScriptableObjects ──
+            // ── Phase 2: ScriptableObjects + Scene skeleton ──
             BuildReport.RunPhase("Phase 2/10: ScriptableObjects", () =>
             {
                 ProjectSetupWizard.RunSetup();
             });
 
-            // ── Phase 2b: Visual Upgrade (procedural meshes + shader materials) ──
-            BuildReport.RunPhase("Phase 2b/10: Visual Upgrade", () =>
+            // ── Phase 3: Visual Assets (meshes + materials + skybox) ──
+            BuildReport.RunPhase("Phase 3/10: Visual Assets", () =>
             {
-                VisualUpgradeBuilder.BuildVisualUpgrade();
+                VisualUpgradeBuilder.BuildVisualAssets();
             });
 
-            // ── Phase 3: Zone Definitions ──
-            BuildReport.RunPhase("Phase 3/10: Zone Definitions", () =>
+            // ── Phase 4: Zone Definitions ──
+            BuildReport.RunPhase("Phase 4/10: Zone Definitions", () =>
             {
                 ZoneDefinitionFactory.BuildZoneDefinitions();
             });
 
-            // ── Phase 4: Quest Definitions ──
-            BuildReport.RunPhase("Phase 4/10: Quest Definitions", () =>
+            // ── Phase 5: Quest Definitions ──
+            BuildReport.RunPhase("Phase 5/10: Quest Definitions", () =>
             {
                 QuestDefinitionFactory.BuildAllQuests();
             });
 
-            // ── Phase 5: Character Prefabs ──
-            BuildReport.RunPhase("Phase 5/10: Character Prefabs", () =>
+            // ── Phase 6: Character Prefabs ──
+            BuildReport.RunPhase("Phase 6/10: Character Prefabs", () =>
             {
                 CharacterPrefabFactory.BuildAllCharacters();
             });
 
-            // ── Phase 6: Scenes (Boot + UI_Overlay) ──
-            BuildReport.RunPhase("Phase 6/10: Scenes (Boot + UI_Overlay)", () =>
+            // ── Phase 7: Scenes (Boot + UI_Overlay) ──
+            BuildReport.RunPhase("Phase 7/10: Scenes (Boot + UI_Overlay)", () =>
             {
                 SceneFactory.CreateAllMissingScenes();
             });
 
-            // ── Phase 7: Scaffold managers + populate Echohaven ──
+            // ── Phase 8: Scaffold managers + populate Echohaven ──
             string echohavenPath = "Assets/_Project/Scenes/Echohaven_VerticalSlice.unity";
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
             {
-                BuildReport.RunPhase("Phase 7/10: Scaffold Managers", () =>
+                BuildReport.RunPhase("Phase 8/10: Scaffold + Populate", () =>
                 {
                     EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
                     MasterSceneScaffold.ScaffoldAll();
@@ -126,11 +126,26 @@ namespace Tartaria.Editor
             }
             else
             {
-                BuildReport.Skip("Phase 7/10: Scaffold Managers", "Echohaven scene not found");
+                BuildReport.Skip("Phase 8/10: Scaffold + Populate", "Echohaven scene not found");
             }
 
-            // ── Phase 8: Input + Build Settings ──
-            BuildReport.RunPhase("Phase 8/10: Input + Build Settings", () =>
+            // ── Phase 9: Apply Visual Upgrade to scene + build building prefabs ──
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+            {
+                BuildReport.RunPhase("Phase 9/10: Apply Visual Upgrade", () =>
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    VisualUpgradeBuilder.ApplyVisualUpgrade();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+            else
+            {
+                BuildReport.Skip("Phase 9/10: Apply Visual Upgrade", "Echohaven scene not found");
+            }
+
+            // ── Phase 10: Input + Build Settings ──
+            BuildReport.RunPhase("Phase 10/10: Input + Build Settings", () =>
             {
                 InputActionsAssigner.AssignInputActions();
                 ConfigureBuildSettings();
