@@ -52,7 +52,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
-            if (_rsQueryCreated && _rsQuery.IsValid) _rsQuery.Dispose();
+            if (_rsQueryCreated) _rsQuery.Dispose();
             if (Instance == this) Instance = null;
         }
 
