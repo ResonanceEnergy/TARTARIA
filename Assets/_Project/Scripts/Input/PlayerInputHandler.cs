@@ -35,6 +35,7 @@ namespace Tartaria.Input
 
         CharacterController _controller;
         Camera _mainCamera;
+        float _cameraRetryTimer;
         Vector3 _velocity;
         Vector2 _moveInput;
         bool _isSprinting;
@@ -133,7 +134,14 @@ namespace Tartaria.Input
 
             // Refresh camera ref if lost (zone transition, cutscene swap)
             if (_mainCamera == null)
-                _mainCamera = Camera.main;
+            {
+                _cameraRetryTimer -= Time.deltaTime;
+                if (_cameraRetryTimer <= 0f)
+                {
+                    _cameraRetryTimer = 0.25f;
+                    _mainCamera = Camera.main;
+                }
+            }
 
             // Camera-relative movement
             if (_mainCamera != null && _moveInput.sqrMagnitude > 0.01f)

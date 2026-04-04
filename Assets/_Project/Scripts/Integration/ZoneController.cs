@@ -42,6 +42,10 @@ namespace Tartaria.Integration
         float _discoveryTimer;
         float _currentRS;
         bool _zoneNameShown;
+        float _playerRetryTimer;
+        bool _atmosphereDirty = true;
+        static readonly Color SunColorCool = new Color(0.8f, 0.75f, 0.7f);
+        static readonly Color SunColorWarm = new Color(1f, 0.92f, 0.75f);
 
         void Awake()
         {
@@ -76,14 +80,23 @@ namespace Tartaria.Integration
         {
             if (_playerTransform == null)
             {
-                var player = GameObject.FindWithTag("Player");
-                if (player != null)
-                    _playerTransform = player.transform;
+                _playerRetryTimer -= Time.deltaTime;
+                if (_playerRetryTimer <= 0f)
+                {
+                    _playerRetryTimer = 0.5f;
+                    var player = GameObject.FindWithTag("Player");
+                    if (player != null)
+                        _playerTransform = player.transform;
+                }
                 return;
             }
 
             CheckDiscoveries();
-            UpdateAtmosphere();
+            if (_atmosphereDirty)
+            {
+                _atmosphereDirty = false;
+                UpdateAtmosphere();
+            }
             CheckIdleDialogue();
         }
 
@@ -120,6 +133,7 @@ namespace Tartaria.Integration
         public void UpdateRS(float rs)
         {
             _currentRS = rs;
+            _atmosphereDirty = true;
         }
 
         void UpdateAtmosphere()
@@ -141,8 +155,8 @@ namespace Tartaria.Integration
             {
                 sun.intensity = Mathf.Lerp(0.6f, 1.4f, t);
                 sun.color = Color.Lerp(
-                    new Color(0.8f, 0.75f, 0.7f),   // Cool/dim
-                    new Color(1f, 0.92f, 0.75f), t); // Warm golden
+                    SunColorCool,
+                    SunColorWarm, t);
             }
         }
 

@@ -304,8 +304,9 @@ namespace Tartaria.Integration
             while (cameFrom.ContainsKey(current))
             {
                 current = cameFrom[current];
-                path.Insert(0, current);
+                path.Add(current);
             }
+            path.Reverse();
             return path;
         }
 

@@ -45,6 +45,7 @@ namespace Tartaria.Integration
         const float BuildingCacheInterval = 2f;
 
         readonly Dictionary<string, CorruptionState> _states = new();
+        readonly List<string> _keyBuffer = new();
 
         public event System.Action<string, float> OnCorruptionChanged;
         public event System.Action<string> OnCorruptionPurged;
@@ -232,8 +233,9 @@ namespace Tartaria.Integration
             // Rate is modulated by Moon modifier corruptionSpreadRate
             float rate = spreadRatePerSecond * mods.corruptionSpreadRate;
 
-            var keys = new List<string>(_states.Keys);
-            foreach (var key in keys)
+            _keyBuffer.Clear();
+            _keyBuffer.AddRange(_states.Keys);
+            foreach (var key in _keyBuffer)
             {
                 var state = _states[key];
                 if (state.purged || state.isolated) continue;
@@ -256,8 +258,9 @@ namespace Tartaria.Integration
 
             float rate = spreadRatePerSecond * mods.corruptionSpreadRate;
 
-            var keys = new List<string>(_states.Keys);
-            foreach (var key in keys)
+            _keyBuffer.Clear();
+            _keyBuffer.AddRange(_states.Keys);
+            foreach (var key in _keyBuffer)
             {
                 var state = _states[key];
                 // Only spread from non-isolated, heavily corrupted buildings

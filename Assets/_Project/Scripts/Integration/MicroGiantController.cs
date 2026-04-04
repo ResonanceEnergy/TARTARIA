@@ -68,6 +68,8 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
 
         void OnDestroy()
@@ -110,6 +112,7 @@ namespace Tartaria.Integration
             {
                 _aetherCharge = 0f;
                 ExitMicroMode();
+                return;
             }
 
             // Check if all nodes purged

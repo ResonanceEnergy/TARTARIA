@@ -30,8 +30,9 @@ namespace Tartaria.Gameplay
             {
                 if (building.ValueRO.State == BuildingRestorationState.Emerging)
                 {
+                    float speed = math.max(dissolution.ValueRO.Speed, 0.001f);
                     dissolution.ValueRW.Progress = math.min(1.0f,
-                        dissolution.ValueRO.Progress + (dt / dissolution.ValueRO.Speed));
+                        dissolution.ValueRO.Progress + (dt / speed));
                 }
             }
 

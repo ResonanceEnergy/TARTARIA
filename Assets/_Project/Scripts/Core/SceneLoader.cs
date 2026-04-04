@@ -46,9 +46,10 @@ namespace Tartaria.Core
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             if (Instance == this)
             {
-                Debug.LogWarning("[SceneLoader] Instance destroyed — coroutines will stop!");
+                Debug.LogWarning("[SceneLoader] Instance destroyed -- coroutines will stop!");
                 Instance = null;
             }
         }

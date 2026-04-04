@@ -35,6 +35,10 @@ namespace Tartaria.Integration
         float[] _nodeAccuracies = new float[3];
         bool _isDiscovered;
         TuningMiniGameController _tuningController;
+        static readonly int DissolveProgressId = Shader.PropertyToID("_DissolveProgress");
+        static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        static readonly int ColorId = Shader.PropertyToID("_Color");
+        MaterialPropertyBlock _mpb;
 
         string _promptCache;
         BuildingRestorationState _promptState = (BuildingRestorationState)255;
@@ -48,6 +52,7 @@ namespace Tartaria.Integration
         {
             if (mainRenderer == null)
                 mainRenderer = GetComponent<MeshRenderer>();
+            _mpb = new MaterialPropertyBlock();
 
             // Find or create tuning controller
             _tuningController = GetComponent<TuningMiniGameController>();
@@ -229,15 +234,15 @@ namespace Tartaria.Integration
             if (_nodesCompleted >= 3)
                 BeginEmergence();
             else
-                GameStateManager.Instance.TransitionTo(GameState.Exploration);
+                GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
             UpdateVisuals();
         }
 
         void OnTuningFailed()
         {
-            Debug.Log($"[Building] {GetDisplayName()} tuning failed — retry available");
-            GameStateManager.Instance.TransitionTo(GameState.Exploration);
+            Debug.Log($"[Building] {GetDisplayName()} tuning failed -- retry available");
+            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
             DialogueManager.Instance?.PlayContextDialogue("tuning_fail");
         }
 
@@ -268,8 +273,12 @@ namespace Tartaria.Integration
                 elapsed += Time.deltaTime;
                 float progress = Mathf.Clamp01(elapsed / duration);
 
-                if (mainRenderer != null && mainRenderer.material.HasProperty("_DissolveProgress"))
-                    mainRenderer.material.SetFloat("_DissolveProgress", progress);
+                if (mainRenderer != null && mainRenderer.sharedMaterial.HasProperty(DissolveProgressId))
+                {
+                    mainRenderer.GetPropertyBlock(_mpb);
+                    _mpb.SetFloat(DissolveProgressId, progress);
+                    mainRenderer.SetPropertyBlock(_mpb);
+                }
 
                 // Scale up building from buried (30%) to full height
                 transform.localScale = new Vector3(
@@ -320,7 +329,7 @@ namespace Tartaria.Integration
             };
 
             if (mat != null)
-                mainRenderer.material = mat;
+                mainRenderer.sharedMaterial = mat;
 
             // Color tint based on state
             Color tint = _state switch
@@ -333,10 +342,12 @@ namespace Tartaria.Integration
                 _ => Color.white
             };
 
-            if (mainRenderer.material.HasProperty("_BaseColor"))
-                mainRenderer.material.SetColor("_BaseColor", tint);
-            else if (mainRenderer.material.HasProperty("_Color"))
-                mainRenderer.material.color = tint;
+            mainRenderer.GetPropertyBlock(_mpb);
+            if (mainRenderer.sharedMaterial.HasProperty(BaseColorId))
+                _mpb.SetColor(BaseColorId, tint);
+            else if (mainRenderer.sharedMaterial.HasProperty(ColorId))
+                _mpb.SetColor(ColorId, tint);
+            mainRenderer.SetPropertyBlock(_mpb);
         }
 
         // ─── Save/Load ──────────────────────────────

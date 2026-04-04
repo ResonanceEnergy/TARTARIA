@@ -24,6 +24,8 @@ namespace Tartaria.Editor
         int _passCount;
         int _failCount;
         bool _hasRun;
+        static GUIStyle _summaryStyle;
+        static GUIStyle _detailStyle;
 
         [MenuItem("Tartaria/Readiness Check", false, -50)]
         static void Open()
@@ -58,16 +60,16 @@ namespace Tartaria.Editor
             GUILayout.Space(6);
 
             // Summary bar
-            var summaryStyle = new GUIStyle(EditorStyles.boldLabel) { fontSize = 13 };
+            _summaryStyle ??= new GUIStyle(EditorStyles.boldLabel) { fontSize = 13 };
             if (_failCount == 0)
             {
-                summaryStyle.normal.textColor = new Color(0.1f, 0.7f, 0.1f);
-                EditorGUILayout.LabelField($"ALL {_passCount} CHECKS PASSED", summaryStyle);
+                _summaryStyle.normal.textColor = new Color(0.1f, 0.7f, 0.1f);
+                EditorGUILayout.LabelField($"ALL {_passCount} CHECKS PASSED", _summaryStyle);
             }
             else
             {
-                summaryStyle.normal.textColor = new Color(0.9f, 0.2f, 0.1f);
-                EditorGUILayout.LabelField($"{_failCount} FAILED / {_passCount} PASSED", summaryStyle);
+                _summaryStyle.normal.textColor = new Color(0.9f, 0.2f, 0.1f);
+                EditorGUILayout.LabelField($"{_failCount} FAILED / {_passCount} PASSED", _summaryStyle);
             }
 
             GUILayout.Space(4);
@@ -85,9 +87,9 @@ namespace Tartaria.Editor
 
                 // Label + detail
                 EditorGUILayout.LabelField(r.label, GUILayout.Width(240));
-                var detailStyle = new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
-                detailStyle.normal.textColor = r.passed ? Color.gray : new Color(0.9f, 0.3f, 0.2f);
-                EditorGUILayout.LabelField(r.detail, detailStyle);
+                _detailStyle ??= new GUIStyle(EditorStyles.miniLabel) { wordWrap = true };
+                _detailStyle.normal.textColor = r.passed ? Color.gray : new Color(0.9f, 0.3f, 0.2f);
+                EditorGUILayout.LabelField(r.detail, _detailStyle);
 
                 EditorGUILayout.EndHorizontal();
             }

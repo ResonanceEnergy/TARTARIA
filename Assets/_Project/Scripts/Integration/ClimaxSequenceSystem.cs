@@ -48,6 +48,8 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
             RegisterClimax(Moon1Climax.Build());
             RegisterClimax(Moon2Climax.Build());
             RegisterClimax(Moon3Climax.Build());
@@ -65,9 +67,9 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             if (_isPlaying)
             {
-                if (_activeSequence != null) StopCoroutine(_activeSequence);
                 FinishClimax();
             }
             if (Instance == this) Instance = null;

@@ -52,11 +52,22 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+        }
+
+        void Start()
+        {
+            if (lookTarget == null)
+            {
+                var player = GameObject.FindWithTag("Player");
+                if (player != null) lookTarget = player.transform;
+            }
         }
 
         void Update()
@@ -282,12 +293,6 @@ namespace Tartaria.Integration
 
         void UpdateFacing()
         {
-            if (lookTarget == null)
-            {
-                var player = GameObject.FindWithTag("Player");
-                if (player != null) lookTarget = player.transform;
-            }
-
             if (lookTarget == null) return;
 
             float dist = Vector3.Distance(transform.position, lookTarget.position);

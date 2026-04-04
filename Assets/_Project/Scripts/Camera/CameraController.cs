@@ -53,6 +53,7 @@ namespace Tartaria.Camera
         float _zoomOffset;
         Coroutine _closeUpCoroutine;
         GameState _preCloseUpState;
+        float _playerSearchCooldown;
 
         void Awake()
         {
@@ -69,17 +70,18 @@ namespace Tartaria.Camera
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             if (_closeUpCoroutine != null)
-            {
-                StopCoroutine(_closeUpCoroutine);
                 GameStateManager.Instance?.TransitionTo(_preCloseUpState);
-            }
         }
 
         void LateUpdate()
         {
             if (followTarget == null)
             {
+                _playerSearchCooldown -= Time.deltaTime;
+                if (_playerSearchCooldown > 0f) return;
+                _playerSearchCooldown = 0.5f;
                 var player = GameObject.FindWithTag("Player");
                 if (player != null)
                     followTarget = player.transform;
@@ -94,6 +96,7 @@ namespace Tartaria.Camera
 
         void UpdateCameraMode()
         {
+            if (GameStateManager.Instance == null) return;
             var state = GameStateManager.Instance.CurrentState;
 
             switch (state)
@@ -240,8 +243,8 @@ namespace Tartaria.Camera
 
         System.Collections.IEnumerator CloseUpSequence(Vector3 point, float duration)
         {
-            _preCloseUpState = GameStateManager.Instance.CurrentState;
-            GameStateManager.Instance.TransitionTo(GameState.Cinematic);
+            _preCloseUpState = GameStateManager.Instance?.CurrentState ?? GameState.Exploration;
+            GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
 
             float elapsed = 0f;
             Vector3 startPos = transform.position;
@@ -273,7 +276,7 @@ namespace Tartaria.Camera
                 yield return null;
             }
 
-            GameStateManager.Instance.TransitionTo(_preCloseUpState);
+            GameStateManager.Instance?.TransitionTo(_preCloseUpState);
             _closeUpCoroutine = null;
         }
     }
