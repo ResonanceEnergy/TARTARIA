@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: aecd2b6d17c7518489c591e2da163526, type: 3}
   m_Name: Zone_12_CelestialObservatory
-  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:ZoneDefinition
+  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.ZoneDefinition
   zoneName: Celestial Observatory
   sceneName: CelestialObservatory
   subtitle: Geometry at Sufficient Distance

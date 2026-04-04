@@ -9,9 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 20fad75016a22ef41b778380002fbad8, type: 3}
   m_Name: Quest_anastasia_finale
-  m_EditorClassIdentifier: Tartaria.Core:Tartaria.Core:QuestDefinition
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.QuestDefinition
   questId: anastasia_finale
   displayName: Anastasia's Final Manifestation
   description: Help Princess Anastasia fully manifest and deliver her message.

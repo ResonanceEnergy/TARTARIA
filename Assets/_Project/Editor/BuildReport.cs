@@ -35,6 +35,7 @@ namespace Tartaria.Editor
         public static int FailCount { get; private set; }
         public static int SkipCount { get; private set; }
         public static bool HasFailures => FailCount > 0;
+        public static bool IsRunning => _totalTimer.IsRunning;
         public static IReadOnlyList<PhaseResult> Phases => _phases;
 
         /// <summary>Call at the start of any pipeline run.</summary>
