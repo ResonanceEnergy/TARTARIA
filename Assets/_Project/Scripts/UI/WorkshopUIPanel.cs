@@ -53,6 +53,8 @@ namespace Tartaria.UI
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
 
             if (upgradeButton != null)
                 upgradeButton.onClick.AddListener(HandleUpgradeClick);

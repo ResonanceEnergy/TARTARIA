@@ -87,7 +87,8 @@ namespace Tartaria.Integration
         void Start()
         {
             // Subscribe to state changes
-            GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
 
             // Wire player combat events → CombatBridge
             if (playerInput != null)
@@ -376,7 +377,8 @@ namespace Tartaria.Integration
             if (_playerQueryCreated) { _playerQuery.Dispose(); _playerQueryCreated = false; }
 
             GameEvents.OnRequestActivateRSBuff -= HandleRequestActivateRSBuff;
-            GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged -= OnGameStateChanged;
             if (playerInput != null)
             {
                 playerInput.OnResonancePulse -= HandleResonancePulse;
@@ -1040,7 +1042,7 @@ namespace Tartaria.Integration
             MiloController.Instance?.NotifyCombatVictory();
 
             // Return to exploration
-            GameStateManager.Instance.TransitionTo(GameState.Exploration);
+            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
             SaveManager.Instance?.MarkDirty();
         }
@@ -1182,7 +1184,7 @@ namespace Tartaria.Integration
         {
             Debug.Log("[GameLoop] Zone victory sequence started!");
 
-            GameStateManager.Instance.TransitionTo(GameState.Cinematic);
+            GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
             DialogueManager.Instance?.PlayContextDialogue("zone_complete");
 
             // Companion zone-complete notifications

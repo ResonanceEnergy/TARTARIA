@@ -51,6 +51,13 @@ namespace Tartaria.Save
             LoadOrCreate();
         }
 
+        void OnDestroy()
+        {
+            // Flush any pending save on destruction
+            if (_isDirty) Save();
+            if (Instance == this) Instance = null;
+        }
+
         void Update()
         {
             if (!_isDirty) return;

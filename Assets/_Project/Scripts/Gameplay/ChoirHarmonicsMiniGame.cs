@@ -69,9 +69,7 @@ namespace Tartaria.Gameplay
         public int VoicesEntered => _voicesEntered;
 
         public event System.Action<float, PerformanceTier> OnPerformanceCompleted; // RS, tier
-#pragma warning disable CS0067
         public event System.Action OnPerformanceFailed;
-#pragma warning restore CS0067
         public event System.Action<int> OnVoiceEntered;               // voice index
         public event System.Action<int> OnVoiceDrifted;               // voice index
         public event System.Action OnFullHarmonyAchieved;
@@ -81,6 +79,8 @@ namespace Tartaria.Gameplay
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
 
         void OnDestroy()

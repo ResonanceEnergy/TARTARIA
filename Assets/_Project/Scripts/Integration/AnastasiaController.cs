@@ -119,6 +119,9 @@ namespace Tartaria.Integration
         // Cached component references
         Renderer[] _cachedRenderers;
         Rigidbody _cachedPlayerRb;
+        MaterialPropertyBlock _mpb;
+        static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
+        static readonly int ColorId = Shader.PropertyToID("_Color");
 
         // Golden Motes (13-bit packed into ushort)
         ushort _motesCollected;
@@ -156,13 +159,16 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
             BuildLineIndex();
         }
 
         void Start()
         {
             _playerTransform = GameObject.FindWithTag("Player")?.transform;
-            GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
+            if (GameStateManager.Instance != null)
+                GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
 
             // Start invisible — manifest after first dome restoration
             SetMode(AnastasiaMode.Invisible);
@@ -196,9 +202,11 @@ namespace Tartaria.Integration
         {
             // Block mode changes until initial zone manifestation finishes
             if (!_zoneFirstAppearanceDone) return;
+            if (GameStateManager.Instance == null) return;
+            var gsState = GameStateManager.Instance.CurrentState;
 
             // Priority 1: Combat → Invisible
-            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+            if (gsState == GameState.Combat)
             {
                 if (_currentMode != AnastasiaMode.Invisible)
                     SetMode(AnastasiaMode.Invisible);
@@ -207,7 +215,7 @@ namespace Tartaria.Integration
 
             // If returning from Invisible (combat ended)
             if (_currentMode == AnastasiaMode.Invisible &&
-                GameStateManager.Instance.CurrentState != GameState.Combat)
+                gsState != GameState.Combat)
             {
                 StartCoroutine(RemanifestCoroutine());
                 return;
@@ -221,7 +229,7 @@ namespace Tartaria.Integration
                 {
                     _playerIdleTimer += Time.deltaTime;
                     if (_playerIdleTimer >= conversationIdleThreshold &&
-                        GameStateManager.Instance.CurrentState == GameState.Exploration)
+                        gsState == GameState.Exploration)
                     {
                         SetMode(AnastasiaMode.Conversational);
                         _playerIdleTimer = 0f;
@@ -238,7 +246,7 @@ namespace Tartaria.Integration
             if (_currentMode == AnastasiaMode.Conversational)
             {
                 if (!IsPlayerIdle() ||
-                    GameStateManager.Instance.CurrentState != GameState.Exploration)
+                    gsState != GameState.Exploration)
                 {
                     SetMode(AnastasiaMode.Silent);
                     return;
@@ -339,20 +347,23 @@ namespace Tartaria.Integration
 
             // Apply to renderers (particle system alpha, mesh alpha, etc.)
             if (_cachedRenderers == null) return;
+            _mpb ??= new MaterialPropertyBlock();
             foreach (var r in _cachedRenderers)
             {
-                if (r.material.HasProperty("_BaseColor"))
+                r.GetPropertyBlock(_mpb);
+                if (r.sharedMaterial.HasProperty(BaseColorId))
                 {
-                    Color c = r.material.GetColor("_BaseColor");
+                    Color c = r.sharedMaterial.GetColor(BaseColorId);
                     c.a = _currentOpacity;
-                    r.material.SetColor("_BaseColor", c);
+                    _mpb.SetColor(BaseColorId, c);
                 }
-                else if (r.material.HasProperty("_Color"))
+                else if (r.sharedMaterial.HasProperty(ColorId))
                 {
-                    Color c = r.material.GetColor("_Color");
+                    Color c = r.sharedMaterial.GetColor(ColorId);
                     c.a = _currentOpacity;
-                    r.material.SetColor("_Color", c);
+                    _mpb.SetColor(ColorId, c);
                 }
+                r.SetPropertyBlock(_mpb);
             }
         }
 

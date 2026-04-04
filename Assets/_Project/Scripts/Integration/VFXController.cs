@@ -56,6 +56,8 @@ namespace Tartaria.Integration
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+            foreach (var mat in _instancedMaterials)
+                if (mat != null) Destroy(mat);
             _instancedMaterials.Clear();
             if (_particleMaterial != null) Destroy(_particleMaterial);
         }

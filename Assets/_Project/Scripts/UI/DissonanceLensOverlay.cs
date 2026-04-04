@@ -54,6 +54,9 @@ namespace Tartaria.UI
         MonoBehaviour[] _cachedSceneObjects = System.Array.Empty<MonoBehaviour>();
         float _sceneCacheTimer;
         const float SCENE_CACHE_INTERVAL = 3f;
+        Color _ringColor = new(0.8f, 0.1f, 0.3f, 1f);
+        Color _labelColor = new(1f, 0.3f, 0.5f, 1f);
+        Rect _fullScreenRect;
 
         public bool IsActive => _active;
         public bool IsUnlocked => _unlocked;
@@ -64,6 +67,8 @@ namespace Tartaria.UI
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
 
             // Create a 1x1 white texture for drawing
             _overlayTexture = new Texture2D(1, 1);
@@ -160,7 +165,9 @@ namespace Tartaria.UI
             // Full-screen tint overlay
             Color tint = Color.Lerp(cleanTint, corruptionTint, _pulseAlpha * 0.5f);
             GUI.color = tint;
-            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), _overlayTexture);
+            _fullScreenRect.width = Screen.width;
+            _fullScreenRect.height = Screen.height;
+            GUI.DrawTexture(_fullScreenRect, _overlayTexture);
 
             // Draw corruption markers
             if (_cachedCam == null) _cachedCam = UnityEngine.Camera.main;
@@ -187,13 +194,15 @@ namespace Tartaria.UI
                 float alpha = Mathf.Lerp(0.3f, 1f, marker.corruptionLevel) * _pulseAlpha;
 
                 // Corruption ring
-                GUI.color = new Color(0.8f, 0.1f, 0.3f, alpha);
+                _ringColor.a = alpha;
+                GUI.color = _ringColor;
                 GUI.DrawTexture(
                     new Rect(screenPos.x - size * 0.5f, screenY - size * 0.5f, size, size),
                     _overlayTexture);
 
                 // Label
-                GUI.color = new Color(1f, 0.3f, 0.5f, alpha);
+                _labelColor.a = alpha;
+                GUI.color = _labelColor;
                 GUI.Label(
                     new Rect(screenPos.x - 80f, screenY + size * 0.5f, 160f, 20f),
                     $"<b>{marker.name}</b> [{marker.corruptionLevel:P0}]",

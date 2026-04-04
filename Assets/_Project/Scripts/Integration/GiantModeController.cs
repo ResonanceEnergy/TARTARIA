@@ -63,6 +63,8 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
 
         void OnDestroy()
@@ -86,6 +88,7 @@ namespace Tartaria.Integration
             if (_isGiant)
             {
                 _aetherCharge -= aetherCostPerSecond * Time.deltaTime;
+                _totalTimeAsGiant += Time.deltaTime;
                 HUDController.Instance?.UpdateAetherCharge(_aetherCharge);
 
                 if (_aetherCharge <= 0f)
@@ -134,6 +137,7 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
             Debug.Log("[GiantMode] Activated");
+            _totalActivations++;
             OnGiantActivated?.Invoke();
         }
 
@@ -171,8 +175,7 @@ namespace Tartaria.Integration
             int count = Physics.OverlapSphereNonAlloc(targetPoint, rockCutRange, _overlapBuffer);
             for (int i = 0; i < count; i++)
             {
-                var building = _overlapBuffer[i].GetComponent<InteractableBuilding>();
-                if (building != null)
+                if (_overlapBuffer[i].TryGetComponent<InteractableBuilding>(out var building))
                 {
                     // Apply corruption removal
                     CorruptionSystem.Instance?.PurgeCorruption(building.BuildingId, rockCutDamage);
@@ -206,8 +209,7 @@ namespace Tartaria.Integration
                 if (col.CompareTag("Rubble"))
                 {
                     // Launch rubble away with force
-                    var rb = col.GetComponent<Rigidbody>();
-                    if (rb != null)
+                    if (col.TryGetComponent<Rigidbody>(out var rb))
                     {
                         Vector3 dir = (col.transform.position - playerTransform.position).normalized;
                         rb.AddForce(dir * 500f + Vector3.up * 200f, ForceMode.Impulse);
@@ -220,6 +222,7 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayGolemDeath();
 
             Debug.Log($"[GiantMode] Rubble Clear: {cleared} objects cleared");
+            _rubbleCleared += cleared;
             OnAbilityUsed?.Invoke(GiantAbility.RubbleClear);
         }
 
@@ -237,10 +240,11 @@ namespace Tartaria.Integration
             int count = Physics.OverlapSphereNonAlloc(targetPoint, buildingLiftRange, _overlapBuffer);
             for (int i = 0; i < count; i++)
             {
-                var building = _overlapBuffer[i].GetComponent<InteractableBuilding>();
-                if (building != null && building.State == BuildingRestorationState.Active)
+                if (_overlapBuffer[i].TryGetComponent<InteractableBuilding>(out var building)
+                    && building.State == BuildingRestorationState.Active)
                 {
                     _liftedBuilding = building.transform;
+                    _buildingsLifted++;
                     Debug.Log($"[GiantMode] Lifting building: {building.BuildingId}");
                     break;
                 }

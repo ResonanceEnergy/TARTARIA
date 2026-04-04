@@ -124,8 +124,8 @@ namespace Tartaria.Integration
             Debug.Log($"[ZoneTransition] {CurrentZone?.zoneName ?? "None"} -> {targetZone.zoneName}");
 
             // Enter loading state
-            var prevState = GameStateManager.Instance.CurrentState;
-            GameStateManager.Instance.TransitionTo(GameState.Loading);
+            var prevState = GameStateManager.Instance?.CurrentState ?? GameState.Exploration;
+            GameStateManager.Instance?.TransitionTo(GameState.Loading);
 
             bool success = false;
             try
@@ -163,7 +163,7 @@ namespace Tartaria.Integration
             {
                 _transitioning = false;
                 // Return to exploration
-                GameStateManager.Instance.TransitionTo(GameState.Exploration);
+                GameStateManager.Instance?.TransitionTo(GameState.Exploration);
             }
 
             if (success)

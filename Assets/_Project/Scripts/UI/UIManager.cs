@@ -42,6 +42,7 @@ namespace Tartaria.UI
 
         float _saveIndicatorTimer;
         bool _aetherVisionActive;
+        float _prePauseTimeScale = 1f;
 
         void Awake()
         {
@@ -95,9 +96,12 @@ namespace Tartaria.UI
             SetPanelActive(loadingPanel, current == GameState.Loading);
 
             if (current == GameState.Paused)
+            {
+                _prePauseTimeScale = Time.timeScale;
                 Time.timeScale = 0f;
+            }
             else if (previous == GameState.Paused)
-                Time.timeScale = 1f;
+                Time.timeScale = _prePauseTimeScale;
         }
 
         void SetPanelActive(GameObject panel, bool active)
@@ -110,6 +114,7 @@ namespace Tartaria.UI
         public void TogglePause()
         {
             var state = GameStateManager.Instance;
+            if (state == null) return;
             if (state.CurrentState == GameState.Paused)
                 state.ReturnToPrevious();
             else if (state.IsPlaying)

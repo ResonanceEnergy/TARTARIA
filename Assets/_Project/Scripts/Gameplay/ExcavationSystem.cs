@@ -52,6 +52,8 @@ namespace Tartaria.Gameplay
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
 
         void OnDestroy()
@@ -153,11 +155,7 @@ namespace Tartaria.Gameplay
             if (site.isComplete) return;
 
             // Range check — player must be within interactionRadius
-            if (_cachedPlayer == null)
-            {
-                var playerObj = GameObject.FindWithTag("Player");
-                if (playerObj != null) _cachedPlayer = playerObj.transform;
-            }
+            if (_cachedPlayer == null) return;
             if (_cachedPlayer != null && Vector3.Distance(_cachedPlayer.position, site.position) > interactionRadius)
             {
                 ServiceLocator.HUD?.ShowInteractionPrompt("Too far to dig here.");

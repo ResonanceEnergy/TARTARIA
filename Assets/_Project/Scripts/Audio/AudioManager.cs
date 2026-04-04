@@ -35,6 +35,12 @@ namespace Tartaria.Audio
             InitializeTonePool();
         }
 
+        void OnDestroy()
+        {
+            StopAllCoroutines();
+            if (Instance == this) Instance = null;
+        }
+
         void InitializeSFXPool()
         {
             _sfxPool = new AudioSource[sfxPoolSize];

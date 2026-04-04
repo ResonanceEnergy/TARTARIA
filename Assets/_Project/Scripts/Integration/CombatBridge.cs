@@ -58,6 +58,8 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
 
         void Start()
@@ -415,21 +417,11 @@ namespace Tartaria.Integration
 
         Vector3 GetPlayerPosition()
         {
-            if (_playerTransform == null)
-            {
-                var playerObj = GameObject.FindWithTag("Player");
-                if (playerObj != null) _playerTransform = playerObj.transform;
-            }
             return _playerTransform != null ? _playerTransform.position : Vector3.zero;
         }
 
         Vector3 GetPlayerForward()
         {
-            if (_playerTransform == null)
-            {
-                var playerObj = GameObject.FindWithTag("Player");
-                if (playerObj != null) _playerTransform = playerObj.transform;
-            }
             return _playerTransform != null ? _playerTransform.forward : Vector3.forward;
         }
 

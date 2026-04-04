@@ -39,6 +39,14 @@ namespace Tartaria.Integration
         const int MaxLogLines = 50;
         int _logLineCount;
 
+        static GUIStyle _headerStyle;
+        static GUIStyle _logStyle;
+        static readonly Color BgColor = new Color(0f, 0f, 0f, 0.9f);
+        static readonly Rect BgRect = new Rect(10, 10, 500, 350);
+        static readonly Rect AreaRect = new Rect(14, 14, 492, 342);
+        static readonly Color HeaderColor = new Color(0.9f, 0.85f, 0.3f);
+        static readonly Color LogColor = new Color(0.8f, 0.9f, 0.8f);
+
         void Update()
         {
             #if !UNITY_EDITOR
@@ -56,22 +64,22 @@ namespace Tartaria.Integration
         {
             if (!_visible) return;
 
-            GUI.color = new Color(0f, 0f, 0f, 0.9f);
-            GUI.DrawTexture(new Rect(10, 10, 500, 350), Texture2D.whiteTexture);
+            GUI.color = BgColor;
+            GUI.DrawTexture(BgRect, Texture2D.whiteTexture);
             GUI.color = Color.white;
 
-            GUILayout.BeginArea(new Rect(14, 14, 492, 342));
+            GUILayout.BeginArea(AreaRect);
 
             // Header
-            var headerStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, fontStyle = FontStyle.Bold };
-            headerStyle.normal.textColor = new Color(0.9f, 0.85f, 0.3f);
-            GUILayout.Label("TARTARIA DEBUG CONSOLE", headerStyle);
+            _headerStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 14, fontStyle = FontStyle.Bold };
+            _headerStyle.normal.textColor = HeaderColor;
+            GUILayout.Label("TARTARIA DEBUG CONSOLE", _headerStyle);
 
             // Log area
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(260));
-            var logStyle = new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true, richText = true };
-            logStyle.normal.textColor = new Color(0.8f, 0.9f, 0.8f);
-            GUILayout.Label(_log, logStyle);
+            _logStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 11, wordWrap = true, richText = true };
+            _logStyle.normal.textColor = LogColor;
+            GUILayout.Label(_log, _logStyle);
             GUILayout.EndScrollView();
 
             // Input

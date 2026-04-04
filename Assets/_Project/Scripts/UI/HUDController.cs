@@ -93,6 +93,8 @@ namespace Tartaria.UI
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
             ServiceLocator.HUD = this;
         }
 
@@ -107,6 +109,10 @@ namespace Tartaria.UI
             // Subscribe to accessibility changes for text scale / high contrast
             if (AccessibilityManager.Instance != null)
                 AccessibilityManager.Instance.OnSettingsChanged += HandleAccessibilityChanged;
+
+            // Set static aether bar color once
+            if (aetherChargeBar != null)
+                aetherChargeBar.color = aetherColor;
         }
 
         void OnDestroy()
@@ -175,7 +181,6 @@ namespace Tartaria.UI
             {
                 aetherChargeBar.fillAmount = Mathf.Lerp(aetherChargeBar.fillAmount,
                     _displayAether / 100f, Time.deltaTime * 6f);
-                aetherChargeBar.color = aetherColor;
             }
 
             int aetherInt = Mathf.RoundToInt(_displayAether);
@@ -445,7 +450,8 @@ namespace Tartaria.UI
         {
             if (text == null) return;
             var c = text.color;
-            text.color = new Color(c.r, c.g, c.b, 1f);
+            c.a = 1f;
+            text.color = c;
             text.fontStyle |= TMPro.FontStyles.Bold;
         }
     }

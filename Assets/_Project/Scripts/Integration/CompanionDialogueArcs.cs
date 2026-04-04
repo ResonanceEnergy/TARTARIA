@@ -116,6 +116,8 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
 
             // Initialize all companions at Stranger
             foreach (CompanionId c in System.Enum.GetValues(typeof(CompanionId)))

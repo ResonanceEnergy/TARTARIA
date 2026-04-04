@@ -181,11 +181,14 @@ namespace Tartaria.Gameplay
             direction = Vector3.zero;
             strength = 0f;
 
-            var player = _cachedPlayerTransform != null ? _cachedPlayerTransform.gameObject : GameObject.FindWithTag("Player");
-            if (player == null) return false;
-            _cachedPlayerTransform = player.transform;
+            if (_cachedPlayerTransform == null)
+            {
+                var playerObj = GameObject.FindWithTag("Player");
+                if (playerObj == null) return false;
+                _cachedPlayerTransform = playerObj.transform;
+            }
 
-            Vector3 playerPos = player.transform.position;
+            Vector3 playerPos = _cachedPlayerTransform.position;
 
             foreach (var poi in _registeredPOIs)
             {

@@ -64,6 +64,8 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
         }
 
         void OnDestroy()
@@ -313,8 +315,8 @@ namespace Tartaria.Integration
         Voice = 2,         // Moon 9: Active voice responses
         Evidence = 3,      // Moon 12: Physical evidence found
         Manifested = 4,    // Moon 13: Full physical form
-        Redeemed = 5,      // Post-confrontation redemption
-        Confrontation = 6  // Redemption arc confrontation phase
+        Confrontation = 5, // Redemption arc confrontation phase
+        Redeemed = 6       // Post-confrontation redemption
     }
 
     [System.Serializable]

@@ -28,6 +28,7 @@ namespace Tartaria.Integration
         int _passed;
         int _failed;
         bool _validated;
+        static GUIStyle _overlayStyle;
 
         void Awake()
         {
@@ -37,6 +38,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             if (Instance == this) Instance = null;
         }
 
@@ -163,7 +165,7 @@ namespace Tartaria.Integration
                 ? new Color(0f, 0.2f, 0f, 0.75f * alpha)
                 : new Color(0.3f, 0f, 0f, 0.85f * alpha);
 
-            var style = new GUIStyle(GUI.skin.label)
+            _overlayStyle ??= new GUIStyle(GUI.skin.label)
             {
                 fontSize = 12,
                 fontStyle = FontStyle.Bold,
@@ -171,7 +173,7 @@ namespace Tartaria.Integration
                 richText = false,
                 alignment = TextAnchor.UpperLeft,
             };
-            style.normal.textColor = new Color(1f, 1f, 1f, alpha);
+            _overlayStyle.normal.textColor = new Color(1f, 1f, 1f, alpha);
 
             float width = 360f;
             float height = (_passed + _failed + 6) * 16f;
@@ -180,7 +182,7 @@ namespace Tartaria.Integration
             GUI.color = bgColor;
             GUI.DrawTexture(rect, Texture2D.whiteTexture);
             GUI.color = new Color(1f, 1f, 1f, alpha);
-            GUI.Label(new Rect(14f, 12f, width - 8f, height - 4f), _report, style);
+            GUI.Label(new Rect(14f, 12f, width - 8f, height - 4f), _report, _overlayStyle);
         }
     }
 }

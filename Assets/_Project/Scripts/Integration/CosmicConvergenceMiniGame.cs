@@ -83,6 +83,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            StopAllCoroutines();
             UnsubscribePhaseHandlers();
             if (Instance == this) Instance = null;
         }
