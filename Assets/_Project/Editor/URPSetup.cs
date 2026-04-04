@@ -31,8 +31,11 @@ namespace Tartaria.Editor
             if (rendererData == null)
             {
                 rendererData = ScriptableObject.CreateInstance<UniversalRendererData>();
+                rendererData.renderingMode = RenderingMode.ForwardPlus;
+                rendererData.postProcessData = AssetDatabase.LoadAssetAtPath<PostProcessData>(
+                    "Packages/com.unity.render-pipelines.universal/Runtime/Data/PostProcessData.asset");
                 AssetDatabase.CreateAsset(rendererData, RendererDataPath);
-                Debug.Log($"[Tartaria] Created URP Renderer: {RendererDataPath}");
+                Debug.Log($"[Tartaria] Created URP Renderer (Forward+): {RendererDataPath}");
             }
 
             // Create pipeline asset

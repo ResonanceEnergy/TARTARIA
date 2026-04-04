@@ -38,7 +38,7 @@ namespace Tartaria.Core
             var oldState = CurrentState;
             CurrentState = newState;
 
-            Debug.Log($"[GameState] {oldState} → {newState}");
+            Debug.Log($"[GameState] {oldState} → {newState}\n{System.Environment.StackTrace}");
             OnStateChanged?.Invoke(oldState, newState);
         }
 
