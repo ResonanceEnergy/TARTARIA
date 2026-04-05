@@ -43,13 +43,11 @@ namespace Tartaria.Editor
         /// <summary>
         /// Phase 7b: Apply generated meshes and materials to scene objects and prefabs.
         /// Must run AFTER EchohavenScenePopulator has populated the scene.
-        /// Also builds building prefabs using the procedural meshes.
         /// </summary>
         public static void ApplyVisualUpgrade()
         {
             UpgradeScene();
             UpgradePrefabs();
-            AssetFactoryWizard.BuildBuildingPrefabs();
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
         }
@@ -1001,6 +999,28 @@ namespace Tartaria.Editor
                 new Color(0.4f, 0.6f, 1f), 3f, 15f);
             AddPointLight("Light_Fountain", new Vector3(-20f, 2f, 35f),
                 new Color(0.2f, 0.5f, 0.8f), 2.5f, 12f);
+
+            // ── Assign custom skybox ──
+            var skyMat = LoadMat("M_Skybox_Tartaria");
+            if (skyMat != null)
+            {
+                RenderSettings.skybox = skyMat;
+                RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
+                RenderSettings.ambientSkyColor = new Color(0.25f, 0.35f, 0.55f);
+                RenderSettings.ambientEquatorColor = new Color(0.45f, 0.40f, 0.35f);
+                RenderSettings.ambientGroundColor = new Color(0.18f, 0.15f, 0.12f);
+                DynamicGI.UpdateEnvironment();
+            }
+
+            // ── Remove AudioListeners from gameplay scene ──
+            // Boot camera owns the sole listener; SceneLoader manages handoff at runtime.
+            var listeners = Object.FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
+            if (listeners.Length > 0)
+            {
+                foreach (var l in listeners)
+                    Object.DestroyImmediate(l);
+                Debug.Log($"[Tartaria] Removed {listeners.Length} AudioListener(s) from Echohaven (SceneLoader manages at runtime).");
+            }
 
             EditorSceneManager.MarkSceneDirty(scene);
             Debug.Log("[Tartaria] Scene upgraded — procedural architecture + shader materials applied.");

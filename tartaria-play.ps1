@@ -327,8 +327,8 @@ function Watch-EditorLog {
         Write-Host "  RUNTIME VALIDATION (waiting for canary files)..." -ForegroundColor Cyan
 
         # Wait for BootValidator canary (runtime writes it after all checks pass)
-        $bootCanary = Join-Path $ProjectRoot "Assets/_Project/Logs/boot-validator-canary.txt"
-        $sceneCanary = Join-Path $ProjectRoot "Assets/_Project/Logs/sceneloader-canary.txt"
+        $bootCanary = Join-Path $ProjectPath "Assets/_Project/Logs/boot-validator-canary.txt"
+        $sceneCanary = Join-Path $ProjectPath "Assets/_Project/Logs/sceneloader-canary.txt"
         $canaryTimeout = 30
         $canaryStart = Get-Date
         while (-not (Test-Path $bootCanary) -and ((Get-Date) - $canaryStart).TotalSeconds -lt $canaryTimeout) {

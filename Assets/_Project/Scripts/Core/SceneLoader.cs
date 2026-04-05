@@ -138,6 +138,14 @@ namespace Tartaria.Core
                 yield return new WaitForSecondsRealtime(minimumLoadTime - elapsed);
             }
 
+            // Disable Boot scene camera — gameplay CameraRig takes over
+            var bootCam = GameObject.Find("BootCamera");
+            if (bootCam != null)
+            {
+                bootCam.SetActive(false);
+                Debug.Log("[SceneLoader] Disabled BootCamera — CameraRig takes over.");
+            }
+
             // Enforce exactly one AudioListener — gameplay camera takes priority
             var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
             if (listeners.Length > 1)
@@ -146,13 +154,15 @@ namespace Tartaria.Core
                     Destroy(listeners[i]);
                 Debug.Log($"[SceneLoader] Removed {listeners.Length - 1} duplicate AudioListener(s).");
             }
-
-            // Disable Boot scene camera — gameplay CameraRig takes over
-            var bootCam = GameObject.Find("BootCamera");
-            if (bootCam != null)
+            else if (listeners.Length == 0)
             {
-                bootCam.SetActive(false);
-                Debug.Log("[SceneLoader] Disabled BootCamera — CameraRig takes over.");
+                // BootCamera was the only listener and is now disabled — add one to CameraRig
+                var mainCam = UnityEngine.Camera.main;
+                if (mainCam != null && mainCam.GetComponent<AudioListener>() == null)
+                {
+                    mainCam.gameObject.AddComponent<AudioListener>();
+                    Debug.Log("[SceneLoader] Added AudioListener to Main Camera.");
+                }
             }
 
             // Transition to exploration
