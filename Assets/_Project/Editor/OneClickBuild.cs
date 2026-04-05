@@ -86,6 +86,7 @@ namespace Tartaria.Editor
             BuildReport.RunPhase("Phase 3/10: Visual Assets", () =>
             {
                 VisualUpgradeBuilder.BuildVisualAssets();
+                AssetFactoryWizard.BuildBuildingPrefabs(); // Must run before Phase 8 populate
             });
 
             // ── Phase 4: Zone Definitions ──

@@ -99,7 +99,7 @@ namespace Tartaria.Editor
             ground.transform.SetParent(parent.transform);
             ground.transform.localPosition = Vector3.zero;
             ground.isStatic = true;
-            AssignMaterial(ground, "Ground_Plaza");
+            AssignMaterial(ground, "M_Ground_Terrain");
 
             // Central plaza — slightly raised, lighter
             var plaza = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -108,7 +108,7 @@ namespace Tartaria.Editor
             plaza.transform.localPosition = new Vector3(0f, 0.05f, 0f);
             plaza.transform.localScale = new Vector3(15f, 0.1f, 15f);
             plaza.isStatic = true;
-            AssignMaterial(plaza, "Stone_Active");
+            AssignMaterial(plaza, "M_Stone_Plaza");
 
             // Mud field markers (4 mounds at edges to imply buried structures)
             for (int i = 0; i < 4; i++)
@@ -121,7 +121,7 @@ namespace Tartaria.Editor
                     Mathf.Sin(angle) * 60f, 0.5f, Mathf.Cos(angle) * 60f);
                 mound.transform.localScale = new Vector3(8f, 2f, 8f);
                 mound.isStatic = true;
-                AssignMaterial(mound, "Mud_Buried");
+                AssignMaterial(mound, "M_Mud_Fresh");
             }
 
             return 1;
@@ -142,7 +142,7 @@ namespace Tartaria.Editor
             marker.transform.SetParent(spawn.transform);
             marker.transform.localPosition = new Vector3(0f, -0.9f, 0f);
             marker.transform.localScale = new Vector3(1.5f, 0.05f, 1.5f);
-            AssignMaterial(marker, "Aether_Glow");
+            AssignMaterial(marker, "M_Aether_Bright");
 
             // Try to place player prefab
             var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
@@ -175,15 +175,15 @@ namespace Tartaria.Editor
 
             n += PlaceBuildingMarker(parent.transform, "StarDome_Placeholder",
                 new Vector3(30f, 0f, 20f), PrimitiveType.Sphere,
-                new Vector3(12f, 8f, 12f), "Mud_Buried");
+                new Vector3(12f, 8f, 12f), "M_Mud_Fresh");
 
             n += PlaceBuildingMarker(parent.transform, "HarmonicFountain_Placeholder",
                 new Vector3(-20f, 0f, 35f), PrimitiveType.Cylinder,
-                new Vector3(6f, 3f, 6f), "Mud_Buried");
+                new Vector3(6f, 3f, 6f), "M_Mud_Fresh");
 
             n += PlaceBuildingMarker(parent.transform, "CrystalSpire_Placeholder",
                 new Vector3(0f, 0f, -30f), PrimitiveType.Cylinder,
-                new Vector3(3f, 15f, 3f), "Mud_Buried");
+                new Vector3(3f, 15f, 3f), "M_Mud_Fresh");
 
             return n;
         }
@@ -208,6 +208,7 @@ namespace Tartaria.Editor
             if (prefab != null)
             {
                 var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+                instance.name = name; // Keep placeholder name for VisualUpgradeBuilder
                 instance.transform.position = pos;
                 Object.DestroyImmediate(go);
                 instance.transform.SetParent(parent);
@@ -249,7 +250,7 @@ namespace Tartaria.Editor
             ring.transform.SetParent(go.transform);
             ring.transform.localPosition = new Vector3(0f, 0.02f, 0f);
             ring.transform.localScale = new Vector3(4f, 0.02f, 4f);
-            AssignMaterial(ring, "MudGolem_Body");
+            AssignMaterial(ring, "M_Corruption");
 
             return 1;
         }
@@ -311,7 +312,18 @@ namespace Tartaria.Editor
 
         static int CreateCameraRig()
         {
-            if (GameObject.Find("CameraRig") != null) return 0;
+            var existingRig = GameObject.Find("CameraRig");
+            if (existingRig != null)
+            {
+                // Ensure existing camera has MainCamera tag (may be missing from older builds)
+                var existingCam = existingRig.GetComponentInChildren<UnityEngine.Camera>();
+                if (existingCam != null && !existingCam.CompareTag("MainCamera"))
+                {
+                    existingCam.gameObject.tag = "MainCamera";
+                    Debug.Log("[EchohavenScenePopulator] Fixed MainCamera tag on existing CameraRig.");
+                }
+                return 0;
+            }
 
             var rig = new GameObject("CameraRig");
             rig.transform.position = new Vector3(0f, 10f, -30f);
@@ -328,8 +340,8 @@ namespace Tartaria.Editor
             cam.fieldOfView = 55f;
             cam.nearClipPlane = 0.3f;
             cam.farClipPlane = 300f;
-            if (Object.FindAnyObjectByType<AudioListener>() == null)
-                camGO.AddComponent<AudioListener>();
+            // Do NOT add AudioListener here — SceneLoader manages the single
+            // listener at runtime after disabling Boot camera.
 
             // Camera controller (if exists)
             var ccType = typeof(Tartaria.Camera.CameraController);

@@ -257,11 +257,11 @@ namespace Tartaria.Editor
                 "Echohaven_CrystalSpire"
             };
 
-            // Load materials
-            var mudMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/Mud_Buried.mat");
-            var revealedMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/Mud_Revealed.mat");
-            var activeMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/Stone_Active.mat");
-            var crystalMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/Crystal_Active.mat");
+            // Load materials (M_ prefix matches VisualUpgradeBuilder naming)
+            var mudMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/M_Mud_Fresh.mat");
+            var revealedMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/M_Mud_Cracking.mat");
+            var activeMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/M_Stone_Active.mat");
+            var crystalMat = AssetDatabase.LoadAssetAtPath<Material>($"{MaterialsPath}/M_Crystal.mat");
 
             foreach (var defName in defNames)
             {
@@ -360,6 +360,9 @@ namespace Tartaria.Editor
 
                 // Assign material references via SerializedObject
                 var renderer = body.GetComponent<MeshRenderer>();
+                // Set initial visible material (buildings start Buried → mud)
+                if (renderer != null && mudMat != null)
+                    renderer.sharedMaterial = mudMat;
                 so.FindProperty("mainRenderer").objectReferenceValue = renderer;
                 if (mudMat != null)
                     so.FindProperty("mudMaterial").objectReferenceValue = mudMat;

@@ -4,12 +4,12 @@ using Tartaria.Gameplay;
 namespace Tartaria.Integration
 {
     /// <summary>
-    /// Building Spawner — creates the MonoBehaviour side of Tartarian buildings:
-    /// greybox mesh + InteractableBuilding + ProximityTrigger + colliders.
+    /// Building Spawner — wires up the MonoBehaviour side of Tartarian buildings:
+    /// InteractableBuilding + ProximityTrigger + colliders.
     /// Runs after WorldInitializer creates ECS entities.
     ///
-    /// Place this in the gameplay scene (Echohaven_VerticalSlice).
-    /// Positions match WorldInitializer's serialized building positions.
+    /// First looks for existing scene buildings placed by EchohavenScenePopulator.
+    /// Only creates greybox fallbacks if no matching object is found.
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-80)] // After WorldInitializer (-90), before GameLoopController (-50)
@@ -23,42 +23,44 @@ namespace Tartaria.Integration
         [Header("Discovery Radius")]
         [SerializeField] float discoveryRadius = 15f;
 
-        [Header("Prefabs (optional — falls back to greybox if null)")]
-        [SerializeField] GameObject domePrefab;
-        [SerializeField] GameObject fountainPrefab;
-        [SerializeField] GameObject spirePrefab;
+        // Scene object names from EchohavenScenePopulator
+        static readonly string[] DomeNames = { "StarDome_Placeholder", "Echohaven_StarDome" };
+        static readonly string[] FountainNames = { "HarmonicFountain_Placeholder", "Echohaven_HarmonicFountain" };
+        static readonly string[] SpireNames = { "CrystalSpire_Placeholder", "Echohaven_CrystalSpire" };
 
         void Start()
         {
-            SpawnBuilding("dome", domePosition, domePrefab, PrimitiveType.Sphere, new Vector3(8f, 6f, 8f));
-            SpawnBuilding("fountain", fountainPosition, fountainPrefab, PrimitiveType.Cylinder, new Vector3(4f, 3f, 4f));
-            SpawnBuilding("spire", spirePosition, spirePrefab, PrimitiveType.Cylinder, new Vector3(3f, 12f, 3f));
+            WireBuilding("dome", domePosition, DomeNames, PrimitiveType.Sphere, new Vector3(8f, 6f, 8f));
+            WireBuilding("fountain", fountainPosition, FountainNames, PrimitiveType.Cylinder, new Vector3(4f, 3f, 4f));
+            WireBuilding("spire", spirePosition, SpireNames, PrimitiveType.Cylinder, new Vector3(3f, 12f, 3f));
 
-            Debug.Log("[BuildingSpawner] 3 buildings spawned with interaction + discovery triggers.");
+            Debug.Log("[BuildingSpawner] 3 buildings wired with interaction + discovery triggers.");
         }
 
-        void SpawnBuilding(string buildingId, Vector3 position, GameObject prefab,
+        void WireBuilding(string buildingId, Vector3 position, string[] sceneNames,
             PrimitiveType fallbackShape, Vector3 fallbackScale)
         {
-            GameObject building;
-
-            if (prefab != null)
+            // Try to find existing scene object first
+            GameObject building = null;
+            foreach (var name in sceneNames)
             {
-                building = Instantiate(prefab, position, Quaternion.identity);
+                building = GameObject.Find(name);
+                if (building != null) break;
             }
-            else
+
+            // Fallback: create greybox if nothing in scene
+            if (building == null)
             {
                 building = CreateGreyboxBuilding(buildingId, position, fallbackShape, fallbackScale);
+                building.name = $"Building_{buildingId}";
             }
-
-            building.name = $"Building_{buildingId}";
 
             // Ensure InteractableBuilding component
             var interactable = building.GetComponent<InteractableBuilding>();
             if (interactable == null)
                 interactable = building.AddComponent<InteractableBuilding>();
 
-            // Ensure box collider for interaction raycasts
+            // Ensure collider for interaction raycasts
             var col = building.GetComponent<Collider>();
             if (col == null)
             {
@@ -71,11 +73,15 @@ namespace Tartaria.Integration
             if (buildingLayer >= 0)
                 building.layer = buildingLayer;
 
-            // Add discovery proximity trigger as child
-            var triggerGO = new GameObject($"DiscoveryTrigger_{buildingId}");
-            triggerGO.transform.SetParent(building.transform, false);
-            var trigger = triggerGO.AddComponent<ProximityTrigger>();
-            trigger.Configure(ProximityTrigger.TriggerAction.DiscoverBuilding, discoveryRadius, interactable);
+            // Add discovery proximity trigger as child (if not already present)
+            string triggerName = $"DiscoveryTrigger_{buildingId}";
+            if (building.transform.Find(triggerName) == null)
+            {
+                var triggerGO = new GameObject(triggerName);
+                triggerGO.transform.SetParent(building.transform, false);
+                var trigger = triggerGO.AddComponent<ProximityTrigger>();
+                trigger.Configure(ProximityTrigger.TriggerAction.DiscoverBuilding, discoveryRadius, interactable);
+            }
 
             // Register as scanner POI
             var scanner = ResonanceScannerSystem.Instance;
