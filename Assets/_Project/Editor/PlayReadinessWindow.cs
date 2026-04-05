@@ -189,6 +189,27 @@ namespace Tartaria.Editor
             Add("Input actions asset",
                 AssetExists("Assets/_Project/Input/TartariaInputActions.inputactions"),
                 "Input bindings");
+
+            // Check Player prefab has input wired
+            var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Prefabs/Characters/Player.prefab");
+            if (playerPrefab != null)
+            {
+                var handler = playerPrefab.GetComponent<Tartaria.Input.PlayerInputHandler>();
+                bool hasInput = handler != null;
+                if (hasInput)
+                {
+                    var so = new SerializedObject(handler);
+                    var prop = so.FindProperty("inputActions");
+                    hasInput = prop != null && prop.objectReferenceValue != null;
+                }
+                Add("Player prefab input wired", hasInput, hasInput ? "OK" : "No InputActionAsset");
+            }
+
+            // Check UI_Overlay has HUD content
+            var uiScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(
+                "Assets/_Project/Scenes/UI_Overlay.unity");
+            Add("UI Overlay scene", uiScene != null, uiScene != null ? "OK" : "MISSING");
         }
 
         // ─── Build Settings ───────────────────────────

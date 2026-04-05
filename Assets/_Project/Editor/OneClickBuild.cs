@@ -76,10 +76,11 @@ namespace Tartaria.Editor
                 URPSetup.EnsureURPPipeline();
             });
 
-            // ── Phase 2: ScriptableObjects + Scene skeleton ──
-            BuildReport.RunPhase("Phase 2/10: ScriptableObjects", () =>
+            // ── Phase 2: ScriptableObjects + Input Actions ──
+            BuildReport.RunPhase("Phase 2/12: ScriptableObjects + Input", () =>
             {
                 ProjectSetupWizard.RunSetup();
+                InputActionsFactory.CreateInputActionsAsset();
             });
 
             // ── Phase 3: Visual Assets (meshes + materials + skybox) ──
@@ -108,10 +109,22 @@ namespace Tartaria.Editor
             });
 
             // ── Phase 7: Scenes (Boot + UI_Overlay) ──
-            BuildReport.RunPhase("Phase 7/10: Scenes (Boot + UI_Overlay)", () =>
+            BuildReport.RunPhase("Phase 7/12: Scenes (Boot + UI_Overlay)", () =>
             {
                 SceneFactory.CreateAllMissingScenes();
             });
+
+            // ── Phase 7b: Populate UI Overlay ──
+            string uiOverlayPath = "Assets/_Project/Scenes/UI_Overlay.unity";
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(uiOverlayPath) != null)
+            {
+                BuildReport.RunPhase("Phase 7b/12: Populate UI Overlay", () =>
+                {
+                    EditorSceneManager.OpenScene(uiOverlayPath, OpenSceneMode.Single);
+                    UIOverlayPopulator.Populate();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
 
             // ── Phase 8: Scaffold managers + populate Echohaven ──
             string echohavenPath = "Assets/_Project/Scenes/Echohaven_VerticalSlice.unity";
@@ -145,10 +158,11 @@ namespace Tartaria.Editor
                 BuildReport.Skip("Phase 9/10: Apply Visual Upgrade", "Echohaven scene not found");
             }
 
-            // ── Phase 10: Input + Build Settings ──
-            BuildReport.RunPhase("Phase 10/10: Input + Build Settings", () =>
+            // ── Phase 10: Input assignment (scene must be open) + Build Settings ──
+            BuildReport.RunPhase("Phase 10/12: Input + Build Settings", () =>
             {
                 InputActionsAssigner.AssignInputActions();
+                EditorSceneManager.SaveOpenScenes();
                 ConfigureBuildSettings();
             });
 
