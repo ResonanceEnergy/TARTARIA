@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Tartaria.Core;
 
 namespace Tartaria.Integration
@@ -13,6 +14,9 @@ namespace Tartaria.Integration
     {
         [Header("Player Prefab")]
         [SerializeField] GameObject playerPrefab;
+
+        [Header("Input")]
+        [SerializeField] InputActionAsset inputActions;
 
         [Header("Spawn Settings")]
         [SerializeField] Vector3 spawnOffset = new(0f, 1f, 0f);
@@ -72,7 +76,16 @@ namespace Tartaria.Integration
             if (col != null) Destroy(col);
 
             player.AddComponent<CharacterController>();
-            player.AddComponent<Input.PlayerInputHandler>();
+            var handler = player.AddComponent<Input.PlayerInputHandler>();
+
+            // Wire input actions if available
+            if (inputActions != null)
+            {
+                // Use reflection to set private serialized field at runtime
+                var field = typeof(Input.PlayerInputHandler).GetField("inputActions",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (field != null) field.SetValue(handler, inputActions);
+            }
 
             DontDestroyOnLoad(player);
             return player;

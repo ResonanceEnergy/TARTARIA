@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 namespace Tartaria.Editor
@@ -49,6 +50,24 @@ namespace Tartaria.Editor
                 go.transform.SetParent(parent);
                 go.AddComponent<Tartaria.Integration.PlayerSpawner>();
                 n++;
+            }
+
+            // Wire input actions on PlayerSpawner for fallback player
+            var spawner = Object.FindFirstObjectByType<Tartaria.Integration.PlayerSpawner>();
+            if (spawner != null)
+            {
+                var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                    InputActionsFactory.AssetPath);
+                if (inputAsset != null)
+                {
+                    var so = new SerializedObject(spawner);
+                    var prop = so.FindProperty("inputActions");
+                    if (prop != null && prop.objectReferenceValue == null)
+                    {
+                        prop.objectReferenceValue = inputAsset;
+                        so.ApplyModifiedProperties();
+                    }
+                }
             }
 
             if (Object.FindFirstObjectByType<Tartaria.Integration.BuildingSpawner>() == null)
@@ -151,6 +170,7 @@ namespace Tartaria.Editor
             {
                 var player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
                 player.transform.position = spawn.transform.position;
+                AssignInputActionsToPlayer(player);
             }
 
             // Try to place Milo prefab
@@ -391,6 +411,20 @@ namespace Tartaria.Editor
                 var r = go.GetComponent<MeshRenderer>();
                 if (r != null) r.sharedMaterial = mat;
             }
+        }
+
+        static void AssignInputActionsToPlayer(GameObject player)
+        {
+            var handler = player.GetComponent<Tartaria.Input.PlayerInputHandler>();
+            if (handler == null) return;
+            var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                InputActionsFactory.AssetPath);
+            if (inputAsset == null) return;
+            var so = new SerializedObject(handler);
+            var prop = so.FindProperty("inputActions");
+            if (prop != null) prop.objectReferenceValue = inputAsset;
+            so.ApplyModifiedProperties();
+            Debug.Log("[EchohavenScenePopulator] Input actions assigned to Player.");
         }
 
         static GameObject FindOrCreate(string name)

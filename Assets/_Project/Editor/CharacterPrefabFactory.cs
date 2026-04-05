@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System.IO;
 using Tartaria.Input;
 using Tartaria.Integration;
@@ -70,7 +71,19 @@ namespace Tartaria.Editor
             cc.height = 2f;
             cc.radius = 0.4f;
 
-            root.AddComponent<PlayerInputHandler>();
+            var pih = root.AddComponent<PlayerInputHandler>();
+
+            // Assign input actions asset if it exists
+            var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                InputActionsFactory.AssetPath);
+            if (inputAsset != null)
+            {
+                var so = new SerializedObject(pih);
+                var prop = so.FindProperty("inputActions");
+                if (prop != null) prop.objectReferenceValue = inputAsset;
+                so.ApplyModifiedProperties();
+            }
+
             root.AddComponent<Rigidbody>().isKinematic = true;
 
             // Camera follow target
