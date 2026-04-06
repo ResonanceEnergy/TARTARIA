@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Tartaria.Core;
 
 namespace Tartaria.Integration
@@ -28,7 +29,6 @@ namespace Tartaria.Integration
     public class DebugCheatConsole : MonoBehaviour
     {
         [SerializeField] bool enabledInBuilds = false;
-        [SerializeField] KeyCode toggleKey = KeyCode.BackQuote;
 
         bool _visible;
         string _input = "";
@@ -53,7 +53,7 @@ namespace Tartaria.Integration
             if (!enabledInBuilds) return;
             #endif
 
-            if (UnityEngine.Input.GetKeyDown(toggleKey))
+            if (Keyboard.current != null && Keyboard.current.backquoteKey.wasPressedThisFrame)
             {
                 _visible = !_visible;
                 if (_visible) _input = "";
