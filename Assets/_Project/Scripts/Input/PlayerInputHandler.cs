@@ -97,8 +97,6 @@ namespace Tartaria.Input
             _aetherVisionAction = _playerMap.FindAction("AetherVision");
             _pauseAction = _playerMap.FindAction("Pause");
 
-            try
-            {
             // Subscribe to button callbacks
             if (_interactAction != null) _interactAction.performed += OnInteractPerformed;
             if (_aetherVisionAction != null) _aetherVisionAction.performed += OnAetherVisionPerformed;
@@ -108,35 +106,6 @@ namespace Tartaria.Input
             if (_shieldAction != null) _shieldAction.performed += OnFrequencyShieldPerformed;
 
             _playerMap.Enable();
-            }
-            catch (System.Exception e)
-            {
-                // Binding resolution can fail if the .inputactions asset has stale
-                // control-scheme references. Fall back to a runtime clone which
-                // strips the corrupt binding state.
-                Debug.LogWarning($"[PlayerInputHandler] Enable failed ({e.GetType().Name}), retrying with runtime clone.");
-                inputActions = Instantiate(inputActions);
-                _playerMap = inputActions.FindActionMap("Player");
-                if (_playerMap == null) return;
-
-                _moveAction = _playerMap.FindAction("Move");
-                _sprintAction = _playerMap.FindAction("Sprint");
-                _interactAction = _playerMap.FindAction("Interact");
-                _attackAction = _playerMap.FindAction("ResonancePulse");
-                _harmonicStrikeAction = _playerMap.FindAction("HarmonicStrike");
-                _shieldAction = _playerMap.FindAction("FrequencyShield");
-                _aetherVisionAction = _playerMap.FindAction("AetherVision");
-                _pauseAction = _playerMap.FindAction("Pause");
-
-                if (_interactAction != null) _interactAction.performed += OnInteractPerformed;
-                if (_aetherVisionAction != null) _aetherVisionAction.performed += OnAetherVisionPerformed;
-                if (_pauseAction != null) _pauseAction.performed += OnPausePerformed;
-                if (_attackAction != null) _attackAction.performed += OnResonancePulsePerformed;
-                if (_harmonicStrikeAction != null) _harmonicStrikeAction.performed += OnHarmonicStrikePerformed;
-                if (_shieldAction != null) _shieldAction.performed += OnFrequencyShieldPerformed;
-
-                _playerMap.Enable();
-            }
         }
 
         void CleanupInputActions()
