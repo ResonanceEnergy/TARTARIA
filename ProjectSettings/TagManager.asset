@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Player
   - Building
+  - Enemy
+  - NPC
   layers:
   - Default
   - TransparentFX
@@ -16,10 +18,10 @@ TagManager:
   - 
   - 
   - Building
-  - 
-  - 
-  - 
-  - 
+  - Interactable
+  - Player
+  - Trigger
+  - Enemy
   - 
   - 
   - 

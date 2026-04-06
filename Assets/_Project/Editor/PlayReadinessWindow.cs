@@ -257,6 +257,75 @@ namespace Tartaria.Editor
             CheckComponentInScene<Audio.AudioManager>("AudioManager");
             CheckComponentInScene<UI.UIManager>("UIManager");
             CheckComponentInScene<UI.HUDController>("HUDController");
+
+            // ─── Wiring Checks ────────────────────────
+            CheckWiring();
+        }
+
+        void CheckWiring()
+        {
+            // PlayerSpawner has prefab
+            var spawner = Object.FindFirstObjectByType<Integration.PlayerSpawner>();
+            if (spawner != null)
+            {
+                var so = new SerializedObject(spawner);
+                var prefabProp = so.FindProperty("playerPrefab");
+                bool hasPrefab = prefabProp != null && prefabProp.objectReferenceValue != null;
+                Add("PlayerSpawner.playerPrefab", hasPrefab,
+                    hasPrefab ? "Wired" : "NULL — run Wire Scene References");
+            }
+
+            // QuestManager has quest database
+            var qm = Object.FindFirstObjectByType<Integration.QuestManager>();
+            if (qm != null)
+            {
+                var so = new SerializedObject(qm);
+                var dbProp = so.FindProperty("questDatabase");
+                int count = dbProp != null ? dbProp.arraySize : 0;
+                Add($"QuestManager.questDatabase ({count})", count > 0,
+                    count > 0 ? $"{count} quests" : "EMPTY — run Wire Scene References");
+            }
+
+            // GameLoopController has refs wired
+            var glc = Object.FindFirstObjectByType<Integration.GameLoopController>();
+            if (glc != null)
+            {
+                var so = new SerializedObject(glc);
+                var piProp = so.FindProperty("playerInput");
+                bool hasPI = piProp != null && piProp.objectReferenceValue != null;
+                Add("GameLoopController.playerInput", hasPI,
+                    hasPI ? "Wired" : "NULL — RuntimeGlueBridge wires at runtime");
+
+                var ccProp = so.FindProperty("cameraController");
+                bool hasCC = ccProp != null && ccProp.objectReferenceValue != null;
+                Add("GameLoopController.cameraController", hasCC,
+                    hasCC ? "Wired" : "NULL — RuntimeGlueBridge wires at runtime");
+            }
+
+            // InteractableBuildings have definitions
+            var buildings = Object.FindObjectsByType<Integration.InteractableBuilding>(FindObjectsSortMode.None);
+            int wiredBuildings = 0;
+            foreach (var b in buildings)
+            {
+                var so = new SerializedObject(b);
+                var defProp = so.FindProperty("definition");
+                if (defProp != null && defProp.objectReferenceValue != null)
+                    wiredBuildings++;
+            }
+            Add($"Building definitions wired ({wiredBuildings}/{buildings.Length})",
+                buildings.Length == 0 || wiredBuildings == buildings.Length,
+                buildings.Length == 0 ? "No buildings in scene" :
+                wiredBuildings == buildings.Length ? "All wired" : "Run Wire Scene References");
+
+            // Layers configured
+            bool hasBuildingLayer = LayerMask.NameToLayer("Building") >= 0;
+            bool hasInteractableLayer = LayerMask.NameToLayer("Interactable") >= 0;
+            bool hasPlayerLayer = LayerMask.NameToLayer("Player") >= 0;
+            Add("Physics layers configured",
+                hasBuildingLayer && hasInteractableLayer && hasPlayerLayer,
+                (hasBuildingLayer && hasInteractableLayer && hasPlayerLayer)
+                    ? "Building/Interactable/Player OK"
+                    : "Missing layers — run Wire Scene References");
         }
 
         void CheckComponentInScene<T>(string label) where T : Component

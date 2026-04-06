@@ -166,6 +166,17 @@ namespace Tartaria.Editor
                 ConfigureBuildSettings();
             });
 
+            // ── Phase 11: Scene Wiring Pass — fill all serialized references ──
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+            {
+                BuildReport.RunPhase("Phase 11/12: Scene Wiring Pass", () =>
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    SceneWiringPass.WireAll();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+
             // ── Finalize ──
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
