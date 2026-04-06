@@ -1006,6 +1006,8 @@ namespace Tartaria.Integration
             if (_ecsReady)
                 ResonanceEventHelper.QueueBuildingRestored(_em, _rsEntity, allPerfect, allPerfect ? 1f : 0.8f);
 
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, buildingName);
+
             AdaptiveMusicController.Instance?.PlayRestoration();
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
