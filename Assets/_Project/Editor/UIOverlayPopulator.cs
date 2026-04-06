@@ -204,7 +204,7 @@ namespace Tartaria.Editor
                 tmp.fontSize = 14f;
                 tmp.color = Color.white;
                 tmp.alignment = TextAlignmentOptions.TopLeft;
-                tmp.enableWordWrapping = true;
+                tmp.textWrappingMode = TextWrappingModes.Normal;
                 tmp.raycastTarget = false;
                 var rt = go.GetComponent<RectTransform>();
                 rt.anchorMin = new Vector2(0f, 0f);
