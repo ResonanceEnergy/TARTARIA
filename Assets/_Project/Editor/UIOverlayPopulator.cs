@@ -309,7 +309,7 @@ namespace Tartaria.Editor
                 tmp.text = "Wave 1/3";
                 tmp.fontSize = 14f;
                 tmp.color = Color.white;
-                tmp.alignment = TextAlignmentOptions.TopCenter;
+                tmp.alignment = TextAlignmentOptions.Top;
                 tmp.raycastTarget = false;
                 StretchFill(go);
                 var rt = go.GetComponent<RectTransform>();
@@ -321,7 +321,7 @@ namespace Tartaria.Editor
                 tmp.text = "4 remaining";
                 tmp.fontSize = 12f;
                 tmp.color = new Color(0.7f, 0.7f, 0.7f);
-                tmp.alignment = TextAlignmentOptions.BottomCenter;
+                tmp.alignment = TextAlignmentOptions.Bottom;
                 tmp.raycastTarget = false;
                 StretchFill(go);
                 var rt = go.GetComponent<RectTransform>();
