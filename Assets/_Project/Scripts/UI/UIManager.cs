@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Audio;
 
 namespace Tartaria.UI
 {
@@ -116,9 +117,15 @@ namespace Tartaria.UI
             var state = GameStateManager.Instance;
             if (state == null) return;
             if (state.CurrentState == GameState.Paused)
+            {
                 state.ReturnToPrevious();
+                AudioManager.Instance?.PlaySFX2D("UIClose");
+            }
             else if (state.IsPlaying)
+            {
                 state.TransitionTo(GameState.Paused);
+                AudioManager.Instance?.PlaySFX2D("UIOpen");
+            }
         }
 
         public void ShowDialogue(string speaker, string text, Sprite portrait = null)
@@ -139,6 +146,7 @@ namespace Tartaria.UI
         {
             _aetherVisionActive = !_aetherVisionActive;
             SetPanelActive(aetherVisionOverlay, _aetherVisionActive);
+            AudioManager.Instance?.PlaySFX2D(_aetherVisionActive ? "AetherVisionOn" : "AetherVisionOff");
         }
 
         public void ShowSaveIndicator()
@@ -148,6 +156,7 @@ namespace Tartaria.UI
                 saveIndicator.SetActive(true);
                 _saveIndicatorTimer = saveIndicatorDuration;
             }
+            AudioManager.Instance?.PlaySFX2D("SaveConfirm");
         }
 
         public void UpdateLoadingProgress(float progress, string tip = null)

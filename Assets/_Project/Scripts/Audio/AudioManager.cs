@@ -33,6 +33,7 @@ namespace Tartaria.Audio
 
             InitializeSFXPool();
             InitializeTonePool();
+            ProceduralSFXLibrary.Initialize();
         }
 
         void OnDestroy()
@@ -162,6 +163,27 @@ namespace Tartaria.Audio
             }
             if (clip != null)
                 PlaySFX2D(clip, volume);
+        }
+
+        // ─── Procedural SFX by Name ──────────────────
+
+        /// <summary>
+        /// Plays a named procedural SFX at a world position (3D spatial).
+        /// Names: Footstep, Interact, Discovery, ResonancePulse, CombatHit, etc.
+        /// </summary>
+        public void PlaySFX(string name, Vector3 position, float volume = 1.0f)
+        {
+            var clip = ProceduralSFXLibrary.Get(name);
+            if (clip != null) PlaySFX(clip, position, volume);
+        }
+
+        /// <summary>
+        /// Plays a named procedural SFX as 2D (non-spatial, for UI/feedback).
+        /// </summary>
+        public void PlaySFX2D(string name, float volume = 1.0f)
+        {
+            var clip = ProceduralSFXLibrary.Get(name);
+            if (clip != null) PlaySFX2D(clip, volume);
         }
 
         AudioSource GetNextPooledSource()

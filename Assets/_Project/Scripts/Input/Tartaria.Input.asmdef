@@ -3,6 +3,7 @@
     "rootNamespace": "Tartaria.Input",
     "references": [
         "Tartaria.Core",
+        "Tartaria.Audio",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],

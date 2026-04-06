@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Core;
+using Tartaria.Audio;
 
 #if ENABLE_INPUT_SYSTEM
 using Pointer = UnityEngine.InputSystem.Pointer;
@@ -39,6 +40,7 @@ namespace Tartaria.Input
         Vector3 _velocity;
         Vector2 _moveInput;
         bool _isSprinting;
+        float _footstepTimer;
 
         // Input actions (bound from InputActionAsset)
         InputAction _moveAction;
@@ -158,6 +160,14 @@ namespace Tartaria.Input
                 float speed = moveSpeed * (_isSprinting ? sprintMultiplier : 1f);
                 _controller.Move(MoveDirection * speed * Time.deltaTime);
 
+                // Footstep SFX (throttled)
+                _footstepTimer -= Time.deltaTime;
+                if (_footstepTimer <= 0f)
+                {
+                    _footstepTimer = _isSprinting ? 0.28f : 0.42f;
+                    AudioManager.Instance?.PlaySFX(_isSprinting ? "FootstepSprint" : "Footstep", transform.position, 0.35f);
+                }
+
                 // Rotate toward movement direction
                 if (MoveDirection != Vector3.zero)
                 {
@@ -197,6 +207,7 @@ namespace Tartaria.Input
         {
             if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
             AetherVisionActive = !AetherVisionActive;
+            AudioManager.Instance?.PlaySFX2D(AetherVisionActive ? "AetherVisionOn" : "AetherVisionOff");
             GameEvents.FireToggleAetherVision();
         }
 
@@ -240,6 +251,7 @@ namespace Tartaria.Input
                     if (dist <= interactRadius)
                     {
                         interactable.Interact(gameObject);
+                        AudioManager.Instance?.PlaySFX("Interact", hit.point, 0.5f);
                     }
                 }
             }

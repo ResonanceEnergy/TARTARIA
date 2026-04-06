@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.UI;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -90,6 +91,7 @@ namespace Tartaria.Integration
             {
                 DialogueManager.Instance?.PlayContextDialogue("quest_start");
                 HUDController.Instance?.ShowInteractionPrompt($"New Quest: {def.displayName}");
+                AudioManager.Instance?.PlaySFX2D("QuestAccept");
             }
 
             Debug.Log($"[QuestManager] Quest activated: {questId}");
@@ -239,6 +241,7 @@ namespace Tartaria.Integration
 
                 DialogueManager.Instance?.PlayContextDialogue("quest_complete");
                 HUDController.Instance?.ShowInteractionPrompt($"Quest Complete: {def.displayName}");
+                AudioManager.Instance?.PlaySFX2D("QuestComplete");
                 Debug.Log($"[QuestManager] Quest completed: {questId} (+{def.rsReward} RS)");
 
                 // Activate follow-up quests
