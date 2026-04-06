@@ -210,6 +210,18 @@ namespace Tartaria.Editor
             var uiScene = AssetDatabase.LoadAssetAtPath<SceneAsset>(
                 "Assets/_Project/Scenes/UI_Overlay.unity");
             Add("UI Overlay scene", uiScene != null, uiScene != null ? "OK" : "MISSING");
+
+            // Check Logitech controller support script exists
+            bool hasLogitech = AssetExists("Assets/_Project/Scripts/Input/LogitechControllerSupport.cs");
+            Add("Logitech controller support", hasLogitech,
+                hasLogitech ? "F310/F510/F710 DirectInput" : "MISSING");
+
+            // Check InputActionsFactory includes CameraLook + CameraZoom
+            var factoryAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(
+                "Assets/_Project/Editor/InputActionsFactory.cs");
+            bool hasCameraActions = factoryAsset != null && factoryAsset.text.Contains("CameraLook");
+            Add("Gamepad camera actions", hasCameraActions,
+                hasCameraActions ? "CameraLook + CameraZoom" : "Rebuild input actions");
         }
 
         // ─── Build Settings ───────────────────────────
