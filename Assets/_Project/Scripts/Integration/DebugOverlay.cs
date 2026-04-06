@@ -23,7 +23,7 @@ namespace Tartaria.Integration
     public class DebugOverlay : MonoBehaviour
     {
         [SerializeField, Tooltip("Show debug overlay when scene loads")] bool showOnStart;
-[SerializeField, Tooltip("Key to toggle debug overlay visibility")] KeyCode toggleKey = KeyCode.F1;
+
 
         bool _visible;
         float _fps;
@@ -66,9 +66,6 @@ namespace Tartaria.Integration
         void Update()
         {
             if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
-                _visible = !_visible;
-            // Legacy Input fallback (configurable toggleKey)
-            if (UnityEngine.Input.GetKeyDown(toggleKey))
                 _visible = !_visible;
 
             // FPS calculation
