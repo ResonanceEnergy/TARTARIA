@@ -28,7 +28,9 @@ namespace Tartaria.Integration
     /// </summary>
     public class DebugCheatConsole : MonoBehaviour
     {
+        #pragma warning disable CS0414 // used inside #if !UNITY_EDITOR
         [SerializeField] bool enabledInBuilds = false;
+        #pragma warning restore CS0414
 
         bool _visible;
         string _input = "";
