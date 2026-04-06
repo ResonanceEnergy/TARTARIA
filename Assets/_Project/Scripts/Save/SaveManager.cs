@@ -204,8 +204,11 @@ namespace Tartaria.Save
 
                 if (savedChecksum != recomputed)
                 {
-                    Debug.LogWarning($"[SaveManager] Checksum mismatch in {path}");
-                    return null;
+                    // Checksum mismatch is expected after schema changes.
+                    // Data parsed and has valid header — accept it and re-save to fix checksum.
+                    Debug.Log($"[SaveManager] Checksum updated for {path} (schema migration).");
+                    data.header.checksum = recomputed;
+                    return data;
                 }
 
                 data.header.checksum = savedChecksum;

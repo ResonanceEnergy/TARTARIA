@@ -134,10 +134,13 @@ namespace Tartaria.Integration
         /// </summary>
         public void ProgressByType(QuestObjectiveType type, string targetId = null, int amount = 1)
         {
-            foreach (var kvp in _questStates)
+            // Snapshot keys — ProgressObjective/CompleteQuest/ActivateQuest modify _questStates
+            var snapshot = new List<string>(_questStates.Keys);
+            foreach (var questId in snapshot)
             {
-                if (kvp.Value.status != QuestStatus.Active) continue;
-                if (!_questLookup.TryGetValue(kvp.Key, out var def)) continue;
+                if (!_questStates.TryGetValue(questId, out var state)) continue;
+                if (state.status != QuestStatus.Active) continue;
+                if (!_questLookup.TryGetValue(questId, out var def)) continue;
                 if (def.objectives == null) continue;
 
                 for (int i = 0; i < def.objectives.Length; i++)
@@ -147,7 +150,7 @@ namespace Tartaria.Integration
                         def.objectives[i].targetId != targetId)
                         continue;
 
-                    ProgressObjective(kvp.Key, i, amount);
+                    ProgressObjective(questId, i, amount);
                 }
             }
         }
