@@ -5,6 +5,7 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -162,6 +163,7 @@ namespace Tartaria.Integration
             // Haptic feedback
             AdvanceCombo();
             HapticFeedbackManager.Instance?.PlayCombatHit();
+            AudioManager.Instance?.PlaySFX("ResonancePulse", playerPos);
 
             // VFX
             VFXController.Instance?.PlayResonancePulse(playerPos, pulseRange);
@@ -179,6 +181,7 @@ namespace Tartaria.Integration
 
             AdvanceCombo();
             HapticFeedbackManager.Instance?.PlayCombatHit();
+            AudioManager.Instance?.PlaySFX("HarmonicStrike", playerPos);
             VFXController.Instance?.PlayHarmonicStrike(playerPos, forward);
         }
 
@@ -197,6 +200,7 @@ namespace Tartaria.Integration
             }
 
             VFXController.Instance?.PlayShieldActivation(GetPlayerPosition());
+            AudioManager.Instance?.PlaySFX("ShieldActivate", GetPlayerPosition());
         }
 
         // ─── Enemy Monitoring ────────────────────────
@@ -246,6 +250,7 @@ namespace Tartaria.Integration
                 // Death feedback for any enemy kill (including the last one)
                 HapticFeedbackManager.Instance?.PlayGolemDeath();
                 VFXController.Instance?.PlayEnemyDissolution(deathPos);
+                AudioManager.Instance?.PlaySFX("EnemyDeath", deathPos);
             }
 
             _activeEnemyCount = count;

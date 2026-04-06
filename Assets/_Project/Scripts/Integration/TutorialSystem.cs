@@ -4,6 +4,7 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.UI;
 using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -126,6 +127,7 @@ namespace Tartaria.Integration
         {
             _tutorialFinished = true;
             HUDController.Instance?.HideInteractionPrompt();
+            AudioManager.Instance?.PlaySFX2D("TutorialDone");
             OnTutorialComplete?.Invoke();
         }
 
@@ -341,6 +343,7 @@ namespace Tartaria.Integration
                     : Vector3.zero);
 
             OnStepCompleted?.Invoke(stepDef.step);
+            AudioManager.Instance?.PlaySFX2D("TutorialStep");
 
             _state = TutorialState.Celebrating;
             _celebrationTimer = celebrationDuration;

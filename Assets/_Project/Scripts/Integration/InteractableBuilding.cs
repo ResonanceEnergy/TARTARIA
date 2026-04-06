@@ -3,6 +3,7 @@ using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Gameplay;
 using Tartaria.UI;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -178,6 +179,7 @@ namespace Tartaria.Integration
             if (_state == BuildingRestorationState.Buried)
             {
                 _state = BuildingRestorationState.Revealed;
+                AudioManager.Instance?.PlaySFX("BuildingReveal", transform.position);
                 UpdateVisuals();
             }
 
@@ -223,6 +225,7 @@ namespace Tartaria.Integration
 
             string tier = TuningMiniGameController.GetAccuracyTier(accuracy);
             Debug.Log($"[Building] {GetDisplayName()} node {_nodesCompleted}/3 complete — {tier} ({accuracy:P0})");
+            AudioManager.Instance?.PlaySFX("TuneSuccess", transform.position);
 
             // Notify game loop
             GameLoopController.Instance?.OnTuningNodeComplete(buildingId, _nodesCompleted - 1, accuracy);
@@ -242,6 +245,7 @@ namespace Tartaria.Integration
         void OnTuningFailed()
         {
             Debug.Log($"[Building] {GetDisplayName()} tuning failed -- retry available");
+            AudioManager.Instance?.PlaySFX("TuneFail", transform.position);
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
             DialogueManager.Instance?.PlayContextDialogue("tuning_fail");
         }
@@ -295,6 +299,7 @@ namespace Tartaria.Integration
         void CompleteRestoration()
         {
             _state = BuildingRestorationState.Active;
+            AudioManager.Instance?.PlaySFX("BuildingActive", transform.position);
             UpdateVisuals();
 
             // Register building for passive income

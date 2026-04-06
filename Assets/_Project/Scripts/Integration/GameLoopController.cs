@@ -952,6 +952,7 @@ namespace Tartaria.Integration
             // Audio + Haptics
             AdaptiveMusicController.Instance?.PlayDiscovery();
             HapticFeedbackManager.Instance?.PlayDiscovery();
+            AudioManager.Instance?.PlaySFX("Discovery", position);
 
             // Camera close-up (suppress during scene-load grace period to prevent snap-back)
             if (Time.time - _sceneLoadTime > DISCOVERY_GRACE_PERIOD)
@@ -1010,6 +1011,7 @@ namespace Tartaria.Integration
 
             AdaptiveMusicController.Instance?.PlayRestoration();
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            AudioManager.Instance?.PlaySFX("Emergence", position);
 
             // Cinematic reveal
             cameraController?.FocusOnPoint(position, 5f);
@@ -1043,6 +1045,7 @@ namespace Tartaria.Integration
 
             HapticFeedbackManager.Instance?.PlayGolemDeath();
             VFXController.Instance?.PlayEnemyDissolution(position);
+            AudioManager.Instance?.PlaySFX("EnemyDeath", position);
             DialogueManager.Instance?.PlayContextDialogue("combat_victory");
 
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.DefeatEnemies);
