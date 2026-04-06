@@ -6,10 +6,10 @@ using System.IO;
 namespace Tartaria.Editor
 {
     /// <summary>
-    /// Creates the TartariaInputActions.inputactions asset with all 8 player actions
+    /// Creates the TartariaInputActions.inputactions asset with all 10 player actions
     /// bound to keyboard/mouse + gamepad. Idempotent — skips if asset already exists.
     ///
-    /// Actions (matching PlayerInputHandler.SetupInputActions):
+    /// Actions (matching PlayerInputHandler / CameraController):
     ///   Move (Vector2)       — WASD / Left Stick
     ///   Sprint (Button)      — Shift / Left Stick Press
     ///   Interact (Button)    — E / South Button (A)
@@ -18,6 +18,8 @@ namespace Tartaria.Editor
     ///   FrequencyShield      — Q / Left Shoulder
     ///   AetherVision         — Tab / Right Trigger
     ///   Pause                — Escape / Start
+    ///   CameraLook (Vector2) — Mouse Delta / Right Stick
+    ///   CameraZoom (Axis)    — Scroll Y / D-Pad Y
     /// </summary>
     public static class InputActionsFactory
     {
@@ -118,6 +120,24 @@ namespace Tartaria.Editor
                     ""type"": 0,
                     ""id"": ""c7b8d9e0-1f2a-3b4c-5d6e-f7a8b9c0d1e2"",
                     ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""CameraLook"",
+                    ""type"": 1,
+                    ""id"": ""d8e9f0a1-2b3c-4d5e-6f7a-8b9c0d1e2f3a"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CameraZoom"",
+                    ""type"": 0,
+                    ""id"": ""e9f0a1b2-3c4d-5e6f-7a8b-9c0d1e2f3a4b"",
+                    ""expectedControlType"": ""Axis"",
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
@@ -352,6 +372,50 @@ namespace Tartaria.Editor
                     ""processors"": """",
                     ""groups"": ""Gamepad"",
                     ""action"": ""Pause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""90a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5"",
+                    ""path"": ""<Gamepad>/rightStick"",
+                    ""interactions"": """",
+                    ""processors"": ""StickDeadzone(min=0.15)"",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""CameraLook"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a0a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5"",
+                    ""path"": ""<Mouse>/scroll/y"",
+                    ""interactions"": """",
+                    ""processors"": ""Normalize(min=-120,max=120)"",
+                    ""groups"": ""Keyboard"",
+                    ""action"": ""CameraZoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a1a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5"",
+                    ""path"": ""<Gamepad>/dpad/y"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""CameraZoom"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a2a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5"",
+                    ""path"": ""<Gamepad>/rightShoulder"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Gamepad"",
+                    ""action"": ""CameraZoom"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }

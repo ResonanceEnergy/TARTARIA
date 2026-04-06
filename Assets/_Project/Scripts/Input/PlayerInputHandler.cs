@@ -238,10 +238,16 @@ namespace Tartaria.Input
         {
             if (_mainCamera == null) return;
 
-            Vector2 pointerPos = Pointer.current != null
-                ? Pointer.current.position.ReadValue()
-                : new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-            Ray ray = _mainCamera.ScreenPointToRay(pointerPos);
+            // Gamepad: cast from screen center (no pointer); Mouse: cast from pointer
+            Vector2 screenPos;
+            if (Gamepad.current != null && (Pointer.current == null || !Pointer.current.press.isPressed))
+                screenPos = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+            else if (Pointer.current != null)
+                screenPos = Pointer.current.position.ReadValue();
+            else
+                screenPos = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+
+            Ray ray = _mainCamera.ScreenPointToRay(screenPos);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, interactableLayer))
             {
                 var interactable = hit.collider.GetComponent<IInteractable>();
@@ -252,7 +258,34 @@ namespace Tartaria.Input
                     {
                         interactable.Interact(gameObject);
                         AudioManager.Instance?.PlaySFX("Interact", hit.point, 0.5f);
+                        return;
                     }
+                }
+            }
+
+            // Gamepad fallback: proximity sphere-cast for nearest interactable
+            if (Gamepad.current != null)
+            {
+                Collider[] nearby = Physics.OverlapSphere(transform.position, interactRadius, interactableLayer);
+                float bestDist = float.MaxValue;
+                IInteractable bestTarget = null;
+                Vector3 bestPos = Vector3.zero;
+                foreach (var col in nearby)
+                {
+                    var target = col.GetComponent<IInteractable>();
+                    if (target == null) continue;
+                    float d = Vector3.Distance(transform.position, col.transform.position);
+                    if (d < bestDist)
+                    {
+                        bestDist = d;
+                        bestTarget = target;
+                        bestPos = col.transform.position;
+                    }
+                }
+                if (bestTarget != null)
+                {
+                    bestTarget.Interact(gameObject);
+                    AudioManager.Instance?.PlaySFX("Interact", bestPos, 0.5f);
                 }
             }
         }

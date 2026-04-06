@@ -43,6 +43,8 @@ namespace Tartaria.Camera
         [SerializeField, Tooltip("Minimum allowed zoom distance")] float zoomMin = 5f;
         [SerializeField, Tooltip("Maximum allowed zoom distance")] float zoomMax = 25f;
         [SerializeField, Tooltip("Camera orbit rotation speed (degrees/sec)")] float orbitSpeed = 120f;
+        [SerializeField, Tooltip("Gamepad right-stick orbit sensitivity")] float gamepadOrbitSpeed = 150f;
+        [SerializeField, Tooltip("Gamepad zoom speed (D-pad / right shoulder)")] float gamepadZoomSpeed = 8f;
         [SerializeField, Tooltip("Camera movement interpolation speed")] float smoothSpeed = 8f;
 
         UnityEngine.Camera _camera;
@@ -164,6 +166,29 @@ namespace Tartaria.Camera
                     _currentYaw -= orbitSpeed * Time.deltaTime;
                 if (keyboard.eKey.isPressed)
                     _currentYaw += orbitSpeed * Time.deltaTime;
+            }
+
+            // Gamepad right stick = orbit (read from PlayerInputHandler action map)
+            var gamepad = Gamepad.current;
+            if (gamepad != null)
+            {
+                Vector2 rightStick = gamepad.rightStick.ReadValue();
+                if (rightStick.sqrMagnitude > 0.02f)
+                {
+                    _currentYaw += rightStick.x * gamepadOrbitSpeed * Time.deltaTime;
+                    // Right stick Y adjusts pitch within bounds
+                    _currentPitch = Mathf.Clamp(
+                        _currentPitch - rightStick.y * gamepadOrbitSpeed * 0.5f * Time.deltaTime,
+                        20f, 80f);
+                }
+
+                // D-pad Y / right shoulder = zoom
+                float dpadY = gamepad.dpad.y.ReadValue();
+                if (Mathf.Abs(dpadY) > 0.1f)
+                {
+                    _zoomOffset -= dpadY * gamepadZoomSpeed * Time.deltaTime;
+                    _zoomOffset = Mathf.Clamp(_zoomOffset, zoomMin - exploreDistance, zoomMax - exploreDistance);
+                }
             }
         }
 
