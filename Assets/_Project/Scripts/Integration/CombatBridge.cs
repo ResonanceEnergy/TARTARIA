@@ -444,7 +444,8 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
-            if (_enemyQueryCreated) { _enemyQuery.Dispose(); _enemyQueryCreated = false; }
+            bool worldAlive = _world != null && _world.IsCreated;
+            if (_enemyQueryCreated && worldAlive) { _enemyQuery.Dispose(); _enemyQueryCreated = false; }
             if (_initialized && _world != null && _world.IsCreated && _em.Exists(_playerCombatEntity))
                 _em.DestroyEntity(_playerCombatEntity);
             if (Instance == this) Instance = null;
