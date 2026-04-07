@@ -25,7 +25,7 @@ namespace Tartaria.Integration
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-50)] // Run before most MonoBehaviours
-    public class GameLoopController : MonoBehaviour, IGameLoopService
+    public class GameLoopController : ECSMonoBehaviour, IGameLoopService
     {
         public static GameLoopController Instance { get; private set; }
 
@@ -388,13 +388,10 @@ namespace Tartaria.Integration
             playerInput.OnFrequencyShield += HandleFrequencyShield;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
             StopAllCoroutines();
             if (Instance == this) Instance = null;
-            bool worldAlive = _ecsWorld != null && _ecsWorld.IsCreated;
-            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
-            if (_playerQueryCreated && worldAlive) { _playerQuery.Dispose(); _playerQueryCreated = false; }
 
             GameEvents.OnRequestActivateRSBuff -= HandleRequestActivateRSBuff;
             if (GameStateManager.Instance != null)
@@ -586,6 +583,7 @@ namespace Tartaria.Integration
                 BellTowerSyncMiniGame.Instance.OnTowerDesynced -= HandleTowerDesynced;
                 BellTowerSyncMiniGame.Instance.OnResonanceScoreChanged -= HandleBellTowerRSChanged;
             }
+            base.OnDestroy();
         }
 
         void InitECS()
@@ -599,11 +597,13 @@ namespace Tartaria.Integration
             {
                 _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
                 _rsQueryCreated = true;
+                TrackQuery(_rsQuery, _ecsWorld);
             }
             if (!_playerQueryCreated)
             {
                 _playerQuery = _em.CreateEntityQuery(typeof(PlayerTag), typeof(LocalTransform));
                 _playerQueryCreated = true;
+                TrackQuery(_playerQuery, _ecsWorld);
             }
 
             // Find ResonanceScore singleton

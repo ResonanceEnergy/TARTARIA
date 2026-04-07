@@ -177,6 +177,14 @@ namespace Tartaria.Editor
                 });
             }
 
+            // ── Phase 12: Scene Validation — forbidden component check ──
+            BuildReport.RunPhase("Phase 12/12: Scene Validation", () =>
+            {
+                int violations = SceneValidator.ValidateAll();
+                if (violations > 0)
+                    throw new System.Exception($"SceneValidator found {violations} forbidden component(s). See errors above.");
+            });
+
             // ── Finalize ──
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

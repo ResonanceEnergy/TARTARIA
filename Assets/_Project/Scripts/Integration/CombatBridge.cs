@@ -18,7 +18,7 @@ namespace Tartaria.Integration
     /// Attack actions queue DamageEvents on nearby enemy entities.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CombatBridge : MonoBehaviour
+    public class CombatBridge : ECSMonoBehaviour
     {
         public static CombatBridge Instance { get; private set; }
 
@@ -91,6 +91,7 @@ namespace Tartaria.Integration
             // Cache enemy query for reuse in MonitorEnemies/DamageNearbyEnemies/DamageEnemiesInCone
             _enemyQuery = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
             _enemyQueryCreated = true;
+            TrackQuery(_enemyQuery, _world);
 
             // Cache player transform
             var playerObj = GameObject.FindWithTag("Player");
@@ -123,6 +124,7 @@ namespace Tartaria.Integration
             {
                 _enemyQuery = _em.CreateEntityQuery(typeof(EnemyTag), typeof(HarmonicCombatant), typeof(LocalTransform));
                 _enemyQueryCreated = true;
+                TrackQuery(_enemyQuery, _world);
             }
 
             // Update cooldown timers
@@ -442,13 +444,13 @@ namespace Tartaria.Integration
 
         public float CorruptionResistance => _corruptionResistance;
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
             bool worldAlive = _world != null && _world.IsCreated;
-            if (_enemyQueryCreated && worldAlive) { _enemyQuery.Dispose(); _enemyQueryCreated = false; }
-            if (_initialized && _world != null && _world.IsCreated && _em.Exists(_playerCombatEntity))
+            if (_initialized && worldAlive && _em.Exists(_playerCombatEntity))
                 _em.DestroyEntity(_playerCombatEntity);
             if (Instance == this) Instance = null;
+            base.OnDestroy();
         }
     }
 }

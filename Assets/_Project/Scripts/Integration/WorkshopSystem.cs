@@ -22,7 +22,7 @@ namespace Tartaria.Integration
     ///   Tier 5: Perfected (max output, requires RS 100 + all buildings Tier 4)
     /// </summary>
     [DisallowMultipleComponent]
-    public class WorkshopSystem : MonoBehaviour
+    public class WorkshopSystem : ECSMonoBehaviour
     {
         public static WorkshopSystem Instance { get; private set; }
 
@@ -50,11 +50,10 @@ namespace Tartaria.Integration
                 upgradeTiers = CreateDefaultTiers();
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            bool worldAlive = _ecsWorld != null && _ecsWorld.IsCreated;
-            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
             if (Instance == this) Instance = null;
+            base.OnDestroy();
         }
 
         // ─── Public API ──────────────────────────────
@@ -178,6 +177,7 @@ namespace Tartaria.Integration
                 _em = _ecsWorld.EntityManager;
                 _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
                 _rsQueryCreated = true;
+                TrackQuery(_rsQuery, _ecsWorld);
             }
             if (!_rsQueryCreated || _rsQuery.CalculateEntityCount() == 0) return 0f;
             return _em.GetComponentData<ResonanceScore>(_rsQuery.GetSingletonEntity()).CurrentRS;
