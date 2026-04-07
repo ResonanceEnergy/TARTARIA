@@ -35,6 +35,7 @@ namespace Tartaria.Editor
         {
             int wired = 0;
             wired += EnsureLayers();
+            wired += WirePlayerPrefabInputActions();
             wired += WirePlayerSpawner();
             wired += WireQuestManager();
             wired += WireInteractableBuildings();
@@ -74,6 +75,44 @@ namespace Tartaria.Editor
 
             prop.stringValue = name;
             tagManager.ApplyModifiedProperties();
+            return 1;
+        }
+
+        // ─── Player Prefab InputActions ─────────────
+
+        static int WirePlayerPrefabInputActions()
+        {
+            string prefabPath = $"{PrefabsPath}/Characters/Player.prefab";
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(prefabPath);
+            if (prefab == null) return 0;
+
+            var pih = prefab.GetComponent<PlayerInputHandler>();
+            if (pih == null) return 0;
+
+            // Check via SerializedObject if already wired
+            var check = new SerializedObject(pih);
+            var checkProp = check.FindProperty("inputActions");
+            if (checkProp == null || checkProp.objectReferenceValue != null) return 0;
+
+            var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                InputActionsFactory.AssetPath);
+            if (inputAsset == null) return 0;
+
+            // Must use PrefabUtility to persist changes into the prefab asset
+            var contents = PrefabUtility.LoadPrefabContents(prefabPath);
+            var handler = contents.GetComponent<PlayerInputHandler>();
+            if (handler != null)
+            {
+                var so = new SerializedObject(handler);
+                var prop = so.FindProperty("inputActions");
+                if (prop != null)
+                {
+                    prop.objectReferenceValue = inputAsset;
+                    so.ApplyModifiedProperties();
+                }
+            }
+            PrefabUtility.SaveAsPrefabAsset(contents, prefabPath);
+            PrefabUtility.UnloadPrefabContents(contents);
             return 1;
         }
 
@@ -343,13 +382,28 @@ namespace Tartaria.Editor
                 n++;
             }
 
-            // Wire PlayerInputHandler interactable layer mask to include Building layer
+            // Wire PlayerInputHandler on scene player instance
             if (player != null)
             {
                 var handler = player.GetComponent<PlayerInputHandler>();
                 if (handler != null)
                 {
                     var so = new SerializedObject(handler);
+
+                    // Wire inputActions if null
+                    var inputProp = so.FindProperty("inputActions");
+                    if (inputProp != null && inputProp.objectReferenceValue == null)
+                    {
+                        var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                            InputActionsFactory.AssetPath);
+                        if (inputAsset != null)
+                        {
+                            inputProp.objectReferenceValue = inputAsset;
+                            so.ApplyModifiedProperties();
+                            n++;
+                        }
+                    }
+
                     var layerProp = so.FindProperty("interactableLayer");
                     if (layerProp != null)
                     {

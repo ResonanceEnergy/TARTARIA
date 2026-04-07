@@ -54,6 +54,24 @@ namespace Tartaria.Integration
             var instance = Instantiate(playerPrefab, transform.position + spawnOffset, Quaternion.identity);
             instance.name = "Player";
             instance.tag = "Player";
+
+            // Ensure PlayerInputHandler has inputActions (safety net if prefab reference is missing)
+            if (inputActions != null)
+            {
+                var handler = instance.GetComponent<Input.PlayerInputHandler>();
+                if (handler != null)
+                {
+                    var field = typeof(Input.PlayerInputHandler).GetField("inputActions",
+                        System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                    if (field != null && field.GetValue(handler) == null)
+                    {
+                        field.SetValue(handler, inputActions);
+                        handler.enabled = false;
+                        handler.enabled = true; // Re-trigger OnEnable → SetupInputActions
+                    }
+                }
+            }
+
             DontDestroyOnLoad(instance);
             _spawned = true;
             Debug.Log($"[PlayerSpawner] Player spawned at {instance.transform.position}");

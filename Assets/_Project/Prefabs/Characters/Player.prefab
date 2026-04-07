@@ -430,7 +430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 05fce6928f67f0a40af9265384088e4d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tartaria.Input::Tartaria.Input.PlayerInputHandler
-  inputActions: {fileID: 0}
+  inputActions: {fileID: -944628639613478452, guid: 73c6ae0651cdf2b49abd31611293157c, type: 3}
   moveSpeed: 6
   sprintMultiplier: 1.6
   rotationSpeed: 720
