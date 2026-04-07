@@ -209,7 +209,7 @@ namespace Tartaria.Core
     ///   - Connection to CorruptionSystem for severing/repair
     ///   - Debug overlay visualization
     /// </summary>
-    public class LeyLineManager : UnityEngine.MonoBehaviour
+    public class LeyLineManager : ECSMonoBehaviour
     {
         public static LeyLineManager Instance { get; private set; }
 
@@ -244,6 +244,7 @@ namespace Tartaria.Core
             {
                 _leyLineQuery = em.CreateEntityQuery(typeof(LeyLineProximity), typeof(PlayerTag));
                 _leyLineQueryCreated = true;
+                TrackQuery(_leyLineQuery, world);
             }
             if (_leyLineQuery.CalculateEntityCount() == 0) return 1f;
 
@@ -258,10 +259,10 @@ namespace Tartaria.Core
             Instance = this;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            if (_leyLineQueryCreated) { _leyLineQuery.Dispose(); _leyLineQueryCreated = false; }
             if (Instance == this) Instance = null;
+            base.OnDestroy();
         }
 
         /// <summary>

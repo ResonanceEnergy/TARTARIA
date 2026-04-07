@@ -20,7 +20,7 @@ namespace Tartaria.Integration
     /// Uses IMGUI for zero-dependency rendering (no Canvas/TMP required).
     /// Editor and Development builds only.
     /// </summary>
-    public class DebugOverlay : MonoBehaviour
+    public class DebugOverlay : ECSMonoBehaviour
     {
         [SerializeField, Tooltip("Show debug overlay when scene loads")] bool showOnStart;
 
@@ -63,10 +63,9 @@ namespace Tartaria.Integration
             if (playerObj != null) _cachedPlayer = playerObj.transform;
         }
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            bool worldAlive = _world != null && _world.IsCreated;
-            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
+            base.OnDestroy();
         }
 
         void Update()
@@ -88,11 +87,12 @@ namespace Tartaria.Integration
             if (!_ecsReady)
             {
                 _world = World.DefaultGameObjectInjectionWorld;
-                if (_world != null)
+                if (_world != null && !_rsQueryCreated)
                 {
                     _em = _world.EntityManager;
                     _rsQuery = _em.CreateEntityQuery(typeof(ResonanceScore));
                     _rsQueryCreated = true;
+                    TrackQuery(_rsQuery, _world);
                 }
                 if (_rsQueryCreated && _rsQuery.CalculateEntityCount() > 0)
                 {

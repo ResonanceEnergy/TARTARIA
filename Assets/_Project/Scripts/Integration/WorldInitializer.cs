@@ -19,7 +19,7 @@ namespace Tartaria.Integration
     /// </summary>
     [DisallowMultipleComponent]
     [DefaultExecutionOrder(-90)] // After GameBootstrap (-100), before GameLoopController (-50)
-    public class WorldInitializer : MonoBehaviour
+    public class WorldInitializer : ECSMonoBehaviour
     {
         [Header("Companion Spawn")]
         [SerializeField] Vector3 companionOffset = new(2f, 0f, -1f);
@@ -38,11 +38,9 @@ namespace Tartaria.Integration
         EntityQuery _rsQuery;
         bool _rsQueryCreated;
 
-        void OnDestroy()
+        protected override void OnDestroy()
         {
-            var world = World.DefaultGameObjectInjectionWorld;
-            bool worldAlive = world != null && world.IsCreated;
-            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
+            base.OnDestroy();
         }
 
         void Update()
@@ -59,6 +57,7 @@ namespace Tartaria.Integration
             {
                 _rsQuery = em.CreateEntityQuery(typeof(ResonanceScore));
                 _rsQueryCreated = true;
+                TrackQuery(_rsQuery, world);
             }
             if (_rsQuery.CalculateEntityCount() == 0) return;
 
