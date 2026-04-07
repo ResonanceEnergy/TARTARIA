@@ -106,8 +106,9 @@ namespace Tartaria.Core
             }
             else
             {
-                Canary("FAILED to load gameplay scene");
-                Debug.LogError($"[SceneLoader] Failed to load scene: {gameplayScene}");
+                Canary("FAILED to load gameplay scene — aborting");
+                Debug.LogError($"[SceneLoader] CRITICAL: Scene not found: {gameplayScene}. Aborting load.");
+                yield break;
             }
 
             // Load UI overlay additively
@@ -125,8 +126,9 @@ namespace Tartaria.Core
             }
             else
             {
-                Canary("UI overlay scene not found");
-                Debug.LogWarning($"[SceneLoader] UI overlay scene not found: {uiOverlayScene}");
+                Canary("UI overlay scene not found — aborting");
+                Debug.LogError($"[SceneLoader] CRITICAL: Scene not found: {uiOverlayScene}. Aborting load.");
+                yield break;
             }
 
             // Minimum loading time
@@ -142,6 +144,9 @@ namespace Tartaria.Core
             var bootCam = GameObject.Find("BootCamera");
             if (bootCam != null)
             {
+                // Destroy the Boot AudioListener before deactivating so it can't win the FindObjectsByType race
+                var bootListener = bootCam.GetComponent<AudioListener>();
+                if (bootListener != null) Destroy(bootListener);
                 bootCam.SetActive(false);
                 Debug.Log("[SceneLoader] Disabled BootCamera — CameraRig takes over.");
             }
@@ -150,8 +155,23 @@ namespace Tartaria.Core
             var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
             if (listeners.Length > 1)
             {
-                for (int i = 1; i < listeners.Length; i++)
-                    Destroy(listeners[i]);
+                // Keep the one on the active main camera; destroy the rest
+                var mainCam = UnityEngine.Camera.main;
+                AudioListener kept = null;
+                foreach (var listener in listeners)
+                {
+                    if (kept == null && mainCam != null && listener.gameObject == mainCam.gameObject)
+                    {
+                        kept = listener;
+                        continue;
+                    }
+                    if (kept == null && listener.isActiveAndEnabled)
+                    {
+                        kept = listener;
+                        continue;
+                    }
+                    Destroy(listener);
+                }
                 Debug.Log($"[SceneLoader] Removed {listeners.Length - 1} duplicate AudioListener(s).");
             }
             else if (listeners.Length == 0)
