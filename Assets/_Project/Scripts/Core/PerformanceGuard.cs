@@ -33,12 +33,15 @@ namespace Tartaria.Core
         [Header("Monitoring")]
         [SerializeField, Min(10), Tooltip("Frames to average for performance stats")] int sampleWindowFrames = 120;
         [SerializeField, Min(1f), Tooltip("Seconds between budget-exceeded alerts")] float alertCooldownSeconds = 10f;
+        [SerializeField, Min(0f), Tooltip("Seconds to ignore violations at startup")] float warmupSeconds = 3f;
+        [SerializeField, Min(0f), Tooltip("Extra ms tolerance above target before alerting")] float toleranceMs = 2f;
 
         // Frame time tracking
         float[] _frameTimes;
         int _frameIndex;
         int _sampleCount;
         float _alertCooldown;
+        float _warmupTimer;
 
         // Per-system profiler markers
         static readonly ProfilerMarker s_markerAether = new("Tartaria.AetherField");
@@ -104,12 +107,20 @@ namespace Tartaria.Core
             // Track worst
             if (frameMs > _worstFrameMs) _worstFrameMs = frameMs;
 
+            // Warmup grace — ignore violations during startup
+            if (_warmupTimer < warmupSeconds)
+            {
+                _warmupTimer += Time.unscaledDeltaTime;
+                return;
+            }
+
             // Tick alert cooldown regardless of budget status
             if (_alertCooldown > 0f)
                 _alertCooldown -= Time.unscaledDeltaTime;
 
-            // Budget check
-            if (frameMs > targetFrameTimeMs)
+            // Budget check (with tolerance margin)
+            float alertThreshold = targetFrameTimeMs + toleranceMs;
+            if (frameMs > alertThreshold)
             {
                 _budgetExceededCount++;
 
