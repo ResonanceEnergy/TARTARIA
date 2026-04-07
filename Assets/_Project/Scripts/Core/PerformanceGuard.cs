@@ -197,6 +197,11 @@ namespace Tartaria.Core
             CheckBudget("AI", _lastAIMs, aiBudgetMs, ref culprit, ref worstBudgetRatio);
             CheckBudget("Corruption", _lastCorruptionMs, corruptionBudgetMs, ref culprit, ref worstBudgetRatio);
 
+            // When no system has reported timing, only log extreme spikes (>3x target)
+            // to avoid noise from editor jitter, GC, and scene loads
+            if (worstBudgetRatio <= 0f && frameMs < targetFrameTimeMs * 3f)
+                return;
+
             Debug.LogWarning(
                 $"[PerfGuard] Frame budget exceeded: {frameMs:F1}ms " +
                 $"(target {targetFrameTimeMs:F1}ms). Primary offender: {culprit}");
