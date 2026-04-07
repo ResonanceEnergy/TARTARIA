@@ -97,12 +97,7 @@ namespace Tartaria.Integration
                 GameStateManager.Instance.OnStateChanged += OnGameStateChanged;
 
             // Wire player combat events → CombatBridge
-            if (playerInput != null)
-            {
-                playerInput.OnResonancePulse += HandleResonancePulse;
-                playerInput.OnHarmonicStrike += HandleHarmonicStrike;
-                playerInput.OnFrequencyShield += HandleFrequencyShield;
-            }
+            BindCombatEvents();
 
             // Wire save events for subsystem sync
             if (SaveManager.Instance != null)
@@ -373,6 +368,24 @@ namespace Tartaria.Integration
 
             // Deferred ECS init (world may not be ready in Awake)
             InitECS();
+        }
+
+        /// <summary>
+        /// Subscribe combat events from playerInput. Safe to call multiple times
+        /// (idempotent — unsubscribes before subscribing to prevent doubles).
+        /// Called from Start() and from RuntimeGlueBridge after late-wiring.
+        /// </summary>
+        public void BindCombatEvents()
+        {
+            if (playerInput == null) return;
+            // Unsubscribe first to prevent doubles
+            playerInput.OnResonancePulse -= HandleResonancePulse;
+            playerInput.OnHarmonicStrike -= HandleHarmonicStrike;
+            playerInput.OnFrequencyShield -= HandleFrequencyShield;
+            // Subscribe
+            playerInput.OnResonancePulse += HandleResonancePulse;
+            playerInput.OnHarmonicStrike += HandleHarmonicStrike;
+            playerInput.OnFrequencyShield += HandleFrequencyShield;
         }
 
         void OnDestroy()

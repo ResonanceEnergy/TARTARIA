@@ -136,7 +136,7 @@ namespace Tartaria.Camera
 
         void HandleInput()
         {
-            if (GameStateManager.Instance.IsPaused) return;
+            if (GameStateManager.Instance == null || GameStateManager.Instance.IsPaused) return;
 
             var mouse = Mouse.current;
             var keyboard = Keyboard.current;

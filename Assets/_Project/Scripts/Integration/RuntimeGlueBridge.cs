@@ -62,6 +62,7 @@ namespace Tartaria.Integration
                     if (handler != null)
                     {
                         piField.SetValue(glc, handler);
+                        glc.BindCombatEvents();
                         Log($"Wired GameLoopController.playerInput -> {player.name}");
                     }
                 }
