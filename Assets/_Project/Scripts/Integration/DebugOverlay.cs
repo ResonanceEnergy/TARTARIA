@@ -63,6 +63,12 @@ namespace Tartaria.Integration
             if (playerObj != null) _cachedPlayer = playerObj.transform;
         }
 
+        void OnDestroy()
+        {
+            bool worldAlive = _world != null && _world.IsCreated;
+            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
+        }
+
         void Update()
         {
             if (Keyboard.current != null && Keyboard.current.f1Key.wasPressedThisFrame)
