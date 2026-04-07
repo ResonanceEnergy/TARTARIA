@@ -254,10 +254,7 @@ namespace Tartaria.Editor
             // === GameManagers (root) ===
             var managersGO = new GameObject("--- GAME MANAGERS ---");
 
-            // GameBootstrap
-            var bootstrapGO = new GameObject("GameBootstrap");
-            bootstrapGO.transform.SetParent(managersGO.transform);
-            bootstrapGO.AddComponent<Core.GameBootstrap>();
+            // GameBootstrap lives in Boot.unity only — do NOT add to gameplay scene
 
             // GameLoopController (central orchestrator)
             var loopGO = new GameObject("GameLoopController");
@@ -334,10 +331,7 @@ namespace Tartaria.Editor
             buildingSpawnerGO.transform.SetParent(managersGO.transform);
             buildingSpawnerGO.AddComponent<BuildingSpawner>();
 
-            // SceneLoader (async scene loading after boot)
-            var sceneLoaderGO = new GameObject("SceneLoader");
-            sceneLoaderGO.transform.SetParent(managersGO.transform);
-            sceneLoaderGO.AddComponent<Core.SceneLoader>();
+            // SceneLoader lives in Boot.unity only — do NOT add to gameplay scene
 
             // === Player ===
             var playerGO = CreatePlayer();
