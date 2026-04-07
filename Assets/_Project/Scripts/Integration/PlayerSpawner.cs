@@ -102,7 +102,12 @@ namespace Tartaria.Integration
                 // Use reflection to set private serialized field at runtime
                 var field = typeof(Input.PlayerInputHandler).GetField("inputActions",
                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (field != null) field.SetValue(handler, inputActions);
+                if (field != null)
+                {
+                    field.SetValue(handler, inputActions);
+                    handler.enabled = false;
+                    handler.enabled = true; // Re-trigger OnEnable → SetupInputActions
+                }
             }
 
             DontDestroyOnLoad(player);
