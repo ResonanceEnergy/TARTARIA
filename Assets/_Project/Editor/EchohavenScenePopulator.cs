@@ -78,13 +78,12 @@ namespace Tartaria.Editor
                 n++;
             }
 
-            if (Object.FindFirstObjectByType<Tartaria.Core.SceneLoader>() == null)
-            {
-                var go = new GameObject("SceneLoader");
-                go.transform.SetParent(parent);
-                go.AddComponent<Tartaria.Core.SceneLoader>();
-                n++;
-            }
+            // SceneLoader and GameBootstrap live in Boot.unity only — do NOT scaffold here.
+            // Clean up any duplicates left by earlier builds.
+            foreach (var dup in Object.FindObjectsByType<Tartaria.Core.SceneLoader>(FindObjectsSortMode.None))
+                Object.DestroyImmediate(dup.gameObject);
+            foreach (var dup in Object.FindObjectsByType<Tartaria.Core.GameBootstrap>(FindObjectsSortMode.None))
+                Object.DestroyImmediate(dup.gameObject);
 
             return n;
         }
