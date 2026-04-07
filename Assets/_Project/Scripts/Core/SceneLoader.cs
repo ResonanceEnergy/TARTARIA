@@ -42,14 +42,18 @@ namespace Tartaria.Core
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+            Application.quitting += () => _quitting = true;
         }
+
+        bool _quitting;
 
         void OnDestroy()
         {
             StopAllCoroutines();
             if (Instance == this)
             {
-                Debug.LogWarning("[SceneLoader] Instance destroyed -- coroutines will stop!");
+                if (!_quitting)
+                    Debug.LogWarning("[SceneLoader] Instance destroyed -- coroutines will stop!");
                 Instance = null;
             }
         }
