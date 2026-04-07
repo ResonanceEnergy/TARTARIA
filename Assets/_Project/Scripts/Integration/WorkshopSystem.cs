@@ -52,7 +52,8 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
-            if (_rsQueryCreated) _rsQuery.Dispose();
+            bool worldAlive = _ecsWorld != null && _ecsWorld.IsCreated;
+            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
             if (Instance == this) Instance = null;
         }
 

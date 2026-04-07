@@ -79,9 +79,11 @@ namespace Tartaria.Core
             var configQuery = em.CreateEntityQuery(typeof(AetherFieldConfig));
             if (configQuery.CalculateEntityCount() > 0)
             {
+                configQuery.Dispose();
                 Debug.Log("[Tartaria] ECS world already initialized — skipping duplicate creation.");
                 return true;
             }
+            configQuery.Dispose();
 
             // Create Aether field configuration singleton
             var configEntity = em.CreateEntity();

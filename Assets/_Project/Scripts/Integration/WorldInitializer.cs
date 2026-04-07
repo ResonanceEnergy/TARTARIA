@@ -38,6 +38,13 @@ namespace Tartaria.Integration
         EntityQuery _rsQuery;
         bool _rsQueryCreated;
 
+        void OnDestroy()
+        {
+            var world = World.DefaultGameObjectInjectionWorld;
+            bool worldAlive = world != null && world.IsCreated;
+            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
+        }
+
         void Update()
         {
             if (_initialized) return;
