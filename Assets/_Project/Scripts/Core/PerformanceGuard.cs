@@ -34,7 +34,7 @@ namespace Tartaria.Core
         [SerializeField, Min(10), Tooltip("Frames to average for performance stats")] int sampleWindowFrames = 120;
         [SerializeField, Min(1f), Tooltip("Seconds between budget-exceeded alerts")] float alertCooldownSeconds = 10f;
         [SerializeField, Min(0f), Tooltip("Seconds to ignore violations at startup")] float warmupSeconds = 3f;
-        [SerializeField, Min(0f), Tooltip("Extra ms tolerance above target before alerting")] float toleranceMs = 2f;
+        [SerializeField, Min(0f), Tooltip("Extra ms tolerance above target before alerting")] float toleranceMs = 4f;
 
         // Frame time tracking
         float[] _frameTimes;
