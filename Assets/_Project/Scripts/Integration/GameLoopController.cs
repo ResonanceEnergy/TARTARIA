@@ -392,8 +392,9 @@ namespace Tartaria.Integration
         {
             StopAllCoroutines();
             if (Instance == this) Instance = null;
-            if (_rsQueryCreated) { _rsQuery.Dispose(); _rsQueryCreated = false; }
-            if (_playerQueryCreated) { _playerQuery.Dispose(); _playerQueryCreated = false; }
+            bool worldAlive = _ecsWorld != null && _ecsWorld.IsCreated;
+            if (_rsQueryCreated && worldAlive) { _rsQuery.Dispose(); _rsQueryCreated = false; }
+            if (_playerQueryCreated && worldAlive) { _playerQuery.Dispose(); _playerQueryCreated = false; }
 
             GameEvents.OnRequestActivateRSBuff -= HandleRequestActivateRSBuff;
             if (GameStateManager.Instance != null)
