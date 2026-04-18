@@ -165,6 +165,7 @@ namespace Tartaria.Integration
 
             _stationsDiscovered[stationIndex] = true;
             OnStationDiscovered?.Invoke(stationIndex);
+            SaveManager.Instance?.MarkDirty();
             Debug.Log($"[ContinentalRail] Station discovered: {stationIndex}");
         }
 
@@ -197,6 +198,8 @@ namespace Tartaria.Integration
 
             GameLoopController.Instance?.QueueRSReward(RSRewardPerSegment, "rail_segment");
             OnSegmentRestored?.Invoke(fromStation, toStation);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, "rail_segment");
+            Audio.AudioManager.Instance?.PlaySFX2D("RailSegmentRestored");
 
             Debug.Log($"[ContinentalRail] Segment restored: {fromStation} → {toStation}");
 
@@ -218,6 +221,7 @@ namespace Tartaria.Integration
                 seg.corruptionLevel = 0f;
                 _segmentsRestored++;
                 CheckNetworkComplete();
+                SaveManager.Instance?.MarkDirty();
             }
         }
 
@@ -240,6 +244,7 @@ namespace Tartaria.Integration
             _trainActive = true;
 
             OnTrainDeparted?.Invoke(fromStation, toStation);
+            Audio.AudioManager.Instance?.PlaySFX2D("TrainDeparted");
             Debug.Log($"[ContinentalRail] Train departed: {fromStation} → {toStation} ({path.Count} stops)");
             return true;
         }
@@ -327,6 +332,7 @@ namespace Tartaria.Integration
                 _trainActive = false;
                 _trainCurrentStation = _trainTargetStation;
                 OnTrainArrived?.Invoke(_trainCurrentStation);
+                Audio.AudioManager.Instance?.PlaySFX2D("TrainArrived");
 
                 // Zone transition
                 ZoneTransitionSystem.Instance?.TransitionToZone(
@@ -371,6 +377,8 @@ namespace Tartaria.Integration
             GameLoopController.Instance?.QueueRSReward(RSRewardNetworkComplete, "rail_network_complete");
             VFXController.Instance?.SpawnContinentalTrainAurora(transform.position);
             AchievementSystem.Instance?.Unlock("E06");
+            ThorneController.Instance?.NotifyZoneSecured();
+            MiloController.Instance?.NotifyCombatVictory();
             OnNetworkComplete?.Invoke();
 
             Debug.Log("[ContinentalRail] Full network restored! Continental Aurora triggered.");

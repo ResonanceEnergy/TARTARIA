@@ -1,4 +1,5 @@
 using UnityEngine;
+using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
 
@@ -298,6 +299,7 @@ namespace Tartaria.Gameplay
             {
                 totalRS *= 1.618f;
                 OnTranscendentMoment?.Invoke();
+                AudioManager.Instance?.PlaySFX2D("ChoirTranscendent");
             }
 
             Debug.Log($"[ChoirHarmonics] Performance complete! Score {score:P0}, Tier {tier}, RS {totalRS:F1}");
@@ -312,6 +314,7 @@ namespace Tartaria.Gameplay
                 OnPerformanceFailed?.Invoke();
 
             OnPerformanceCompleted?.Invoke(totalRS, tier);
+            AudioManager.Instance?.PlaySFX2D("ChoirComplete");
             ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "ChoirHarmonics");
         }
     }

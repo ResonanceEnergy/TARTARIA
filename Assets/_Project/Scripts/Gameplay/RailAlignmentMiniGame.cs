@@ -80,12 +80,15 @@ namespace Tartaria.Gameplay
             GenerateGrid(config);
 
             GameStateManager.Instance?.TransitionTo(GameState.Tuning);
+            AudioManager.Instance?.PlaySFX2D("AlignmentStart");
         }
 
         public void AbortAlignment()
         {
             _isActive = false;
             OnAlignmentFailed?.Invoke();
+            AudioManager.Instance?.PlaySFX2D("AlignmentAborted");
+            HapticFeedbackManager.Instance?.StopAll();
             GameStateManager.Instance?.ReturnToPrevious();
         }
 
@@ -249,6 +252,7 @@ namespace Tartaria.Gameplay
             if (accuracy < 0.6f)
             {
                 OnAlignmentFailed?.Invoke();
+                AudioManager.Instance?.PlaySFX2D("AlignmentFailed");
             }
             else
             {
@@ -259,6 +263,7 @@ namespace Tartaria.Gameplay
                 float rsReward = baseRSReward * accuracy * multiplier;
                 AetherFieldManager.Instance?.AddResonanceScore(rsReward);
                 OnAlignmentComplete?.Invoke(accuracy);
+                HapticFeedbackManager.Instance?.PlayPerfectTune();
                 ServiceLocator.GameLoop?.OnMiniGameCompleted(rsReward, "RailAlignment");
             }
 

@@ -167,12 +167,15 @@ namespace Tartaria.Integration
 
                 float totalReward = RSRewardCompletion * _convergenceScore;
                 GameLoopController.Instance?.OnMiniGameCompleted(totalReward, "cosmic_convergence");
+                Save.SaveManager.Instance?.MarkDirty();
                 AchievementSystem.Instance?.Unlock("M06");
 
                 HUDController.Instance?.ShowInteractionPrompt(
                     $"COSMIC CONVERGENCE COMPLETE\nScore: {_convergenceScore:P0}");
+                Audio.AudioManager.Instance?.PlaySFX2D("ConvergenceComplete");
 
                 OnConvergenceComplete?.Invoke(_convergenceScore);
+                Audio.AdaptiveMusicController.Instance?.PlayRestoration();
 
                 if (_convergenceScore < 0.5f)
                     OnConvergenceFailed?.Invoke();

@@ -239,8 +239,9 @@ namespace Tartaria.Gameplay
             ServiceLocator.Lirael?.RememberOrphanTrain();
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "orphan_train");
             OnPuzzleCompleted?.Invoke(totalRS);
-            ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "OrphanTrain");
+            Audio.AudioManager.Instance?.PlaySFX2D("TrainRestored");
         }
 
         void FailPuzzle()
@@ -248,6 +249,7 @@ namespace Tartaria.Gameplay
             _isActive = false;
             Debug.Log("[OrphanTrain] Puzzle failed — time expired");
             OnPuzzleFailed?.Invoke();
+            Audio.AudioManager.Instance?.PlaySFX2D("TrainFailed");
         }
     }
 

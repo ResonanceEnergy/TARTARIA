@@ -24,7 +24,35 @@ namespace Tartaria.Editor
 
         // Retry budget: ~5 seconds of update ticks (editor usually ticks ~10/s during load)
         const int MaxRetries = 50;
+        static int _playFrameDelay = -1;
         static int _retryCount;
+
+        [InitializeOnLoadMethod]
+        static void RegisterPlayModeKick()
+        {
+            EditorApplication.update += PlayModeKicker;
+        }
+
+        static void PlayModeKicker()
+        {
+            if (_playFrameDelay < 0) return;
+            _playFrameDelay--;
+            if (_playFrameDelay <= 0)
+            {
+                EditorApplication.update -= PlayModeKicker;
+                Debug.Log("[Tartaria] PlayModeKicker firing -- isPlaying = true");
+                OneClickBuild.CloseTMPImporterWindow();
+                EditorApplication.isPlaying = true;
+                Debug.Log($"[Tartaria] isPlaying is now: {EditorApplication.isPlaying}");
+                // Focus Game View so keyboard input reaches the player
+                EditorApplication.delayCall += () =>
+                {
+                    var gameViewType = System.Type.GetType("UnityEditor.GameView,UnityEditor");
+                    if (gameViewType != null)
+                        EditorWindow.FocusWindowIfItsOpen(gameViewType);
+                };
+            }
+        }
 
         static AutoPlayBoot()
         {
@@ -158,10 +186,13 @@ namespace Tartaria.Editor
             if (!BuildReport.HasFailures)
             {
                 Debug.Log("[Tartaria] Pipeline complete -- entering Play mode on next frame");
-                EditorApplication.delayCall += () =>
-                {
-                    EditorApplication.isPlaying = true;
-                };
+
+                // Close TMP importer window — it spams "Cannot import in play mode" errors
+                OneClickBuild.CloseTMPImporterWindow();
+
+                // Schedule Play mode via update kicker (delayCall doesn't fire reliably after pipeline)
+                _playFrameDelay = 5; // wait 5 update ticks
+                Debug.Log("[Tartaria] PlayModeKicker armed -- will fire in 5 ticks");
             }
             else
             {

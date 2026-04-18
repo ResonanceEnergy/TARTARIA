@@ -92,6 +92,7 @@ namespace Tartaria.Integration
             _korathRevelationHeard = true;
             TransitionToPhase(ZerethPhase.Whispers);
             _presenceLevel = 0.2f;
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>
@@ -113,6 +114,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayLineById(responseId, voiceVolumeCurve * _presenceLevel);
             _voiceResponsesPlayed++;
             OnVoiceResponse?.Invoke(responseId);
+            Save.SaveManager.Instance?.MarkDirty();
 
             // Increase presence with each stone
             _presenceLevel = Mathf.Min(_presenceLevel + 0.08f, 0.8f);
@@ -133,6 +135,7 @@ namespace Tartaria.Integration
             // Apply dissonance aura
             VFXController.Instance?.PlayDissonancePulse(worldPosition, dissonanceRadius);
             HapticFeedbackManager.Instance?.PlayCombatHit();
+            Audio.AudioManager.Instance?.PlaySFX("DissonanceEvent", worldPosition);
 
             // Counter-narrative voice line
             string[] lines =
@@ -160,6 +163,7 @@ namespace Tartaria.Integration
             TransitionToPhase(ZerethPhase.Evidence);
 
             DialogueManager.Instance?.PlayLineById("zereth_trigger_room");
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>
@@ -178,7 +182,9 @@ namespace Tartaria.Integration
             transform.localScale = Vector3.one * 5f;
 
             OnPhysicalManifestation?.Invoke();
+            Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
             DialogueManager.Instance?.PlayLineById("zereth_manifest_final");
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Zereth] Full manifestation at the Nexus. Radiating 9-Band transcendence energy.");
         }
 
@@ -200,7 +206,10 @@ namespace Tartaria.Integration
 
                 DialogueManager.Instance?.PlayLineById("zereth_redemption");
                 OnRedemption?.Invoke();
+                AchievementSystem.Instance?.CheckZerethRedeemed();
                 OnPhaseChanged?.Invoke(ZerethPhase.Redeemed);
+                Save.SaveManager.Instance?.MarkDirty();
+                Audio.AdaptiveMusicController.Instance?.PlayRestoration();
 
                 Debug.Log("[Zereth] Redeemed. Harmony and freedom coexist.");
             }
@@ -209,6 +218,7 @@ namespace Tartaria.Integration
                 // Partial alignment — dissonance persists but weakened
                 _dissonanceIntensity = 1f - alignmentScore;
                 DialogueManager.Instance?.PlayLineById("zereth_partial_align");
+                Save.SaveManager.Instance?.MarkDirty();
             }
         }
 
@@ -228,6 +238,7 @@ namespace Tartaria.Integration
             TransitionToPhase(ZerethPhase.Confrontation);
             _presenceLevel = Mathf.Max(_presenceLevel, 0.6f);
             DialogueManager.Instance?.PlayLineById("zereth_redemption_arc_begin");
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Zereth] Redemption arc begun via player plea.");
         }
 
@@ -240,6 +251,7 @@ namespace Tartaria.Integration
             _presenceLevel = 0f;
             DialogueManager.Instance?.PlayLineById("zereth_imprisoned");
             OnPhaseChanged?.Invoke(ZerethPhase.Redeemed);
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Zereth] Imprisoned by player condemnation.");
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -123,6 +124,7 @@ namespace Tartaria.Integration
             _towerAccuracy[towerIndex] = accuracy;
 
             OnTowerTuned?.Invoke(towerIndex, accuracy);
+            Audio.AudioManager.Instance?.PlaySFX2D("TowerTuned");
         }
 
         /// <summary>
@@ -180,7 +182,10 @@ namespace Tartaria.Integration
 
                 // Sync/desync events
                 if (_towerSynced[i] && !wasSync)
+                {
                     OnTowerSynced?.Invoke(i);
+                    HapticFeedbackManager.Instance?.PlayPerfectTune();
+                }
                 else if (!_towerSynced[i] && wasSync)
                     OnTowerDesynced?.Invoke(i);
             }
@@ -211,8 +216,12 @@ namespace Tartaria.Integration
             {
                 _cascadeTriggered = true;
                 OnCascadeTriggered?.Invoke();
+                Audio.AdaptiveMusicController.Instance?.PlayRestoration();
                 QuestManager.Instance?.ProgressByType(
                     QuestObjectiveType.CompleteMiniGame, "bell_tower_sync_game");
+                GameLoopController.Instance?.OnMiniGameCompleted(_planetaryResonanceScore * 30f, "BellTowerSync");
+                Save.SaveManager.Instance?.MarkDirty();
+                HapticFeedbackManager.Instance?.PlayBuildingEmergence();
                 Debug.Log($"[BellTowerSync] PLANETARY RESONANCE CASCADE! Score: {_planetaryResonanceScore:F3}");
             }
         }

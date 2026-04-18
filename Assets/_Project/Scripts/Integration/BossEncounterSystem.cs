@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
 
@@ -261,6 +262,7 @@ namespace Tartaria.Integration
                 case BossAttackPattern.FrequencyJam:
                     // Disables tuning for 5 seconds + minor damage
                     combat?.DamagePlayer(baseDamage * 0.3f, "freq_jam");
+                    HapticFeedbackManager.Instance?.PlayGolemSpawn();
                     break;
 
                 case BossAttackPattern.LeyLineSever:
@@ -309,6 +311,8 @@ namespace Tartaria.Integration
                         _isVulnerable = true;
                         _vulnerableTimer = phase.vulnerableDuration;
                         OnBossDialogue?.Invoke("The boss staggers! Strike now!");
+                        HapticFeedbackManager.Instance?.PlayCombatHit();
+                        AudioManager.Instance?.PlayTone(528f, 0.3f);
                     }
                 }
             }
@@ -335,6 +339,8 @@ namespace Tartaria.Integration
                 // VFX burst on phase change
                 VFXController.Instance?.PlayEffect(
                     VFXEffect.HarmonicCascade, transform.position);
+                AdaptiveMusicController.Instance?.PlayZoneShift();
+                HapticFeedbackManager.Instance?.PlayGolemSpawn();
 
                 Debug.Log($"[Boss] Phase {_currentPhase + 1}: {newPhase.phaseName}");
             }
@@ -367,6 +373,16 @@ namespace Tartaria.Integration
 
             OnBossDefeated?.Invoke(result);
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.DefeatBoss, _currentBoss.bossName);
+
+            // Defeat VFX / audio / haptics
+            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position);
+            VFXController.Instance?.TriggerZoneComplete();
+            AudioManager.Instance?.PlaySFX("BossDefeat", transform.position);
+            AdaptiveMusicController.Instance?.ExitCombat();
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.BossDefeat);
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            EconomySystem.Instance?.AddCurrency(CurrencyType.AetherShards, Mathf.RoundToInt(rsReward / 5f));
+
             Debug.Log($"[Boss] {_currentBoss.bossName} DEFEATED! Score: {performanceScore:P0}, RS: {rsReward:F0}");
 
             // Restore ley lines severed during fight

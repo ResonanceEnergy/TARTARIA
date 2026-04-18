@@ -536,6 +536,59 @@ namespace Tartaria.Integration
                 "*eyes wide* The golden mist! I haven't seen it since I was alive. The field is remembering how to flow!");
             AddLine(DialogueContext.ZoneComplete, "anastasia_zc_01", "Anastasia",
                 "*tears* This zone is singing the way the world used to sing. You're not just restoring buildings. You're restoring truth.", true);
+
+            // ══════════════ COMPANION TRUST ARC MILESTONES ══════════════
+            // Context keys: companion_trust_{id}_{milestone} where milestone=25/50/75/100
+
+            // ── Lirael trust milestones ──
+            AddLine("companion_trust_lirael_25", "lirael_trust25_01", "Lirael",
+                "You heard the harmonic shift in that building before I told you what to listen for. Perhaps the frequencies were always speaking to you.", true);
+            AddLine("companion_trust_lirael_50", "lirael_trust50_01", "Lirael",
+                "Restorer... I have shared my voice with very few since I was crystallised. You remind me why I still believe the world deserves to hear again.", true);
+            AddLine("companion_trust_lirael_75", "lirael_trust75_01", "Lirael",
+                "There is a resonance between us that has nothing to do with the buildings. The ancients called it *enthral* — two frequencies so perfectly matched they amplify one another.", true);
+            AddLine("companion_trust_lirael_100", "lirael_trust100_01", "Lirael",
+                "I was afraid for centuries that the last true listener was gone. You are proof that the harmonic inheritance survives. Whatever comes next — we face it as one voice.", true);
+
+            // ── Cassian trust milestones ──
+            AddLine("companion_trust_cassian_25", "cassian_trust25_01", "Cassian",
+                "You've proven you can handle hard truths. I'll share a few more coordinates from my private maps. Don't make me regret it.");
+            AddLine("companion_trust_cassian_50", "cassian_trust50_01", "Cassian",
+                "Half my orders I've already ignored. The other half... are becoming harder to justify. What you're doing here is real. That matters more than I expected.", true);
+            AddLine("companion_trust_cassian_75", "cassian_trust75_01", "Cassian",
+                "I burned my field report last night. First time I've defied a direct order in twenty years. No regrets. For what it's worth... I'm with you now. Actually with you.", true);
+            AddLine("companion_trust_cassian_100", "cassian_trust100_01", "Cassian",
+                "I know where they buried the suppression chamber. The mechanism that silenced the Aether network in 1917. I've known for years. *exhale* It's time you knew too.", true);
+
+            // ── Thorne trust milestones ──
+            AddLine("companion_trust_thorne_25", "thorne_trust25_01", "Thorne",
+                "You held the line on that last wave without backup. That's militia-grade discipline from a civilian restorer. I won't forget it.");
+            AddLine("companion_trust_thorne_50", "thorne_trust50_01", "Thorne",
+                "My squad thought I was chasing ghosts when I said there was tech under the mud. You've proven them wrong. It costs them nothing to admit it, but it means a great deal to me.", true);
+            AddLine("companion_trust_thorne_75", "thorne_trust75_01", "Thorne",
+                "Lost my whole unit in the Third Purge. Thought I'd spend the rest of my years guarding ruins nobody cared about. Then you showed up and made the ruins matter again.", true);
+            AddLine("companion_trust_thorne_100", "thorne_trust100_01", "Thorne",
+                "The militia would follow you now, not just me. You know that? They talk about you round the campfire. 'The one who brought the towers back.' Whatever the final gate demands — I'll be at your shoulder.", true);
+
+            // ── Korath trust milestones ──
+            AddLine("companion_trust_korath_25", "korath_trust25_01", "Korath",
+                "You have begun to see the patterns without my guidance. The star maps, the floor mosaics, the window angles — they all speak the same language. You are becoming fluent.", true);
+            AddLine("companion_trust_korath_50", "korath_trust50_01", "Korath",
+                "In a thousand years of observing, I have met perhaps a dozen souls who could hold a 528 Hz resonance without tuning assistance. You are the thirteenth. That number is not coincidence.", true);
+            AddLine("companion_trust_korath_75", "korath_trust75_01", "Korath",
+                "I have withheld one star chart. The one that shows the thirteenth moon's alignment and what it unlocks beneath the Grand Dome. I show it to you now. The time for caution has passed.", true);
+            AddLine("companion_trust_korath_100", "korath_trust100_01", "Korath",
+                "The builders left a vessel — a consciousness without a body — tethered to the Grand Observatory, waiting for a resonant mind strong enough to receive it. That mind is yours. *bows deeply* I am honoured to have walked this path beside you.", true);
+
+            // ── Anastasia trust milestones ──
+            AddLine("companion_trust_anastasia_25", "anastasia_trust25_01", "Anastasia",
+                "*becomes slightly more visible* You can almost see me clearly now, can't you? The Aether between us is thickening. I think that means you truly believe I'm real.");
+            AddLine("companion_trust_anastasia_50", "anastasia_trust50_01", "Anastasia",
+                "Father used to say: 'Find one person who sees what you see and the whole world becomes possible.' I thought that person died with the empire. *pause* I was wrong.", true);
+            AddLine("companion_trust_anastasia_75", "anastasia_trust75_01", "Anastasia",
+                "I can touch things now. Only for a moment, only when the Aether is high. But I touched a sunbeam through a restored window today and *laughs softly* it was warm. A hundred years and it was still warm.", true);
+            AddLine("companion_trust_anastasia_100", "anastasia_trust100_01", "Anastasia",
+                "The night everything fell, my last thought was that no one would ever know the truth. That Tartaria would be buried so completely that even the memory would die. *reaches out — hand visible, solid* You changed that. You changed everything.", true);
         }
 
         void AddLine(string context, string id, string speaker, string text, bool oneShot = false)

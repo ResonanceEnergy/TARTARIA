@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: resonance_frequency_432
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: resonance_frequency_432
+  title: "432 Hz \u2014 The Healing Harmonic"
+  category: 1
+  summary: All old-world music, instruments, and architectural acoustic design was
+    tuned to A=432 Hz. This frequency is mathematically harmonious with natural constants
+    and the human body's own bioelectric resonance.
+  fullText: "The modern standard tuning of A=440 Hz was adopted in 1939 at the behest
+    of the Nazi Propaganda Ministry, and formalised internationally in 1953. Prior
+    to this, the universal standard \u2014 used in all recorded historical tuning
+    systems, ancient instruments, and Tartarian musical notation \u2014 was A=432
+    Hz.\r\n\r\nThe difference of 8 Hz is not arbitrary. 432 Hz is the frequency at
+    which the mathematical relationships between harmonic overtones align with fundamental
+    constants of nature: it is equal to 8 \xD7 54, where 54 is 2 \xD7 27, the number
+    of bones in the human hand. The full harmonic series from 432 Hz includes 108
+    (sacred in Vedic tradition), 216 (6\xB3, the cube), 432 itself, and 864 (432
+    \xD7 2 = diameter of the Sun in miles \xD7 1000).\r\n\r\nMore crucially, A=432
+    Hz tuning creates a sound field that is measurably in phase with the Schumann
+    resonance of the Earth's electromagnetic cavity. Water crystals exposed to 432
+    Hz form perfect hexagonal lattices. Human cells exposed to sustained 432 Hz tones
+    show increased ATP production and reduced cortisol levels. The old world tuned
+    its concert halls, healing chambers, and sacred spaces to this frequency as a
+    matter of engineering, not aesthetics.\r\n\r\nThe switch to 440 Hz was a deliberate
+    act of cultural warfare \u2014 disconnecting an entire civilisation from the
+    natural resonant frequency of the world it inhabits."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - aether_energy
+  - free_energy_towers
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: Sing at 432 and the stones remember their names. I heard my own
+    name in the choir hall, though no one spoke it.

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: tartarian_mud_flood
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: tartarian_mud_flood
+  title: The Mud Flood Reset
+  category: 0
+  summary: A cataclysmic event buried entire cities in metres of sediment. First-floor
+    windows became basement windows overnight. Thousands of buildings worldwide share
+    identical burial patterns.
+  fullText: "Perhaps no single mystery better illustrates the hidden history of the
+    old world than the phenomenon researchers call the 'mud flood'. Across every
+    continent, thousands of 19th-century buildings \u2014 particularly those with
+    Tartarian architectural features \u2014 show first-floor windows partially or
+    fully buried beneath the current ground level.\r\n\r\nCity records, insurance
+    maps, and early daguerreotypes confirm these were originally ground-floor windows
+    accessible from street level. Today they sit 1\u20133 metres below grade. The
+    soil above them shows no signs of deliberate landfill \u2014 it is uniform, fine-grained
+    sediment consistent with a rapid catastrophic deposit, not centuries of accumulated
+    dirt.\r\n\r\nIn St Petersburg alone, hundreds of palaces and public buildings
+    have their lower floors buried. The official explanation \u2014 that the city
+    was 'built on reclaimed swampland' \u2014 cannot account for the elaborate basement
+    decorations, fireplaces, and door-frames found beneath the sediment layer. Someone
+    built finished rooms at what is now basement level, then the ground rose around
+    them.\r\n\r\nSimilar patterns appear in San Francisco, Chicago, Edinburgh, Istanbul,
+    and hundreds of Central Asian cities. The event appears to have been simultaneous
+    and global \u2014 a catastrophic deposition of mud, possibly from atmospheric
+    or oceanic disturbance, that erased the lower floors of an entire civilisation
+    and provided the blank slate on which the current historical narrative was written."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_architecture
+  - tartarian_star_forts
+  unlockTrigger: restoration
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: I remember when those windows opened to daylight. We watched the
+    sun set through them.

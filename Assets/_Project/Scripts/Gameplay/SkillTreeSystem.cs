@@ -1,7 +1,9 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
+using Tartaria.Audio;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Gameplay
 {
@@ -70,6 +72,8 @@ namespace Tartaria.Gameplay
             _modifierCacheDirty = true;
             ApplySkillEffect(node);
             OnSkillUnlocked?.Invoke(id);
+            AudioManager.Instance?.PlaySFX2D("SkillUnlocked");
+            HapticFeedbackManager.Instance?.PlayDiscovery();
             return true;
         }
 

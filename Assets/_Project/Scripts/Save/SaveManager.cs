@@ -238,7 +238,7 @@ namespace Tartaria.Save
                 },
                 player = new PlayerSaveData
                 {
-                    position = new SerializableVector3(0, 0, 0),
+                    position = new SerializableVector3(10, 1, 5),
                     currentZone = "echohaven",
                     aetherCharge = 0f
                 },
@@ -353,6 +353,15 @@ namespace Tartaria.Save
                 if (data.combatWave == null) data.combatWave = new CombatWaveSaveBlock();
                 data.header.schemaVersion = 8;
                 data.header.gameVersion = "0.8.0";
+                MarkDirty();
+            }
+
+            if (data.header.schemaVersion < 9)
+            {
+                // v8 → v9: add archive unlock persistence
+                if (data.archive == null) data.archive = new ArchiveSaveBlock();
+                data.header.schemaVersion = 9;
+                data.header.gameVersion = "0.9.0";
                 MarkDirty();
             }
         }

@@ -135,6 +135,7 @@ namespace Tartaria.Integration
                 _ => CassianMood.Conflicted
             };
             OnTrustChanged?.Invoke(_trustLevel);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>
@@ -166,6 +167,7 @@ namespace Tartaria.Integration
             string intel = GenerateIntel(zoneId, isAccurate);
 
             OnIntelShared?.Invoke(intel);
+            HapticFeedbackManager.Instance?.PlayDiscovery();
             return intel;
         }
 
@@ -207,7 +209,9 @@ namespace Tartaria.Integration
             _promptDirty = true;
 
             DialogueManager.Instance?.PlayLineById("cassian_intro_01");
+            HapticFeedbackManager.Instance?.PlayDiscovery();
             AdjustTrust(5f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         void PlayLowTrustDialogue()

@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: anastasia_history
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: anastasia_history
+  title: "Princess Anastasia \u2014 The Archive Echo"
+  category: 6
+  summary: "The last daughter of the Romanov dynasty. Her survival of the 1918 execution
+    is one of history's most contested mysteries \u2014 but the deeper question is
+    what she knew about the Tartarian legacy her family had inherited."
+  fullText: "Grand Duchess Anastasia Nikolaevna Romanova, born 18 June 1901, was
+    the youngest daughter of Tsar Nicholas II of Russia. The Romanov dynasty claimed
+    rule over the largest land empire in history \u2014 a territory that encompassed
+    the heartland of the old Tartarian civilisation.\r\n\r\nWhat the official historical
+    narrative does not address is the nature of the Romanovs' custodianship. The
+    Winter Palace, the Summer Palace, the Peterhof, and hundreds of other imperial
+    residences were not built by the Romanovs. They were inherited, along with an
+    oral tradition of the buildings' original functions and a collection of documents
+    that described the aetheric technology the buildings had been designed to operate.\r\n\r\nAnastasia,
+    by multiple accounts, was the member of the family most deeply immersed in this
+    tradition. Her private journals \u2014 fragments of which survived the revolution
+    in the hands of her companion Anna Vyrubova \u2014 describe experiments she conducted
+    in the basement of the Alexander Palace involving 'resonance amplification' and
+    'frequency mapping of the local ley intersection'.\r\n\r\nWhether she survived
+    the execution at Yekaterinburg in 1918 has never been definitively resolved.
+    At least three women successfully claimed her identity in the subsequent decades.
+    The Archive contains evidence that whatever survived \u2014 her consciousness,
+    her memories, her encoded knowledge \u2014 was not lost."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_architecture
+  - free_energy_towers
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: I remember everything. That is the problem. And the gift.

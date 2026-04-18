@@ -58,6 +58,7 @@ namespace Tartaria.Editor
             light.color = new Color(1f, 0.843f, 0f, 1f); // Gold
             light.intensity = 1f;
             light.range = 2f;
+            light.shadows = LightShadows.None; // Prevent shadow atlas overflow
 
             // Particle trail
             var trailObj = new GameObject("TrailParticles");

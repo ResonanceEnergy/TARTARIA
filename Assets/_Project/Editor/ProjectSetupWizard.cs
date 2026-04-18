@@ -372,7 +372,7 @@ namespace Tartaria.Editor
             playerGO.tag = "Player";
             playerGO.layer = LayerMask.NameToLayer("Player") >= 0 ?
                 LayerMask.NameToLayer("Player") : 0;
-            playerGO.transform.position = new Vector3(0f, 1f, -20f);
+            playerGO.transform.position = new Vector3(0f, 1f, 0f);
 
             // Character controller
             var cc = playerGO.AddComponent<CharacterController>();

@@ -8,10 +8,11 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M_Skybox_Tartaria
-  m_Shader: {fileID: 4800000, guid: 884621fb2b1b15e409806f9e9fddc8ea, type: 3}
+  m_Shader: {fileID: 106, guid: 0000000000000000f000000000000000, type: 0}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
+  m_ValidKeywords:
+  - _SUNDISK_HIGH_QUALITY
   m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -29,19 +30,24 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Ints: []
     m_Floats:
+    - _AtmosphereThickness: 1
     - _CloudDensity: 0.35
     - _CloudSpeed: 0.015
     - _CorruptionAmount: 0
+    - _Exposure: 1.2
     - _RSProgress: 0.3
     - _StarDensity: 0.5
+    - _SunDisk: 2
     - _SunGlowFalloff: 12
     - _SunSize: 0.04
+    - _SunSizeConvergence: 5
     - _TimeOfDay: 0.45
     m_Colors:
     - _CorruptionTint: {r: 0.3, g: 0.15, b: 0.35, a: 1}
     - _GoldenTint: {r: 0.95, g: 0.85, b: 0.4, a: 1}
-    - _GroundColor: {r: 0.18, g: 0.15, b: 0.12, a: 1}
+    - _GroundColor: {r: 0.22, g: 0.2, b: 0.18, a: 1}
     - _HorizonColor: {r: 0.7, g: 0.58, b: 0.42, a: 1}
+    - _SkyTint: {r: 0.35, g: 0.45, b: 0.65, a: 1}
     - _SunColor: {r: 1, g: 0.85, b: 0.5, a: 1}
     - _TopColor: {r: 0.12, g: 0.2, b: 0.45, a: 1}
   m_BuildTextureStacks: []

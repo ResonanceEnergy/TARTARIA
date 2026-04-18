@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.Universal;
 
 namespace Tartaria.Editor
 {
@@ -21,7 +22,10 @@ namespace Tartaria.Editor
         public static void Populate()
         {
             int added = 0;
+            CleanDuplicateBuildingMarkers();   // Fix 13: remove stale duplicates from prior runs
             added += CreateTerrain();
+            FixupPlazaCollider();
+            FixupPlayerSpawn();
             added += CreatePlayerSpawn();
             added += CreateBuildingMarkers();
             added += CreateEnemySpawnMarkers();
@@ -29,6 +33,7 @@ namespace Tartaria.Editor
             added += CreateCameraRig();
             added += CreateBoundary();
             added += EnsureV37Managers();
+            added += CreatePostProcessing();
 
             if (added > 0)
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -78,6 +83,24 @@ namespace Tartaria.Editor
                 n++;
             }
 
+            // RuntimeHUDBuilder — creates Canvas + all HUD panels at runtime
+            if (Object.FindFirstObjectByType<Tartaria.Integration.RuntimeHUDBuilder>() == null)
+            {
+                var go = new GameObject("RuntimeHUDBuilder");
+                go.transform.SetParent(parent);
+                go.AddComponent<Tartaria.Integration.RuntimeHUDBuilder>();
+                n++;
+            }
+
+            // EchohavenContentSpawner — populates NPCs, enemies, collectibles, VFX
+            if (Object.FindFirstObjectByType<Tartaria.Integration.EchohavenContentSpawner>() == null)
+            {
+                var go = new GameObject("EchohavenContentSpawner");
+                go.transform.SetParent(parent);
+                go.AddComponent<Tartaria.Integration.EchohavenContentSpawner>();
+                n++;
+            }
+
             // SceneLoader and GameBootstrap live in Boot.unity only — do NOT scaffold here.
             // Clean up any duplicates left by earlier builds.
             foreach (var dup in Object.FindObjectsByType<Tartaria.Core.SceneLoader>(FindObjectsSortMode.None))
@@ -86,6 +109,47 @@ namespace Tartaria.Editor
                 Object.DestroyImmediate(dup.gameObject);
 
             return n;
+        }
+
+        // ─── Collider Fixup ──────────────────────────
+
+        static void FixupPlazaCollider()
+        {
+            var plaza = GameObject.Find("CentralPlaza");
+            if (plaza == null) return;
+            var capsule = plaza.GetComponent<CapsuleCollider>();
+            if (capsule == null) return;
+            Object.DestroyImmediate(capsule);
+            if (plaza.GetComponent<BoxCollider>() == null)
+                plaza.AddComponent<BoxCollider>();
+            UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+        }
+
+        // ─── Spawn Position Fixup ───────────────────
+
+        static readonly Vector3 DesiredSpawnPos = new Vector3(10f, 1f, 5f);
+
+        static void FixupPlayerSpawn()
+        {
+            var spawn = GameObject.Find("PlayerSpawn");
+            if (spawn == null) return;
+            if (Vector3.Distance(spawn.transform.position, DesiredSpawnPos) > 0.1f)
+            {
+                spawn.transform.position = DesiredSpawnPos;
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+            }
+
+            // Remove any baked Player prefab instance from the scene
+            // PlayerSpawner handles instantiation at runtime from the prefab
+            var player = GameObject.FindWithTag("Player");
+            if (player != null)
+            {
+                Object.DestroyImmediate(player);
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+            }
         }
 
         // ─── Terrain ─────────────────────────────────
@@ -120,29 +184,45 @@ namespace Tartaria.Editor
             AssignMaterial(ground, "M_Ground_Terrain");
 
             // Central plaza — slightly raised, lighter
+            // Use Cylinder visual but replace CapsuleCollider with BoxCollider.
+            // CapsuleCollider on (15, 0.1, 15) scale becomes a sphere of radius 7.5
+            // that the player slides off of. BoxCollider gives a flat walkable surface.
             var plaza = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             plaza.name = "CentralPlaza";
             plaza.transform.SetParent(parent.transform);
             plaza.transform.localPosition = new Vector3(0f, 0.05f, 0f);
             plaza.transform.localScale = new Vector3(15f, 0.1f, 15f);
             plaza.isStatic = true;
+            Object.DestroyImmediate(plaza.GetComponent<CapsuleCollider>());
+            plaza.AddComponent<BoxCollider>();
             AssignMaterial(plaza, "M_Stone_Plaza");
 
-            // Mud field markers (4 mounds at edges to imply buried structures)
-            for (int i = 0; i < 4; i++)
-            {
-                float angle = i * 90f * Mathf.Deg2Rad;
-                var mound = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                mound.name = $"MudMound_{i}";
-                mound.transform.SetParent(parent.transform);
-                mound.transform.localPosition = new Vector3(
-                    Mathf.Sin(angle) * 60f, 0.5f, Mathf.Cos(angle) * 60f);
-                mound.transform.localScale = new Vector3(8f, 2f, 8f);
-                mound.isStatic = true;
-                AssignMaterial(mound, "M_Mud_Fresh");
-            }
+            // Mud mounds near each building — visible from center, imply buried structures
+            // StarDome area (30, 0, 20) — two mounds nearby
+            PlaceMudMound(parent.transform, "MudMound_0", new Vector3(25f, 0.3f, 14f),
+                new Vector3(6f, 1.5f, 5f));
+            PlaceMudMound(parent.transform, "MudMound_1", new Vector3(35f, 0.2f, 25f),
+                new Vector3(5f, 1.2f, 6f));
+            // Fountain area (-20, 0, 35)
+            PlaceMudMound(parent.transform, "MudMound_2", new Vector3(-15f, 0.3f, 28f),
+                new Vector3(7f, 1.8f, 5f));
+            // Spire area (0, 0, -30) — visible as you orbit camera
+            PlaceMudMound(parent.transform, "MudMound_3", new Vector3(5f, 0.2f, -24f),
+                new Vector3(5f, 1.3f, 7f));
 
             return 1;
+        }
+
+        static void PlaceMudMound(Transform parent, string name, Vector3 pos, Vector3 scale)
+        {
+            if (parent.Find(name) != null) return;
+            var mound = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            mound.name = name;
+            mound.transform.SetParent(parent);
+            mound.transform.localPosition = pos;
+            mound.transform.localScale = scale;
+            mound.isStatic = true;
+            AssignMaterial(mound, "M_Mud_Fresh");
         }
 
         // ─── Player Spawn ────────────────────────────
@@ -152,7 +232,7 @@ namespace Tartaria.Editor
             if (GameObject.Find("PlayerSpawn") != null) return 0;
 
             var spawn = new GameObject("PlayerSpawn");
-            spawn.transform.position = new Vector3(0f, 1f, -20f);
+            spawn.transform.position = new Vector3(10f, 1f, 5f);
 
             // Visible marker (editor only)
             var marker = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -162,15 +242,8 @@ namespace Tartaria.Editor
             marker.transform.localScale = new Vector3(1.5f, 0.05f, 1.5f);
             AssignMaterial(marker, "M_Aether_Bright");
 
-            // Try to place player prefab
-            var playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
-                $"{PrefabsPath}/Characters/Player.prefab");
-            if (playerPrefab != null)
-            {
-                var player = (GameObject)PrefabUtility.InstantiatePrefab(playerPrefab);
-                player.transform.position = spawn.transform.position;
-                AssignInputActionsToPlayer(player);
-            }
+            // Player is NOT baked into the scene — PlayerSpawner handles instantiation at runtime
+            // This avoids position-override loss when VisualUpgradeBuilder re-saves the prefab
 
             // Try to place Milo prefab
             var miloPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(
@@ -186,6 +259,29 @@ namespace Tartaria.Editor
 
         // ─── Building Markers ────────────────────────
         // Positions match WorldInitializer.cs SerializeField defaults
+
+        /// <summary>
+        /// Fix 13: Remove duplicate building marker GameObjects accumulated from repeated
+        /// Populate() calls. Keeps only the first object found per building name.
+        /// </summary>
+        static void CleanDuplicateBuildingMarkers()
+        {
+            string[] buildingNames = { "StarDome_Placeholder", "HarmonicFountain_Placeholder", "CrystalSpire_Placeholder" };
+            foreach (var name in buildingNames)
+            {
+                var all = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);
+                var matches = new System.Collections.Generic.List<GameObject>();
+                foreach (var t in all)
+                    if (t.name == name) matches.Add(t.gameObject);
+
+                // Keep first, destroy the rest
+                for (int i = 1; i < matches.Count; i++)
+                {
+                    Debug.Log($"[EchohavenScenePopulator] Removing duplicate building marker: {name} #{i}");
+                    Object.DestroyImmediate(matches[i]);
+                }
+            }
+        }
 
         static int CreateBuildingMarkers()
         {
@@ -312,6 +408,7 @@ namespace Tartaria.Editor
             aether.color = new Color(0.2f, 0.6f, 1f);
             aether.intensity = 2f;
             aether.range = 25f;
+            aether.shadows = LightShadows.None; // Prevent shadow atlas overflow
 
             // Ambient settings
             RenderSettings.ambientMode = AmbientMode.Trilight;
@@ -388,14 +485,101 @@ namespace Tartaria.Editor
                 new(1f, 10f, 200f), new(1f, 10f, 200f)
             };
 
+            // Rocky wall tint — muted grey-brown
+            var wallShader = Shader.Find("Universal Render Pipeline/Lit");
+
             for (int i = 0; i < 4; i++)
             {
-                var wall = new GameObject($"Wall_{dirs[i]}");
+                // Visible wall: cube primitive with mesh + collider
+                var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                wall.name = $"Wall_{dirs[i]}";
                 wall.transform.SetParent(boundary.transform);
                 wall.transform.position = positions[i];
-                var bc = wall.AddComponent<BoxCollider>();
-                bc.size = scales[i];
+                wall.transform.localScale = scales[i];
+
+                // Replace default box collider (already created by CreatePrimitive)
+                // — keeps collider sized correctly via transform.localScale
+
+                // Apply a rocky boundary material
+                var mr = wall.GetComponent<MeshRenderer>();
+                if (wallShader != null)
+                {
+                    var mat = new Material(wallShader);
+                    mat.SetColor("_BaseColor", new Color(0.25f, 0.22f, 0.18f)); // dark earth/stone
+                    mr.material = mat;
+                }
             }
+
+            return 1;
+        }
+
+        // ─── Post-Processing ─────────────────────────
+
+        static int CreatePostProcessing()
+        {
+            if (GameObject.Find("PostProcessVolume") != null) return 0;
+
+            // Create a VolumeProfile with post-processing overrides
+            string profilePath = "Assets/_Project/Config/EchohavenVolumeProfile.asset";
+            var profile = AssetDatabase.LoadAssetAtPath<VolumeProfile>(profilePath);
+            if (profile == null)
+            {
+                profile = ScriptableObject.CreateInstance<VolumeProfile>();
+
+                // Bloom — makes aether glow effects pop
+                var bloom = profile.Add<Bloom>(true);
+                bloom.threshold.value = 0.9f;
+                bloom.threshold.overrideState = true;
+                bloom.intensity.value = 0.8f;
+                bloom.intensity.overrideState = true;
+                bloom.scatter.value = 0.65f;
+                bloom.scatter.overrideState = true;
+
+                // Tonemapping — ACES for cinematic look
+                var tonemap = profile.Add<Tonemapping>(true);
+                tonemap.mode.value = TonemappingMode.ACES;
+                tonemap.mode.overrideState = true;
+
+                // Color Adjustments — warm, slightly saturated
+                var colorAdj = profile.Add<ColorAdjustments>(true);
+                colorAdj.postExposure.value = 0.3f;
+                colorAdj.postExposure.overrideState = true;
+                colorAdj.contrast.value = 12f;
+                colorAdj.contrast.overrideState = true;
+                colorAdj.saturation.value = 15f;
+                colorAdj.saturation.overrideState = true;
+                colorAdj.colorFilter.value = new Color(1f, 0.97f, 0.92f); // slight warm tint
+                colorAdj.colorFilter.overrideState = true;
+
+                // Vignette — subtle edge darkening
+                var vignette = profile.Add<Vignette>(true);
+                vignette.intensity.value = 0.25f;
+                vignette.intensity.overrideState = true;
+                vignette.smoothness.value = 0.4f;
+                vignette.smoothness.overrideState = true;
+
+                // Color Curves — lift shadows slightly for atmosphere
+                var curves = profile.Add<LiftGammaGain>(true);
+                curves.lift.value = new Vector4(0.02f, 0.03f, 0.06f, 0f); // cool shadow tint
+                curves.lift.overrideState = true;
+                curves.gamma.value = new Vector4(0f, 0f, 0f, 0.05f); // slight gamma boost
+                curves.gamma.overrideState = true;
+
+                string dir = System.IO.Path.GetDirectoryName(
+                    System.IO.Path.Combine(Application.dataPath, "..", profilePath));
+                if (!System.IO.Directory.Exists(dir))
+                    System.IO.Directory.CreateDirectory(dir);
+
+                AssetDatabase.CreateAsset(profile, profilePath);
+                Debug.Log("[Tartaria] VolumeProfile created with Bloom, Tonemapping, Color, Vignette.");
+            }
+
+            // Create global Volume in scene
+            var volumeGO = new GameObject("PostProcessVolume");
+            var volume = volumeGO.AddComponent<Volume>();
+            volume.isGlobal = true;
+            volume.priority = 1f;
+            volume.profile = profile;
 
             return 1;
         }

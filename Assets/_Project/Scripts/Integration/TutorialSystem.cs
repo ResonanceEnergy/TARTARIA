@@ -32,9 +32,14 @@ namespace Tartaria.Integration
 
         readonly List<TutorialStepDef> _steps = new();
         readonly HashSet<TutorialStep> _completed = new();
+        // Tracks which steps have been SHOWN this session (not just completed)
+        // Prevents skipping steps that were force-completed before BeginStep reached them
+        readonly HashSet<TutorialStep> _shown = new();
         int _currentIndex;
         float _promptTimer;
         float _celebrationTimer;
+        float _observeTimer;           // Time in Observing state (ensures step is visible)
+        const float MinObserveTime = 2.5f; // Minimum seconds a step stays visible
         TutorialState _state = TutorialState.Idle;
         bool _tutorialFinished;
 
@@ -84,7 +89,8 @@ namespace Tartaria.Integration
                     break;
 
                 case TutorialState.Observing:
-                    if (CheckStepCondition())
+                    _observeTimer += Time.deltaTime;
+                    if (_observeTimer >= MinObserveTime && CheckStepCondition())
                     {
                         CompleteCurrentStep();
                     }
@@ -111,6 +117,7 @@ namespace Tartaria.Integration
             if (_completed.Contains(step)) return;
             _completed.Add(step);
             OnStepCompleted?.Invoke(step);
+            AudioManager.Instance?.PlaySFX2D("TutorialStep");
 
             // If this is the current step, advance
             if (_currentIndex < _steps.Count && _steps[_currentIndex].step == step)
@@ -127,6 +134,7 @@ namespace Tartaria.Integration
         {
             _tutorialFinished = true;
             HUDController.Instance?.HideInteractionPrompt();
+            HUDController.Instance?.ShowObjective(null);
             AudioManager.Instance?.PlaySFX2D("TutorialDone");
             OnTutorialComplete?.Invoke();
         }
@@ -137,6 +145,7 @@ namespace Tartaria.Integration
         public void ResetTutorial()
         {
             _completed.Clear();
+            _shown.Clear();
             _currentIndex = 0;
             _tutorialFinished = false;
             _state = TutorialState.Idle;
@@ -165,11 +174,16 @@ namespace Tartaria.Integration
         {
             if (data == null) return;
             _completed.Clear();
+            _shown.Clear();
             if (data.completedSteps != null)
             {
                 foreach (var id in data.completedSteps)
                     if (System.Enum.IsDefined(typeof(TutorialStep), id))
-                        _completed.Add((TutorialStep)id);
+                    {
+                        var ts = (TutorialStep)id;
+                        _completed.Add(ts);
+                        _shown.Add(ts); // Treat saved completed steps as already shown
+                    }
             }
             _currentIndex = data.currentIndex;
             _tutorialFinished = data.finished;
@@ -272,12 +286,15 @@ namespace Tartaria.Integration
             {
                 _tutorialFinished = true;
                 OnTutorialComplete?.Invoke();
+                Save.SaveManager.Instance?.MarkDirty();
+                AudioManager.Instance?.PlaySFX2D("TutorialComplete");
                 Debug.Log("[Tutorial] All steps complete!");
                 return;
             }
 
-            // Skip already-completed steps
-            while (index < _steps.Count && _completed.Contains(_steps[index].step))
+            // Skip already-shown (and completed) steps — don't skip merely force-completed steps
+            // that haven't been displayed yet (they need to be shown first)
+            while (index < _steps.Count && _shown.Contains(_steps[index].step))
                 index++;
 
             if (index >= _steps.Count)
@@ -295,7 +312,11 @@ namespace Tartaria.Integration
         void ShowPrompt()
         {
             var step = _steps[_currentIndex];
+            _shown.Add(step.step);  // Mark as shown — won't be skipped in future BeginStep calls
+            _observeTimer = 0f;     // Reset observe timer every time we start watching a step
             HUDController.Instance?.ShowInteractionPrompt(step.prompt);
+            // Also update persistent objective panel
+            HUDController.Instance?.ShowObjective(step.prompt);
             Debug.Log($"[Tutorial] Step {_currentIndex}: {step.step} — {step.prompt}");
         }
 

@@ -69,15 +69,23 @@ namespace Tartaria.Editor
             Check("Build settings: 3+ scenes", hasThree);
             Check("Build settings: correct order", correctOrder);
 
-            // ── Scene Managers (open Boot or Echohaven to check) ──
+            // ── Scene Managers ──
+            // Boot-only components (GameBootstrap, SceneLoader) live in Boot.unity
+            string bootPath = "Assets/_Project/Scenes/Boot.unity";
+            if (AssetExists(bootPath))
+            {
+                EditorSceneManager.OpenScene(bootPath, OpenSceneMode.Single);
+                CheckComponent<Core.GameBootstrap>("GameBootstrap");
+                CheckComponent<Core.SceneLoader>("SceneLoader");
+            }
+
+            // Gameplay components live in Echohaven
             string echoPath = "Assets/_Project/Scenes/Echohaven_VerticalSlice.unity";
             if (AssetExists(echoPath))
             {
                 EditorSceneManager.OpenScene(echoPath, OpenSceneMode.Single);
-                CheckComponent<Core.GameBootstrap>("GameBootstrap");
                 Check("GameStateManager", Core.GameStateManager.Instance != null);
                 CheckComponent<Integration.GameLoopController>("GameLoopController");
-                CheckComponent<Core.SceneLoader>("SceneLoader");
                 CheckComponent<Integration.PlayerSpawner>("PlayerSpawner");
                 CheckComponent<Integration.BuildingSpawner>("BuildingSpawner");
                 CheckComponent<Integration.TutorialSystem>("TutorialSystem");
@@ -89,7 +97,6 @@ namespace Tartaria.Editor
                 CheckComponent<Integration.RuntimeBootValidator>("RuntimeBootValidator");
 
                 // Reopen Boot scene for play
-                string bootPath = "Assets/_Project/Scenes/Boot.unity";
                 if (AssetExists(bootPath))
                     EditorSceneManager.OpenScene(bootPath, OpenSceneMode.Single);
             }

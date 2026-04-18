@@ -152,6 +152,7 @@ namespace Tartaria.Integration
             _playerTransform.position = entryPoint;
 
             HapticFeedbackManager.Instance?.PlayDiscovery();
+            Audio.AudioManager.Instance?.PlaySFX2D("MicroModeEnter");
             Debug.Log($"[MicroGiant] Entering building: {buildingId}");
             OnMicroEntered?.Invoke();
         }
@@ -180,6 +181,7 @@ namespace Tartaria.Integration
 
             Debug.Log("[MicroGiant] Exited micro mode");
             OnMicroExited?.Invoke();
+            Audio.AudioManager.Instance?.PlaySFX2D("MicroModeExit");
         }
 
         /// <summary>
@@ -247,6 +249,8 @@ namespace Tartaria.Integration
 
             // Purge corruption from parent building
             CorruptionSystem.Instance?.PurgeCorruption(_activeBuildingId, 100f);
+            Save.SaveManager.Instance?.MarkDirty();
+            Audio.AudioManager.Instance?.PlaySFX2D("MicroPurgeComplete");
 
             ExitMicroMode();
         }

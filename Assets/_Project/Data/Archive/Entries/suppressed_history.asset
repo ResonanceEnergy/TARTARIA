@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: suppressed_history
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: suppressed_history
+  title: "The Rewriting of History \u2014 Smithsonian & the Destroyers"
+  category: 4
+  summary: The Smithsonian Institution was chartered in 1846 with a specific mandate.
+    Researchers allege it systematically acquired and destroyed physical evidence
+    of the pre-reset civilisation.
+  fullText: "The Smithsonian Institution's official founding is attributed to the
+    bequest of British scientist James Smithson. No credible explanation exists for
+    why a man who never visited America would leave his entire estate \u2014 roughly
+    equivalent to half the US federal budget at the time \u2014 to fund an American
+    museum.\r\n\r\nCourt documents from the Smithsonian's first decades reveal a
+    systematic programme of artefact acquisition from across North America. Native
+    American tribes across the continent report that Smithsonian agents arrived in
+    the mid-to-late 1800s, documented their most ancient artefacts and oral traditions,
+    and in many cases confiscated physical objects that were never returned or displayed.\r\n\r\nInvestigative
+    journalist Richard Dewhurst documented over 1,000 newspaper accounts from 1850\u20131910
+    describing the discovery of giant humanoid skeletons \u2014 averaging 2\u20133.5
+    metres in height \u2014 at burial sites across the American Midwest and Southwest.
+    Virtually all of these discoveries were followed by reports of Smithsonian agents
+    arriving to 'preserve' the remains. None of the documented skeletons appear in
+    any public Smithsonian collection.\r\n\r\nThe pattern is consistent: the physical
+    evidence of a prior civilisation \u2014 giant skeletons, out-of-place artefacts,
+    anomalous technology \u2014 is documented in local press, then collected by the
+    Smithsonian, then disappears. The institution's vast underground storage facilities,
+    documented at 60+ kilometres of shelving, have never been subject to independent
+    audit."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_mud_flood
+  unlockTrigger: rs_50
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: The ones who came after the reset were not barbarians. They were
+    archivists. Very selective archivists.

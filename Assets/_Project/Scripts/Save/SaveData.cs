@@ -60,12 +60,15 @@ namespace Tartaria.Save
 
         // v8 save blocks
         public CombatWaveSaveBlock combatWave = new();
+
+        // v9 save blocks
+        public ArchiveSaveBlock archive = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 8;
+        public int schemaVersion = 9;
         public string gameVersion = "0.8.0";
         public string platform = "windows";
         public int saveSlot;
@@ -509,5 +512,16 @@ namespace Tartaria.Save
         public int currentWaveIndex;
         public int enemiesRemaining;
         public int totalWaves;
+    }
+
+    // ─── v9 Save Blocks (Archive) ─────────────────
+
+    [Serializable]
+    public class ArchiveSaveBlock
+    {
+        // Ids of entries the player has unlocked
+        public string[] unlockedEntryIds = System.Array.Empty<string>();
+        // Cumulative RS earned (used by ArchiveManager for tier unlock tracking)
+        public float cumulativeRS;
     }
 }

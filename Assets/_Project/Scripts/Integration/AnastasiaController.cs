@@ -160,7 +160,7 @@ namespace Tartaria.Integration
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             transform.SetParent(null);
-            DontDestroyOnLoad(gameObject);
+            // Do NOT call DontDestroyOnLoad — she is recreated each play session by EchohavenContentSpawner
             BuildLineIndex();
         }
 
@@ -433,6 +433,7 @@ namespace Tartaria.Integration
 
             // Drift backward if player approaches (Silent mode default)
             _zoneFirstAppearanceDone = true;
+            Audio.AudioManager.Instance?.PlaySFX("AnastasiaManifest", transform.position);
             Debug.Log("[Anastasia] First manifestation complete — Silent mode active.");
         }
 
@@ -619,6 +620,7 @@ namespace Tartaria.Integration
             TryDeliverLine($"mote_{zoneIndex}");
 
             OnMoteCollected?.Invoke(zoneIndex);
+            Audio.AudioManager.Instance?.PlaySFX("MoteCollect", transform.position);
             SaveManager.Instance?.MarkDirty();
 
             Debug.Log($"[Anastasia] Golden Mote collected: zone {zoneIndex} ({GetMotesCollectedCount()}/{totalMotes})");
@@ -685,6 +687,7 @@ namespace Tartaria.Integration
 
             // Play the footstep — the most important sound in the game
             // AudioSource.PlayClipAtPoint(solidFootstep, transform.position);
+            Audio.AudioManager.Instance?.PlaySFX("SolidFootstep", transform.position);
 
             // Deliver The Final Line
             TryDeliverLine("solidification_final");
@@ -705,6 +708,7 @@ namespace Tartaria.Integration
             _postSolidificationWarmGlow = true;
             SetSolidPhase(SolidificationPhase.Complete);
             SetMode(AnastasiaMode.Silent);
+            AchievementSystem.Instance?.CheckSolidification();
 
             // Post-solidification whisper
             TryDeliverLine("post_solidification");

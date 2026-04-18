@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
 
@@ -57,6 +58,7 @@ namespace Tartaria.Gameplay
             _traceSamples = 0;
 
             GameStateManager.Instance?.TransitionTo(GameState.Tuning);
+            AudioManager.Instance?.PlaySFX2D("TuningStart");
         }
 
         void Update()
@@ -288,6 +290,7 @@ namespace Tartaria.Gameplay
                 {
                     // Success! Return to exploration
                     OnTuningComplete?.Invoke(_accuracy);
+                    AudioManager.Instance?.PlaySFX2D("TuningComplete");
 
                     // Haptic feedback for success
                     if (HapticFeedbackManager.Instance != null)
@@ -302,6 +305,7 @@ namespace Tartaria.Gameplay
                 {
                     // Fail — reset for retry
                     OnTuningFailed?.Invoke();
+                    AudioManager.Instance?.PlaySFX2D("TuningFailed");
                 }
             }
             finally

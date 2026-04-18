@@ -648,137 +648,301 @@ namespace Tartaria.Editor
 
         static void BuildShaderMaterials()
         {
-            // TartarianStone variants
-            CreateStone("M_Stone_Weathered", new Color(0.55f, 0.50f, 0.42f),
-                0.45f, 0.3f, 0f, 0f);
-            CreateStone("M_Stone_Active", new Color(0.72f, 0.68f, 0.58f),
-                0.3f, 0.2f, 0.3f, 0.2f);
-            CreateStone("M_Stone_Golden", new Color(0.78f, 0.72f, 0.55f),
-                0.15f, 0.35f, 0.8f, 0.6f);
-            CreateStone("M_Stone_Plaza", new Color(0.60f, 0.56f, 0.48f),
-                0.5f, 0.2f, 0.1f, 0.05f);
+            // Generate procedural detail textures
+            BuildProceduralTextures();
 
-            // MudDissolution variants
-            CreateMud("M_Mud_Fresh", new Color(0.35f, 0.25f, 0.15f), 0f);
-            CreateMud("M_Mud_Cracking", new Color(0.42f, 0.32f, 0.20f), 0.4f);
-            CreateMud("M_Mud_Dissolving", new Color(0.50f, 0.38f, 0.25f), 0.7f);
+            // Stone variants — lighter, more varied palette
+            CreateStone("M_Stone_Weathered", new Color(0.62f, 0.58f, 0.50f),
+                0.45f, 0.3f, 0f, 0f, "Tex_StoneNoise");
+            CreateStone("M_Stone_Active", new Color(0.82f, 0.78f, 0.70f),
+                0.3f, 0.4f, 0.3f, 0.4f, "Tex_StoneNoise");
+            CreateStone("M_Stone_Golden", new Color(0.88f, 0.80f, 0.50f),
+                0.15f, 0.5f, 0.8f, 0.8f, "Tex_StoneNoise");
+            CreateStone("M_Stone_Plaza", new Color(0.75f, 0.72f, 0.65f),
+                0.5f, 0.3f, 0.1f, 0.05f, "Tex_StoneTile");
 
-            // AetherFlow
-            CreateAether("M_Aether_Flow", new Color(0.2f, 0.5f, 0.9f, 0.3f), 1.5f);
-            CreateAether("M_Aether_Bright", new Color(0.3f, 0.7f, 1f, 0.5f), 3f);
-            CreateAether("M_Aether_Water", new Color(0.15f, 0.4f, 0.7f, 0.4f), 0.8f);
+            // Mud variants — with organic noise
+            CreateMud("M_Mud_Fresh", new Color(0.30f, 0.20f, 0.12f), 0f);
+            CreateMud("M_Mud_Cracking", new Color(0.38f, 0.28f, 0.16f), 0.4f);
+            CreateMud("M_Mud_Dissolving", new Color(0.45f, 0.35f, 0.22f), 0.7f);
 
-            // CorruptionPulse
-            CreateCorruption("M_Corruption", new Color(0.15f, 0.05f, 0.2f, 0.7f), 1f);
+            // Aether — bright blue/cyan energy (transparent + emissive)
+            CreateAether("M_Aether_Flow", new Color(0.1f, 0.4f, 0.95f, 0.4f), 2f);
+            CreateAether("M_Aether_Bright", new Color(0.2f, 0.75f, 1f, 0.6f), 4f);
+            CreateAether("M_Aether_Water", new Color(0.05f, 0.35f, 0.7f, 0.5f), 1.2f);
 
-            // GhostOpacity for Anastasia
-            CreateGhost("M_Ghost_Anastasia", new Color(0.75f, 0.85f, 1f, 0.35f), 0.35f);
+            // Corruption (transparent dark purple)
+            CreateCorruption("M_Corruption", new Color(0.25f, 0.05f, 0.3f, 0.7f), 1.5f);
 
-            // Ground — custom stone for terrain
-            CreateStone("M_Ground_Terrain", new Color(0.38f, 0.35f, 0.28f),
-                0.65f, 0f, 0f, 0f);
+            // Ghost (transparent pale blue)
+            CreateGhost("M_Ghost_Anastasia", new Color(0.8f, 0.88f, 1f, 0.4f), 0.5f);
 
-            // Gold accents
-            CreateStone("M_Gold_Ornament", new Color(0.9f, 0.78f, 0.3f),
-                0f, 0.92f, 1f, 1.2f);
+            // Ground — green-brown terrain with spatial color map
+            CreateStone("M_Ground_Terrain", new Color(0.85f, 0.85f, 0.85f),
+                0.65f, 0.1f, 0f, 0f, "Tex_GrassNoise", 1f);
 
-            // Crystal
-            CreateAether("M_Crystal", new Color(0.7f, 0.8f, 1f, 0.6f), 2f);
+            // Gold accents — bright warm gold
+            CreateStone("M_Gold_Ornament", new Color(0.95f, 0.82f, 0.30f),
+                0f, 0.85f, 1f, 1.5f);
 
-            Debug.Log("[Tartaria] 16 shader-based materials created.");
+            // Crystal — ice blue (transparent)
+            CreateAether("M_Crystal", new Color(0.6f, 0.82f, 1f, 0.65f), 2.5f);
+
+            // Character-specific materials — more contrast, distinct colors
+            CreateStone("Player_Aether", new Color(0.25f, 0.35f, 0.55f),
+                0f, 0.65f, 0.15f, 0.6f);  // deeper blue, subtle glow
+            CreateStone("Player_Head", new Color(0.70f, 0.75f, 0.88f),
+                0f, 0.7f, 0.1f, 0.8f);    // much lighter, stands out
+            CreateStone("Player_Limbs", new Color(0.18f, 0.25f, 0.42f),
+                0f, 0.5f, 0.1f, 0.3f);    // dark, high contrast with body
+            CreateStone("Aether_Glow", new Color(0.1f, 0.55f, 1f),
+                0f, 0.3f, 0f, 3f);        // intense blue emission
+            CreateStone("Crystal_Active", new Color(0.7f, 0.9f, 1f),
+                0f, 0.8f, 0f, 2.5f);      // bright white-blue, like eyes
+            CreateStone("MudGolem_Body", new Color(0.35f, 0.25f, 0.15f),
+                0f, 0.15f, 0f, 0f, "Tex_MudNoise");
+
+            Debug.Log("[Tartaria] 22 URP/Lit materials created/refreshed.");
+        }
+
+        // ─── Procedural Texture Generation ───
+
+        static void BuildProceduralTextures()
+        {
+            GenerateNoiseTexture("Tex_StoneNoise", 256, 0.85f, 1.15f, Color.white, 8f);
+            GenerateNoiseTexture("Tex_MudNoise", 256, 0.7f, 1.0f,
+                new Color(0.9f, 0.85f, 0.8f), 5f);
+            GenerateTerrainColorMap("Tex_GrassNoise", 512, 200f);
+            GenerateTileTexture("Tex_StoneTile", 256, 8, new Color(0.9f, 0.88f, 0.85f),
+                new Color(0.6f, 0.58f, 0.55f));
+        }
+
+        static void GenerateNoiseTexture(string name, int size, float minBright,
+            float maxBright, Color tint, float noiseScale)
+        {
+            string path = $"{MatPath}/{name}.png";
+            if (File.Exists(Path.Combine(Application.dataPath, "..", path))) return;
+
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    float n = Mathf.PerlinNoise(x / noiseScale + 0.5f, y / noiseScale + 0.5f);
+                    // Add second octave for detail
+                    n += Mathf.PerlinNoise(x / (noiseScale * 0.5f) + 100f,
+                        y / (noiseScale * 0.5f) + 100f) * 0.5f;
+                    n /= 1.5f;
+                    float brightness = Mathf.Lerp(minBright, maxBright, n);
+                    tex.SetPixel(x, y, tint * brightness);
+                }
+            }
+            tex.Apply();
+            File.WriteAllBytes(Path.Combine(Application.dataPath, "..", path), tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(path);
+            // Set texture import settings
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer != null)
+            {
+                importer.wrapMode = TextureWrapMode.Repeat;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.textureCompression = TextureImporterCompression.CompressedHQ;
+                importer.SaveAndReimport();
+            }
+        }
+
+        static void GenerateTerrainColorMap(string name, int size, float terrainSize)
+        {
+            string path = $"{MatPath}/{name}.png";
+            if (File.Exists(Path.Combine(Application.dataPath, "..", path))) return;
+
+            Color grassDark = new Color(0.22f, 0.38f, 0.15f);
+            Color grassLight = new Color(0.35f, 0.52f, 0.25f);
+            Color dirtBrown = new Color(0.42f, 0.32f, 0.20f);
+            Color pathTan = new Color(0.55f, 0.48f, 0.38f);
+            Color plazaGrey = new Color(0.58f, 0.56f, 0.52f);
+
+            float half = terrainSize * 0.5f;
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true);
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    // Map pixel to world position
+                    float wx = -half + (float)x / size * terrainSize;
+                    float wz = -half + (float)y / size * terrainSize;
+                    float dist = Mathf.Sqrt(wx * wx + wz * wz);
+
+                    // Determine path
+                    float angle = Mathf.Atan2(wz, wx);
+                    float pathWave = Mathf.Abs(Mathf.Sin(angle * 2f));
+                    bool isPath = (pathWave < 0.15f && dist > 10f);
+
+                    Color c;
+                    if (dist < 12f)
+                    {
+                        // Plaza center — stone
+                        c = plazaGrey;
+                    }
+                    else if (dist < 20f)
+                    {
+                        // Plaza edge — blend to grass
+                        float t = (dist - 12f) / 8f;
+                        c = Color.Lerp(plazaGrey, grassLight, t);
+                    }
+                    else if (isPath)
+                    {
+                        c = pathTan;
+                    }
+                    else
+                    {
+                        // Grass with noise variation
+                        float n1 = Mathf.PerlinNoise(wx * 0.05f + 50f, wz * 0.05f + 50f);
+                        float n2 = Mathf.PerlinNoise(wx * 0.12f + 80f, wz * 0.12f + 80f);
+                        c = Color.Lerp(grassDark, grassLight, n1);
+                        c = Color.Lerp(c, dirtBrown, n2 * 0.35f);
+                    }
+                    // Add subtle per-pixel noise for variation
+                    float micro = Mathf.PerlinNoise(x * 0.3f + 200f, y * 0.3f + 200f);
+                    c *= Mathf.Lerp(0.9f, 1.1f, micro);
+                    c.a = 1f;
+                    tex.SetPixel(x, y, c);
+                }
+            }
+            tex.Apply();
+            File.WriteAllBytes(Path.Combine(Application.dataPath, "..", path), tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(path);
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer != null)
+            {
+                importer.wrapMode = TextureWrapMode.Clamp;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.textureCompression = TextureImporterCompression.CompressedHQ;
+                importer.SaveAndReimport();
+            }
+        }
+
+        static void GenerateTileTexture(string name, int size, int tiles,
+            Color fillColor, Color lineColor)
+        {
+            string path = $"{MatPath}/{name}.png";
+            if (File.Exists(Path.Combine(Application.dataPath, "..", path))) return;
+
+            var tex = new Texture2D(size, size, TextureFormat.RGBA32, true);
+            int tileSize = size / tiles;
+            for (int y = 0; y < size; y++)
+            {
+                for (int x = 0; x < size; x++)
+                {
+                    bool isEdge = (x % tileSize < 2) || (y % tileSize < 2);
+                    float noise = Mathf.PerlinNoise(x / 4f + 50f, y / 4f + 50f);
+                    Color c = isEdge ? lineColor : Color.Lerp(fillColor,
+                        fillColor * 0.85f, noise);
+                    tex.SetPixel(x, y, c);
+                }
+            }
+            tex.Apply();
+            File.WriteAllBytes(Path.Combine(Application.dataPath, "..", path), tex.EncodeToPNG());
+            Object.DestroyImmediate(tex);
+            AssetDatabase.ImportAsset(path);
+            var importer = AssetImporter.GetAtPath(path) as TextureImporter;
+            if (importer != null)
+            {
+                importer.wrapMode = TextureWrapMode.Repeat;
+                importer.filterMode = FilterMode.Bilinear;
+                importer.textureCompression = TextureImporterCompression.CompressedHQ;
+                importer.SaveAndReimport();
+            }
         }
 
         static void CreateStone(string name, Color baseColor,
-            float weathering, float smoothness, float goldenStr, float emissionStr)
+            float weathering, float smoothness, float goldenStr, float emissionStr,
+            string textureName = null, float textureScale = 4f)
         {
-            string path = $"{MatPath}/{name}.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
-
-            var shader = Shader.Find("Tartaria/TartarianStone");
-            if (shader == null) { Debug.LogWarning($"TartarianStone shader not found for {name}"); return; }
-
-            var mat = new Material(shader);
-            mat.name = name;
+            var mat = SetupURPMaterial(name);
+            if (mat == null) return;
             mat.SetColor("_BaseColor", baseColor);
             mat.SetFloat("_Smoothness", smoothness);
-            mat.SetFloat("_WeatheringAmount", weathering);
-            mat.SetFloat("_GoldenStrength", goldenStr);
-            mat.SetFloat("_EmissionStrength", emissionStr);
-            mat.SetFloat("_AetherPulse", 1.618f);
-            mat.SetFloat("_RestorationProgress", 1f);
-            AssetDatabase.CreateAsset(mat, path);
+            mat.SetFloat("_Metallic", goldenStr > 0.5f ? 0.6f : 0.1f);
+            if (emissionStr > 0f)
+            {
+                Color emColor = Color.Lerp(new Color(0.9f, 0.75f, 0.3f), baseColor, 0.3f) * emissionStr;
+                mat.SetColor("_EmissionColor", emColor);
+                mat.EnableKeyword("_EMISSION");
+            }
+            // Apply procedural detail texture if specified
+            if (!string.IsNullOrEmpty(textureName))
+            {
+                var tex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{MatPath}/{textureName}.png");
+                if (tex != null)
+                {
+                    mat.SetTexture("_BaseMap", tex);
+                    mat.SetTextureScale("_BaseMap", new Vector2(textureScale, textureScale));
+                }
+            }
+            EditorUtility.SetDirty(mat);
         }
 
         static void CreateMud(string name, Color baseColor, float dissolution)
         {
-            string path = $"{MatPath}/{name}.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
-
-            var shader = Shader.Find("Tartaria/MudDissolution");
-            if (shader == null) { Debug.LogWarning($"MudDissolution shader not found for {name}"); return; }
-
-            var mat = new Material(shader);
-            mat.name = name;
+            var mat = SetupURPMaterial(name);
+            if (mat == null) return;
             mat.SetColor("_BaseColor", baseColor);
-            mat.SetFloat("_DissolutionProgress", dissolution);
-            mat.SetFloat("_EdgeWidth", 0.03f);
-            mat.SetColor("_EdgeColor", new Color(0.9f, 0.75f, 0.3f));
-            mat.SetFloat("_RumbleIntensity", 0.05f);
-            AssetDatabase.CreateAsset(mat, path);
+            mat.SetFloat("_Smoothness", 0.1f);
+            mat.SetFloat("_Metallic", 0f);
+            // Apply mud noise texture for organic look
+            var tex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{MatPath}/Tex_MudNoise.png");
+            if (tex != null)
+            {
+                mat.SetTexture("_BaseMap", tex);
+                mat.SetTextureScale("_BaseMap", new Vector2(3f, 3f));
+            }
+            // Cracking/dissolving mud gets subtle emission to show energy underneath
+            if (dissolution > 0.2f)
+            {
+                Color emColor = new Color(0.6f, 0.4f, 0.1f) * dissolution * 0.5f;
+                mat.SetColor("_EmissionColor", emColor);
+                mat.EnableKeyword("_EMISSION");
+            }
+            EditorUtility.SetDirty(mat);
         }
 
         static void CreateAether(string name, Color baseColor, float intensity)
         {
-            string path = $"{MatPath}/{name}.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
-
-            var shader = Shader.Find("Tartaria/AetherFlow");
-            if (shader == null) { Debug.LogWarning($"AetherFlow shader not found for {name}"); return; }
-
-            var mat = new Material(shader);
-            mat.name = name;
+            var mat = SetupURPMaterial(name);
+            if (mat == null) return;
             mat.SetColor("_BaseColor", baseColor);
-            mat.SetFloat("_Intensity", intensity);
-            mat.SetFloat("_FlowSpeed", 1f);
-            mat.SetFloat("_PulseSpeed", 1.618f);
-            mat.SetFloat("_FresnelPower", 3f);
-            AssetDatabase.CreateAsset(mat, path);
+            SetTransparent(mat);
+            Color emColor = new Color(baseColor.r, baseColor.g, baseColor.b) * intensity;
+            mat.SetColor("_EmissionColor", emColor);
+            mat.EnableKeyword("_EMISSION");
+            EditorUtility.SetDirty(mat);
         }
 
         static void CreateCorruption(string name, Color baseColor, float intensity)
         {
-            string path = $"{MatPath}/{name}.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
-
-            var shader = Shader.Find("Tartaria/CorruptionPulse");
-            if (shader == null) { Debug.LogWarning($"CorruptionPulse shader not found for {name}"); return; }
-
-            var mat = new Material(shader);
-            mat.name = name;
+            var mat = SetupURPMaterial(name);
+            if (mat == null) return;
             mat.SetColor("_BaseColor", baseColor);
-            mat.SetFloat("_CorruptionIntensity", intensity);
-            mat.SetFloat("_PulseSpeed", 2f);
-            mat.SetFloat("_FresnelPower", 3f);
-            AssetDatabase.CreateAsset(mat, path);
+            SetTransparent(mat);
+            Color emColor = new Color(0.5f, 0.1f, 0.6f) * intensity;
+            mat.SetColor("_EmissionColor", emColor);
+            mat.EnableKeyword("_EMISSION");
+            EditorUtility.SetDirty(mat);
         }
 
         static void CreateGhost(string name, Color baseColor, float opacity)
         {
-            string path = $"{MatPath}/{name}.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null) return;
-
-            var shader = Shader.Find("Tartaria/GhostOpacity");
-            if (shader == null) { Debug.LogWarning($"GhostOpacity shader not found for {name}"); return; }
-
-            var mat = new Material(shader);
-            mat.name = name;
+            var mat = SetupURPMaterial(name);
+            if (mat == null) return;
             mat.SetColor("_BaseColor", baseColor);
-            mat.SetFloat("_Opacity", opacity);
-            mat.SetFloat("_FresnelPower", 2f);
-            mat.SetFloat("_PulseSpeed", 1f);
-            mat.SetColor("_EmissionColor", new Color(0.3f, 0.4f, 0.6f));
-            mat.SetFloat("_EmissionStrength", 0.5f);
-            AssetDatabase.CreateAsset(mat, path);
+            SetTransparent(mat);
+            Color emColor = new Color(0.3f, 0.4f, 0.6f) * 0.5f;
+            mat.SetColor("_EmissionColor", emColor);
+            mat.EnableKeyword("_EMISSION");
+            EditorUtility.SetDirty(mat);
         }
 
         // ═══════════════════════════════════════════════
@@ -788,31 +952,33 @@ namespace Tartaria.Editor
         static void BuildSkyboxMaterial()
         {
             string path = $"{MatPath}/M_Skybox_Tartaria.mat";
-            if (AssetDatabase.LoadAssetAtPath<Material>(path) != null)
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+
+            // Use built-in Skybox/Procedural for reliability
+            var shader = Shader.Find("Skybox/Procedural");
+            if (shader == null) { Debug.LogWarning("Skybox/Procedural shader not found"); return; }
+
+            if (mat == null)
             {
-                RenderSettings.skybox = AssetDatabase.LoadAssetAtPath<Material>(path);
-                return;
+                mat = new Material(shader);
+                mat.name = "M_Skybox_Tartaria";
+                AssetDatabase.CreateAsset(mat, path);
             }
-
-            var shader = Shader.Find("Tartaria/SkyGradient");
-            if (shader == null) { Debug.LogWarning("SkyGradient shader not found"); return; }
-
-            var mat = new Material(shader);
-            mat.name = "M_Skybox_Tartaria";
-            mat.SetColor("_TopColor", new Color(0.12f, 0.20f, 0.45f));
-            mat.SetColor("_HorizonColor", new Color(0.70f, 0.58f, 0.42f));
-            mat.SetColor("_GroundColor", new Color(0.18f, 0.15f, 0.12f));
-            mat.SetColor("_SunColor", new Color(1f, 0.85f, 0.5f));
+            else
+            {
+                mat.shader = shader;
+            }
+            mat.SetColor("_SkyTint", new Color(0.35f, 0.45f, 0.65f));
+            mat.SetColor("_GroundColor", new Color(0.22f, 0.20f, 0.18f));
+            mat.SetFloat("_Exposure", 1.2f);
+            mat.SetFloat("_AtmosphereThickness", 1.0f);
+            mat.SetFloat("_SunDisk", 2f); // High quality
             mat.SetFloat("_SunSize", 0.04f);
-            mat.SetFloat("_SunGlowFalloff", 12f);
-            mat.SetFloat("_CloudDensity", 0.35f);
-            mat.SetFloat("_CloudSpeed", 0.015f);
-            mat.SetFloat("_TimeOfDay", 0.45f);
-            mat.SetFloat("_RSProgress", 0.3f);
-            AssetDatabase.CreateAsset(mat, path);
+            mat.SetFloat("_SunSizeConvergence", 5f);
+            EditorUtility.SetDirty(mat);
 
             RenderSettings.skybox = mat;
-            Debug.Log("[Tartaria] Skybox assigned: Tartaria/SkyGradient.");
+            Debug.Log("[Tartaria] Skybox assigned: Skybox/Procedural.");
         }
 
         // ═══════════════════════════════════════════════
@@ -992,13 +1158,21 @@ namespace Tartaria.Editor
                 if (mr != null) mr.sharedMaterial = aetherBright;
             }
 
-            // ── Additional atmospheric lights ──
-            AddPointLight("Light_StarDome", new Vector3(30f, 6f, 20f),
-                new Color(0.9f, 0.8f, 0.3f), 4f, 20f);
-            AddPointLight("Light_Spire", new Vector3(0f, 8f, -30f),
-                new Color(0.4f, 0.6f, 1f), 3f, 15f);
-            AddPointLight("Light_Fountain", new Vector3(-20f, 2f, 35f),
-                new Color(0.2f, 0.5f, 0.8f), 2.5f, 12f);
+            // ── Upgrade Player placeholder mesh ──
+            var playerPlaceholder = GameObject.Find("PlayerMesh_Placeholder");
+            if (playerPlaceholder != null)
+            {
+                var mr = playerPlaceholder.GetComponent<MeshRenderer>();
+                if (mr != null && aetherFlow != null) mr.sharedMaterial = aetherFlow;
+            }
+
+            // ── Additional atmospheric lights (bright enough to see from spawn) ──
+            AddPointLight("Light_StarDome", new Vector3(30f, 8f, 20f),
+                new Color(0.95f, 0.85f, 0.3f), 8f, 35f);
+            AddPointLight("Light_Spire", new Vector3(0f, 12f, -30f),
+                new Color(0.4f, 0.65f, 1f), 6f, 30f);
+            AddPointLight("Light_Fountain", new Vector3(-20f, 4f, 35f),
+                new Color(0.3f, 0.6f, 0.9f), 6f, 25f);
 
             // ── Assign custom skybox ──
             var skyMat = LoadMat("M_Skybox_Tartaria");
@@ -1050,6 +1224,7 @@ namespace Tartaria.Editor
         static void AddDecoration(string name, Vector3 position, Mesh mesh, Material mat,
             Vector3 scale, Quaternion? rotation = null)
         {
+            if (mat == null) return; // Skip — no material means it would render pink
             if (GameObject.Find(name) != null) return;
 
             var go = new GameObject(name);
@@ -1098,6 +1273,43 @@ namespace Tartaria.Editor
             return AssetDatabase.LoadAssetAtPath<Material>($"{MatPath}/{name}.mat");
         }
 
+        /// <summary>
+        /// Creates or retrieves a material and forces it to use URP/Lit shader.
+        /// Always updates shader even on existing materials to fix pink/broken rendering.
+        /// </summary>
+        static Material SetupURPMaterial(string name)
+        {
+            string path = $"{MatPath}/{name}.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) { Debug.LogWarning($"[Tartaria] URP/Lit not found for {name}"); return null; }
+            if (mat == null)
+            {
+                mat = new Material(shader);
+                mat.name = name;
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            else
+            {
+                mat.shader = shader;
+            }
+            return mat;
+        }
+
+        /// <summary>
+        /// Configures a URP/Lit material for transparent rendering.
+        /// </summary>
+        static void SetTransparent(Material mat)
+        {
+            mat.SetFloat("_Surface", 1f);
+            mat.SetOverrideTag("RenderType", "Transparent");
+            mat.SetFloat("_SrcBlend", (float)UnityEngine.Rendering.BlendMode.SrcAlpha);
+            mat.SetFloat("_DstBlend", (float)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+            mat.SetFloat("_ZWrite", 0f);
+            mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+        }
+
         // ═══════════════════════════════════════════════
         //  PREFAB UPGRADE
         // ═══════════════════════════════════════════════
@@ -1106,7 +1318,9 @@ namespace Tartaria.Editor
         {
             UpgradePlayerPrefab();
             UpgradeMiloPrefab();
-            Debug.Log("[Tartaria] Character prefabs upgraded with shader materials.");
+            UpgradeMudGolemPrefab();
+            UpgradeAnastasiaPrefab();
+            Debug.Log("[Tartaria] All character prefabs upgraded with shader materials.");
         }
 
         static void UpgradePlayerPrefab()
@@ -1118,14 +1332,58 @@ namespace Tartaria.Editor
             var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
             try
             {
-                var aetherMat = LoadMat("M_Aether_Flow");
+                var playerMat = LoadMat("Player_Aether");
+                var headMat = LoadMat("Player_Head");
+                var limbMat = LoadMat("Player_Limbs");
                 var stoneMat = LoadMat("M_Stone_Active");
+                var bodyMat = playerMat != null ? playerMat : stoneMat;
+                var useLimbMat = limbMat != null ? limbMat : bodyMat;
+                var useHeadMat = headMat != null ? headMat : bodyMat;
 
-                // Body + Head get stone material
-                ApplyMatToChild(instance, "Body", stoneMat);
-                ApplyMatToChild(instance, "Head", stoneMat);
-                // AetherCore gets bright glow
-                ApplyMatToChild(instance, "AetherCore", LoadMat("M_Aether_Bright"));
+                // Body — core material (deep blue)
+                ApplyMatToChild(instance, "Body", bodyMat);
+                // Head — lighter, clearly distinct from body
+                ApplyMatToChild(instance, "Head", useHeadMat);
+                // Eyes — brilliant white-blue crystals
+                var headT = instance.transform.Find("Head");
+                if (headT != null)
+                {
+                    var crystalMat = LoadMat("Crystal_Active");
+                    var aetherGlow = LoadMat("Aether_Glow");
+                    ApplyMatToChild(headT.gameObject, "Eye_L", crystalMat);
+                    ApplyMatToChild(headT.gameObject, "Eye_R", crystalMat);
+                    ApplyMatToChild(headT.gameObject, "Visor", aetherGlow);
+                    // Add point lights in eyes for glow effect
+                    AddChildLight(headT, "Eye_L", new Color(0.4f, 0.7f, 1f), 1.5f, 2f);
+                    AddChildLight(headT, "Eye_R", new Color(0.4f, 0.7f, 1f), 1.5f, 2f);
+                }
+                // Arms + Legs — dark limbs for silhouette contrast
+                ApplyMatToChild(instance, "Arm_L", useLimbMat);
+                ApplyMatToChild(instance, "Arm_R", useLimbMat);
+                ApplyMatToChild(instance, "Leg_L", useLimbMat);
+                ApplyMatToChild(instance, "Leg_R", useLimbMat);
+                ApplyMatToChild(instance, "Foot_L", useLimbMat);
+                ApplyMatToChild(instance, "Foot_R", useLimbMat);
+                // Shoulders — warm gold accent
+                var goldMat = LoadMat("M_Gold_Ornament");
+                ApplyMatToChild(instance, "Shoulder_L", goldMat);
+                ApplyMatToChild(instance, "Shoulder_R", goldMat);
+                // Belt — gold accent
+                ApplyMatToChild(instance, "Belt", goldMat);
+                // AetherCore — very bright glow with a light source
+                var aetherBright = LoadMat("M_Aether_Bright");
+                ApplyMatToChild(instance, "AetherCore", aetherBright);
+                var coreT = instance.transform.Find("AetherCore");
+                if (coreT != null)
+                {
+                    var coreLight = coreT.gameObject.GetComponent<Light>();
+                    if (coreLight == null) coreLight = coreT.gameObject.AddComponent<Light>();
+                    coreLight.type = LightType.Point;
+                    coreLight.color = new Color(0.2f, 0.7f, 1f);
+                    coreLight.intensity = 3f;
+                    coreLight.range = 4f;
+                    coreLight.shadows = LightShadows.None;
+                }
 
                 PrefabUtility.SaveAsPrefabAsset(instance, path);
             }
@@ -1133,6 +1391,20 @@ namespace Tartaria.Editor
             {
                 Object.DestroyImmediate(instance);
             }
+        }
+
+        static void AddChildLight(Transform parent, string childName,
+            Color color, float intensity, float range)
+        {
+            var child = parent.Find(childName);
+            if (child == null) return;
+            var light = child.GetComponent<Light>();
+            if (light == null) light = child.gameObject.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.color = color;
+            light.intensity = intensity;
+            light.range = range;
+            light.shadows = LightShadows.None;
         }
 
         static void UpgradeMiloPrefab()
@@ -1156,6 +1428,81 @@ namespace Tartaria.Editor
                 }
 
                 PrefabUtility.SaveAsPrefabAsset(instance, path);
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        static void UpgradeMudGolemPrefab()
+        {
+            string path = "Assets/_Project/Prefabs/Characters/MudGolem.prefab";
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab == null) return;
+
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            try
+            {
+                var golemMat = LoadMat("MudGolem_Body");
+                var stoneMat = LoadMat("M_Stone_Active");
+                var useMat = golemMat != null ? golemMat : stoneMat;
+                var crystalMat = LoadMat("Crystal_Active");
+
+                // Apply dark earth material to all mesh renderers
+                foreach (var r in instance.GetComponentsInChildren<MeshRenderer>())
+                {
+                    if (r.gameObject.name.StartsWith("Eye_") || r.gameObject.name.Contains("Core"))
+                        r.sharedMaterial = crystalMat != null ? crystalMat : useMat;
+                    else
+                        r.sharedMaterial = useMat;
+                }
+
+                // Glowing red eyes for threat readability
+                AddChildLight(instance.transform, "Eye_L", new Color(1f, 0.3f, 0.1f), 1.2f, 2.5f);
+                AddChildLight(instance.transform, "Eye_R", new Color(1f, 0.3f, 0.1f), 1.2f, 2.5f);
+
+                PrefabUtility.SaveAsPrefabAsset(instance, path);
+                Debug.Log("[VisualUpgrade] MudGolem prefab upgraded.");
+            }
+            finally
+            {
+                Object.DestroyImmediate(instance);
+            }
+        }
+
+        static void UpgradeAnastasiaPrefab()
+        {
+            string path = "Assets/_Project/Prefabs/Characters/Anastasia.prefab";
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (prefab == null) return;
+
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
+            try
+            {
+                var ghostMat = LoadMat("M_Anastasia_Ghost");
+                var glowMat  = LoadMat("M_Anastasia_Glow");
+
+                // Apply ghost transparency to main body parts
+                foreach (var r in instance.GetComponentsInChildren<MeshRenderer>())
+                {
+                    string n = r.gameObject.name;
+                    if (n == "Crown" || n.StartsWith("Eye"))
+                        r.sharedMaterial = glowMat != null ? glowMat : ghostMat;
+                    else
+                        r.sharedMaterial = ghostMat;
+                }
+
+                // Ensure ethereal glow light has no shadows
+                var glow = instance.transform.Find("EtherealGlow");
+                if (glow != null)
+                {
+                    var l = glow.GetComponent<Light>();
+                    if (l != null) { l.shadows = LightShadows.None; l.intensity = 0.9f; l.range = 5f; }
+                }
+
+                PrefabUtility.SaveAsPrefabAsset(instance, path);
+                Debug.Log("[VisualUpgrade] Anastasia prefab upgraded.");
             }
             finally
             {

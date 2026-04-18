@@ -119,6 +119,8 @@ namespace Tartaria.Integration
                 _aetherCharge = currentAether;
                 if (_aetherCharge >= minimumAetherToActivate)
                     ActivateGiantMode();
+                else
+                    Audio.AudioManager.Instance?.PlaySFX2D("InsufficientAether");
             }
         }
 
@@ -135,6 +137,7 @@ namespace Tartaria.Integration
 
             // Haptic feedback
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            Audio.AudioManager.Instance?.PlaySFX("GiantModeActivate", playerTransform != null ? playerTransform.position : Vector3.zero);
 
             Debug.Log("[GiantMode] Activated");
             _totalActivations++;
@@ -155,6 +158,8 @@ namespace Tartaria.Integration
 
             cameraController?.SetGiantMode(false);
             CombatBridge.Instance?.SetGiantMode(false);
+            Audio.AudioManager.Instance?.PlaySFX2D("GiantModeDeactivate");
+            Save.SaveManager.Instance?.MarkDirty();
 
             Debug.Log("[GiantMode] Deactivated");
             OnGiantDeactivated?.Invoke();
@@ -182,6 +187,7 @@ namespace Tartaria.Integration
 
                     VFXController.Instance?.PlayResonancePulse(targetPoint, rockCutRange * 0.5f);
                     HapticFeedbackManager.Instance?.PlayCombatHit();
+                    Audio.AudioManager.Instance?.PlaySFX("RockCut", targetPoint);
                     break;
                 }
             }
@@ -220,6 +226,7 @@ namespace Tartaria.Integration
 
             VFXController.Instance?.PlayResonancePulse(playerTransform.position, rubbleClearRadius);
             HapticFeedbackManager.Instance?.PlayGolemDeath();
+            Audio.AudioManager.Instance?.PlaySFX("RubbleClear", playerTransform.position);
 
             Debug.Log($"[GiantMode] Rubble Clear: {cleared} objects cleared");
             _rubbleCleared += cleared;
@@ -245,6 +252,7 @@ namespace Tartaria.Integration
                 {
                     _liftedBuilding = building.transform;
                     _buildingsLifted++;
+                    Audio.AudioManager.Instance?.PlaySFX("BuildingPickup", _liftedBuilding.position);
                     Debug.Log($"[GiantMode] Lifting building: {building.BuildingId}");
                     break;
                 }
@@ -262,6 +270,8 @@ namespace Tartaria.Integration
             {
                 Debug.Log($"[GiantMode] Building placed at {_liftedBuilding.position}");
                 _liftedBuilding = null;
+                Audio.AudioManager.Instance?.PlaySFX2D("BuildingPlace");
+                Save.SaveManager.Instance?.MarkDirty();
             }
             _activeAbility = GiantAbility.None;
         }

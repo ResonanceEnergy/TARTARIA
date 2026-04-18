@@ -102,12 +102,14 @@ namespace Tartaria.UI
         {
             _isOpen = true;
             if (panelRoot != null) panelRoot.SetActive(true);
+            Audio.AudioManager.Instance?.PlaySFX2D("UIOpen");
         }
 
         public void Close()
         {
             _isOpen = false;
             if (panelRoot != null) panelRoot.SetActive(false);
+            Audio.AudioManager.Instance?.PlaySFX2D("UIClose");
         }
 
         public void Toggle()

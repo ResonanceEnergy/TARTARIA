@@ -155,6 +155,30 @@ namespace Tartaria.Editor
                 StretchFill(go);
             });
 
+            // ─── Objective Panel (top-center, persistent hint) ───
+            added += EnsurePanel(hud.transform, "ObjectivePanel",
+                new Vector2(0.5f, 1f), new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(0f, -20f), new Vector2(400f, 36f));
+            var objectivePanel = FindChild(hud.transform, "ObjectivePanel");
+            added += EnsureChild<Image>(objectivePanel.transform, "ObjBG", go =>
+            {
+                go.GetComponent<Image>().color = new Color(0.08f, 0.06f, 0.12f, 0.7f);
+                StretchFill(go);
+            });
+            added += EnsureChild<TextMeshProUGUI>(objectivePanel.transform, "ObjText", go =>
+            {
+                var tmp = go.GetComponent<TextMeshProUGUI>();
+                tmp.text = "Explore Echohaven — find the buried structures";
+                tmp.fontSize = 16f;
+                tmp.color = TutorialAmber;
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.raycastTarget = false;
+                StretchFill(go);
+                var rt = go.GetComponent<RectTransform>();
+                rt.offsetMin = new Vector2(10f, 2f);
+                rt.offsetMax = new Vector2(-10f, -2f);
+            });
+
             // ─── Dialogue Panel (bottom, wide) ───
             var dialoguePanel = FindChild(hud.transform, "DialoguePanel");
             if (dialoguePanel == null)
@@ -600,6 +624,10 @@ namespace Tartaria.Editor
             SetRef(so, "moonTrophyPanel", trophyPanel?.GetComponent<RectTransform>());
             SetRef(so, "moonTrophyText", FindChild(trophyPanel?.transform, "TrophyTitle")?.GetComponent<TextMeshProUGUI>());
             SetRef(so, "moonTrophySubtext", FindChild(trophyPanel?.transform, "TrophySubtext")?.GetComponent<TextMeshProUGUI>());
+            // Objective panel
+            var objPanel = FindChild(hud?.transform, "ObjectivePanel");
+            SetRef(so, "objectivePanel", objPanel?.GetComponent<RectTransform>());
+            SetRef(so, "objectiveText", FindChild(objPanel?.transform, "ObjText")?.GetComponent<TextMeshProUGUI>());
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(ctrl);
             Debug.Log("[UIOverlayPopulator] HUDController references wired.");

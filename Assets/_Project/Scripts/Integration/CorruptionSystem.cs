@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.UI;
@@ -143,6 +144,9 @@ namespace Tartaria.Integration
                 VFXController.Instance?.PlayTuningSuccess(
                     GetBuildingPosition(buildingId), true);
                 HapticFeedbackManager.Instance?.PlayPerfectTune();
+                AudioManager.Instance?.PlaySFX("CorruptionPurge", GetBuildingPosition(buildingId));
+                AdaptiveMusicController.Instance?.PlayRestoration();
+                QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteMiniGame, buildingId);
 
                 Debug.Log($"[Corruption] Building {buildingId} fully purged!");
                 OnCorruptionPurged?.Invoke(buildingId);

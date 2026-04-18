@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: thirteen_moons
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: thirteen_moons
+  title: The 13-Moon Calendar
+  category: 2
+  summary: The Gregorian calendar replaced a universal 13-month, 28-day lunar calendar
+    that had been in use across all major civilisations. The old calendar aligned
+    human biological cycles with natural time.
+  fullText: "Every human culture prior to the forced adoption of the Gregorian calendar
+    in 1582 used some form of the 13-moon, 28-day calendar. The Maya, the Celts,
+    the ancient Egyptians, the Chinese, the Vedic Indians, and the Native American
+    nations all independently arrived at the same structure: 13 months of 28 days,
+    totalling 364 days, plus one 'day out of time' \u2014 a day belonging to no month,
+    a time of reset and renewal.\r\n\r\nThe human female menstrual cycle averages
+    28 days. The lunar synodic period averages 29.5 days \u2014 close enough that
+    over 13 months, the correspondence locks precisely. Every organ in the human
+    body has a documented 28-day regeneration cycle. The 13-moon calendar is not
+    merely astronomical \u2014 it is a biological operating system for the human
+    body.\r\n\r\nThe Gregorian calendar \u2014 with its irregular month lengths,
+    arbitrary week structures, and complete disconnection from lunar cycles \u2014
+    creates a permanent state of biological desynchronisation. Research into chronobiology
+    consistently shows that humans living off-grid by lunar cycles experience lower
+    cortisol, better sleep, and measurably stronger immune function.\r\n\r\nThe Tartarian
+    civilisation structured its entire social, agricultural, and ceremonial life
+    around the 13-moon framework. The 13 major zones of the old world map correspond
+    to the 13 moons. Each moon governed a specific type of restoration, healing,
+    or cultivation \u2014 a practice preserved in fragments in every surviving indigenous
+    calendar system."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - ley_lines_history
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: When you restore the thirteenth building, time itself will remember
+    its own rhythm.

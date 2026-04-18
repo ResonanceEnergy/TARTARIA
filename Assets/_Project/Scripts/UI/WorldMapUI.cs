@@ -114,12 +114,14 @@ namespace Tartaria.UI
             RebuildMap();
             ClearDetail();
             ShowMap();
+            Audio.AudioManager.Instance?.PlaySFX2D("MapOpen");
         }
 
         public void Close()
         {
             _isOpen = false;
             if (mapPanel != null) mapPanel.SetActive(false);
+            Audio.AudioManager.Instance?.PlaySFX2D("UIClose");
         }
 
         public void Toggle() { if (_isOpen) Close(); else Open(); }
@@ -258,6 +260,7 @@ namespace Tartaria.UI
         void SelectZone(int index)
         {
             _selectedZone = index;
+            Audio.AudioManager.Instance?.PlaySFX2D("ZoneSelected");
             var campaign = ServiceLocator.Campaign;
             int currentMoon = campaign?.CurrentMoonIndex ?? 0;
 

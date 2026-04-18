@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: star_alignment_cities
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: star_alignment_cities
+  title: Cities Aligned to the Stars
+  category: 2
+  summary: Dozens of major world cities were laid out with their street grids aligned
+    to specific star constellations. Washington DC, Cairo, Paris, and Cusco all encode
+    star maps in their urban geometry.
+  fullText: "Washington DC's street plan, laid out by Pierre Charles L'Enfant in
+    1791, contains multiple pentagonal and hexagonal geometries that align precisely
+    with the positions of major stars at specific calendar dates. The Capitol building,
+    the White House, and the Washington Monument form a triangle whose proportions
+    correspond to the triangle formed by Regulus, Arcturus, and Spica.\r\n\r\nThis
+    is not unique to Washington. Cairo's ancient street grid aligns the three great
+    pyramids with the three stars of Orion's belt with an angular precision better
+    than 0.1 degrees. The old city of Cusco was laid out in the shape of a puma,
+    with the Coricancha sun temple positioned at the animal's heart \u2014 which
+    corresponds to the position of the Sun at the summer solstice as seen from the
+    temple. Paris, Rome, and Constantinople all encode similar astrocartographic
+    information.\r\n\r\nThe Tartarian world map suggests a global civilisation that
+    treated urban planning as a form of applied astronomy \u2014 each city was a
+    lens that concentrated the electromagnetic influence of specific star systems
+    at specific times of year. The alignment was not symbolic; the founders believed
+    (and may have been correct) that cities built in stellar alignment accumulated
+    a different quality of aetheric energy than those that were not."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - ley_lines_history
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: They did not build cities. They built instruments. Each street
+    was a string tuned to a different star.

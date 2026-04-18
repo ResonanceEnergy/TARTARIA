@@ -120,6 +120,7 @@ namespace Tartaria.Gameplay
             site.isDiscovered = true;
             _sites[siteId] = site;
             OnSiteDiscovered?.Invoke(site);
+            HapticFeedbackManager.Instance?.PlayDiscovery();
 
             // HUD marker
             ServiceLocator.HUD?.ShowInteractionPrompt(
@@ -208,6 +209,7 @@ namespace Tartaria.Gameplay
             var layerType = GetLayerType(site.layersCleared - 1, site.totalLayers);
             ServiceLocator.VFX?.PlayEffect(VFXEffect.Spark, site.position);
             HapticFeedbackManager.Instance?.PlayDiscovery();
+            AudioManager.Instance?.PlaySFX("LayerCleared", site.position);
 
             Debug.Log($"[Excavation] Layer {site.layersCleared}/{site.totalLayers} cleared — " +
                       $"RS +{rsYield:F1} ({layerType})");
@@ -221,6 +223,8 @@ namespace Tartaria.Gameplay
                 _digProgress = 0f;
 
                 OnExcavationComplete?.Invoke(site);
+                AudioManager.Instance?.PlaySFX("ExcavationComplete", site.position);
+                HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
                 // Trigger building discovery if linked
                 if (!string.IsNullOrEmpty(site.buildingId))

@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: aether_energy
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: aether_energy
+  title: "Aetheric Energy \u2014 The Fifth Element"
+  category: 1
+  summary: 'Pre-reset science recognised a fifth fundamental force: the aether. An
+    invisible medium that permeates all space, carries electromagnetic waves, and
+    can be shaped by resonance to produce free energy.'
+  fullText: "Until 1887, mainstream physics universally accepted the existence of
+    the aether \u2014 an invisible medium that fills all space and serves as the
+    carrier wave for light and electromagnetic phenomena. The Michelson\u2013Morley
+    experiment was subsequently interpreted as disproving its existence, a conclusion
+    that Tesla, among others, strongly disputed.\r\n\r\nThe aether, as understood
+    in old-world science, is not merely a carrier wave. It is a dynamic energy medium
+    with intrinsic pressure and flow patterns. Zones of high aetheric density \u2014
+    which correspond precisely to ley line intersections \u2014 allow the extraction
+    of useful work without any apparent energy input, because the work is done by
+    aetheric flow rather than by any fuel source.\r\n\r\nTartarian building design
+    consistently places the most important rooms \u2014 throne rooms, council chambers,
+    healing halls \u2014 at the intersection of structural resonance lines that correspond
+    to these high-density zones. The cathedral builders understood this; the placement
+    of the high altar in a Gothic cathedral is rarely arbitrary \u2014 it sits at
+    the exact point where the building's standing-wave geometry concentrates the
+    most aetheric pressure.\r\n\r\nModern researchers who have reconstructed small-scale
+    versions of documented Tartarian resonance devices \u2014 using the proportions
+    found in architectural drawings and archaeological fragments \u2014 consistently
+    report anomalous energy readings: electromagnetic fields that increase in amplitude
+    over time without any external input, and materials that spontaneously align
+    themselves into geometric configurations."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - free_energy_towers
+  - resonance_frequency_432
+  - ley_lines_history
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: The aether does not sleep. It has merely been forgotten. Remind
+    it of your frequency and it will answer.

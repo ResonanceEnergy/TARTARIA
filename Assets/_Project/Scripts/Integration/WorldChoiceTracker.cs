@@ -135,6 +135,8 @@ namespace Tartaria.Integration
         public void PresentChoice(WorldChoiceId choiceId)
         {
             OnChoicePresented?.Invoke(choiceId);
+            Audio.AudioManager.Instance?.PlaySFX2D("ChoicePresented");
+            Input.HapticFeedbackManager.Instance?.PlayDiscovery();
             Debug.Log($"[WorldChoice] Presenting: {choiceId}");
         }
 
@@ -155,6 +157,8 @@ namespace Tartaria.Integration
 
             ApplyConsequences(choiceId, option);
             OnChoiceMade?.Invoke(choiceId, option);
+            Audio.AudioManager.Instance?.PlaySFX2D("WorldChoiceMade");
+            Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             SaveManager.Instance?.MarkDirty();
         }
 
