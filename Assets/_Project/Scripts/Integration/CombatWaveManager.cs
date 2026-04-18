@@ -125,6 +125,7 @@ namespace Tartaria.Integration
             _encounterActive = false;
             _currentWaveIndex = -1;
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
+            AdaptiveMusicController.Instance?.ExitCombat();
 
             Debug.Log("[CombatWave] Encounter aborted.");
         }
@@ -273,6 +274,7 @@ namespace Tartaria.Integration
 
             // VFX for spawn
             VFXController.Instance?.PlayEnemyDissolution(position);
+            AudioManager.Instance?.PlaySFX("EnemySpawn", position);
         }
 
         /// <summary>Spawn a single enemy at position (debug console).</summary>
@@ -286,7 +288,10 @@ namespace Tartaria.Integration
             if (_currentWaveIndex < 0 || _currentWaveIndex >= _waves.Count) return;
             float reward = _waves[_currentWaveIndex].rsReward;
             if (reward > 0)
+            {
                 GameLoopController.Instance?.QueueRSReward(reward, $"wave_{_currentWaveIndex + 1}");
+                HapticFeedbackManager.Instance?.PlayCombatHit();
+            }
         }
 
         IEnumerator DelayedNextWave()
@@ -310,7 +315,10 @@ namespace Tartaria.Integration
 
             // Haptics + VFX
             HapticFeedbackManager.Instance?.PlayGolemDeath();
+            AdaptiveMusicController.Instance?.ExitCombat();
+            Save.SaveManager.Instance?.MarkDirty();
             DialogueManager.Instance?.PlayContextDialogue("combat_victory");
+            AchievementSystem.Instance?.CheckEnemyDefeated(_currentWaveIndex, "wave", false);
 
             Debug.Log("[CombatWave] Encounter complete!");
         }

@@ -91,6 +91,7 @@ namespace Tartaria.Gameplay
             if (!EconomySystem.Instance?.CanAfford(CurrencyType.AetherShards, (int)aetherCostPerScan) ?? true)
             {
                 Debug.Log("[Scanner] Insufficient Aether for scan.");
+                AudioManager.Instance?.PlaySFX2D("InsufficientAether");
                 return false;
             }
 
@@ -162,6 +163,7 @@ namespace Tartaria.Gameplay
             if (_lastResults.Count == 0)
             {
                 ServiceLocator.HUD?.ShowInteractionPrompt("No resonance signals detected nearby.");
+                AudioManager.Instance?.PlaySFX2D("ScanNoSignal");
             }
             else
             {

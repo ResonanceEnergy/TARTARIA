@@ -108,6 +108,7 @@ namespace Tartaria.Gameplay
         {
             _isActive = false;
             OnCutFailed?.Invoke();
+            AudioManager.Instance?.PlaySFX2D("CuttingAborted");
             GameStateManager.Instance?.ReturnToPrevious();
         }
 
@@ -243,6 +244,7 @@ namespace Tartaria.Gameplay
 
                 float finalAccuracy = Mathf.Clamp01(overallAccuracy * multiplier * comboBonus);
                 OnCutComplete?.Invoke(finalAccuracy);
+                HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
                 // RS reward
                 float rsReward = _config.baseRSReward * finalAccuracy;

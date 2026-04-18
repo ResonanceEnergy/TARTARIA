@@ -21,9 +21,9 @@ namespace Tartaria.Camera
         [SerializeField, Tooltip("Transform to follow and orbit around")] Transform followTarget;
 
         [Header("Exploration Mode")]
-        [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 15f;
-        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 45f;
-        [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 50f;
+        [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 9f;
+        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 18f;
+        [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 55f;
 
         [Header("Combat Mode")]
         [SerializeField, Tooltip("Camera distance in combat mode")] float combatDistance = 20f;
@@ -48,6 +48,7 @@ namespace Tartaria.Camera
         [SerializeField, Tooltip("Camera movement interpolation speed")] float smoothSpeed = 8f;
 
         UnityEngine.Camera _camera;
+        Transform _lookTarget; // CameraTarget child (chest height) — falls back to followTarget
         float _currentDistance;
         float _currentPitch;
         float _currentYaw;
@@ -56,6 +57,10 @@ namespace Tartaria.Camera
         Coroutine _closeUpCoroutine;
         GameState _preCloseUpState;
         float _playerSearchCooldown;
+
+        // Camera-local InputAction instances — avoids shared-state issues with PlayerInputHandler's clone
+        InputAction _zoomAction;
+        InputAction _gamepadOrbitAction;
 
         void Awake()
         {
@@ -68,12 +73,39 @@ namespace Tartaria.Camera
             _currentDistance = exploreDistance;
             _currentPitch = explorePitch;
             _targetFOV = exploreFOV;
+            _playerSearchCooldown = 0f; // Search immediately on first frame
+        }
+
+        void OnEnable()
+        {
+            _zoomAction = new InputAction("CameraZoom", InputActionType.Value);
+            _zoomAction.AddBinding("<Mouse>/scroll/y")
+                .WithProcessor("Normalize(min=-120,max=120)");
+            _zoomAction.AddBinding("<Gamepad>/dpad/y");
+            _zoomAction.Enable();
+
+            _gamepadOrbitAction = new InputAction("GamepadOrbit", InputActionType.Value,
+                binding: "<Gamepad>/rightStick",
+                processors: "StickDeadzone(min=0.15)");
+            _gamepadOrbitAction.Enable();
+        }
+
+        void OnDisable()
+        {
+            _zoomAction?.Disable();
+            _zoomAction?.Dispose();
+            _zoomAction = null;
+            _gamepadOrbitAction?.Disable();
+            _gamepadOrbitAction?.Dispose();
+            _gamepadOrbitAction = null;
         }
 
         void OnDestroy()
         {
+            bool wasInCloseUp = _closeUpCoroutine != null;
             StopAllCoroutines();
-            if (_closeUpCoroutine != null)
+            _closeUpCoroutine = null;
+            if (wasInCloseUp)
                 GameStateManager.Instance?.TransitionTo(_preCloseUpState);
         }
 
@@ -83,10 +115,16 @@ namespace Tartaria.Camera
             {
                 _playerSearchCooldown -= Time.deltaTime;
                 if (_playerSearchCooldown > 0f) return;
-                _playerSearchCooldown = 0.5f;
+                _playerSearchCooldown = 0.25f; // Retry every 0.25s (was 0.5s)
                 var player = GameObject.FindWithTag("Player");
                 if (player != null)
+                {
                     followTarget = player.transform;
+                    // Use CameraTarget child (chest height) for look-at if available
+                    var ct = followTarget.Find("CameraTarget");
+                    _lookTarget = ct != null ? ct : followTarget;
+                    Debug.Log("[CameraController] Player found and locked.");
+                }
                 else
                     return;
             }
@@ -138,28 +176,24 @@ namespace Tartaria.Camera
         {
             if (GameStateManager.Instance == null || GameStateManager.Instance.IsPaused) return;
 
-            var mouse = Mouse.current;
-            var keyboard = Keyboard.current;
-
-            // Scroll wheel = zoom
-            if (mouse != null)
+            // Zoom via Input System action (mouse scroll + gamepad dpad — normalized + deadzone)
+            float zoomInput = _zoomAction != null ? _zoomAction.ReadValue<float>() : 0f;
+            if (Mathf.Abs(zoomInput) > 0.01f)
             {
-                float scroll = mouse.scroll.ReadValue().y / 120f;
-                if (Mathf.Abs(scroll) > 0.01f)
-                {
-                    _zoomOffset -= scroll * zoomSpeed;
-                    _zoomOffset = Mathf.Clamp(_zoomOffset, zoomMin - exploreDistance, zoomMax - exploreDistance);
-                }
-
-                // Middle mouse = orbit
-                if (mouse.middleButton.isPressed)
-                {
-                    float mouseX = mouse.delta.ReadValue().x * 0.1f;
-                    _currentYaw += mouseX * orbitSpeed * Time.deltaTime;
-                }
+                _zoomOffset -= zoomInput * zoomSpeed;
+                _zoomOffset = Mathf.Clamp(_zoomOffset, zoomMin - exploreDistance, zoomMax - exploreDistance);
             }
 
-            // Q/E = orbit
+            // Mouse orbit: middle-button + delta (direct read — modifier gating pattern)
+            var mouse = Mouse.current;
+            if (mouse != null && mouse.middleButton.isPressed)
+            {
+                float mouseX = mouse.delta.ReadValue().x * 0.1f;
+                _currentYaw += mouseX * orbitSpeed * Time.deltaTime;
+            }
+
+            // Keyboard orbit: Q/E (direct read — dual-purpose keys shared with FrequencyShield/Interact)
+            var keyboard = Keyboard.current;
             if (keyboard != null)
             {
                 if (keyboard.qKey.isPressed)
@@ -168,32 +202,21 @@ namespace Tartaria.Camera
                     _currentYaw += orbitSpeed * Time.deltaTime;
             }
 
-            // Gamepad right stick = orbit (read from PlayerInputHandler action map)
-            var gamepad = Gamepad.current;
-            if (gamepad != null)
+            // Gamepad orbit via Input System action (right stick with deadzone processor)
+            Vector2 rightStick = _gamepadOrbitAction != null ? _gamepadOrbitAction.ReadValue<Vector2>() : Vector2.zero;
+            if (rightStick.sqrMagnitude > 0.02f)
             {
-                Vector2 rightStick = gamepad.rightStick.ReadValue();
-                if (rightStick.sqrMagnitude > 0.02f)
-                {
-                    _currentYaw += rightStick.x * gamepadOrbitSpeed * Time.deltaTime;
-                    // Right stick Y adjusts pitch within bounds
-                    _currentPitch = Mathf.Clamp(
-                        _currentPitch - rightStick.y * gamepadOrbitSpeed * 0.5f * Time.deltaTime,
-                        20f, 80f);
-                }
-
-                // D-pad Y / right shoulder = zoom
-                float dpadY = gamepad.dpad.y.ReadValue();
-                if (Mathf.Abs(dpadY) > 0.1f)
-                {
-                    _zoomOffset -= dpadY * gamepadZoomSpeed * Time.deltaTime;
-                    _zoomOffset = Mathf.Clamp(_zoomOffset, zoomMin - exploreDistance, zoomMax - exploreDistance);
-                }
+                _currentYaw += rightStick.x * gamepadOrbitSpeed * Time.deltaTime;
+                _currentPitch = Mathf.Clamp(
+                    _currentPitch - rightStick.y * gamepadOrbitSpeed * 0.5f * Time.deltaTime,
+                    20f, 80f);
             }
         }
 
         void ApplyCamera()
         {
+            Vector3 lookPos = _lookTarget != null ? _lookTarget.position : followTarget.position;
+
             // Calculate camera position from spherical coordinates
             float pitchRad = _currentPitch * Mathf.Deg2Rad;
             float yawRad = _currentYaw * Mathf.Deg2Rad;
@@ -204,11 +227,11 @@ namespace Tartaria.Camera
                 Mathf.Cos(yawRad) * Mathf.Cos(pitchRad)
             ) * _currentDistance;
 
-            Vector3 targetPos = followTarget.position + offset;
+            Vector3 targetPos = lookPos + offset;
 
             transform.position = Vector3.Lerp(
                 transform.position, targetPos, Time.deltaTime * smoothSpeed);
-            transform.LookAt(followTarget.position);
+            transform.LookAt(lookPos);
 
             // Smooth FOV transition
             if (_camera != null)
@@ -258,17 +281,46 @@ namespace Tartaria.Camera
         }
 
         /// <summary>
+        /// Triggers a brief positional camera shake (does not disrupt follow target).
+        /// </summary>
+        public void TriggerShake(float intensity = 0.3f, float duration = 0.45f)
+        {
+            StartCoroutine(ShakeSequence(intensity, duration));
+        }
+
+        System.Collections.IEnumerator ShakeSequence(float intensity, float duration)
+        {
+            float elapsed = 0f;
+            Vector3 origin = transform.position;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float envelope = 1f - Mathf.Clamp01(elapsed / duration); // fade out
+                float ox = (UnityEngine.Random.value * 2f - 1f) * intensity * envelope;
+                float oy = (UnityEngine.Random.value * 2f - 1f) * intensity * envelope * 0.5f;
+                transform.position = origin + new Vector3(ox, oy, 0f);
+                yield return null;
+            }
+            transform.position = origin;
+        }
+
+        /// <summary>
         /// Triggers a close-up shot at a specific position (building discovery, etc.)
+        /// Skips if a close-up is already in progress to prevent state corruption
+        /// from multiple simultaneous building discoveries.
         /// </summary>
         public void FocusOnPoint(Vector3 worldPoint, float duration = 2f)
         {
-            // Will integrate with Cinemachine virtual cameras
+            if (_closeUpCoroutine != null) return; // Already in a close-up
             _closeUpCoroutine = StartCoroutine(CloseUpSequence(worldPoint, duration));
         }
 
         System.Collections.IEnumerator CloseUpSequence(Vector3 point, float duration)
         {
-            _preCloseUpState = GameStateManager.Instance?.CurrentState ?? GameState.Exploration;
+            var currentState = GameStateManager.Instance?.CurrentState ?? GameState.Exploration;
+            // Never save Cinematic/Boot/Loading as return state — always fall back to Exploration
+            _preCloseUpState = (currentState == GameState.Exploration || currentState == GameState.Combat || currentState == GameState.Tuning)
+                ? currentState : GameState.Exploration;
             GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
 
             float elapsed = 0f;

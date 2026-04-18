@@ -106,6 +106,7 @@ namespace Tartaria.Integration
                 $"{building?.Definition?.buildingName ?? buildingId} upgraded to Tier {newTier}!");
 
             Debug.Log($"[Workshop] {buildingId} upgraded to Tier {newTier}");
+            Save.SaveManager.Instance?.MarkDirty();
             return true;
         }
 
@@ -147,6 +148,7 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayBuildingUpgrade(building.transform.position, newTier);
             Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
             Input.HapticFeedbackManager.Instance?.PlayCombatHit();
+            Audio.AudioManager.Instance?.PlaySFX("BuildingUpgrade", building.transform.position);
 
             // Scale boost (subtle growth per tier)
             float scaleBoost = 1f + (newTier * 0.02f);

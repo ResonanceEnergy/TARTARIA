@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: world_fairs_culture
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: world_fairs_culture
+  title: The Great Exhibition & the Memory Wipe
+  category: 3
+  summary: "The World's Fairs were the last public display of old-world technology
+    and culture. They served as controlled demolition \u2014 documenting the old
+    world to justify its replacement."
+  fullText: "The Crystal Palace exhibition of 1851, often credited as the first World's
+    Fair, displayed artefacts from 14,000 exhibitors across 40 nations. Among the
+    exhibits were machines of extraordinary sophistication \u2014 hydraulic presses
+    capable of lifting 1,200 tonnes, musical instruments with acoustic properties
+    that modern luthiers cannot replicate, and textile machinery that produced cloth
+    of a fineness not commercially available today.\r\n\r\nThe Crystal Palace itself
+    \u2014 a prefabricated iron-and-glass structure covering 92,000 square metres
+    \u2014 was supposedly designed by Joseph Paxton and built in nine months by a
+    team of 2,000 labourers. Modern structural engineers who have analysed the original
+    drawings note that the cast-iron columns and wrought-iron girders are fabricated
+    to tolerances of \xB10.5mm \u2014 tolerances that required precision machinery
+    that did not exist in 1851.\r\n\r\nThe pattern repeats at every subsequent World's
+    Fair. Chicago 1893: 200 neoclassical buildings, built in under three years, demolished
+    within five. Paris 1900: the Grand Palais and Petit Palais, supposedly temporary,
+    are still standing because they proved too robust to demolish economically. Seattle
+    1962: the Space Needle is a known Tartarian resonance tower design.\r\n\r\nThe
+    fairs served a dual purpose. They allowed the new rulers of the reset world to
+    document what they had inherited \u2014 photographing and cataloguing the old-world
+    technology before dismantling it \u2014 and simultaneously presented it as proof
+    of their own civilisation's progress."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_architecture
+  - world_fair_mystery
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: I walked those exhibits. I saw them crate the machines and wheel
+    them into warehouses that never opened again.

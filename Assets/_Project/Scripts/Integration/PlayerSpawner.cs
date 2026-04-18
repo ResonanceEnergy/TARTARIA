@@ -32,26 +32,32 @@ namespace Tartaria.Integration
         {
             if (_spawned) return;
 
-            // Don't double-spawn if Player already exists
+            // Determine spawn position from PlayerSpawn marker (set by EchohavenScenePopulator)
+            var spawnMarker = GameObject.Find("PlayerSpawn");
+            Vector3 spawnPos = spawnMarker != null
+                ? spawnMarker.transform.position + spawnOffset
+                : transform.position + spawnOffset;
+
+            // If Player already exists (e.g. baked in scene or DontDestroyOnLoad), destroy it
+            // and let the spawner create a fresh prefab instance at the correct position.
+            // Relocation via transform.position doesn't stick with CharacterController.
             var existing = GameObject.FindWithTag("Player");
             if (existing != null)
             {
-                Debug.Log("[PlayerSpawner] Player already exists — skipping spawn.");
-                _spawned = true;
-                return;
+                Debug.Log($"[PlayerSpawner] Destroying stale Player at {existing.transform.position}");
+                Destroy(existing);
             }
 
             if (playerPrefab == null)
             {
-                // Fallback: create a greybox capsule player at runtime
                 var player = CreateFallbackPlayer();
-                player.transform.position = transform.position + spawnOffset;
+                player.transform.position = spawnPos;
                 Debug.Log("[PlayerSpawner] No prefab assigned — spawned fallback player.");
                 _spawned = true;
                 return;
             }
 
-            var instance = Instantiate(playerPrefab, transform.position + spawnOffset, Quaternion.identity);
+            var instance = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
             instance.name = "Player";
             instance.tag = "Player";
 

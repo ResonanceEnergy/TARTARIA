@@ -66,6 +66,7 @@ namespace Tartaria.Integration
             _introduced = true;
             DialogueManager.Instance?.PlayContextDialogue("thorne_intro");
             OnIntroduced?.Invoke();
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Modify trust. Clamped 0-100.</summary>
@@ -78,6 +79,7 @@ namespace Tartaria.Integration
             if (oldLevel != newLevel)
             {
                 OnTrustChanged?.Invoke(newLevel);
+                Save.SaveManager.Instance?.MarkDirty();
 
                 // Trust milestone dialogue
                 switch (newLevel)
@@ -128,12 +130,14 @@ namespace Tartaria.Integration
         {
             _zonesSecuredTogether++;
             AddTrust(8f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Notify Thorne of combat victory (happens via GameLoop).</summary>
         public void NotifyCombatVictory()
         {
             AddTrust(3f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         public void ActivateMilitia()
@@ -141,6 +145,8 @@ namespace Tartaria.Integration
             if (_militiaActive) return;
             _militiaActive = true;
             OnMilitiaActivated?.Invoke();
+            Audio.AudioManager.Instance?.PlaySFX2D("MilitiaActivated");
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Thorne] Militia activated — zone defense patrols now active.");
         }
 

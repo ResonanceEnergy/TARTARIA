@@ -67,6 +67,7 @@ namespace Tartaria.Integration
                 _nodeLookup[node.nodeId] = node;
 
             OnDialogueStarted?.Invoke(tree.treeId, tree.speakerName);
+            Audio.AudioManager.Instance?.PlaySFX2D("DialogueStart");
 
             // Find the root node (first node or explicit rootNodeId)
             DialogueNode root;
@@ -94,6 +95,7 @@ namespace Tartaria.Integration
             // Record in history
             _choiceHistory[_currentNode.nodeId] = choiceIndex;
             OnChoiceMade?.Invoke(_currentNode.nodeId, choiceIndex);
+            HapticFeedbackManager.Instance?.PlayDiscovery();
 
             // Execute consequences
             ExecuteConsequences(choice.consequences);
@@ -146,6 +148,7 @@ namespace Tartaria.Integration
             _activeTree = null;
             _currentNode = null;
             OnDialogueEnded?.Invoke(treeId);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>

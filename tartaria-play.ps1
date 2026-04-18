@@ -403,8 +403,34 @@ if ($BatchFirst -or $BatchOnly) {
     }
 }
 
+# ── Clear stale recovery files (prevents "Recovering Scene Backups" dialog) ──
+# Force-kill creates Temp/__Backupscenes -- must remove the DIRECTORY, not just contents
+$backupScenes = Join-Path $ProjectPath "Temp\__Backupscenes"
+if (Test-Path $backupScenes) {
+    Remove-Item $backupScenes -Recurse -Force -ErrorAction SilentlyContinue
+    Write-Host "Removed Temp\__Backupscenes directory" -ForegroundColor Yellow
+}
+$recoveryPath = Join-Path $ProjectPath "Assets\_Recovery"
+if (Test-Path $recoveryPath) {
+    $recoveryFiles = Get-ChildItem $recoveryPath -File -ErrorAction SilentlyContinue
+    if ($recoveryFiles) {
+        Remove-Item "$recoveryPath\*" -Recurse -Force -ErrorAction SilentlyContinue
+        Write-Host "Cleared $($recoveryFiles.Count) stale recovery files" -ForegroundColor Yellow
+    }
+}
+
+# ── Clear save data for clean start ──
+$savePath = Join-Path $env:LOCALAPPDATA "..\LocalLow\ResonanceEnergy\TARTARIA World of Wonder"
+if (Test-Path $savePath) {
+    $saveFiles = Get-ChildItem $savePath -File -ErrorAction SilentlyContinue
+    if ($saveFiles) {
+        $saveFiles | Remove-Item -Force -ErrorAction SilentlyContinue
+        Write-Host "Cleared $($saveFiles.Count) save files for clean start" -ForegroundColor Yellow
+    }
+}
+
 # ── Drop sentinel file for AutoPlayBoot ──
-# Sentinel goes in Library/ — Unity wipes Temp/ on project open!
+# Sentinel goes in Library/ -- Unity wipes Temp/ on project open!
 $sentinelPath = Join-Path $ProjectPath "Library\TARTARIA_AUTOPLAY"
 "autoplay" | Set-Content -Path $sentinelPath -NoNewline
 Write-Host "Sentinel file created" -ForegroundColor Green

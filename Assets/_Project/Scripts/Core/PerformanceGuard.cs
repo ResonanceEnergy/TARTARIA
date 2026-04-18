@@ -33,7 +33,7 @@ namespace Tartaria.Core
         [Header("Monitoring")]
         [SerializeField, Min(10), Tooltip("Frames to average for performance stats")] int sampleWindowFrames = 120;
         [SerializeField, Min(1f), Tooltip("Seconds between budget-exceeded alerts")] float alertCooldownSeconds = 10f;
-        [SerializeField, Min(0f), Tooltip("Seconds to ignore violations at startup")] float warmupSeconds = 3f;
+        [SerializeField, Min(0f), Tooltip("Seconds to ignore violations at startup")] float warmupSeconds = 5f;
         [SerializeField, Min(0f), Tooltip("Extra ms tolerance above target before alerting")] float toleranceMs = 4f;
 
         // Frame time tracking
@@ -197,9 +197,9 @@ namespace Tartaria.Core
             CheckBudget("AI", _lastAIMs, aiBudgetMs, ref culprit, ref worstBudgetRatio);
             CheckBudget("Corruption", _lastCorruptionMs, corruptionBudgetMs, ref culprit, ref worstBudgetRatio);
 
-            // When no system has reported timing, only log extreme spikes (>3x target)
-            // to avoid noise from editor jitter, GC, and scene loads
-            if (worstBudgetRatio <= 0f && frameMs < targetFrameTimeMs * 3f)
+            // When no system has reported timing, these spikes are editor overhead,
+            // GC pauses, or scene transitions — not actionable game code issues
+            if (worstBudgetRatio <= 0f)
                 return;
 
             Debug.LogWarning(

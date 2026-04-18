@@ -364,8 +364,10 @@ namespace Tartaria.Integration
             // HUD notification
             UI.HUDController.Instance?.ShowInteractionPrompt(
                 $"ACHIEVEMENT UNLOCKED\n{def.title}");
+            Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
             OnAchievementUnlocked?.Invoke(def);
+            Audio.AudioManager.Instance?.PlaySFX2D("AchievementUnlocked");
             SaveManager.Instance?.MarkDirty();
         }
 

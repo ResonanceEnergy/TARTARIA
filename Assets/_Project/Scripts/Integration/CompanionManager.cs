@@ -61,6 +61,9 @@ namespace Tartaria.Integration
             _states[companionId] = state;
 
             DialogueManager.Instance?.PlayContextDialogue($"companion_join_{companionId}");
+            Audio.AudioManager.Instance?.PlaySFX2D("CompanionUnlock");
+            Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log($"[CompanionManager] {companionId} has joined the party!");
         }
 
@@ -84,7 +87,15 @@ namespace Tartaria.Integration
             foreach (float milestone in _trustMilestones)
             {
                 if (oldTrust < milestone && state.trustLevel >= milestone)
+                {
                     QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, companionId);
+                    // Fire trust-tier-specific dialogue arc
+                    int tier = Mathf.RoundToInt(milestone);
+                    DialogueManager.Instance?.PlayContextDialogue($"companion_trust_{companionId}_{tier}");
+                    AchievementSystem.Instance?.CheckCompanionTrust(companionId, state.trustLevel);
+                    Debug.Log($"[CompanionManager] {companionId} trust milestone reached: {tier}");
+                    Save.SaveManager.Instance?.MarkDirty();
+                }
             }
         }
 

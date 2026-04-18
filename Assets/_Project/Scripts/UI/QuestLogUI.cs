@@ -93,12 +93,14 @@ namespace Tartaria.UI
             _isOpen = true;
             if (questLogPanel != null) questLogPanel.SetActive(true);
             RefreshList();
+            Audio.AudioManager.Instance?.PlaySFX2D("UIOpen");
         }
 
         public void Close()
         {
             _isOpen = false;
             if (questLogPanel != null) questLogPanel.SetActive(false);
+            Audio.AudioManager.Instance?.PlaySFX2D("UIClose");
         }
 
         public bool IsOpen => _isOpen;

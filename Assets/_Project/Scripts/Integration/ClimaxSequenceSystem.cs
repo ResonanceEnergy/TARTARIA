@@ -101,6 +101,7 @@ namespace Tartaria.Integration
             _isPlaying = true;
             _activeMoonIndex = moonIndex;
             OnClimaxStarted?.Invoke(moonIndex);
+            AdaptiveMusicController.Instance?.PlayZoneShift();
 
             _activeSequence = StartCoroutine(RunClimax(def));
             Debug.Log($"[Climax] Moon {moonIndex + 1} climax started!");
@@ -260,6 +261,7 @@ namespace Tartaria.Integration
             GameLoopController.Instance?.QueueRSReward(beat.floatParam, $"climax_moon{_activeMoonIndex + 1}");
             HUDController.Instance?.FlashRSGain(beat.floatParam);
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            AudioManager.Instance?.PlaySFX2D("RSGain");
             yield return new WaitForSeconds(beat.duration > 0 ? beat.duration : 1.5f);
         }
 
@@ -272,11 +274,13 @@ namespace Tartaria.Integration
             // Announce completion
             HUDController.Instance?.ShowInteractionPrompt($"Moon {moonIdx + 1} Complete!");
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
+            AdaptiveMusicController.Instance?.ExitCombat();
 
             OnClimaxCompleted?.Invoke(moonIdx);
 
             // Trigger campaign advance
             CampaignFlowController.Instance?.AdvanceToNextMoon();
+            Save.SaveManager.Instance?.MarkDirty();
 
             Debug.Log($"[Climax] Moon {moonIdx + 1} climax complete.");
         }

@@ -40,10 +40,11 @@ namespace Tartaria.Editor
             CharacterPrefabFactory.BuildAllCharacters();
             Moon2ZoneScaffold.BuildBuildingDefinitions();
             MoonBuildingFactory.BuildAllMoonBuildings();
+            ArchiveDatabasePopulator.BuildArchiveDatabase();
 
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log("[Tartaria] All assets built (Audio, Anastasia, Zones, Quests, Prefabs, Moon2).");
+            Debug.Log("[Tartaria] All assets built (Audio, Anastasia, Zones, Quests, Prefabs, Moon2, Archive).");
         }
 
         [MenuItem("Tartaria/Build Assets/Materials", false, 11)]

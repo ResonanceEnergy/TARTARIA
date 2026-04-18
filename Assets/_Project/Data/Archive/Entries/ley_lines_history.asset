@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: ley_lines_history
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: ley_lines_history
+  title: "Ley Lines \u2014 The Earth's Nerve System"
+  category: 2
+  summary: An invisible grid of electromagnetic channels circles the globe. Ancient
+    civilisations mapped, followed, and built upon these lines for thousands of years.
+    Every major sacred site lies at their intersections.
+  fullText: "In 1921, amateur archaeologist Alfred Watkins noticed that ancient monuments,
+    standing stones, churches, and holy wells in the Herefordshire countryside aligned
+    in perfect straight lines. He called them 'leys'. The discovery was ridiculed
+    for decades \u2014 until satellite mapping revealed the same phenomenon worldwide.\r\n\r\nThe
+    straight-line alignments are not coincidence. Major ley lines follow the paths
+    of the strongest electromagnetic conductivity in the Earth's crust \u2014 zones
+    where piezoelectric rock types, underground water courses, and geomagnetic field
+    anomalies combine to create channels of elevated aetheric flow. A compass needle
+    brought to a ley-line intersection will deviate measurably from magnetic north.\r\n\r\nEvery
+    culture independently mapped this grid. The Chinese called them 'lung mei' \u2014
+    dragon paths. The Aboriginal Australians followed 'songlines'. The ancient Egyptians
+    laid out the Nile Valley temple system along ley alignments. The Roman road network
+    followed existing ley paths wherever topography permitted. The medieval cathedral
+    builders systematically sited their churches at ley nodes \u2014 not because
+    of tradition but because the energy at those points made the buildings' resonant
+    properties orders of magnitude more powerful.\r\n\r\nThe Tartarian civilisation
+    appears to have built an entire infrastructure network on this grid. Their towers
+    and energy collection buildings were sited at ley nodes. Their road and canal
+    systems followed ley paths. Their music halls and healing centres were positioned
+    at high-flux intersections where the concentrated aetheric energy amplified the
+    therapeutic effects of resonant frequencies."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_star_forts
+  - aether_energy
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: The lines were roads before roads existed. They are roads still.
+    We just forgot how to walk them.

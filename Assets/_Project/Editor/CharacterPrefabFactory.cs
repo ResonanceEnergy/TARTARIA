@@ -33,7 +33,8 @@ namespace Tartaria.Editor
         static void CreatePlayerPrefab()
         {
             string path = $"{PrefabsPath}/Player.prefab";
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null) return;
+            // Force rebuild to pick up latest geometry (arms, legs, etc.)
+            AssetDatabase.DeleteAsset(path);
 
             var root = new GameObject("Player");
             root.tag = "Player";
@@ -54,7 +55,69 @@ namespace Tartaria.Editor
             head.transform.localPosition = new Vector3(0f, 2.2f, 0f);
             head.transform.localScale = Vector3.one * 0.5f;
             Object.DestroyImmediate(head.GetComponent<SphereCollider>());
-            AssignMaterial(head, "Player_Aether");
+            AssignMaterial(head, "Player_Head");
+
+            // Eyes — two small dark spheres on the head
+            for (int i = 0; i < 2; i++)
+            {
+                float side = i == 0 ? -1f : 1f;
+                var eye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                eye.name = $"Eye_{(i == 0 ? "L" : "R")}";
+                eye.transform.SetParent(head.transform);
+                eye.transform.localPosition = new Vector3(side * 0.25f, 0.1f, 0.4f);
+                eye.transform.localScale = Vector3.one * 0.18f;
+                Object.DestroyImmediate(eye.GetComponent<SphereCollider>());
+                AssignMaterial(eye, "Crystal_Active");
+            }
+
+            // Visor band — thin cube across eyes for a stylized look
+            var visor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            visor.name = "Visor";
+            visor.transform.SetParent(head.transform);
+            visor.transform.localPosition = new Vector3(0f, 0.1f, 0.38f);
+            visor.transform.localScale = new Vector3(0.7f, 0.12f, 0.08f);
+            Object.DestroyImmediate(visor.GetComponent<BoxCollider>());
+            AssignMaterial(visor, "Aether_Glow");
+
+            // Arms — cylinders
+            for (int i = 0; i < 2; i++)
+            {
+                float side = i == 0 ? -1f : 1f;
+                var arm = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                arm.name = $"Arm_{(i == 0 ? "L" : "R")}";
+                arm.transform.SetParent(root.transform);
+                arm.transform.localPosition = new Vector3(side * 0.55f, 1.2f, 0f);
+                arm.transform.localScale = new Vector3(0.18f, 0.45f, 0.18f);
+                arm.transform.localRotation = Quaternion.Euler(0f, 0f, side * 10f);
+                Object.DestroyImmediate(arm.GetComponent<CapsuleCollider>());
+                AssignMaterial(arm, "Player_Limbs");
+            }
+
+            // Legs — cylinders
+            for (int i = 0; i < 2; i++)
+            {
+                float side = i == 0 ? -1f : 1f;
+                var leg = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                leg.name = $"Leg_{(i == 0 ? "L" : "R")}";
+                leg.transform.SetParent(root.transform);
+                leg.transform.localPosition = new Vector3(side * 0.2f, 0.3f, 0f);
+                leg.transform.localScale = new Vector3(0.22f, 0.35f, 0.22f);
+                Object.DestroyImmediate(leg.GetComponent<CapsuleCollider>());
+                AssignMaterial(leg, "Player_Limbs");
+            }
+
+            // Feet — cubes
+            for (int i = 0; i < 2; i++)
+            {
+                float side = i == 0 ? -1f : 1f;
+                var foot = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                foot.name = $"Foot_{(i == 0 ? "L" : "R")}";
+                foot.transform.SetParent(root.transform);
+                foot.transform.localPosition = new Vector3(side * 0.2f, -0.05f, 0.05f);
+                foot.transform.localScale = new Vector3(0.24f, 0.1f, 0.32f);
+                Object.DestroyImmediate(foot.GetComponent<BoxCollider>());
+                AssignMaterial(foot, "Player_Limbs");
+            }
 
             // Aether glow indicator — small sphere on chest
             var glow = GameObject.CreatePrimitive(PrimitiveType.Sphere);
@@ -64,6 +127,29 @@ namespace Tartaria.Editor
             glow.transform.localScale = Vector3.one * 0.2f;
             Object.DestroyImmediate(glow.GetComponent<SphereCollider>());
             AssignMaterial(glow, "Aether_Glow");
+
+            // Shoulder guards — small cubes on shoulders for silhouette
+            for (int i = 0; i < 2; i++)
+            {
+                float side = i == 0 ? -1f : 1f;
+                var shoulder = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                shoulder.name = $"Shoulder_{(i == 0 ? "L" : "R")}";
+                shoulder.transform.SetParent(root.transform);
+                shoulder.transform.localPosition = new Vector3(side * 0.5f, 1.75f, 0f);
+                shoulder.transform.localScale = new Vector3(0.28f, 0.08f, 0.28f);
+                shoulder.transform.localRotation = Quaternion.Euler(0f, 0f, side * -15f);
+                Object.DestroyImmediate(shoulder.GetComponent<BoxCollider>());
+                AssignMaterial(shoulder, "Player_Limbs");
+            }
+
+            // Belt — thin cylinder at waist
+            var belt = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            belt.name = "Belt";
+            belt.transform.SetParent(root.transform);
+            belt.transform.localPosition = new Vector3(0f, 0.6f, 0f);
+            belt.transform.localScale = new Vector3(0.5f, 0.04f, 0.5f);
+            Object.DestroyImmediate(belt.GetComponent<CapsuleCollider>());
+            AssignMaterial(belt, "M_Gold_Ornament");
 
             // Components
             var cc = root.AddComponent<CharacterController>();
@@ -84,8 +170,6 @@ namespace Tartaria.Editor
                 so.ApplyModifiedProperties();
             }
 
-            root.AddComponent<Rigidbody>().isKinematic = true;
-
             // Camera follow target
             var camTarget = new GameObject("CameraTarget");
             camTarget.transform.SetParent(root.transform);
@@ -105,7 +189,9 @@ namespace Tartaria.Editor
         static void CreateMiloPrefab()
         {
             string path = $"{PrefabsPath}/Milo.prefab";
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null) return;
+            // Force-rebuild: delete stale prefab if it exists
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null)
+                AssetDatabase.DeleteAsset(path);
 
             var root = new GameObject("Milo");
 
@@ -160,7 +246,9 @@ namespace Tartaria.Editor
         static void CreateMudGolemPrefab()
         {
             string path = $"{PrefabsPath}/MudGolem.prefab";
-            if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null) return;
+            // Force-rebuild: delete stale prefab if it exists
+            if (AssetDatabase.LoadAssetAtPath<GameObject>(path) != null)
+                AssetDatabase.DeleteAsset(path);
 
             var root = new GameObject("MudGolem");
 

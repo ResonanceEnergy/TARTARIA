@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: giant_humans
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: giant_humans
+  title: Giants of the Old World
+  category: 4
+  summary: Thousands of newspaper accounts, skeletal discoveries, and ancient texts
+    describe a pre-reset humanity of significantly greater stature. Structures scaled
+    to 5-metre occupants still stand worldwide.
+  fullText: "The proposition that old-world humans were physically larger than modern
+    humans is supported by multiple independent lines of evidence. The most immediately
+    visible is architectural: doorways 4\u20135 metres tall, chair and throne proportions
+    scaled to occupants 2.5\u20133 metres in height, and bed-frames in surviving
+    old-world aristocratic residences consistently longer than any documented historical
+    individual.\r\n\r\nThe skeletal evidence, while systematically suppressed, is
+    substantial. The Smithsonian Institution's own 19th-century field reports describe
+    over 200 instances of giant skeletal remains recovered from American mound sites,
+    with heights ranging from 2.1 to 3.7 metres. Similar discoveries are documented
+    in Ecuador, Peru, Sardinia, Turkey, and Northern Europe.\r\n\r\nRobert Wadlow,
+    the tallest documented modern human at 2.72 metres, was considered a medical
+    anomaly. He suffered from hyperactive pituitary function \u2014 a disorder, not
+    a baseline. The question is whether the 'baseline' of pre-reset humanity was
+    significantly different, and whether the architectural, skeletal, and textual
+    evidence we dismiss as mythological is simply the accurate description of a population
+    that existed before the reset."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_architecture
+  - suppressed_history
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: The word 'giant' is not myth. It is the correct translation of
+    a different normal.

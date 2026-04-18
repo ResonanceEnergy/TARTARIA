@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Tartaria.Audio;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Gameplay
 {
@@ -63,6 +65,8 @@ namespace Tartaria.Gameplay
 
             _discoveredRecipes.Add(recipeId);
             OnRecipeDiscovered?.Invoke(recipeId);
+            AudioManager.Instance?.PlaySFX2D("RecipeDiscovered");
+            HapticFeedbackManager.Instance?.PlayDiscovery();
             Debug.Log($"[Crafting] Recipe discovered: {recipeId}");
         }
 
@@ -146,6 +150,8 @@ namespace Tartaria.Gameplay
             _inventory[recipe.outputItemId] += recipe.outputCount;
 
             OnItemCrafted?.Invoke(recipeId);
+            AudioManager.Instance?.PlaySFX2D("CraftComplete");
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             Debug.Log($"[Crafting] Crafted: {recipe.outputItemId} x{recipe.outputCount}");
             return true;
         }
@@ -230,6 +236,8 @@ namespace Tartaria.Gameplay
             {
                 ConsumeItem(itemId);
                 OnItemUsed?.Invoke(itemId);
+                AudioManager.Instance?.PlaySFX2D("ItemUse");
+                HapticFeedbackManager.Instance?.PlayCombatHit();
                 Debug.Log($"[Crafting] Used item: {itemId}");
             }
             return applied;

@@ -67,6 +67,26 @@ namespace Tartaria.Integration
                 }
             }
 
+            // Auto-populate from QuestDatabaseBuilder if no quests loaded (Gap 5)
+            if (_questLookup.Count == 0)
+            {
+                questDatabase = QuestDatabaseBuilder.BuildAll();
+                if (questDatabase != null)
+                {
+                    foreach (var quest in questDatabase)
+                    {
+                        if (quest == null) continue;
+                        _questLookup[quest.questId] = quest;
+                        _questStates[quest.questId] = new QuestState
+                        {
+                            status = quest.autoActivate ? QuestStatus.Active : QuestStatus.Locked,
+                            objectiveProgress = new int[quest.objectives != null ? quest.objectives.Length : 0]
+                        };
+                    }
+                    Debug.Log($"[QuestManager] Auto-populated {_questLookup.Count} quests from QuestDatabaseBuilder.");
+                }
+            }
+
             Debug.Log($"[QuestManager] Loaded {_questLookup.Count} quests.");
         }
 
@@ -92,6 +112,7 @@ namespace Tartaria.Integration
                 DialogueManager.Instance?.PlayContextDialogue("quest_start");
                 HUDController.Instance?.ShowInteractionPrompt($"New Quest: {def.displayName}");
                 AudioManager.Instance?.PlaySFX2D("QuestAccept");
+                Input.HapticFeedbackManager.Instance?.PlayDiscovery();
             }
 
             Debug.Log($"[QuestManager] Quest activated: {questId}");
@@ -245,6 +266,8 @@ namespace Tartaria.Integration
                 DialogueManager.Instance?.PlayContextDialogue("quest_complete");
                 HUDController.Instance?.ShowInteractionPrompt($"Quest Complete: {def.displayName}");
                 AudioManager.Instance?.PlaySFX2D("QuestComplete");
+                Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+                Save.SaveManager.Instance?.MarkDirty();
                 Debug.Log($"[QuestManager] Quest completed: {questId} (+{def.rsReward} RS)");
 
                 // Activate follow-up quests

@@ -1,6 +1,7 @@
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Gameplay
 {
@@ -312,6 +313,7 @@ namespace Tartaria.Gameplay
 
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             OnPuzzleCompleted?.Invoke(totalRS);
+            AudioManager.Instance?.PlaySFX2D("ConduitComplete");
             ServiceLocator.GameLoop?.OnMiniGameCompleted(totalRS, "AetherConduit");
         }
 
@@ -320,6 +322,7 @@ namespace Tartaria.Gameplay
             _isActive = false;
             Debug.Log("[AetherConduit] Failed — time expired");
             OnPuzzleFailed?.Invoke();
+            AudioManager.Instance?.PlaySFX2D("ConduitFailed");
         }
     }
 

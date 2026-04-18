@@ -203,6 +203,7 @@ namespace Tartaria.Integration
 
             VFXController.Instance?.PlayShieldActivation(GetPlayerPosition());
             AudioManager.Instance?.PlaySFX("ShieldActivate", GetPlayerPosition());
+            HapticFeedbackManager.Instance?.PlayCombatHit();
         }
 
         // ─── Enemy Monitoring ────────────────────────
@@ -371,6 +372,7 @@ namespace Tartaria.Integration
             _em.SetComponentData(_playerCombatEntity, combatant);
 
             Debug.Log($"[CombatBridge] Player hit by {source} for {damage} dmg. HP: {combatant.Health}");
+            HapticFeedbackManager.Instance?.PlayCombatHit();
 
             if (combatant.Health <= 0f)
                 CheckPlayerHealth();
@@ -389,6 +391,8 @@ namespace Tartaria.Integration
             if (active)
             {
                 // Giant mode preserves current aether charge; damage scaling handled via _giantModeActive flag
+                AudioManager.Instance?.PlaySFX("GiantMode", GetPlayerPosition());
+                HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             }
             _em.SetComponentData(_playerCombatEntity, combatant);
 

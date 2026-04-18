@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: free_energy_towers
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: free_energy_towers
+  title: Tesla & the Aetheric Power Grid
+  category: 1
+  summary: "Nikola Tesla's Wardenclyffe Tower was the modern attempt to rebuild a
+    worldwide wireless power grid that had operated in the old world \u2014 transmitted
+    through the Earth itself."
+  fullText: "Nikola Tesla's most ambitious project was not merely an experiment.
+    He stated repeatedly that he had rediscovered a principle of electrical transmission
+    that ancient engineers had understood \u2014 the use of the Earth itself as a
+    conductor, with the ionosphere serving as the return path.\r\n\r\nHis Wardenclyffe
+    Tower design included a resonant cavity between the tower's capacitor dome and
+    a deep underground shaft, creating a standing wave in the Earth's electromagnetic
+    field. At the correct resonant frequency, power could be extracted at any receiver
+    tuned to the same frequency, anywhere on the planet, at effectively zero marginal
+    cost.\r\n\r\nThe architecture of Tartarian buildings provides strong evidence
+    that such a grid once existed. Hundreds of old-world towers, spires, and domed
+    buildings were topped with metallic finials, lightning rods, and copper-clad
+    domes that are structurally unnecessary for their claimed functions but ideal
+    as receiving antennae for a wireless power grid. The internal column structures
+    of Tartarian buildings frequently match the proportions of quarter-wave resonators.\r\n\r\nJ.P.
+    Morgan withdrew funding for Wardenclyffe in 1903, famously asking 'Where do I
+    put the meter?' \u2014 an acknowledgement that the technology was real, but that
+    a metered power system could not be monetised in the same way as a wired one.
+    The tower was demolished in 1917. The patents were purchased and suppressed."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - aether_energy
+  - resonance_frequency_432
+  unlockTrigger: rs_25
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: He was not inventing. He was remembering. Every formula he wrote
+    had already been written, once, in copper and stone.

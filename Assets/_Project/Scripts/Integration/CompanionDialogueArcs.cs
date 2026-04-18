@@ -140,6 +140,7 @@ namespace Tartaria.Integration
             if (_trust[companion] < TrustLevel.Bonded)
             {
                 _trust[companion]++;
+                Save.SaveManager.Instance?.MarkDirty();
                 Debug.Log($"[DialogueArcs] {companion} trust → {_trust[companion]}");
             }
         }
@@ -170,6 +171,7 @@ namespace Tartaria.Integration
         public void MarkSeen(string dialogueKey)
         {
             _seenDialogues.Add(dialogueKey);
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log($"[DialogueArcs] Seen: {dialogueKey}");
         }
 

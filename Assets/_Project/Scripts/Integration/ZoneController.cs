@@ -22,7 +22,7 @@ namespace Tartaria.Integration
         [SerializeField] string zoneSubtitle = "The Buried Settlement";
 
         [Header("Discovery")]
-        [SerializeField] float discoveryRadius = 30f;
+        [SerializeField] float discoveryRadius = 15f;
         [SerializeField] float discoveryCheckInterval = 0.5f;
 
         [Header("Atmosphere")]
@@ -60,8 +60,25 @@ namespace Tartaria.Integration
 
         void Start()
         {
-            // Find all buildings in zone
-            _buildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            _sceneLoadTime = Time.time;
+
+            // Runtime override: scene may have stale 30f from editor serialization
+            if (discoveryRadius > 15f) discoveryRadius = 15f;
+
+            // Find all buildings in zone, deduplicate by position
+            var allBuildings = FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            var unique = new System.Collections.Generic.List<InteractableBuilding>();
+            var seen = new System.Collections.Generic.HashSet<string>();
+            foreach (var b in allBuildings)
+            {
+                // Key by rounded position to catch duplicates at same location
+                string key = $"{b.transform.position.x:F0}_{b.transform.position.z:F0}";
+                if (seen.Add(key))
+                    unique.Add(b);
+            }
+            _buildings = unique.ToArray();
+            if (_buildings.Length != allBuildings.Length)
+                Debug.Log($"[ZoneController] {allBuildings.Length} InteractableBuildings found, deduped to {_buildings.Length}");
 
             // Find player
             var player = GameObject.FindWithTag("Player");
@@ -74,6 +91,7 @@ namespace Tartaria.Integration
 
             // Show zone name on entry
             ShowZoneName();
+            CompanionManager.Instance?.CheckUnlocks(0);
         }
 
         void Update()
@@ -102,8 +120,14 @@ namespace Tartaria.Integration
 
         // ─── Discovery System ────────────────────────
 
+        float _sceneLoadTime;
+        const float DISCOVERY_GRACE_PERIOD = 5f;
+
         void CheckDiscoveries()
         {
+            // Suppress discoveries during scene-load grace period
+            if (Time.time - _sceneLoadTime <= DISCOVERY_GRACE_PERIOD) return;
+
             _discoveryTimer += Time.deltaTime;
             if (_discoveryTimer < discoveryCheckInterval) return;
             _discoveryTimer = 0f;
@@ -121,6 +145,7 @@ namespace Tartaria.Integration
                 if (dist <= discoveryRadius)
                 {
                     building.Discover();
+                    return; // One discovery per check cycle to prevent cinematic overlap
                 }
             }
         }
@@ -168,6 +193,7 @@ namespace Tartaria.Integration
             _zoneNameShown = true;
 
             HUDController.Instance?.SetZoneName($"{zoneName} — {zoneSubtitle}");
+            Audio.AdaptiveMusicController.Instance?.SetZone(0);
         }
 
         // ─── Idle Dialogue ───────────────────────────
@@ -185,6 +211,7 @@ namespace Tartaria.Integration
             {
                 _idleTimer = 0;
                 DialogueManager.Instance?.PlayContextDialogue("exploration_idle");
+                MiloController.Instance?.RequestBanter();
             }
 
             // Reset idle timer on movement

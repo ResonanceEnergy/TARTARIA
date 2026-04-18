@@ -69,11 +69,12 @@ namespace Tartaria.Editor
         public static void RunBuildPhases()
         {
 
-            // ── Phase 1: Directories + URP ──
+            // ── Phase 1: Directories + URP + TMP Essentials ──
             BuildReport.RunPhase("Phase 1/10: Directories", () =>
             {
                 EnsureDirectories();
                 URPSetup.EnsureURPPipeline();
+                ImportTMPEssentials();
             });
 
             // ── Phase 2: ScriptableObjects + Input Actions ──
@@ -100,12 +101,15 @@ namespace Tartaria.Editor
             BuildReport.RunPhase("Phase 5/10: Quest Definitions", () =>
             {
                 QuestDefinitionFactory.BuildAllQuests();
+                AnastasiaDialoguePopulator.BuildDialogueDatabase();
+                ArchiveDatabasePopulator.BuildArchiveDatabase();
             });
 
             // ── Phase 6: Character Prefabs ──
             BuildReport.RunPhase("Phase 6/10: Character Prefabs", () =>
             {
                 CharacterPrefabFactory.BuildAllCharacters();
+                AnastasiaPrefabFactory.BuildAnastasiaPrefab();
             });
 
             // ── Phase 7: Scenes (Boot + UI_Overlay) ──
@@ -158,6 +162,12 @@ namespace Tartaria.Editor
                 BuildReport.Skip("Phase 9/10: Apply Visual Upgrade", "Echohaven scene not found");
             }
 
+            // ── Phase 9b: URP Quality Upgrade (MSAA, shadows, post-processing) ──
+            BuildReport.RunPhase("Phase 9b/15: URP Quality Upgrade", () =>
+            {
+                URPSetup.UpgradeURPQuality();
+            });
+
             // ── Phase 10: Input assignment (scene must be open) + Build Settings ──
             BuildReport.RunPhase("Phase 10/12: Input + Build Settings", () =>
             {
@@ -193,6 +203,81 @@ namespace Tartaria.Editor
             string bootPath = "Assets/_Project/Scenes/Boot.unity";
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(bootPath) != null)
                 EditorSceneManager.OpenScene(bootPath, OpenSceneMode.Single);
+        }
+
+        /// <summary>
+        /// Import TMP Essential Resources if not already present.
+        /// Must run before any UI phases that create TextMeshPro components.
+        /// Also closes the TMP importer window if it's open.
+        /// </summary>
+        static void ImportTMPEssentials()
+        {
+            // Check if TMP settings asset exists (indicates essentials are imported)
+            var settings = AssetDatabase.FindAssets("t:TMP_Settings");
+            if (settings.Length > 0)
+            {
+                Debug.Log("[Tartaria] TMP Essential Resources already imported — skipping.");
+                CloseTMPImporterWindow();
+                return;
+            }
+
+            // Find the .unitypackage inside the ugui package cache
+            string packagePath = null;
+            var ugui = System.IO.Directory.GetDirectories(
+                System.IO.Path.Combine(Application.dataPath, "..", "Library", "PackageCache"), "com.unity.ugui*");
+            foreach (var dir in ugui)
+            {
+                string candidate = System.IO.Path.Combine(dir, "Package Resources", "TMP Essential Resources.unitypackage");
+                if (System.IO.File.Exists(candidate))
+                {
+                    packagePath = candidate;
+                    break;
+                }
+            }
+
+            if (packagePath == null)
+            {
+                Debug.LogWarning("[Tartaria] TMP Essential Resources package not found in PackageCache — TMP fonts may be missing.");
+                return;
+            }
+
+            Debug.Log($"[Tartaria] Importing TMP Essential Resources from {packagePath}");
+            AssetDatabase.ImportPackage(packagePath, false); // false = don't show dialog
+            AssetDatabase.Refresh();
+            Debug.Log("[Tartaria] TMP Essential Resources imported.");
+
+            CloseTMPImporterWindow();
+        }
+
+        /// <summary>
+        /// Close any open TMP Package Resource Importer windows.
+        /// These pop up automatically and block Play mode with "Cannot import in play mode".
+        /// </summary>
+        public static void CloseTMPImporterWindow()
+        {
+            try
+            {
+                var windowType = System.Type.GetType(
+                    "TMPro.TMP_PackageResourceImporterWindow, Unity.ugui");
+                if (windowType == null)
+                    windowType = System.Type.GetType(
+                        "TMPro.TMP_PackageResourceImporterWindow, Unity.TextMeshPro");
+                if (windowType == null) return;
+
+                var windows = Resources.FindObjectsOfTypeAll(windowType);
+                foreach (var w in windows)
+                {
+                    if (w is EditorWindow ew)
+                    {
+                        Debug.Log("[Tartaria] Closing TMP Package Resource Importer window.");
+                        ew.Close();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[Tartaria] Could not close TMP importer window: {ex.Message}");
+            }
         }
 
         static void EnsureDirectories()

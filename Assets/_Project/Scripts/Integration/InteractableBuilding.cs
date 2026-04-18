@@ -39,6 +39,7 @@ namespace Tartaria.Integration
         static readonly int DissolveProgressId = Shader.PropertyToID("_DissolveProgress");
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         static readonly int ColorId = Shader.PropertyToID("_Color");
+        static readonly int EmissionColorId = Shader.PropertyToID("_EmissionColor");
         MaterialPropertyBlock _mpb;
 
         string _promptCache;
@@ -48,6 +49,17 @@ namespace Tartaria.Integration
         public string BuildingId => buildingId;
         public BuildingRestorationState State => _state;
         public BuildingDefinition Definition => definition;
+
+        /// <summary>
+        /// Inject materials at runtime when InteractableBuilding is added via AddComponent
+        /// (SerializeField references are null in that case).
+        /// </summary>
+        public void SetMaterials(Material mud, Material revealed, Material active)
+        {
+            if (mudMaterial == null) mudMaterial = mud;
+            if (revealedMaterial == null) revealedMaterial = revealed;
+            if (activeMaterial == null) activeMaterial = active;
+        }
 
         void Start()
         {
@@ -105,9 +117,24 @@ namespace Tartaria.Integration
             switch (_state)
             {
                 case BuildingRestorationState.Buried:
-                    // Can't interact until discovered (proximity trigger)
-                    if (HUDController.Instance != null)
-                        HUDController.Instance.ShowInteractionPrompt("This structure is buried deep...");
+                    // Player is trying to interact with buried structure — start excavation
+                    if (_isDiscovered)
+                    {
+                        // Already discovered: auto-reveal via resonance pulse
+                        Discover();
+                        AudioManager.Instance?.PlaySFX("BuildingReveal", transform.position);
+                        if (HUDController.Instance != null)
+                            HUDController.Instance.ShowInteractionPrompt(
+                                $"The mud crumbles! {GetDisplayName()} is revealed!");
+                        DialogueManager.Instance?.PlayContextDialogue(DialogueContext.Discovery);
+                    }
+                    else
+                    {
+                        // Not yet discovered — give hint
+                        if (HUDController.Instance != null)
+                            HUDController.Instance.ShowInteractionPrompt(
+                                "Something is buried here... Move closer to investigate.");
+                    }
                     break;
 
                 case BuildingRestorationState.Revealed:
@@ -156,7 +183,9 @@ namespace Tartaria.Integration
             _promptNodes = _nodesCompleted;
             _promptCache = _state switch
             {
-                BuildingRestorationState.Buried => "",
+                BuildingRestorationState.Buried => _isDiscovered
+                    ? $"[E] Excavate {GetDisplayName()}"
+                    : "[E] Investigate mound",
                 BuildingRestorationState.Revealed => $"[E] Tune {GetDisplayName()} (Node {_nodesCompleted + 1}/3)",
                 BuildingRestorationState.Tuning => $"[E] Tune {GetDisplayName()} (Node {_nodesCompleted + 1}/3)",
                 BuildingRestorationState.Emerging => "Restoration in progress...",
@@ -185,6 +214,7 @@ namespace Tartaria.Integration
 
             GameLoopController.Instance?.OnBuildingDiscovered(
                 GetDisplayName(), transform.position);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         // ─── Tuning ──────────────────────────────────
@@ -232,6 +262,7 @@ namespace Tartaria.Integration
 
             // Tutorial: first tuning completion
             TutorialSystem.Instance?.ForceComplete(TutorialStep.Tuning);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteTuning, buildingId);
 
             // All nodes done?
             if (_nodesCompleted >= 3)
@@ -271,24 +302,78 @@ namespace Tartaria.Integration
             float buriedY = initialScale.y * 0.3f;
             float fullY = initialScale.y;
 
-            // Animate mud dissolution via material property
+            // Material colour waypoints: mud-fresh → mud-cracking → stone
+            // (revealedMaterial is M_Mud_Cracking, activeMaterial is M_Stone_Active)
+            Color mudColor    = new Color(0.30f, 0.20f, 0.12f);
+            Color crackColor  = new Color(0.42f, 0.32f, 0.18f);
+            Color stoneColor  = new Color(0.82f, 0.78f, 0.70f);
+            Color emitOff     = Color.black;
+            Color emitMid     = new Color(0.35f, 0.27f, 0.08f) * 1.2f;
+            Color emitFull    = new Color(0.6f,  0.5f,  0.2f)  * 2.5f;
+
+            bool swappedToCracking = false;
+            bool swappedToStone    = false;
+
+            // Camera shake + discovery flash at sequence start
+            FindAnyObjectByType<Tartaria.Camera.CameraController>()?.TriggerShake(0.35f, 0.5f);
+            RuntimeHUDBuilder.Instance?.FlashDiscovery();
+
             while (elapsed < duration)
             {
                 elapsed += Time.deltaTime;
-                float progress = Mathf.Clamp01(elapsed / duration);
+                float t = Mathf.Clamp01(elapsed / duration);
 
-                if (mainRenderer != null && mainRenderer.sharedMaterial.HasProperty(DissolveProgressId))
-                {
-                    mainRenderer.GetPropertyBlock(_mpb);
-                    _mpb.SetFloat(DissolveProgressId, progress);
-                    mainRenderer.SetPropertyBlock(_mpb);
-                }
-
-                // Scale up building from buried (30%) to full height
+                // Scale up from 30% buried to full
                 transform.localScale = new Vector3(
                     initialScale.x,
-                    Mathf.Lerp(buriedY, fullY, progress),
+                    Mathf.Lerp(buriedY, fullY, Mathf.SmoothStep(0f, 1f, t)),
                     initialScale.z);
+
+                // Material swap at milestones
+                if (!swappedToCracking && t >= 0.25f)
+                {
+                    swappedToCracking = true;
+                    if (revealedMaterial != null)
+                        mainRenderer.sharedMaterial = revealedMaterial;
+                }
+                if (!swappedToStone && t >= 0.75f)
+                {
+                    swappedToStone = true;
+                    if (activeMaterial != null)
+                        mainRenderer.sharedMaterial = activeMaterial;
+                }
+
+                // Continuous colour/emission blend via MaterialPropertyBlock
+                if (mainRenderer != null)
+                {
+                    Color baseCol;
+                    Color emitCol;
+                    if (t < 0.25f)
+                    {
+                        float lt = t / 0.25f;
+                        baseCol = Color.Lerp(mudColor, crackColor, lt);
+                        emitCol = Color.Lerp(emitOff, emitMid, lt);
+                    }
+                    else if (t < 0.75f)
+                    {
+                        float lt = (t - 0.25f) / 0.5f;
+                        baseCol = Color.Lerp(crackColor, stoneColor, lt);
+                        emitCol = Color.Lerp(emitMid, emitFull, lt);
+                    }
+                    else
+                    {
+                        baseCol = stoneColor;
+                        emitCol = emitFull;
+                    }
+
+                    mainRenderer.GetPropertyBlock(_mpb);
+                    if (mainRenderer.sharedMaterial.HasProperty(BaseColorId))
+                        _mpb.SetColor(BaseColorId, baseCol);
+                    else if (mainRenderer.sharedMaterial.HasProperty(ColorId))
+                        _mpb.SetColor(ColorId, baseCol);
+                    _mpb.SetColor(EmissionColorId, emitCol);
+                    mainRenderer.SetPropertyBlock(_mpb);
+                }
 
                 yield return null;
             }
@@ -317,6 +402,8 @@ namespace Tartaria.Integration
 
             // Tutorial: first building fully restored
             TutorialSystem.Instance?.ForceComplete(TutorialStep.BuildingRestore);
+            AchievementSystem.Instance?.CheckBuildingRestored(
+                ZoneController.Instance?.GetRestoredBuildingCount() ?? 1, allPerfect);
         }
 
         // ─── Visuals ─────────────────────────────────
@@ -333,8 +420,26 @@ namespace Tartaria.Integration
                 _ => mainRenderer.sharedMaterial
             };
 
+            // Failsafe: NEVER allow null material (prevents pink)
+            if (mat == null)
+            {
+                var shader = Shader.Find("Universal Render Pipeline/Lit")
+                          ?? Shader.Find("Standard");
+                if (shader != null)
+                {
+                    mat = new Material(shader);
+                    mat.SetColor("_BaseColor", new Color(0.35f, 0.25f, 0.15f));
+                    mat.SetFloat("_Smoothness", 0.1f);
+                    Debug.LogWarning($"[Building] {buildingId}: created failsafe material for state {_state}");
+                }
+            }
+
             if (mat != null)
                 mainRenderer.sharedMaterial = mat;
+
+            // Ensure emission keyword is on for pulsing
+            if (mainRenderer.sharedMaterial != null)
+                mainRenderer.sharedMaterial.EnableKeyword("_EMISSION");
 
             // Color tint based on state
             Color tint = _state switch
@@ -352,6 +457,27 @@ namespace Tartaria.Integration
                 _mpb.SetColor(BaseColorId, tint);
             else if (mainRenderer.sharedMaterial.HasProperty(ColorId))
                 _mpb.SetColor(ColorId, tint);
+            mainRenderer.SetPropertyBlock(_mpb);
+        }
+
+        /// <summary>Subtle pulsing glow on non-active buildings so player can find them.</summary>
+        void Update()
+        {
+            if (mainRenderer == null || _state == BuildingRestorationState.Active) return;
+
+            // Pulse emission to draw player attention
+            float pulse = (Mathf.Sin(Time.time * 2f) + 1f) * 0.5f; // 0..1
+            Color emissionColor = _state switch
+            {
+                BuildingRestorationState.Buried => Color.Lerp(Color.black, new Color(0.3f, 0.2f, 0.05f), pulse * 0.4f),
+                BuildingRestorationState.Revealed => Color.Lerp(new Color(0.2f, 0.15f, 0f), new Color(0.5f, 0.4f, 0.1f), pulse),
+                BuildingRestorationState.Tuning => Color.Lerp(new Color(0.3f, 0.25f, 0f), new Color(0.8f, 0.6f, 0.1f), pulse),
+                BuildingRestorationState.Emerging => new Color(0.9f, 0.7f, 0.2f) * pulse,
+                _ => Color.black
+            };
+
+            mainRenderer.GetPropertyBlock(_mpb);
+            _mpb.SetColor(EmissionColorId, emissionColor);
             mainRenderer.SetPropertyBlock(_mpb);
         }
 

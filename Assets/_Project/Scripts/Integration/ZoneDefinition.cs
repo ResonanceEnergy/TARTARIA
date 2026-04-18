@@ -18,6 +18,8 @@ namespace Tartaria.Integration
         [Header("Gameplay")]
         public int zoneIndex;
         public float rsRequirementToUnlock;
+        [Tooltip("Quest that must be completed before this zone unlocks. Leave empty for no requirement.")]
+        public string prerequisiteQuestId;
         public int buildingCount = 3;
         public Vector3 playerSpawnPosition;
 

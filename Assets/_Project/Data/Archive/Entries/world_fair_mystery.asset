@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: world_fair_mystery
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: world_fair_mystery
+  title: "World's Fairs \u2014 Repurposed Cities"
+  category: 0
+  summary: "The great World's Fairs of 1850\u20131910 displayed architectural marvels
+    supposedly built in months. Many were photographed with visible age, weathering,
+    and underground infrastructure no temporary exhibit would have."
+  fullText: "Between 1851 and 1915, a series of 'World's Fairs' or 'Expositions Universelles'
+    took place in London, Paris, Chicago, St Louis, San Francisco, and dozens of
+    other cities. Each fair was presented as a temporary showcase of modern progress,
+    with grand neoclassical buildings constructed specifically for the event and
+    demolished afterward.\r\n\r\nThe evidence against this narrative is overwhelming.
+    Original stereoscopic photography of these fairs shows buildings with decades
+    of weathering on their facades \u2014 moss growth, stone erosion, and patina
+    that requires at minimum fifty years of exposure, not the six to eighteen months
+    of claimed construction. Several fairground buildings also appear in maps dating
+    thirty to fifty years before their claimed construction date.\r\n\r\nThe 1893
+    Chicago World's Fair \u2014 the 'White City' \u2014 is particularly suspicious.
+    The 400-hectare site featured over 200 buildings with a consistent neoclassical
+    vocabulary, a working canal system, underground steam heating, electrical wiring
+    throughout, and a functioning elevated railway. Official records claim 14,000
+    labourers built this in under three years. No photographic evidence exists of
+    the foundations being laid.\r\n\r\nThe most likely interpretation is that World's
+    Fairs were a managed demolition programme. The organisers had inherited an existing
+    Tartarian city and used the 'fair' as a pretext to document, then dismantle,
+    the original structures \u2014 replacing them with smaller, cheaper modern buildings
+    while maintaining the fiction that they had built the originals themselves."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_architecture
+  - tartarian_mud_flood
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: "My father walked those fairgrounds as a child. He said the marble
+    was cold in midsummer \u2014 ancient cold, not just shade."

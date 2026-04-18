@@ -112,6 +112,133 @@ Shader "Tartaria/MudDissolution"
             }
             ENDHLSL
         }
+
+        // ── ShadowCaster — mud buildings cast shadows even while dissolving ──
+        Pass
+        {
+            Name "ShadowCaster"
+            Tags { "LightMode" = "ShadowCaster" }
+
+            ZWrite On
+            ZTest LEqual
+            ColorMask 0
+
+            HLSLPROGRAM
+            #pragma vertex ShadowVert
+            #pragma fragment ShadowFrag
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct ShadowAttributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS   : NORMAL;
+                float2 uv         : TEXCOORD0;
+            };
+
+            struct ShadowVaryings
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv         : TEXCOORD0;
+            };
+
+            TEXTURE2D(_NoiseTex); SAMPLER(sampler_NoiseTex);
+
+            CBUFFER_START(UnityPerMaterial)
+                float4 _BaseColor;
+                float4 _MainTex_ST;
+                float4 _NoiseTex_ST;
+                float  _DissolutionProgress;
+                float  _EdgeWidth;
+                float4 _EdgeColor;
+                float  _RumbleIntensity;
+            CBUFFER_END
+
+            ShadowVaryings ShadowVert(ShadowAttributes input)
+            {
+                ShadowVaryings output;
+                float3 pos = input.positionOS.xyz;
+                float rumble = sin(_Time.y * 8.0 + pos.x * 3.0 + pos.z * 5.0)
+                             * _RumbleIntensity * _DissolutionProgress;
+                pos += input.normalOS * rumble;
+
+                VertexPositionInputs posInputs = GetVertexPositionInputs(pos);
+                output.positionCS = posInputs.positionCS;
+                output.uv = input.uv * _NoiseTex_ST.xy + _NoiseTex_ST.zw;
+                return output;
+            }
+
+            half4 ShadowFrag(ShadowVaryings input) : SV_Target
+            {
+                float noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, input.uv).r;
+                clip(noise - _DissolutionProgress);
+                return 0;
+            }
+            ENDHLSL
+        }
+
+        // ── DepthOnly — correct depth prepass for dissolved geometry ──
+        Pass
+        {
+            Name "DepthOnly"
+            Tags { "LightMode" = "DepthOnly" }
+
+            ZWrite On
+            ColorMask R
+
+            HLSLPROGRAM
+            #pragma vertex DepthVert
+            #pragma fragment DepthFrag
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct DepthAttributes
+            {
+                float4 positionOS : POSITION;
+                float3 normalOS   : NORMAL;
+                float2 uv         : TEXCOORD0;
+            };
+
+            struct DepthVaryings
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv         : TEXCOORD0;
+            };
+
+            TEXTURE2D(_NoiseTex); SAMPLER(sampler_NoiseTex);
+
+            CBUFFER_START(UnityPerMaterial)
+                float4 _BaseColor;
+                float4 _MainTex_ST;
+                float4 _NoiseTex_ST;
+                float  _DissolutionProgress;
+                float  _EdgeWidth;
+                float4 _EdgeColor;
+                float  _RumbleIntensity;
+            CBUFFER_END
+
+            DepthVaryings DepthVert(DepthAttributes input)
+            {
+                DepthVaryings output;
+                float3 pos = input.positionOS.xyz;
+                float rumble = sin(_Time.y * 8.0 + pos.x * 3.0 + pos.z * 5.0)
+                             * _RumbleIntensity * _DissolutionProgress;
+                pos += input.normalOS * rumble;
+
+                VertexPositionInputs posInputs = GetVertexPositionInputs(pos);
+                output.positionCS = posInputs.positionCS;
+                output.uv = input.uv * _NoiseTex_ST.xy + _NoiseTex_ST.zw;
+                return output;
+            }
+
+            half4 DepthFrag(DepthVaryings input) : SV_Target
+            {
+                float noise = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, input.uv).r;
+                clip(noise - _DissolutionProgress);
+                return 0;
+            }
+            ENDHLSL
+        }
     }
     FallBack "Universal Render Pipeline/Lit"
 }

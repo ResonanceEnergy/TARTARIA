@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: nikola_tesla
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: nikola_tesla
+  title: "Nikola Tesla \u2014 The Rememberer"
+  category: 6
+  summary: Tesla did not invent his technology. He remembered it. His visions, his
+    eidetic recall of full working blueprints, and his uncanny ability to predict
+    experimental results all suggest access to knowledge that predated him.
+  fullText: "Nikola Tesla described his creative process in terms that his contemporaries
+    found baffling. He did not sketch concepts and develop them experimentally; he
+    perceived complete, working machines in full three-dimensional detail before
+    any physical component existed. He wrote: 'The pieces of apparatus I conceived
+    were to me absolutely real and tangible in every detail, even to the minutest
+    marks and signs... I practised this up to the point where I could actually build
+    the apparatus in my imagination.'\r\n\r\nThis is not a description of imagination.
+    It is a description of recall. The distinction matters. When Tesla built a device
+    that matched his mental image, it worked on the first attempt \u2014 a statistical
+    impossibility if the design were being developed through trial and error.\r\n\r\nHis
+    knowledge of the Earth's resonant properties, of the ionosphere's electrical
+    characteristics, and of the standing-wave behaviour of distributed electromagnetic
+    fields was decades ahead of any contemporaneous scientific understanding. The
+    Earth-ionosphere resonant cavity (the Schumann resonance) was not formally described
+    until 1952 \u2014 thirty years after Tesla had already engineered a system to
+    exploit it.\r\n\r\nThe working hypothesis that reconciles these anomalies: Tesla
+    was one of several individuals in the post-reset world who had access, through
+    mechanisms not fully understood, to the technical knowledge of the Tartarian
+    civilisation. He could access this knowledge visually \u2014 a library of blueprints
+    encoded at a level deeper than conscious memory."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - free_energy_towers
+  - aether_energy
+  unlockTrigger: rs_25
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: He stood in the same places I stood, a hundred years after me.
+    He heard the same frequencies. How could he not remember?

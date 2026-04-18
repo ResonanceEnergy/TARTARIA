@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: mud_generators
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: mud_generators
+  title: Atmospheric Water & Energy Generators
+  category: 1
+  summary: Old-world towers and rooftop structures were not merely decorative. They
+    functioned as atmospheric energy collectors, dew harvesters, and electrostatic
+    generators drawing power from the charge differential between earth and sky.
+  fullText: "Every terrestrial surface exists within a potential gradient. At ground
+    level, the atmospheric potential is approximately 0 volts. At 1000 metres altitude,
+    it rises to roughly 300,000 volts. This vertical potential gradient \u2014 which
+    reaches 100 volts per metre on a clear day and several thousand volts per metre
+    during storms \u2014 is a continuous source of electrical energy that requires
+    no fuel.\r\n\r\nTartarian towers, finials, and roof structures were proportioned
+    to exploit this gradient. A tower of correct height, with a properly conductive
+    tip and a grounded base, acts as a continuous electrostatic generator. The taller
+    the structure, the greater the voltage differential it can tap. A building 60
+    metres high can access a 6,000-volt potential difference simply by virtue of
+    existing.\r\n\r\nThe internal copper conduits found in the walls of many surviving
+    Tartarian buildings \u2014 dismissed as 'primitive plumbing' \u2014 were in fact
+    the wiring of this distributed power collection system. The fluid they carried
+    was not water but mercury, used as a superconducting liquid at the operating
+    temperatures of the old world's infrastructure.\r\n\r\nThe rooftop structures
+    of World's Fair buildings, Russian palace complexes, and American capitol buildings
+    all share the same proportional relationship between tower height, dome diameter,
+    and finial length \u2014 the exact ratios required to maximise electrostatic
+    collection efficiency."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - free_energy_towers
+  - aether_energy
+  unlockTrigger: rs_50
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: The towers were not reaching for heaven. They were drinking from
+    it.

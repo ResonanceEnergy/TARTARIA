@@ -44,6 +44,9 @@ namespace Tartaria.Integration
         bool _playerQueryCreated;
         bool _ecsReady;
 
+        // Pending RS rewards — buffered until ECS is ready
+        readonly System.Collections.Generic.List<(float amount, string source)> _pendingRsRewards = new();
+
         // Cached scene queries
         InteractableBuilding[] _cachedBuildings = System.Array.Empty<InteractableBuilding>();
         float _buildingCacheAge = float.MaxValue;
@@ -71,7 +74,7 @@ namespace Tartaria.Integration
 
         // Scene-load grace period — suppress cinematic close-ups during initial load
         float _sceneLoadTime;
-        const float DISCOVERY_GRACE_PERIOD = 3f;
+        const float DISCOVERY_GRACE_PERIOD = 5f;
 
         // Buff tracking
         float _rsBuffTimer;
@@ -154,7 +157,10 @@ namespace Tartaria.Integration
 
             // Wire Day Out of Time memory zone transitions → HUD + atmosphere
             if (DayOutOfTimeController.Instance != null)
+            {
                 DayOutOfTimeController.Instance.OnMemoryZoneChanged += HandleMemoryZoneChanged;
+                DayOutOfTimeController.Instance.OnEventCompleted += HandleDayOutOfTimeCompleted;
+            }
 
             // Wire economy events → HUD currency display
             if (EconomySystem.Instance != null)
@@ -382,10 +388,12 @@ namespace Tartaria.Integration
             playerInput.OnResonancePulse -= HandleResonancePulse;
             playerInput.OnHarmonicStrike -= HandleHarmonicStrike;
             playerInput.OnFrequencyShield -= HandleFrequencyShield;
+            playerInput.OnScan -= HandleScan;
             // Subscribe
             playerInput.OnResonancePulse += HandleResonancePulse;
             playerInput.OnHarmonicStrike += HandleHarmonicStrike;
             playerInput.OnFrequencyShield += HandleFrequencyShield;
+            playerInput.OnScan += HandleScan;
         }
 
         protected override void OnDestroy()
@@ -401,6 +409,7 @@ namespace Tartaria.Integration
                 playerInput.OnResonancePulse -= HandleResonancePulse;
                 playerInput.OnHarmonicStrike -= HandleHarmonicStrike;
                 playerInput.OnFrequencyShield -= HandleFrequencyShield;
+                playerInput.OnScan -= HandleScan;
             }
             if (SaveManager.Instance != null)
             {
@@ -436,7 +445,10 @@ namespace Tartaria.Integration
             if (LeyLineManager.Instance != null)
                 LeyLineManager.Instance.OnLineRestored -= HandleLeyLineRestored;
             if (DayOutOfTimeController.Instance != null)
+            {
                 DayOutOfTimeController.Instance.OnMemoryZoneChanged -= HandleMemoryZoneChanged;
+                DayOutOfTimeController.Instance.OnEventCompleted -= HandleDayOutOfTimeCompleted;
+            }
             if (EconomySystem.Instance != null)
                 EconomySystem.Instance.OnCurrencyChanged -= HandleCurrencyChanged;
             if (CraftingSystem.Instance != null)
@@ -611,6 +623,10 @@ namespace Tartaria.Integration
             {
                 _rsEntity = _rsQuery.GetSingletonEntity();
                 _ecsReady = true;
+                // Flush any RS rewards that arrived before ECS was ready
+                foreach (var (amt, src) in _pendingRsRewards)
+                    QueueRSReward(amt, src);
+                _pendingRsRewards.Clear();
             }
 
             // Find player entity for position sync
@@ -707,6 +723,9 @@ namespace Tartaria.Integration
                 // Zone atmosphere
                 if (ZoneController.Instance != null)
                     ZoneController.Instance.UpdateRS(currentRS);
+
+                // Companion RS awareness
+                KorathController.Instance?.UpdatePlayerRS(currentRS);
 
                 _lastRS = currentRS;
             }
@@ -812,16 +831,18 @@ namespace Tartaria.Integration
         {
             Debug.Log($"[GameLoop] Boss defeated: {result.bossName} — Score {result.performanceScore:P0}");
 
-            // Trigger climax sequence for the current Moon
+            // Trigger climax sequence for the current Moon (climax handles AdvanceToNextMoon in FinishClimax)
             int moonIdx = CampaignFlowController.Instance?.CurrentMoonIndex ?? 0;
             ClimaxSequenceSystem.Instance?.TriggerClimax(moonIdx);
-
-            // Advance Moon campaign
-            CampaignFlowController.Instance?.AdvanceToNextMoon();
 
             // Companion celebration
             MiloController.Instance?.NotifyCombatVictory();
             LiraelController.Instance?.NotifyZoneComplete();
+            ThorneController.Instance?.NotifyZoneSecured();
+            KorathController.Instance?.NotifyZoneComplete();
+
+            // Achievement
+            AchievementSystem.Instance?.CheckBossDefeated(result.bossName ?? "boss");
 
             // Hide boss health bar
             HUDController.Instance?.HideBossHealth();
@@ -851,6 +872,7 @@ namespace Tartaria.Integration
 
             // RS bonus for climax completion
             QueueRSReward(25f, "climax_bonus");
+            EconomySystem.Instance?.AddCurrency(CurrencyType.AetherShards, 50 + moonIndex * 10);
 
             // Flash the RS gauge
             HUDController.Instance?.FlashRSGain(25f);
@@ -875,6 +897,7 @@ namespace Tartaria.Integration
         {
             HUDController.Instance?.UpdateWaveEnemies(0);
             NotificationSystem.Instance?.Show($"Wave {waveIndex + 1} cleared!", NotificationType.Combat);
+            AdaptiveMusicController.Instance?.ExitCombat();
         }
 
         void HandleAllWavesCleared()
@@ -883,6 +906,7 @@ namespace Tartaria.Integration
             HUDController.Instance?.HideWaveCounter();
             HUDController.Instance?.HideBossHealth();
             NotificationSystem.Instance?.Show("All waves eliminated! Victory!", NotificationType.Combat);
+            AdaptiveMusicController.Instance?.ExitCombat();
             SaveManager.Instance?.MarkDirty();
         }
 
@@ -904,6 +928,7 @@ namespace Tartaria.Integration
         {
             if (!_ecsReady) return;
             CombatBridge.Instance?.FireResonancePulse();
+            DamageGolemGameObjects(playerInput != null ? playerInput.transform.position : Vector3.zero, 8f, 25f);
             TutorialSystem.Instance?.ForceComplete(TutorialStep.ResonancePulse);
         }
 
@@ -911,7 +936,21 @@ namespace Tartaria.Integration
         {
             if (!_ecsReady) return;
             CombatBridge.Instance?.FireHarmonicStrike();
+            DamageGolemGameObjects(playerInput != null ? playerInput.transform.position : Vector3.zero, 5f, 35f);
             TutorialSystem.Instance?.ForceComplete(TutorialStep.HarmonicStrike);
+        }
+
+        /// <summary>Deal damage to fallback MudGolem GameObjects (non-ECS path).</summary>
+        void DamageGolemGameObjects(Vector3 origin, float range, float damage)
+        {
+            var cols = Physics.OverlapSphere(origin, range);
+            foreach (var col in cols)
+            {
+                var health = col.GetComponent<Integration.MudGolemHealth>()
+                          ?? col.GetComponentInParent<Integration.MudGolemHealth>();
+                if (health != null)
+                    health.TakeDamage(damage);
+            }
         }
 
         void HandleFrequencyShield()
@@ -919,6 +958,11 @@ namespace Tartaria.Integration
             if (!_ecsReady) return;
             CombatBridge.Instance?.ActivateFrequencyShield();
             TutorialSystem.Instance?.ForceComplete(TutorialStep.FrequencyShield);
+        }
+
+        void HandleScan(Vector3 position)
+        {
+            ResonanceScannerSystem.Instance?.PerformScan(position, _lastRS);
         }
 
         // ─── Save Sync ──────────────────────────────
@@ -1045,6 +1089,7 @@ namespace Tartaria.Integration
             // Companion notifications
             MiloController.Instance?.NotifyBuildingRestored();
             LiraelController.Instance?.NotifyBuildingRestored();
+            KorathController.Instance?.NotifyBuildingRestored();
 
             SaveManager.Instance?.MarkDirty();
         }
@@ -1064,8 +1109,17 @@ namespace Tartaria.Integration
 
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.DefeatEnemies);
 
+            // Loot drop — award Aether Shards for enemy defeat
+            int shardReward = UnityEngine.Random.Range(2, 6);
+            EconomySystem.Instance?.AddCurrency(CurrencyType.AetherShards, shardReward);
+
+            // Achievement tracking
+            AchievementSystem.Instance?.CheckEnemyDefeated(
+                1, "generic", GiantModeController.Instance?.IsGiant ?? false);
+
             // Companion notifications
             MiloController.Instance?.NotifyCombatVictory();
+            ThorneController.Instance?.NotifyCombatVictory();
 
             // Return to exploration
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
@@ -1080,7 +1134,7 @@ namespace Tartaria.Integration
         /// </summary>
         public void QueueRSReward(float amount, string source)
         {
-            if (!_ecsReady) return;
+            if (!_ecsReady) { _pendingRsRewards.Add((amount, source)); return; }
             Debug.Log($"[GameLoop] RS reward +{amount} from {source}");
             var buffer = _em.GetBuffer<ResonanceEvent>(_rsEntity);
             buffer.Add(new ResonanceEvent
@@ -1216,6 +1270,8 @@ namespace Tartaria.Integration
             // Companion zone-complete notifications
             MiloController.Instance?.NotifyZoneComplete();
             LiraelController.Instance?.NotifyZoneComplete();
+            ThorneController.Instance?.NotifyZoneSecured();
+            KorathController.Instance?.NotifyZoneComplete();
 
             // Let the celebration effects play for a few seconds
             yield return new WaitForSeconds(3f);
@@ -1297,6 +1353,19 @@ namespace Tartaria.Integration
                     };
                 }
                 save.workshop.entries = entries;
+            }
+
+            // Buildings — serialize InteractableBuilding states (Gap 18)
+            if (_cachedBuildings != null && _cachedBuildings.Length > 0)
+            {
+                var buildingSaves = new Save.BuildingSaveState[_cachedBuildings.Length];
+                for (int bi = 0; bi < _cachedBuildings.Length; bi++)
+                {
+                    var ib = _cachedBuildings[bi];
+                    if (ib == null) continue;
+                    buildingSaves[bi] = ib.ToSaveState();
+                }
+                save.world.buildings = buildingSaves;
             }
 
             // Zone
@@ -2280,23 +2349,36 @@ namespace Tartaria.Integration
                 var rsEntity = _rsQuery.GetSingletonEntity();
                 var rs = _em.GetComponentData<ResonanceScore>(rsEntity);
                 rs.CurrentRS = save.world.resonanceScore;
+                // Pre-set ThresholdReached so ECS doesn't re-trigger already-crossed thresholds
+                float savedRS = save.world.resonanceScore;
+                int savedThreshold = savedRS >= 100f ? 100 : savedRS >= 75f ? 75 : savedRS >= 50f ? 50 : savedRS >= 25f ? 25 : 0;
+                rs.ThresholdReached = savedThreshold;
                 _em.SetComponentData(rsEntity, rs);
-                _lastRS = save.world.resonanceScore;
-                Debug.Log($"[GameLoop] RS restored: {save.world.resonanceScore:F1}");
+                _lastRS = savedRS;
+                _lastThreshold = savedThreshold;
+
+                Debug.Log($"[GameLoop] RS restored: {savedRS:F1} (threshold: {savedThreshold})");
             }
 
-            // Restore Player ECS position
-            if (save.player != null && _playerQuery.CalculateEntityCount() > 0)
+            // Restore Player ECS position (skip for fresh saves — let PlayerSpawner handle it)
+            if (save.player != null && save.header.playTimeSeconds > 0f && _playerQuery.CalculateEntityCount() > 0)
             {
                 var playerEntity = _playerQuery.GetSingletonEntity();
                 var lt = _em.GetComponentData<LocalTransform>(playerEntity);
-                lt.Position = new float3(save.player.position.x, save.player.position.y, save.player.position.z);
+                float ecsY = Mathf.Max(save.player.position.y, 1.5f);
+                lt.Position = new float3(save.player.position.x, ecsY, save.player.position.z);
                 _em.SetComponentData(playerEntity, lt);
 
-                // Sync MonoBehaviour player too
+                // Sync MonoBehaviour player too — disable CC to avoid collision state corruption
                 var playerGO = GameObject.FindWithTag("Player");
                 if (playerGO != null)
-                    playerGO.transform.position = new Vector3(save.player.position.x, save.player.position.y, save.player.position.z);
+                {
+                    float safeY = Mathf.Max(save.player.position.y, 1.5f);
+                    var cc = playerGO.GetComponent<CharacterController>();
+                    if (cc != null) cc.enabled = false;
+                    playerGO.transform.position = new Vector3(save.player.position.x, safeY, save.player.position.z);
+                    if (cc != null) cc.enabled = true;
+                }
             }
 
             // Restore Building ECS states
@@ -2457,6 +2539,15 @@ namespace Tartaria.Integration
                     UnityEngine.Vector3.zero, UnityEngine.Vector3.one, 0.5f));
             HUDController.Instance?.ShowInteractionPrompt($"Ley line restored between nodes {nodeA} and {nodeB}!");
             Debug.Log($"[GameLoop] Ley line restored: {nodeA} ↔ {nodeB}, +{rsReward} RS");
+        }
+
+        void HandleDayOutOfTimeCompleted()
+        {
+            QueueRSReward(50f, "day_out_of_time");
+            AchievementSystem.Instance?.CheckDayOutOfTime();
+            AdaptiveMusicController.Instance?.PlayStinger(StingerType.BossDefeat);
+            HUDController.Instance?.ShowAchievementToast("THE DAY OUT OF TIME \u2014 Resonance Restored!");
+            Debug.Log("[GameLoop] Day Out of Time event completed.");
         }
 
         void HandleMemoryZoneChanged(int zoneIndex)
@@ -2681,6 +2772,7 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayBuildingUpgrade(Vector3.zero, newTier);
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.QuestComplete);
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            MiloController.Instance?.NotifyBuildingRestored();
             Debug.Log($"[GameLoop] Building upgraded: {buildingId} → tier {newTier}");
         }
 
@@ -2729,6 +2821,7 @@ namespace Tartaria.Integration
         {
             HUDController.Instance?.ShowInteractionPrompt($"Cassian: \"{intel}\"");
             DialogueManager.Instance?.PlayContextDialogue("discovery");
+            CompanionManager.Instance?.AddTrust("cassian", 5f);
             Debug.Log($"[GameLoop] Cassian shared intel: {intel}");
         }
 
@@ -2780,6 +2873,7 @@ namespace Tartaria.Integration
             HUDController.Instance?.ShowAchievementToast("Fleet fully operational!");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.ZoneComplete);
             VFXController.Instance?.TriggerAetherWake();
+            ThorneController.Instance?.NotifyZoneSecured();
             Debug.Log("[GameLoop] Fleet fully operational");
         }
 

@@ -159,24 +159,28 @@ namespace Tartaria.Core
             var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
             if (listeners.Length > 1)
             {
-                // Keep the one on the active main camera; destroy the rest
+                // Two-pass: first pick the one to keep, then destroy the rest
                 var mainCam = UnityEngine.Camera.main;
                 AudioListener kept = null;
-                foreach (var listener in listeners)
-                {
-                    if (kept == null && mainCam != null && listener.gameObject == mainCam.gameObject)
-                    {
-                        kept = listener;
-                        continue;
-                    }
-                    if (kept == null && listener.isActiveAndEnabled)
-                    {
-                        kept = listener;
-                        continue;
-                    }
-                    Destroy(listener);
-                }
-                Debug.Log($"[SceneLoader] Removed {listeners.Length - 1} duplicate AudioListener(s).");
+
+                // Priority 1: main camera listener
+                if (mainCam != null)
+                    foreach (var l in listeners)
+                        if (l.gameObject == mainCam.gameObject) { kept = l; break; }
+
+                // Priority 2: first active listener
+                if (kept == null)
+                    foreach (var l in listeners)
+                        if (l.isActiveAndEnabled) { kept = l; break; }
+
+                // Priority 3: any listener
+                if (kept == null)
+                    kept = listeners[0];
+
+                foreach (var l in listeners)
+                    if (l != kept) Destroy(l);
+
+                Debug.Log($"[SceneLoader] Kept AudioListener on {kept.gameObject.name}, removed {listeners.Length - 1} duplicate(s).");
             }
             else if (listeners.Length == 0)
             {

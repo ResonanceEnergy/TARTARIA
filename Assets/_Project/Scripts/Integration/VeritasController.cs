@@ -69,6 +69,7 @@ namespace Tartaria.Integration
             _introduced = true;
             DialogueManager.Instance?.PlayContextDialogue("veritas_intro");
             OnIntroduced?.Invoke();
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Veritas] Manifested at organ bench.");
         }
 
@@ -82,6 +83,7 @@ namespace Tartaria.Integration
             if (oldLevel != newLevel)
             {
                 OnTrustChanged?.Invoke(newLevel);
+                Save.SaveManager.Instance?.MarkDirty();
 
                 switch (newLevel)
                 {
@@ -122,6 +124,9 @@ namespace Tartaria.Integration
             if (registerIndex < 0 || registerIndex >= 5) return;
             _registersRestored = Mathf.Min(_registersRestored + 1, 5);
             OnRegisterRestored?.Invoke(_registersRestored);
+            Audio.AudioManager.Instance?.PlaySFX2D("RegisterRestored");
+            Input.HapticFeedbackManager.Instance?.PlayPerfectTune();
+            Save.SaveManager.Instance?.MarkDirty();
             AddTrust(5f);
 
             if (_registersRestored >= 5)
@@ -172,6 +177,8 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("veritas_requiem");
             AddTrust(15f);
             OnRequiemPerformed?.Invoke();
+            Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Moon 12: Assist Lirael at Tower 6 with organ-tower hybrid.</summary>
@@ -181,6 +188,7 @@ namespace Tartaria.Integration
             _bellTowerAssisted = true;
             DialogueManager.Instance?.PlayContextDialogue("veritas_bell_tower_assist");
             AddTrust(10f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Moon 13: Play the final note of the unfinished Requiem.</summary>
@@ -190,6 +198,8 @@ namespace Tartaria.Integration
             _finalNoteCompleted = true;
             DialogueManager.Instance?.PlayLineById("veritas_final_note");
             AddTrust(20f);
+            AchievementSystem.Instance?.CheckTrueEnding();
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         // ─── External Notifications ──────────────────
@@ -198,6 +208,7 @@ namespace Tartaria.Integration
         public void NotifyBuildingRestored()
         {
             AddTrust(2f);
+            Save.SaveManager.Instance?.MarkDirty();
             if (TrustLevel >= VeritasTrustLevel.Passage)
                 DialogueManager.Instance?.PlayContextDialogue("veritas_building_harmonics");
         }
@@ -206,6 +217,7 @@ namespace Tartaria.Integration
         public void NotifyZoneComplete()
         {
             AddTrust(5f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         // ─── Save / Load ────────────────────────────

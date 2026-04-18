@@ -1,24 +1,24 @@
 {
-    "name": "Tartaria.Gameplay",
-    "rootNamespace": "Tartaria.Gameplay",
-    "references": [
-        "Tartaria.Core",
-        "Tartaria.Input",
-        "Tartaria.Audio",
-        "Unity.Entities",
-        "Unity.Burst",
-        "Unity.Collections",
-        "Unity.Mathematics",
-        "Unity.Transforms",
-        "Unity.InputSystem"
-    ],
-    "includePlatforms": [],
-    "excludePlatforms": [],
-    "allowUnsafeCode": false,
-    "overrideReferences": false,
-    "precompiledReferences": [],
-    "autoReferenced": true,
-    "defineConstraints": [],
-    "versionDefines": [],
-    "noEngineReferences": false
+  "name": "Tartaria.Gameplay",
+  "rootNamespace": "Tartaria.Gameplay",
+  "references": [
+    "Tartaria.Core",
+    "Tartaria.Input",
+    "Tartaria.Audio",
+    "Unity.Entities",
+    "Unity.Burst",
+    "Unity.Collections",
+    "Unity.Mathematics",
+    "Unity.Transforms",
+    "Unity.InputSystem"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
 }

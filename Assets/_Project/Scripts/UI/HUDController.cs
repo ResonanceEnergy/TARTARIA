@@ -54,6 +54,10 @@ namespace Tartaria.UI
         [SerializeField] TMPro.TextMeshProUGUI moonTrophySubtext;
         [SerializeField] float trophyDisplayDuration = 5f;
 
+        [Header("Objective")]
+        [SerializeField] RectTransform objectivePanel;
+        [SerializeField] TMPro.TextMeshProUGUI objectiveText;
+
         [Header("RS Threshold Markers")]
         [SerializeField] GameObject[] thresholdMarkers; // 4 markers at 25/50/75/100
 
@@ -239,6 +243,14 @@ namespace Tartaria.UI
             if (string.IsNullOrEmpty(zoneName)) return;
             if (zoneNameText != null)
                 zoneNameText.text = zoneName;
+        }
+
+        public void ShowObjective(string text)
+        {
+            if (objectivePanel != null)
+                objectivePanel.gameObject.SetActive(!string.IsNullOrEmpty(text));
+            if (objectiveText != null)
+                objectiveText.text = text ?? "";
         }
 
         public void FlashRSGain(float amount)

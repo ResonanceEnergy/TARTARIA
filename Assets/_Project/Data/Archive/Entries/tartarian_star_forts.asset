@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: tartarian_star_forts
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: tartarian_star_forts
+  title: Star Forts & Energy Geometry
+  category: 0
+  summary: Hundreds of star-shaped fortresses built worldwide share geometries aligned
+    to Earth's energy grid. They are structurally over-engineered as simple military
+    fortifications.
+  fullText: "The Vauban-style star fort appears across six continents \u2014 in Europe,
+    the Americas, Russia, India, and Africa \u2014 always with the same angular bastion
+    geometry and always over-engineered far beyond what military defence would require.
+    Many sit atop hills that function as natural energy accumulation points, where
+    ley lines intersect.\r\n\r\nThe internal geometry of a star fort is, in fact,
+    a functioning resonance amplifier. The angular points create interference patterns
+    in ambient electromagnetic fields. Tests conducted at Fort Bourtange and Castillo
+    de San Marcos consistently show measurable spikes in Schumann resonance readings
+    at the central courtyard \u2014 precisely where the old-world inhabitants would
+    have gathered.\r\n\r\nThe 'fort' interpretation may be a post-reset rationalisation.
+    The structures predate the gunpowder warfare they supposedly defended against,
+    and their orientation \u2014 universally aligned to cardinal directions with
+    specific angular offsets corresponding to golden-ratio divisions \u2014 suggests
+    a purpose more akin to an antenna array than a garrison.\r\n\r\nThe most revealing
+    detail is the underground infrastructure. Every major star fort conceals a labyrinth
+    of tunnels, vaulted chambers, and cisterns connected to the wider ley-line network.
+    Fort Jefferson in the Gulf of Mexico has six tiers of sub-sea tunnels. Mehrangarh
+    Fort in India has chambers that predate the claimed construction by at least
+    two thousand years."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_architecture
+  - ley_lines_history
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: The star shape is not for defence. It is a lens. It focuses what
+    rises from the earth.

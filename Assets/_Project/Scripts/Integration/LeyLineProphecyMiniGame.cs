@@ -155,6 +155,8 @@ namespace Tartaria.Integration
             _stonesCompleted++;
 
             OnStoneActivated?.Invoke(stoneIndex);
+            Audio.AudioManager.Instance?.PlaySFX2D("StoneActivated");
+            Input.HapticFeedbackManager.Instance?.PlayDiscovery();
 
             // Start temporal echo vision
             string visionId = stoneDefinitions != null && stoneIndex < stoneDefinitions.Length
@@ -172,6 +174,8 @@ namespace Tartaria.Integration
             if (_stonesCompleted >= TotalProphecyStones)
             {
                 OnAllStonesComplete?.Invoke();
+                Save.SaveManager.Instance?.MarkDirty();
+                Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
                 Debug.Log("[LeyLineProphecy] ALL 12 STONES ACTIVATED — Prophecy complete!");
             }
         }
@@ -183,6 +187,7 @@ namespace Tartaria.Integration
             _currentVisionStone = stoneIndex;
 
             OnVisionStarted?.Invoke(stoneIndex, visionId);
+            Audio.AudioManager.Instance?.PlaySFX2D("VisionStart");
 
             // Show prophecy text via HUD
             if (stoneDefinitions != null && stoneIndex < stoneDefinitions.Length)

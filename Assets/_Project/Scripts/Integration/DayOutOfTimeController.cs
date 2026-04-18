@@ -94,6 +94,8 @@ namespace Tartaria.Integration
             _currentMemoryZone = 0;
 
             GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
+            Tartaria.Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
+            Tartaria.Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             Debug.Log("[DotT] Day Out of Time has begun.");
 
             StartCoroutine(DotTSequence());
@@ -140,6 +142,7 @@ namespace Tartaria.Integration
                 // Phase 6: True Ending
                 _eventCompleted = true;
                 OnEventCompleted?.Invoke();
+                AchievementSystem.Instance?.CheckDayOutOfTime();
 
                 HUDController.Instance?.ShowInteractionPrompt(
                     "THE DAY OUT OF TIME\nResonance Restored. The world remembers.");
@@ -188,6 +191,7 @@ namespace Tartaria.Integration
 
             _currentMemoryZone = zoneIndex;
             OnMemoryZoneChanged?.Invoke(zoneIndex);
+            Tartaria.Input.HapticFeedbackManager.Instance?.PlayDiscovery();
 
             HUDController.Instance?.ShowInteractionPrompt(
                 $"Memory {zoneIndex + 1} of 13");

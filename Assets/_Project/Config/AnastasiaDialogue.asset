@@ -1,0 +1,642 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: AnastasiaDialogue
+  m_EditorClassIdentifier: Tartaria.Integration:Tartaria.Integration:AnastasiaDialogueDatabase
+  lines:
+  - id: 0
+    moon: 1
+    category: 0
+    triggerContext: discovery
+    text: This dome. I watched them build it. Ages ago. They sang while they worked.
+  - id: 1
+    moon: 1
+    category: 0
+    triggerContext: restoration
+    text: The stones remember their shape. You just reminded them.
+  - id: 2
+    moon: 1
+    category: 0
+    triggerContext: discovery
+    text: Your resonance is... different. Brighter than what the Archive expected.
+  - id: 3
+    moon: 1
+    category: 2
+    triggerContext: companion_milo
+    text: He's louder than anyone I've heard in centuries. I think I like it.
+  - id: 4
+    moon: 1
+    category: 1
+    triggerContext: discovery
+    text: Careful with the lower strata. That's where the important things sleep.
+  - id: 5
+    moon: 1
+    category: 5
+    triggerContext: idle
+    text: At night, it almost looks like it used to.
+  - id: 6
+    moon: 2
+    category: 0
+    triggerContext: discovery
+    text: The Archive looks like this. All light and facets. But colder.
+  - id: 7
+    moon: 2
+    category: 0
+    triggerContext: discovery
+    text: These crystals amplify Aether the way a bell amplifies silence.
+  - id: 8
+    moon: 2
+    category: 1
+    triggerContext: discovery
+    text: I've been in a cave of light for so long, I'd forgotten what darkness smells
+      like.
+  - id: 9
+    moon: 2
+    category: 3
+    triggerContext: tuning_complete
+    text: You're better at that than the original tuners were. Don't tell them I
+      said so.
+  - id: 10
+    moon: 2
+    category: 2
+    triggerContext: companion_lirael
+    text: She sings to the crystals. They sing back. I wonder if she knows she's
+      doing it.
+  - id: 11
+    moon: 2
+    category: 0
+    triggerContext: discovery
+    text: This was the heart of their resonance network. The first antenna.
+  - id: 12
+    moon: 2
+    category: 5
+    triggerContext: idle
+    text: If you put your ear very close... no. I suppose you can't hear it.
+  - id: 13
+    moon: 3
+    category: 0
+    triggerContext: discovery
+    text: Wind. I remember wind. It's one of the first things you forget when you
+      become light.
+  - id: 14
+    moon: 3
+    category: 0
+    triggerContext: discovery
+    text: The orphan train tracks... those children. They built this route themselves.
+  - id: 15
+    moon: 3
+    category: 0
+    triggerContext: discovery
+    text: Highland architecture is different. Built to bend, not break. Like reeds.
+  - id: 16
+    moon: 3
+    category: 3
+    triggerContext: restoration
+    text: The turbines used to power the aqueducts. Water and wind, partners.
+  - id: 17
+    moon: 3
+    category: 2
+    triggerContext: companion_thorne
+    text: The airship captain carries something heavy. Not cargo.
+  - id: 18
+    moon: 3
+    category: 2
+    triggerContext: companion_npc
+    text: Children echoes are the cruelest thing about this world. They don't know
+      they're trapped.
+  - id: 19
+    moon: 3
+    category: 1
+    triggerContext: weather_storm
+    text: Lightning and Aether were twins once. The architects used both.
+  - id: 20
+    moon: 3
+    category: 5
+    triggerContext: idle
+    text: I can see four zones from here. Four incomplete worlds. You'll fix them.
+  - id: 21
+    moon: 4
+    category: 0
+    triggerContext: discovery
+    text: I know this place. Not this specific fort, but this geometry. I grew up
+      in one like it.
+  - id: 22
+    moon: 4
+    category: 0
+    triggerContext: discovery
+    text: Star forts weren't military. They were amplifiers. Five points, each resonating
+      at a different frequency.
+  - id: 23
+    moon: 4
+    category: 0
+    triggerContext: discovery
+    text: The moat isn't water anymore. It's liquid corruption. Be careful.
+  - id: 24
+    moon: 4
+    category: 4
+    triggerContext: climax
+    text: They're trying to destroy what they can't corrupt. That's desperation.
+  - id: 25
+    moon: 4
+    category: 1
+    triggerContext: restoration
+    text: The fort held. Eight hundred years of neglect and it still held.
+  - id: 26
+    moon: 4
+    category: 2
+    triggerContext: companion_korath
+    text: He remembers the old world better than I do. But he carries it differently
+      -- like a wound that taught him something.
+  - id: 27
+    moon: 4
+    category: 3
+    triggerContext: building
+    text: Golden ratio alignments were mandatory in royal architecture. Not for beauty
+      -- for function.
+  - id: 28
+    moon: 4
+    category: 0
+    triggerContext: discovery
+    text: A Star Chamber. Where the Archive was accessed. Where I was... stored.
+  - id: 29
+    moon: 4
+    category: 5
+    triggerContext: idle
+    text: Watching the horizon from a star fort. Some things transcend timeline.
+  - id: 30
+    moon: 5
+    category: 0
+    triggerContext: discovery
+    text: A colosseum! Not for fighting -- for resonance performances. The acoustics
+      must be extraordinary.
+  - id: 31
+    moon: 5
+    category: 0
+    triggerContext: discovery
+    text: The seating holds five thousand echo imprints. Five thousand people who
+      watched something beautiful.
+  - id: 32
+    moon: 5
+    category: 0
+    triggerContext: restoration
+    text: The stage is alive again. I can hear the ghost of applause.
+  - id: 33
+    moon: 5
+    category: 4
+    triggerContext: tuning_complete
+    text: Overtones were sacred. The note above the note -- the truth behind the
+      truth.
+  - id: 34
+    moon: 5
+    category: 0
+    triggerContext: discovery
+    text: Water doesn't corrupt -- it preserves. What's beneath the surface may be
+      more intact than what's above.
+  - id: 35
+    moon: 5
+    category: 2
+    triggerContext: companion_milo
+    text: He's trying to sell tickets to an echo audience. I admire the optimism.
+  - id: 36
+    moon: 5
+    category: 1
+    triggerContext: combat_end
+    text: The corruption in water is different. Slower. Patient. Like venom.
+  - id: 37
+    moon: 5
+    category: 5
+    triggerContext: idle
+    text: If I stood here and sang... would you hear me? Or just the light?
+  - id: 38
+    moon: 5
+    category: 3
+    triggerContext: building
+    text: Amphitheater acoustics require precise curvature. The golden ratio isn't
+      just visual.
+  - id: 39
+    moon: 6
+    category: 0
+    triggerContext: discovery
+    text: Books. Real books. With pages that turn. I haven't touched a page in...
+  - id: 40
+    moon: 6
+    category: 0
+    triggerContext: discovery
+    text: The Living Library wasn't just storage. It was an interface to the Archive.
+      My Archive.
+  - id: 41
+    moon: 6
+    category: 0
+    triggerContext: discovery
+    text: I can feel the Archive here. Like pressing your hand against glass and
+      feeling warmth on the other side.
+  - id: 42
+    moon: 6
+    category: 1
+    triggerContext: discovery
+    text: The librarians encoded knowledge in rhythm. Read with your ears, not your
+      eyes.
+  - id: 43
+    moon: 6
+    category: 2
+    triggerContext: companion_npc
+    text: Veritas. Still at the keys. Still playing the piece that was interrupted.
+      Still waiting for the ending.
+  - id: 44
+    moon: 6
+    category: 4
+    triggerContext: restoration
+    text: The Library is remembering. Sections are lighting up that have been dark
+      since the Flood.
+  - id: 45
+    moon: 6
+    category: 2
+    triggerContext: companion_lore
+    text: That shelf describes my preservation. In clinical terms. As if archiving
+      a person is a simple administrative act.
+  - id: 46
+    moon: 6
+    category: 5
+    triggerContext: idle
+    text: I used to read by candlelight. Light reading light. There's a joke in there
+      but it makes me tired.
+  - id: 47
+    moon: 6
+    category: 3
+    triggerContext: building
+    text: Library wings should follow Fibonacci sequencing. Each room slightly larger
+      than the last.
+  - id: 48
+    moon: 6
+    category: 4
+    triggerContext: climax
+    text: The Library is breathing. The whole structure is alive again. I can feel
+      every page turning.
+  - id: 49
+    moon: 7
+    category: 0
+    triggerContext: discovery
+    text: Clockwork. Gears that mesh and turn. Do you know what I'd give for a single
+      moving part?
+  - id: 50
+    moon: 7
+    category: 0
+    triggerContext: discovery
+    text: The Citadel's orrery mapped every celestial body. Tartarian astronomy was
+      mechanical prophecy.
+  - id: 51
+    moon: 7
+    category: 1
+    triggerContext: restoration
+    text: That sound -- metal touching metal, turning with purpose. It's the most
+      physical sound in this world.
+  - id: 52
+    moon: 7
+    category: 0
+    triggerContext: discovery
+    text: This machine predicted the Mud Flood. The architects who read it had four
+      hours to prepare. I was archived in three.
+  - id: 53
+    moon: 7
+    category: 2
+    triggerContext: companion_milo
+    text: He keeps poking the gears. He's going to lose a finger and somehow monetize
+      it.
+  - id: 54
+    moon: 7
+    category: 4
+    triggerContext: tuning_complete
+    text: Synchronization was the Tartarian word for prayer. Making things move together.
+  - id: 55
+    moon: 7
+    category: 1
+    triggerContext: combat_end
+    text: Corrupted machines aren't evil. They're in pain. Gears grinding against
+      their own design.
+  - id: 56
+    moon: 7
+    category: 5
+    triggerContext: idle
+    text: Tick. Tick. Tick. Time moves here. In the Archive, there is no tick. Only...
+      duration.
+  - id: 57
+    moon: 8
+    category: 0
+    triggerContext: discovery
+    text: Things grow here. Roots push through stone. Life refusing to yield. I envy
+      roots.
+  - id: 58
+    moon: 8
+    category: 0
+    triggerContext: discovery
+    text: Bioluminescence is Aether expressing itself through biology. Even nature
+      builds with sacred ratios.
+  - id: 59
+    moon: 8
+    category: 1
+    triggerContext: restoration
+    text: The vines knew where to go. They were waiting for permission.
+  - id: 60
+    moon: 8
+    category: 0
+    triggerContext: discovery
+    text: I can't smell them. That's the cruelest part. I can see beauty but I can't...
+      participate in it.
+  - id: 61
+    moon: 8
+    category: 2
+    triggerContext: companion_lirael
+    text: Lirael touches the bark and the tree glows brighter. She doesn't know she's
+      feeding it.
+  - id: 62
+    moon: 8
+    category: 1
+    triggerContext: discovery
+    text: The root network mirrors the ley lines above. Nature copied the architects.
+      Or maybe the other way around.
+  - id: 63
+    moon: 8
+    category: 3
+    triggerContext: building
+    text: Build with the trees, not against them. The strongest structures let life
+      grow through them.
+  - id: 64
+    moon: 8
+    category: 5
+    triggerContext: idle
+    text: Sunlight passes through me. I'm too transparent even for a shadow.
+  - id: 65
+    moon: 9
+    category: 0
+    triggerContext: discovery
+    text: Aurora. The sky remembering how to sing in color. This is the frequency
+      I was preserved in.
+  - id: 66
+    moon: 9
+    category: 0
+    triggerContext: discovery
+    text: The Spire channels solar energy into Aether. Pure conversion. I am the
+      same kind of conversion.
+  - id: 67
+    moon: 9
+    category: 4
+    triggerContext: tuning_complete
+    text: I can feel the aurora tuning like a voice inside my chest. If I had a chest.
+  - id: 68
+    moon: 9
+    category: 0
+    triggerContext: discovery
+    text: From up here, the ley lines look like veins. The planet has a circulatory
+      system and we're teaching it to pulse again.
+  - id: 69
+    moon: 9
+    category: 2
+    triggerContext: companion_thorne
+    text: He sees navigation. I see home. Same light, different meaning.
+  - id: 70
+    moon: 9
+    category: 1
+    triggerContext: restoration
+    text: For a moment, the aurora and I were the same frequency. I couldn't tell
+      where I ended and the sky began.
+  - id: 71
+    moon: 9
+    category: 1
+    triggerContext: combat_end
+    text: Corruption fears light. It's the one thing they can't absorb. That gives
+      me hope.
+  - id: 72
+    moon: 9
+    category: 5
+    triggerContext: idle
+    text: At night, I'm almost invisible against the aurora. Two kinds of light,
+      overlapping.
+  - id: 73
+    moon: 10
+    category: 0
+    triggerContext: discovery
+    text: The Forge heat... I can sense it even though I can't feel warmth. Like
+      a memory of temperature.
+  - id: 74
+    moon: 10
+    category: 0
+    triggerContext: discovery
+    text: Sonic hammering. The Tartarian smiths shaped metal with sound, not muscle.
+      Each strike a note.
+  - id: 75
+    moon: 10
+    category: 1
+    triggerContext: restoration
+    text: The anvil's ring -- B flat. The note of transformation. Matter yielding
+      to intent.
+  - id: 76
+    moon: 10
+    category: 0
+    triggerContext: discovery
+    text: This alloy responds to Aether. The smiths sang to their creations. The
+      creations listened.
+  - id: 77
+    moon: 10
+    category: 2
+    triggerContext: companion_korath
+    text: He's remembering the old forges. The ones that made the tools that built
+      the world I lost.
+  - id: 78
+    moon: 10
+    category: 0
+    triggerContext: discovery
+    text: The planet's core is pure frequency. We're building on top of the universe's
+      bass note.
+  - id: 79
+    moon: 10
+    category: 3
+    triggerContext: building
+    text: Forged Tartarian alloy resonates for centuries. These buildings will outlast
+      any flood.
+  - id: 80
+    moon: 10
+    category: 5
+    triggerContext: idle
+    text: Fire is the only element that creates light. We have that in common.
+  - id: 81
+    moon: 11
+    category: 0
+    triggerContext: discovery
+    text: Water and Archives have the same function -- preserving what was. But water
+      doesn't choose what it keeps.
+  - id: 82
+    moon: 11
+    category: 0
+    triggerContext: discovery
+    text: The Tidal Archive is older than the planetary one. Older than the civilization
+      that built me.
+  - id: 83
+    moon: 11
+    category: 0
+    triggerContext: discovery
+    text: I float through water the way I float through everything. No resistance.
+      No... interaction.
+  - id: 84
+    moon: 11
+    category: 4
+    triggerContext: discovery
+    text: A whole city. Intact. Under the surface. They chose to let the tide take
+      them rather than fight it.
+  - id: 85
+    moon: 11
+    category: 1
+    triggerContext: discovery
+    text: The tide writes in light. I can almost read it. Almost.
+  - id: 86
+    moon: 11
+    category: 1
+    triggerContext: restoration
+    text: The water is clearing. I can see all the way down. All the way to the old
+      world.
+  - id: 87
+    moon: 11
+    category: 2
+    triggerContext: companion_lirael
+    text: Lirael stands at the waterline. The tide reaches for her and passes through.
+      We both know how that feels.
+  - id: 88
+    moon: 11
+    category: 5
+    triggerContext: idle
+    text: Tides come and go. Echoes stay. I'm not sure which is lonelier.
+  - id: 89
+    moon: 12
+    category: 0
+    triggerContext: discovery
+    text: The Observatory mapped the stars that map us. Everything is geometry at
+      sufficient distance.
+  - id: 90
+    moon: 12
+    category: 0
+    triggerContext: discovery
+    text: These lenses were ground to Tartarian precision -- twelve decimal places.
+      The stars demanded nothing less.
+  - id: 91
+    moon: 12
+    category: 1
+    triggerContext: discovery
+    text: I recognize these constellations. They've shifted since I was archived.
+      Even the sky moved on without me.
+  - id: 92
+    moon: 12
+    category: 4
+    triggerContext: restoration
+    text: 432 Hz. The frequency that connects the planet to the cosmos. The frequency
+      of home.
+  - id: 93
+    moon: 12
+    category: 2
+    triggerContext: companion_npc
+    text: The navigator sees patterns I can feel but not name. Mathematics made manifest.
+  - id: 94
+    moon: 12
+    category: 0
+    triggerContext: restoration
+    text: The planet can see the sky again. And the sky can see us.
+  - id: 95
+    moon: 12
+    category: 3
+    triggerContext: building
+    text: Observatory construction requires absolute stillness. No vibration. Not
+      even from the wind.
+  - id: 96
+    moon: 12
+    category: 5
+    triggerContext: idle
+    text: I used to wish on stars. Now I'm the same kind of light. I wish on sunrises
+      instead.
+  - id: 97
+    moon: 13
+    category: 4
+    triggerContext: discovery
+    text: All the ley lines. Every one. Connected. I can feel the whole planet. It's...
+      awake.
+  - id: 98
+    moon: 13
+    category: 4
+    triggerContext: restoration
+    text: This is what the Archive preserved us for. This moment. All the silence
+      was for this.
+  - id: 99
+    moon: 13
+    category: 1
+    triggerContext: pre_climax
+    text: Whatever happens next -- the digging, the tuning, the building, the quiet
+      afternoons -- it mattered. All of it.
+  - id: 100
+    moon: 13
+    category: 4
+    triggerContext: climax
+    text: Listen. The world is singing. After eight hundred years of silence. It's
+      singing.
+  - id: 101
+    moon: 13
+    category: 5
+    triggerContext: post_climax
+    text: ...thank you. For bringing it all back. For bringing me back. Almost.
+  - id: 102
+    moon: 0
+    category: 7
+    triggerContext: solidification_final
+    text: ...I can feel the ground.
+  - id: 103
+    moon: 0
+    category: 5
+    triggerContext: post_solidification
+    text: Ten seconds. That's more than most people get in a lifetime.
+  - id: 104
+    moon: 1
+    category: 6
+    triggerContext: mote_0
+    text: You found it. A piece of me I didn't know was missing.
+  - id: 105
+    moon: 6
+    category: 6
+    triggerContext: mote_5
+    text: That shelf. That exact shelf. That's where my record is stored. My... biography
+      in light.
+  - id: 106
+    moon: 11
+    category: 6
+    triggerContext: mote_10
+    text: ...this was my room. Before. The mote is sitting right where my bed used
+      to be.
+  - id: 107
+    moon: 0
+    category: 0
+    triggerContext: reserved_dlc_01
+    text: 
+  - id: 108
+    moon: 0
+    category: 0
+    triggerContext: reserved_dlc_02
+    text: 
+  - id: 109
+    moon: 0
+    category: 0
+    triggerContext: reserved_dlc_03
+    text: 
+  - id: 110
+    moon: 0
+    category: 0
+    triggerContext: reserved_dlc_04
+    text: 
+  - id: 111
+    moon: 0
+    category: 0
+    triggerContext: reserved_dlc_05
+    text: 

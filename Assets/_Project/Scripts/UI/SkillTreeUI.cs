@@ -111,12 +111,14 @@ namespace Tartaria.UI
             _isOpen = true;
             skillTreePanel.SetActive(true);
             SwitchTree(_activeTree);
+            Audio.AudioManager.Instance?.PlaySFX2D("UIOpen");
         }
 
         public void Close()
         {
             _isOpen = false;
             if (skillTreePanel != null) skillTreePanel.SetActive(false);
+            Audio.AudioManager.Instance?.PlaySFX2D("UIClose");
         }
 
         public void Toggle()

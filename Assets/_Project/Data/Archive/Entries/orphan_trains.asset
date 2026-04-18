@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: orphan_trains
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: orphan_trains
+  title: "The Orphan Trains \u2014 Repopulating the Reset World"
+  category: 4
+  summary: Between 1854 and 1929, over 250,000 orphan children were transported from
+    Eastern cities across America to be 'adopted' by rural families. Many had no
+    documented origin. They may have been survivors of the reset world.
+  fullText: "The Orphan Train movement, documented in American social history as
+    a 19th-century child welfare programme, transported over 250,000 children from
+    New York, Boston, and other Eastern cities to rural communities across the Midwest
+    and West between 1854 and 1929.\r\n\r\nThe official narrative describes these
+    as the children of poor urban immigrants. The anomalies in the records suggest
+    something stranger. Many orphan train riders had no documented parentage, no
+    immigration papers, and could not be matched to any urban census record. Their
+    clothing and personal effects, described by receiving families, often included
+    items of high quality and unusual design inconsistent with poverty.\r\n\r\nMultiple
+    orphan train riders later recalled, in interviews conducted in the 1960s, memories
+    of living in buildings with 'very high ceilings', 'rooms as big as churches',
+    and 'lights that never went out' \u2014 before finding themselves on the streets
+    of New York with no explanation for how they had arrived there.\r\n\r\nThe most
+    unsettling evidence comes from comparative DNA studies conducted in 2019. A disproportionate
+    number of orphan train descendant families carry haplogroups associated with
+    Central Asian and Eastern European populations that have no documented immigration
+    pathway into 19th-century America. The children may have been the survivors of
+    a civilisation that was not supposed to survive."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_mud_flood
+  unlockTrigger: rs_50
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: I know what it is to wake in a city and not know who you were the
+    day before. Some of those children were sleeping through a much longer night
+    than you know.

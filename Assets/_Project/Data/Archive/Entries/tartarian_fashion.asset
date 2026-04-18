@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: tartarian_fashion
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: tartarian_fashion
+  title: "Tartarian Fashion \u2014 Encoding Light"
+  category: 3
+  summary: "Old-world clothing was not merely decorative. The materials, colours,
+    geometric embroidery patterns, and metallic elements were functional \u2014 designed
+    to interact with the body's bioelectric field."
+  fullText: "Surviving daguerreotypes and lithographs of old-world fashion reveal
+    a consistent aesthetic that modern historians attribute to 'Victorian fussiness'.
+    The reality is more interesting: every element of traditional Tartarian dress
+    served a functional purpose related to the wearer's bioelectric and electromagnetic
+    health.\r\n\r\nThe heavy embroidery found on Russian, Central Asian, Eastern
+    European, and Chinese traditional dress is not random decoration. The geometric
+    patterns \u2014 meanders, swastikas (an ancient solar symbol predating its 20th-century
+    misappropriation), spirals, and interlocking hexagons \u2014 are executed in
+    metallic thread at specific densities that create a Faraday-cage-like mesh around
+    the torso's major organ groups.\r\n\r\nThe colour choices were equally deliberate.
+    Old-world textile dyes were plant-based and carried the electromagnetic signature
+    of the plants from which they were derived. Indigo and woad (both yield the same
+    blue dye) have measurable antimicrobial and UV-blocking properties. Madder red
+    (from Rubia tinctorum) creates a cloth with resonance properties that match the
+    frequency of oxygenated haemoglobin.\r\n\r\nThe metallic headpieces, kokoshniks,
+    and crowns of Tartarian nobility were not symbols of status. They were resonance
+    amplifiers \u2014 precisely shaped to focus aetheric energy at the crown of the
+    head, the location of what yogic and Vedic traditions identify as the seat of
+    higher cognitive function."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_architecture
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: My mother wore her embroidery to the restoration ceremonies. She
+    said the patterns kept her warm in ways wool could not.

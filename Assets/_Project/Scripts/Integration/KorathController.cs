@@ -71,6 +71,7 @@ namespace Tartaria.Integration
             _introduced = true;
             DialogueManager.Instance?.PlayContextDialogue("korath_intro");
             OnIntroduced?.Invoke();
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Check if Korath should appear (RS threshold).</summary>
@@ -100,6 +101,7 @@ namespace Tartaria.Integration
                         break;
                     case KorathTrustLevel.HarmonicBond:
                         RevealDayOutOfTime();
+                        Input.HapticFeedbackManager.Instance?.PlayDiscovery();
                         break;
                 }
             }
@@ -147,6 +149,7 @@ namespace Tartaria.Integration
             _revelationsUnlocked++;
             OnRevelationUnlocked?.Invoke(_revelationsUnlocked);
             AddTrust(5f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Track player RS for dynamic responses.</summary>
@@ -188,6 +191,9 @@ namespace Tartaria.Integration
             _dayOutOfTimeRevealed = true;
             DialogueManager.Instance?.PlayContextDialogue("day_out_of_time");
             OnDayOutOfTimeRevealed?.Invoke();
+            Save.SaveManager.Instance?.MarkDirty();
+            AchievementSystem.Instance?.CheckDayOutOfTime();
+            Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
             Debug.Log("[Korath] Day Out of Time revealed — end-game event unlocked.");
         }
 
@@ -197,18 +203,21 @@ namespace Tartaria.Integration
         public void NotifyZoneComplete()
         {
             AddTrust(6f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Building restoration grants minor trust.</summary>
         public void NotifyBuildingRestored()
         {
             AddTrust(2f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>World Choice W3: Player allows Korath's sacrifice ritual.</summary>
         public void CompleteSacrificeRitual()
         {
             AddTrust(15f);
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Korath] Sacrifice ritual completed by player choice.");
         }
 
@@ -216,6 +225,7 @@ namespace Tartaria.Integration
         public void PreventSacrifice()
         {
             AddTrust(-10f);
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Korath] Sacrifice prevented by player choice.");
         }
 

@@ -85,6 +85,19 @@ namespace Tartaria.Integration
                 }
             }
 
+            // Quest prerequisite check — ensure required quest is completed
+            if (!string.IsNullOrEmpty(nextZone.prerequisiteQuestId))
+            {
+                bool questDone = QuestManager.Instance?.IsQuestComplete(nextZone.prerequisiteQuestId) ?? true;
+                if (!questDone)
+                {
+                    HUDController.Instance?.ShowInteractionPrompt(
+                        $"Zone locked. Complete: {nextZone.prerequisiteQuestId}");
+                    Debug.Log($"[ZoneTransition] Quest gate failed: {nextZone.prerequisiteQuestId} not completed");
+                    return;
+                }
+            }
+
             StartCoroutine(TransitionSequence(next));
         }
 
@@ -254,6 +267,8 @@ namespace Tartaria.Integration
             // Moon-specific haptic on zone entry
             Input.HapticFeedbackManager.Instance?.PlayMoonHaptic(
                 zone.zoneIndex, Input.HapticContext.ZoneTransition);
+            Audio.AdaptiveMusicController.Instance?.SetZone(zone.zoneIndex);
+            CompanionManager.Instance?.CheckUnlocks(zone.zoneIndex);
         }
     }
 }

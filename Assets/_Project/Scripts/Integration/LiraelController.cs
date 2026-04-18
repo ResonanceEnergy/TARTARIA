@@ -83,6 +83,7 @@ namespace Tartaria.Integration
             _introduced = true;
             DialogueManager.Instance?.PlayContextDialogue("lirael_intro");
             OnIntroduced?.Invoke();
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Modify trust. Clamped 0-100.</summary>
@@ -95,6 +96,7 @@ namespace Tartaria.Integration
             if (oldLevel != newLevel)
             {
                 OnTrustChanged?.Invoke(newLevel);
+                Save.SaveManager.Instance?.MarkDirty();
 
                 switch (newLevel)
                 {
@@ -119,6 +121,7 @@ namespace Tartaria.Integration
         {
             _dissonanceWarningsGiven++;
             OnDissonanceDetected?.Invoke();
+            Input.HapticFeedbackManager.Instance?.PlayDissonanceAlert();
 
             if (TrustLevel >= LiraelTrustLevel.Remembering)
                 DialogueManager.Instance?.PlayContextDialogue("lirael_dissonance_warning");
@@ -137,6 +140,7 @@ namespace Tartaria.Integration
 
             // Each song slightly increases her solidity
             UpdateSolidity(Mathf.Min(_solidity + 0.05f, 1f));
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Ask Lirael about the world. Her answers are half-questions.</summary>
@@ -177,6 +181,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("lirael_orphan_train");
             AddTrust(10f);
             UpdateSolidity(Mathf.Min(_solidity + 0.1f, 1f));
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Moon 6: Lirael conducts the children's choir.</summary>
@@ -187,6 +192,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("lirael_choir");
             AddTrust(12f);
             UpdateSolidity(0.55f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Moon 7: Lirael learns Korath's songs.</summary>
@@ -197,6 +203,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("lirael_korath_songs");
             AddTrust(10f);
             UpdateSolidity(0.7f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Moon 11: Fountain healing makes Lirael semi-solid.</summary>
@@ -207,6 +214,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("lirael_fountain_heal");
             AddTrust(15f);
             UpdateSolidity(0.85f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         // ─── External Notifications ──────────────────
@@ -215,6 +223,7 @@ namespace Tartaria.Integration
         public void NotifyBuildingRestored()
         {
             AddTrust(3f);
+            Save.SaveManager.Instance?.MarkDirty();
             DialogueManager.Instance?.PlayContextDialogue("lirael_world_breath");
         }
 
@@ -222,6 +231,7 @@ namespace Tartaria.Integration
         public void NotifyZoneComplete()
         {
             AddTrust(5f);
+            Save.SaveManager.Instance?.MarkDirty();
             RememberSong();
         }
 
@@ -240,6 +250,8 @@ namespace Tartaria.Integration
             _fullyManifested = true;
             UpdateSolidity(1f);
             OnFullyManifested?.Invoke();
+            AchievementSystem.Instance?.CheckSolidification();
+            Save.SaveManager.Instance?.MarkDirty();
             Debug.Log("[Lirael] Fully manifested — solid, radiant, voice clear.");
         }
 

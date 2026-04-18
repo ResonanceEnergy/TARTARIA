@@ -36,6 +36,7 @@ namespace Tartaria.Integration
         void WireAll()
         {
             WireGameLoopController();
+            EnsureVisualSystems();
             EnsureDebugConsole();
         }
 
@@ -82,6 +83,36 @@ namespace Tartaria.Integration
                         Log($"Wired GameLoopController.cameraController -> {cam.name}");
                     }
                 }
+            }
+        }
+
+        void EnsureVisualSystems()
+        {
+            // TartariaPostProcessing — global URP Volume (Bloom + Vignette + ColorAdj)
+            if (FindAnyObjectByType<TartariaPostProcessing>() == null)
+            {
+                var go = new GameObject("--- TARTARIA POSTPROCESSING ---");
+                go.AddComponent<TartariaPostProcessing>();
+                DontDestroyOnLoad(go);
+                Log("Created TartariaPostProcessing (runtime URP Volume)");
+            }
+
+            // LeyLineVisualizer — GL ley line renderer (visible during AetherVision / Scan)
+            if (FindAnyObjectByType<LeyLineVisualizer>() == null)
+            {
+                var go = new GameObject("--- LEY LINE VISUALIZER ---");
+                go.AddComponent<LeyLineVisualizer>();
+                DontDestroyOnLoad(go);
+                Log("Created LeyLineVisualizer");
+            }
+
+            // ArchiveManager — Old World Archive unlock tracking
+            if (FindAnyObjectByType<ArchiveManager>() == null)
+            {
+                var go = new GameObject("--- ARCHIVE MANAGER ---");
+                go.AddComponent<ArchiveManager>();
+                DontDestroyOnLoad(go);
+                Log("Created ArchiveManager");
             }
         }
 

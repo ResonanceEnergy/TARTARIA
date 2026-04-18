@@ -1,0 +1,45 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: tartarian_architecture
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: tartarian_architecture
+  title: Tartarian Architecture
+  category: 0
+  summary: "Massive, ornate structures built to an inhuman scale \u2014 featuring
+    30-metre ceilings, floor-to-ceiling windows, and load-bearing arches that dwarf
+    modern equivalents."
+  fullText: "The hallmark of Tartarian architecture is its impossible grandeur. Buildings
+    constructed ostensibly for the 17th\u201319th centuries display window heights
+    of 8\u201312 metres, internal galleries wide enough to dock ships, and stonework
+    carved with a precision that modern diamond tools would struggle to replicate.\r\n\r\nThe
+    most striking anomaly is the scale mismatch. Grand Central Station in New York,
+    the Palais du Trocad\xE9ro, the old buildings of Astana, St Petersburg, and hundreds
+    of World's Fair structures all share identical architectural grammar \u2014 vast
+    columned facades, domed rotundas, bas-relief friezes, and underground infrastructure
+    far beyond what the documented builders could have produced in the claimed time-frames.\r\n\r\nResearchers
+    who examine original construction photographs note the absence of scaffolding
+    adequate to the height, no photographic record of foundations being dug, and
+    buildings that appear in 'before' photos already half-complete. The working theory
+    is that these were existing structures repurposed, refaced, or partially reconstructed
+    from an earlier civilisation \u2014 one with far greater architectural capability
+    than the colonists who claimed to have built them."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_mud_flood
+  - tartarian_star_forts
+  - tartarian_world_fairs
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: These proportions were not built for people of this age. The ceilings
+    remember giants.

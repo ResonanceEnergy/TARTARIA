@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: old_world_maps
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: old_world_maps
+  title: Maps That Shouldn't Exist
+  category: 7
+  summary: "The Piri Reis map (1513) accurately charts the coastline of Antarctica
+    \u2014 which was not discovered until 1818. The Orontius Finaeus map (1531) shows
+    Antarctica ice-free. Both were copied from older source maps."
+  fullText: "The Piri Reis map, compiled in 1513 by Ottoman admiral Piri Reis and
+    preserved in the Topkapi Palace in Istanbul, accurately depicts the coastline
+    of Antarctica at a time when Antarctica was not 'discovered' for another 305
+    years. More remarkably, the coastline shown corresponds to the sub-glacial topography
+    of Antarctica as revealed by modern seismic surveys \u2014 the shape of the continent
+    under two miles of ice, which the ice has covered for at least 12,000 years.\r\n\r\nPiri
+    Reis himself wrote, in a marginal note on the map, that it was compiled from
+    'ancient maps' and 'Arab maps' of great age. He was not claiming to have surveyed
+    Antarctica himself. He was copying from a source \u2014 a source that predated
+    the growth of the Antarctic ice sheet.\r\n\r\nThe Orontius Finaeus map of 1531
+    shows Antarctica as a continent with mountain ranges, river systems, and ice-free
+    coastlines corresponding almost exactly to the sub-ice topography. Charles Hapgood,
+    a Harvard geography professor, spent years analysing these maps and concluded
+    that they were copies of source documents produced by a civilisation with advanced
+    cartographic capability at least 12,000 years ago \u2014 coinciding precisely
+    with the proposed time-frame of the Tartarian civilisation's flourishing.\r\n\r\nThe
+    implication is stark: someone surveyed Antarctica before the ice, copied the
+    survey onto perishable media, and those copies were preserved through multiple
+    civilisational resets until they reached the Ottoman cartographers of the 16th
+    century."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - suppressed_history
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: The cartographers who drew those maps had never been to Antarctica.
+    But someone had.

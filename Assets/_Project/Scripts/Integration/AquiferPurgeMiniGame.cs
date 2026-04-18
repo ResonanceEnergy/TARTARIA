@@ -124,6 +124,7 @@ namespace Tartaria.Integration
                 _layerPurity[i] = 0f;
                 _layerAccuracy[i] = 0f;
             }
+            Audio.AudioManager.Instance?.PlaySFX2D("AquiferPurgeStart");
             Debug.Log("[AquiferPurge] Mini-game started. 3 corruption layers to purge.");
         }
 
@@ -259,6 +260,9 @@ namespace Tartaria.Integration
 
             GameLoopController.Instance?.OnMiniGameCompleted(reward, "aquifer_purge");
             OnLayerPurged?.Invoke(_currentLayer, avgAccuracy);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteMiniGame, "aquifer_purge");
+            Audio.AudioManager.Instance?.PlaySFX2D("LayerPurged");
+            Input.HapticFeedbackManager.Instance?.PlayDiscovery();
 
             Debug.Log($"[AquiferPurge] Layer {_currentLayer + 1} purged! Accuracy: {avgAccuracy:P0}");
 
@@ -266,10 +270,14 @@ namespace Tartaria.Integration
             if (_currentLayer >= TotalCorruptionLayers)
             {
                 OnAllLayersPurged?.Invoke();
+                Audio.AdaptiveMusicController.Instance?.PlayRestoration();
+                Save.SaveManager.Instance?.MarkDirty();
                 VFXController.Instance?.SpawnAquiferPurificationCascade(transform.position);
 
                 // Achievement
                 AchievementSystem.Instance?.Unlock("M05");
+                KorathController.Instance?.NotifyBuildingRestored();
+                ThorneController.Instance?.NotifyZoneSecured();
                 Debug.Log("[AquiferPurge] All layers purged! Fountain chain activated.");
             }
         }

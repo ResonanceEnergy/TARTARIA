@@ -7,7 +7,7 @@
             "actions": [
                 {
                     "name": "Move",
-                    "type": 1,
+                    "type": 0,
                     "id": "b8a7d9c4-3e5f-4a1b-9c2d-e6f8a0b3c5d7",
                     "expectedControlType": "Vector2",
                     "processors": "",
@@ -79,7 +79,7 @@
                 },
                 {
                     "name": "CameraLook",
-                    "type": 1,
+                    "type": 2,
                     "id": "d8e9f0a1-2b3c-4d5e-6f7a-8b9c0d1e2f3a",
                     "expectedControlType": "Vector2",
                     "processors": "",

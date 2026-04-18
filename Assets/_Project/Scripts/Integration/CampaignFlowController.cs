@@ -190,6 +190,8 @@ namespace Tartaria.Integration
             // Show intro dialogue
             DialogueManager.Instance?.PlayContextDialogue($"moon_{index + 1}_intro");
             UI.HUDController.Instance?.ShowInteractionPrompt($"Moon {index + 1}: {moon.moonName}");
+            Audio.AdaptiveMusicController.Instance?.SetZone(index);
+            Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
             OnMoonStarted?.Invoke(index);
         }
@@ -205,6 +207,9 @@ namespace Tartaria.Integration
             Debug.Log($"[Campaign] Moon {index + 1} completed: {moons[index].moonName}");
             DialogueManager.Instance?.PlayContextDialogue($"moon_{index + 1}_complete");
             OnMoonCompleted?.Invoke(index);
+            AchievementSystem.Instance?.CheckMoonCompleted(index);
+            Save.SaveManager.Instance?.MarkDirty();
+            Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
         }
 
         void OnQuestStatusChanged(string questId, QuestStatus status)

@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: antique_photographs
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: antique_photographs
+  title: "Photographic Anomalies \u2014 The Old World in Focus"
+  category: 7
+  summary: Early photography captured a world that does not match the official historical
+    record. Depopulated cities, unfinished demolitions, and impossible construction
+    speeds are all visible in 19th-century daguerreotypes.
+  fullText: "The invention of practical photography in 1839 came at a pivotal historical
+    moment \u2014 precisely when the post-reset civilisation was consolidating its
+    narrative and repurposing the infrastructure of the old world. The camera recorded
+    what the eye saw, without editorial control, and some of what it recorded does
+    not fit the accepted story.\r\n\r\nEarly photographs of American and European
+    cities consistently show an anomaly: the streets are nearly empty. In images
+    of Chicago, New York, London, and Paris from the 1860s\u20131880s, broad avenues
+    lined with monumental buildings are completely devoid of pedestrians. The official
+    explanation \u2014 that early exposure times of several minutes made moving subjects
+    invisible \u2014 cannot account for images where even stationary street vendors,
+    carts, and carriages are absent.\r\n\r\nThe alternative explanation: the cities
+    shown in these photographs had only recently been cleared of their original inhabitants.
+    The new settlers had not yet moved in. The buildings were ready; the people were
+    not.\r\n\r\nOther photographic anomalies: World's Fair construction sequences
+    that show buildings appearing between photographs with no visible intermediate
+    construction phases. Post-Civil War American city photographs showing large buildings
+    in varying states of uncovering from soil \u2014 not being built up, but being
+    excavated from below. And most strangely, consistent degradation in photographic
+    quality from the 1840s to the 1890s \u2014 as if the earliest photographers had
+    better equipment than those who came later."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - tartarian_mud_flood
+  - world_fair_mystery
+  unlockTrigger: rs_25
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: I have seen those photographs. I appear in one of them, in a courtyard
+    I did not know had been photographed. I am not blurred.

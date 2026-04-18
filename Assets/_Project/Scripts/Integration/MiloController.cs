@@ -74,6 +74,7 @@ namespace Tartaria.Integration
             _introduced = true;
             DialogueManager.Instance?.PlayContextDialogue("milo_intro");
             OnIntroduced?.Invoke();
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Modify trust. Clamped 0-100.</summary>
@@ -86,6 +87,7 @@ namespace Tartaria.Integration
             if (oldLevel != newLevel)
             {
                 OnTrustChanged?.Invoke(newLevel);
+                Save.SaveManager.Instance?.MarkDirty();
 
                 switch (newLevel)
                 {
@@ -108,6 +110,7 @@ namespace Tartaria.Integration
         {
             _artifactsAppraised++;
             OnArtifactAppraised?.Invoke(_artifactsAppraised);
+            Save.SaveManager.Instance?.MarkDirty();
 
             if (TrustLevel >= MiloTrustLevel.Curious)
             {
@@ -163,6 +166,8 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("milo_orphan_train");
             AddTrust(10f);
             TriggerSincereMoment();
+            Save.SaveManager.Instance?.MarkDirty();
+            Input.HapticFeedbackManager.Instance?.PlayDiscovery();
         }
 
         /// <summary>Moon 5: Milo's outburst at White City demolition.</summary>
@@ -173,6 +178,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("milo_white_city_rage");
             AddTrust(15f);
             TriggerSincereMoment();
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Moon 7: Milo goes silent witnessing Korath's sacrifice.</summary>
@@ -182,6 +188,7 @@ namespace Tartaria.Integration
             _korathSacrificeWitnessed = true;
             // Milo goes silent — no dialogue, just trust
             AddTrust(12f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         void TriggerSincereMoment()
@@ -196,6 +203,7 @@ namespace Tartaria.Integration
         public void NotifyBuildingRestored()
         {
             AddTrust(3f);
+            Save.SaveManager.Instance?.MarkDirty();
             if (TrustLevel >= MiloTrustLevel.Invested)
                 DialogueManager.Instance?.PlayContextDialogue("milo_impressed_build");
         }
@@ -204,6 +212,7 @@ namespace Tartaria.Integration
         public void NotifyZoneComplete()
         {
             AddTrust(5f);
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         /// <summary>Combat victory — Milo quips.</summary>
@@ -211,6 +220,7 @@ namespace Tartaria.Integration
         {
             AddTrust(2f);
             DialogueManager.Instance?.PlayContextDialogue("milo_combat_quip");
+            Save.SaveManager.Instance?.MarkDirty();
         }
 
         // ─── Save / Load ────────────────────────────

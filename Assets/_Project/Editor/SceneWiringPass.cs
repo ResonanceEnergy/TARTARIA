@@ -41,10 +41,12 @@ namespace Tartaria.Editor
             wired += WireInteractableBuildings();
             wired += WireGameLoopController();
             wired += WireBuildingColliderLayers();
+            wired += WireZoneController();
 
             if (wired > 0)
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
                     UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+                UnityEditor.SceneManagement.EditorSceneManager.SaveOpenScenes();
 
             Debug.Log($"[SceneWiringPass] {wired} references wired.");
         }
@@ -189,6 +191,11 @@ namespace Tartaria.Editor
             {
                 var path = AssetDatabase.GUIDToAssetPath(guids[i]);
                 var questDef = AssetDatabase.LoadAssetAtPath<QuestDefinition>(path);
+                if (questDef == null)
+                {
+                    Debug.LogWarning($"[SceneWiringPass] Failed to load QuestDefinition at {path}");
+                    continue;
+                }
                 dbProp.GetArrayElementAtIndex(i).objectReferenceValue = questDef;
             }
 
@@ -440,6 +447,28 @@ namespace Tartaria.Editor
             go.layer = layer;
             foreach (Transform child in go.transform)
                 SetLayerRecursive(child.gameObject, layer);
+        }
+
+        // ─── ZoneController ─────────────────────────
+
+        static int WireZoneController()
+        {
+            var zc = Object.FindFirstObjectByType<ZoneController>();
+            if (zc == null) return 0;
+
+            var so = new SerializedObject(zc);
+            int n = 0;
+
+            // Force discovery radius to 15 (was 30, caused instant discovery at spawn)
+            var radiusProp = so.FindProperty("discoveryRadius");
+            if (radiusProp != null && radiusProp.floatValue > 15f)
+            {
+                radiusProp.floatValue = 15f;
+                n++;
+            }
+
+            so.ApplyModifiedProperties();
+            return n;
         }
     }
 }

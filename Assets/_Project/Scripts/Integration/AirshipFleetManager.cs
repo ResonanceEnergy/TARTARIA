@@ -148,9 +148,11 @@ namespace Tartaria.Integration
 
             RecalculateLift(shipIndex);
             OnAirshipRestored?.Invoke(shipIndex);
+            Audio.AudioManager.Instance?.PlaySFX("AirshipRestored", transform.position);
 
             QuestManager.Instance?.ProgressByType(
                 QuestObjectiveType.RestoreBuilding, _ships[shipIndex].shipId);
+            Save.SaveManager.Instance?.MarkDirty();
 
             Debug.Log($"[AirshipFleet] Ship {_ships[shipIndex].shipId} restored ({_shipsRestored}/{MaxAirships})");
 
@@ -158,6 +160,8 @@ namespace Tartaria.Integration
             {
                 _fleetOperational = true;
                 OnFleetOperational?.Invoke();
+                Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+                Audio.AdaptiveMusicController.Instance?.PlayZoneShift();
                 Debug.Log("[AirshipFleet] FLEET OPERATIONAL — all 3 airships restored!");
             }
 
@@ -178,9 +182,12 @@ namespace Tartaria.Integration
             RecalculateLift(shipIndex);
 
             OnMercuryOrbTuned?.Invoke(shipIndex, _ships[shipIndex].mercuryOrbsTuned);
+            Input.HapticFeedbackManager.Instance?.PlayPerfectTune();
 
             QuestManager.Instance?.ProgressByType(
                 QuestObjectiveType.CompleteTuning, "mercury_orb");
+            Audio.AudioManager.Instance?.PlaySFX("MercuryOrbTuned", transform.position);
+            Save.SaveManager.Instance?.MarkDirty();
 
             Debug.Log($"[AirshipFleet] Mercury orb tuned on {_ships[shipIndex].shipId} ({_ships[shipIndex].mercuryOrbsTuned}/{MercuryOrbsPerShip})");
             return true;
@@ -194,6 +201,7 @@ namespace Tartaria.Integration
             if (_currentFormation == formation) return;
             _currentFormation = formation;
             OnFormationChanged?.Invoke(formation);
+            Audio.AudioManager.Instance?.PlaySFX2D("FormationChange");
             Debug.Log($"[AirshipFleet] Formation changed to {formation}");
         }
 
@@ -208,6 +216,8 @@ namespace Tartaria.Integration
             if (_ships[shipIndex].HealthPct < 0.3f) return false;
 
             _ships[shipIndex].state = AirshipState.InFlight;
+            Audio.AudioManager.Instance?.PlaySFX("AirshipLaunch", transform.position);
+            Save.SaveManager.Instance?.MarkDirty();
             return true;
         }
 
@@ -222,6 +232,8 @@ namespace Tartaria.Integration
 
             _ships[shipIndex].state = AirshipState.Idle;
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.ReachAirshipDestination, _ships[shipIndex].shipId);
+            Audio.AudioManager.Instance?.PlaySFX("AirshipLand", transform.position);
+            Save.SaveManager.Instance?.MarkDirty();
             return true;
         }
 

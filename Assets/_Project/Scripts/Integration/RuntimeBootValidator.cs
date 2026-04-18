@@ -154,17 +154,6 @@ namespace Tartaria.Integration
 
         void OnGUI()
         {
-            if (!_validated || !showOverlay || _overlayTimer <= 0f) return;
-            _overlayTimer -= Time.unscaledDeltaTime;
-
-            float alpha = Mathf.Clamp01(_overlayTimer / 2f); // Fade out last 2 seconds
-            bool allGood = _failed == 0;
-
-            // Background
-            var bgColor = allGood
-                ? new Color(0f, 0.2f, 0f, 0.75f * alpha)
-                : new Color(0.3f, 0f, 0f, 0.85f * alpha);
-
             _overlayStyle ??= new GUIStyle(GUI.skin.label)
             {
                 fontSize = 12,
@@ -173,16 +162,49 @@ namespace Tartaria.Integration
                 richText = false,
                 alignment = TextAnchor.UpperLeft,
             };
-            _overlayStyle.normal.textColor = new Color(1f, 1f, 1f, alpha);
 
-            float width = 360f;
-            float height = (_passed + _failed + 6) * 16f;
-            var rect = new Rect(10f, 10f, width, height);
+            if (_validated && showOverlay && _overlayTimer > 0f)
+            {
+                _overlayTimer -= Time.unscaledDeltaTime;
+                float alpha = Mathf.Clamp01(_overlayTimer / 2f);
+                bool allGood = _failed == 0;
+                var bgColor = allGood
+                    ? new Color(0f, 0.2f, 0f, 0.75f * alpha)
+                    : new Color(0.3f, 0f, 0f, 0.85f * alpha);
+                _overlayStyle.normal.textColor = new Color(1f, 1f, 1f, alpha);
+                float width = 360f;
+                float height = (_passed + _failed + 6) * 16f;
+                var rect = new Rect(10f, 10f, width, height);
+                GUI.color = bgColor;
+                GUI.DrawTexture(rect, Texture2D.whiteTexture);
+                GUI.color = new Color(1f, 1f, 1f, alpha);
+                GUI.Label(new Rect(14f, 12f, width - 8f, height - 4f), _report, _overlayStyle);
+            }
 
-            GUI.color = bgColor;
-            GUI.DrawTexture(rect, Texture2D.whiteTexture);
-            GUI.color = new Color(1f, 1f, 1f, alpha);
-            GUI.Label(new Rect(14f, 12f, width - 8f, height - 4f), _report, _overlayStyle);
+            // Persistent debug HUD
+            if (_validated)
+            {
+                var player = GameObject.FindWithTag("Player");
+                var cam = UnityEngine.Camera.main;
+                var pih = player != null ? player.GetComponent<Input.PlayerInputHandler>() : null;
+                var gs = GameStateManager.Instance;
+                string debugInfo = "=== TARTARIA DEBUG ===\n";
+                debugInfo += $"State: {gs?.CurrentState}\n";
+                debugInfo += $"IsPlaying: {gs?.IsPlaying}\n";
+                debugInfo += $"Player: {(player != null ? player.transform.position.ToString("F1") : "NULL")}\n";
+                debugInfo += $"Camera: {(cam != null ? cam.transform.position.ToString("F1") : "NULL")}\n";
+                debugInfo += $"CamEnabled: {(cam != null ? cam.enabled.ToString() : "NULL")}\n";
+                debugInfo += $"Moving: {(pih != null ? pih.IsMoving.ToString() : "?")}\n";
+                debugInfo += $"FPS: {(1f / Time.unscaledDeltaTime):F0}\n";
+                _overlayStyle.normal.textColor = Color.yellow;
+                float dw = 300f;
+                float dh = 130f;
+                var dRect = new Rect(10f, Screen.height - dh - 10f, dw, dh);
+                GUI.color = new Color(0f, 0f, 0f, 0.7f);
+                GUI.DrawTexture(dRect, Texture2D.whiteTexture);
+                GUI.color = Color.white;
+                GUI.Label(new Rect(14f, Screen.height - dh - 6f, dw - 8f, dh - 4f), debugInfo, _overlayStyle);
+            }
         }
     }
 }
