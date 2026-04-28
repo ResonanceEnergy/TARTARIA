@@ -22,7 +22,7 @@ namespace Tartaria.Editor
         public static void Populate()
         {
             int added = 0;
-            CleanDuplicateBuildingMarkers();   // Fix 13: remove stale duplicates from prior runs
+            added += CleanDuplicateBuildingMarkers();   // Fix 13: remove stale duplicates from prior runs
             added += CreateTerrain();
             FixupPlazaCollider();
             FixupPlayerSpawn();
@@ -264,23 +264,50 @@ namespace Tartaria.Editor
         /// Fix 13: Remove duplicate building marker GameObjects accumulated from repeated
         /// Populate() calls. Keeps only the first object found per building name.
         /// </summary>
-        static void CleanDuplicateBuildingMarkers()
+        static int CleanDuplicateBuildingMarkers()
         {
-            string[] buildingNames = { "StarDome_Placeholder", "HarmonicFountain_Placeholder", "CrystalSpire_Placeholder" };
-            foreach (var name in buildingNames)
-            {
-                var all = Object.FindObjectsByType<Transform>(FindObjectsSortMode.None);
-                var matches = new System.Collections.Generic.List<GameObject>();
-                foreach (var t in all)
-                    if (t.name == name) matches.Add(t.gameObject);
+            int removed = 0;
 
-                // Keep first, destroy the rest
-                for (int i = 1; i < matches.Count; i++)
+            // Pass 1: dedupe by InteractableBuilding component + rounded position.
+            // Catches prefab instances regardless of name override.
+            var allBuildings = Object.FindObjectsByType<Tartaria.Integration.InteractableBuilding>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            var seenPos = new System.Collections.Generic.HashSet<string>();
+            foreach (var b in allBuildings)
+            {
+                if (b == null) continue;
+                var p = b.transform.position;
+                string key = $"{Mathf.RoundToInt(p.x)}_{Mathf.RoundToInt(p.z)}";
+                if (!seenPos.Add(key))
                 {
-                    Debug.Log($"[EchohavenScenePopulator] Removing duplicate building marker: {name} #{i}");
-                    Object.DestroyImmediate(matches[i]);
+                    Object.DestroyImmediate(b.gameObject);
+                    removed++;
                 }
             }
+
+            // Pass 2: dedupe by name (legacy placeholders without component)
+            string[] buildingNames = { "StarDome_Placeholder", "HarmonicFountain_Placeholder", "CrystalSpire_Placeholder",
+                                       "Echohaven_StarDome", "Echohaven_HarmonicFountain", "Echohaven_CrystalSpire" };
+            var allTransforms = Object.FindObjectsByType<Transform>(
+                FindObjectsInactive.Include, FindObjectsSortMode.None);
+            foreach (var name in buildingNames)
+            {
+                var matches = new System.Collections.Generic.List<GameObject>();
+                foreach (var t in allTransforms)
+                    if (t != null && t.gameObject != null && t.name == name) matches.Add(t.gameObject);
+                for (int i = 1; i < matches.Count; i++)
+                {
+                    if (matches[i] != null)
+                    {
+                        Object.DestroyImmediate(matches[i]);
+                        removed++;
+                    }
+                }
+            }
+
+            if (removed > 0)
+                Debug.Log($"[EchohavenScenePopulator] Removed {removed} duplicate building markers.");
+            return removed;
         }
 
         static int CreateBuildingMarkers()

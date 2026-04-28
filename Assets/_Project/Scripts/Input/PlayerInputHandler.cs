@@ -79,9 +79,7 @@ namespace Tartaria.Input
         /// </summary>
         void EnsureSafetyFloor()
         {
-            // Build a mask that includes everything EXCEPT Building (8), Player (10), Trigger (11)
-            int excludeLayers = (1 << 8) | (1 << 10) | (1 << 11); // Building, Player, Trigger
-            int groundMask = Physics.DefaultRaycastLayers & ~excludeLayers;
+            int groundMask = GetGroundMask();
 
             // Raycast from high up to find actual terrain height
             // Temporarily disable own collider so we don't hit ourselves
@@ -102,6 +100,27 @@ namespace Tartaria.Input
             transform.position = new Vector3(transform.position.x, safeY, transform.position.z);
             _controller.enabled = true;
             _velocity = Vector3.zero;
+        }
+
+        int GetGroundMask()
+        {
+            // Include everything EXCEPT Building (8), Player (10), Trigger (11)
+            int excludeLayers = (1 << 8) | (1 << 10) | (1 << 11);
+            return Physics.DefaultRaycastLayers & ~excludeLayers;
+        }
+
+        bool TrySampleGroundHeight(Vector3 worldPos, out float groundHeight)
+        {
+            int groundMask = GetGroundMask();
+            Vector3 origin = worldPos + Vector3.up * 2f;
+            if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 30f, groundMask, QueryTriggerInteraction.Ignore))
+            {
+                groundHeight = hit.point.y;
+                return true;
+            }
+
+            groundHeight = _groundHeight;
+            return false;
         }
 
         void OnDestroy()
@@ -375,8 +394,7 @@ namespace Tartaria.Input
                 Debug.LogWarning($"[PlayerInput] Fall-through at Y={transform.position.y:F1}, ground={_groundHeight:F1}, resetting");
                 float resetX = transform.position.x;
                 float resetZ = transform.position.z;
-                int excludeLayers = (1 << 8) | (1 << 10) | (1 << 11); // Building, Player, Trigger
-                int groundMask = Physics.DefaultRaycastLayers & ~excludeLayers;
+                int groundMask = GetGroundMask();
                 if (Physics.Raycast(new Vector3(resetX, 100f, resetZ), Vector3.down, out RaycastHit gHit, 300f, groundMask, QueryTriggerInteraction.Ignore))
                     _groundHeight = gHit.point.y;
                 else
@@ -394,8 +412,15 @@ namespace Tartaria.Input
             {
                 // Raycast from slightly above feet — if ground is within step distance, treat as grounded
                 if (Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, out RaycastHit stepHit, 0.4f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                {
                     grounded = true;
+                    _groundHeight = stepHit.point.y;
+                }
             }
+
+            // Continuously refresh ground reference while traversing uneven terrain.
+            if (TrySampleGroundHeight(transform.position, out float sampledGroundY))
+                _groundHeight = sampledGroundY;
 
             // Gravity
             if (grounded && _velocity.y < 0)
@@ -416,6 +441,22 @@ namespace Tartaria.Input
             // (calling Move() twice per frame causes CC collision detection bugs)
             horizontalMove.y = _velocity.y * Time.deltaTime;
             _controller.Move(horizontalMove);
+
+            // Runaway depenetration guard: if CC.Move() shoved us upward by
+            // more than 5m in a single frame (common when spawned overlapping
+            // a wall collider), snap back to ground level.
+            if (transform.position.y > _groundHeight + 10f)
+            {
+                Debug.LogWarning($"[PlayerInput] Depenetration spike Y={transform.position.y:F1}, ground={_groundHeight:F1}, snapping down");
+                _controller.enabled = false;
+                transform.position = new Vector3(
+                    transform.position.x,
+                    _groundHeight + 1.5f,
+                    transform.position.z);
+                _controller.enabled = true;
+                _velocity = Vector3.zero;
+                return;
+            }
 
             // Immediate ground clamp — if CC.Move() let us sink below terrain,
             // snap back above it.  This catches first-frame and edge-case

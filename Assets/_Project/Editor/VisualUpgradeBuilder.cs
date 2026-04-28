@@ -1261,8 +1261,8 @@ namespace Tartaria.Editor
             light.color = color;
             light.intensity = intensity;
             light.range = range;
-            light.shadows = LightShadows.Soft;
-            light.shadowStrength = 0.5f;
+            // Atmospheric fill lights — no shadows to avoid atlas overflow (shadow atlas is 2048x2048)
+            light.shadows = LightShadows.None;
 
             var parent = GameObject.Find("Echohaven_Lighting");
             if (parent != null) go.transform.SetParent(parent.transform);
