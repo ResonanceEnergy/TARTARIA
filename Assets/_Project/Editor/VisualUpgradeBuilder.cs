@@ -379,8 +379,10 @@ namespace Tartaria.Editor
                 {
                     int a = z * (res + 1) + x;
                     int b = a + res + 1;
-                    tris.Add(a); tris.Add(b); tris.Add(a + 1);
-                    tris.Add(a + 1); tris.Add(b); tris.Add(b + 1);
+                    // Clockwise winding viewed from above (+Y) so terrain is
+                    // visible from above — Unity culls back faces by default.
+                    tris.Add(a); tris.Add(a + 1); tris.Add(b);
+                    tris.Add(a + 1); tris.Add(b + 1); tris.Add(b);
                 }
             }
 

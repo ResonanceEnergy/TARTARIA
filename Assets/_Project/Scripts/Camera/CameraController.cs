@@ -22,7 +22,7 @@ namespace Tartaria.Camera
 
         [Header("Exploration Mode")]
         [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 22f;
-        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 75f;
+        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 55f;
         [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 60f;
 
         [Header("Combat Mode")]
