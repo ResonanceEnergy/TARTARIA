@@ -297,6 +297,8 @@ namespace Tartaria.Integration
 
         GameObject CreateAetherShard(Vector3 pos)
         {
+            pos = ResolveShardSpawnPosition(pos);
+
             var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
             go.name = "AetherShard";
             go.transform.position = pos;
@@ -342,6 +344,22 @@ namespace Tartaria.Integration
             go.AddComponent<AetherShardPickup>().rsReward = collectRSReward;
 
             return go;
+        }
+
+        Vector3 ResolveShardSpawnPosition(Vector3 requested)
+        {
+            // Keep shard positions collectible on uneven procedural terrain.
+            int excludeLayers = (1 << 8) | (1 << 10) | (1 << 11); // Building, Player, Trigger
+            int groundMask = Physics.DefaultRaycastLayers & ~excludeLayers;
+            Vector3 origin = new Vector3(requested.x, 100f, requested.z);
+            if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 300f, groundMask, QueryTriggerInteraction.Ignore))
+            {
+                var snapped = new Vector3(requested.x, hit.point.y + 0.9f, requested.z);
+                Debug.Log($"[EchohavenContentSpawner] Shard spawn snapped {requested} -> {snapped}");
+                return snapped;
+            }
+
+            return requested;
         }
 
         // ─── Environmental Props (Gap 8) ─────────────

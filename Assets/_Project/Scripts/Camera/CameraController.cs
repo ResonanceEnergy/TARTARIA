@@ -21,9 +21,9 @@ namespace Tartaria.Camera
         [SerializeField, Tooltip("Transform to follow and orbit around")] Transform followTarget;
 
         [Header("Exploration Mode")]
-        [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 9f;
-        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 18f;
-        [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 55f;
+        [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 22f;
+        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 75f;
+        [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 60f;
 
         [Header("Combat Mode")]
         [SerializeField, Tooltip("Camera distance in combat mode")] float combatDistance = 20f;
@@ -57,6 +57,7 @@ namespace Tartaria.Camera
         Coroutine _closeUpCoroutine;
         GameState _preCloseUpState;
         float _playerSearchCooldown;
+        int _diagCounter;
 
         // Camera-local InputAction instances — avoids shared-state issues with PlayerInputHandler's clone
         InputAction _zoomAction;
@@ -72,6 +73,7 @@ namespace Tartaria.Camera
 
             _currentDistance = exploreDistance;
             _currentPitch = explorePitch;
+            _currentYaw = 180f; // Face north — toward the StarDome / Fountain cluster
             _targetFOV = exploreFOV;
             _playerSearchCooldown = 0f; // Search immediately on first frame
         }
@@ -232,6 +234,12 @@ namespace Tartaria.Camera
             transform.position = Vector3.Lerp(
                 transform.position, targetPos, Time.deltaTime * smoothSpeed);
             transform.LookAt(lookPos);
+
+            // First-frame diag (after player lock)
+            if (_diagCounter++ == 0)
+            {
+                Debug.Log($"[CameraController] DIAG pitch={_currentPitch:F1} yaw={_currentYaw:F1} dist={_currentDistance:F1} look={lookPos} camPos={transform.position} fwd={transform.forward} state={GameStateManager.Instance?.CurrentState}");
+            }
 
             // Smooth FOV transition
             if (_camera != null)
