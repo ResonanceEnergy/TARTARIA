@@ -30,20 +30,8 @@ namespace Tartaria.Core
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
-            EnsureInventorySystem();
-        }
-
-        /// <summary>
-        /// Ensures the singleton InventorySystem exists from boot, before any
-        /// scene-side PickupInteractable / ShovelPickup tries to call it.
-        /// Idempotent: safe to call repeatedly.
-        /// </summary>
-        static void EnsureInventorySystem()
-        {
-            if (Tartaria.Gameplay.InventorySystem.Instance != null) return;
-            var go = new GameObject("InventorySystem");
-            go.AddComponent<Tartaria.Gameplay.InventorySystem>();
-            // InventorySystem.Awake() handles DontDestroyOnLoad + Instance set.
+            // Note: InventorySystem is Lazy singleton - auto-initializes on first access
+            // No need to initialize here (avoids assembly circular dependency)
         }
 
         void OnDestroy()
