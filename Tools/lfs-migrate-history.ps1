@@ -5,16 +5,32 @@
 #
 # Solo dev = generally safe. Run only when ready.
 #
-# Effect: shrinks the .git folder dramatically (often 5–20×) and makes future
+# Effect: shrinks the .git folder dramatically (often 5-20x) and makes future
 # clones fast.
+#
+# Usage:
+#   .\Tools\lfs-migrate-history.ps1            (interactive, prompts MIGRATE/PUSH)
+#   .\Tools\lfs-migrate-history.ps1 -Force     (non-interactive, full migrate + push)
+#   .\Tools\lfs-migrate-history.ps1 -DryRun    (analyze only, no rewrite)
+
+param(
+    [switch]$Force,
+    [switch]$DryRun,
+    [switch]$NoPush
+)
 
 $ErrorActionPreference = "Stop"
 $RepoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $RepoRoot
 
+function Section($t) { Write-Host "`n=== $t ===" -ForegroundColor Cyan }
+function Ok($t)      { Write-Host "  [OK] $t"     -ForegroundColor Green }
+function Warn($t)    { Write-Host "  [WARN] $t"   -ForegroundColor Yellow }
+function Fail($t)    { Write-Host "  [FAIL] $t"   -ForegroundColor Red; exit 1 }
+
 Write-Host @"
 ================================================================================
-  Git LFS history migration — DESTRUCTIVE OPERATION
+  Git LFS history migration - DESTRUCTIVE OPERATION
 ================================================================================
   This will rewrite ALL commits on the current branch to move matching binary
   files into LFS storage. After this you must force-push.
@@ -22,22 +38,38 @@ Write-Host @"
   Run this ONLY if you are the sole user of this repo, or you have coordinated
   with all collaborators to re-clone after the force-push.
 
-  A backup of .git is recommended before proceeding.
+  Force flag : $Force
+  DryRun     : $DryRun
+  NoPush     : $NoPush
 ================================================================================
 "@ -ForegroundColor Yellow
 
-$confirm = Read-Host "Type 'MIGRATE' to proceed, anything else to abort"
-if ($confirm -ne "MIGRATE") {
-    Write-Host "Aborted." -ForegroundColor Cyan
-    exit 0
+if (-not $Force -and -not $DryRun) {
+    $confirm = Read-Host "Type 'MIGRATE' to proceed, anything else to abort"
+    if ($confirm -ne "MIGRATE") {
+        Write-Host "Aborted." -ForegroundColor Cyan
+        exit 0
+    }
 }
 
-Write-Host "`n[1/4] Backing up .git folder to .git.backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')..." -ForegroundColor Cyan
+# --- Backup ---
 $backupName = ".git.backup-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-Copy-Item -Path ".git" -Destination $backupName -Recurse -Force
-Write-Host "  Backup at: $backupName" -ForegroundColor Green
+Section "[1/5] Backing up .git folder to $backupName"
+if ($DryRun) {
+    Warn "DryRun: skipping backup"
+} else {
+    Copy-Item -Path ".git" -Destination $backupName -Recurse -Force
+    Ok "Backup at: $backupName"
+}
 
-Write-Host "`n[2/4] Migrating binary file types into LFS across all branches and tags..." -ForegroundColor Cyan
+# --- Pre-migration size ---
+Section "[2/5] Pre-migration .git size"
+$preSize = (Get-ChildItem -Path .git -Recurse -Force -ErrorAction SilentlyContinue |
+            Measure-Object -Property Length -Sum).Sum / 1MB
+Write-Host ("  .git: {0:N1} MB" -f $preSize)
+
+# --- Migrate ---
+Section "[3/5] Migrating binary file types into LFS across all refs"
 $includes = "*.fbx,*.FBX,*.dae,*.obj,*.OBJ,*.blend," +
             "*.wav,*.WAV,*.mp3,*.ogg,*.aif,*.aiff,*.flac," +
             "*.png,*.PNG,*.jpg,*.JPG,*.jpeg," +
@@ -47,25 +79,45 @@ $includes = "*.fbx,*.FBX,*.dae,*.obj,*.OBJ,*.blend," +
             "*.bytes,*.unitypackage,*.bundle," +
             "*.zip,*.7z,*.gz"
 
+if ($DryRun) {
+    Write-Host "  DryRun: showing files that WOULD migrate..."
+    git lfs migrate info --include="$includes" --everything
+    Section "[5/5] DryRun done"
+    Write-Host "  No changes made. Re-run without -DryRun to actually migrate." -ForegroundColor Yellow
+    exit 0
+}
+
 git lfs migrate import --include="$includes" --everything
 if ($LASTEXITCODE -ne 0) {
-    Write-Host "  Migration failed. Restore from $backupName if needed." -ForegroundColor Red
-    exit 1
+    Fail "Migration failed. Restore from $backupName if needed."
 }
-Write-Host "  Migration complete." -ForegroundColor Green
+Ok "Migration complete"
 
-Write-Host "`n[3/4] Repo size after migration:" -ForegroundColor Cyan
-$gitSize = (Get-ChildItem -Path .git -Recurse -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum / 1MB
-Write-Host ("  .git: {0:N1} MB" -f $gitSize)
+# --- Post-migration size ---
+Section "[4/5] Post-migration .git size"
+$postSize = (Get-ChildItem -Path .git -Recurse -Force -ErrorAction SilentlyContinue |
+             Measure-Object -Property Length -Sum).Sum / 1MB
+Write-Host ("  .git: {0:N1} MB  (was {1:N1} MB - {2:N1} MB saved)" -f $postSize, $preSize, ($preSize - $postSize))
 
-Write-Host "`n[4/4] Force-push the rewritten history..." -ForegroundColor Cyan
-$confirm2 = Read-Host "Type 'PUSH' to force-push, anything else to skip (you can push later manually)"
-if ($confirm2 -eq "PUSH") {
+# --- Force push ---
+Section "[5/5] Force-push rewritten history"
+if ($NoPush) {
+    Warn "NoPush flag set - skipping push. Manual: git push --force-with-lease origin --all"
+} elseif ($Force) {
     git push --force-with-lease origin --all
+    if ($LASTEXITCODE -ne 0) { Fail "git push --all failed" }
     git push --force-with-lease origin --tags
-    Write-Host "  Force-push complete." -ForegroundColor Green
+    Ok "Force-push complete"
 } else {
-    Write-Host "  Skipped. To push later: git push --force-with-lease origin --all" -ForegroundColor Yellow
+    $confirm2 = Read-Host "Type 'PUSH' to force-push, anything else to skip"
+    if ($confirm2 -eq "PUSH") {
+        git push --force-with-lease origin --all
+        if ($LASTEXITCODE -ne 0) { Fail "git push --all failed" }
+        git push --force-with-lease origin --tags
+        Ok "Force-push complete"
+    } else {
+        Warn "Skipped. To push later: git push --force-with-lease origin --all"
+    }
 }
 
-Write-Host "`nDone. Backup at $backupName — delete it when you've verified everything works." -ForegroundColor Cyan
+Write-Host "`nDone. Backup at $backupName - delete it when you've verified everything works." -ForegroundColor Cyan

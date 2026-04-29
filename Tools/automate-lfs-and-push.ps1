@@ -75,7 +75,9 @@ $files = @(
     "Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs",
     "Tools/automate-lfs-and-push.ps1",
     "Tools/lfs-migrate-history.ps1",
-    "AUTOMATE.bat"
+    "AUTOMATE.bat",
+    "MIGRATE.bat",
+    "download-mixamo-characters.ps1"
 )
 foreach ($f in $files) {
     if (Test-Path $f) {
