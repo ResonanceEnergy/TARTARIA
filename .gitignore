@@ -57,3 +57,14 @@ Tools/migrate-last-run.log
 
 # Git LFS migration backups
 .git.backup-*
+
+# ─── PBR texture variants we don't use (DirectX normals, raw roughness, preview thumbs) ───
+# Keep NormalGL + Color + Displacement + AO + Metalness; reject the rest
+Assets/_Project/Textures/PBR/**/*_NormalDX.png
+Assets/_Project/Textures/PBR/**/*_Roughness.png
+Assets/_Project/Textures/PBR/**/*_NormalDX.png.meta
+Assets/_Project/Textures/PBR/**/*_Roughness.png.meta
+# AmbientCG preview thumbnails (root of each set)
+Assets/_Project/Textures/PBR/*/[A-Z]*[0-9].png
+Assets/_Project/Textures/PBR/*/[A-Z]*[0-9].png.meta
+
