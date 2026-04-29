@@ -53,3 +53,7 @@ Assets/_Project/Logs.meta
 # Cowork sandbox probe files
 .lfs-write-test
 Tools/automate-last-run.log
+Tools/migrate-last-run.log
+
+# Git LFS migration backups
+.git.backup-*

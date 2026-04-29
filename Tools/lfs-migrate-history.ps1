@@ -68,6 +68,17 @@ $preSize = (Get-ChildItem -Path .git -Recurse -Force -ErrorAction SilentlyContin
             Measure-Object -Property Length -Sum).Sum / 1MB
 Write-Host ("  .git: {0:N1} MB" -f $preSize)
 
+# --- Stash working tree (git lfs migrate refuses if dirty) ---
+$stashed = $false
+$dirty = (git status --porcelain | Measure-Object).Count
+if ($dirty -gt 0) {
+    Section "[2.5/5] Stashing $dirty uncommitted changes (will pop after migrate)"
+    git stash push --include-untracked -m "pre-lfs-migrate-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+    if ($LASTEXITCODE -ne 0) { Fail "git stash failed" }
+    $stashed = $true
+    Ok "Working tree stashed"
+}
+
 # --- Migrate ---
 Section "[3/5] Migrating binary file types into LFS across all refs"
 $includes = "*.fbx,*.FBX,*.dae,*.obj,*.OBJ,*.blend," +
@@ -82,13 +93,19 @@ $includes = "*.fbx,*.FBX,*.dae,*.obj,*.OBJ,*.blend," +
 if ($DryRun) {
     Write-Host "  DryRun: showing files that WOULD migrate..."
     git lfs migrate info --include="$includes" --everything
+    if ($stashed) { git stash pop }
     Section "[5/5] DryRun done"
     Write-Host "  No changes made. Re-run without -DryRun to actually migrate." -ForegroundColor Yellow
     exit 0
 }
 
-git lfs migrate import --include="$includes" --everything
+# Pipe 'y' into stdin in case any prompt fires (belt + suspenders since we stashed)
+"y" | git lfs migrate import --include="$includes" --everything
 if ($LASTEXITCODE -ne 0) {
+    if ($stashed) {
+        Warn "Migration failed - attempting to restore stash..."
+        git stash pop
+    }
     Fail "Migration failed. Restore from $backupName if needed."
 }
 Ok "Migration complete"
@@ -117,6 +134,17 @@ if ($NoPush) {
         Ok "Force-push complete"
     } else {
         Warn "Skipped. To push later: git push --force-with-lease origin --all"
+    }
+}
+
+# --- Restore stash ---
+if ($stashed) {
+    Section "[6/6] Restoring stashed working tree"
+    git stash pop
+    if ($LASTEXITCODE -ne 0) {
+        Warn "git stash pop returned non-zero - your changes are still safe in the stash list (git stash list)"
+    } else {
+        Ok "Working tree restored"
     }
 }
 
