@@ -13,7 +13,7 @@ function Ok($t)      { Write-Host "  [OK] $t"     -ForegroundColor Green }
 function Warn($t)    { Write-Host "  [WARN] $t"   -ForegroundColor Yellow }
 function Fail($t)    { Write-Host "  [FAIL] $t"   -ForegroundColor Red; exit 1 }
 
-Section "0. Sanity"
+Section "0. Sanity + cleanup"
 if (-not (Test-Path ".git")) { Fail "Not a git repo: $RepoRoot" }
 
 # Stale index.lock cleanup - Unity sometimes leaves these behind on Editor crash
@@ -30,6 +30,14 @@ if (Test-Path $lock) {
         Ok "Removed stale .git/index.lock (age $ageStr min)"
     } else {
         Fail "Fresh index.lock present - another git process may be running. Wait 30s and retry."
+    }
+}
+
+# Cowork sandbox probe files cleanup (now also gitignored)
+foreach ($crud in @(".lfs-write-test")) {
+    if (Test-Path $crud) {
+        Remove-Item $crud -Force
+        Ok "Removed stray $crud"
     }
 }
 
@@ -61,6 +69,7 @@ Section "4. Stage curated set of changes"
 # Avoid sweeping in the 1900-file dirty tree blindly.
 $files = @(
     ".gitattributes",
+    ".gitignore",
     ".github/workflows/unity-build.yml",
     "Assets/_Project/Scripts/Core/GameBootstrap.cs",
     "Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs",
