@@ -101,12 +101,22 @@ namespace Tartaria.Integration
         {
             if (enemyPrefab == null)
             {
-                Debug.LogWarning("[ProximityTrigger] No enemy prefab assigned.");
+                var waveManager = CombatWaveManager.Instance;
+                if (waveManager == null)
+                {
+                    Debug.LogWarning("[ProximityTrigger] No enemy prefab assigned and no CombatWaveManager found.");
+                    return;
+                }
+
+                var encounter = CombatWaveManager.BuildZoneEncounter(1, $"proximity_{Mathf.RoundToInt(transform.position.x)}_{Mathf.RoundToInt(transform.position.z)}");
+                waveManager.StartEncounter(encounter, transform.position);
+                Debug.Log("[ProximityTrigger] Started fallback enemy encounter via CombatWaveManager.");
                 return;
             }
 
             var enemy = Instantiate(enemyPrefab, transform.position, Quaternion.identity);
             enemy.name = $"MudGolem_{transform.position.x:F0}_{transform.position.z:F0}";
+            Tartaria.Core.GameStateManager.Instance?.TransitionTo(Tartaria.Core.GameState.Combat);
             Tartaria.Audio.AudioManager.Instance?.PlaySFX("EnemySpawn", transform.position);
             Debug.Log($"[ProximityTrigger] Enemy spawned: {enemy.name}");
         }
@@ -133,11 +143,12 @@ namespace Tartaria.Integration
         /// <summary>
         /// Configure this trigger at runtime (used by BuildingSpawner).
         /// </summary>
-        public void Configure(TriggerAction triggerAction, float radius, InteractableBuilding building = null)
+        public void Configure(TriggerAction triggerAction, float radius, InteractableBuilding building = null, GameObject spawnEnemyPrefab = null)
         {
             action = triggerAction;
             triggerRadius = radius;
             linkedBuilding = building;
+            enemyPrefab = spawnEnemyPrefab;
             if (_collider != null)
             {
                 float maxScale = Mathf.Max(

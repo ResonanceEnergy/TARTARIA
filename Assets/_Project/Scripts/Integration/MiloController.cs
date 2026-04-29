@@ -35,6 +35,8 @@ namespace Tartaria.Integration
 
         // ─── State ───
         bool _introduced;
+
+        public bool HasIntroduced => _introduced;
         int _artifactsAppraised;
         int _jokesDelivered;
         int _sincereMoments;

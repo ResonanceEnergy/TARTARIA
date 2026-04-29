@@ -69,9 +69,29 @@ namespace Tartaria.Integration
         {
             CreateCompanionEntity(em);
             CreateEnemySpawnTriggers(em);
+            CreateRuntimeEnemyProximityTriggers();
             CreateBuildingEntities(em);
 
             Debug.Log("[WorldInit] Companion, 3 spawn triggers, 3 buildings created in ECS.");
+        }
+
+        void CreateRuntimeEnemyProximityTriggers()
+        {
+            CreateRuntimeEnemyProximityTrigger("EnemyTrigger_RS25", golemSpawn1, 12f);
+            CreateRuntimeEnemyProximityTrigger("EnemyTrigger_RS50", golemSpawn2, 12f);
+            CreateRuntimeEnemyProximityTrigger("EnemyTrigger_RS75", golemSpawn3, 12f);
+        }
+
+        static void CreateRuntimeEnemyProximityTrigger(string triggerName, Vector3 position, float radius)
+        {
+            if (GameObject.Find(triggerName) != null)
+                return;
+
+            var go = new GameObject(triggerName);
+            go.transform.position = position;
+
+            var trigger = go.AddComponent<ProximityTrigger>();
+            trigger.Configure(ProximityTrigger.TriggerAction.SpawnEnemy, radius);
         }
 
         // ─── Companion (Milo) ────────────────────────

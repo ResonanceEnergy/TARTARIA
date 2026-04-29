@@ -42,6 +42,7 @@ namespace Tartaria.Editor
             wired += WireGameLoopController();
             wired += WireBuildingColliderLayers();
             wired += WireZoneController();
+            wired += WireVFXPrefabs(); // Feature 3
 
             if (wired > 0)
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -468,6 +469,72 @@ namespace Tartaria.Editor
             }
 
             so.ApplyModifiedProperties();
+            return n;
+        }
+
+        // ─── VFX Prefabs (Feature 3) ────────────────
+
+        static int WireVFXPrefabs()
+        {
+            int n = 0;
+            const string vfxPath = "Assets/_Project/Prefabs/VFX";
+
+            // Load VFX prefabs
+            var scanPulse = AssetDatabase.LoadAssetAtPath<GameObject>($"{vfxPath}/ScanPulse.prefab");
+            var restoreSparkle = AssetDatabase.LoadAssetAtPath<GameObject>($"{vfxPath}/RestoreSparkle.prefab");
+            var shardCollect = AssetDatabase.LoadAssetAtPath<GameObject>($"{vfxPath}/ShardCollect.prefab");
+
+            // Wire ResonanceScannerSystem
+            var scanner = Object.FindFirstObjectByType<ResonanceScannerSystem>();
+            if (scanner != null && scanPulse != null)
+            {
+                var so = new SerializedObject(scanner);
+                var vfxProp = so.FindProperty("scanPulseVFX");
+                if (vfxProp != null && vfxProp.objectReferenceValue == null)
+                {
+                    vfxProp.objectReferenceValue = scanPulse;
+                    so.ApplyModifiedProperties();
+                    n++;
+                }
+            }
+
+            // Wire InteractableBuildings
+            var buildings = Object.FindObjectsByType<InteractableBuilding>(FindObjectsSortMode.None);
+            foreach (var building in buildings)
+            {
+                if (restoreSparkle != null)
+                {
+                    var so = new SerializedObject(building);
+                    var vfxProp = so.FindProperty("restoreSparkleVFX");
+                    if (vfxProp != null && vfxProp.objectReferenceValue == null)
+                    {
+                        vfxProp.objectReferenceValue = restoreSparkle;
+                        so.ApplyModifiedProperties();
+                        n++;
+                    }
+                }
+            }
+
+            // Wire PickupInteractables
+            var pickups = Object.FindObjectsByType<PickupInteractable>(FindObjectsSortMode.None);
+            foreach (var pickup in pickups)
+            {
+                if (shardCollect != null)
+                {
+                    var so = new SerializedObject(pickup);
+                    var vfxProp = so.FindProperty("shardCollectVFX");
+                    if (vfxProp != null && vfxProp.objectReferenceValue == null)
+                    {
+                        vfxProp.objectReferenceValue = shardCollect;
+                        so.ApplyModifiedProperties();
+                        n++;
+                    }
+                }
+            }
+
+            if (n > 0)
+                Debug.Log($"[SceneWiringPass] Wired {n} VFX prefab references");
+
             return n;
         }
     }

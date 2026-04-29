@@ -21,14 +21,14 @@ namespace Tartaria.Camera
         [SerializeField, Tooltip("Transform to follow and orbit around")] Transform followTarget;
 
         [Header("Exploration Mode")]
-        [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 22f;
-        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 55f;
-        [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 60f;
+        [SerializeField, Tooltip("Camera distance in exploration mode")] float exploreDistance = 9f;
+        [SerializeField, Tooltip("Camera pitch angle in exploration mode")] float explorePitch = 28f;
+        [SerializeField, Tooltip("Field of view in exploration mode")] float exploreFOV = 65f;
 
         [Header("Combat Mode")]
-        [SerializeField, Tooltip("Camera distance in combat mode")] float combatDistance = 20f;
-        [SerializeField, Tooltip("Camera pitch angle in combat mode")] float combatPitch = 50f;
-        [SerializeField, Tooltip("Field of view in combat mode")] float combatFOV = 60f;
+        [SerializeField, Tooltip("Camera distance in combat mode")] float combatDistance = 12f;
+        [SerializeField, Tooltip("Camera pitch angle in combat mode")] float combatPitch = 32f;
+        [SerializeField, Tooltip("Field of view in combat mode")] float combatFOV = 65f;
 
         [Header("Close-Up Mode")]
         [SerializeField, Tooltip("Camera distance for close-up inspections")] float closeUpDistance = 5f;
@@ -40,12 +40,14 @@ namespace Tartaria.Camera
 
         [Header("Controls")]
         [SerializeField, Tooltip("Mouse scroll zoom speed")] float zoomSpeed = 3f;
-        [SerializeField, Tooltip("Minimum allowed zoom distance")] float zoomMin = 5f;
-        [SerializeField, Tooltip("Maximum allowed zoom distance")] float zoomMax = 25f;
+        [SerializeField, Tooltip("Minimum allowed zoom distance")] float zoomMin = 4f;
+        [SerializeField, Tooltip("Maximum allowed zoom distance")] float zoomMax = 18f;
         [SerializeField, Tooltip("Camera orbit rotation speed (degrees/sec)")] float orbitSpeed = 120f;
         [SerializeField, Tooltip("Gamepad right-stick orbit sensitivity")] float gamepadOrbitSpeed = 150f;
         [SerializeField, Tooltip("Gamepad zoom speed (D-pad / right shoulder)")] float gamepadZoomSpeed = 8f;
         [SerializeField, Tooltip("Camera movement interpolation speed")] float smoothSpeed = 8f;
+        [SerializeField, Tooltip("Enable verbose runtime camera diagnostics")]
+        bool enableDiagnostics;
 
         UnityEngine.Camera _camera;
         Transform _lookTarget; // CameraTarget child (chest height) — falls back to followTarget
@@ -65,6 +67,17 @@ namespace Tartaria.Camera
 
         void Awake()
         {
+            // Runtime safety: older scenes may carry stale serialized camera values
+            // (18m distance / 55 deg pitch). Clamp to the intended tighter framing.
+            exploreDistance = 9f;
+            explorePitch = 28f;
+            exploreFOV = 65f;
+            combatDistance = 12f;
+            combatPitch = 32f;
+            combatFOV = 65f;
+            zoomMin = 4f;
+            zoomMax = 18f;
+
             _camera = GetComponent<UnityEngine.Camera>();
             if (_camera == null)
                 _camera = GetComponentInChildren<UnityEngine.Camera>();
@@ -150,10 +163,14 @@ namespace Tartaria.Camera
                     break;
 
                 case GameState.Combat:
-                    _currentDistance = Mathf.Lerp(_currentDistance, combatDistance + _zoomOffset, Time.deltaTime * smoothSpeed);
+                {
+                    // Prevent combat camera from drifting too far back due to exploration zoom offset.
+                    float combatZoomOffset = Mathf.Clamp(_zoomOffset, -2f, 0f);
+                    _currentDistance = Mathf.Lerp(_currentDistance, combatDistance + combatZoomOffset, Time.deltaTime * smoothSpeed);
                     _currentPitch = Mathf.Lerp(_currentPitch, combatPitch, Time.deltaTime * smoothSpeed);
                     _targetFOV = combatFOV;
                     break;
+                }
 
                 case GameState.Tuning:
                     _currentDistance = Mathf.Lerp(_currentDistance, tuningDistance, Time.deltaTime * smoothSpeed);
@@ -235,10 +252,52 @@ namespace Tartaria.Camera
                 transform.position, targetPos, Time.deltaTime * smoothSpeed);
             transform.LookAt(lookPos);
 
-            // First-frame diag (after player lock)
-            if (_diagCounter++ == 0)
+            // Periodic diag — fires on first frame, then every 60 frames (~1s at 60fps).
+            // Lets us see the exact moment the camera math changes after the
+            // Loading->Exploration transition.
+            bool firstFrame = _diagCounter == 0;
+            bool periodic = _diagCounter > 0 && (_diagCounter % 60) == 0;
+            _diagCounter++;
+            if (enableDiagnostics && (firstFrame || periodic))
             {
-                Debug.Log($"[CameraController] DIAG pitch={_currentPitch:F1} yaw={_currentYaw:F1} dist={_currentDistance:F1} look={lookPos} camPos={transform.position} fwd={transform.forward} state={GameStateManager.Instance?.CurrentState}");
+                var st = GameStateManager.Instance?.CurrentState;
+                var pl = followTarget != null ? followTarget.position : Vector3.zero;
+                var camParent = transform.parent != null ? transform.parent.name : "<none>";
+                var camWorld = transform.position;
+                Debug.Log($"[CameraController] DIAG f={_diagCounter - 1} state={st} pitch={_currentPitch:F1} yaw={_currentYaw:F1} dist={_currentDistance:F1} zoff={_zoomOffset:F1} look={lookPos} player={pl} camPos={camWorld} fwd={transform.forward} parent={camParent}");
+            }
+            if (enableDiagnostics && firstFrame)
+            {
+                // SCENE DIAG: dump ground/terrain mesh state so we can verify the
+                // user actually has a visible floor under the camera.
+                var gp = GameObject.Find("GroundPlane");
+                if (gp == null)
+                {
+                    Debug.LogError("[CameraController] SCENE DIAG: GroundPlane NOT FOUND in scene.");
+                }
+                else
+                {
+                    var mf = gp.GetComponent<MeshFilter>();
+                    var mr = gp.GetComponent<MeshRenderer>();
+                    var mesh = mf != null ? mf.sharedMesh : null;
+                    Vector3 firstNormal = Vector3.zero;
+                    if (mesh != null && mesh.triangles.Length >= 3 && mesh.vertices.Length > 0)
+                    {
+                        var v0 = mesh.vertices[mesh.triangles[0]];
+                        var v1 = mesh.vertices[mesh.triangles[1]];
+                        var v2 = mesh.vertices[mesh.triangles[2]];
+                        firstNormal = Vector3.Cross(v1 - v0, v2 - v0).normalized;
+                    }
+                    Debug.Log($"[CameraController] SCENE DIAG: GroundPlane pos={gp.transform.position} active={gp.activeInHierarchy} mr.enabled={(mr != null && mr.enabled)} mat={(mr != null && mr.sharedMaterial != null ? mr.sharedMaterial.name : "<none>")} meshName={(mesh != null ? mesh.name : "<null>")} verts={(mesh != null ? mesh.vertexCount : 0)} tris={(mesh != null ? mesh.triangles.Length / 3 : 0)} bounds={(mesh != null ? mesh.bounds.ToString() : "<n/a>")} firstTriNormal={firstNormal}");
+                }
+                // Camera count + which is main
+                var allCams = GameObject.FindObjectsByType<UnityEngine.Camera>(FindObjectsSortMode.None);
+                string camList = "";
+                foreach (var cc in allCams)
+                {
+                    camList += $"  - {cc.gameObject.name} enabled={cc.enabled} depth={cc.depth} pos={cc.transform.position} display={cc.targetDisplay} mask={cc.cullingMask:X}\n";
+                }
+                Debug.Log($"[CameraController] SCENE DIAG: {allCams.Length} Camera(s); MainCamera={(UnityEngine.Camera.main != null ? UnityEngine.Camera.main.gameObject.name : "<null>")}\n{camList}");
             }
 
             // Smooth FOV transition

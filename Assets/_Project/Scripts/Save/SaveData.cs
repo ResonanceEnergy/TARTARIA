@@ -291,6 +291,7 @@ namespace Tartaria.Save
     {
         public string[] completedStepIds = Array.Empty<string>();
         public bool tutorialFinished;
+        public int[] completedSteps = Array.Empty<int>(); // Numeric step indices for linear tutorial
     }
 
     [Serializable]

@@ -1,0 +1,51 @@
+            added += CreateBuildingMarkers();
+            added += CreateEnemySpawnMarkers();
+            added += CreateLighting();
+            added += CreateCameraRig();
+            added += CreateBoundary();
+            added += EnsureV37Managers();
+            added += CreatePostProcessing();
+
+            if (added > 0)
+                UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
+                    UnityEngine.SceneManagement.SceneManager.GetActiveScene());
+
+            Debug.Log($"[Tartaria] Echohaven populated — {added} objects added.");
+        }
+
+        // ─── v37 Manager Wiring ──────────────────────
+
+        static int EnsureV37Managers()
+        {
+            int n = 0;
+            var parent = FindOrCreate("--- GAME MANAGERS ---").transform;
+
+            if (Object.FindFirstObjectByType<Tartaria.Integration.PlayerSpawner>() == null)
+            {
+                var go = new GameObject("PlayerSpawner");
+                go.transform.SetParent(parent);
+                go.AddComponent<Tartaria.Integration.PlayerSpawner>();
+                n++;
+            }
+
+            // Wire input actions on PlayerSpawner for fallback player
+            var spawner = Object.FindFirstObjectByType<Tartaria.Integration.PlayerSpawner>();
+            if (spawner != null)
+            {
+                var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
+                    InputActionsFactory.AssetPath);
+                if (inputAsset != null)
+                {
+                    var so = new SerializedObject(spawner);
+                    var prop = so.FindProperty("inputActions");
+                    if (prop != null && prop.objectReferenceValue == null)
+                    {
+                        prop.objectReferenceValue = inputAsset;
+                        so.ApplyModifiedProperties();
+                    }
+                }
+            }
+
+            if (Object.FindFirstObjectByType<Tartaria.Integration.BuildingSpawner>() == null)
+            {
+                var go = new GameObject("BuildingSpawner");

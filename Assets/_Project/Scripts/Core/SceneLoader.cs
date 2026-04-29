@@ -95,6 +95,11 @@ namespace Tartaria.Core
             GameStateManager.Instance.TransitionTo(GameState.Loading);
             float startTime = Time.realtimeSinceStartup;
 
+            // Disable BootCamera IMMEDIATELY — before async scene loads add their own
+            // CameraRig. Otherwise BootCamera at (0,0,0) renders for 5+ seconds while
+            // the gameplay scene streams in, showing a face-down view of the terrain edge.
+            DisableBootCamera();
+
             // Load gameplay scene
             Canary($"Loading gameplay scene: {gameplayScene}");
             Debug.Log($"[SceneLoader] Loading gameplay scene: {gameplayScene}");
@@ -145,15 +150,9 @@ namespace Tartaria.Core
             }
 
             // Disable Boot scene camera — gameplay CameraRig takes over
-            var bootCam = GameObject.Find("BootCamera");
-            if (bootCam != null)
-            {
-                // Destroy the Boot AudioListener before deactivating so it can't win the FindObjectsByType race
-                var bootListener = bootCam.GetComponent<AudioListener>();
-                if (bootListener != null) Destroy(bootListener);
-                bootCam.SetActive(false);
-                Debug.Log("[SceneLoader] Disabled BootCamera — CameraRig takes over.");
-            }
+            // (Idempotent: already disabled at start of LoadSequenceInner; this is the
+            // belt-and-suspenders pass after gameplay scene is fully loaded.)
+            DisableBootCamera();
 
             // Enforce exactly one AudioListener — gameplay camera takes priority
             var listeners = FindObjectsByType<AudioListener>(FindObjectsSortMode.None);
@@ -198,6 +197,25 @@ namespace Tartaria.Core
             Debug.Log("[SceneLoader] Transitioning to Exploration...");
             GameStateManager.Instance.TransitionTo(GameState.Exploration);
             Debug.Log("[SceneLoader] Gameplay + UI scenes loaded. Entering Exploration.");
+        }
+
+        /// <summary>
+        /// Disable the Boot scene's bootstrap camera so the gameplay CameraRig owns
+        /// the screen. Safe to call multiple times — no-op once BootCamera is gone.
+        /// </summary>
+        static void DisableBootCamera()
+        {
+            var bootCam = GameObject.Find("BootCamera");
+            if (bootCam == null) return;
+            // Destroy the Boot AudioListener first so it can't win FindObjectsByType races.
+            var bootListener = bootCam.GetComponent<AudioListener>();
+            if (bootListener != null) Destroy(bootListener);
+            // Disable the Camera component as well as the GameObject — defends against
+            // anything that re-activates the parent without re-checking the camera.
+            var bootCameraComp = bootCam.GetComponent<UnityEngine.Camera>();
+            if (bootCameraComp != null) bootCameraComp.enabled = false;
+            bootCam.SetActive(false);
+            Debug.Log("[SceneLoader] Disabled BootCamera — CameraRig takes over.");
         }
     }
 }

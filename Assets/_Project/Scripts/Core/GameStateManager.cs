@@ -28,6 +28,12 @@ namespace Tartaria.Core
         public GameState CurrentState { get; private set; } = GameState.Boot;
         public GameState PreviousState { get; private set; } = GameState.Boot;
 
+        /// <summary>
+        /// Current moon phase in 13-moon campaign (0-12).
+        /// Affects Aether yield and certain quest triggers.
+        /// </summary>
+        public int CurrentMoonPhase { get; set; } = 0;
+
         public event Action<GameState, GameState> OnStateChanged;
 
         public void TransitionTo(GameState newState)

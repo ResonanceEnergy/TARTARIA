@@ -168,8 +168,86 @@ namespace Tartaria.Editor
                 URPSetup.UpgradeURPQuality();
             });
 
+            // ── Phase 9c: Build Post-FX Volume Profile + place in scene ──
+            BuildReport.RunPhase("Phase 9c/15: Post-FX Volume", () =>
+            {
+                PostFXVolumeFactory.BuildVolumeProfile();
+                URPSetup.UpgradeURPQuality(); // re-run to pick up the now-existing profile
+                if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    PostFXVolumeFactory.EnsureSceneVolume();
+                    EditorSceneManager.SaveOpenScenes();
+                }
+            });
+
+            // ── Phase 9d: Procedural audio assets ──
+            BuildReport.RunPhase("Phase 9d/15: Audio (procedural)", () =>
+            {
+                AudioFactory.BuildAudioAssets();
+            });
+
+            // ── Phase 9d2: VFX Prefabs (Feature 3) ──
+            BuildReport.RunPhase("Phase 9d2/15: VFX Prefabs", () =>
+            {
+                VFXFactory.BuildAllVFX();
+            });
+
+            // ── Phase 9e: Decorate prefabs (Player FX + PlayerAnimator + Building auras + detail geo) ──
+            BuildReport.RunPhase("Phase 9e/15: Decorate Prefabs (FX)", () =>
+            {
+                AmbientFXFactory.DecorateAllPrefabs();
+                BuildingDetailFactory.DecorateAllBuildings();
+            });
+
+            // ── Phase 9f: Add ambient FX + audio + foliage to scene ──
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+            {
+                BuildReport.RunPhase("Phase 9f/15: Scene Decoration (FX+Audio+Foliage+Skybox)", () =>
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    SkyboxFactory.BuildAndApply();
+                    AmbientFXFactory.AddAmbientToScene();
+                    AudioFactory.AddAmbienceToScene();
+                    FoliageFactory.BuildAndScatter();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+
+            // ── Phase 9g: Moon 1 APV scenarios + dome VFX Graph wiring ──
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+            {
+                BuildReport.RunPhase("Phase 9g/17: Moon 1 APV + Dome VFX", () =>
+                {
+                    Moon1LightingAuthoring.SetupMoon1APV();
+                    Moon1VFXGraphSetup.WireMoon1DomeVFXGraph();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+
+            // ── Phase 9h: Custom Shaders (P1) — Create materials from 4 custom URP shaders + apply to scene ──
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+            {
+                BuildReport.RunPhase("Phase 9h/17: Custom Shaders (P1)", () =>
+                {
+                    CustomShaderApplicator.CreateAllMaterialsStatic();
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    CustomShaderApplicator.ApplyMaterialsToSceneStatic();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+
+            // ── Phase 9i: VFX Upgrade (P2) — Enhance particle systems to 500-2000 particles + create Aurora ──
+            BuildReport.RunPhase("Phase 9i/17: VFX Upgrade (P2)", () =>
+            {
+                VFXUpgradeTool.UpgradeScanPulseStatic();
+                VFXUpgradeTool.UpgradeRestoreSparkleStatic();
+                VFXUpgradeTool.UpgradeShardCollectStatic();
+                VFXUpgradeTool.CreateAuroraVFXStatic();
+            });
+
             // ── Phase 10: Input assignment (scene must be open) + Build Settings ──
-            BuildReport.RunPhase("Phase 10/12: Input + Build Settings", () =>
+            BuildReport.RunPhase("Phase 10/14: Input + Build Settings", () =>
             {
                 InputActionsAssigner.AssignInputActions();
                 EditorSceneManager.SaveOpenScenes();
@@ -179,7 +257,7 @@ namespace Tartaria.Editor
             // ── Phase 11: Scene Wiring Pass — fill all serialized references ──
             if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
             {
-                BuildReport.RunPhase("Phase 11/12: Scene Wiring Pass", () =>
+                BuildReport.RunPhase("Phase 11/14: Scene Wiring Pass", () =>
                 {
                     EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
                     SceneWiringPass.WireAll();
@@ -188,11 +266,28 @@ namespace Tartaria.Editor
             }
 
             // ── Phase 12: Scene Validation — forbidden component check ──
-            BuildReport.RunPhase("Phase 12/12: Scene Validation", () =>
+            BuildReport.RunPhase("Phase 12/14: Scene Validation", () =>
             {
                 int violations = SceneValidator.ValidateAll();
                 if (violations > 0)
                     throw new System.Exception($"SceneValidator found {violations} forbidden component(s). See errors above.");
+            });
+
+            // ── Phase 13: Bind external assets fetched by OpenClaw (HDRI + Mixamo + PBR + Decals) ──
+            BuildReport.RunPhase("Phase 13/17: External Assets (HDRI + Mixamo + PBR + Decals)", () =>
+            {
+                HDRISkyboxBinder.BindLatestHDRI();
+                MixamoAnimatorBinder.BuildController();
+                PBRMaterialBinder.BindAll();
+                DecalFeatureBinder.AddDecalFeature();
+                if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    HDRISkyboxBinder.BindLatestHDRI(); // reapply with scene loaded
+                    PBRSceneApplier.Apply();
+                    PBRResourceCopier.MirrorAndAttach();
+                    EditorSceneManager.SaveOpenScenes();
+                }
             });
 
             // ── Finalize ──

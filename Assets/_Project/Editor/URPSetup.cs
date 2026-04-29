@@ -102,14 +102,14 @@ namespace Tartaria.Editor
             // Soft shadows
             SetBool(so, "m_SoftShadowsSupported", true);
 
-            // 4 shadow cascades for smoother shadow transitions
-            SetInt(so, "m_ShadowCascadeCount", 4);
+            // Keep cascade count moderate to avoid runtime atlas pressure in dense scenes.
+            SetInt(so, "m_ShadowCascadeCount", 2);
 
-            // Shadow distance — increase for open world
-            SetFloat(so, "m_ShadowDistance", 80f);
+            // Slightly reduced shadow distance for stability/perf in Echohaven.
+            SetFloat(so, "m_ShadowDistance", 60f);
 
-            // Additional light shadows (point/spot lights cast shadows)
-            SetBool(so, "m_AdditionalLightShadowsSupported", true);
+            // Disable additional light shadows to prevent punctual shadow atlas downsizing spam.
+            SetBool(so, "m_AdditionalLightShadowsSupported", false);
 
             // HDR color grading for richer tonemapping
             SetInt(so, "m_ColorGradingMode", 1); // 0=LDR, 1=HDR
@@ -123,11 +123,53 @@ namespace Tartaria.Editor
                 if (vpProp != null) vpProp.objectReferenceValue = volumeProfile;
             }
 
+            // URP 17 upscaler: Spatial-Temporal Post-Processing (STP).
+            // UpscalingFilterSelection enum: Auto=0, Linear=1, Point=2, FSR=3, STP=4.
+            SetInt(so, "m_UpscalingFilter", 4);
+
+            // GPU Resident Drawer + GPU occlusion culling.
+            // GPUResidentDrawerMode enum: Disabled=0, InstancedDrawing=1.
+            SetInt(so, "m_GPUResidentDrawerMode", 1);
+            SetBool(so, "m_GPUResidentDrawerEnableOcclusionCullingInCameras", true);
+
+            // APV baseline support for Moon 1 lighting scenario blending.
+            // LightProbeSystem enum: LegacyLightProbes=0, ProbeVolumes=1.
+            SetInt(so, "m_LightProbeSystem", 1);
+            SetBool(so, "m_SupportProbeVolumeGPUStreaming", true);
+            SetBool(so, "m_SupportProbeVolumeDiskStreaming", true);
+            SetBool(so, "m_SupportProbeVolumeScenarios", true);
+            SetBool(so, "m_SupportProbeVolumeScenarioBlending", true);
+
+            // Required by GPU Resident Drawer to avoid BRG variant stripping during player builds.
+            // batchRendererGroupShaderStrippingMode is read-only; write m_BrgStripping=2 (KeepAll) directly.
+            var gfxSettings = AssetDatabase.LoadAllAssetsAtPath("ProjectSettings/GraphicsSettings.asset");
+            if (gfxSettings != null && gfxSettings.Length > 0 && gfxSettings[0] != null)
+            {
+                var gfxSo = new SerializedObject(gfxSettings[0]);
+                var brgProp = gfxSo.FindProperty("m_BrgStripping");
+                if (brgProp != null)
+                {
+                    brgProp.intValue = 2; // BatchRendererGroupStrippingMode.KeepAll
+                    gfxSo.ApplyModifiedProperties();
+                }
+            }
+
             so.ApplyModifiedProperties();
             EditorUtility.SetDirty(pipelineAsset);
+
+            // Ensure renderer stays on Forward+ (required by GPU Resident Drawer).
+            var rendererData = AssetDatabase.LoadAssetAtPath<UniversalRendererData>(RendererDataPath);
+            if (rendererData != null)
+            {
+                var rendererSo = new SerializedObject(rendererData);
+                SetInt(rendererSo, "m_RenderingMode", 2); // Forward+
+                rendererSo.ApplyModifiedProperties();
+                EditorUtility.SetDirty(rendererData);
+            }
+
             AssetDatabase.SaveAssets();
 
-            Debug.Log("[Tartaria] URP Quality upgraded: MSAA 4x, soft shadows, 4 cascades, HDR grading, additional shadows.");
+            Debug.Log("[Tartaria] URP Quality upgraded: Forward+, GPU Resident Drawer + GPU occlusion culling, STP upscaler, APV scenarios/blending, MSAA 4x, soft shadows, 2 cascades, HDR grading, additional shadows disabled.");
         }
 
         static void SetInt(SerializedObject so, string prop, int value)

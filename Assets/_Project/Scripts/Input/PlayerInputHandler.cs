@@ -45,6 +45,7 @@ namespace Tartaria.Input
         bool _loggedMoveFallback;
         bool _loggedMoveActionOk;
         bool _firstMove = true;
+        float _externalMoveMultiplier = 1f;
 
         // Input actions (bound from InputActionAsset)
         InputAction _moveAction;
@@ -56,12 +57,18 @@ namespace Tartaria.Input
         InputAction _aetherVisionAction;
         InputAction _pauseAction;
         InputAction _scanAction;
+        InputAction _frequencyAdjustAction;
 
         InputActionMap _playerMap;
 
         public Vector3 MoveDirection { get; private set; }
         public bool IsMoving => _moveInput.sqrMagnitude > 0.01f;
         public bool AetherVisionActive { get; private set; }
+
+        public void SetExternalMoveMultiplier(float multiplier)
+        {
+            _externalMoveMultiplier = Mathf.Clamp(multiplier, 0.1f, 2f);
+        }
 
         void Awake()
         {
@@ -113,7 +120,14 @@ namespace Tartaria.Input
         {
             int groundMask = GetGroundMask();
             Vector3 origin = worldPos + Vector3.up * 2f;
-            if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 30f, groundMask, QueryTriggerInteraction.Ignore))
+            // Disable our own CharacterController so the downward raycast can't
+            // self-hit our capsule (the layer-mask exclusion alone is insufficient
+            // because the player prefab may be on the Default layer).
+            bool wasEnabled = _controller != null && _controller.enabled;
+            if (wasEnabled) _controller.enabled = false;
+            bool found = Physics.Raycast(origin, Vector3.down, out RaycastHit hit, 30f, groundMask, QueryTriggerInteraction.Ignore);
+            if (wasEnabled) _controller.enabled = true;
+            if (found)
             {
                 groundHeight = hit.point.y;
                 return true;
@@ -173,6 +187,7 @@ namespace Tartaria.Input
             _aetherVisionAction = _playerMap.FindAction("AetherVision");
             _pauseAction = _playerMap.FindAction("Pause");
             _scanAction = _playerMap.FindAction("Scan");
+            _frequencyAdjustAction = _playerMap.FindAction("FrequencyAdjust");
 
             // Subscribe to button callbacks
             if (_interactAction != null) _interactAction.performed += OnInteractPerformed;
@@ -226,7 +241,17 @@ namespace Tartaria.Input
             if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
 
             HandleMovementInput();
+            HandleContinuousActions();
             HandleActionFallbacks();
+        }
+
+        void HandleContinuousActions()
+        {
+            if (GameStateManager.Instance?.CurrentState != GameState.Tuning) return;
+
+            float adjust = _frequencyAdjustAction != null ? _frequencyAdjustAction.ReadValue<float>() : 0f;
+            if (Mathf.Abs(adjust) > 0.01f)
+                OnFrequencyAdjust?.Invoke(adjust);
         }
 
         // Key state for edge-detect (wasPressedThisFrame equivalent with manual tracking
@@ -281,6 +306,25 @@ namespace Tartaria.Input
                 OnScan?.Invoke(transform.position);
             _prevGKey = gDown;
 
+            // Tuning fallback axis (when no InputActionAsset is loaded)
+            if (state == GameState.Tuning)
+            {
+                float tuningAdjust = 0f;
+                if (kb.leftArrowKey.isPressed || kb.aKey.isPressed) tuningAdjust -= 1f;
+                if (kb.rightArrowKey.isPressed || kb.dKey.isPressed) tuningAdjust += 1f;
+
+                var pad = Gamepad.current;
+                if (pad != null)
+                {
+                    float stickY = pad.rightStick.ReadValue().y;
+                    if (Mathf.Abs(stickY) > 0.2f)
+                        tuningAdjust = stickY;
+                }
+
+                if (Mathf.Abs(tuningAdjust) > 0.01f)
+                    OnFrequencyAdjust?.Invoke(tuningAdjust);
+            }
+
             // Combat-only keys
             if (state == GameState.Combat)
             {
@@ -330,8 +374,20 @@ namespace Tartaria.Input
                         if (!_loggedMoveFallback)
                         {
                             _loggedMoveFallback = true;
-                            Debug.LogWarning($"[PlayerInput] Using direct keyboard fallback — InputAction Move not reading WASD. _moveAction={((_moveAction != null) ? "exists enabled=" + _moveAction.enabled : "NULL")}");
+                            Debug.LogWarning($"[PlayerInput] Using direct keyboard fallback -- InputAction Move not reading WASD. _moveAction={((_moveAction != null) ? "exists enabled=" + _moveAction.enabled : "NULL")}");
                         }
+                    }
+                }
+
+                // Gamepad left-stick direct fallback (if InputActionAsset isn't loaded yet)
+                if (_moveInput.sqrMagnitude < 0.01f)
+                {
+                    var pad = Gamepad.current;
+                    if (pad != null)
+                    {
+                        Vector2 stick = pad.leftStick.ReadValue();
+                        if (stick.sqrMagnitude > 0.0225f) // 0.15 deadzone squared
+                            _moveInput = stick;
                     }
                 }
             }
@@ -367,7 +423,7 @@ namespace Tartaria.Input
 
                 MoveDirection = (camForward * _moveInput.y + camRight * _moveInput.x).normalized;
 
-                float speed = moveSpeed * (_isSprinting ? sprintMultiplier : 1f);
+                float speed = moveSpeed * (_isSprinting ? sprintMultiplier : 1f) * _externalMoveMultiplier;
                 horizontalMove = MoveDirection * speed * Time.deltaTime;
 
                 // Footstep SFX (throttled)
@@ -410,8 +466,14 @@ namespace Tartaria.Input
             bool grounded = _controller.isGrounded;
             if (!grounded)
             {
-                // Raycast from slightly above feet — if ground is within step distance, treat as grounded
-                if (Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, out RaycastHit stepHit, 0.4f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                // Raycast from slightly above feet — if ground is within step distance, treat as grounded.
+                // Disable own CC during raycast so we don't self-hit our capsule.
+                int gMask = GetGroundMask();
+                bool ccWasEnabled = _controller.enabled;
+                if (ccWasEnabled) _controller.enabled = false;
+                bool stepFound = Physics.Raycast(transform.position + Vector3.up * 0.1f, Vector3.down, out RaycastHit stepHit, 0.4f, gMask, QueryTriggerInteraction.Ignore);
+                if (ccWasEnabled) _controller.enabled = true;
+                if (stepFound)
                 {
                     grounded = true;
                     _groundHeight = stepHit.point.y;
@@ -477,9 +539,14 @@ namespace Tartaria.Input
 
         void OnInteractPerformed(InputAction.CallbackContext ctx)
         {
-            if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
+            // Allow interaction in any non-paused state. Gating on IsPlaying
+            // silently dropped E-key presses if state hadn't been set yet
+            // (e.g. first frame after scene load) — the #1 reason "interact
+            // does nothing".
+            var state = GameStateManager.Instance?.CurrentState ?? GameState.Exploration;
+            if (state == GameState.Paused || state == GameState.Menu || state == GameState.Loading) return;
 
-            if (GameStateManager.Instance.CurrentState == GameState.Combat)
+            if (state == GameState.Combat)
             {
                 // Left-click in combat = Resonance Pulse
                 OnResonancePulse?.Invoke();
@@ -530,57 +597,68 @@ namespace Tartaria.Input
 
         void TryInteract()
         {
-            if (_mainCamera == null) return;
+            // Robustness: if interactableLayer wasn't configured (mask = 0),
+            // fall back to ALL layers except Ignore Raycast and Water.
+            // Without this guard, Physics.Raycast with mask=0 hits nothing
+            // and the player can never interact with anything.
+            int mask = interactableLayer.value;
+            if (mask == 0) mask = ~((1 << 2) | (1 << 4)); // exclude IgnoreRaycast, Water
 
-            // Gamepad: cast from screen center (no pointer); Mouse: cast from pointer
-            Vector2 screenPos;
-            if (Gamepad.current != null && (Pointer.current == null || !Pointer.current.press.isPressed))
-                screenPos = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-            else if (Pointer.current != null)
-                screenPos = Pointer.current.position.ReadValue();
-            else
-                screenPos = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
-
-            Ray ray = _mainCamera.ScreenPointToRay(screenPos);
-            if (Physics.Raycast(ray, out RaycastHit hit, 100f, interactableLayer))
+            // 1) Camera raycast (mouse aim or screen center)
+            if (_mainCamera != null)
             {
-                var interactable = hit.collider.GetComponent<IInteractable>();
-                if (interactable != null)
+                Vector2 screenPos;
+                if (Gamepad.current != null && (Pointer.current == null || !Pointer.current.press.isPressed))
+                    screenPos = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+                else if (Pointer.current != null)
+                    screenPos = Pointer.current.position.ReadValue();
+                else
+                    screenPos = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
+
+                Ray ray = _mainCamera.ScreenPointToRay(screenPos);
+                if (Physics.Raycast(ray, out RaycastHit hit, 100f, mask, QueryTriggerInteraction.Collide))
                 {
-                    float dist = Vector3.Distance(transform.position, hit.point);
-                    if (dist <= interactRadius)
+                    var interactable = hit.collider.GetComponentInParent<IInteractable>();
+                    if (interactable != null)
                     {
-                        interactable.Interact(gameObject);
-                        AudioManager.Instance?.PlaySFX("Interact", hit.point, 0.5f);
-                        return;
+                        float dist = Vector3.Distance(transform.position, hit.point);
+                        if (dist <= interactRadius)
+                        {
+                            interactable.Interact(gameObject);
+                            AudioManager.Instance?.PlaySFX("Interact", hit.point, 0.5f);
+                            return;
+                        }
                     }
                 }
             }
 
-            // Gamepad fallback: proximity sphere-cast for nearest interactable
-            if (Gamepad.current != null)
+            // 2) Always-on proximity fallback: pick nearest interactable in radius.
+            //    Works for keyboard, mouse and gamepad alike.
+            Collider[] nearby = Physics.OverlapSphere(transform.position, interactRadius, mask, QueryTriggerInteraction.Collide);
+            float bestDist = float.MaxValue;
+            IInteractable bestTarget = null;
+            Vector3 bestPos = Vector3.zero;
+            foreach (var col in nearby)
             {
-                Collider[] nearby = Physics.OverlapSphere(transform.position, interactRadius, interactableLayer);
-                float bestDist = float.MaxValue;
-                IInteractable bestTarget = null;
-                Vector3 bestPos = Vector3.zero;
-                foreach (var col in nearby)
+                var target = col.GetComponentInParent<IInteractable>();
+                if (target == null) continue;
+                float d = Vector3.Distance(transform.position, col.transform.position);
+                if (d < bestDist)
                 {
-                    var target = col.GetComponent<IInteractable>();
-                    if (target == null) continue;
-                    float d = Vector3.Distance(transform.position, col.transform.position);
-                    if (d < bestDist)
-                    {
-                        bestDist = d;
-                        bestTarget = target;
-                        bestPos = col.transform.position;
-                    }
+                    bestDist = d;
+                    bestTarget = target;
+                    bestPos = col.transform.position;
                 }
-                if (bestTarget != null)
-                {
-                    bestTarget.Interact(gameObject);
-                    AudioManager.Instance?.PlaySFX("Interact", bestPos, 0.5f);
-                }
+            }
+            if (bestTarget != null)
+            {
+                bestTarget.Interact(gameObject);
+                AudioManager.Instance?.PlaySFX("Interact", bestPos, 0.5f);
+            }
+            else
+            {
+                AudioManager.Instance?.PlaySFX2D("InteractFail", 0.3f);
+                Debug.Log($"[PlayerInput] TryInteract: no IInteractable in {interactRadius}m (mask=0x{mask:X})");
             }
         }
 
@@ -589,6 +667,7 @@ namespace Tartaria.Input
         public event System.Action OnHarmonicStrike;
         public event System.Action OnFrequencyShield;
         public event System.Action<Vector3> OnScan;
+        public event System.Action<float> OnFrequencyAdjust;
     }
 
     /// <summary>

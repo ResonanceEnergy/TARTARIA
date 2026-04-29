@@ -37,6 +37,9 @@ namespace Tartaria.Gameplay
         [SerializeField, Min(0f)] float aetherCostPerScan = 5f;
         [SerializeField, Min(1)] int maxPingsPerScan = 10;
 
+        [Header("VFX (Feature 3)")]
+        [SerializeField] GameObject scanPulseVFX;
+
         float _cooldownTimer;
         Transform _cachedPlayerTransform;
         bool _scannerUnlocked = true; // Available from game start
@@ -155,8 +158,12 @@ namespace Tartaria.Gameplay
             ServiceLocator.VFX?.PlayEffect(VFXEffect.AetherVortex, playerPosition);
             HapticFeedbackManager.Instance?.PlayDiscovery();
 
-            // Audio ping
-            AudioManager.Instance?.PlayTone(432f, 0.3f);
+            // Feature 3: Spawn ScanPulse VFX
+            if (scanPulseVFX != null)
+                Instantiate(scanPulseVFX, playerPosition, Quaternion.identity);
+
+            // Audio ping (Feature 2: ResonancePulse SFX)
+            AudioManager.Instance?.PlaySFX("ResonancePulse", playerPosition, 0.6f);
 
             OnScanComplete?.Invoke(_lastResults);
 

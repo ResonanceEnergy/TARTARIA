@@ -33,6 +33,10 @@ namespace Tartaria.Integration
         [SerializeField] PlayerInputHandler playerInput;
         [SerializeField] Camera.CameraController cameraController;
 
+        [Header("Enemy Spawning")]
+        [SerializeField] GameObject mudGolemPrefab;
+        [SerializeField] float enemySpawnDistance = 20f;
+
         // Cached ECS references
         World _ecsWorld;
         EntityManager _em;
@@ -80,6 +84,9 @@ namespace Tartaria.Integration
         float _rsBuffTimer;
         const float RS_BUFF_MULTIPLIER = 1.25f;
         const float RS_BUFF_DURATION = 60f;
+
+        // Enemy spawn tracking
+        readonly System.Collections.Generic.HashSet<int> _spawnedEnemyThresholds = new();
 
         void Awake()
         {
@@ -746,7 +753,8 @@ namespace Tartaria.Integration
             switch (threshold)
             {
                 case RSThreshold.FirstGolem: // RS 25
-                    // First enemy spawns (handled by ECS EnemySpawnSystem)
+                    // Spawn first Mud Golem
+                    SpawnMudGolem();
                     // Trigger stinger + haptics
                     AdaptiveMusicController.Instance?.PlayCombatStart();
                     HapticFeedbackManager.Instance?.PlayGolemSpawn();
@@ -1003,6 +1011,9 @@ namespace Tartaria.Integration
             Debug.Log($"[GameLoop] Building discovered: {buildingName}");
             TutorialSystem.Instance?.ForceComplete(TutorialStep.Discovery);
 
+            // Fire GameEvents for decoupled listeners (e.g., TutorialController)
+            GameEvents.FireBuildingDiscovered(buildingName, position);
+
             // Queue RS reward via ECS
             if (_ecsReady)
                 ResonanceEventHelper.QueueDiscovery(_em, _rsEntity, 0.9f);
@@ -1125,6 +1136,48 @@ namespace Tartaria.Integration
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
             SaveManager.Instance?.MarkDirty();
+        }
+
+        /// <summary>
+        /// Spawns a Mud Golem enemy near the player.
+        /// Called when RS crosses enemy spawn thresholds.
+        /// </summary>
+        public void SpawnMudGolem()
+        {
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player == null)
+            {
+                Debug.LogWarning("[GameLoop] Cannot spawn golem: player not found");
+                return;
+            }
+
+            // Find spawn position away from player
+            Vector2 randomDir = UnityEngine.Random.insideUnitCircle.normalized;
+            Vector3 spawnOffset = new Vector3(randomDir.x, 0f, randomDir.y) * enemySpawnDistance;
+            Vector3 spawnPos = player.transform.position + spawnOffset;
+            spawnPos.y = player.transform.position.y; // Keep on same plane
+
+            // Instantiate from prefab or create fallback cube
+            GameObject golem;
+            if (mudGolemPrefab != null)
+            {
+                golem = Instantiate(mudGolemPrefab, spawnPos, Quaternion.identity);
+            }
+            else
+            {
+                // Fallback: create placeholder cube
+                golem = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                golem.transform.position = spawnPos;
+                golem.transform.localScale = Vector3.one * 2f;
+                golem.name = "MudGolem_Fallback";
+                golem.AddComponent<AI.MudGolemAI>();
+            }
+
+            // Trigger tutorial step 5
+            if (TutorialController.Instance != null)
+                TutorialController.Instance.TriggerEnemyStep();
+
+            Debug.Log($"[GameLoop] Spawned Mud Golem at {spawnPos}");
         }
 
         // ─── RS Reward Queue (generic) ───────────────

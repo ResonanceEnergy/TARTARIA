@@ -122,6 +122,9 @@ namespace Tartaria.Integration
                 _prevArchiveKey = archiveDown;
 
                 bool tuneDown = kb.tKey.isPressed;
+                // Gamepad fallback for T (tuning overlay): Left trigger (avoid conflict with Scan on buttonEast)
+                var pad = UnityEngine.InputSystem.Gamepad.current;
+                if (pad != null && pad.leftTrigger.isPressed) tuneDown = true;
                 if (tuneDown && !_prevTuneKey && _tuningOverlayGO != null)
                 {
                     bool nowActive = !_tuningOverlayGO.activeSelf;
@@ -232,7 +235,7 @@ namespace Tartaria.Integration
             txt.color = new Color(0.85f, 0.85f, 0.7f, 0.9f);
             txt.alignment = TextAlignmentOptions.Left;
             txt.raycastTarget = false;
-            txt.enableWordWrapping = false;
+            txt.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
             var txtRT = txt.GetComponent<RectTransform>();
             txtRT.anchorMin = Vector2.zero;
             txtRT.anchorMax = Vector2.one;
