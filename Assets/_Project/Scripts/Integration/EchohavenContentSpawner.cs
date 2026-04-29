@@ -1806,6 +1806,10 @@ namespace Tartaria.Integration
             _picked = true;
             ShovelAcquired = true;
 
+            // Bridge: also register pickup in the new InventorySystem so InventoryUI updates
+            // and SaveData.inventoryItemIds persists the shovel across save/load.
+            Tartaria.Gameplay.InventorySystem.Instance?.AddItem("shovel", 1);
+
             UI.HUDController.Instance?.ShowObjective($"Tool Acquired: {displayName}");
             RuntimeHUDBuilder.Instance?.ShowDamageNumber(1f, transform.position + Vector3.up * 1.5f);
             AudioManager.Instance?.PlaySFX("Discovery", transform.position, 0.6f);
