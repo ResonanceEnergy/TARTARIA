@@ -95,6 +95,10 @@ namespace Tartaria.Editor
                 CheckComponent<UI.HUDController>("HUDController");
                 CheckComponent<Integration.RuntimeGlueBridge>("RuntimeGlueBridge");
                 CheckComponent<Integration.RuntimeBootValidator>("RuntimeBootValidator");
+                CheckComponent<Integration.EndCardController>("EndCardController");
+
+                Check("Slice quest asset", AssetExists("Assets/_Project/Config/Quests/Quest_AwakenStarDome.asset"));
+                Check("Slice dialogue asset", AssetExists("Assets/_Project/Config/Dialogue/Dialogue_Anastasia_AwakenStarDome.asset"));
 
                 // Reopen Boot scene for play
                 if (AssetExists(bootPath))

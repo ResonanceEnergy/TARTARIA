@@ -132,6 +132,7 @@ namespace Tartaria.Editor
             if (Ensure<Integration.RuntimeGlueBridge>(parent)) n++;
             if (Ensure<Integration.RuntimeBootValidator>(parent)) n++;
             if (Ensure<Integration.DebugCheatConsole>(parent)) n++;
+            if (Ensure<Integration.EndCardController>(parent)) n++;
             // Audio
             if (Ensure<Audio.AudioManager>(parent)) n++;
             if (Ensure<Audio.AdaptiveMusicController>(parent)) n++;

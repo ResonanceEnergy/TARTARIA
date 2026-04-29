@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 783c8e7f21e8206409406032bcc04911, type: 3}
+  m_Name: Dialogue_Anastasia_AwakenStarDome
+  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.AnastasiaDialogueDatabase
+  lines:
+  - id: 1
+    moon: 1
+    category: 4
+    triggerContext: awaken_star_dome_intro
+    text: Elara. The dome remembers your voice. It only waits to be asked.
+  - id: 2
+    moon: 1
+    category: 0
+    triggerContext: awaken_star_dome_lore
+    text: This was the first lens of the choir. Twelve more sleep beyond the horizon.
+  - id: 3
+    moon: 1
+    category: 2
+    triggerContext: awaken_star_dome_prompt
+    text: Hold the Resonance. Let it find the note the stone has forgotten.
+  - id: 4
+    moon: 1
+    category: 4
+    triggerContext: awaken_star_dome_task
+    text: Restore the Dome. Channel the resonance. Echohaven is listening.
