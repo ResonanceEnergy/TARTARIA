@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using Tartaria.Core;
 using Tartaria.Input;
 
@@ -45,6 +46,9 @@ namespace Tartaria.Gameplay
         [SerializeField] float chainBonusMultiplier = 0.25f;
         [SerializeField] float timeBonusMaxRS = 5f;
 
+        [Header("Input")]
+        [SerializeField, Min(1f)] float controllerAdjustHzPerSecond = 24f;
+
         // ─── State ───
         RailSegment[] _segments;
         int _activeSegment;
@@ -75,6 +79,32 @@ namespace Tartaria.Gameplay
             {
                 FailPuzzle();
                 return;
+            }
+
+            // Keyboard fallback for desktop playtesting
+            var kb = Keyboard.current;
+            if (kb != null)
+            {
+                float axis = 0f;
+                if (kb.leftArrowKey.isPressed || kb.aKey.isPressed) axis -= 1f;
+                if (kb.rightArrowKey.isPressed || kb.dKey.isPressed) axis += 1f;
+                if (Mathf.Abs(axis) > 0.01f)
+                    AdjustFrequency(axis * controllerAdjustHzPerSecond * Time.deltaTime);
+
+                if (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame)
+                    ConfirmSegment();
+            }
+
+            // Gamepad controls: right-stick Y tunes, A confirms
+            var pad = Gamepad.current;
+            if (pad != null)
+            {
+                float axis = pad.rightStick.ReadValue().y;
+                if (Mathf.Abs(axis) > 0.2f)
+                    AdjustFrequency(axis * controllerAdjustHzPerSecond * Time.deltaTime);
+
+                if (pad.buttonSouth.wasPressedThisFrame)
+                    ConfirmSegment();
             }
         }
 

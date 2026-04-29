@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.VFX;
 using Tartaria.Core;
 
 namespace Tartaria.Integration
@@ -35,6 +36,12 @@ namespace Tartaria.Integration
         ParticleSystem _shieldVFX;
         ParticleSystem _dissolutionVFX;
         ParticleSystem _ambientParticles;
+
+        [Header("VFX Graph (Moon 1)")]
+        [SerializeField] VisualEffectAsset domeAwakeningBurstGraph;
+        [SerializeField] int domeAwakeningBurstPoolSize = 2;
+        readonly System.Collections.Generic.List<VisualEffect> _domeAwakeningPool = new();
+        int _nextDomeAwakeningIndex;
 
         // World palette
         float _currentRS;
@@ -82,6 +89,26 @@ namespace Tartaria.Integration
             _shieldVFX = CreateSystem("VFX_Shield", CelestialWhite, 60, 0.05f, 2f, burst: false);
             _dissolutionVFX = CreateSystem("VFX_Dissolution", MudBrown, 80, 0.3f, 2f, burst: true);
             _ambientParticles = CreateAmbientSystem();
+            CreateDomeAwakeningVFXGraphPool();
+        }
+
+        void CreateDomeAwakeningVFXGraphPool()
+        {
+            _domeAwakeningPool.Clear();
+            _nextDomeAwakeningIndex = 0;
+
+            if (domeAwakeningBurstGraph == null)
+                return;
+
+            int poolSize = Mathf.Max(1, domeAwakeningBurstPoolSize);
+            for (int i = 0; i < poolSize; i++)
+            {
+                var go = new GameObject($"VFXG_DomeAwakening_{i}");
+                go.transform.SetParent(transform);
+                var vfx = go.AddComponent<VisualEffect>();
+                vfx.visualEffectAsset = domeAwakeningBurstGraph;
+                _domeAwakeningPool.Add(vfx);
+            }
         }
 
         ParticleSystem CreateSystem(string name, Color color, int maxParticles,
@@ -224,10 +251,30 @@ namespace Tartaria.Integration
 
         public void PlayBuildingEmergence(Vector3 position)
         {
+            if (PlayDomeAwakeningBurst(position))
+                return;
+
             _emergenceParticles.transform.position = position;
             var shape = _emergenceParticles.shape;
             shape.radius = 10f; // Large area for building
             _emergenceParticles.Play();
+        }
+
+        bool PlayDomeAwakeningBurst(Vector3 position)
+        {
+            if (_domeAwakeningPool.Count == 0)
+                return false;
+
+            var vfx = _domeAwakeningPool[_nextDomeAwakeningIndex];
+            _nextDomeAwakeningIndex = (_nextDomeAwakeningIndex + 1) % _domeAwakeningPool.Count;
+
+            if (vfx == null)
+                return false;
+
+            vfx.transform.position = position;
+            vfx.Reinit();
+            vfx.Play();
+            return true;
         }
 
         public void PlayBuildingUpgrade(Vector3 position, int tier)

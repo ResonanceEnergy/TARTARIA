@@ -48,36 +48,45 @@ namespace Tartaria.Editor
             Object.DestroyImmediate(body.GetComponent<CapsuleCollider>());
             AssignMaterial(body, "Player_Aether");
 
-            // Head — sphere
-            var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            // Head — capsule (helmet-like silhouette)
+            var head = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             head.name = "Head";
             head.transform.SetParent(root.transform);
-            head.transform.localPosition = new Vector3(0f, 2.2f, 0f);
-            head.transform.localScale = Vector3.one * 0.5f;
-            Object.DestroyImmediate(head.GetComponent<SphereCollider>());
+            head.transform.localPosition = new Vector3(0f, 2.12f, 0f);
+            head.transform.localScale = new Vector3(0.42f, 0.30f, 0.42f);
+            Object.DestroyImmediate(head.GetComponent<CapsuleCollider>());
             AssignMaterial(head, "Player_Head");
 
-            // Eyes — two small dark spheres on the head
+            // Eye slits — narrow emissive bars (less toy-like than ball eyes)
             for (int i = 0; i < 2; i++)
             {
                 float side = i == 0 ? -1f : 1f;
-                var eye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                var eye = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 eye.name = $"Eye_{(i == 0 ? "L" : "R")}";
                 eye.transform.SetParent(head.transform);
-                eye.transform.localPosition = new Vector3(side * 0.25f, 0.1f, 0.4f);
-                eye.transform.localScale = Vector3.one * 0.18f;
-                Object.DestroyImmediate(eye.GetComponent<SphereCollider>());
-                AssignMaterial(eye, "Crystal_Active");
+                eye.transform.localPosition = new Vector3(side * 0.11f, 0.07f, 0.21f);
+                eye.transform.localScale = new Vector3(0.11f, 0.05f, 0.02f);
+                Object.DestroyImmediate(eye.GetComponent<BoxCollider>());
+                AssignMaterial(eye, "Aether_Glow");
             }
 
-            // Visor band — thin cube across eyes for a stylized look
+            // Visor band — reinforced frame
             var visor = GameObject.CreatePrimitive(PrimitiveType.Cube);
             visor.name = "Visor";
             visor.transform.SetParent(head.transform);
-            visor.transform.localPosition = new Vector3(0f, 0.1f, 0.38f);
-            visor.transform.localScale = new Vector3(0.7f, 0.12f, 0.08f);
+            visor.transform.localPosition = new Vector3(0f, 0.08f, 0.20f);
+            visor.transform.localScale = new Vector3(0.34f, 0.08f, 0.03f);
             Object.DestroyImmediate(visor.GetComponent<BoxCollider>());
             AssignMaterial(visor, "Aether_Glow");
+
+            // Jaw guard
+            var jaw = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            jaw.name = "JawGuard";
+            jaw.transform.SetParent(head.transform);
+            jaw.transform.localPosition = new Vector3(0f, -0.08f, 0.16f);
+            jaw.transform.localScale = new Vector3(0.25f, 0.10f, 0.04f);
+            Object.DestroyImmediate(jaw.GetComponent<BoxCollider>());
+            AssignMaterial(jaw, "Player_Limbs");
 
             // Arms — cylinders
             for (int i = 0; i < 2; i++)

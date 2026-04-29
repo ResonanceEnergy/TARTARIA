@@ -4,6 +4,7 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
+using Tartaria.Camera;
 
 namespace Tartaria.Integration
 {
@@ -52,6 +53,9 @@ namespace Tartaria.Integration
 
         void Start()
         {
+            EnsureRuntimeVisuals();
+            EnsureTraversalFreedom();
+            EnsureGameplayMissingPieces();
             SpawnMilo();
             SpawnLirael();                                              // Gap 3: Lirael first appearance
             SpawnCassian();
@@ -71,6 +75,402 @@ namespace Tartaria.Integration
             CompanionManager.Instance?.CheckUnlocks(0);                // Gap 25: companion unlock check
 
             Debug.Log("[EchohavenContentSpawner] Zone content populated.");
+        }
+
+        void EnsureRuntimeVisuals()
+        {
+            EnsurePlayerAnimatorPresent();
+            EnsureAmbientMotes();
+            EnsureRuntimeFoliage();
+            EnsureSkyboxAndFog();
+            EnsureBuildingVisualDetails();
+        }
+
+        void EnsureTraversalFreedom()
+        {
+            // Remove hard world blockers so the player can roam freely.
+            var worldBoundary = GameObject.Find("WorldBoundary");
+            if (worldBoundary != null)
+            {
+                var cols = worldBoundary.GetComponentsInChildren<Collider>(true);
+                for (int i = 0; i < cols.Length; i++)
+                    cols[i].enabled = false;
+            }
+
+            // Older scenes contain Wall_* colliders outside WorldBoundary.
+            string[] wallNames = { "Wall_North", "Wall_South", "Wall_East", "Wall_West" };
+            for (int i = 0; i < wallNames.Length; i++)
+            {
+                var wall = GameObject.Find(wallNames[i]);
+                if (wall == null) continue;
+                var wc = wall.GetComponent<Collider>();
+                if (wc != null) wc.enabled = false;
+            }
+        }
+
+        void EnsureGameplayMissingPieces()
+        {
+            EnsureShovelPickup();
+            EnsureMudDigVisuals();
+            EnsureEnemyPresence();
+            EnsureAnastasiaPresence();
+        }
+
+        void EnsureShovelPickup()
+        {
+            if (GameObject.Find("ShovelPickup") != null) return;
+
+            Vector3 spawn = new Vector3(12f, 1f, 7f);
+            var playerSpawn = GameObject.Find("PlayerSpawn");
+            if (playerSpawn != null)
+                spawn = playerSpawn.transform.position + new Vector3(2.5f, 0.2f, 1.2f);
+
+            var root = new GameObject("ShovelPickup");
+            root.transform.position = spawn;
+
+            var handle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            handle.name = "Handle";
+            handle.transform.SetParent(root.transform, false);
+            handle.transform.localPosition = new Vector3(0f, 0.65f, 0f);
+            handle.transform.localRotation = Quaternion.Euler(0f, 0f, 18f);
+            handle.transform.localScale = new Vector3(0.06f, 0.65f, 0.06f);
+
+            var blade = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            blade.name = "Blade";
+            blade.transform.SetParent(root.transform, false);
+            blade.transform.localPosition = new Vector3(0f, 0.15f, 0f);
+            blade.transform.localScale = new Vector3(0.26f, 0.18f, 0.10f);
+
+            SetLitMaterial(handle, new Color(0.35f, 0.25f, 0.12f), 0.12f);
+            SetEmissiveMaterial(blade, new Color(0.9f, 0.85f, 0.65f), 0.5f);
+
+            var c = root.AddComponent<SphereCollider>();
+            c.isTrigger = true;
+            c.radius = 1.2f;
+            root.layer = LayerMask.NameToLayer("Interactable");
+            if (root.layer < 0) root.layer = 0;
+
+            var pickup = root.AddComponent<ShovelPickup>();
+            pickup.displayName = "Field Shovel";
+
+            AddNameplate(root, "[E] Pick Up Shovel", new Color(0.95f, 0.85f, 0.35f));
+        }
+
+        void EnsureMudDigVisuals()
+        {
+            if (GameObject.Find("--- DIG MOUNDS ---") != null) return;
+
+            var parent = new GameObject("--- DIG MOUNDS ---");
+            Vector3[] centers =
+            {
+                new(30f, 0f, 20f),
+                new(-20f, 0f, 35f),
+                new(0f, 0f, -30f),
+            };
+
+            for (int c = 0; c < centers.Length; c++)
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    float ang = i * Mathf.PI * 0.5f;
+                    float rad = 2.2f + i * 0.35f;
+                    Vector3 pos = centers[c] + new Vector3(Mathf.Cos(ang) * rad, 0f, Mathf.Sin(ang) * rad);
+                    float y = SampleGroundY(pos.x, pos.z);
+                    if (!float.IsNaN(y)) pos.y = y;
+
+                    var mound = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    mound.name = $"MudMound_{c}_{i}";
+                    mound.transform.SetParent(parent.transform, false);
+                    mound.transform.position = pos + new Vector3(0f, 0.3f, 0f);
+                    mound.transform.localScale = new Vector3(2.0f, 0.8f, 2.0f);
+                    SetLitMaterial(mound, new Color(0.24f, 0.17f, 0.10f), 0.06f);
+                }
+            }
+
+            AddNameplate(parent, "Dig Sites", new Color(0.35f, 1f, 0.4f));
+        }
+
+        void EnsureEnemyPresence()
+        {
+            int existing = GameObject.FindObjectsByType<MudGolemHealth>(FindObjectsSortMode.None).Length;
+            int needed = Mathf.Max(0, 4 - existing);
+            if (needed <= 0) return;
+
+            Vector3 center = new Vector3(20f, 0f, 10f);
+            var player = GameObject.FindWithTag("Player");
+            if (player != null) center = player.transform.position + new Vector3(12f, 0f, 10f);
+
+            for (int i = 0; i < needed; i++)
+            {
+                float a = (Mathf.PI * 2f / Mathf.Max(needed, 1)) * i;
+                SpawnMudGolem(center + new Vector3(Mathf.Cos(a) * 5f, 0f, Mathf.Sin(a) * 5f));
+            }
+        }
+
+        void EnsureAnastasiaPresence()
+        {
+            if (AnastasiaController.Instance == null)
+            {
+                SpawnAnastasia();
+                TriggerAnastasiaFirstAppearance();
+                return;
+            }
+
+            var player = GameObject.FindWithTag("Player");
+            if (player == null) return;
+            var a = AnastasiaController.Instance.transform;
+            if (Vector3.Distance(a.position, player.transform.position) > 60f)
+                a.position = player.transform.position + new Vector3(4f, 1.2f, 3f);
+        }
+
+        void EnsurePlayerAnimatorPresent()
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player == null) return;
+            if (player.GetComponent<PlayerAnimator>() == null)
+                player.AddComponent<PlayerAnimator>();
+        }
+
+        void EnsureAmbientMotes()
+        {
+            if (GameObject.Find("AmbientAetherMotes") != null) return;
+
+            var go = new GameObject("AmbientAetherMotes");
+            go.transform.position = new Vector3(0f, 8f, 0f);
+            var ps = go.AddComponent<ParticleSystem>();
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+            var main = ps.main;
+            main.playOnAwake = false;
+            main.duration = 5f;
+            main.loop = true;
+            main.startLifetime = 8f;
+            main.startSpeed = 0.35f;
+            main.startSize = new ParticleSystem.MinMaxCurve(0.06f, 0.16f);
+            main.startColor = new Color(0.7f, 0.9f, 1f, 0.7f);
+            main.maxParticles = 500;
+            main.simulationSpace = ParticleSystemSimulationSpace.World;
+
+            var emission = ps.emission;
+            emission.rateOverTime = 90f;
+
+            var shape = ps.shape;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(140f, 24f, 140f);
+
+            ps.Play(true);
+            Debug.Log("[EchohavenContentSpawner] Runtime visual fallback: AmbientAetherMotes created.");
+        }
+
+        void EnsureRuntimeFoliage()
+        {
+            if (GameObject.Find("FoliageRoot") != null) return;
+
+            var root = new GameObject("FoliageRoot");
+            var grassParent = new GameObject("Grass");
+            grassParent.transform.SetParent(root.transform, false);
+
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            var grassMat = shader != null ? new Material(shader) : null;
+            if (grassMat != null)
+            {
+                grassMat.SetColor("_BaseColor", new Color(0.30f, 0.50f, 0.22f));
+                grassMat.SetFloat("_Smoothness", 0.15f);
+            }
+
+            var rng = new System.Random(0xBADA55);
+            const int grassCount = 700;
+            const float half = 92f;
+
+            for (int i = 0; i < grassCount; i++)
+            {
+                float x = ((float)rng.NextDouble() * 2f - 1f) * half;
+                float z = ((float)rng.NextDouble() * 2f - 1f) * half;
+                float y = SampleGroundY(x, z);
+                if (float.IsNaN(y)) continue;
+
+                var tuft = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                tuft.name = "Grass";
+                tuft.transform.SetParent(grassParent.transform, false);
+                tuft.transform.position = new Vector3(x, y + 0.2f, z);
+                float h = 0.25f + (float)rng.NextDouble() * 0.45f;
+                tuft.transform.localScale = new Vector3(0.07f, h, 0.07f);
+                tuft.transform.rotation = Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f);
+                var col = tuft.GetComponent<Collider>();
+                if (col != null) Destroy(col);
+                if (grassMat != null)
+                {
+                    var mr = tuft.GetComponent<MeshRenderer>();
+                    if (mr != null) mr.material = grassMat;
+                }
+            }
+
+            Debug.Log("[EchohavenContentSpawner] Runtime visual fallback: foliage scattered.");
+        }
+
+        void EnsureSkyboxAndFog()
+        {
+            // Don't clobber an HDRI skybox bound during build (Phase 13).
+            var current = RenderSettings.skybox;
+            bool hasHDRI = current != null && current.shader != null &&
+                           current.shader.name == "Skybox/Cubemap" && current.HasProperty("_Tex") && current.GetTexture("_Tex") != null;
+            if (!hasHDRI)
+            {
+                var shader = Shader.Find("Skybox/Procedural");
+                if (shader != null)
+                {
+                    var sky = new Material(shader);
+                    sky.SetFloat("_SunSize", 0.03f);
+                    sky.SetFloat("_AtmosphereThickness", 1.2f);
+                    sky.SetColor("_SkyTint", new Color(0.32f, 0.56f, 0.78f));
+                    sky.SetColor("_GroundColor", new Color(0.48f, 0.40f, 0.30f));
+                    sky.SetFloat("_Exposure", 1.15f);
+                    RenderSettings.skybox = sky;
+                }
+            }
+            else
+            {
+                Debug.Log("[EchohavenContentSpawner] HDRI skybox detected — preserving.");
+            }
+
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Trilight;
+            RenderSettings.ambientSkyColor = new Color(0.55f, 0.64f, 0.72f);
+            RenderSettings.ambientEquatorColor = new Color(0.42f, 0.40f, 0.33f);
+            RenderSettings.ambientGroundColor = new Color(0.24f, 0.22f, 0.18f);
+
+            RenderSettings.fog = true;
+            RenderSettings.fogMode = FogMode.ExponentialSquared;
+            RenderSettings.fogColor = new Color(0.58f, 0.54f, 0.46f);
+            RenderSettings.fogDensity = 0.0045f;
+        }
+
+        void EnsureBuildingVisualDetails()
+        {
+            EnsureStarDomeDetails();
+            EnsureFountainOrb();
+            EnsureSpireCrystalCluster();
+        }
+
+        void EnsureStarDomeDetails()
+        {
+            var dome = FindFirst("StarDome_Placeholder", "Echohaven_StarDome", "Building_dome");
+            if (dome == null) return;
+
+            if (dome.transform.Find("Detail_AntennaSpire") == null)
+            {
+                var antenna = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                antenna.name = "Detail_AntennaSpire";
+                antenna.transform.SetParent(dome.transform, false);
+                antenna.transform.localPosition = new Vector3(0f, 7.5f, 0f);
+                antenna.transform.localScale = new Vector3(0.25f, 2.0f, 0.25f);
+                SetEmissiveMaterial(antenna, new Color(0.45f, 0.85f, 1f), 1.6f);
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+                string n = $"Detail_Buttress_{i}";
+                if (dome.transform.Find(n) != null) continue;
+                float t = (Mathf.PI * 2f / 6f) * i;
+                var b = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                b.name = n;
+                b.transform.SetParent(dome.transform, false);
+                b.transform.localPosition = new Vector3(Mathf.Cos(t) * 4.5f, 1.8f, Mathf.Sin(t) * 4.5f);
+                b.transform.localRotation = Quaternion.Euler(0f, -t * Mathf.Rad2Deg, 0f);
+                b.transform.localScale = new Vector3(0.6f, 3.2f, 1.8f);
+                SetLitMaterial(b, new Color(0.58f, 0.55f, 0.50f), 0.25f);
+            }
+        }
+
+        void EnsureFountainOrb()
+        {
+            var fountain = FindFirst("HarmonicFountain_Placeholder", "Echohaven_HarmonicFountain", "Building_fountain");
+            if (fountain == null) return;
+            if (fountain.transform.Find("Detail_OrbFinial") != null) return;
+
+            var orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orb.name = "Detail_OrbFinial";
+            orb.transform.SetParent(fountain.transform, false);
+            orb.transform.localPosition = new Vector3(0f, 4.2f, 0f);
+            orb.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+            SetEmissiveMaterial(orb, new Color(1f, 0.82f, 0.42f), 1.8f);
+        }
+
+        void EnsureSpireCrystalCluster()
+        {
+            var spire = FindFirst("CrystalSpire_Placeholder", "Echohaven_CrystalSpire", "Building_spire");
+            if (spire == null) return;
+            if (spire.transform.Find("Detail_CrystalCluster") != null) return;
+
+            var cluster = new GameObject("Detail_CrystalCluster");
+            cluster.transform.SetParent(spire.transform, false);
+            cluster.transform.localPosition = new Vector3(0f, 8f, 0f);
+
+            for (int i = 0; i < 5; i++)
+            {
+                var shard = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                shard.name = $"Shard_{i}";
+                shard.transform.SetParent(cluster.transform, false);
+                float a = (Mathf.PI * 2f / 5f) * i;
+                shard.transform.localPosition = new Vector3(Mathf.Cos(a) * 0.5f, 0.25f, Mathf.Sin(a) * 0.5f);
+                shard.transform.localScale = new Vector3(0.14f, 0.9f + 0.3f * (i % 2), 0.14f);
+                shard.transform.localRotation = Quaternion.Euler(10f + i * 7f, -a * Mathf.Rad2Deg, 0f);
+                SetEmissiveMaterial(shard, new Color(0.75f, 0.55f, 1f), 1.5f);
+            }
+        }
+
+        static GameObject FindFirst(params string[] names)
+        {
+            for (int i = 0; i < names.Length; i++)
+            {
+                var go = GameObject.Find(names[i]);
+                if (go != null) return go;
+            }
+            return null;
+        }
+
+        static void SetLitMaterial(GameObject go, Color baseColor, float smoothness)
+        {
+            var mr = go.GetComponent<MeshRenderer>();
+            if (mr == null) return;
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            if (shader == null) return;
+            var mat = new Material(shader);
+            mat.SetColor("_BaseColor", baseColor);
+            mat.SetFloat("_Smoothness", smoothness);
+            mr.material = mat;
+        }
+
+        static void SetEmissiveMaterial(GameObject go, Color emissive, float intensity)
+        {
+            var mr = go.GetComponent<MeshRenderer>();
+            if (mr == null) return;
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            if (shader == null) return;
+            var mat = new Material(shader);
+            mat.SetColor("_BaseColor", emissive * 0.35f);
+            mat.SetFloat("_Smoothness", 0.65f);
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", emissive * intensity);
+            mr.material = mat;
+
+            var l = go.GetComponent<Light>();
+            if (l == null) l = go.AddComponent<Light>();
+            l.type = LightType.Point;
+            l.color = emissive;
+            l.intensity = 2.4f;
+            l.range = 10f;
+            l.shadows = LightShadows.None;
+        }
+
+        float SampleGroundY(float x, float z)
+        {
+            var origin = new Vector3(x, 200f, z);
+            int mask = ~((1 << 8) | (1 << 10) | (1 << 11));
+            if (Physics.Raycast(origin, Vector3.down, out var hit, 500f, mask, QueryTriggerInteraction.Ignore))
+                return hit.point.y;
+            return float.NaN;
         }
 
         void ActivateStartingQuest()
@@ -181,6 +581,20 @@ namespace Tartaria.Integration
             light.intensity = 1.5f;
             light.range = 5f;
             light.shadows = LightShadows.None;
+
+            // Interaction trigger so player can press E to talk to Milo.
+            // Without this, MiloController exists but has no way to be reached
+            // by raycast/proximity from PlayerInputHandler.
+            var col = root.AddComponent<CapsuleCollider>();
+            col.isTrigger = true;
+            col.center = new Vector3(0f, 0.7f, 0f);
+            col.height = 1.5f;
+            col.radius = 0.6f;
+            int layer = LayerMask.NameToLayer("Interactable");
+            root.layer = layer >= 0 ? layer : 0;
+            root.AddComponent<MiloInteractable>();
+
+            AddNameplate(root, "[E] Talk to Milo", new Color(0.5f, 0.8f, 1f));
 
             return root;
         }
@@ -525,7 +939,47 @@ namespace Tartaria.Integration
             // Dust motes in the central plaza
             CreateDustMotes(new Vector3(0f, 2f, 0f), "Dust_Plaza");
 
-            Debug.Log("[EchohavenContentSpawner] Particle effects spawned.");
+            // Spawn Aurora VFX in sky (permanent ambient effect)
+            SpawnAuroraVFX();
+
+            // Trigger periodic scan pulse at player position for visual interest
+            InvokeRepeating(nameof(TriggerAmbientScanPulse), 5f, 10f);
+
+            Debug.Log("[EchohavenContentSpawner] Particle effects spawned (wisps, dust, aurora, periodic scan).");
+        }
+
+        void SpawnAuroraVFX()
+        {
+            #if UNITY_EDITOR
+            var auroraPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Prefabs/VFX/Aurora.prefab");
+            if (auroraPrefab != null)
+            {
+                var aurora = Instantiate(auroraPrefab, new Vector3(0, 50, 0), Quaternion.identity);
+                aurora.name = "Sky_Aurora";
+                _environmentalVFX.AddRange(aurora.GetComponentsInChildren<ParticleSystem>());
+                Debug.Log("[EchohavenContentSpawner] Aurora VFX spawned in sky.");
+            }
+            else
+            {
+                Debug.LogWarning("[EchohavenContentSpawner] Aurora.prefab not found at Assets/_Project/Prefabs/VFX/Aurora.prefab");
+            }
+            #endif
+        }
+
+        void TriggerAmbientScanPulse()
+        {
+            var player = GameObject.FindWithTag("Player");
+            if (player == null) return;
+
+            #if UNITY_EDITOR
+            var scanPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+                "Assets/_Project/Prefabs/VFX/ScanPulse.prefab");
+            if (scanPrefab != null)
+            {
+                Instantiate(scanPrefab, player.transform.position, Quaternion.identity);
+            }
+            #endif
         }
 
         void CreateAetherWisps(Vector3 pos, string name)
@@ -769,6 +1223,9 @@ namespace Tartaria.Integration
 
         void SpawnMudGolem(Vector3 pos)
         {
+            float y = SampleGroundY(pos.x, pos.z);
+            if (!float.IsNaN(y)) pos.y = y + 0.1f;
+
             GameObject golem = null;
 
             #if UNITY_EDITOR
@@ -786,10 +1243,20 @@ namespace Tartaria.Integration
 
             golem.name = "MudGolem";
 
+            if (golem.GetComponent<MudGolemHealth>() == null)
+            {
+                var health = golem.AddComponent<MudGolemHealth>();
+                health.MaxHealth = 50f;
+                health.CurrentHealth = 50f;
+            }
+
             // Set enemy layer
             int enemyLayer = LayerMask.NameToLayer("Enemy");
             if (enemyLayer >= 0)
                 SetLayerRecursive(golem, enemyLayer);
+
+            if (golem.transform.Find("Nameplate") == null)
+                AddNameplate(golem, "Mud Golem", new Color(0.85f, 0.45f, 0.3f));
         }
 
         GameObject CreateMudGolemFallback(Vector3 pos)
@@ -1317,6 +1784,72 @@ namespace Tartaria.Integration
             if (light != null) light.gameObject.SetActive(false);
 
             Debug.Log($"[DigSiteInteraction] Player excavated {SiteName}");
+        }
+    }
+
+    /// <summary>
+    /// Runtime shovel pickup for MVP excavation readability.
+    /// </summary>
+    public class ShovelPickup : MonoBehaviour, Input.IInteractable
+    {
+        /// <summary>Static flag — true once the player has picked up the shovel.</summary>
+        public static bool ShovelAcquired { get; private set; }
+
+        public string displayName = "Shovel";
+        bool _picked;
+
+        public string GetInteractPrompt() => _picked ? $"{displayName} acquired" : $"[E] Pick Up {displayName}";
+
+        public void Interact(GameObject player)
+        {
+            if (_picked) return;
+            _picked = true;
+            ShovelAcquired = true;
+
+            UI.HUDController.Instance?.ShowObjective($"Tool Acquired: {displayName}");
+            RuntimeHUDBuilder.Instance?.ShowDamageNumber(1f, transform.position + Vector3.up * 1.5f);
+            AudioManager.Instance?.PlaySFX("Discovery", transform.position, 0.6f);
+
+            var col = GetComponent<Collider>();
+            if (col != null) col.enabled = false;
+
+            foreach (Transform child in transform)
+                child.gameObject.SetActive(false);
+
+            Destroy(gameObject, 2f);
+        }
+    }
+
+    /// <summary>
+    /// Wrapper component that lets the player Interact with Milo to trigger
+    /// his introduction / dialogue. Sits on the Milo GameObject alongside
+    /// the trigger collider so PlayerInputHandler raycasts can hit it.
+    /// </summary>
+    public class MiloInteractable : MonoBehaviour, Input.IInteractable
+    {
+        public string GetInteractPrompt()
+        {
+            return MiloController.Instance != null && MiloController.Instance.HasIntroduced
+                ? "[E] Talk to Milo"
+                : "[E] Greet Milo";
+        }
+
+        public void Interact(GameObject player)
+        {
+            var milo = MiloController.Instance;
+            if (milo == null) return;
+
+            if (!milo.HasIntroduced)
+            {
+                milo.Introduce();
+            }
+            else
+            {
+                // Re-trigger context dialogue for repeat conversations
+                DialogueManager.Instance?.PlayContextDialogue("milo_chat");
+                milo.AddTrust(1f);
+            }
+            AudioManager.Instance?.PlaySFX("Interact", transform.position, 0.4f);
         }
     }
 

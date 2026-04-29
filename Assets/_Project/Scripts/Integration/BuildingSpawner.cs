@@ -68,6 +68,16 @@ namespace Tartaria.Integration
                 building.name = $"Building_{buildingId}";
             }
 
+            // Decorate with Tartarian architectural detail (columns, dome cap, basin, plinth, bands)
+            var kind = buildingId switch
+            {
+                "dome" => TartarianArchitectureBuilder.BuildingKind.Dome,
+                "fountain" => TartarianArchitectureBuilder.BuildingKind.Fountain,
+                "spire" => TartarianArchitectureBuilder.BuildingKind.Spire,
+                _ => TartarianArchitectureBuilder.BuildingKind.Dome,
+            };
+            TartarianArchitectureBuilder.Decorate(building, kind, fallbackScale);
+
             // Ensure InteractableBuilding component
             var interactable = building.GetComponent<InteractableBuilding>();
             if (interactable == null)
@@ -92,6 +102,13 @@ namespace Tartaria.Integration
             int buildingLayer = LayerMask.NameToLayer("Building");
             if (buildingLayer >= 0)
                 building.layer = buildingLayer;
+
+            // MVP: mark all spawned buildings as discovered immediately so
+            // the player can begin excavation without needing to walk into
+            // each ProximityTrigger first. The discovery trigger still works
+            // for late-arriving players, but the dig site UX is broken if
+            // E does nothing on a visible mound.
+            interactable.Discover();
 
             // Add discovery proximity trigger as SIBLING (not child) to avoid
             // SphereCollider radius being scaled by the building's transform scale.
@@ -130,6 +147,33 @@ namespace Tartaria.Integration
 
             // Add floating discovery marker (golden diamond above building)
             AddDiscoveryMarker(building, buildingId);
+
+            // Add mud slowdown zone around each buried structure.
+            AddMudZone(building, buildingId);
+        }
+
+        void AddMudZone(GameObject building, string id)
+        {
+            string zoneName = $"MudZone_{id}";
+            if (building.transform.Find(zoneName) != null) return;
+
+            var zone = new GameObject(zoneName);
+            zone.transform.SetParent(building.transform, false);
+            zone.transform.localPosition = Vector3.zero;
+
+            float radius = 6f;
+            var rend = building.GetComponentInChildren<Renderer>();
+            if (rend != null)
+            {
+                var ext = rend.bounds.extents;
+                radius = Mathf.Max(4f, Mathf.Max(ext.x, ext.z) + 1.5f);
+            }
+
+            var col = zone.AddComponent<SphereCollider>();
+            col.isTrigger = true;
+            col.radius = radius;
+
+            zone.AddComponent<MudZone>();
         }
 
         void AddDiscoveryMarker(GameObject building, string id)

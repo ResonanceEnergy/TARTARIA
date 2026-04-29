@@ -1,0 +1,518 @@
+=== OneClickBuild.cs (first 160) ===
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+namespace Tartaria.Editor
+{
+    /// <summary>
+    /// Master build-everything script. Runs all factories and scene builders
+    /// in the correct dependency order, then opens the Boot scene ready for Play.
+    ///
+    /// Every phase is isolated: a failure in one phase logs the error and
+    /// continues to the next. Results are tracked via BuildReport for
+    /// post-mortem analysis by both the Unity console and PowerShell launcher.
+    ///
+    /// Menu: Tartaria > BUILD EVERYTHING
+    /// Also available as batch mode entry point.
+    /// </summary>
+    public static class OneClickBuild
+    {
+        [MenuItem("Tartaria/BUILD EVERYTHING", false, -100)]
+        public static void BuildEverything()
+        {
+            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+            {
+                if (!EditorUtility.DisplayDialog("Tartaria: Build Everything",
+                    "This will create/update:\n\n" +
+                    "  1. Directory structure + URP\n" +
+                    "  2. ScriptableObjects (Buildings, Constants)\n" +
+                    "  3. Visual Assets (procedural meshes + shader materials)\n" +
+                    "  4-5. Zone + Quest Definitions\n" +
+                    "  6. Character prefabs (Player, Milo, MudGolem)\n" +
+                    "  7. Scenes (Boot, UI_Overlay)\n" +
+                    "  8. Echohaven scene population\n" +
+                    "  9. Apply Visual Upgrade (materials + building prefabs)\n" +
+                    "  10. Input actions + Build settings\n\n" +
+                    "Existing assets are preserved (idempotent).",
+                    "Build It!", "Cancel"))
+                    return;
+            }
+
+            RunBuild();
+
+            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+            {
+                string msg = BuildReport.HasFailures
+                    ? $"{BuildReport.FailCount} phase(s) failed. Check Console for details."
+                    : $"All {BuildReport.PassCount} phases completed. Boot scene is ready!";
+
+                EditorUtility.DisplayDialog("Build Complete", msg, "OK");
+            }
+        }
+
+        /// <summary>
+        /// Batch-mode safe entry point:
+        /// Unity.exe -batchmode -projectPath ... -executeMethod Tartaria.Editor.OneClickBuild.RunBuild -quit
+        /// </summary>
+        public static void RunBuild()
+        {
+            BuildReport.Begin("BUILD EVERYTHING");
+            RunBuildPhases();
+            BuildReport.Finish();
+        }
+
+        /// <summary>
+        /// Raw build phases WITHOUT owning the BuildReport lifecycle.
+        /// Call this from AutoPlayBoot (which owns Begin/Finish) to avoid
+        /// resetting the outer report.
+        /// </summary>
+        public static void RunBuildPhases()
+        {
+
+            // ── Phase 1: Directories + URP + TMP Essentials ──
+            BuildReport.RunPhase("Phase 1/10: Directories", () =>
+            {
+                EnsureDirectories();
+                URPSetup.EnsureURPPipeline();
+                ImportTMPEssentials();
+            });
+
+            // ── Phase 2: ScriptableObjects + Input Actions ──
+            BuildReport.RunPhase("Phase 2/12: ScriptableObjects + Input", () =>
+            {
+                ProjectSetupWizard.RunSetup();
+                InputActionsFactory.CreateInputActionsAsset();
+            });
+
+            // ── Phase 3: Visual Assets (meshes + materials + skybox) ──
+            BuildReport.RunPhase("Phase 3/10: Visual Assets", () =>
+            {
+                VisualUpgradeBuilder.BuildVisualAssets();
+                AssetFactoryWizard.BuildBuildingPrefabs(); // Must run before Phase 8 populate
+            });
+
+            // ── Phase 4: Zone Definitions ──
+            BuildReport.RunPhase("Phase 4/10: Zone Definitions", () =>
+            {
+                ZoneDefinitionFactory.BuildZoneDefinitions();
+            });
+
+            // ── Phase 5: Quest Definitions ──
+            BuildReport.RunPhase("Phase 5/10: Quest Definitions", () =>
+            {
+                QuestDefinitionFactory.BuildAllQuests();
+                AnastasiaDialoguePopulator.BuildDialogueDatabase();
+                ArchiveDatabasePopulator.BuildArchiveDatabase();
+            });
+
+            // ── Phase 6: Character Prefabs ──
+            BuildReport.RunPhase("Phase 6/10: Character Prefabs", () =>
+            {
+                CharacterPrefabFactory.BuildAllCharacters();
+                AnastasiaPrefabFactory.BuildAnastasiaPrefab();
+            });
+
+            // ── Phase 7: Scenes (Boot + UI_Overlay) ──
+            BuildReport.RunPhase("Phase 7/12: Scenes (Boot + UI_Overlay)", () =>
+            {
+                SceneFactory.CreateAllMissingScenes();
+            });
+
+            // ── Phase 7b: Populate UI Overlay ──
+            string uiOverlayPath = "Assets/_Project/Scenes/UI_Overlay.unity";
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(uiOverlayPath) != null)
+            {
+                BuildReport.RunPhase("Phase 7b/12: Populate UI Overlay", () =>
+                {
+                    EditorSceneManager.OpenScene(uiOverlayPath, OpenSceneMode.Single);
+                    UIOverlayPopulator.Populate();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+
+            // ── Phase 8: Scaffold managers + populate Echohaven ──
+            string echohavenPath = "Assets/_Project/Scenes/Echohaven_VerticalSlice.unity";
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+            {
+                BuildReport.RunPhase("Phase 8/10: Scaffold + Populate", () =>
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    MasterSceneScaffold.ScaffoldAll();
+                    EchohavenScenePopulator.Populate();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+            else
+            {
+                BuildReport.Skip("Phase 8/10: Scaffold + Populate", "Echohaven scene not found");
+            }
+
+            // ── Phase 9: Apply Visual Upgrade to scene + build building prefabs ──
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+            {
+                BuildReport.RunPhase("Phase 9/10: Apply Visual Upgrade", () =>
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    VisualUpgradeBuilder.ApplyVisualUpgrade();
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+            else
+
+=== VisualUpgradeBuilder.cs (first 110) ===
+using UnityEngine;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using System.Collections.Generic;
+using System.IO;
+
+namespace Tartaria.Editor
+{
+    /// <summary>
+    /// Generates procedural meshes and styled materials using the custom Tartaria shaders,
+    /// replacing all placeholder primitives in the Echohaven scene.
+    ///
+    /// Menu: Tartaria > Build Assets > Visual Upgrade
+    /// </summary>
+    public static class VisualUpgradeBuilder
+    {
+        const string MeshPath = "Assets/_Project/Models/Generated";
+        const string MatPath = "Assets/_Project/Materials";
+        const string PrefabPath = "Assets/_Project/Prefabs/Buildings";
+
+        [MenuItem("Tartaria/Build Assets/Visual Upgrade", false, 9)]
+        public static void BuildVisualUpgrade()
+        {
+            BuildVisualAssets();
+            ApplyVisualUpgrade();
+            Debug.Log("[Tartaria] Visual Upgrade complete — procedural meshes, shader materials, skybox applied.");
+        }
+
+        /// <summary>
+        /// Phase 2b: Generate procedural meshes, shader materials, and skybox.
+        /// Safe to run before scene geometry exists.
+        /// </summary>
+        public static void BuildVisualAssets()
+        {
+            EnsureDirs();
+            BuildMeshAssets();
+            BuildShaderMaterials();
+            BuildSkyboxMaterial();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        /// <summary>
+        /// Phase 7b: Apply generated meshes and materials to scene objects and prefabs.
+        /// Must run AFTER EchohavenScenePopulator has populated the scene.
+        /// </summary>
+        public static void ApplyVisualUpgrade()
+        {
+            UpgradeScene();
+            UpgradePrefabs();
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+
+        // ═══════════════════════════════════════════════
+        //  DIRECTORIES
+        // ═══════════════════════════════════════════════
+
+        static void EnsureDirs()
+        {
+            string[] dirs = { MeshPath, MatPath, PrefabPath, "Assets/_Project/Models" };
+            foreach (var d in dirs)
+            {
+                string full = Path.Combine(Application.dataPath, "..", d);
+                if (!Directory.Exists(full)) Directory.CreateDirectory(full);
+            }
+            AssetDatabase.Refresh();
+        }
+
+        // ═══════════════════════════════════════════════
+        //  PROCEDURAL MESH GENERATION
+        // ═══════════════════════════════════════════════
+
+        static void BuildMeshAssets()
+        {
+            SaveMeshAsset(GenerateDomeMesh(32, 16), "Dome");
+            SaveMeshAsset(GenerateSpireMesh(16, 24), "Spire");
+            SaveMeshAsset(GenerateFountainMesh(24), "Fountain");
+            SaveMeshAsset(GeneratePillarMesh(8, 12), "RuinedPillar");
+            SaveMeshAsset(GenerateTerrainMesh(64, 200f), "Terrain");
+            SaveMeshAsset(GenerateArchMesh(12), "Arch");
+            SaveMeshAsset(GenerateStepPyramidMesh(5), "StepPyramid");
+            Debug.Log("[Tartaria] 7 procedural meshes generated.");
+        }
+
+        static void SaveMeshAsset(Mesh mesh, string name)
+        {
+            mesh.name = name;
+            string path = $"{MeshPath}/{name}.asset";
+            var existing = AssetDatabase.LoadAssetAtPath<Mesh>(path);
+            if (existing != null)
+            {
+                existing.Clear();
+                EditorUtility.CopySerialized(mesh, existing);
+            }
+            else
+            {
+                AssetDatabase.CreateAsset(mesh, path);
+            }
+        }
+
+        // ── Dome: hemisphere with ornamental ring at base ──
+
+        static Mesh GenerateDomeMesh(int lonSegments, int latSegments)
+        {
+            var verts = new List<Vector3>();
+            var tris = new List<int>();
+            var uvs = new List<Vector2>();
+            var normals = new List<Vector3>();
+
+
+=== AutoPlayBoot.cs ===
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+
+namespace Tartaria.Editor
+{
+    /// <summary>
+    /// Auto-play trigger: when Unity opens and finds the sentinel file
+    /// "Temp/TARTARIA_AUTOPLAY", it runs BUILD EVERYTHING -> Validate -> Enter Play Mode.
+    ///
+    /// The sentinel file is created by the PowerShell launcher script
+    /// and deleted after consumption.
+    ///
+    /// Hardened: waits for editor readiness, per-phase error isolation,
+    /// writes build report for PowerShell to parse, cleans up Device Simulator.
+    ///
+    /// Also available manually: Tartaria > Build + Validate + Play
+    /// </summary>
+    [InitializeOnLoad]
+    public static class AutoPlayBoot
+    {
+        // Sentinel lives in Library/ — Temp/ gets wiped on project open!
+        const string SentinelPath = "Library/TARTARIA_AUTOPLAY";
+
+        // Retry budget: ~5 seconds of update ticks (editor usually ticks ~10/s during load)
+        const int MaxRetries = 50;
+        static int _playFrameDelay = -1;
+        static int _retryCount;
+
+        [InitializeOnLoadMethod]
+        static void RegisterPlayModeKick()
+        {
+            EditorApplication.update += PlayModeKicker;
+        }
+
+        static void PlayModeKicker()
+        {
+            if (_playFrameDelay < 0) return;
+            _playFrameDelay--;
+            if (_playFrameDelay <= 0)
+            {
+                EditorApplication.update -= PlayModeKicker;
+                Debug.Log("[Tartaria] PlayModeKicker firing -- isPlaying = true");
+                OneClickBuild.CloseTMPImporterWindow();
+                EditorApplication.isPlaying = true;
+                Debug.Log($"[Tartaria] isPlaying is now: {EditorApplication.isPlaying}");
+                // Focus Game View so keyboard input reaches the player
+                EditorApplication.delayCall += () =>
+                {
+                    var gameViewType = System.Type.GetType("UnityEditor.GameView,UnityEditor");
+                    if (gameViewType != null)
+                        EditorWindow.FocusWindowIfItsOpen(gameViewType);
+                };
+            }
+        }
+
+        static AutoPlayBoot()
+        {
+            _retryCount = 0;
+            EditorApplication.update += WaitForEditorReady;
+        }
+
+        static void WaitForEditorReady()
+        {
+            _retryCount++;
+
+            // Give up after budget exhausted
+            if (_retryCount > MaxRetries)
+            {
+                EditorApplication.update -= WaitForEditorReady;
+                return;
+            }
+
+            // Must not be compiling, importing, or still in a domain reload
+            if (EditorApplication.isCompiling || EditorApplication.isUpdating)
+                return;
+
+            string fullPath = System.IO.Path.Combine(
+                System.IO.Path.GetDirectoryName(Application.dataPath), SentinelPath);
+
+            if (!System.IO.File.Exists(fullPath))
+            {
+                EditorApplication.update -= WaitForEditorReady;
+                return;
+            }
+
+            // Found sentinel — consume it and run
+            EditorApplication.update -= WaitForEditorReady;
+
+            try
+            {
+                System.IO.File.Delete(fullPath);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[Tartaria] Could not delete sentinel: {ex.Message}");
+            }
+
+            Debug.Log("[Tartaria] ============================================");
+            Debug.Log("[Tartaria] AUTO-PLAY SENTINEL DETECTED");
+            Debug.Log("[Tartaria] ============================================");
+
+            // Clean up Device Simulator to avoid its internal NullRef
+            CloseDeviceSimulator();
+
+            // Run the full pipeline
+            try
+            {
+                RunBuildValidatePlay();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[Tartaria] AUTO-PLAY PIPELINE CRASHED: {ex}");
+                // Still write a report so PowerShell can detect the failure
+                BuildReport.Begin("AUTO-PLAY (crashed)");
+                BuildReport.RunPhase("Pipeline", () => throw ex);
+                BuildReport.Finish();
+            }
+        }
+
+        /// <summary>
+        /// Close any open Device Simulator windows to prevent
+        /// Unity's internal NullReferenceException during serialization.
+        /// </summary>
+        static void CloseDeviceSimulator()
+        {
+            try
+            {
+                var simType = System.Type.GetType(
+                    "UnityEditor.DeviceSimulation.SimulatorWindow, UnityEditor");
+                if (simType == null) return;
+
+                var windows = Resources.FindObjectsOfTypeAll(simType);
+                foreach (var w in windows)
+                {
+                    if (w is EditorWindow ew)
+                    {
+                        Debug.Log("[Tartaria] Closing Device Simulator window (prevents NullRef)");
+                        ew.Close();
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[Tartaria] Could not close Device Simulator: {ex.Message}");
+            }
+        }
+
+        [MenuItem("Tartaria/Build + Validate + Play", false, -90)]
+        public static void RunBuildValidatePlay()
+        {
+            BuildReport.Begin("BUILD + VALIDATE + PLAY");
+
+            // Phase 1: Build Everything
+            Debug.Log("[Tartaria] === AUTO-PLAY: Phase 1/3 -- BUILD EVERYTHING ===");
+            OneClickBuild.RunBuildPhases();
+
+            // Phase 2: Validate (run even if build had partial failures)
+            Debug.Log("[Tartaria] === AUTO-PLAY: Phase 2/3 -- READINESS CHECK ===");
+            BuildReport.RunPhase("READINESS VALIDATION", () =>
+            {
+                BatchReadinessValidator.Validate();
+            });
+
+            // Phase 3: Open Boot scene and enter Play mode
+            Debug.Log("[Tartaria] === AUTO-PLAY: Phase 3/3 -- ENTERING PLAY MODE ===");
+            string bootPath = "Assets/_Project/Scenes/Boot.unity";
+
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(bootPath) != null)
+            {
+                BuildReport.RunPhase("Open Boot Scene", () =>
+                {
+                    EditorSceneManager.OpenScene(bootPath, OpenSceneMode.Single);
+                    EditorSceneManager.SaveOpenScenes();
+                });
+            }
+            else
+            {
+                BuildReport.Skip("Open Boot Scene", "Boot.unity not found after build");
+                Debug.LogError("[Tartaria] Boot.unity was not created by BUILD EVERYTHING");
+            }
+
+            BuildReport.Finish();
+
+            // Only enter Play if there were no critical failures
+            if (!BuildReport.HasFailures)
+            {
+                Debug.Log("[Tartaria] Pipeline complete -- entering Play mode on next frame");
+
+                // Close TMP importer window — it spams "Cannot import in play mode" errors
+                OneClickBuild.CloseTMPImporterWindow();
+
+                // Schedule Play mode via update kicker (delayCall doesn't fire reliably after pipeline)
+                _playFrameDelay = 5; // wait 5 update ticks
+                Debug.Log("[Tartaria] PlayModeKicker armed -- will fire in 5 ticks");
+            }
+            else
+            {
+                Debug.LogWarning(
+                    $"[Tartaria] Pipeline had {BuildReport.FailCount} failure(s) -- NOT entering Play mode.\n" +
+                    "[Tartaria] Fix errors above, then: Tartaria > Build + Validate + Play");
+            }
+        }
+    }
+}
+
+=== Editor list ===
+
+Name
+----
+AnastasiaDialoguePopulator.cs
+AnastasiaPrefabFactory.cs
+ArchiveDatabasePopulator.cs
+AssetFactoryWizard.cs
+AudioStubFactory.cs
+AutoPlayBoot.cs
+BatchReadinessValidator.cs
+BuildReport.cs
+CharacterPrefabFactory.cs
+EchohavenScenePopulator.cs
+FirstTimeSetup.cs
+GoldenMotePrefabFactory.cs
+InputActionsAssigner.cs
+InputActionsFactory.cs
+MasterSceneScaffold.cs
+Moon2ZoneScaffold.cs
+MoonBuildingFactory.cs
+OneClickBuild.cs
+PlayReadinessWindow.cs
+ProjectSetupWizard.cs
+QuestDefinitionFactory.cs
+SceneComponentManifest.cs
+SceneFactory.cs
+SceneValidator.cs
+SceneWiringPass.cs
+SyncSolutionOnLoad.cs
+TartariaSceneGizmos.cs
+TempTerrainHeightRunner.cs
+UIOverlayPopulator.cs
+URPSetup.cs
+VisualUpgradeBuilder.cs
+ZoneDefinitionFactory.cs
+

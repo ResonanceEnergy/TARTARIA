@@ -6210,9 +6210,11 @@ MonoBehaviour:
   dialoguePanel: {fileID: 71118405}
   loadingPanel: {fileID: 2021479182}
   aetherVisionOverlay: {fileID: 192512559}
+  tutorialPanel: {fileID: 0}
   dialogueSpeakerText: {fileID: 888832549}
   dialogueBodyText: {fileID: 1882554592}
   dialoguePortrait: {fileID: 682350991}
+  tutorialText: {fileID: 0}
   loadingBar: {fileID: 162046291}
   loadingTipText: {fileID: 593111178}
   saveIndicator: {fileID: 1579220416}

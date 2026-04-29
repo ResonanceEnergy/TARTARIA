@@ -194,6 +194,30 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
+        /// Get the first active quest's data (for simple single-quest-at-a-time UIs).
+        /// Feature 4: returns current active quest.
+        /// </summary>
+        public QuestData GetActiveQuest()
+        {
+            RebuildCachedListsIfDirty();
+            if (_cachedActiveIds.Count == 0) return null;
+
+            string questId = _cachedActiveIds[0];
+            if (!_questLookup.TryGetValue(questId, out var def)) return null;
+            if (!_questStates.TryGetValue(questId, out var state)) return null;
+
+            return new QuestData
+            {
+                id = questId,
+                title = def.displayName,
+                description = def.description,
+                objectiveIds = def.objectives != null
+                    ? System.Array.ConvertAll(def.objectives, o => o.description)
+                    : new string[0]
+            };
+        }
+
+        /// <summary>
         /// Get all completed quest IDs.
         /// </summary>
         public List<string> GetCompletedQuestIds()
@@ -309,6 +333,18 @@ namespace Tartaria.Integration
                     _questStates[kvp.Key] = kvp.Value;
             }
         }
+    }
+
+    /// <summary>
+    /// Simple quest data container for UI/HUD display (Feature 4).
+    /// Contains only the essential fields needed to show active quest info.
+    /// </summary>
+    public class QuestData
+    {
+        public string id;
+        public string title;
+        public string description;
+        public string[] objectiveIds;
     }
 
     // Quest types (QuestStatus, QuestState, QuestDefinition, etc.) are defined in Tartaria.Core.QuestTypes

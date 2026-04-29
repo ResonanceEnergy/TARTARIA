@@ -63,6 +63,10 @@ namespace Tartaria.Audio
             Register("QuestComplete",  GenQuestComplete());
             Register("SaveConfirm",    GenSaveConfirm());
             Register("AchievementPop", GenAchievementPop());
+            Register("ItemPickup",     GenItemPickup());      // Feature 2: shard pickup
+            Register("InventoryFull",  GenInventoryFull());   // Feature 2: fail sound
+            Register("ScanNoSignal",   GenScanNoSignal());    // Feature 2: scan fail
+            Register("InsufficientAether", GenInsufficientAether()); // Feature 2: not enough aether
 
             // Tutorial
             Register("TutorialStep",   GenTutorialStep());
@@ -471,6 +475,67 @@ namespace Tartaria.Audio
                 data[i] = env * (Sine(i, F_HEALING) + 0.5f * Sine(i, F_CELESTIAL * 0.5f) + 0.2f * Sine(i, F_HARMONIC * 2f));
             }
             return MakeClip("SFX_AchievementPop", data);
+        }
+
+        static AudioClip GenItemPickup()
+        {
+            // Golden chime: 432 → 528 → 648 sparkle
+            int len = Samples(0.4f);
+            var data = new float[len];
+            float[] notes = { F_HARMONIC, F_HEALING, F_HARMONIC * 1.5f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                int n = Mathf.Min((int)(t * notes.Length), notes.Length - 1);
+                float noteT = (t * notes.Length) - n;
+                float env = Mathf.Sin(noteT * Mathf.PI) * Mathf.Exp(-2f * t);
+                data[i] = env * 0.4f * (Sine(i, notes[n]) + 0.3f * Sine(i, notes[n] * 2f));
+            }
+            return MakeClip("SFX_ItemPickup", data);
+        }
+
+        static AudioClip GenInventoryFull()
+        {
+            // Dull thud: low freq with slight dissonance
+            int len = Samples(0.25f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t) * (1f - t);
+                data[i] = env * 0.3f * (Sine(i, 180f) + 0.4f * Sine(i, 185f)); // slight beating
+            }
+            return MakeClip("SFX_InventoryFull", data);
+        }
+
+        static AudioClip GenScanNoSignal()
+        {
+            // Descending tone: disappointment
+            int len = Samples(0.3f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float freq = Mathf.Lerp(F_HARMONIC, F_HARMONIC * 0.7f, t);
+                float env = Mathf.Exp(-4f * t);
+                data[i] = env * 0.25f * Sine(i, freq);
+            }
+            return MakeClip("SFX_ScanNoSignal", data);
+        }
+
+        static AudioClip GenInsufficientAether()
+        {
+            // Same as ScanNoSignal but slightly different freq for variety
+            int len = Samples(0.28f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float freq = Mathf.Lerp(360f, 240f, t);
+                float env = (1f - t) * 0.8f;
+                data[i] = env * 0.3f * Sine(i, freq);
+            }
+            return MakeClip("SFX_InsufficientAether", data);
         }
 
         // ─── Tutorial ───

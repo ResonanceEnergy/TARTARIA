@@ -1,0 +1,185 @@
+=== Editor.log filtered ===
+[EchohavenContentSpawner] Shard spawn snapped (5.00, 0.80, 30.00) -> (5.00, 2.72, 30.00)
+Tartaria.Integration.EchohavenContentSpawner:ResolveShardSpawnPosition (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:358)
+Tartaria.Integration.EchohavenContentSpawner:CreateAetherShard (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:300)
+Tartaria.Integration.EchohavenContentSpawner:SpawnCollectibles () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:291)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:58)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 358)
+[EchohavenContentSpawner] Shard spawn snapped (40.00, 0.80, 15.00) -> (40.00, 2.88, 15.00)
+Tartaria.Integration.EchohavenContentSpawner:ResolveShardSpawnPosition (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:358)
+Tartaria.Integration.EchohavenContentSpawner:CreateAetherShard (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:300)
+Tartaria.Integration.EchohavenContentSpawner:SpawnCollectibles () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:291)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:58)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 358)
+[EchohavenContentSpawner] Shard spawn snapped (-25.00, 0.80, 25.00) -> (-25.00, 1.05, 25.00)
+Tartaria.Integration.EchohavenContentSpawner:ResolveShardSpawnPosition (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:358)
+Tartaria.Integration.EchohavenContentSpawner:CreateAetherShard (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:300)
+Tartaria.Integration.EchohavenContentSpawner:SpawnCollectibles () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:291)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:58)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 358)
+[EchohavenContentSpawner] Shard spawn snapped (10.00, 0.80, -25.00) -> (10.00, 2.13, -25.00)
+Tartaria.Integration.EchohavenContentSpawner:ResolveShardSpawnPosition (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:358)
+Tartaria.Integration.EchohavenContentSpawner:CreateAetherShard (UnityEngine.Vector3) (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:300)
+Tartaria.Integration.EchohavenContentSpawner:SpawnCollectibles () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:291)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:58)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 358)
+[EchohavenContentSpawner] 8 Aether Shards placed.
+Tartaria.Integration.EchohavenContentSpawner:SpawnCollectibles () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:295)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:58)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 295)
+[EchohavenContentSpawner] Environmental props placed.
+Tartaria.Integration.EchohavenContentSpawner:SpawnEnvironmentalProps () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:386)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:59)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 386)
+[EchohavenContentSpawner] 3 corruption zones seeded.
+Tartaria.Integration.EchohavenContentSpawner:SpawnCorruptionZones () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:513)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:60)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 513)
+[EchohavenContentSpawner] Particle effects spawned.
+Tartaria.Integration.EchohavenContentSpawner:SpawnParticleEffects () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:528)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:61)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 528)
+[EchohavenContentSpawner] Ambient audio sources placed.
+Tartaria.Integration.EchohavenContentSpawner:SpawnAmbientAudio () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:635)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:62)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 635)
+[EchohavenContentSpawner] 2 initial Mud Golems placed.
+Tartaria.Integration.EchohavenContentSpawner:SpawnInitialEnemies () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:1012)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:63)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 1012)
+[EchohavenContentSpawner] Enemy wave encounters configured.
+Tartaria.Integration.EchohavenContentSpawner:SetupEnemyWaveEncounters () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:717)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:64)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 717)
+[EchohavenContentSpawner] 3 Moon 1 excavation sites registered.
+Tartaria.Integration.EchohavenContentSpawner:RegisterEchohavenExcavationSites () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:861)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:65)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 861)
+[EchohavenContentSpawner] 3 dig site markers placed.
+Tartaria.Integration.EchohavenContentSpawner:PlaceDigSiteMarkers () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:1025)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:66)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 1025)
+[EchohavenContentSpawner] Starting quest activated on HUD.
+Tartaria.Integration.EchohavenContentSpawner:ActivateStartingQuest () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:89)
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:69)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 89)
+[EchohavenContentSpawner] Zone content populated.
+Tartaria.Integration.EchohavenContentSpawner:Start () (at Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs:73)
+(Filename: Assets/_Project/Scripts/Integration/EchohavenContentSpawner.cs Line: 73)
+[Campaign] Moon 1 begins: Echohaven
+UnityEngine.UIElements.BaseVisualElementPanel:Render ()
+UnityEngine.UIElements.UIElementsUtility:DoDispatch (UnityEngine.UIElements.BaseVisualElementPanel)
+UnityEngine.UIElements.BaseVisualElementPanel:Render ()
+UnityEngine.UIElements.UIElementsUtility:DoDispatch (UnityEngine.UIElements.BaseVisualElementPanel)
+Tartaria.Integration.RuntimeGlueBridge:EnsureVisualSystems () (at Assets/_Project/Scripts/Integration/RuntimeGlueBridge.cs:95)
+Tartaria.Integration.RuntimeGlueBridge:EnsureVisualSystems () (at Assets/_Project/Scripts/Integration/RuntimeGlueBridge.cs:97)
+[RuntimeGlue] Created LeyLineVisualizer
+Tartaria.Integration.RuntimeGlueBridge:EnsureVisualSystems () (at Assets/_Project/Scripts/Integration/RuntimeGlueBridge.cs:106)
+Tartaria.Integration.RuntimeGlueBridge:EnsureVisualSystems () (at Assets/_Project/Scripts/Integration/RuntimeGlueBridge.cs:115)
+[Campaign] Restored to Moon 1: Echohaven
+[Tutorial] Step 0: Movement — Use WASD to explore Echohaven. Follow the hum of lost frequencies.
+##utp:{"type":"MemoryLeaks","version":2,"phase":"Immediate","time":1777352098794,"processId":40924,"allocatedMemory":342806018,"memoryLabels":[{"Default":29317},{"Permanent":15524},{"NewDelete":69969},{"Thread":4232584},{"Manager":3084557},{"VertexData":8},{"Geometry":816},{"Texture":296},{"Shader":80531},{"Material":24},{"GfxDevice":60961},{"Animation":392},{"Audio":2664},{"FreeType":8},{"FontEngine":324315492},{"Physics":2090},{"Physics2D":16},{"Serialization":160416},{"Input":14984},{"JobScheduler":33024},{"TextLib":18520},{"Mono":32},{"MonoCode":64},{"ScriptingNativeRuntime":155060},{"BaseObject":1641168},{"Resource":1336},{"Renderer":3008},{"Transform":4685},{"File":18558},{"WebCam":616},{"Culling":32},{"Terrain":11394},{"Wind":24},{"STL":40},{"String":12982},{"DynamicArray":143472},{"HashMap":85751},{"Utility":2660322},{"Curl":48},{"PoolAlloc":5992},{"AI":40},{"TypeTree":5341},{"ScriptManager":512},{"RuntimeInitializeOnLoadManager":64},{"SpriteAtlas":112},{"GI":7792},{"Director":8240},{"CloudService":8064},{"WebRequest":7184},{"VR":47994},{"SceneManager":504},{"Video":64},{"LazyScriptCache":32},{"NativeArray":1968},{"Camera":17},{"Secure":1},{"SerializationCache":1576},{"APIUpdating":10320},{"Subsystems":336},{"VirtualTexturing":57888},{"StaticSafetyDebugInfo":278528},{"Analytics":384},{"Hierarchy":608},{"UIElements":38000},{"CoreStats":13032},{"Identifiers":12960},{"Gui":129},{"EditorUtility":193819},{"VersionControl":4},{"Undo":947},{"AssetDatabase":5197466},{"EditorGi":328},{"UnityConnect":29432},{"Upm":1972},{"AssetCompliance":64},{"DrivenProperties":72},{"LocalIPC":211},{"ProfilerEditor":9746},{"CoreBusinessMetrics":2866},{"Licensing":664},{"AssetReference":32},{"IPCStream":32}]}
+
+=== GroundPlane in scene ===
+--- component on GroundPlane (kind !u!4) ---
+--- !u!4 &408817733
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408817732}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 479056563}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- component on GroundPlane (kind !u!64) ---
+--- !u!64 &408817734
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408817732}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 4300000, guid: f4c03f565ce72814ea94eac19b6bfcf2, type: 2}
+--- component on GroundPlane (kind !u!23) ---
+--- !u!23 &408817735
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408817732}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: ed8120753e321b54da615ed0a85070c5, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightm
+--- component on GroundPlane (kind !u!33) ---
+--- !u!33 &408817736
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 408817732}
+  m_Mesh: {fileID: 4300000, guid: f4c03f565ce72814ea94eac19b6bfcf2, type: 2}
+--- GroundPlane GameObject ---
+--- !u!1 &408817732
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 408817733}
+  - component: {fileID: 408817736}
+  - component: {fileID: 408817735}
+  - component: {fileID: 408817734}
+  m_Layer: 0
+  m_Name: GroundPlane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 2147483647
+  m_IsActive: 1

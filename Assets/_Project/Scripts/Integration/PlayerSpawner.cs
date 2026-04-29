@@ -78,9 +78,43 @@ namespace Tartaria.Integration
                 }
             }
 
+            // Wire interactableLayer mask on the runtime player so Physics.Raycast
+            // actually hits things. Without this, the mask is 0 and no interactable
+            // is ever found — the #1 cause of "E does nothing".
+            EnsureInteractableLayerMask(instance);
+
             DontDestroyOnLoad(instance);
             _spawned = true;
             Debug.Log($"[PlayerSpawner] Player spawned at {instance.transform.position}");
+        }
+
+        /// <summary>
+        /// Sets the LayerMask field on PlayerInputHandler so interaction raycasts
+        /// actually have layers to hit. Includes Building, Interactable, Trigger,
+        /// Enemy and NPC tag layer if present.
+        /// </summary>
+        static void EnsureInteractableLayerMask(GameObject player)
+        {
+            var handler = player.GetComponent<Input.PlayerInputHandler>();
+            if (handler == null) return;
+            var field = typeof(Input.PlayerInputHandler).GetField("interactableLayer",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field == null) return;
+
+            int mask = 0;
+            int building     = LayerMask.NameToLayer("Building");
+            int interactable = LayerMask.NameToLayer("Interactable");
+            int trigger      = LayerMask.NameToLayer("Trigger");
+            int enemy        = LayerMask.NameToLayer("Enemy");
+            if (building     >= 0) mask |= (1 << building);
+            if (interactable >= 0) mask |= (1 << interactable);
+            if (trigger      >= 0) mask |= (1 << trigger);
+            if (enemy        >= 0) mask |= (1 << enemy);
+            // Always include Default so prop-on-default-layer with IInteractable still works.
+            mask |= (1 << 0);
+
+            field.SetValue(handler, (LayerMask)mask);
+            Debug.Log($"[PlayerSpawner] interactableLayer mask set to 0x{mask:X}");
         }
 
         /// <summary>

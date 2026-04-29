@@ -31,6 +31,9 @@ namespace Tartaria.Integration
         [Header("Tuning")]
         [SerializeField] Transform[] tuningNodePositions;
 
+        [Header("VFX (Feature 3)")]
+        [SerializeField] GameObject restoreSparkleVFX;
+
         BuildingRestorationState _state = BuildingRestorationState.Buried;
         int _nodesCompleted;
         float[] _nodeAccuracies = new float[3];
@@ -45,6 +48,7 @@ namespace Tartaria.Integration
         string _promptCache;
         BuildingRestorationState _promptState = (BuildingRestorationState)255;
         int _promptNodes = -1;
+        bool _excavationHooked;
 
         public string BuildingId => buildingId;
         public BuildingRestorationState State => _state;
@@ -65,6 +69,8 @@ namespace Tartaria.Integration
         {
             if (mainRenderer == null)
                 mainRenderer = GetComponent<MeshRenderer>();
+            if (mainRenderer == null)
+                mainRenderer = GetComponentInChildren<MeshRenderer>();
             _mpb = new MaterialPropertyBlock();
 
             // Find or create tuning controller
@@ -82,6 +88,7 @@ namespace Tartaria.Integration
             UpdateVisuals();
             RestoreFromSave();
             RegisterWithScanner();
+            TryRegisterExcavationCallbacks();
         }
 
         void OnDestroy()
@@ -91,6 +98,11 @@ namespace Tartaria.Integration
             {
                 _tuningController.OnTuningComplete -= OnTuningComplete;
                 _tuningController.OnTuningFailed -= OnTuningFailed;
+            }
+            if (_excavationHooked && ExcavationSystem.Instance != null)
+            {
+                ExcavationSystem.Instance.OnExcavationComplete -= OnExcavationComplete;
+                _excavationHooked = false;
             }
             // Unregister scanner POI
             Gameplay.ResonanceScannerSystem.Instance?.UnregisterPOI(buildingId);
@@ -120,13 +132,8 @@ namespace Tartaria.Integration
                     // Player is trying to interact with buried structure — start excavation
                     if (_isDiscovered)
                     {
-                        // Already discovered: auto-reveal via resonance pulse
-                        Discover();
-                        AudioManager.Instance?.PlaySFX("BuildingReveal", transform.position);
-                        if (HUDController.Instance != null)
-                            HUDController.Instance.ShowInteractionPrompt(
-                                $"The mud crumbles! {GetDisplayName()} is revealed!");
-                        DialogueManager.Instance?.PlayContextDialogue(DialogueContext.Discovery);
+                        if (!TryBeginExcavation())
+                            RevealBuriedStructure();
                     }
                     else
                     {
@@ -154,6 +161,9 @@ namespace Tartaria.Integration
                     break;
 
                 case BuildingRestorationState.Active:
+                    if (TryStartBuildingMiniGame())
+                        break;
+
                     // Fully restored — enter micro mode if available, otherwise show lore
                     if (MicroGiantController.Instance != null && !MicroGiantController.Instance.IsMicro)
                     {
@@ -204,17 +214,114 @@ namespace Tartaria.Integration
         {
             if (_isDiscovered) return;
             _isDiscovered = true;
+            ExcavationSystem.Instance?.DiscoverSite(buildingId);
 
-            if (_state == BuildingRestorationState.Buried)
-            {
-                _state = BuildingRestorationState.Revealed;
-                AudioManager.Instance?.PlaySFX("BuildingReveal", transform.position);
-                UpdateVisuals();
-            }
+            // Audio feedback for discovery (Feature 2)
+            AudioManager.Instance?.PlaySFX("Discovery", transform.position, 0.7f);
+
+            if (_state == BuildingRestorationState.Buried && IsExcavationComplete())
+                RevealBuriedStructure();
+            else if (_state == BuildingRestorationState.Buried)
+                HUDController.Instance?.ShowInteractionPrompt($"{GetDisplayName()} site identified. Press [E] to dig.");
 
             GameLoopController.Instance?.OnBuildingDiscovered(
                 GetDisplayName(), transform.position);
             Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        void TryRegisterExcavationCallbacks()
+        {
+            if (_excavationHooked || ExcavationSystem.Instance == null) return;
+
+            ExcavationSystem.Instance.OnExcavationComplete += OnExcavationComplete;
+            _excavationHooked = true;
+        }
+
+        bool TryBeginExcavation()
+        {
+            var excavation = ExcavationSystem.Instance;
+            if (excavation == null)
+                return false;
+
+            if (IsExcavationComplete())
+                return false;
+
+            if (excavation.IsDigging)
+            {
+                HUDController.Instance?.ShowInteractionPrompt("Already excavating another site.");
+                return true;
+            }
+
+            excavation.BeginDig(buildingId);
+            HUDController.Instance?.ShowInteractionPrompt($"Digging {GetDisplayName()}...");
+            return true;
+        }
+
+        bool IsExcavationComplete()
+        {
+            var site = ExcavationSystem.Instance?.GetSite(buildingId);
+            return site.HasValue && site.Value.isComplete;
+        }
+
+        void OnExcavationComplete(ExcavationSite site)
+        {
+            if (site.siteId != buildingId && site.buildingId != buildingId)
+                return;
+
+            if (_state == BuildingRestorationState.Buried)
+            {
+                RevealBuriedStructure();
+                DialogueManager.Instance?.PlayContextDialogue(DialogueContext.Discovery);
+            }
+        }
+
+        void RevealBuriedStructure()
+        {
+            if (_state != BuildingRestorationState.Buried)
+                return;
+
+            _state = BuildingRestorationState.Revealed;
+            AudioManager.Instance?.PlaySFX("BuildingReveal", transform.position);
+            HUDController.Instance?.ShowInteractionPrompt($"The mud crumbles! {GetDisplayName()} is revealed!");
+            UpdateVisuals();
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        bool TryStartBuildingMiniGame()
+        {
+            string key = string.IsNullOrEmpty(buildingId) ? string.Empty : buildingId.ToLowerInvariant();
+            switch (key)
+            {
+                case "dome":
+                    EnsureMiniGameComponent<ChoirHarmonicsMiniGame>().StartPerformance();
+                    HUDController.Instance?.ShowInteractionPrompt("Choir Harmonics challenge started.");
+                    return true;
+                case "fountain":
+                    EnsureMiniGameComponent<PipeOrganMiniGame>().StartOrgan();
+                    HUDController.Instance?.ShowInteractionPrompt("Pipe Organ challenge started.");
+                    return true;
+                case "spire":
+                    EnsureMiniGameComponent<AetherConduitMiniGame>().StartPuzzle();
+                    HUDController.Instance?.ShowInteractionPrompt("Aether Conduit challenge started.");
+                    return true;
+                default:
+                    EnsureMiniGameComponent<RailAlignmentMiniGame>().StartAlignment();
+                    HUDController.Instance?.ShowInteractionPrompt("Rail Alignment challenge started.");
+                    return true;
+            }
+        }
+
+        static T EnsureMiniGameComponent<T>() where T : Component
+        {
+            var existing = FindAnyObjectByType<T>();
+            if (existing != null)
+                return existing;
+
+            var host = GameObject.Find("MiniGameHost");
+            if (host == null)
+                host = new GameObject("MiniGameHost");
+
+            return host.AddComponent<T>();
         }
 
         // ─── Tuning ──────────────────────────────────
@@ -385,6 +492,11 @@ namespace Tartaria.Integration
         {
             _state = BuildingRestorationState.Active;
             AudioManager.Instance?.PlaySFX("BuildingActive", transform.position);
+            
+            // Feature 3: Spawn RestoreSparkle VFX
+            if (restoreSparkleVFX != null)
+                Instantiate(restoreSparkleVFX, transform.position, Quaternion.identity);
+            
             UpdateVisuals();
 
             // Register building for passive income
@@ -463,6 +575,9 @@ namespace Tartaria.Integration
         /// <summary>Subtle pulsing glow on non-active buildings so player can find them.</summary>
         void Update()
         {
+            if (!_excavationHooked)
+                TryRegisterExcavationCallbacks();
+
             if (mainRenderer == null || _state == BuildingRestorationState.Active) return;
 
             // Pulse emission to draw player attention

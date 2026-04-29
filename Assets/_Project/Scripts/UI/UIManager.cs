@@ -27,11 +27,15 @@ namespace Tartaria.UI
         [SerializeField] GameObject dialoguePanel;
         [SerializeField] GameObject loadingPanel;
         [SerializeField] GameObject aetherVisionOverlay;
+        [SerializeField] GameObject tutorialPanel;
 
         [Header("Dialogue")]
         [SerializeField] TMPro.TextMeshProUGUI dialogueSpeakerText;
         [SerializeField] TMPro.TextMeshProUGUI dialogueBodyText;
         [SerializeField] UnityEngine.UI.Image dialoguePortrait;
+
+        [Header("Tutorial")]
+        [SerializeField] TMPro.TextMeshProUGUI tutorialText;
 
         [Header("Loading")]
         [SerializeField] UnityEngine.UI.Image loadingBar;
@@ -140,6 +144,18 @@ namespace Tartaria.UI
         public void HideDialogue()
         {
             SetPanelActive(dialoguePanel, false);
+        }
+
+        public void ShowTutorial(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+            SetPanelActive(tutorialPanel, true);
+            if (tutorialText != null) tutorialText.text = message;
+        }
+
+        public void HideTutorial()
+        {
+            SetPanelActive(tutorialPanel, false);
         }
 
         public void ToggleAetherVision()

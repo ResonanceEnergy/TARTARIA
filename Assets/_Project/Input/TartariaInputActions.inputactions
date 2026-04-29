@@ -94,6 +94,24 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Scan",
+                    "type": 0,
+                    "id": "f0f1a2b3-4c5d-6e7f-8a9b-0c1d2e3f4a5b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "FrequencyAdjust",
+                    "type": 2,
+                    "id": "a1b2c3d4-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+                    "expectedControlType": "Axis",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -380,6 +398,39 @@
                     "processors": "",
                     "groups": "Gamepad",
                     "action": "CameraZoom",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b3a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard",
+                    "action": "Scan",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b4a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5",
+                    "path": "<Gamepad>/buttonEast",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Gamepad",
+                    "action": "Scan",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "c5a1b2c3-d4e5-f6a7-b8c9-d0e1f2a3b4c5",
+                    "path": "<Gamepad>/rightStick/y",
+                    "interactions": "",
+                    "processors": "StickDeadzone(min=0.2)",
+                    "groups": "Gamepad",
+                    "action": "FrequencyAdjust",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

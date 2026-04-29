@@ -379,10 +379,12 @@ namespace Tartaria.Editor
                 {
                     int a = z * (res + 1) + x;
                     int b = a + res + 1;
-                    // Clockwise winding viewed from above (+Y) so terrain is
-                    // visible from above — Unity culls back faces by default.
-                    tris.Add(a); tris.Add(a + 1); tris.Add(b);
-                    tris.Add(a + 1); tris.Add(b + 1); tris.Add(b);
+                    // Winding such that the surface normal points +Y (upward).
+                    // Verified via cross-product: (b-a) x (a+1-a) = (0,1,0).
+                    // Unity culls back faces; this makes the terrain visible
+                    // from above.
+                    tris.Add(a); tris.Add(b); tris.Add(a + 1);
+                    tris.Add(a + 1); tris.Add(b); tris.Add(b + 1);
                 }
             }
 
@@ -652,6 +654,9 @@ namespace Tartaria.Editor
         {
             // Generate procedural detail textures
             BuildProceduralTextures();
+
+            // Create a single unified Tartarian stone material with animated Aether veins.
+            CreateAetherVeinMasterMaterial();
 
             // Stone variants — lighter, more varied palette
             CreateStone("M_Stone_Weathered", new Color(0.62f, 0.58f, 0.50f),
@@ -1272,7 +1277,59 @@ namespace Tartaria.Editor
 
         static Material LoadMat(string name)
         {
+            if (name.StartsWith("M_Stone_"))
+            {
+                var unified = AssetDatabase.LoadAssetAtPath<Material>($"{MatPath}/M_AetherVein_Master.mat");
+                if (unified != null)
+                    return unified;
+            }
             return AssetDatabase.LoadAssetAtPath<Material>($"{MatPath}/{name}.mat");
+        }
+
+        static void CreateAetherVeinMasterMaterial()
+        {
+            string path = $"{MatPath}/M_AetherVein_Master.mat";
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var shader = Shader.Find("Tartaria/AetherVeinStone");
+            if (shader == null)
+            {
+                Debug.LogWarning("[Tartaria] AetherVeinStone shader not found; skipping unified stone material.");
+                return;
+            }
+
+            if (mat == null)
+            {
+                mat = new Material(shader);
+                mat.name = "M_AetherVein_Master";
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            else
+            {
+                mat.shader = shader;
+            }
+
+            var stoneTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{MatPath}/Tex_StoneTile.png");
+            var noiseTex = AssetDatabase.LoadAssetAtPath<Texture2D>($"{MatPath}/Tex_StoneNoise.png");
+            mat.SetColor("_BaseColor", new Color(0.78f, 0.74f, 0.68f, 1f));
+            mat.SetColor("_VeinColorCold", new Color(0.22f, 0.56f, 0.95f, 1f));
+            mat.SetColor("_VeinColorHot", new Color(1.0f, 0.86f, 0.50f, 1f));
+            mat.SetFloat("_AetherIntensity", 1.8f);
+            mat.SetFloat("_AetherPulseSpeed", 1.618f);
+            mat.SetFloat("_AetherShift", 0.35f);
+            mat.SetFloat("_TriplanarScale", 1.2f);
+            mat.SetFloat("_VeinScale", 1.9f);
+            mat.SetFloat("_Smoothness", 0.38f);
+            mat.SetFloat("_Metallic", 0.06f);
+
+            if (stoneTex != null)
+                mat.SetTexture("_MainTex", stoneTex);
+            if (noiseTex != null)
+            {
+                mat.SetTexture("_VeinMask", noiseTex);
+                mat.SetTexture("_DetailNoise", noiseTex);
+            }
+
+            EditorUtility.SetDirty(mat);
         }
 
         /// <summary>
