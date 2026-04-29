@@ -49,3 +49,7 @@ Assets/_Recovery.meta
 Assets/_Project/Logs/
 Assets/_Project/Logs.meta
 *.log
+
+# Cowork sandbox probe files
+.lfs-write-test
+Tools/automate-last-run.log
