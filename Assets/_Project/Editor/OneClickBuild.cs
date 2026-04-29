@@ -246,6 +246,39 @@ namespace Tartaria.Editor
                 VFXUpgradeTool.CreateAuroraVFXStatic();
             });
 
+            // ── Phase 9j: Asset Integration (P3) — Apply downloaded FREE assets: Capoeira animations + Player mesh ──
+            BuildReport.RunPhase("Phase 9j/18: Asset Integration (Capoeira + Player Mesh)", () =>
+            {
+                // Check if assets exist before integration
+                bool hasCapoeira = System.IO.Directory.Exists("Assets/_Project/Models/Animations/Capoeira");
+
+                if (hasCapoeira)
+                {
+                    AssetIntegrationTool.IntegrateCapoeiraAnimations();
+                }
+                else
+                {
+                    Debug.LogWarning("[OneClickBuild] Capoeira animations not found - skipping animation integration");
+                }
+
+                // ALWAYS restore Player to capsule (remove any wrong mesh that was applied)
+                // Player is ELARA VOSS (female) - Player_Mesh.fbx was male, keeping capsule until correct model
+                RestorePlayerCapsule.RestoreCapsule();
+
+                AssetIntegrationTool.ValidateCustomShaders();
+            });
+
+            // ── Phase 9k DISABLED — framework bootstrap deferred until a real swap is needed.
+            //    The SOs (CharacterVisualProfile, MaterialVariantSet, AudioCue, AudioCueLibrary) and
+            //    AssetFrameworkFactory exist but are dormant. Re-enable when content actually needs swapping.
+            //    Reason: doc 31 §10 point 6 — ship the slice first, refactor on demand. ──
+
+            // ── Phase 9l: Slice Assets — Quest_AwakenStarDome + Dialogue_Anastasia_AwakenStarDome ──
+            BuildReport.RunPhase("Phase 9l/19: Slice Assets (Quest + Dialogue)", () =>
+            {
+                SliceAssetsFactory.EnsureSliceAssets();
+            });
+
             // ── Phase 10: Input assignment (scene must be open) + Build Settings ──
             BuildReport.RunPhase("Phase 10/14: Input + Build Settings", () =>
             {
