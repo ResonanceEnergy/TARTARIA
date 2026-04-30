@@ -268,10 +268,14 @@ namespace Tartaria.Editor
                 AssetIntegrationTool.ValidateCustomShaders();
             });
 
-            // ── Phase 9k DISABLED — framework bootstrap deferred until a real swap is needed.
-            //    The SOs (CharacterVisualProfile, MaterialVariantSet, AudioCue, AudioCueLibrary) and
-            //    AssetFrameworkFactory exist but are dormant. Re-enable when content actually needs swapping.
-            //    Reason: doc 31 §10 point 6 — ship the slice first, refactor on demand. ──
+            // ── Phase 9k: Asset Framework Bootstrap (Mixer + Snapshots + Cue Library + default profiles) ──
+            //    Idempotent — only creates assets that don't already exist.
+            //    Snapshot transitions (Exploration/Combat) are wired in AudioManager
+            //    and auto-trigger on GameState.Combat changes.
+            BuildReport.RunPhase("Phase 9k/19: Asset Framework Bootstrap", () =>
+            {
+                AssetFrameworkFactory.BootstrapAll();
+            });
 
             // ── Phase 9l: Slice Assets — Quest_AwakenStarDome + Dialogue_Anastasia_AwakenStarDome ──
             BuildReport.RunPhase("Phase 9l/19: Slice Assets (Quest + Dialogue)", () =>
