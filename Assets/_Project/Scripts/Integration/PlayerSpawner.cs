@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Core;
+using Tartaria.Core.Data;
 
 namespace Tartaria.Integration
 {
@@ -14,6 +15,11 @@ namespace Tartaria.Integration
     {
         [Header("Player Prefab")]
         [SerializeField] GameObject playerPrefab;
+
+        [Header("Visual Profile (optional)")]
+        [SerializeField, Tooltip("ScriptableObject describing the active character visual " +
+                                  "(mesh, animator, footsteps, VFX). Null = use prefab as-is.")]
+        CharacterVisualProfile visualProfile;
 
         [Header("Input")]
         [SerializeField] InputActionAsset inputActions;
@@ -83,9 +89,47 @@ namespace Tartaria.Integration
             // is ever found — the #1 cause of "E does nothing".
             EnsureInteractableLayerMask(instance);
 
+            // Apply visual profile (mesh / animator) — zero-op if profile is null.
+            ApplyVisualProfile(instance);
+
             DontDestroyOnLoad(instance);
             _spawned = true;
             Debug.Log($"[PlayerSpawner] Player spawned at {instance.transform.position}");
+        }
+
+        /// <summary>
+        /// Applies a CharacterVisualProfile to the spawned player.
+        /// Swaps mesh + animator without touching CharacterController, scripts or input.
+        /// Null profile = no-op (keeps prefab default — capsule/placeholder).
+        /// </summary>
+        void ApplyVisualProfile(GameObject instance)
+        {
+            if (visualProfile == null) return;
+
+            // Swap mesh: remove existing "PlayerMesh" child if any, instantiate new.
+            if (visualProfile.HasMesh)
+            {
+                var existingMesh = instance.transform.Find("PlayerMesh");
+                if (existingMesh != null) Destroy(existingMesh.gameObject);
+
+                var mesh = Instantiate(visualProfile.meshPrefab, instance.transform);
+                mesh.name = "PlayerMesh";
+                mesh.transform.localPosition = new Vector3(0f, visualProfile.meshYOffset, 0f);
+                mesh.transform.localRotation = Quaternion.identity;
+                Debug.Log($"[PlayerSpawner] Applied mesh from profile: {visualProfile.characterId}");
+            }
+
+            // Swap animator controller (only if profile has one and player has Animator).
+            if (visualProfile.HasAnimator)
+            {
+                var animator = instance.GetComponentInChildren<Animator>();
+                if (animator != null)
+                {
+                    animator.runtimeAnimatorController = visualProfile.animatorController;
+                    if (visualProfile.avatar != null) animator.avatar = visualProfile.avatar;
+                    Debug.Log($"[PlayerSpawner] Applied animator: {visualProfile.animatorController.name}");
+                }
+            }
         }
 
         /// <summary>
