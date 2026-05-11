@@ -12,6 +12,7 @@ namespace Tartaria.Gameplay
     /// Each transition triggers visual, audio, and haptic feedback.
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [BurstCompile]
     public partial struct BuildingRestorationSystem : ISystem
     {
         public void OnCreate(ref SystemState state)
@@ -77,6 +78,7 @@ namespace Tartaria.Gameplay
     /// buildings or POIs and triggers discovery events.
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [BurstCompile]
     public partial struct DiscoverySystem : ISystem
     {
         public void OnCreate(ref SystemState state)

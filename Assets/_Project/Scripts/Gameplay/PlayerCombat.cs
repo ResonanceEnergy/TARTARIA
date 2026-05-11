@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Unity.Profiling;
 using Tartaria.Audio;
 
 namespace Tartaria.Gameplay
@@ -15,6 +16,9 @@ namespace Tartaria.Gameplay
     [DisallowMultipleComponent]
     public class PlayerCombat : MonoBehaviour
     {
+        static readonly ProfilerMarker s_UpdateMarker = new ProfilerMarker("PlayerCombat.Update");
+        static readonly ProfilerMarker s_SwingMarker = new ProfilerMarker("PlayerCombat.Swing");
+
         [Header("Melee")]
         [SerializeField] int meleeDamage = 25;
         [SerializeField] float reach = 2.6f;
@@ -35,53 +39,59 @@ namespace Tartaria.Gameplay
 
         void Update()
         {
-            bool fire = false;
-            var mouse = Mouse.current;
-            if (mouse != null && mouse.leftButton.wasPressedThisFrame) fire = true;
-            var pad = Gamepad.current;
-            if (pad != null && pad.buttonWest.wasPressedThisFrame) fire = true;
+            using (s_UpdateMarker.Auto())
+            {
+                bool fire = false;
+                var mouse = Mouse.current;
+                if (mouse != null && mouse.leftButton.wasPressedThisFrame) fire = true;
+                var pad = Gamepad.current;
+                if (pad != null && pad.buttonWest.wasPressedThisFrame) fire = true;
 
-            if (fire && Time.time - _lastSwingStart >= cooldown)
-                Swing();
+                if (fire && Time.time - _lastSwingStart >= cooldown)
+                    Swing();
+            }
         }
 
         void Swing()
         {
-            _lastSwingStart = Time.time;
-            try { OnSwing?.Invoke(); } catch { }
-            AudioManager.Instance?.PlaySFX("CombatHit", transform.position);
-
-            // Sphere swept forward in front of player chest
-            Vector3 origin = transform.position + Vector3.up * 1.2f + transform.forward * (reach * 0.5f);
-            int hit = 0;
-            var cols = Physics.OverlapSphere(origin, radius, ~0, QueryTriggerInteraction.Collide);
-            for (int i = 0; i < cols.Length; i++)
+            using (s_SwingMarker.Auto())
             {
-                var c = cols[i];
-                if (c == null) continue;
-                if (c.transform.IsChildOf(transform) || c.transform == transform) continue;
-                
-                // Bridge to enemy components living in AI / Integration asmdefs
-                c.SendMessageUpwards("TakeDamage", (int)meleeDamage, SendMessageOptions.DontRequireReceiver);
-                c.SendMessageUpwards("TakeDamage", (float)meleeDamage, SendMessageOptions.DontRequireReceiver);
-                
-                // Sprint: Spawn damage number at hit position
-                DamageNumberPool.Spawn(meleeDamage, c.transform.position);
-                
-                hit++;
-            }
+                _lastSwingStart = Time.time;
+                try { OnSwing?.Invoke(); } catch { }
+                AudioManager.Instance?.PlaySFX("CombatHit", transform.position);
 
-            if (hit > 0)
-            {
-                AudioManager.Instance?.PlaySFX("EnemyDeath", origin);
-                Debug.Log($"[PlayerCombat] Hit {hit} target(s) for {meleeDamage}");
-                
-                // Sprint: Hit-stop on confirmed hit
-                HitStopController.Trigger(meleeDamage);
-                
-                // Sprint: Camera punch
-                if (_impulseSource != null)
-                    _impulseSource.GenerateImpulse(0.5f);
+                // Sphere swept forward in front of player chest
+                Vector3 origin = transform.position + Vector3.up * 1.2f + transform.forward * (reach * 0.5f);
+                int hit = 0;
+                var cols = Physics.OverlapSphere(origin, radius, ~0, QueryTriggerInteraction.Collide);
+                for (int i = 0; i < cols.Length; i++)
+                {
+                    var c = cols[i];
+                    if (c == null) continue;
+                    if (c.transform.IsChildOf(transform) || c.transform == transform) continue;
+                    
+                    // Bridge to enemy components living in AI / Integration asmdefs
+                    c.SendMessageUpwards("TakeDamage", (int)meleeDamage, SendMessageOptions.DontRequireReceiver);
+                    c.SendMessageUpwards("TakeDamage", (float)meleeDamage, SendMessageOptions.DontRequireReceiver);
+                    
+                    // Sprint: Spawn damage number at hit position
+                    DamageNumberPool.Spawn(meleeDamage, c.transform.position);
+                    
+                    hit++;
+                }
+
+                if (hit > 0)
+                {
+                    AudioManager.Instance?.PlaySFX("EnemyDeath", origin);
+                    Debug.Log($"[PlayerCombat] Hit {hit} target(s) for {meleeDamage}");
+                    
+                    // Sprint: Hit-stop on confirmed hit
+                    HitStopController.Trigger(meleeDamage);
+                    
+                    // Sprint: Camera punch
+                    if (_impulseSource != null)
+                        _impulseSource.GenerateImpulse(0.5f);
+                }
             }
         }
 

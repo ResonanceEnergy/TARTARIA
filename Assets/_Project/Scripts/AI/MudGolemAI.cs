@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.Profiling;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using System.Collections;
@@ -19,6 +20,11 @@ namespace Tartaria.AI
     [DisallowMultipleComponent]
     public class MudGolemAI : MonoBehaviour
     {
+        static readonly ProfilerMarker s_UpdateMarker = new ProfilerMarker("MudGolemAI.Update");
+        static readonly ProfilerMarker s_PatrolMarker = new ProfilerMarker("MudGolemAI.UpdatePatrol");
+        static readonly ProfilerMarker s_ChaseMarker = new ProfilerMarker("MudGolemAI.UpdateChase");
+        static readonly ProfilerMarker s_AttackMarker = new ProfilerMarker("MudGolemAI.UpdateAttack");
+
         [Header("Stats")]
         [SerializeField] int maxHealth = 50;
         [SerializeField] int meleeDamage = 10;
@@ -217,31 +223,34 @@ namespace Tartaria.AI
 
         void Update()
         {
-            if (_state == GolemState.Dead) return;
-
-            // Sprint Batch 2: Apply knockback velocity
-            if (_knockbackVelocity.sqrMagnitude > 0.01f)
+            using (s_UpdateMarker.Auto())
             {
-                if (_controller != null)
-                    _controller.Move(_knockbackVelocity * Time.deltaTime);
-                _knockbackVelocity = Vector3.Lerp(_knockbackVelocity, Vector3.zero, Time.deltaTime * 5f);
-            }
+                if (_state == GolemState.Dead) return;
 
-            float distToPlayer = _player != null
-                ? Vector3.Distance(transform.position, _player.position)
-                : float.MaxValue;
+                // Sprint Batch 2: Apply knockback velocity
+                if (_knockbackVelocity.sqrMagnitude > 0.01f)
+                {
+                    if (_controller != null)
+                        _controller.Move(_knockbackVelocity * Time.deltaTime);
+                    _knockbackVelocity = Vector3.Lerp(_knockbackVelocity, Vector3.zero, Time.deltaTime * 5f);
+                }
 
-            switch (_state)
-            {
-                case GolemState.Patrol:
-                    UpdatePatrol(distToPlayer);
-                    break;
-                case GolemState.Chase:
-                    UpdateChase(distToPlayer);
-                    break;
-                case GolemState.Attack:
-                    UpdateAttack(distToPlayer);
-                    break;
+                float distToPlayer = _player != null
+                    ? Vector3.Distance(transform.position, _player.position)
+                    : float.MaxValue;
+
+                switch (_state)
+                {
+                    case GolemState.Patrol:
+                        UpdatePatrol(distToPlayer);
+                        break;
+                    case GolemState.Chase:
+                        UpdateChase(distToPlayer);
+                        break;
+                    case GolemState.Attack:
+                        UpdateAttack(distToPlayer);
+                        break;
+                }
             }
         }
 
@@ -272,35 +281,38 @@ namespace Tartaria.AI
 
         void UpdatePatrol(float distToPlayer)
         {
-            // Sprint Batch 3: Perception cone check
-            if (_player != null && CanSeePlayer())
+            using (s_PatrolMarker.Auto())
             {
-                _lastKnownPlayerPosition = _player.position;
-                TransitionTo(GolemState.Chase);
-                return;
-            }
-
-            if (_hasNavMesh)
-            {
-                if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance)
+                // Sprint Batch 3: Perception cone check
+                if (_player != null && CanSeePlayer())
                 {
-                    // Reached patrol point, wait then pick new target
-                    if (Time.time - _stateEnterTime >= patrolWaitTime)
-                        SetNewPatrolTarget();
+                    _lastKnownPlayerPosition = _player.position;
+                    TransitionTo(GolemState.Chase);
+                    return;
                 }
-            }
-            else
-            {
-                // Fallback: walk toward patrol target
-                Vector3 dir = (_patrolTarget - transform.position).normalized;
-                dir.y = 0f;
-                transform.position += dir * moveSpeed * Time.deltaTime;
-                transform.forward = dir;
 
-                if (Vector3.Distance(transform.position, _patrolTarget) < 1f)
+                if (_hasNavMesh)
                 {
-                    if (Time.time - _stateEnterTime >= patrolWaitTime)
-                        SetNewPatrolTarget();
+                    if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance)
+                    {
+                        // Reached patrol point, wait then pick new target
+                        if (Time.time - _stateEnterTime >= patrolWaitTime)
+                            SetNewPatrolTarget();
+                    }
+                }
+                else
+                {
+                    // Fallback: walk toward patrol target
+                    Vector3 dir = (_patrolTarget - transform.position).normalized;
+                    dir.y = 0f;
+                    transform.position += dir * moveSpeed * Time.deltaTime;
+                    transform.forward = dir;
+
+                    if (Vector3.Distance(transform.position, _patrolTarget) < 1f)
+                    {
+                        if (Time.time - _stateEnterTime >= patrolWaitTime)
+                            SetNewPatrolTarget();
+                    }
                 }
             }
         }
@@ -328,67 +340,73 @@ namespace Tartaria.AI
 
         void UpdateChase(float distToPlayer)
         {
-            // Sprint Batch 3: Track last known position
-            if (_player != null && CanSeePlayer())
+            using (s_ChaseMarker.Auto())
             {
-                _lastKnownPlayerPosition = _player.position;
-                _lostTargetTime = 0f;
-            }
-            else
-            {
-                // Lost line of sight — continue to last known position
-                _lostTargetTime += Time.deltaTime;
-                if (_lostTargetTime >= lostTargetSearchDuration)
+                // Sprint Batch 3: Track last known position
+                if (_player != null && CanSeePlayer())
                 {
-                    Debug.Log("[MudGolem] Lost player for 8s, returning to patrol");
-                    TransitionTo(GolemState.Patrol);
+                    _lastKnownPlayerPosition = _player.position;
+                    _lostTargetTime = 0f;
+                }
+                else
+                {
+                    // Lost line of sight — continue to last known position
+                    _lostTargetTime += Time.deltaTime;
+                    if (_lostTargetTime >= lostTargetSearchDuration)
+                    {
+                        Debug.Log("[MudGolem] Lost player for 8s, returning to patrol");
+                        TransitionTo(GolemState.Patrol);
+                        return;
+                    }
+                }
+
+                if (distToPlayer <= attackRange)
+                {
+                    TransitionTo(GolemState.Attack);
                     return;
                 }
-            }
 
-            if (distToPlayer <= attackRange)
-            {
-                TransitionTo(GolemState.Attack);
-                return;
-            }
+                if (_player == null) return;
 
-            if (_player == null) return;
+                Vector3 targetPos = _lostTargetTime > 0f ? _lastKnownPlayerPosition : _player.position;
 
-            Vector3 targetPos = _lostTargetTime > 0f ? _lastKnownPlayerPosition : _player.position;
-
-            if (_hasNavMesh)
-            {
-                _agent.SetDestination(targetPos);
-            }
-            else
-            {
-                Vector3 dir = (targetPos - transform.position).normalized;
-                dir.y = 0f;
-                transform.position += dir * chaseSpeed * Time.deltaTime;
-                transform.forward = dir;
+                if (_hasNavMesh)
+                {
+                    _agent.SetDestination(targetPos);
+                }
+                else
+                {
+                    Vector3 dir = (targetPos - transform.position).normalized;
+                    dir.y = 0f;
+                    transform.position += dir * chaseSpeed * Time.deltaTime;
+                    transform.forward = dir;
+                }
             }
         }
 
         void UpdateAttack(float distToPlayer)
         {
-            if (distToPlayer > attackRange)
+            using (s_AttackMarker.Auto())
             {
-                TransitionTo(GolemState.Chase);
-                return;
-            }
+                if (distToPlayer > attackRange)
+                {
+                    TransitionTo(GolemState.Chase);
+                    return;
+                }
 
-            if (_player == null) return;
+                if (_player == null) return;
 
-            // Face player
-            Vector3 lookDir = (_player.position - transform.position).normalized;
-            lookDir.y = 0f;
-            transform.forward = lookDir;
+                // Face player
+                Vector3 lookDir = (_player.position - transform.position).normalized;
+                lookDir.y = 0f;
+                transform.forward = lookDir;
 
-            // Attack on cooldown
-            if (Time.time - _lastAttackTime >= attackCooldown)
-            {
-                _lastAttackTime = Time.time;
-                PerformMeleeAttack();
+                // Attack on cooldown
+                if (Time.time - _lastAttackTime >= attackCooldown)
+                {
+                    _lastAttackTime = Time.time;
+                    PerformMeleeAttack();
+                }
             }
         }
 
