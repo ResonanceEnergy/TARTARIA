@@ -24,6 +24,15 @@ namespace Tartaria.Gameplay
     {
         public static CraftingSystem Instance { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("CraftingSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<CraftingSystem>();
+        }
+
         // ─── Events ───
         public event Action<string> OnRecipeDiscovered;       // recipeId
         public event Action<string> OnItemCrafted;            // recipeId

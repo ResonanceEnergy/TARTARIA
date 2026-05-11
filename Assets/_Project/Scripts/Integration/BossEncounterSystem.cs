@@ -69,6 +69,15 @@ namespace Tartaria.Integration
             DontDestroyOnLoad(gameObject);
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("BossEncounterSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<BossEncounterSystem>();
+        }
+
         void OnDestroy()
         {
             if (Instance == this) Instance = null;

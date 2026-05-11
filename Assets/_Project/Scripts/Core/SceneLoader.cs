@@ -24,6 +24,15 @@ namespace Tartaria.Core
 
         bool _loaded;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("SceneLoader");
+            DontDestroyOnLoad(go);
+            go.AddComponent<SceneLoader>();
+        }
+
         static void Canary(string msg)
         {
             try

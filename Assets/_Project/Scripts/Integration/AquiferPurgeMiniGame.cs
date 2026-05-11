@@ -26,6 +26,15 @@ namespace Tartaria.Integration
     {
         public static AquiferPurgeMiniGame Instance { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("AquiferPurgeMiniGame");
+            DontDestroyOnLoad(go);
+            go.AddComponent<AquiferPurgeMiniGame>();
+        }
+
         // ─── Constants ───────────────────────────────
 
         public const int TotalCorruptionLayers = 3;

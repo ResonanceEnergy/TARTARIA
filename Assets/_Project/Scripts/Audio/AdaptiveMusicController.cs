@@ -49,6 +49,15 @@ namespace Tartaria.Audio
         int _currentZone = -1;
         float _zoneBaseFreq = 432f;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("AdaptiveMusicController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<AdaptiveMusicController>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

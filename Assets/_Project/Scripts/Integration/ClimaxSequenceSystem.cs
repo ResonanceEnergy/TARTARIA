@@ -44,6 +44,15 @@ namespace Tartaria.Integration
 
         public bool IsPlaying => _isPlaying;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("ClimaxSequenceSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<ClimaxSequenceSystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

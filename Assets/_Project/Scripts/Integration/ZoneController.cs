@@ -47,6 +47,15 @@ namespace Tartaria.Integration
         static readonly Color SunColorCool = new Color(0.8f, 0.75f, 0.7f);
         static readonly Color SunColorWarm = new Color(1f, 0.92f, 0.75f);
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("ZoneController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<ZoneController>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

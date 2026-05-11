@@ -249,23 +249,114 @@ namespace Tartaria.Editor
             // ── Phase 9j: Asset Integration (P3) — Apply downloaded FREE assets: Capoeira animations + Player mesh ──
             BuildReport.RunPhase("Phase 9j/18: Asset Integration (Capoeira + Player Mesh)", () =>
             {
-                // Check if assets exist before integration
+                bool hasKayKit  = System.IO.File.Exists("Assets/_Project/Models/Characters/KayKit/Rogue_Hooded.fbx");
                 bool hasCapoeira = System.IO.Directory.Exists("Assets/_Project/Models/Animations/Capoeira");
 
-                if (hasCapoeira)
+                // Skip Capoeira (Humanoid rig) when KayKit (Generic) is the avatar — it can't drive a Generic skeleton
+                // and only litters the prefab with an unused humanoid AnimatorController.
+                if (hasCapoeira && !hasKayKit)
                 {
                     AssetIntegrationTool.IntegrateCapoeiraAnimations();
+                }
+                else if (hasCapoeira && hasKayKit)
+                {
+                    Debug.Log("[OneClickBuild] KayKit Generic rig active — skipping Capoeira humanoid controller (incompatible).");
                 }
                 else
                 {
                     Debug.LogWarning("[OneClickBuild] Capoeira animations not found - skipping animation integration");
                 }
 
-                // ALWAYS restore Player to capsule (remove any wrong mesh that was applied)
-                // Player is ELARA VOSS (female) - Player_Mesh.fbx was male, keeping capsule until correct model
-                RestorePlayerCapsule.RestoreCapsule();
+                // Replace procedural capsule with KayKit Rogue_Hooded (gender-neutral hooded silhouette).
+                // Falls back to capsule if KayKit FBX missing.
+                if (hasKayKit)
+                {
+                    AssetIntegrationTool.ReplacePlayerMeshModel();
+                }
+                else
+                {
+                    RestorePlayerCapsule.RestoreCapsule();
+                }
 
                 AssetIntegrationTool.ValidateCustomShaders();
+            });
+
+            // ── Phase 9j2: Humanoid Mesh Auto-Bind (closes §8 items 5 + 8) ──
+            //    Drop a Mixamo female humanoid FBX into Assets/_Project/Models/Characters/
+            //    and Player.prefab gets a real SkinnedMeshRenderer. Silently skips when
+            //    the drop-zone is empty so the build stays green pre-asset-acquisition.
+            BuildReport.RunPhase("Phase 9j2/19: Humanoid Mesh Auto-Bind", () =>
+            {
+                HumanoidAutoBinder.BindIfAvailable();
+            });
+
+            // ── Phase 9j3: KayKit Adventurers Import (chibi character pack) ──
+            //    Copies the FREE KayKit Adventurers pack into the project tree
+            //    (models, textures, materials, prefabs). Uses Generic rig so it
+            //    coexists with HumanoidAutoBinder. Silently no-ops when the pack
+            //    folder is missing.
+            BuildReport.RunPhase("Phase 9j3/19: KayKit Adventurers Import", () =>
+            {
+                KayKitImporter.ImportAll();
+            });
+
+            // ── Phase 9j4: KayKit Extra Packs (Tools, Forest, Skeletons, Anims) ──
+            //    Imports the additional FREE KayKit packs. Each pack is
+            //    independently optional and silently no-ops when its source
+            //    folder is missing.
+            BuildReport.RunPhase("Phase 9j4/19: KayKit Extra Packs Import", () =>
+            {
+                KayKitPacksImporter.ImportAll();
+            });
+
+            // ── Phase 9j5: KayKit Deep Integration ──
+            //    Imports adventurer weapons/gear, mannequin chars, sets up anim
+            //    FBX clip flags, builds shared AnimatorControllers (Medium +
+            //    Large), assigns them to every char prefab and attaches a
+            //    class-appropriate weapon under each character's right hand.
+            BuildReport.RunPhase("Phase 9j5/19: KayKit Deep Integration", () =>
+            {
+                KayKitDeepIntegrator.Run();
+            });
+
+            // ── Phase 9j6: Generate stub scenes for Moons 2–13 ─
+            //    Creates an Assets/_Project/Scenes/Moons/{ZoneName}.unity stub
+            //    for every moon that doesn't yet have one. Each stub has a
+            //    ground plane, sun, fog/ambient tuned from ZoneDefinitionFactory,
+            //    a PlayerSpawn marker, and a MainCamera.
+            BuildReport.RunPhase("Phase 9j6/19: Moon Scenes Factory (stubs for Moons 2–13)", () =>
+            {
+                MoonScenesFactory.CreateAll();
+            });
+
+            // ── Phase 9j7: Dress every moon scene with KayKit characters + props ──
+            //    Places adventurers / skeletons / forest / tools props into
+            //    Echohaven AND every Moon 2–13 stub so all 13 zones contain
+            //    visible content. Idempotent — recreates a single
+            //    "KayKit_Dressing" root per scene each pass.
+            BuildReport.RunPhase("Phase 9j7/19: KayKit Dressing (all 13 moons)", () =>
+            {
+                EchohavenKayKitDressing.DressAllMoons();
+            });
+
+            // ── Phase 9j8: Per-Moon definitions, quest stubs, runtime bootstrappers ──
+            //    Authors:
+            //      • 13 MoonDefinition SOs in Config/Moons/
+            //      • 12 Quest stubs (Moon 2-13) in Config/Quests/
+            //      • Drops a MoonRuntimeBootstrapper into every Moon 2-13 stub scene
+            //        wired to the matching MoonDefinition (auto-applies fog, spawns
+            //        player, activates per-moon quest at Start).
+            BuildReport.RunPhase("Phase 9j8/19: Moon Definitions + Quest Stubs + Bootstrappers", () =>
+            {
+                MoonDefinitionsFactory.Run();
+            });
+
+            // ── Phase 9j9: Echohaven Combat Arena ───────────────────────────────
+            //    Drops a scripted 3-wave golem encounter into Echohaven so the
+            //    player gets immediate, escalating combat on scene load.
+            BuildReport.RunPhase("Phase 9j9/19: Echohaven Combat Arena", () =>
+            {
+                EchohavenCombatArenaAttacher.Attach();
             });
 
             // ── Phase 9k: Asset Framework Bootstrap (Mixer + Snapshots + Cue Library + default profiles) ──
@@ -275,6 +366,14 @@ namespace Tartaria.Editor
             BuildReport.RunPhase("Phase 9k/19: Asset Framework Bootstrap", () =>
             {
                 AssetFrameworkFactory.BootstrapAll();
+            });
+
+            // ── Phase 9k2: Bind any designer-dropped ambient music tracks ──
+            //    Drop .wav/.ogg files into Assets/_Project/Audio/Ambience/ and
+            //    they get auto-attached to the AudioAmbience scene root.
+            BuildReport.RunPhase("Phase 9k2/19: Ambience Auto-Bind", () =>
+            {
+                AmbienceAutoBinder.BindAll();
             });
 
             // ── Phase 9l: Slice Assets — Quest_AwakenStarDome + Dialogue_Anastasia_AwakenStarDome ──
@@ -440,22 +539,9 @@ namespace Tartaria.Editor
 
         static void ConfigureBuildSettings()
         {
-            var scenes = new System.Collections.Generic.List<EditorBuildSettingsScene>();
-
-            TryAddScene(scenes, "Assets/_Project/Scenes/Boot.unity");
-            TryAddScene(scenes, "Assets/_Project/Scenes/Echohaven_VerticalSlice.unity");
-            TryAddScene(scenes, "Assets/_Project/Scenes/UI_Overlay.unity");
-
-            EditorBuildSettings.scenes = scenes.ToArray();
-            Debug.Log("[Tartaria] Build settings: Boot(0) -> Echohaven(1) -> UI_Overlay(2)");
-        }
-
-        static void TryAddScene(System.Collections.Generic.List<EditorBuildSettingsScene> scenes, string path)
-        {
-            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(path) != null)
-                scenes.Add(new EditorBuildSettingsScene(path, true));
-            else
-                Debug.LogWarning($"[Tartaria] Scene not found: {path}");
+            // Delegate to MoonScenesFactory so Build Settings always reflects
+            // the canonical Boot → Echohaven → Moons 2–13 → UI_Overlay order.
+            MoonScenesFactory.UpdateBuildSettings();
         }
     }
 }

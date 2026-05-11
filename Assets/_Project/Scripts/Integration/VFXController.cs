@@ -52,6 +52,15 @@ namespace Tartaria.Integration
         static readonly Color MudBrown = new(0.4f, 0.3f, 0.2f);
         static readonly Color CelestialWhite = new(1f, 0.95f, 0.85f);
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("VFXController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<VFXController>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

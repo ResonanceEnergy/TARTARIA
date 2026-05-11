@@ -398,6 +398,20 @@ namespace Tartaria.Input
             }
 
             _isSprinting = _sprintAction != null ? _sprintAction.IsPressed() : (Keyboard.current?.leftShiftKey.isPressed ?? false);
+            // Stamina gate (best-effort via reflection so we avoid an Input→Gameplay asmdef edge).
+            if (_isSprinting)
+            {
+                var t = System.Type.GetType("Tartaria.Gameplay.PlayerStamina, Tartaria.Gameplay");
+                if (t != null)
+                {
+                    var inst = t.GetProperty("Instance")?.GetValue(null);
+                    if (inst != null)
+                    {
+                        var s = t.GetProperty("Stamina")?.GetValue(inst);
+                        if (s is float f && f <= 0f) _isSprinting = false;
+                    }
+                }
+            }
 
             // Refresh camera ref if lost (zone transition, cutscene swap)
             if (_mainCamera == null)

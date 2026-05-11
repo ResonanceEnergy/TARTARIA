@@ -55,6 +55,15 @@ namespace Tartaria.Core
         public int ForgeTokens => _forgeTokens;
         public int ResonanceShards => _resonanceShards;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("EconomySystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<EconomySystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

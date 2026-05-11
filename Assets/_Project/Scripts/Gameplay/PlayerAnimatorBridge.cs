@@ -27,7 +27,6 @@ namespace Tartaria.Gameplay
         {
             _animator = GetComponent<Animator>();
 
-            // Auto-find references if not assigned
             if (inputHandler == null)
                 inputHandler = GetComponent<PlayerInputHandler>();
 
@@ -35,31 +34,29 @@ namespace Tartaria.Gameplay
                 characterController = GetComponent<CharacterController>();
         }
 
+        void OnEnable()  { PlayerCombat.OnSwing += HandleSwing; }
+        void OnDisable() { PlayerCombat.OnSwing -= HandleSwing; }
+
+        void HandleSwing()
+        {
+            if (_animator != null) _animator.SetTrigger(AttackId);
+        }
+
         void Update()
         {
-            if (_animator == null || inputHandler == null)
-                return;
+            if (_animator == null) return;
 
-            // Update Speed parameter (0 = idle, 1 = walking)
-            float speed = inputHandler.IsMoving ? 1f : 0f;
+            // Day-? sprint blends with stamina; use 1.5 multiplier when sprinting.
+            float speed = 0f;
+            if (inputHandler != null && inputHandler.IsMoving)
+                speed = (PlayerStamina.Instance != null && PlayerStamina.Instance.IsSprinting) ? 1.5f : 1f;
             _animator.SetFloat(SpeedId, speed);
 
-            // Update IsGrounded
             bool isGrounded = characterController != null ? characterController.isGrounded : true;
             _animator.SetBool(IsGroundedId, isGrounded);
 
-            // Trigger Jump (if input system has jump input in the future)
-            // For now, check vertical velocity
             if (characterController != null && characterController.velocity.y > 1f)
-            {
                 _animator.SetTrigger(JumpId);
-            }
-
-            // Attack trigger (placeholder - wire to combat system later)
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Mouse0) || UnityEngine.Input.GetKeyDown(KeyCode.F))
-            {
-                _animator.SetTrigger(AttackId);
-            }
         }
     }
 }

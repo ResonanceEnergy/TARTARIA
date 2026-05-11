@@ -29,6 +29,15 @@ namespace Tartaria.Gameplay
 
         public event Action<SkillId> OnSkillUnlocked;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("SkillTreeSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<SkillTreeSystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

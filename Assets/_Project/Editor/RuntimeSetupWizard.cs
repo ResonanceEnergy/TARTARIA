@@ -45,7 +45,7 @@ namespace Tartaria.Editor
             _setupDayNight = EditorGUILayout.Toggle("1. Attach DayNightCycleController to Sun", _setupDayNight);
             _bakeOcclusion = EditorGUILayout.Toggle("2. Bake Occlusion Culling Data", _bakeOcclusion);
             _setupLODs = EditorGUILayout.Toggle("3. Add LODGroup to 3 Buildings", _setupLODs);
-            _createGolemPrefab = EditorGUILayout.Toggle("4. Create MudGolem Prefab (Placeholder)", _createGolemPrefab);
+            _createGolemPrefab = EditorGUILayout.Toggle("4. Create MudGolem Prefab", _createGolemPrefab);
             _wireUI = EditorGUILayout.Toggle("5. Wire Tutorial/Subtitle UI Panels", _wireUI);
             
             GUILayout.Space(20);
@@ -239,50 +239,15 @@ namespace Tartaria.Editor
                 return;
             }
             
-            // Create placeholder golem
-            GameObject golem = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            golem.name = "MudGolem";
-            
-            // Scale to 2x2x2 (human-sized)
-            golem.transform.localScale = new Vector3(2f, 2f, 2f);
-            
-            // Set material to brown/mud color
-            var renderer = golem.GetComponent<MeshRenderer>();
-            var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            material.color = new Color(0.4f, 0.3f, 0.2f, 1f); // muddy brown
-            renderer.material = material;
-            
-            // Add MudGolemAI component
-            var ai = golem.AddComponent<MudGolemAI>();
-            
-            // Add NavMeshAgent (will be configured at runtime)
-            var agent = golem.AddComponent<UnityEngine.AI.NavMeshAgent>();
-            agent.speed = 3.5f;
-            agent.angularSpeed = 120f;
-            agent.acceleration = 8f;
-            agent.stoppingDistance = 2.5f;
-            agent.radius = 1f;
-            agent.height = 2f;
-            
-            // Add capsule collider
-            var collider = golem.AddComponent<CapsuleCollider>();
-            collider.height = 2f;
-            collider.radius = 1f;
-            collider.center = Vector3.zero;
-            
-            // Set layer to Enemy (12)
-            golem.layer = LayerMask.NameToLayer("Enemy");
-            if (golem.layer == 0) // Fallback if layer doesn't exist
-            {
-                golem.layer = 12;
-            }
-            
+            // Build a proper procedural Mud Golem (torso/head/eyes/arms/legs)
+            GameObject golem = Tartaria.AI.MudGolemAI.BuildProcedural(Vector3.zero, Quaternion.identity);
+
             // Save as prefab
             GameObject prefab = PrefabUtility.SaveAsPrefabAsset(golem, prefabPath);
-            
+
             // Clean up scene instance
             DestroyImmediate(golem);
-            
+
             Debug.Log($"[RuntimeSetup]   ✓ MudGolem prefab created at {prefabPath}");
         }
 

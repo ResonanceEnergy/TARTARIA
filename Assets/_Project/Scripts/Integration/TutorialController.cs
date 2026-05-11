@@ -49,6 +49,15 @@ namespace Tartaria.Integration
             "Defeat Mud Golems to protect Echohaven"
         };
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("TutorialController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<TutorialController>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

@@ -1111,7 +1111,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                // Generate a procedural tone as placeholder
+                // Procedural fallback: synthesize a low drone matching the requested ambience type
                 src.clip = GenerateAmbientTone(sfxName);
                 src.Play();
             }
@@ -1221,7 +1221,7 @@ namespace Tartaria.Integration
             }
         }
 
-        void SpawnMudGolem(Vector3 pos)
+        public void SpawnMudGolem(Vector3 pos)
         {
             float y = SampleGroundY(pos.x, pos.z);
             if (!float.IsNaN(y)) pos.y = y + 0.1f;
@@ -1249,6 +1249,10 @@ namespace Tartaria.Integration
                 health.MaxHealth = 50f;
                 health.CurrentHealth = 50f;
             }
+
+            // Day-2: real chase/attack AI on every spawned golem (was previously inert).
+            if (golem.GetComponent<Tartaria.AI.MudGolemAI>() == null)
+                golem.AddComponent<Tartaria.AI.MudGolemAI>();
 
             // Set enemy layer
             int enemyLayer = LayerMask.NameToLayer("Enemy");
@@ -1723,6 +1727,12 @@ namespace Tartaria.Integration
         public float CurrentHealth = 50f;
         bool _dead;
 
+        /// <summary>Static event fired when ANY golem dies — used by combat arena wave tracking.</summary>
+        public static event System.Action<MudGolemHealth> OnAnyGolemDied;
+
+        // Run-scoped kill counter to drive C02 progressive achievement.
+        static int _golemKillCount;
+
         public void TakeDamage(float amount)
         {
             if (_dead) return;
@@ -1730,6 +1740,17 @@ namespace Tartaria.Integration
             AudioManager.Instance?.PlaySFX("CombatHit", transform.position);
             if (CurrentHealth <= 0f)
                 Die();
+        }
+
+        /// <summary>
+        /// Day-2 bridge: called by Tartaria.AI.MudGolemAI via SendMessage when its
+        /// internal FSM kills the golem. Avoids an asmdef cycle (AI -> Integration).
+        /// </summary>
+        public void KillFromAI()
+        {
+            if (_dead) return;
+            CurrentHealth = 0f;
+            Die();
         }
 
         void Die()
@@ -1742,6 +1763,20 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayEnemyDissolution(transform.position);
             AudioManager.Instance?.PlaySFX("EnemyDeath", transform.position);
             HapticFeedbackManager.Instance?.PlayGolemDeath();
+
+            // Day-11: drop a pickup so combat has loot.
+            LootDropper.Spawn(transform.position + Vector3.up * 0.4f);
+
+            // Achievements: C01 first kill, C02 progressive (25 golems).
+            var ach = AchievementSystem.Instance;
+            if (ach != null)
+            {
+                ach.Unlock("C01");
+                _golemKillCount++;
+                ach.SetProgress("C02", Mathf.Clamp01(_golemKillCount / 25f));
+            }
+
+            try { OnAnyGolemDied?.Invoke(this); } catch { /* listener errors should not block death */ }
 
             Destroy(gameObject, 0.15f);
         }

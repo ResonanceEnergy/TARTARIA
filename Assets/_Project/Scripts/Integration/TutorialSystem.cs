@@ -46,6 +46,15 @@ namespace Tartaria.Integration
         public int CurrentStepIndex => _currentIndex;
         public bool IsComplete => _tutorialFinished;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("TutorialSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<TutorialSystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

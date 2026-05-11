@@ -48,6 +48,15 @@ namespace Tartaria.Gameplay
         public ExcavationSite ActiveSite => _activeSite;
         public float DigProgress => _digProgress;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("ExcavationSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<ExcavationSystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

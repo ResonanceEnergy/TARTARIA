@@ -49,6 +49,15 @@ namespace Tartaria.Integration
         public event Action OnEventCompleted;
         public event Action<int> OnMemoryZoneChanged;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("DayOutOfTimeController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<DayOutOfTimeController>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

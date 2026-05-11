@@ -27,6 +27,16 @@ namespace Tartaria.Save
 
         [SerializeField] float autoSaveIntervalSeconds = 10f;
 
+        // Day-9: self-bootstrap so the ~12 callsites of MarkDirty() actually persist.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("SaveManager");
+            DontDestroyOnLoad(go);
+            go.AddComponent<SaveManager>();
+        }
+
         SaveData _currentSave;
         float _autoSaveTimer;
         bool _isDirty;
@@ -60,6 +70,20 @@ namespace Tartaria.Save
 
         void Update()
         {
+            // ── Quicksave / Quickload hotkeys (F5 / F9) ──
+            // Uses the new InputSystem when present, falls back to legacy Input.
+#if ENABLE_INPUT_SYSTEM
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null)
+            {
+                if (kb.f5Key.wasPressedThisFrame) { QuickSave(); }
+                if (kb.f9Key.wasPressedThisFrame) { QuickLoad(); }
+            }
+#else
+            if (Input.GetKeyDown(KeyCode.F5)) { QuickSave(); }
+            if (Input.GetKeyDown(KeyCode.F9)) { QuickLoad(); }
+#endif
+
             if (!_isDirty) return;
 
             _autoSaveTimer += Time.deltaTime;
@@ -68,6 +92,21 @@ namespace Tartaria.Save
                 Save();
                 _autoSaveTimer = 0f;
             }
+        }
+
+        /// <summary>F5 — force-save immediately and toast the player.</summary>
+        public void QuickSave()
+        {
+            MarkDirty();
+            Save();
+            Tartaria.UI.HUDController.Instance?.ShowAchievementToast("Quicksave");
+        }
+
+        /// <summary>F9 — re-read save from disk and broadcast OnAfterLoad to all subsystems.</summary>
+        public void QuickLoad()
+        {
+            LoadOrCreate();
+            Tartaria.UI.HUDController.Instance?.ShowAchievementToast("Quickload");
         }
 
         void OnApplicationFocus(bool hasFocus)

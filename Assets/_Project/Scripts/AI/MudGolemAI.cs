@@ -76,6 +76,125 @@ namespace Tartaria.AI
             Debug.Log($"[MudGolem] Spawned at {transform.position}, HP={_currentHealth}, NavMesh={_hasNavMesh}");
         }
 
+        // ─── Procedural visual builder ───────────────
+        /// <summary>
+        /// Builds a fully-formed Mud Golem GameObject from primitives:
+        /// torso, head, two arms, two legs, glowing eyes, and a muddy material.
+        /// Adds NavMeshAgent + CapsuleCollider + Rigidbody + MudGolemAI so the
+        /// returned object is gameplay-ready. Used by both the runtime spawn
+        /// fallback and the editor RuntimeSetupWizard.
+        /// </summary>
+        public static GameObject BuildProcedural(Vector3 position, Quaternion rotation)
+        {
+            var root = new GameObject("MudGolem");
+            root.transform.SetPositionAndRotation(position, rotation);
+
+            // Materials
+            var mudShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            var mudMat = new Material(mudShader) { name = "MudGolem_Body" };
+            mudMat.color = new Color(0.32f, 0.24f, 0.16f);
+            if (mudMat.HasProperty("_Smoothness")) mudMat.SetFloat("_Smoothness", 0.15f);
+            if (mudMat.HasProperty("_Metallic"))   mudMat.SetFloat("_Metallic", 0.05f);
+
+            var eyeMat = new Material(mudShader) { name = "MudGolem_Eye" };
+            eyeMat.color = new Color(1.0f, 0.45f, 0.10f);
+            if (eyeMat.HasProperty("_EmissionColor"))
+            {
+                eyeMat.EnableKeyword("_EMISSION");
+                eyeMat.SetColor("_EmissionColor", new Color(2.4f, 1.0f, 0.2f));
+            }
+
+            // Torso (squashed sphere)
+            var torso = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            torso.name = "Torso";
+            torso.transform.SetParent(root.transform, false);
+            torso.transform.localPosition = new Vector3(0f, 1.0f, 0f);
+            torso.transform.localScale = new Vector3(1.4f, 1.6f, 1.0f);
+            torso.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+            Object.Destroy(torso.GetComponent<Collider>());
+
+            // Head (cube)
+            var head = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            head.name = "Head";
+            head.transform.SetParent(root.transform, false);
+            head.transform.localPosition = new Vector3(0f, 2.05f, 0f);
+            head.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+            head.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+            Object.Destroy(head.GetComponent<Collider>());
+
+            // Eyes
+            for (int i = 0; i < 2; i++)
+            {
+                var eye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                eye.name = i == 0 ? "Eye_L" : "Eye_R";
+                eye.transform.SetParent(head.transform, false);
+                eye.transform.localPosition = new Vector3(i == 0 ? -0.22f : 0.22f, 0.05f, -0.46f);
+                eye.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                eye.GetComponent<MeshRenderer>().sharedMaterial = eyeMat;
+                Object.Destroy(eye.GetComponent<Collider>());
+            }
+
+            // Arms (cylinders)
+            for (int i = 0; i < 2; i++)
+            {
+                var arm = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                arm.name = i == 0 ? "Arm_L" : "Arm_R";
+                arm.transform.SetParent(root.transform, false);
+                arm.transform.localPosition = new Vector3(i == 0 ? -0.95f : 0.95f, 1.0f, 0f);
+                arm.transform.localScale = new Vector3(0.32f, 0.7f, 0.32f);
+                arm.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+                Object.Destroy(arm.GetComponent<Collider>());
+
+                // Fist
+                var fist = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                fist.name = "Fist";
+                fist.transform.SetParent(arm.transform, false);
+                fist.transform.localPosition = new Vector3(0f, -1.05f, 0f);
+                fist.transform.localScale = new Vector3(1.6f, 0.7f, 1.6f);
+                fist.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+                Object.Destroy(fist.GetComponent<Collider>());
+            }
+
+            // Legs (cubes)
+            for (int i = 0; i < 2; i++)
+            {
+                var leg = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                leg.name = i == 0 ? "Leg_L" : "Leg_R";
+                leg.transform.SetParent(root.transform, false);
+                leg.transform.localPosition = new Vector3(i == 0 ? -0.4f : 0.4f, 0.0f, 0f);
+                leg.transform.localScale = new Vector3(0.55f, 1.0f, 0.55f);
+                leg.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+                Object.Destroy(leg.GetComponent<Collider>());
+            }
+
+            // Gameplay components
+            var collider = root.AddComponent<CapsuleCollider>();
+            collider.height = 2.6f;
+            collider.radius = 0.85f;
+            collider.center = new Vector3(0f, 1.0f, 0f);
+
+            var rb = root.AddComponent<Rigidbody>();
+            rb.mass = 80f;
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+            var agent = root.AddComponent<NavMeshAgent>();
+            agent.speed = 3.5f;
+            agent.angularSpeed = 240f;
+            agent.acceleration = 10f;
+            agent.stoppingDistance = 2.5f;
+            agent.radius = 0.85f;
+            agent.height = 2.6f;
+
+            // Layer
+            int enemyLayer = LayerMask.NameToLayer("Enemy");
+            root.layer = enemyLayer >= 0 ? enemyLayer : 12;
+            root.tag = "Enemy";
+
+            root.AddComponent<MudGolemAI>();
+            return root;
+        }
+
         void Update()
         {
             if (_state == GolemState.Dead) return;
@@ -282,6 +401,11 @@ namespace Tartaria.AI
 
             // Award RS via GameEvents
             GameEvents.FireRSChange(5f);
+
+            // Notify combat arena / moon activator wave-tracking via the
+            // MudGolemHealth bridge (Integration assembly) using SendMessage
+            // to avoid an asmdef cycle (AI must NOT reference Integration).
+            SendMessage("KillFromAI", SendMessageOptions.DontRequireReceiver);
 
             // Destroy after 2s
             Destroy(gameObject, 2f);

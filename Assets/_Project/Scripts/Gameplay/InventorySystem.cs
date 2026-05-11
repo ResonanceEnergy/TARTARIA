@@ -34,6 +34,15 @@ namespace Tartaria.Gameplay
 
         readonly Dictionary<string, int> _items = new();
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("InventorySystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<InventorySystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

@@ -87,6 +87,15 @@ namespace Tartaria.Integration
 
         // ─── Lifecycle ───────────────────────────────
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("ContinentalRailSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<ContinentalRailSystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

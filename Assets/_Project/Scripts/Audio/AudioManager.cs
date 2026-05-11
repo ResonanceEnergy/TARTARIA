@@ -33,7 +33,7 @@ namespace Tartaria.Audio
         [SerializeField, Tooltip("Combat snapshot — typically ducks music, boosts SFX.")]
         AudioMixerSnapshot combatSnapshot;
         [SerializeField, Min(0f), Tooltip("Crossfade duration (seconds) between Exploration and Combat snapshots.")]
-        float snapshotTransitionSeconds = 1.0f;
+        float snapshotTransitionSeconds = 1.5f;
 
         [SerializeField, Tooltip("If true, snapshots auto-transition based on GameState (Combat -> Combat snapshot, else Exploration).")]
         bool autoTransitionWithGameState = true;
@@ -178,6 +178,20 @@ namespace Tartaria.Audio
             if (snapshot == null || snapshot == _activeSnapshot) return;
             snapshot.TransitionTo(snapshotTransitionSeconds);
             _activeSnapshot = snapshot;
+        }
+
+        /// <summary>
+        /// Blends between two snapshots with explicit weights over <paramref name="seconds"/>.
+        /// Use for partial transitions (e.g. tense exploration = 70% Exploration + 30% Combat).
+        /// Weights are auto-normalised; pass-through to <c>AudioMixer.TransitionToSnapshots</c>.
+        /// </summary>
+        public void BlendSnapshots(AudioMixerSnapshot a, AudioMixerSnapshot b, float weightB, float seconds = -1f)
+        {
+            if (mixer == null || a == null || b == null) return;
+            weightB = Mathf.Clamp01(weightB);
+            float t = seconds < 0f ? snapshotTransitionSeconds : Mathf.Max(0f, seconds);
+            mixer.TransitionToSnapshots(new[] { a, b }, new[] { 1f - weightB, weightB }, t);
+            _activeSnapshot = weightB > 0.5f ? b : a;
         }
 
         // ─── Public API ──────────────────────────────

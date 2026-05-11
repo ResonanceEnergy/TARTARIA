@@ -19,6 +19,15 @@ namespace Tartaria.Integration
     {
         public static BellTowerSyncMiniGame Instance { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("BellTowerSyncMiniGame");
+            DontDestroyOnLoad(go);
+            go.AddComponent<BellTowerSyncMiniGame>();
+        }
+
         // ─── Constants ───────────────────────────────
 
         public const int TotalTowers = 12;
