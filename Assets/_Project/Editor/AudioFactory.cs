@@ -201,5 +201,63 @@ namespace Tartaria.Editor
                 AssetDatabase.CreateFolder(parent, folder);
             }
         }
+
+        // ── VO Placeholder Generation ─────────────────────────────────────────
+
+        /// <summary>
+        /// Generates 12 short procedural "VO" beep tones (200ms, varying pitch 220-660Hz).
+        /// Used as placeholder dialogue audio until real voice lines are recorded.
+        /// </summary>
+        public static void BuildVOPlaceholders()
+        {
+            const string voDir = "Assets/_Project/Audio/VO/Placeholder";
+            EnsureDir("Assets/_Project/Audio/VO");
+            EnsureDir(voDir);
+
+            float[] pitches = { 220f, 247f, 294f, 330f, 370f, 440f, 494f, 523f, 587f, 659f, 698f, 784f };
+
+            for (int i = 0; i < 12; i++)
+            {
+                string path = $"{voDir}/vo_{i:D2}.wav";
+                if (File.Exists(path))
+                {
+                    Debug.Log($"[AudioFactory] VO placeholder {i:D2} already exists, skipping.");
+                    continue;
+                }
+
+                float[] beep = BuildVOBeep(0.2f, pitches[i]);
+                WriteWav(path, beep);
+            }
+
+            AssetDatabase.Refresh();
+            Debug.Log($"[AudioFactory] 12 VO placeholder beeps generated at {voDir}");
+        }
+
+        static float[] BuildVOBeep(float seconds, float freq)
+        {
+            int n = (int)(seconds * Sample);
+            var samples = new float[n];
+
+            for (int i = 0; i < n; i++)
+            {
+                float t = (float)i / Sample;
+                float s = Mathf.Sin(2 * Mathf.PI * freq * t);
+
+                // ADSR envelope (quick attack, short sustain, quick release)
+                float env;
+                float attack = 0.02f;
+                float release = 0.05f;
+                if (t < attack)
+                    env = t / attack;
+                else if (t > seconds - release)
+                    env = (seconds - t) / release;
+                else
+                    env = 1f;
+
+                samples[i] = s * env * 0.6f;
+            }
+
+            return samples;
+        }
     }
 }

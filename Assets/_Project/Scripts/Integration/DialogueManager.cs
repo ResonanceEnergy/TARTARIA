@@ -151,8 +151,13 @@ namespace Tartaria.Integration
 
             UIManager.Instance?.ShowDialogue(line.speaker, line.text);
 
-            // Voice audio at requested volume
-            AudioManager.Instance?.PlayVoiceLine(line.id, volume);
+            // Try to play VO placeholder; fall back to text-only if unavailable
+            bool hasVO = Audio.VOPlaceholderLibrary.PlayLineIfAvailable(line.id);
+            if (!hasVO)
+            {
+                // Fallback: try AudioManager.PlayVoiceLine if it exists
+                AudioManager.Instance?.PlayVoiceLine(line.id, volume);
+            }
 
             // Auto-close after delay
             CancelInvoke(nameof(HideLine));
