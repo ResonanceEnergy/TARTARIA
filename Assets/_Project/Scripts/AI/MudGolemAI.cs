@@ -548,6 +548,9 @@ namespace Tartaria.AI
         {
             TransitionTo(GolemState.Dead);
 
+            // Spawn death decal at hit position
+            Gameplay.DecalHitPool.Spawn(transform.position, Vector3.up);
+
             if (_hasNavMesh && _agent != null)
                 _agent.enabled = false;
 

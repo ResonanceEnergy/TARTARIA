@@ -42,6 +42,7 @@ namespace Tartaria.Editor
             var verts = new System.Collections.Generic.List<Vector3>();
             var tris = new System.Collections.Generic.List<int>();
             var uvs = new System.Collections.Generic.List<Vector2>();
+            var colors = new System.Collections.Generic.List<Color>();
             float w = 0.4f, h = 0.6f;
             for (int i = 0; i < 3; i++)
             {
@@ -52,6 +53,13 @@ namespace Tartaria.Editor
                 verts.Add(right);                       // bottom-right
                 verts.Add(right + Vector3.up * h);      // top-right
                 verts.Add(-right + Vector3.up * h);     // top-left
+
+                // Vertex colors: R channel = wind influence (0 at base, 1 at top)
+                colors.Add(new Color(0f, 1f, 1f, 1f)); // bottom-left: no wind
+                colors.Add(new Color(0f, 1f, 1f, 1f)); // bottom-right: no wind
+                colors.Add(new Color(1f, 1f, 1f, 1f)); // top-right: full wind
+                colors.Add(new Color(1f, 1f, 1f, 1f)); // top-left: full wind
+
                 uvs.Add(new Vector2(0,0)); uvs.Add(new Vector2(1,0));
                 uvs.Add(new Vector2(1,1)); uvs.Add(new Vector2(0,1));
                 tris.Add(b); tris.Add(b+2); tris.Add(b+1);
@@ -64,6 +72,7 @@ namespace Tartaria.Editor
             mesh.SetVertices(verts);
             mesh.SetTriangles(tris, 0);
             mesh.SetUVs(0, uvs);
+            mesh.SetColors(colors);
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
             return mesh;
@@ -99,8 +108,39 @@ namespace Tartaria.Editor
         // ── Materials ─────────────────────────────────────────────────────────
         static void EnsureMaterials()
         {
-            EnsureLitMaterial(GrassMatPath, new Color(0.35f, 0.55f, 0.25f), emission: new Color(0f,0.05f,0f));
+            EnsureGrassWindMaterial(GrassMatPath, new Color(0.35f, 0.55f, 0.25f));
             EnsureLitMaterial(RockMatPath,  new Color(0.45f, 0.42f, 0.38f), emission: Color.black);
+        }
+
+        static void EnsureGrassWindMaterial(string path, Color baseColor)
+        {
+            var mat = AssetDatabase.LoadAssetAtPath<Material>(path);
+            var shader = Shader.Find("Tartaria/GrassWind");
+
+            if (shader == null)
+            {
+                Debug.LogWarning("[FoliageFactory] Tartaria/GrassWind shader not found — falling back to URP/Lit.");
+                shader = Shader.Find("Universal Render Pipeline/Lit");
+            }
+
+            if (mat == null)
+            {
+                mat = new Material(shader);
+                AssetDatabase.CreateAsset(mat, path);
+            }
+            else
+            {
+                // Update shader if changed
+                if (mat.shader != shader)
+                    mat.shader = shader;
+            }
+
+            if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", baseColor);
+            if (mat.HasProperty("_Smoothness")) mat.SetFloat("_Smoothness", 0.3f);
+            if (mat.HasProperty("_WindStrength")) mat.SetFloat("_WindStrength", 0.15f);
+            if (mat.HasProperty("_WindSpeed")) mat.SetFloat("_WindSpeed", 1.4f);
+
+            EditorUtility.SetDirty(mat);
         }
 
         static void EnsureLitMaterial(string path, Color baseColor, Color emission)

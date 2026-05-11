@@ -449,6 +449,59 @@ namespace Tartaria.Editor
                 }
             });
 
+            // ── Phase 9j13: Timeline for Moon-8 Armada Flyover ──
+            BuildReport.RunPhase("Phase 9j13/19: Climax Timeline (Moon 8)", () =>
+            {
+                ClimaxTimelineFactory.Run();
+            });
+
+            // ── Phase 9j14: VO Placeholder Generation ──
+            BuildReport.RunPhase("Phase 9j14/19: VO Placeholders (12 beep tones)", () =>
+            {
+                AudioFactory.BuildVOPlaceholders();
+            });
+
+            // ── Phase 9j15: Volumetric Fog ──
+            BuildReport.RunPhase("Phase 9j15/19: Volumetric Fog (URP or fallback)", () =>
+            {
+                VolumetricFogFactory.Run();
+            });
+
+            // ── Phase 9j16: Foliage Wind Shader (rebuild grass with vertex colors) ──
+            BuildReport.RunPhase("Phase 9j16/19: Foliage Wind Shader", () =>
+            {
+                // Re-run FoliageFactory to rebuild grass with wind shader + vertex colors
+                if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    FoliageFactory.BuildAndScatter();
+                    EditorSceneManager.SaveOpenScenes();
+                }
+            });
+
+            // ── Phase 9j17: Lens Flares (sun) ──
+            BuildReport.RunPhase("Phase 9j17/19: Lens Flares (Sun)", () =>
+            {
+                if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    LensFlareFactory.Run();
+                    EditorSceneManager.SaveOpenScenes();
+                }
+            });
+
+            // ── Phase 9j18: URP Upscaling (STP + render scale) ──
+            BuildReport.RunPhase("Phase 9j18/19: URP Upscaling (STP)", () =>
+            {
+                UpscalingTuner.Run();
+            });
+
+            // ── Phase 9j19: HDR Output Enable ──
+            BuildReport.RunPhase("Phase 9j19/19: HDR Output Enable", () =>
+            {
+                HDROutputConfigurator.Run();
+            });
+
             // ── Finalize ──
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
