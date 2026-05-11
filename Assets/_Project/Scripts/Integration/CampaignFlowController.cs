@@ -26,19 +26,28 @@ namespace Tartaria.Integration
         public static CampaignFlowController Instance { get; private set; }
 
         [Header("Moon Definitions")]
-        [SerializeField] MoonDefinition[] moons;
+        [SerializeField] MoonChapterDefinition[] moons;
 
         int _currentMoon;
         readonly Dictionary<int, MoonProgress> _moonProgress = new();
 
         public int CurrentMoon => _currentMoon;
         public int CurrentMoonIndex => _currentMoon;
-        public MoonDefinition CurrentMoonDef =>
+        public MoonChapterDefinition CurrentMoonDef =>
             _currentMoon >= 0 && _currentMoon < (moons?.Length ?? 0)
                 ? moons[_currentMoon] : null;
 
         public event Action<int> OnMoonStarted;
         public event Action<int> OnMoonCompleted;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("CampaignFlowController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<CampaignFlowController>();
+        }
 
         void Awake()
         {
@@ -224,7 +233,7 @@ namespace Tartaria.Integration
             }
         }
 
-        int GetCompletedQuestCount(MoonDefinition moon)
+        int GetCompletedQuestCount(MoonChapterDefinition moon)
         {
             if (moon.requiredQuestIds == null) return 0;
             int count = 0;
@@ -236,95 +245,95 @@ namespace Tartaria.Integration
 
         // ─── Default Moon Data ───────────────────────
 
-        MoonDefinition[] BuildDefaultMoons()
+        MoonChapterDefinition[] BuildDefaultMoons()
         {
             return new[]
             {
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Echohaven", zoneIndex = 0,
                     rsThresholdToAdvance = 100f,
                     requiredQuestIds = new[] { "echohaven_main" },
                     questIdsToActivate = new[] { "echohaven_main", "milo_companion" },
                     modifiers = new MoonModifiers { rsGainMultiplier = 1.2f, tuningDifficultyMultiplier = 0.8f }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Shadow & Purge", zoneIndex = 1,
                     rsThresholdToAdvance = 250f,
                     requiredQuestIds = new[] { "shadow_purge_main", "corruption_bloom" },
                     questIdsToActivate = new[] { "shadow_purge_main", "corruption_bloom", "cassian_companion" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableMicroMode = true, corruptionSpreadRate = 0.8f, enemyHealthMultiplier = 1.1f, specialMechanic = "dissonance_lens" }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Windswept Highlands", zoneIndex = 2,
                     rsThresholdToAdvance = 450f,
                     requiredQuestIds = new[] { "highlands_main", "orphan_train_escort" },
                     questIdsToActivate = new[] { "highlands_main", "orphan_train_escort", "rail_network" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableMicroMode = true, tuningDifficultyMultiplier = 1.1f, enemyHealthMultiplier = 1.2f, specialMechanic = "rail_network" }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Star Fort Bastion", zoneIndex = 3,
                     rsThresholdToAdvance = 700f,
                     requiredQuestIds = new[] { "star_fort_main", "korath_echo" },
                     questIdsToActivate = new[] { "star_fort_main", "korath_echo", "precision_cutting" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableMicroMode = true, enemyHealthMultiplier = 1.3f, enemyDamageMultiplier = 1.2f, specialMechanic = "golden_ratio" }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "White City", zoneIndex = 4,
                     rsThresholdToAdvance = 1000f,
                     requiredQuestIds = new[] { "white_city_main" },
                     questIdsToActivate = new[] { "white_city_main", "overtone_networks" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, rsGainMultiplier = 1.3f, corruptionSpreadRate = 1.2f, enemyHealthMultiplier = 1.4f, specialMechanic = "overtone_resonance" }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Sunken Cathedral", zoneIndex = 5,
                     rsThresholdToAdvance = 1400f,
                     requiredQuestIds = new[] { "cathedral_main", "cymatic_requiem" },
                     questIdsToActivate = new[] { "cathedral_main", "cymatic_requiem", "veritas_companion" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, tuningDifficultyMultiplier = 1.3f, enemyHealthMultiplier = 1.5f, enemyDamageMultiplier = 1.3f, specialMechanic = "pipe_organ" }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Giant's Awakening", zoneIndex = 6,
                     rsThresholdToAdvance = 1900f,
                     requiredQuestIds = new[] { "giants_awakening_main", "korath_thaw" },
                     questIdsToActivate = new[] { "giants_awakening_main", "korath_thaw", "cassian_confrontation" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, specialMechanic = "giant_stasis_thaw", enemyHealthMultiplier = 1.6f, enemyDamageMultiplier = 1.4f, corruptionSpreadRate = 1.5f }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "The Airship Armada", zoneIndex = 7,
                     rsThresholdToAdvance = 2500f,
                     requiredQuestIds = new[] { "airship_armada_main", "fleet_restoration" },
                     questIdsToActivate = new[] { "airship_armada_main", "fleet_restoration", "thorne_companion" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "mercury_orb_tuning", enemyHealthMultiplier = 1.7f, enemyDamageMultiplier = 1.5f, aetherDrainMultiplier = 1.5f }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "The Ley Line Prophecy", zoneIndex = 8,
                     rsThresholdToAdvance = 3200f,
                     requiredQuestIds = new[] { "ley_line_prophecy_main", "prophecy_stones" },
                     questIdsToActivate = new[] { "ley_line_prophecy_main", "prophecy_stones", "zereth_whispers" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "prophecy_stones", enemyHealthMultiplier = 1.8f, enemyDamageMultiplier = 1.6f, rsGainMultiplier = 0.9f }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "The Living Grid", zoneIndex = 9,
                     rsThresholdToAdvance = 4000f,
                     requiredQuestIds = new[] { "living_grid_main", "continental_rail" },
                     questIdsToActivate = new[] { "living_grid_main", "continental_rail", "trigger_room" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "continental_train", enemyHealthMultiplier = 2.0f, enemyDamageMultiplier = 1.7f, tuningDifficultyMultiplier = 1.4f }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Veil Between Worlds", zoneIndex = 10,
                     rsThresholdToAdvance = 5000f,
                     requiredQuestIds = new[] { "veil_main", "aquifer_purification" },
                     questIdsToActivate = new[] { "veil_main", "aquifer_purification", "fountain_chain" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "spectral_solidification", enemyHealthMultiplier = 2.2f, enemyDamageMultiplier = 1.8f, corruptionSpreadRate = 2.0f }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "Planetary Bell-Tower Ring", zoneIndex = 11,
                     rsThresholdToAdvance = 6500f,
                     requiredQuestIds = new[] { "bell_tower_ring_main", "tower_synchronization" },
                     questIdsToActivate = new[] { "bell_tower_ring_main", "tower_synchronization", "final_prophecy_stone" },
                     modifiers = new MoonModifiers { enableCorruption = true, enableLeyLines = true, enableGiantMode = true, enableMicroMode = true, specialMechanic = "bell_tower_sync", enemyHealthMultiplier = 2.5f, enemyDamageMultiplier = 2.0f, tuningDifficultyMultiplier = 1.5f, aetherDrainMultiplier = 2.0f }
                 },
-                new MoonDefinition {
+                new MoonChapterDefinition {
                     moonName = "True Timeline Convergence", zoneIndex = 12,
                     rsThresholdToAdvance = float.MaxValue, // Final moon
                     requiredQuestIds = new[] { "convergence_final", "anastasia_finale" },
@@ -353,7 +362,7 @@ namespace Tartaria.Integration
     // ─── Campaign Data Types ─────────────────────
 
     [Serializable]
-    public class MoonDefinition
+    public class MoonChapterDefinition
     {
         public string moonName;
         public int zoneIndex;

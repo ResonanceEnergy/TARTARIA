@@ -93,6 +93,15 @@ namespace Tartaria.UI
         float _trophyTimer;
         bool _trophyVisible;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("HUDController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<HUDController>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

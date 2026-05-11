@@ -102,23 +102,225 @@ namespace Tartaria.Editor
             }
         }
 
-        [MenuItem("TARTARIA/Integration/3. Replace Player Capsule with Player_Mesh")]
+        // KayKit Rogue_Hooded — gender-neutral hooded silhouette, fits Elara Voss canon
+        const string KAYKIT_PLAYER_FBX = "Assets/_Project/Models/Characters/KayKit/Rogue_Hooded.fbx";
+        const string KAYKIT_ANIM_DIR   = "Assets/_Project/Models/Characters/KayKit/Animations";
+        const string KAYKIT_CONTROLLER_PATH = "Assets/_Project/Animations/KayKitPlayerController.controller";
+
+        [MenuItem("TARTARIA/Integration/3. Replace Player Capsule with KayKit Rogue_Hooded")]
         public static void ReplacePlayerMeshModel()
         {
-            Debug.LogWarning("[Integration] Player mesh replacement SKIPPED:");
-            Debug.LogWarning("[Integration] Player_Mesh.fbx is MALE Mixamo Adventurer");
-            Debug.LogWarning("[Integration] Player character is ELARA VOSS (female)");
-            Debug.LogWarning("[Integration] Keeping procedural capsule until correct female character is sourced");
-            
-            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+            Debug.Log("[Integration] Replacing Player capsule with KayKit Rogue_Hooded.fbx (Elara Voss visual)...");
+
+            // 1) Force importer settings on the mesh + KayKit animation rigs (Generic, animations enabled)
+            ConfigureKayKitImporter(KAYKIT_PLAYER_FBX, importAnims: false);
+            ConfigureKayKitAnimationsFolder(KAYKIT_ANIM_DIR);
+
+            GameObject sourceMesh = AssetDatabase.LoadAssetAtPath<GameObject>(KAYKIT_PLAYER_FBX);
+            if (sourceMesh == null)
             {
-                EditorUtility.DisplayDialog("Mesh Replacement Skipped",
-                    "Player_Mesh.fbx is a MALE character.\n\n" +
-                    "Player character is ELARA VOSS (female, 20s).\n\n" +
-                    "Mesh replacement skipped until correct model is sourced.",
-                    "OK");
+                Debug.LogWarning($"[Integration] KayKit source not found at {KAYKIT_PLAYER_FBX} — keeping procedural capsule.");
+                return;
             }
-            return;
+
+            GameObject playerPrefab = AssetDatabase.LoadAssetAtPath<GameObject>(PLAYER_PREFAB_PATH);
+            if (playerPrefab == null)
+            {
+                Debug.LogError($"[Integration] Player prefab not found at: {PLAYER_PREFAB_PATH}");
+                return;
+            }
+
+            string prefabPath = AssetDatabase.GetAssetPath(playerPrefab);
+            GameObject prefabInstance = PrefabUtility.LoadPrefabContents(prefabPath);
+
+            // 2) Strip primitive body parts created by CharacterPrefabFactory.CreatePlayerPrefab
+            string[] primitiveNames = {
+                "Body","Head","Eye_L","Eye_R","Visor","JawGuard",
+                "Arm_L","Arm_R","Leg_L","Leg_R","Foot_L","Foot_R",
+                "Shoulder_L","Shoulder_R","Belt","AetherCore"
+            };
+            foreach (var n in primitiveNames)
+            {
+                var t = prefabInstance.transform.Find(n);
+                if (t != null) Object.DestroyImmediate(t.gameObject);
+            }
+            // Also remove any leftover PlayerMesh from prior runs
+            var prevMesh = prefabInstance.transform.Find("PlayerMesh");
+            if (prevMesh != null) Object.DestroyImmediate(prevMesh.gameObject);
+
+            // 3) Instantiate KayKit mesh as child
+            GameObject meshInstance = (GameObject)PrefabUtility.InstantiatePrefab(sourceMesh, prefabInstance.transform);
+            meshInstance.name = "PlayerMesh";
+            meshInstance.transform.localPosition = Vector3.zero;
+            meshInstance.transform.localRotation = Quaternion.identity;
+            // KayKit Rogue is ~1.7m tall — scale to fit CharacterController height of 2m
+            meshInstance.transform.localScale = Vector3.one * 1.0f;
+
+            // 4) Tint primary body materials with Aether glow accent (cape)
+            string aetherMaterialPath = "Assets/_Project/Materials/M_AetherVein.mat";
+            Material aetherMaterial = AssetDatabase.LoadAssetAtPath<Material>(aetherMaterialPath);
+            if (aetherMaterial != null)
+            {
+                var renderers = meshInstance.GetComponentsInChildren<SkinnedMeshRenderer>();
+                foreach (var renderer in renderers)
+                {
+                    var mats = renderer.sharedMaterials;
+                    for (int i = 0; i < mats.Length; i++)
+                    {
+                        if (mats[i] != null && mats[i].name.ToLowerInvariant().Contains("cape"))
+                            mats[i] = aetherMaterial;
+                    }
+                    renderer.sharedMaterials = mats;
+                }
+            }
+
+            // 5) Build the KayKit animator controller from the pack's own (Generic-rigged) anims
+            //    and assign to root Animator. This replaces the humanoid Capoeira controller
+            //    (which can't drive a Generic skeleton) when KayKit is present.
+            var controller = BuildKayKitAnimatorController();
+            var animator = prefabInstance.GetComponent<Animator>();
+            if (animator == null) animator = prefabInstance.AddComponent<Animator>();
+            animator.applyRootMotion = false;
+            animator.updateMode = AnimatorUpdateMode.Normal;
+            animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+            if (controller != null) animator.runtimeAnimatorController = controller;
+            animator.avatar = null; // Generic rig — no avatar required; Animator uses the SkinnedMeshRenderer hierarchy on PlayerMesh
+
+            // Disable procedural PlayerAnimator so it doesn't fight the new clips
+            var procedural = prefabInstance.GetComponent<Tartaria.Gameplay.PlayerAnimator>();
+            if (procedural != null) procedural.enabled = false;
+
+            // Add bridge if missing — drives Speed/Attack params from input
+            if (prefabInstance.GetComponent<Tartaria.Gameplay.PlayerAnimatorBridge>() == null)
+                prefabInstance.AddComponent<Tartaria.Gameplay.PlayerAnimatorBridge>();
+
+            PrefabUtility.SaveAsPrefabAsset(prefabInstance, prefabPath);
+            PrefabUtility.UnloadPrefabContents(prefabInstance);
+
+            Debug.Log("[Integration] ✓ Player capsule replaced with KayKit Rogue_Hooded mesh + Generic animator.");
+        }
+
+        // Force every KayKit FBX in the animations folder to Generic + import animations.
+        // This is what fixes the silent "no anim plays" smoke that's been haunting the build.
+        static void ConfigureKayKitAnimationsFolder(string folder)
+        {
+            if (!AssetDatabase.IsValidFolder(folder)) return;
+            var guids = AssetDatabase.FindAssets("t:Model", new[] { folder });
+            int n = 0;
+            foreach (var g in guids)
+            {
+                var p = AssetDatabase.GUIDToAssetPath(g);
+                if (ConfigureKayKitImporter(p, importAnims: true)) n++;
+            }
+            Debug.Log($"[Integration] KayKit anim importers configured: {n}/{guids.Length}");
+        }
+
+        static bool ConfigureKayKitImporter(string path, bool importAnims)
+        {
+            var importer = AssetImporter.GetAtPath(path) as ModelImporter;
+            if (importer == null) return false;
+            bool dirty = false;
+            if (importer.animationType != ModelImporterAnimationType.Generic)
+            { importer.animationType = ModelImporterAnimationType.Generic; dirty = true; }
+            if (importAnims && !importer.importAnimation)
+            { importer.importAnimation = true; dirty = true; }
+            if (importer.optimizeGameObjects)
+            { importer.optimizeGameObjects = false; dirty = true; }
+            if (dirty) importer.SaveAndReimport();
+            return dirty;
+        }
+
+        // Build a tiny 3-state controller (Idle/Walk/Attack) from KayKit's own anim FBXs.
+        // Picks the first matching clip name we can find under KayKit/Animations.
+        static AnimatorController BuildKayKitAnimatorController()
+        {
+            if (!AssetDatabase.IsValidFolder(ANIMATIONS_DIR))
+            {
+                Directory.CreateDirectory(ANIMATIONS_DIR);
+                AssetDatabase.Refresh();
+            }
+
+            AnimationClip idle   = FindKayKitClip(new[] { "idle", "ginga", "stand" });
+            AnimationClip walk   = FindKayKitClip(new[] { "walk", "movement", "run" });
+            AnimationClip attack = FindKayKitClip(new[] { "attack", "melee", "swing", "punch" });
+
+            // If we can't find any KayKit clips, return null and let the existing
+            // Capoeira controller (humanoid, may misbehave on Generic) stay attached.
+            if (idle == null && walk == null && attack == null)
+            {
+                Debug.LogWarning("[Integration] No KayKit animation clips found — controller not built.");
+                return null;
+            }
+
+            // Recreate clean each build
+            if (AssetDatabase.LoadAssetAtPath<AnimatorController>(KAYKIT_CONTROLLER_PATH) != null)
+                AssetDatabase.DeleteAsset(KAYKIT_CONTROLLER_PATH);
+
+            var controller = AnimatorController.CreateAnimatorControllerAtPath(KAYKIT_CONTROLLER_PATH);
+            controller.AddParameter("Speed",  AnimatorControllerParameterType.Float);
+            controller.AddParameter("Attack", AnimatorControllerParameterType.Trigger);
+
+            var sm = controller.layers[0].stateMachine;
+
+            var idleState = sm.AddState("Idle");
+            if (idle != null) idleState.motion = idle;
+
+            var walkState = sm.AddState("Walk");
+            if (walk != null) walkState.motion = walk;
+
+            var atkState = sm.AddState("Attack");
+            if (attack != null) atkState.motion = attack;
+
+            sm.defaultState = idleState;
+
+            // Idle <-> Walk by Speed
+            var i2w = idleState.AddTransition(walkState);
+            i2w.AddCondition(AnimatorConditionMode.Greater, 0.1f, "Speed");
+            i2w.hasExitTime = false; i2w.duration = 0.1f;
+
+            var w2i = walkState.AddTransition(idleState);
+            w2i.AddCondition(AnimatorConditionMode.Less, 0.1f, "Speed");
+            w2i.hasExitTime = false; w2i.duration = 0.1f;
+
+            // Anywhere -> Attack on trigger
+            var anyAtk = sm.AddAnyStateTransition(atkState);
+            anyAtk.AddCondition(AnimatorConditionMode.If, 0f, "Attack");
+            anyAtk.hasExitTime = false; anyAtk.duration = 0.05f;
+            anyAtk.canTransitionToSelf = false;
+
+            // Attack -> Idle when finished
+            var atk2idle = atkState.AddTransition(idleState);
+            atk2idle.hasExitTime = true; atk2idle.exitTime = 0.9f; atk2idle.duration = 0.15f;
+
+            AssetDatabase.SaveAssets();
+            Debug.Log($"[Integration] KayKit animator built  Idle:{(idle!=null?idle.name:"-")}  Walk:{(walk!=null?walk.name:"-")}  Attack:{(attack!=null?attack.name:"-")}");
+            return controller;
+        }
+
+        static AnimationClip FindKayKitClip(string[] keywords)
+        {
+            if (!AssetDatabase.IsValidFolder(KAYKIT_ANIM_DIR)) return null;
+            var modelGuids = AssetDatabase.FindAssets("t:Model", new[] { KAYKIT_ANIM_DIR });
+            // Prefer Medium rig for the Rogue (medium humanoid silhouette)
+            System.Collections.Generic.List<string> paths = new System.Collections.Generic.List<string>();
+            foreach (var g in modelGuids) paths.Add(AssetDatabase.GUIDToAssetPath(g));
+            paths.Sort((a, b) => (a.Contains("Medium") ? 0 : 1).CompareTo(b.Contains("Medium") ? 0 : 1));
+
+            foreach (var p in paths)
+            {
+                var assets = AssetDatabase.LoadAllAssetsAtPath(p);
+                foreach (var a in assets)
+                {
+                    var clip = a as AnimationClip;
+                    if (clip == null || clip.name.StartsWith("__preview__")) continue;
+                    string lower = clip.name.ToLowerInvariant();
+                    foreach (var kw in keywords)
+                    {
+                        if (lower.Contains(kw)) return clip;
+                    }
+                }
+            }
+            return null;
         }
 
         [MenuItem("TARTARIA/Integration/3. Replace Player Capsule with Player_Mesh (DISABLED)")]

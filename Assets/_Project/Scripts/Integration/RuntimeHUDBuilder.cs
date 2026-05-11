@@ -57,6 +57,15 @@ namespace Tartaria.Integration
         bool _prevTuneKey;
         GameObject _tuningOverlayGO;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("RuntimeHUDBuilder");
+            DontDestroyOnLoad(go);
+            go.AddComponent<RuntimeHUDBuilder>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

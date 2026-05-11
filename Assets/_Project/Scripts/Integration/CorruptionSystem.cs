@@ -52,6 +52,15 @@ namespace Tartaria.Integration
         public event System.Action<string> OnCorruptionPurged;
         public event System.Action<string, string> OnCorruptionSpread;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("CorruptionSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<CorruptionSystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

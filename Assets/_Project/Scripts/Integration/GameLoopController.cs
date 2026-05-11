@@ -88,6 +88,15 @@ namespace Tartaria.Integration
         // Enemy spawn tracking
         readonly System.Collections.Generic.HashSet<int> _spawnedEnemyThresholds = new();
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("GameLoopController");
+            DontDestroyOnLoad(go);
+            go.AddComponent<GameLoopController>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -1157,7 +1166,7 @@ namespace Tartaria.Integration
             Vector3 spawnPos = player.transform.position + spawnOffset;
             spawnPos.y = player.transform.position.y; // Keep on same plane
 
-            // Instantiate from prefab or create fallback cube
+            // Instantiate from prefab or build proper procedural golem
             GameObject golem;
             if (mudGolemPrefab != null)
             {
@@ -1165,12 +1174,8 @@ namespace Tartaria.Integration
             }
             else
             {
-                // Fallback: create placeholder cube
-                golem = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                golem.transform.position = spawnPos;
-                golem.transform.localScale = Vector3.one * 2f;
-                golem.name = "MudGolem_Fallback";
-                golem.AddComponent<AI.MudGolemAI>();
+                // Procedural fallback: full multi-part golem (torso/head/eyes/arms/legs)
+                golem = AI.MudGolemAI.BuildProcedural(spawnPos, Quaternion.identity);
             }
 
             // Trigger tutorial step 5

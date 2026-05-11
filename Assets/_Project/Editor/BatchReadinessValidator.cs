@@ -60,13 +60,14 @@ namespace Tartaria.Editor
             Check("Input actions asset", AssetExists("Assets/_Project/Input/TartariaInputActions.inputactions"));
 
             // ── Build Settings ──
+            // Canonical order: Boot(0) → Echohaven(1) → Moons 2-13 (2..13) → UI_Overlay(last)
             var scenes = EditorBuildSettings.scenes;
-            bool hasThree = scenes != null && scenes.Length >= 3;
-            bool correctOrder = hasThree
+            bool hasMin = scenes != null && scenes.Length >= 3;
+            bool correctOrder = hasMin
                 && scenes[0].path.Contains("Boot")
                 && scenes[1].path.Contains("Echohaven")
-                && scenes[2].path.Contains("UI_Overlay");
-            Check("Build settings: 3+ scenes", hasThree);
+                && scenes[scenes.Length - 1].path.Contains("UI_Overlay");
+            Check("Build settings: 3+ scenes", hasMin);
             Check("Build settings: correct order", correctOrder);
 
             // ── Scene Managers ──
@@ -99,6 +100,16 @@ namespace Tartaria.Editor
 
                 Check("Slice quest asset", AssetExists("Assets/_Project/Config/Quests/Quest_AwakenStarDome.asset"));
                 Check("Slice dialogue asset", AssetExists("Assets/_Project/Config/Dialogue/Dialogue_Anastasia_AwakenStarDome.asset"));
+
+                // ── Audio Mixer + Snapshots ──
+                const string mixerPath = "Assets/_Project/Audio/Mixers/MasterMixer.mixer";
+                Check("MasterMixer asset", AssetExists(mixerPath));
+                var mixer = AssetDatabase.LoadAssetAtPath<UnityEngine.Audio.AudioMixer>(mixerPath);
+                if (mixer != null)
+                {
+                    Check("Mixer snapshot 'Exploration'", mixer.FindSnapshot("Exploration") != null);
+                    Check("Mixer snapshot 'Combat'",      mixer.FindSnapshot("Combat") != null);
+                }
 
                 // Reopen Boot scene for play
                 if (AssetExists(bootPath))

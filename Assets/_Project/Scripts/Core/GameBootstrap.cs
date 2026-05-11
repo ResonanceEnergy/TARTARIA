@@ -23,6 +23,15 @@ namespace Tartaria.Core
         [SerializeField, Range(0f, 1f)] float aetherDissipation = 0.05f;
         [SerializeField, Min(0f)] float aetherAdvectionSpeed = 1.0f;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("GameBootstrap");
+            DontDestroyOnLoad(go);
+            go.AddComponent<GameBootstrap>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -47,7 +56,21 @@ namespace Tartaria.Core
                 return;
             }
 
-            // Hand off to SceneLoader for async scene loading
+            // Day-13: gate behind main menu "Start" / "Continue" click.
+            // PlayerPrefs flag bypasses menu for dev convenience.
+            bool autoStart = PlayerPrefs.GetInt("TARTARIA_SkipMainMenu", 0) == 1;
+            if (autoStart || !MainMenuActive)
+            {
+                TriggerSceneLoad();
+            }
+            // else: MainMenuOverlay will call BeginGameplay() below when player clicks Start.
+        }
+
+        // Set true by MainMenuOverlay before scene-load to keep GameBootstrap waiting.
+        public static bool MainMenuActive;
+
+        public void TriggerSceneLoad()
+        {
             var sceneLoader = FindAnyObjectByType<SceneLoader>();
             if (sceneLoader != null)
             {
@@ -59,6 +82,13 @@ namespace Tartaria.Core
                 GameStateManager.Instance.TransitionTo(GameState.Loading);
                 GameStateManager.Instance.TransitionTo(GameState.Exploration);
             }
+        }
+
+        /// <summary>Day-13: invoked by MainMenuOverlay when player clicks Start / Continue.</summary>
+        public static void BeginGameplay()
+        {
+            MainMenuActive = false;
+            Instance?.TriggerSceneLoad();
         }
 
         bool InitializeECSWorld()

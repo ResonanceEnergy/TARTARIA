@@ -27,6 +27,16 @@ namespace Tartaria.Integration
     {
         public static AchievementSystem Instance { get; private set; }
 
+        // Self-bootstrap so reward triggers fire even without a scene-side host.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("AchievementSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<AchievementSystem>();
+        }
+
         // ─── Achievement Definition ──────────────────
 
         public enum AchievementCategory : byte
@@ -367,8 +377,22 @@ namespace Tartaria.Integration
             Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
             OnAchievementUnlocked?.Invoke(def);
+            // Polish: surface a corner toast (best effort via reflection so we don't pin asmdef edges).
+            TryShowToast(def);
             Audio.AudioManager.Instance?.PlaySFX2D("AchievementUnlocked");
             SaveManager.Instance?.MarkDirty();
+        }
+
+        static void TryShowToast(AchievementDef def)
+        {
+            try
+            {
+                var t = System.Type.GetType("Tartaria.UI.AchievementToastOverlay, Tartaria.UI");
+                if (t == null) return;
+                var m = t.GetMethod("Show", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                m?.Invoke(null, new object[] { def.title, def.description });
+            }
+            catch { /* best-effort */ }
         }
 
         /// <summary>

@@ -54,36 +54,90 @@ namespace Tartaria.Editor
         {
             if (File.Exists(MIXER_PATH))
             {
-                Debug.Log($"[AssetFramework] Mixer exists: {MIXER_PATH}");
+                Debug.Log($"[AssetFramework] Mixer exists: {MIXER_PATH} — verifying snapshots.");
+                EnsureSnapshotsOnExistingMixer();
                 return;
             }
 
-            // Use Unity's internal AudioMixerController.CreateMixerControllerAtPath via reflection.
-            // This produces a valid mixer asset with a default Master group.
-            var asm = typeof(AudioMixer).Assembly;
-            var ctrlType = asm.GetType("UnityEditor.Audio.AudioMixerController");
+            // Use Unity's internal AudioMixerController. The static
+            // CreateMixerControllerAtPath silently no-ops in batchmode on
+            // Unity 6000.3, so we instantiate the SO directly and call
+            // CreateDefaultAsset(path) which is what the menu item does.
+            // NOTE: AudioMixerController lives in the UnityEditor assembly,
+            // NOT in typeof(AudioMixer).Assembly (which is UnityEngine.AudioModule).
+            System.Type ctrlType = null;
+            foreach (var a in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                ctrlType = a.GetType("UnityEditor.Audio.AudioMixerController");
+                if (ctrlType != null) break;
+            }
             if (ctrlType == null)
             {
                 Debug.LogWarning("[AssetFramework] AudioMixerController type not found - " +
                                  "create the mixer manually: Assets > Create > Audio Mixer at " + MIXER_PATH);
                 return;
             }
-            var createMethod = ctrlType.GetMethod("CreateMixerControllerAtPath",
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-            if (createMethod == null)
+
+            ScriptableObject ctrlInstance = null;
+            try
             {
-                Debug.LogWarning("[AssetFramework] CreateMixerControllerAtPath method not found.");
-                return;
+                ctrlInstance = ScriptableObject.CreateInstance(ctrlType);
+                if (ctrlInstance == null)
+                {
+                    Debug.LogWarning("[AssetFramework] ScriptableObject.CreateInstance(AudioMixerController) returned null.");
+                }
+                else
+                {
+                    // Try CreateDefaultAsset(path) — the canonical Unity menu path.
+                    var createDefault = ctrlType.GetMethod("CreateDefaultAsset",
+                        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
+                        null, new[] { typeof(string) }, null);
+                    if (createDefault != null)
+                    {
+                        createDefault.Invoke(ctrlInstance, new object[] { MIXER_PATH });
+                    }
+                    else
+                    {
+                        // Fallback: direct AssetDatabase.CreateAsset.
+                        AssetDatabase.CreateAsset(ctrlInstance, MIXER_PATH);
+                    }
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[AssetFramework] Direct mixer instantiation failed: {ex.GetBaseException().Message}. " +
+                                 "Falling back to static factory.");
             }
 
-            createMethod.Invoke(null, new object[] { MIXER_PATH });
-            AssetDatabase.ImportAsset(MIXER_PATH, ImportAssetOptions.ForceSynchronousImport);
+            if (!File.Exists(MIXER_PATH))
+            {
+                // Last resort: original static factory path.
+                var createMethod = ctrlType.GetMethod("CreateMixerControllerAtPath",
+                    System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+                if (createMethod != null)
+                {
+                    try { createMethod.Invoke(null, new object[] { MIXER_PATH }); }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogWarning($"[AssetFramework] CreateMixerControllerAtPath threw: {ex.GetBaseException().Message}.");
+                    }
+                }
+            }
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
+            if (File.Exists(MIXER_PATH))
+            {
+                AssetDatabase.ImportAsset(MIXER_PATH, ImportAssetOptions.ForceSynchronousImport);
+            }
 
             // Add child groups + expose volume parameters.
             var mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>(MIXER_PATH);
             if (mixer == null)
             {
-                Debug.LogWarning("[AssetFramework] Mixer created but failed to load.");
+                Debug.LogWarning($"[AssetFramework] Mixer file at '{MIXER_PATH}' not found after creation " +
+                                 $"(file exists on disk: {File.Exists(MIXER_PATH)}). " +
+                                 $"Create manually via menu Assets > Create > Audio Mixer once; subsequent builds will populate groups + snapshots.");
                 return;
             }
 
@@ -122,26 +176,112 @@ namespace Tartaria.Editor
             Debug.Log($"[AssetFramework] Mixer created with 6 groups + 2 snapshots: {MIXER_PATH}");
         }
 
-        /// <summary>
-        /// Adds a snapshot to the mixer if missing, via internal
-        /// AudioMixerController.CreateNewSnapshotFromCurrent reflection.
-        /// </summary>
+        static void EnsureSnapshotsOnExistingMixer()
+        {
+            var mixer = AssetDatabase.LoadAssetAtPath<AudioMixer>(MIXER_PATH);
+            if (mixer == null) return;
+            System.Type ctrlType = null;
+            foreach (var a in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                ctrlType = a.GetType("UnityEditor.Audio.AudioMixerController");
+                if (ctrlType != null) break;
+            }
+            if (ctrlType == null) return;
+            EnsureSnapshot(mixer, ctrlType, "Exploration", makeCurrent: true);
+            EnsureSnapshot(mixer, ctrlType, "Combat",      makeCurrent: false);
+            EditorUtility.SetDirty(mixer);
+            AssetDatabase.SaveAssets();
+        }
+
         static void EnsureSnapshot(AudioMixer mixer, System.Type ctrlType, string name, bool makeCurrent)
         {
             if (mixer == null || ctrlType == null) return;
             if (mixer.FindSnapshot(name) != null) return;
 
-            var createSnap = ctrlType.GetMethod("CreateNewSnapshotFromCurrent",
-                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance,
-                null, new[] { typeof(string), typeof(bool) }, null);
-            if (createSnap == null)
+            // Approach 1: try named factory methods on the controller (signatures
+            // have shifted across Unity versions — enumerate all overloads).
+            string[] candidates = { "CreateNewSnapshotFromCurrent", "CreateNewSnapshot", "AddSnapshot", "AddNewSnapShot" };
+            System.Reflection.MethodInfo createSnap = null;
+            object[] callArgs = null;
+            foreach (var n in candidates)
             {
-                Debug.LogWarning($"[AssetFramework] CreateNewSnapshotFromCurrent not found - " +
-                                 $"add snapshot '{name}' manually in the mixer window.");
+                foreach (var m in ctrlType.GetMethods(System.Reflection.BindingFlags.Public |
+                                                       System.Reflection.BindingFlags.NonPublic |
+                                                       System.Reflection.BindingFlags.Instance))
+                {
+                    if (m.Name != n) continue;
+                    var p = m.GetParameters();
+                    if (p.Length == 2 && p[0].ParameterType == typeof(string) && p[1].ParameterType == typeof(bool))
+                    { createSnap = m; callArgs = new object[] { name, makeCurrent }; break; }
+                    if (p.Length == 1 && p[0].ParameterType == typeof(string))
+                    { createSnap = m; callArgs = new object[] { name }; break; }
+                }
+                if (createSnap != null) break;
+            }
+            if (createSnap != null)
+            {
+                try { createSnap.Invoke(mixer, callArgs); }
+                catch (System.Exception ex)
+                { Debug.LogWarning($"[AssetFramework] Named snapshot factory '{createSnap.Name}' threw: {ex.GetBaseException().Message}"); }
+                if (mixer.FindSnapshot(name) != null)
+                {
+                    Debug.Log($"[AssetFramework] Snapshot '{name}' added via {createSnap.Name}.");
+                    return;
+                }
+            }
+
+            // Approach 2: fallback — instantiate AudioMixerSnapshotController directly,
+            // attach as a sub-asset, and append to the controller's m_Snapshots array via
+            // SerializedObject. This mirrors what AudioMixerController.AddNewSnapShot does
+            // internally on Unity 6 and is stable across editor versions.
+            System.Type snapType = null;
+            foreach (var a in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                snapType = a.GetType("UnityEditor.Audio.AudioMixerSnapshotController");
+                if (snapType != null) break;
+            }
+            if (snapType == null)
+            {
+                Debug.LogWarning($"[AssetFramework] AudioMixerSnapshotController type not found; cannot add snapshot '{name}'.");
                 return;
             }
 
-            createSnap.Invoke(mixer, new object[] { name, makeCurrent });
+            try
+            {
+                // Constructor: AudioMixerSnapshotController(AudioMixer owner)
+                object snapInstance = null;
+                var ctorOwner = snapType.GetConstructor(new[] { typeof(AudioMixer) });
+                if (ctorOwner != null) snapInstance = ctorOwner.Invoke(new object[] { mixer });
+                else snapInstance = ScriptableObject.CreateInstance(snapType);
+                if (snapInstance is UnityEngine.Object so)
+                {
+                    so.name = name;
+                    AssetDatabase.AddObjectToAsset(so, mixer);
+                    var sObj = new SerializedObject(mixer);
+                    var arr = sObj.FindProperty("m_Snapshots");
+                    if (arr != null && arr.isArray)
+                    {
+                        int idx = arr.arraySize;
+                        arr.InsertArrayElementAtIndex(idx);
+                        arr.GetArrayElementAtIndex(idx).objectReferenceValue = so;
+                        if (makeCurrent)
+                        {
+                            var startProp = sObj.FindProperty("m_StartSnapshot");
+                            if (startProp != null) startProp.objectReferenceValue = so;
+                        }
+                        sObj.ApplyModifiedPropertiesWithoutUndo();
+                        EditorUtility.SetDirty(mixer);
+                        AssetDatabase.SaveAssets();
+                        Debug.Log($"[AssetFramework] Snapshot '{name}' added via SerializedObject fallback.");
+                        return;
+                    }
+                }
+                Debug.LogWarning($"[AssetFramework] SerializedObject fallback could not append snapshot '{name}'.");
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[AssetFramework] SerializedObject snapshot fallback threw: {ex.GetBaseException().Message}");
+            }
         }
 
         static void TryExposeVolume(AudioMixer mixer, AudioMixerGroup group, string exposedName,
@@ -154,9 +294,13 @@ namespace Tartaria.Editor
                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
             if (volProp == null) return;
             var volGuid = volProp.GetValue(group);
-            // Build ExposedAudioParameter struct via reflection.
-            var asm = typeof(AudioMixer).Assembly;
-            var paramType = asm.GetType("UnityEditor.Audio.ExposedAudioParameter");
+            // Build ExposedAudioParameter struct via reflection (UnityEditor assembly).
+            System.Type paramType = null;
+            foreach (var a in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                paramType = a.GetType("UnityEditor.Audio.ExposedAudioParameter");
+                if (paramType != null) break;
+            }
             if (paramType == null) return;
             var paramObj = System.Activator.CreateInstance(paramType);
             paramType.GetField("name").SetValue(paramObj, exposedName);

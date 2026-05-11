@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 using System.IO;
 using Tartaria.Input;
 using Tartaria.Integration;
+using Tartaria.Gameplay;
 
 namespace Tartaria.Editor
 {
@@ -30,6 +31,12 @@ namespace Tartaria.Editor
             Debug.Log("[Tartaria] Character prefabs built (Player, Milo, MudGolem).");
         }
 
+        // KayKit Rogue_Hooded is the canon Elara Voss visual. When present we skip
+        // the procedural primitive body — Phase 9j (AssetIntegrationTool.ReplacePlayerMeshModel)
+        // will graft the real mesh as a child. This eliminates the "snowman ghost"
+        // primitive children that used to clip through the KayKit mesh.
+        const string KAYKIT_ROGUE_FBX = "Assets/_Project/Models/Characters/KayKit/Rogue_Hooded.fbx";
+
         static void CreatePlayerPrefab()
         {
             string path = $"{PrefabsPath}/Player.prefab";
@@ -39,6 +46,24 @@ namespace Tartaria.Editor
             var root = new GameObject("Player");
             root.tag = "Player";
 
+            bool useProceduralBody = !System.IO.File.Exists(KAYKIT_ROGUE_FBX);
+
+            if (useProceduralBody)
+            {
+                BuildProceduralBody(root);
+            }
+            else
+            {
+                Debug.Log("[CharacterPrefabFactory] KayKit Rogue_Hooded.fbx detected — skipping procedural body. Phase 9j will graft real mesh.");
+            }
+
+            AttachPlayerComponents(root);
+            SavePrefab(root, path);
+        }
+
+        // Original 2024-era greybox body. Retained as fallback for builds without KayKit.
+        static void BuildProceduralBody(GameObject root)
+        {
             // Body — capsule
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             body.name = "Body";
@@ -159,7 +184,10 @@ namespace Tartaria.Editor
             belt.transform.localScale = new Vector3(0.5f, 0.04f, 0.5f);
             Object.DestroyImmediate(belt.GetComponent<CapsuleCollider>());
             AssignMaterial(belt, "M_Gold_Ornament");
+        }
 
+        static void AttachPlayerComponents(GameObject root)
+        {
             // Components
             var cc = root.AddComponent<CharacterController>();
             cc.center = new Vector3(0f, 1f, 0f);
@@ -167,6 +195,15 @@ namespace Tartaria.Editor
             cc.radius = 0.4f;
 
             var pih = root.AddComponent<PlayerInputHandler>();
+
+            // Day-5: combat health for damage feedback + game-over flow
+            root.AddComponent<PlayerHealth>();
+
+            // Day-8: melee attack on LMB / gamepad West
+            root.AddComponent<PlayerCombat>();
+
+            // Stamina/sprint/dodge
+            root.AddComponent<PlayerStamina>();
 
             // Assign input actions asset if it exists
             var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(
@@ -191,8 +228,6 @@ namespace Tartaria.Editor
             var sc = interactSphere.AddComponent<SphereCollider>();
             sc.isTrigger = true;
             sc.radius = 3f;
-
-            SavePrefab(root, path);
         }
 
         static void CreateMiloPrefab()

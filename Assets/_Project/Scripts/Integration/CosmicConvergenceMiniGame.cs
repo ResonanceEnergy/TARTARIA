@@ -28,6 +28,15 @@ namespace Tartaria.Integration
     {
         public static CosmicConvergenceMiniGame Instance { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("CosmicConvergenceMiniGame");
+            DontDestroyOnLoad(go);
+            go.AddComponent<CosmicConvergenceMiniGame>();
+        }
+
         // ─── Constants ───────────────────────────────
 
         public const int TotalPhases = 6;

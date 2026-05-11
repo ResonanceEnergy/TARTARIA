@@ -19,6 +19,9 @@ namespace Tartaria.Gameplay
         int _currentHealth;
         float _lastDamageTime;
         bool _isDead;
+        Vector3 _spawnPosition;
+        Quaternion _spawnRotation;
+        bool _spawnRecorded;
 
         public event System.Action<int, int> OnHealthChanged; // current, max
         public event System.Action OnDeath;
@@ -30,6 +33,23 @@ namespace Tartaria.Gameplay
         void Awake()
         {
             _currentHealth = maxHealth;
+        }
+
+        void Start()
+        {
+            // Day-14: capture spawn point for respawn-in-place.
+            // (Deferred to Start so any scene-side spawner has placed us first.)
+            _spawnPosition = transform.position;
+            _spawnRotation = transform.rotation;
+            _spawnRecorded = true;
+        }
+
+        /// <summary>Day-14: reset checkpoint to current position (call from Checkpoint trigger).</summary>
+        public void SetCheckpoint(Vector3 pos, Quaternion rot)
+        {
+            _spawnPosition = pos;
+            _spawnRotation = rot;
+            _spawnRecorded = true;
         }
 
         void Update()
@@ -75,16 +95,23 @@ namespace Tartaria.Gameplay
             OnDeath?.Invoke();
 
             Debug.Log("[PlayerHealth] Player died");
-
-            // TODO: Trigger death screen, respawn flow, or reload checkpoint
+            // Day-15: DeathOverlay subscribes via FindFirstObjectByType + OnDeath, drives Respawn().
         }
 
         public void Respawn()
         {
             _currentHealth = maxHealth;
             _isDead = false;
+            // Day-14: teleport back to last checkpoint / scene spawn.
+            if (_spawnRecorded)
+            {
+                var cc = GetComponent<CharacterController>();
+                if (cc != null) cc.enabled = false;
+                transform.SetPositionAndRotation(_spawnPosition, _spawnRotation);
+                if (cc != null) cc.enabled = true;
+            }
             OnHealthChanged?.Invoke(_currentHealth, maxHealth);
-            Debug.Log("[PlayerHealth] Player respawned");
+            Debug.Log($"[PlayerHealth] Player respawned at {_spawnPosition}");
         }
     }
 }

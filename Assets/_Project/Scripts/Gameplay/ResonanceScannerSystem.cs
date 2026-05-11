@@ -50,6 +50,15 @@ namespace Tartaria.Gameplay
         public float CooldownRemaining => Mathf.Max(0f, _cooldownTimer);
         public IReadOnlyList<ScanResult> LastResults => _lastResults;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("ResonanceScannerSystem");
+            DontDestroyOnLoad(go);
+            go.AddComponent<ResonanceScannerSystem>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }

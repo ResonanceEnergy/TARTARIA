@@ -17,6 +17,15 @@ namespace Tartaria.Integration
     {
         public static LeyLineProphecyMiniGame Instance { get; private set; }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("LeyLineProphecyMiniGame");
+            DontDestroyOnLoad(go);
+            go.AddComponent<LeyLineProphecyMiniGame>();
+        }
+
         // ─── Constants ───────────────────────────────
 
         public const int TotalProphecyStones = 12;
