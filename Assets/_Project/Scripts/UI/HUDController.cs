@@ -58,6 +58,11 @@ namespace Tartaria.UI
         [SerializeField] RectTransform objectivePanel;
         [SerializeField] TMPro.TextMeshProUGUI objectiveText;
 
+        [Header("Weapon Display (Sprint Batch 2)")]
+        [SerializeField] UnityEngine.UI.Image weaponIcon;
+        [SerializeField] Sprite meleeWeaponSprite;
+        [SerializeField] Sprite bowWeaponSprite;
+
         [Header("RS Threshold Markers")]
         [SerializeField] GameObject[] thresholdMarkers; // 4 markers at 25/50/75/100
 
@@ -126,6 +131,9 @@ namespace Tartaria.UI
             // Set static aether bar color once
             if (aetherChargeBar != null)
                 aetherChargeBar.color = aetherColor;
+
+            // Sprint Batch 2: Subscribe to weapon changes
+            Tartaria.Gameplay.PlayerWeaponSwitcher.OnWeaponChanged += HandleWeaponChanged;
         }
 
         void OnDestroy()
@@ -134,6 +142,9 @@ namespace Tartaria.UI
             if (Instance == this) Instance = null;
             if (AccessibilityManager.Instance != null)
                 AccessibilityManager.Instance.OnSettingsChanged -= HandleAccessibilityChanged;
+            
+            // Sprint Batch 2: Unsubscribe from weapon changes
+            Tartaria.Gameplay.PlayerWeaponSwitcher.OnWeaponChanged -= HandleWeaponChanged;
         }
 
         void Update()
@@ -474,6 +485,18 @@ namespace Tartaria.UI
             c.a = 1f;
             text.color = c;
             text.fontStyle |= TMPro.FontStyles.Bold;
+        }
+
+        /// <summary>Sprint Batch 2: Update weapon icon when player switches weapons</summary>
+        void HandleWeaponChanged(Tartaria.Gameplay.PlayerWeaponSwitcher.WeaponType weapon)
+        {
+            if (weaponIcon == null) return;
+
+            weaponIcon.sprite = weapon == Tartaria.Gameplay.PlayerWeaponSwitcher.WeaponType.Melee
+                ? meleeWeaponSprite
+                : bowWeaponSprite;
+
+            Debug.Log($"[HUD] Weapon icon updated to {weapon}");
         }
     }
 }
