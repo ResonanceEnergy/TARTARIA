@@ -29,6 +29,14 @@ namespace Tartaria.AI
         [SerializeField] float attackRange = 3f;
         [SerializeField] float attackCooldown = 1.5f;
         [SerializeField] float patrolWaitTime = 5f;
+        
+        [Header("Sprint Batch 3: Perception")]
+        [SerializeField] float sightRange = 18f;
+        [SerializeField] float sightFOV = 90f;
+        [SerializeField] float lostTargetSearchDuration = 8f;
+        
+        [Header("Sprint Batch 3: Attack Telegraph")]
+        [SerializeField] float telegraphDuration = 0.5f;
 
         [Header("Movement (fallback if no NavMesh)")]
         [SerializeField] float moveSpeed = 3f;
@@ -50,6 +58,9 @@ namespace Tartaria.AI
         Renderer[] _renderers;
         CharacterController _controller;
         Vector3 _knockbackVelocity;
+        Vector3 _lastKnownPlayerPosition;
+        float _lostTargetTime;
+        bool _telegraphing;
 
         enum GolemState { Patrol, Chase, Attack, Dead }
 
@@ -261,8 +272,10 @@ namespace Tartaria.AI
 
         void UpdatePatrol(float distToPlayer)
         {
-            if (distToPlayer <= chaseRange && _player != null)
+            // Sprint Batch 3: Perception cone check
+            if (_player != null && CanSeePlayer())
             {
+                _lastKnownPlayerPosition = _player.position;
                 TransitionTo(GolemState.Chase);
                 return;
             }
@@ -292,12 +305,45 @@ namespace Tartaria.AI
             }
         }
 
+        /// <summary>Sprint Batch 3: Perception cone with LineOfSight raycast</summary>
+        bool CanSeePlayer()
+        {
+            if (_player == null) return false;
+
+            Vector3 toPlayer = _player.position - transform.position;
+            float angle = Vector3.Angle(transform.forward, toPlayer);
+
+            if (angle > sightFOV * 0.5f) return false;
+            if (toPlayer.sqrMagnitude > sightRange * sightRange) return false;
+
+            // LineOfSight raycast
+            if (Physics.Raycast(transform.position + Vector3.up, toPlayer.normalized, out RaycastHit hit, sightRange))
+            {
+                if (hit.collider.CompareTag("Player"))
+                    return true;
+            }
+
+            return false;
+        }
+
         void UpdateChase(float distToPlayer)
         {
-            if (distToPlayer > chaseRange)
+            // Sprint Batch 3: Track last known position
+            if (_player != null && CanSeePlayer())
             {
-                TransitionTo(GolemState.Patrol);
-                return;
+                _lastKnownPlayerPosition = _player.position;
+                _lostTargetTime = 0f;
+            }
+            else
+            {
+                // Lost line of sight — continue to last known position
+                _lostTargetTime += Time.deltaTime;
+                if (_lostTargetTime >= lostTargetSearchDuration)
+                {
+                    Debug.Log("[MudGolem] Lost player for 8s, returning to patrol");
+                    TransitionTo(GolemState.Patrol);
+                    return;
+                }
             }
 
             if (distToPlayer <= attackRange)
@@ -308,13 +354,15 @@ namespace Tartaria.AI
 
             if (_player == null) return;
 
+            Vector3 targetPos = _lostTargetTime > 0f ? _lastKnownPlayerPosition : _player.position;
+
             if (_hasNavMesh)
             {
-                _agent.SetDestination(_player.position);
+                _agent.SetDestination(targetPos);
             }
             else
             {
-                Vector3 dir = (_player.position - transform.position).normalized;
+                Vector3 dir = (targetPos - transform.position).normalized;
                 dir.y = 0f;
                 transform.position += dir * chaseSpeed * Time.deltaTime;
                 transform.forward = dir;
@@ -368,6 +416,13 @@ namespace Tartaria.AI
 
         void PerformMeleeAttack()
         {
+            // Sprint Batch 3: Telegraph attack
+            if (!_telegraphing)
+            {
+                StartCoroutine(TelegraphAttack());
+                return;
+            }
+
             // Raycast forward to check for player hit
             if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hit, attackRange))
             {
@@ -385,6 +440,34 @@ namespace Tartaria.AI
                     // VFX handled elsewhere
                 }
             }
+        }
+
+        /// <summary>Sprint Batch 3: 0.5s wind-up with red emission flash</summary>
+        IEnumerator TelegraphAttack()
+        {
+            _telegraphing = true;
+
+            // Red emission flash
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.red * 1.5f);
+                r.SetPropertyBlock(_propBlock);
+            }
+
+            yield return new WaitForSeconds(telegraphDuration);
+
+            // Restore emission
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.black);
+                r.SetPropertyBlock(_propBlock);
+            }
+
+            _telegraphing = false;
         }
 
         // ─── Public API ──────────────────────────────
