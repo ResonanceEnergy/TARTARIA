@@ -1,6 +1,8 @@
 using UnityEngine;
 using UnityEngine.AI;
 using Tartaria.Core;
+using Tartaria.Gameplay;
+using System.Collections;
 
 namespace Tartaria.AI
 {
@@ -44,6 +46,8 @@ namespace Tartaria.AI
         Vector3 _spawnPosition;
         Vector3 _patrolTarget;
         bool _hasNavMesh;
+        MaterialPropertyBlock _propBlock;
+        Renderer[] _renderers;
 
         enum GolemState { Patrol, Chase, Attack, Dead }
 
@@ -52,6 +56,8 @@ namespace Tartaria.AI
             _currentHealth = maxHealth;
             _spawnPosition = transform.position;
             _agent = GetComponent<NavMeshAgent>();
+            _propBlock = new MaterialPropertyBlock();
+            _renderers = GetComponentsInChildren<Renderer>();
 
             // Check if NavMesh is baked
             if (_agent != null && NavMesh.SamplePosition(transform.position, out _, 2f, NavMesh.AllAreas))
@@ -379,8 +385,37 @@ namespace Tartaria.AI
             _currentHealth -= damage;
             Debug.Log($"[MudGolem] Took {damage} damage, HP={_currentHealth}");
 
+            // Sprint: Spawn damage number
+            DamageNumberPool.Spawn(damage, transform.position);
+
+            // Sprint: Hit-flash (white emission for 0.08s)
+            StartCoroutine(HitFlash());
+
             if (_currentHealth <= 0)
                 Die();
+        }
+
+        IEnumerator HitFlash()
+        {
+            // Set white emission
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.white * 2f);
+                r.SetPropertyBlock(_propBlock);
+            }
+
+            yield return new WaitForSeconds(0.08f);
+
+            // Restore original emission
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.black);
+                r.SetPropertyBlock(_propBlock);
+            }
         }
 
         void Die()

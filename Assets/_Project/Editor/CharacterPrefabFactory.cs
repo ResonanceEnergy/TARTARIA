@@ -204,6 +204,12 @@ namespace Tartaria.Editor
 
             // Stamina/sprint/dodge
             root.AddComponent<PlayerStamina>();
+            
+            // Sprint: Dodge + i-frames (Batch 1)
+            root.AddComponent<PlayerDodge>();
+            
+            // Sprint: Cinemachine impulse for camera punch on hit (Batch 1)
+            root.AddComponent<Unity.Cinemachine.CinemachineImpulseSource>();
 
             // Assign input actions asset if it exists
             var inputAsset = AssetDatabase.LoadAssetAtPath<InputActionAsset>(

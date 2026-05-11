@@ -9,6 +9,8 @@ namespace Tartaria.Gameplay
     /// LMB / Gamepad West button → forward sphere overlap → damage MudGolemAI (int)
     /// + MudGolemHealth (float) via SendMessage (asmdef-cycle-safe).
     /// Auto-attached by CharacterPrefabFactory.
+    /// 
+    /// Sprint features: Hit-stop, damage numbers, camera punch on hit-confirmed.
     /// </summary>
     [DisallowMultipleComponent]
     public class PlayerCombat : MonoBehaviour
@@ -24,6 +26,12 @@ namespace Tartaria.Gameplay
         public bool IsSwinging => Time.time - _lastSwingStart < swingDuration;
 
         float _lastSwingStart = -10f;
+        Unity.Cinemachine.CinemachineImpulseSource _impulseSource;
+
+        void Awake()
+        {
+            _impulseSource = GetComponent<Unity.Cinemachine.CinemachineImpulseSource>();
+        }
 
         void Update()
         {
@@ -52,9 +60,14 @@ namespace Tartaria.Gameplay
                 var c = cols[i];
                 if (c == null) continue;
                 if (c.transform.IsChildOf(transform) || c.transform == transform) continue;
+                
                 // Bridge to enemy components living in AI / Integration asmdefs
                 c.SendMessageUpwards("TakeDamage", (int)meleeDamage, SendMessageOptions.DontRequireReceiver);
                 c.SendMessageUpwards("TakeDamage", (float)meleeDamage, SendMessageOptions.DontRequireReceiver);
+                
+                // Sprint: Spawn damage number at hit position
+                DamageNumberPool.Spawn(meleeDamage, c.transform.position);
+                
                 hit++;
             }
 
@@ -62,6 +75,13 @@ namespace Tartaria.Gameplay
             {
                 AudioManager.Instance?.PlaySFX("EnemyDeath", origin);
                 Debug.Log($"[PlayerCombat] Hit {hit} target(s) for {meleeDamage}");
+                
+                // Sprint: Hit-stop on confirmed hit
+                HitStopController.Trigger(meleeDamage);
+                
+                // Sprint: Camera punch
+                if (_impulseSource != null)
+                    _impulseSource.GenerateImpulse(0.5f);
             }
         }
 
