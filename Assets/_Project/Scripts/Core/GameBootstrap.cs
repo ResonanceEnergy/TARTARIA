@@ -71,6 +71,10 @@ namespace Tartaria.Core
 
         public void TriggerSceneLoad()
         {
+            // Lock cursor for gameplay. Pause / Settings / Tutorial overlays unlock as needed.
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+
             var sceneLoader = FindAnyObjectByType<SceneLoader>();
             if (sceneLoader != null)
             {
