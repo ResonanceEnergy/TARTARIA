@@ -48,6 +48,8 @@ namespace Tartaria.AI
         bool _hasNavMesh;
         MaterialPropertyBlock _propBlock;
         Renderer[] _renderers;
+        CharacterController _controller;
+        Vector3 _knockbackVelocity;
 
         enum GolemState { Patrol, Chase, Attack, Dead }
 
@@ -56,6 +58,7 @@ namespace Tartaria.AI
             _currentHealth = maxHealth;
             _spawnPosition = transform.position;
             _agent = GetComponent<NavMeshAgent>();
+            _controller = GetComponent<CharacterController>();
             _propBlock = new MaterialPropertyBlock();
             _renderers = GetComponentsInChildren<Renderer>();
 
@@ -204,6 +207,14 @@ namespace Tartaria.AI
         void Update()
         {
             if (_state == GolemState.Dead) return;
+
+            // Sprint Batch 2: Apply knockback velocity
+            if (_knockbackVelocity.sqrMagnitude > 0.01f)
+            {
+                if (_controller != null)
+                    _controller.Move(_knockbackVelocity * Time.deltaTime);
+                _knockbackVelocity = Vector3.Lerp(_knockbackVelocity, Vector3.zero, Time.deltaTime * 5f);
+            }
 
             float distToPlayer = _player != null
                 ? Vector3.Distance(transform.position, _player.position)
@@ -391,8 +402,22 @@ namespace Tartaria.AI
             // Sprint: Hit-flash (white emission for 0.08s)
             StartCoroutine(HitFlash());
 
+            // Sprint Batch 2: Apply knockback from player direction
+            if (_player != null)
+            {
+                Vector3 dir = (transform.position - _player.position).normalized;
+                OnHit(dir, damage * 0.1f);
+            }
+
             if (_currentHealth <= 0)
                 Die();
+        }
+
+        /// <summary>Sprint Batch 2: Knockback on hit</summary>
+        public void OnHit(Vector3 direction, float force)
+        {
+            _knockbackVelocity = direction * force;
+            Debug.Log($"[MudGolem] Knockback applied: {force:F1}");
         }
 
         IEnumerator HitFlash()
@@ -425,6 +450,9 @@ namespace Tartaria.AI
             if (_hasNavMesh && _agent != null)
                 _agent.enabled = false;
 
+            // Sprint Batch 2: Ragdoll on death
+            EnableRagdoll();
+
             // Death handled by GameLoopController.OnEnemyDefeated via GameEvents
             // Drop loot, VFX, SFX all handled there
 
@@ -442,10 +470,38 @@ namespace Tartaria.AI
             // to avoid an asmdef cycle (AI must NOT reference Integration).
             SendMessage("KillFromAI", SendMessageOptions.DontRequireReceiver);
 
-            // Destroy after 2s
-            Destroy(gameObject, 2f);
+            // Destroy after 4s (longer for ragdoll to settle)
+            Destroy(gameObject, 4f);
 
             Debug.Log("[MudGolem] Dead");
+        }
+
+        /// <summary>Sprint Batch 2: Enable ragdoll on death</summary>
+        void EnableRagdoll()
+        {
+            // Disable Animator and CharacterController
+            var animator = GetComponent<Animator>();
+            if (animator != null) animator.enabled = false;
+            if (_controller != null) _controller.enabled = false;
+
+            // Enable Rigidbody and apply death impulse
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.useGravity = true;
+                rb.constraints = RigidbodyConstraints.None;
+                
+                // Death impulse (backward from player)
+                if (_player != null)
+                {
+                    Vector3 dir = (transform.position - _player.position).normalized;
+                    rb.AddForce(dir * 5f + Vector3.up * 3f, ForceMode.Impulse);
+                    rb.AddTorque(Random.insideUnitSphere * 2f, ForceMode.Impulse);
+                }
+            }
+
+            Debug.Log("[MudGolem] Ragdoll enabled");
         }
     }
 }

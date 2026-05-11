@@ -208,6 +208,10 @@ namespace Tartaria.Editor
             // Sprint: Dodge + i-frames (Batch 1)
             root.AddComponent<PlayerDodge>();
             
+            // Sprint Batch 2: Ranged weapon + weapon switching
+            root.AddComponent<PlayerRanged>();
+            root.AddComponent<PlayerWeaponSwitcher>();
+            
             // Sprint: Cinemachine impulse for camera punch on hit (Batch 1)
             root.AddComponent<Unity.Cinemachine.CinemachineImpulseSource>();
 
