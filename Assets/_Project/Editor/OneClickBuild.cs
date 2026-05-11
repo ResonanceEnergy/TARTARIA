@@ -68,6 +68,11 @@ namespace Tartaria.Editor
         /// </summary>
         public static void RunBuildPhases()
         {
+            // ── Phase 0: Version Generation ──
+            BuildReport.RunPhase("Phase 0/12: Build Version", () =>
+            {
+                BuildVersionGenerator.Generate();
+            });
 
             // ── Phase 1: Directories + URP + TMP Essentials ──
             BuildReport.RunPhase("Phase 1/10: Directories", () =>

@@ -20,6 +20,7 @@ namespace Tartaria.AI
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(CompanionBehaviorSystem))]
+    [BurstCompile]
     public partial struct FractalWraithAISystem : ISystem
     {
         const float FleeSpeedMultiplier = 0.8f;

@@ -23,6 +23,7 @@ namespace Tartaria.AI
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(FractalWraithAISystem))]
+    [BurstCompile]
     public partial struct MirrorWraithAISystem : ISystem
     {
         const float ChaseWeight = 0.3f;

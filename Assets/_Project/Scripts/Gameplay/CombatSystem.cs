@@ -35,6 +35,7 @@ namespace Tartaria.Gameplay
     }
 
     [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [BurstCompile]
     public partial struct HarmonicCombatSystem : ISystem
     {
         public void OnCreate(ref SystemState state)
@@ -144,6 +145,7 @@ namespace Tartaria.Gameplay
     /// Uses deferred structural changes to avoid modifying entities mid-iteration.
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
+    [BurstCompile]
     public partial struct EnemySpawnSystem : ISystem
     {
         public void OnCreate(ref SystemState state)

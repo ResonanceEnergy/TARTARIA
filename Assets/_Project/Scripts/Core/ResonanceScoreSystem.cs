@@ -18,6 +18,7 @@ namespace Tartaria.Core
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [UpdateAfter(typeof(AetherFieldSystem))]
+    [BurstCompile]
     public partial struct ResonanceScoreSystem : ISystem
     {
         public void OnCreate(ref SystemState state)
