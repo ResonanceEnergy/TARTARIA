@@ -359,6 +359,24 @@ namespace Tartaria.Editor
                 EchohavenCombatArenaAttacher.Attach();
             });
 
+            // ── Phase 9j10: Player Animator Controller (rebuild, kill empty-statemachine warning) ──
+            BuildReport.RunPhase("Phase 9j10/19: Player Animator Controller", () =>
+            {
+                Tartaria.EditorTools.PlayerAnimatorControllerFactory.Run();
+            });
+
+            // ── Phase 9j11: Master Mixer expose Master/Music/SFX/UI/Ambience volumes ──
+            BuildReport.RunPhase("Phase 9j11/19: Master Mixer Exposed Params", () =>
+            {
+                Tartaria.EditorTools.MasterMixerExposer.Run();
+            });
+
+            // ── Phase 9j12: Application icon (procedural 13-pointed glyph) ──
+            BuildReport.RunPhase("Phase 9j12/19: App Icon", () =>
+            {
+                Tartaria.EditorTools.AppIconFactory.Run();
+            });
+
             // ── Phase 9k: Asset Framework Bootstrap (Mixer + Snapshots + Cue Library + default profiles) ──
             //    Idempotent — only creates assets that don't already exist.
             //    Snapshot transitions (Exploration/Combat) are wired in AudioManager
