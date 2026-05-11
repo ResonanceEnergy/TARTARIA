@@ -68,6 +68,14 @@ namespace Tartaria.Gameplay
         {
             if (_isDead) return;
 
+            // Sprint: Check for i-frames from dodge
+            var dodge = GetComponent<PlayerDodge>();
+            if (dodge != null && dodge.IsInvulnerable)
+            {
+                Debug.Log("[PlayerHealth] Dodged! No damage taken (i-frames)");
+                return;
+            }
+
             _currentHealth -= amount;
             _lastDamageTime = Time.time;
 

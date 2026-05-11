@@ -428,6 +428,10 @@ namespace Tartaria.Editor
             if (Object.FindAnyObjectByType<AudioListener>() == null)
                 cameraRigGO.AddComponent<AudioListener>();
 
+            // Sprint Batch 1: Cinemachine Brain + Impulse Listener for camera shake
+            cameraRigGO.AddComponent<Unity.Cinemachine.CinemachineBrain>();
+            cameraRigGO.AddComponent<Unity.Cinemachine.CinemachineImpulseListener>();
+
             return cameraRigGO;
         }
 
