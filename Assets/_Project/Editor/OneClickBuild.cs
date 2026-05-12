@@ -364,11 +364,15 @@ namespace Tartaria.Editor
                 EchohavenCombatArenaAttacher.Attach();
             });
 
-            // ── Phase 9j10: Player Animator Controller (rebuild, kill empty-statemachine warning) ──
-            BuildReport.RunPhase("Phase 9j10/19: Player Animator Controller", () =>
-            {
-                Tartaria.EditorTools.PlayerAnimatorControllerFactory.Run();
-            });
+            // ── Phase 9j10: Player Animator Controller (DISABLED) ──
+            //   PlayerAnimatorController.controller is no longer the active controller —
+            //   KayKitPlayerController.controller is bound to the player at runtime.
+            //   Re-creating an empty stub here was destructive and unnecessary.
+            //   If you need a fresh stub, run the menu: Tartaria/Fix/Rebuild Player Animator Controller
+            // BuildReport.RunPhase("Phase 9j10/19: Player Animator Controller", () =>
+            // {
+            //     Tartaria.EditorTools.PlayerAnimatorControllerFactory.Run();
+            // });
 
             // ── Phase 9j11: Master Mixer expose Master/Music/SFX/UI/Ambience volumes ──
             BuildReport.RunPhase("Phase 9j11/19: Master Mixer Exposed Params", () =>

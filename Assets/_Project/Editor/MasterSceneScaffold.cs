@@ -21,8 +21,7 @@ namespace Tartaria.Editor
             added += ScaffoldUISystems();
             added += ScaffoldIntegrationSystems();
             added += ScaffoldNPCs();
-            added += ScaffoldMiniGames();
-
+            added += ScaffoldMiniGames();            added += ScaffoldNavMesh();
             Debug.Log($"[Tartaria] MasterSceneScaffold complete — {added} managers added.");
             if (added > 0)
                 UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(
@@ -174,6 +173,28 @@ namespace Tartaria.Editor
             if (Ensure<Integration.CosmicConvergenceMiniGame>(parent)) n++;
             if (Ensure<Integration.LeyLineProphecyMiniGame>(parent)) n++;
             return n;
+        }
+
+        // ─── NavMesh ─────────────────────────────────
+        //   Adds a NavMeshSurface to the scene and bakes it so AI agents
+        //   (MudGolemAI, etc.) don't fall back to direct walk-toward-target.
+        static int ScaffoldNavMesh()
+        {
+#if UNITY_AI_NAVIGATION
+            var existing = Object.FindFirstObjectByType<Unity.AI.Navigation.NavMeshSurface>();
+            if (existing != null) return 0;
+
+            var parent = FindOrCreateParent("--- NAVIGATION ---").transform;
+            var go = new GameObject("NavMeshSurface");
+            go.transform.SetParent(parent);
+            var surface = go.AddComponent<Unity.AI.Navigation.NavMeshSurface>();
+            surface.collectObjects = Unity.AI.Navigation.CollectObjects.All;
+            try { surface.BuildNavMesh(); }
+            catch (System.Exception e) { Debug.LogWarning($"[Tartaria] NavMesh bake failed: {e.Message}"); }
+            return 1;
+#else
+            return 0;
+#endif
         }
     }
 }

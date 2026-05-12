@@ -48,7 +48,7 @@ namespace Tartaria.EditorTools
             // The mixer's attenuation parameter GUID is on the group's m_Effects[0] (Attenuation).
             // We use SerializedObject reflection to walk the tree.
 
-            var groupIds = CollectAttenuationGuids(so);
+            var groupIds = CollectGroupVolumeGuids(so);
             int added = 0;
 
             foreach (var (groupName, paramName) in Wanted)
@@ -119,9 +119,10 @@ namespace Tartaria.EditorTools
             return false;
         }
 
-        // Walk m_MasterGroup recursively. For each group, find its first Attenuation effect's
-        // first parameter GUID — that's "Volume" — and map groupName → guid.
-        static System.Collections.Generic.Dictionary<string, Guid128> CollectAttenuationGuids(SerializedObject mixerSO)
+        // Walk m_MasterGroup recursively. For each group, read its m_Volume GUID directly
+        // (the Attenuation effect's m_Parameters list is usually empty until the user
+        // right-clicks "Expose..." in the Editor; m_Volume is the canonical volume param).
+        static System.Collections.Generic.Dictionary<string, Guid128> CollectGroupVolumeGuids(SerializedObject mixerSO)
         {
             var dict = new System.Collections.Generic.Dictionary<string, Guid128>();
             var master = mixerSO.FindProperty("m_MasterGroup");
@@ -136,33 +137,23 @@ namespace Tartaria.EditorTools
 
             string name = groupSO.FindProperty("m_Name")?.stringValue ?? "(unnamed)";
 
-            var effects = groupSO.FindProperty("m_Effects");
-            if (effects != null)
+            var volumeProp = groupSO.FindProperty("m_Volume");
+            if (volumeProp != null)
             {
-                for (int i = 0; i < effects.arraySize; i++)
+                var d1 = volumeProp.FindPropertyRelative("data1");
+                var d2 = volumeProp.FindPropertyRelative("data2");
+                var d3 = volumeProp.FindPropertyRelative("data3");
+                var d4 = volumeProp.FindPropertyRelative("data4");
+                if (d1 != null && d2 != null && d3 != null && d4 != null)
                 {
-                    var fxRef = effects.GetArrayElementAtIndex(i);
-                    if (fxRef.objectReferenceValue == null) continue;
-                    var fxSO = new SerializedObject(fxRef.objectReferenceValue);
-                    string fxName = fxSO.FindProperty("m_EffectName")?.stringValue;
-                    if (fxName != "Attenuation") continue;
-
-                    var paramsProp = fxSO.FindProperty("m_Parameters");
-                    if (paramsProp == null || paramsProp.arraySize == 0) continue;
-
-                    var firstParam = paramsProp.GetArrayElementAtIndex(0);
-                    var guidProp = firstParam.FindPropertyRelative("ParameterID");
-                    if (guidProp == null) continue;
-
                     var g = new Guid128
                     {
-                        data1 = guidProp.FindPropertyRelative("data1").uintValue,
-                        data2 = guidProp.FindPropertyRelative("data2").uintValue,
-                        data3 = guidProp.FindPropertyRelative("data3").uintValue,
-                        data4 = guidProp.FindPropertyRelative("data4").uintValue,
+                        data1 = d1.uintValue,
+                        data2 = d2.uintValue,
+                        data3 = d3.uintValue,
+                        data4 = d4.uintValue,
                     };
                     if (!dict.ContainsKey(name)) dict.Add(name, g);
-                    break;
                 }
             }
 

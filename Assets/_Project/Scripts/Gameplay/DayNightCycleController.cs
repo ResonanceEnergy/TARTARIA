@@ -33,6 +33,9 @@ namespace Tartaria.Gameplay
         float _currentTime;
         int _lastMoonPhase = -1;
 
+        /// <summary>Normalized time of day: 0 = midnight, 0.5 = noon, 1 = next midnight.</summary>
+        public float TimeOfDay => cycleDuration > 0f ? (_currentTime / cycleDuration) : 0.5f;
+
         void Awake()
         {
             _light = GetComponent<Light>();
