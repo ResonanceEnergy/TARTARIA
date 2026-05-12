@@ -1,7 +1,9 @@
-using UnityInput = UnityEngine.Input;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Tartaria.UI;
+#if ENABLE_INPUT_SYSTEM
+using UnityEngine.InputSystem;
+#endif
 
 namespace Tartaria.Integration
 {
@@ -57,24 +59,45 @@ namespace Tartaria.Integration
                 if (_helpTimer <= 0f) _showHelp = false;
             }
 
+#if ENABLE_INPUT_SYSTEM
+            var kb = Keyboard.current;
+            if (kb == null) return;
             // F1..F12 = Moons 1..12
+            var fKeys = new[] {
+                kb.f1Key, kb.f2Key, kb.f3Key, kb.f4Key, kb.f5Key, kb.f6Key,
+                kb.f7Key, kb.f8Key, kb.f9Key, kb.f10Key, kb.f11Key, kb.f12Key
+            };
             for (int i = 0; i < 12; i++)
             {
-                if (UnityInput.GetKeyDown(KeyCode.F1 + i))
+                if (fKeys[i] != null && fKeys[i].wasPressedThisFrame)
                 {
                     LoadMoon(i + 1);
                     return;
                 }
             }
-            // Backquote (`) = Moon 13
-            if (UnityInput.GetKeyDown(KeyCode.BackQuote))
-                LoadMoon(13);
-            // M = toggle help overlay
-            if (UnityInput.GetKeyDown(KeyCode.M))
+            if (kb.backquoteKey.wasPressedThisFrame) LoadMoon(13);
+            if (kb.mKey.wasPressedThisFrame)
             {
                 _showHelp = !_showHelp;
                 _helpTimer = _showHelp ? 8f : 0f;
             }
+#else
+            // F1..F12 = Moons 1..12
+            for (int i = 0; i < 12; i++)
+            {
+                if (UnityEngine.Input.GetKeyDown(KeyCode.F1 + i))
+                {
+                    LoadMoon(i + 1);
+                    return;
+                }
+            }
+            if (UnityEngine.Input.GetKeyDown(KeyCode.BackQuote)) LoadMoon(13);
+            if (UnityEngine.Input.GetKeyDown(KeyCode.M))
+            {
+                _showHelp = !_showHelp;
+                _helpTimer = _showHelp ? 8f : 0f;
+            }
+#endif
         }
 
         void LoadMoon(int n)

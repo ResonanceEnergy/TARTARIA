@@ -80,8 +80,8 @@ namespace Tartaria.Save
                 if (kb.f9Key.wasPressedThisFrame) { QuickLoad(); }
             }
 #else
-            if (Input.GetKeyDown(KeyCode.F5)) { QuickSave(); }
-            if (Input.GetKeyDown(KeyCode.F9)) { QuickLoad(); }
+            if (UnityEngine.Input.GetKeyDown(KeyCode.F5)) { QuickSave(); }
+            if (UnityEngine.Input.GetKeyDown(KeyCode.F9)) { QuickLoad(); }
 #endif
 
             if (!_isDirty) return;
