@@ -30,6 +30,10 @@ namespace Tartaria.Camera
 
         object _dialogueManagerInstance;
         PropertyInfo _isActiveProp;
+        System.Type _dmType;
+        PropertyInfo _dmInstanceProp;
+        float _nextResolveAttempt;
+        bool _resolveWarned;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
@@ -41,21 +45,19 @@ namespace Tartaria.Camera
 
         void Awake()
         {
-            // Reflect into DialogueManager.Instance.IsActive (cross-asmdef)
-            var dmType = System.Type.GetType("Tartaria.Integration.DialogueManager, Tartaria.Integration");
-            if (dmType != null)
+            // Resolve DialogueManager type + Instance prop once; instance lookup is lazy.
+            _dmType = System.Type.GetType("Tartaria.Integration.DialogueManager, Tartaria.Integration");
+            if (_dmType != null)
             {
-                var instanceProp = dmType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-                if (instanceProp != null)
-                {
-                    _dialogueManagerInstance = instanceProp.GetValue(null);
-                    if (_dialogueManagerInstance != null)
-                        _isActiveProp = dmType.GetProperty("IsPlaying", BindingFlags.Public | BindingFlags.Instance);
-                }
+                _dmInstanceProp = _dmType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                _isActiveProp = _dmType.GetProperty("IsPlaying", BindingFlags.Public | BindingFlags.Instance);
             }
+        }
 
-            if (_isActiveProp == null)
-                Debug.LogWarning("[DialogueCameraRig] Could not reflect into DialogueManager.IsPlaying — rig will be inactive.");
+        void TryResolveDialogueManager()
+        {
+            if (_dialogueManagerInstance != null || _dmInstanceProp == null) return;
+            try { _dialogueManagerInstance = _dmInstanceProp.GetValue(null); } catch { /* not ready */ }
         }
 
         void LateUpdate()
@@ -73,6 +75,17 @@ namespace Tartaria.Camera
 
         bool GetDialogueActive()
         {
+            if (_dialogueManagerInstance == null && Time.time >= _nextResolveAttempt)
+            {
+                _nextResolveAttempt = Time.time + 1f;
+                TryResolveDialogueManager();
+                if (_dialogueManagerInstance == null && !_resolveWarned && Time.time > 8f)
+                {
+                    _resolveWarned = true;
+                    Debug.Log("[DialogueCameraRig] DialogueManager.Instance not present \u2014 dialogue camera will stay inactive.");
+                }
+            }
+
             if (_isActiveProp == null || _dialogueManagerInstance == null)
                 return false;
 

@@ -24,6 +24,9 @@ namespace Tartaria.World
 
         object _dayNightController;
         PropertyInfo _timeOfDayProp;
+        System.Type _dnType;
+        float _nextResolveAttempt;
+        bool _resolveWarned;
         object _apvInstance;
         PropertyInfo _blendingFactorProp;
 
@@ -102,6 +105,17 @@ namespace Tartaria.World
 
         float GetTimeOfDay()
         {
+            if (_dayNightController == null && Time.time >= _nextResolveAttempt)
+            {
+                _nextResolveAttempt = Time.time + 1f;
+                TryResolveController();
+                if (_dayNightController == null && !_resolveWarned && Time.time > 5f)
+                {
+                    _resolveWarned = true;
+                    Debug.Log("[DayNightAPVBlender] No DayNightCycleController in scene \u2014 using fixed time 0.5 (noon).");
+                }
+            }
+
             if (_dayNightController == null || _timeOfDayProp == null)
                 return 0.5f; // Noon default
 
