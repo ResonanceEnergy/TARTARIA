@@ -116,16 +116,24 @@ Shader "Tartaria/AetherVein"
         {
             Name "ShadowCaster"
             Tags { "LightMode" = "ShadowCaster" }
-            
-            ZWrite On
-            ZTest LEqual
-            ColorMask 0
-            
+            ZWrite On ZTest LEqual ColorMask 0
             HLSLPROGRAM
-            #pragma vertex ShadowPassVertex
-            #pragma fragment ShadowPassFragment
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/ShadowCasterPass.hlsl"
+            #pragma vertex SCVert
+            #pragma fragment SCFrag
+            float3 _LightDirection;
+            float4 SCVert(float4 positionOS : POSITION, float3 normalOS : NORMAL) : SV_POSITION
+            {
+                float3 positionWS = TransformObjectToWorld(positionOS.xyz);
+                float3 normalWS = TransformObjectToWorldNormal(normalOS);
+                float4 positionCS = TransformWorldToHClip(ApplyShadowBias(positionWS, normalWS, _LightDirection));
+                #if UNITY_REVERSED_Z
+                    positionCS.z = min(positionCS.z, UNITY_NEAR_CLIP_VALUE);
+                #else
+                    positionCS.z = max(positionCS.z, UNITY_NEAR_CLIP_VALUE);
+                #endif
+                return positionCS;
+            }
+            half4 SCFrag() : SV_Target { return 0; }
             ENDHLSL
         }
         
@@ -133,15 +141,12 @@ Shader "Tartaria/AetherVein"
         {
             Name "DepthOnly"
             Tags { "LightMode" = "DepthOnly" }
-            
-            ZWrite On
-            ColorMask 0
-            
+            ZWrite On ColorMask 0
             HLSLPROGRAM
-            #pragma vertex DepthOnlyVertex
-            #pragma fragment DepthOnlyFragment
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
-            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+            #pragma vertex DOVert
+            #pragma fragment DOFrag
+            float4 DOVert(float4 positionOS : POSITION) : SV_POSITION { return TransformObjectToHClip(positionOS.xyz); }
+            half4 DOFrag() : SV_Target { return 0; }
             ENDHLSL
         }
     }
