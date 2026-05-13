@@ -10,7 +10,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class BuildAuroraVFX
     {
-        const string AuroraPrefabPath = "Assets/_Project/Prefabs/VFX/Aurora.prefab";
+        const string AuroraPrefabPath = "Assets/_Project/Resources/VFX/Aurora.prefab";
         const string AuroraMaterialPath = "Assets/_Project/Materials/VFX/AuroraMaterial.mat";
         const string AuroraShaderPath = "Tartaria/VFX/Aurora";
 
@@ -95,6 +95,15 @@ namespace Tartaria.Editor
 
             AssetDatabase.Refresh();
             Debug.Log($"[BuildAurora] Created {AuroraPrefabPath}");
+        }
+
+        /// <summary>
+        /// Headless entry point for batchmode execution.
+        /// Usage: Unity.exe -batchmode -executeMethod BuildAuroraVFX.Build
+        /// </summary>
+        public static void Build()
+        {
+            BuildAurora();
         }
 
         static Material GetOrCreateAuroraMaterial()
