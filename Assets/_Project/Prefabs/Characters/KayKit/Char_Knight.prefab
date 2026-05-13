@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &2100720591351120064
+--- !u!1001 &961787830067745812
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -58,10 +58,10 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cee63a4a9743f3349a7650ae6c587e08, type: 3}
---- !u!4 &6504608772757854682 stripped
+--- !u!4 &5348787513961041166 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5143745227777513754, guid: cee63a4a9743f3349a7650ae6c587e08, type: 3}
-  m_PrefabInstance: {fileID: 2100720591351120064}
+  m_PrefabInstance: {fileID: 961787830067745812}
   m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6746930496368099350
 PrefabInstance:
@@ -156,11 +156,11 @@ PrefabInstance:
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: -1108100253261171142, guid: f565c162608a6b44990b3d1d46ed2c18, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6504608772757854682}
+      addedObject: {fileID: 5348787513961041166}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f565c162608a6b44990b3d1d46ed2c18, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3227380375839311533}
+      addedObject: {fileID: 1383553470226542697}
   m_SourcePrefab: {fileID: 100100000, guid: f565c162608a6b44990b3d1d46ed2c18, type: 3}
 --- !u!4 &3260277629183178284 stripped
 Transform:
@@ -172,7 +172,7 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f565c162608a6b44990b3d1d46ed2c18, type: 3}
   m_PrefabInstance: {fileID: 6746930496368099350}
   m_PrefabAsset: {fileID: 0}
---- !u!95 &3227380375839311533
+--- !u!95 &1383553470226542697
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
