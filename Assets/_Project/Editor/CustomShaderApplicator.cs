@@ -196,7 +196,7 @@ namespace Tartaria.Editor
             if (!aetherVein || !corruption || !restoration || !spectralGhost)
             {
                 Debug.LogError("[CustomShaders] Materials not found. Run CreateAllMaterialsStatic() first.");
-                if (!Application.isBatchMode)
+                if (OneClickBuild.DialogsAllowed)
                 {
                     EditorUtility.DisplayDialog("Error", "Materials not found. Run 'Create All Materials' first.", "OK");
                 }
@@ -256,7 +256,7 @@ namespace Tartaria.Editor
 
             Debug.Log($"[CustomShaders] {report}");
             
-            if (!Application.isBatchMode)
+            if (OneClickBuild.DialogsAllowed)
             {
                 EditorUtility.DisplayDialog("Success", report, "OK");
             }
