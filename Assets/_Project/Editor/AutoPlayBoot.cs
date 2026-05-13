@@ -150,7 +150,9 @@ namespace Tartaria.Editor
         public static void RunBuildValidatePlay()
         {
             BuildReport.Begin("BUILD + VALIDATE + PLAY");
-
+            OneClickBuild.PipelineActive = true;
+            try
+            {
             // Phase 1: Build Everything
             Debug.Log("[Tartaria] === AUTO-PLAY: Phase 1/3 -- BUILD EVERYTHING ===");
             OneClickBuild.RunBuildPhases();
@@ -199,6 +201,11 @@ namespace Tartaria.Editor
                 Debug.LogWarning(
                     $"[Tartaria] Pipeline had {BuildReport.FailCount} failure(s) -- NOT entering Play mode.\n" +
                     "[Tartaria] Fix errors above, then: Tartaria > Build + Validate + Play");
+            }
+            }
+            finally
+            {
+                OneClickBuild.PipelineActive = false;
             }
         }
     }

@@ -84,7 +84,7 @@ namespace Tartaria.Editor
                 UpgradeShardCollectStatic();
                 CreateAuroraVFXStatic();
                 
-                if (!Application.isBatchMode)
+                if (OneClickBuild.DialogsAllowed)
                 {
                     EditorUtility.DisplayDialog("Success", "All VFX upgraded to AAA quality!", "OK");
                 }

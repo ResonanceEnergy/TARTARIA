@@ -17,6 +17,22 @@ namespace Tartaria.Editor
     /// </summary>
     public static class OneClickBuild
     {
+        /// <summary>
+        /// True while the auto-play pipeline (or batch build) is running.
+        /// Editor tools called as pipeline phases must NOT show modal dialogs
+        /// when this flag is true — they would block the headless run.
+        /// </summary>
+        public static bool PipelineActive { get; set; }
+
+        /// <summary>
+        /// Returns true if a modal dialog is safe to show right now
+        /// (i.e. user invoked the menu item directly, not via the pipeline).
+        /// </summary>
+        public static bool DialogsAllowed =>
+            !UnityEditorInternal.InternalEditorUtility.inBatchMode
+            && !Application.isBatchMode
+            && !PipelineActive;
+
         [MenuItem("Tartaria/BUILD EVERYTHING", false, -100)]
         public static void BuildEverything()
         {
