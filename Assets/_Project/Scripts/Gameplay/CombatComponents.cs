@@ -271,6 +271,28 @@ namespace Tartaria.Gameplay
         public bool IsVulnerable;              // True when player matches frequency
     }
 
+    // ─── Knockback + Hitstun ─────────────────────
+
+    /// <summary>
+    /// Knockback impulse applied on damage hit. Direction and magnitude
+    /// scale with frequency-match quality. Decays exponentially.
+    /// </summary>
+    public struct KnockbackImpulse : IComponentData
+    {
+        public float3 Direction;             // Unit vector
+        public float Magnitude;              // m/s (0.5..1.0 × 8m/s base)
+        public float DecayRate;              // Exponential decay per second (default 5.0)
+    }
+
+    /// <summary>
+    /// Hit-stun timer — prevents AI updates while stunned.
+    /// Duration scales with attack's frequency-match quality.
+    /// </summary>
+    public struct HitStunTimer : IComponentData
+    {
+        public float Remaining;              // 0.15s..0.4s depending on match quality
+    }
+
     // ─── Damage Events ───────────────────────────
     public struct DamageEvent : IBufferElementData
     {

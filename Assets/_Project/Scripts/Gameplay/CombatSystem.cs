@@ -75,8 +75,8 @@ namespace Tartaria.Gameplay
             }
 
             // Process damage events
-            foreach (var (combatant, damageBuffer, entity) in
-                SystemAPI.Query<RefRW<HarmonicCombatant>, DynamicBuffer<DamageEvent>>()
+            foreach (var (combatant, damageBuffer, transform, entity) in
+                SystemAPI.Query<RefRW<HarmonicCombatant>, DynamicBuffer<DamageEvent>, RefRO<LocalTransform>>()
                     .WithEntityAccess())
             {
                 for (int i = 0; i < damageBuffer.Length; i++)
@@ -99,31 +99,102 @@ namespace Tartaria.Gameplay
                     {
                         // Damage type modifiers
                         float finalDamage = dmg.Amount;
+                        float freqMatchQuality = 0f; // 0..1, used for knockback scaling
+
                         switch (dmg.Type)
                         {
                             case DamageType.ResonancePulse:
                                 // AOE: base damage, bonus if frequency near target's
                                 float freqDelta = math.abs(dmg.Frequency - combatant.ValueRO.CurrentFrequency);
                                 if (freqDelta < CombatBalance.PulseFreqTolerance)
+                                {
                                     finalDamage *= CombatBalance.PulseFreqMatchBonus;
+                                    freqMatchQuality = 1f - (freqDelta / CombatBalance.PulseFreqTolerance);
+                                }
+                                else
+                                {
+                                    freqMatchQuality = 0.5f; // Base knockback even on miss
+                                }
                                 break;
                             case DamageType.HarmonicStrike:
                                 // Directed: 1.25x base, 2x if frequency-matched
                                 finalDamage *= CombatBalance.StrikeBaseMultiplier;
                                 float hsDelta = math.abs(dmg.Frequency - combatant.ValueRO.CurrentFrequency);
                                 if (hsDelta < CombatBalance.StrikeFreqTolerance)
+                                {
                                     finalDamage *= CombatBalance.StrikeTightMatchBonus;
+                                    freqMatchQuality = 1f - (hsDelta / CombatBalance.StrikeFreqTolerance);
+                                }
+                                else
+                                {
+                                    freqMatchQuality = 0.6f; // Better base than Pulse
+                                }
                                 break;
                             case DamageType.GolemSlam:
                                 // Enemy melee: flat damage, ignores frequency
+                                freqMatchQuality = 0.5f;
                                 break;
                             case DamageType.Environmental:
                                 // Environmental: bypasses armor entirely
+                                freqMatchQuality = 0f; // No knockback from environmental
                                 break;
                             default:
                                 break;
                         }
                         combatant.ValueRW.Health -= finalDamage;
+
+                        // Apply knockback + hitstun (enemies only, not player)
+                        if (freqMatchQuality > 0f && state.EntityManager.HasComponent<EnemyTag>(entity))
+                        {
+                            // Get source position to calculate knockback direction
+                            float3 targetPos = transform.ValueRO.Position;
+                            float3 sourcePos = state.EntityManager.HasComponent<LocalTransform>(dmg.Source)
+                                ? state.EntityManager.GetComponentData<LocalTransform>(dmg.Source).Position
+                                : targetPos; // Fallback if source missing
+
+                            float3 knockDir = math.normalizesafe(targetPos - sourcePos, new float3(0, 0, 1));
+                            float knockMag = math.lerp(0.5f, 1.0f, freqMatchQuality) * 8f; // 4..8 m/s
+
+                            // Set/update knockback component
+                            if (state.EntityManager.HasComponent<KnockbackImpulse>(entity))
+                            {
+                                state.EntityManager.SetComponentData(entity, new KnockbackImpulse
+                                {
+                                    Direction = knockDir,
+                                    Magnitude = knockMag,
+                                    DecayRate = 5f
+                                });
+                            }
+                            else
+                            {
+                                state.EntityManager.AddComponentData(entity, new KnockbackImpulse
+                                {
+                                    Direction = knockDir,
+                                    Magnitude = knockMag,
+                                    DecayRate = 5f
+                                });
+                            }
+
+                            // Apply hitstun
+                            float stunDur = math.lerp(0.15f, 0.4f, freqMatchQuality);
+                            if (state.EntityManager.HasComponent<HitStunTimer>(entity))
+                            {
+                                var hst = state.EntityManager.GetComponentData<HitStunTimer>(entity);
+                                hst.Remaining = math.max(hst.Remaining, stunDur); // Take max, don't stack
+                                state.EntityManager.SetComponentData(entity, hst);
+                            }
+                            else
+                            {
+                                state.EntityManager.AddComponentData(entity, new HitStunTimer
+                                {
+                                    Remaining = stunDur
+                                });
+                            }
+
+                            // Extend hit-stop duration based on frequency-match quality
+                            int hitStopDamage = (int)(finalDamage * (1f + freqMatchQuality));
+                            HitStopController.Trigger(hitStopDamage);
+                        }
                     }
                 }
                 damageBuffer.Clear();
