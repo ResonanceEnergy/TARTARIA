@@ -93,6 +93,15 @@ namespace Tartaria.Core
         void LateUpdate()
         {
             UpdateTextureFromECS();
+            
+            // Set global texture and uniforms for shaders (renderer feature will read them)
+            if (_volumeTexture != null)
+            {
+                Shader.SetGlobalTexture("_AetherVolume", _volumeTexture);
+                // Set volume bounds (500m cube centered at origin)
+                Shader.SetGlobalVector("_AetherFieldOrigin", Vector3.zero);
+                Shader.SetGlobalFloat("_AetherFieldSize", 500f);
+            }
         }
 
         void UpdateTextureFromECS()
