@@ -138,7 +138,7 @@ namespace Tartaria.Editor
 
             Debug.Log("[CustomShaders] ✓ All 4 materials created in Assets/_Project/Materials/");
             
-            if (!Application.isBatchMode)
+            if (OneClickBuild.DialogsAllowed)
             {
                 EditorUtility.DisplayDialog("Success", "Created 4 custom shader materials:\n• AetherVein\n• Corruption\n• Restoration\n• SpectralGhost", "OK");
             }
@@ -180,7 +180,7 @@ namespace Tartaria.Editor
             if (!scene.IsValid())
             {
                 Debug.LogError("[CustomShaders] No active scene. Open Echohaven_VerticalSlice.unity first.");
-                if (!Application.isBatchMode)
+                if (OneClickBuild.DialogsAllowed)
                 {
                     EditorUtility.DisplayDialog("Error", "No active scene. Open Echohaven_VerticalSlice.unity first.", "OK");
                 }

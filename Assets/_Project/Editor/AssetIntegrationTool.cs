@@ -93,7 +93,7 @@ namespace Tartaria.Editor
             Debug.Log($"  Jump → au");
             Debug.Log($"  Attack → martelo");
 
-            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+            if (OneClickBuild.DialogsAllowed)
             {
                 EditorUtility.DisplayDialog("Integration Complete",
                     "Capoeira animations successfully applied to Player.prefab!\n\n" +
@@ -333,7 +333,7 @@ namespace Tartaria.Editor
             if (playerMesh == null)
             {
                 Debug.LogError($"[Integration] Player_Mesh.fbx not found at: {PLAYER_MESH_PATH}");
-                if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+                if (OneClickBuild.DialogsAllowed)
                 {
                     EditorUtility.DisplayDialog("Error", "Player_Mesh.fbx not found!\nMake sure it's imported in Assets/_Project/Models/Characters/", "OK");
                 }
@@ -400,7 +400,7 @@ namespace Tartaria.Editor
             PrefabUtility.UnloadPrefabContents(prefabInstance);
 
             Debug.Log($"[Integration] ✓ Player capsule replaced with Player_Mesh.fbx");
-            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+            if (OneClickBuild.DialogsAllowed)
             {
                 EditorUtility.DisplayDialog("Integration Complete",
                     "Player capsule replaced with real 3D model!\n\n" +
