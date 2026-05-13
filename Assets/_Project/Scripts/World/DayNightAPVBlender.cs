@@ -40,22 +40,13 @@ namespace Tartaria.World
 
         void Awake()
         {
-            // Reflect into DayNightCycleController.TimeOfDay
-            var dnType = System.Type.GetType("Tartaria.Gameplay.DayNightCycleController, Tartaria.Gameplay");
-            if (dnType != null)
+            // Cache the type + property once; instance lookup happens lazily.
+            _dnType = System.Type.GetType("Tartaria.Gameplay.DayNightCycleController, Tartaria.Gameplay");
+            if (_dnType != null)
             {
-                var instances = FindObjectsByType(dnType, FindObjectsSortMode.None);
-                if (instances.Length > 0)
-                {
-                    _dayNightController = instances[0];
-                    _timeOfDayProp = dnType.GetProperty("TimeOfDay", BindingFlags.Public | BindingFlags.Instance);
-                }
+                _timeOfDayProp = _dnType.GetProperty("TimeOfDay", BindingFlags.Public | BindingFlags.Instance);
             }
-
-            if (_timeOfDayProp == null)
-            {
-                Debug.LogWarning("[DayNightAPVBlender] Could not find DayNightCycleController.TimeOfDay — using fixed time 0.5 (noon).");
-            }
+            TryResolveController();
 
             // Try to reflect into ProbeReferenceVolume.instance.BlendingFactor (APV API)
             var apvType = System.Type.GetType("UnityEngine.Rendering.ProbeReferenceVolume, Unity.RenderPipelines.Core.Runtime");
@@ -126,6 +117,16 @@ namespace Tartaria.World
             catch
             {
                 return 0.5f;
+            }
+        }
+
+        void TryResolveController()
+        {
+            if (_dnType == null) return;
+            var instances = FindObjectsByType(_dnType, FindObjectsSortMode.None);
+            if (instances.Length > 0)
+            {
+                _dayNightController = instances[0];
             }
         }
     }

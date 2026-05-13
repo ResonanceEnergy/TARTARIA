@@ -1,5 +1,5 @@
 // TARTARIA WORLD OF WONDER
-// Core Assembly — Aether, Resonance, Golden Ratio Engine
+// Gameplay Assembly — Combat, Items, Skills
 // Unity 6 LTS | DOTS/ECS | URP
 
 using Unity.Burst;
