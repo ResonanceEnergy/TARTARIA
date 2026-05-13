@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Yarn.Unity;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
@@ -16,6 +17,9 @@ namespace Tartaria.Integration
     ///
     /// Each NPC can have multiple DialogueTree assets. The DialogueManager
     /// selects the appropriate tree based on context and conditions.
+    /// 
+    /// Yarn integration: if Assets/_Project/Data/Dialogue/{contextId}.yarn exists,
+    /// routes through YarnDialogueAdapter instead of hardcoded tree.
     /// </summary>
     public class DialogueTreeRunner : MonoBehaviour
     {
@@ -51,7 +55,23 @@ namespace Tartaria.Integration
         // ─── Public API ──────────────────────────────
 
         /// <summary>
-        /// Start a branching dialogue tree.
+        /// Start a dialogue by context ID. Routes to Yarn if .yarn file exists.
+        /// </summary>
+        public void StartDialogueByContext(string contextId)
+        {
+            // Check for Yarn file at Assets/_Project/Data/Dialogue/{contextId}.yarn
+            string yarnPath = $"Assets/_Project/Data/Dialogue/{contextId}.yarn";
+            if (System.IO.File.Exists(yarnPath))
+            {
+                StartYarnDialogue(contextId);
+                return;
+            }
+
+            Debug.LogWarning($"[DialogueTreeRunner] No Yarn file found for context '{contextId}' at {yarnPath}");
+        }
+
+        /// <summary>
+        /// Start a branching dialogue tree (legacy path).
         /// </summary>
         public void StartTree(DialogueTree tree)
         {
@@ -80,6 +100,41 @@ namespace Tartaria.Integration
                 EnterNode(root);
             else
                 EndTree();
+        }
+
+        /// <summary>
+        /// Start Yarn dialogue by contextId (node name).
+        /// Creates a YarnDialogueAdapter GameObject if none exists.
+        /// </summary>
+        void StartYarnDialogue(string contextId)
+        {
+            // Find or create YarnDialogueAdapter
+            var adapter = FindAnyObjectByType<YarnDialogueAdapter>();
+            if (adapter == null)
+            {
+                Debug.LogWarning($"[DialogueTreeRunner] No YarnDialogueAdapter found. Create a GameObject with YarnDialogueAdapter + DialogueRunner + YarnProject.");
+                return;
+            }
+
+            // Normalize node name (Yarn node names match file name without extension)
+            string nodeName = contextId.Replace("_", "");  // "Milo_Intro" → "MiloIntro" (if needed)
+            // Yarn 2.5 uses the title from the .yarn file, so try both
+            if (adapter.GetComponent<DialogueRunner>().NodeExists(nodeName))
+            {
+                adapter.StartDialogue(nodeName);
+                _isRunning = true;
+                OnDialogueStarted?.Invoke(contextId, "Yarn");
+            }
+            else if (adapter.GetComponent<DialogueRunner>().NodeExists(contextId))
+            {
+                adapter.StartDialogue(contextId);
+                _isRunning = true;
+                OnDialogueStarted?.Invoke(contextId, "Yarn");
+            }
+            else
+            {
+                Debug.LogWarning($"[DialogueTreeRunner] Yarn node '{nodeName}' / '{contextId}' not found in YarnProject.");
+            }
         }
 
         /// <summary>

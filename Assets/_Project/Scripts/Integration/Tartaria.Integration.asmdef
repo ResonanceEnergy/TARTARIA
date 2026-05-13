@@ -17,7 +17,8 @@
         "Unity.Transforms",
         "Unity.TextMeshPro",
         "Unity.RenderPipelines.Core.Runtime",
-        "Unity.RenderPipelines.Universal.Runtime"
+        "Unity.RenderPipelines.Universal.Runtime",
+        "YarnSpinner.Unity"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
