@@ -10,7 +10,9 @@ namespace Tartaria.Editor
     /// </summary>
     public static class APVBakeTool
     {
-        [MenuItem("Tartaria/Lighting/Bake APV Scenarios (Day+Night)")]
+        // Note: real bake lives in BakeAPVScenarios.cs. This is a stub helper kept under a distinct menu path
+        // to avoid duplicate-MenuItem registration warnings.
+        [MenuItem("Tartaria/Lighting/APV Bake (Stub Helper)")]
         public static void BakeAPVScenarios()
         {
             Debug.Log("[APVBakeTool] Starting APV scenario bake (Day + Night)...");

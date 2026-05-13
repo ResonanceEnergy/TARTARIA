@@ -24,6 +24,9 @@ namespace Tartaria.Gameplay
         static readonly int JumpId = Animator.StringToHash("Jump");
         static readonly int AttackId = Animator.StringToHash("Attack");
 
+        // Cached parameter existence flags — Animator.SetX with a missing parameter logs an error every frame.
+        bool _hasSpeed, _hasIsGrounded, _hasIsSprinting, _hasJump, _hasAttack;
+
         void Awake()
         {
             _animator = GetComponent<Animator>();
@@ -33,6 +36,22 @@ namespace Tartaria.Gameplay
 
             if (characterController == null)
                 characterController = GetComponent<CharacterController>();
+
+            CacheAnimatorParams();
+        }
+
+        void CacheAnimatorParams()
+        {
+            _hasSpeed = _hasIsGrounded = _hasIsSprinting = _hasJump = _hasAttack = false;
+            if (_animator == null || _animator.runtimeAnimatorController == null) return;
+            foreach (var p in _animator.parameters)
+            {
+                if (p.nameHash == SpeedId) _hasSpeed = true;
+                else if (p.nameHash == IsGroundedId) _hasIsGrounded = true;
+                else if (p.nameHash == IsSprintingId) _hasIsSprinting = true;
+                else if (p.nameHash == JumpId) _hasJump = true;
+                else if (p.nameHash == AttackId) _hasAttack = true;
+            }
         }
 
         void OnEnable()  { PlayerCombat.OnSwing += HandleSwing; }
@@ -40,7 +59,7 @@ namespace Tartaria.Gameplay
 
         void HandleSwing()
         {
-            if (_animator != null) _animator.SetTrigger(AttackId);
+            if (_animator != null && _hasAttack) _animator.SetTrigger(AttackId);
         }
 
         void Update()
@@ -55,13 +74,13 @@ namespace Tartaria.Gameplay
                 isSprinting = PlayerStamina.Instance != null && PlayerStamina.Instance.IsSprinting;
                 speed = isSprinting ? 1.5f : 1f;
             }
-            _animator.SetFloat(SpeedId, speed);
-            _animator.SetBool(IsSprintingId, isSprinting);
+            if (_hasSpeed) _animator.SetFloat(SpeedId, speed);
+            if (_hasIsSprinting) _animator.SetBool(IsSprintingId, isSprinting);
 
             bool isGrounded = characterController != null ? characterController.isGrounded : true;
-            _animator.SetBool(IsGroundedId, isGrounded);
+            if (_hasIsGrounded) _animator.SetBool(IsGroundedId, isGrounded);
 
-            if (characterController != null && characterController.velocity.y > 1f)
+            if (_hasJump && characterController != null && characterController.velocity.y > 1f)
                 _animator.SetTrigger(JumpId);
         }
 

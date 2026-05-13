@@ -43,7 +43,21 @@ namespace Tartaria.Gameplay
             state.RequireForUpdate<ResonanceScore>();
         }
 
-        [BurstCompile]
+        // Pending knockback/hitstun deferred until after the iteration loop to avoid
+        // structural changes during enumeration. Also keeps OnUpdate Burst-incompatible
+        // managed calls (HitStopController) out of the Burst code path.
+        struct PendingHitFx
+        {
+            public Entity Target;
+            public float3 KnockDir;
+            public float KnockMag;
+            public float StunDur;
+            public int HitStopDamage;
+        }
+
+        // NOTE: not [BurstCompile] — this method calls into managed HitStopController
+        // (static field access is forbidden by Burst BC1042). Inner queries still
+        // benefit from Burst via SystemAPI.Query codegen.
         public void OnUpdate(ref SystemState state)
         {
             float dt = SystemAPI.Time.DeltaTime;
@@ -75,6 +89,7 @@ namespace Tartaria.Gameplay
             }
 
             // Process damage events
+            var pendingFx = new NativeList<PendingHitFx>(8, Allocator.Temp);
             foreach (var (combatant, damageBuffer, transform, entity) in
                 SystemAPI.Query<RefRW<HarmonicCombatant>, DynamicBuffer<DamageEvent>, RefRO<LocalTransform>>()
                     .WithEntityAccess())
@@ -143,7 +158,7 @@ namespace Tartaria.Gameplay
                         }
                         combatant.ValueRW.Health -= finalDamage;
 
-                        // Apply knockback + hitstun (enemies only, not player)
+                        // Queue knockback + hitstun (enemies only, not player) — applied after iteration
                         if (freqMatchQuality > 0f && state.EntityManager.HasComponent<EnemyTag>(entity))
                         {
                             // Get source position to calculate knockback direction
@@ -154,46 +169,17 @@ namespace Tartaria.Gameplay
 
                             float3 knockDir = math.normalizesafe(targetPos - sourcePos, new float3(0, 0, 1));
                             float knockMag = math.lerp(0.5f, 1.0f, freqMatchQuality) * 8f; // 4..8 m/s
-
-                            // Set/update knockback component
-                            if (state.EntityManager.HasComponent<KnockbackImpulse>(entity))
-                            {
-                                state.EntityManager.SetComponentData(entity, new KnockbackImpulse
-                                {
-                                    Direction = knockDir,
-                                    Magnitude = knockMag,
-                                    DecayRate = 5f
-                                });
-                            }
-                            else
-                            {
-                                state.EntityManager.AddComponentData(entity, new KnockbackImpulse
-                                {
-                                    Direction = knockDir,
-                                    Magnitude = knockMag,
-                                    DecayRate = 5f
-                                });
-                            }
-
-                            // Apply hitstun
                             float stunDur = math.lerp(0.15f, 0.4f, freqMatchQuality);
-                            if (state.EntityManager.HasComponent<HitStunTimer>(entity))
-                            {
-                                var hst = state.EntityManager.GetComponentData<HitStunTimer>(entity);
-                                hst.Remaining = math.max(hst.Remaining, stunDur); // Take max, don't stack
-                                state.EntityManager.SetComponentData(entity, hst);
-                            }
-                            else
-                            {
-                                state.EntityManager.AddComponentData(entity, new HitStunTimer
-                                {
-                                    Remaining = stunDur
-                                });
-                            }
-
-                            // Extend hit-stop duration based on frequency-match quality
                             int hitStopDamage = (int)(finalDamage * (1f + freqMatchQuality));
-                            HitStopController.Trigger(hitStopDamage);
+
+                            pendingFx.Add(new PendingHitFx
+                            {
+                                Target = entity,
+                                KnockDir = knockDir,
+                                KnockMag = knockMag,
+                                StunDur = stunDur,
+                                HitStopDamage = hitStopDamage
+                            });
                         }
                     }
                 }
@@ -207,6 +193,49 @@ namespace Tartaria.Gameplay
                     combatant.ValueRW.Health = 0f;
                 }
             }
+
+            // Apply deferred structural changes & managed hit-stop calls
+            var em = state.EntityManager;
+            for (int i = 0; i < pendingFx.Length; i++)
+            {
+                var fx = pendingFx[i];
+
+                // Knockback
+                if (em.HasComponent<KnockbackImpulse>(fx.Target))
+                {
+                    em.SetComponentData(fx.Target, new KnockbackImpulse
+                    {
+                        Direction = fx.KnockDir,
+                        Magnitude = fx.KnockMag,
+                        DecayRate = 5f
+                    });
+                }
+                else
+                {
+                    em.AddComponentData(fx.Target, new KnockbackImpulse
+                    {
+                        Direction = fx.KnockDir,
+                        Magnitude = fx.KnockMag,
+                        DecayRate = 5f
+                    });
+                }
+
+                // Hitstun (take max, don't stack)
+                if (em.HasComponent<HitStunTimer>(fx.Target))
+                {
+                    var hst = em.GetComponentData<HitStunTimer>(fx.Target);
+                    hst.Remaining = math.max(hst.Remaining, fx.StunDur);
+                    em.SetComponentData(fx.Target, hst);
+                }
+                else
+                {
+                    em.AddComponentData(fx.Target, new HitStunTimer { Remaining = fx.StunDur });
+                }
+
+                // Managed hit-stop (main thread only — Burst-incompatible static field)
+                HitStopController.Trigger(fx.HitStopDamage);
+            }
+            pendingFx.Dispose();
         }
     }
 
