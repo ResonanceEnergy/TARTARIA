@@ -91,8 +91,7 @@ namespace Tartaria.UI
             return _material;
         }
 
-        [System.Obsolete]
-        public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData)
+        public override void RecordRenderGraph(RenderGraph renderGraph, ContextContainer frameData)
         {
             var mat = GetMaterial();
             if (mat == null) return;
@@ -107,13 +106,26 @@ namespace Tartaria.UI
 
             mat.SetMatrix(s_ColorMatrix, correction);
 
-            var cmd = CommandBufferPool.Get("ColorblindCorrection");
-#pragma warning disable CS0618
-            var source = renderingData.cameraData.renderer.cameraColorTargetHandle;
-#pragma warning restore CS0618
-            Blitter.BlitCameraTexture(cmd, source, source, mat, 0);
-            context.ExecuteCommandBuffer(cmd);
-            CommandBufferPool.Release(cmd);
+            var resourceData = frameData.Get<UniversalResourceData>();
+            var source = resourceData.activeColorTexture;
+
+            using (var builder = renderGraph.AddRasterRenderPass<PassData>(
+                "Colorblind Correction", out var passData, profilingSampler))
+            {
+                passData.material = mat;
+                builder.UseTexture(source, AccessFlags.ReadWrite);
+                builder.SetRenderAttachment(source, 0, AccessFlags.Write);
+
+                builder.SetRenderFunc((PassData data, RasterGraphContext context) =>
+                {
+                    Blitter.BlitTexture(context.cmd, new Vector4(1, 1, 0, 0), data.material, 0);
+                });
+            }
+        }
+
+        class PassData
+        {
+            public Material material;
         }
 
         public void Cleanup()

@@ -98,11 +98,6 @@ namespace Tartaria.Gameplay
         }
 
         /// <summary>
-        /// Gets normalized time of day (0 = midnight, 0.5 = noon, 1 = midnight next day).
-        /// </summary>
-        public float TimeOfDay => _currentTime / cycleDuration;
-
-        /// <summary>
         /// Gets current day/night phase as a string (for UI/debugging).
         /// </summary>
         public string CurrentPhase

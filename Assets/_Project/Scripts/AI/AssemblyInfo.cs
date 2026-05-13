@@ -1,5 +1,5 @@
 // TARTARIA WORLD OF WONDER
-// Core Assembly — Aether, Resonance, Golden Ratio Engine
+// AI Assembly — Behavior Trees, NPC Logic
 // Unity 6 LTS | DOTS/ECS | URP
 
 using Unity.Burst;
