@@ -5,7 +5,11 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Tartaria.Core",
+        "Tartaria.Gameplay",
         "Tartaria.Save",
+        "Unity.Entities",
+        "Unity.Transforms",
+        "Unity.Collections",
         "Unity.Mathematics"
     ],
     "includePlatforms": [

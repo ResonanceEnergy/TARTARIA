@@ -38,10 +38,15 @@ namespace Tartaria.AI
             }
 
             // Update each enemy
-            foreach (var (ai, combatant, transform, golem) in
+            foreach (var (ai, combatant, transform, golem, entity) in
                 SystemAPI.Query<RefRW<EnemyAI>, RefRW<HarmonicCombatant>,
-                    RefRW<LocalTransform>, RefRW<MudGolem>>())
+                    RefRW<LocalTransform>, RefRW<MudGolem>>()
+                    .WithEntityAccess())
             {
+                // Skip AI updates if hitstunned
+                if (state.EntityManager.HasComponent<HitStunTimer>(entity))
+                    continue;
+
                 ai.ValueRW.StateTimer += dt;
 
                 switch (ai.ValueRO.State)
