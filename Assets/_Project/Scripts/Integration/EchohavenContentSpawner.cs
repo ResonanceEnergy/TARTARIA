@@ -65,6 +65,8 @@ namespace Tartaria.Integration
             SpawnParticleEffects();
             SpawnAmbientAudio();
             SpawnInitialEnemies();                                      // Spawn 2 golems at game start
+            // TODO Wave4(b): Spawn Aurora.prefab here (VFX not yet created)
+            // SpawnAuroraPermanent();
             SetupEnemyWaveEncounters();
             RegisterEchohavenExcavationSites();                         // Gap 6: register dig sites
             PlaceDigSiteMarkers();                                      // Visual markers over dig sites

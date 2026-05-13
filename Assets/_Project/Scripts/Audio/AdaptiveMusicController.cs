@@ -147,10 +147,41 @@ namespace Tartaria.Audio
 
         void HandleStateChange(GameState prev, GameState current)
         {
-            if (current == GameState.Combat && !_bossActive)
-                EnterCombat();
-            else if (current == GameState.Exploration)
-                ExitCombat();
+            // Map state transitions to music behaviors
+            switch (current)
+            {
+                case GameState.Combat:
+                    if (!_bossActive)
+                        EnterCombat();
+                    break;
+
+                case GameState.Exploration:
+                    ExitCombat();
+                    ExitBossEncounter();
+                    break;
+
+                case GameState.Tuning:
+                    // Tuning mini-game: reduce combat overlay, boost melodic layers
+                    ExitCombat();
+                    break;
+
+                case GameState.Cinematic:
+                    // Cinematics: fade combat, preserve ambient
+                    ExitCombat();
+                    break;
+
+                case GameState.Paused:
+                case GameState.Menu:
+                    // Paused/Menu: lower all layers
+                    break;
+
+                case GameState.Loading:
+                case GameState.Boot:
+                    // Boot/Loading: silent or minimal ambient
+                    break;
+            }
+
+            Debug.Log($"[AdaptiveMusicController] State {prev} → {current} — adjusted music layers.");
         }
 
         // ─── Layer Volume Control ────────────────────
