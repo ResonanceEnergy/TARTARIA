@@ -445,7 +445,7 @@ namespace Tartaria.Editor
 
             Debug.Log($"[Integration] Custom shaders validation: {compiled}/{found} materials compiled successfully");
 
-            if (!UnityEditorInternal.InternalEditorUtility.inBatchMode)
+            if (OneClickBuild.DialogsAllowed)
             {
                 EditorUtility.DisplayDialog("Shader Validation",
                     $"Custom Shaders Status:\n\n" +
