@@ -154,7 +154,7 @@ namespace Tartaria.Integration
             var pickup = root.AddComponent<ShovelPickup>();
             pickup.displayName = "Field Shovel";
 
-            AddNameplate(root, "[E] Pick Up Shovel", new Color(0.95f, 0.85f, 0.35f));
+            AddNameplate(root, Tartaria.Input.InputPromptHelper.Localize("[E] Pick Up Shovel"), new Color(0.95f, 0.85f, 0.35f));
         }
 
         void EnsureMudDigVisuals()
@@ -595,7 +595,7 @@ namespace Tartaria.Integration
             root.layer = layer >= 0 ? layer : 0;
             root.AddComponent<MiloInteractable>();
 
-            AddNameplate(root, "[E] Talk to Milo", new Color(0.5f, 0.8f, 1f));
+            AddNameplate(root, Tartaria.Input.InputPromptHelper.Localize("[E] Talk to Milo"), new Color(0.5f, 0.8f, 1f));
 
             return root;
         }
@@ -1590,7 +1590,7 @@ namespace Tartaria.Integration
             }
 
             // Floating label
-            AddNameplate(marker, $"[E] Dig — {siteName}", new Color(0.3f, 1f, 0.4f));
+            AddNameplate(marker, Tartaria.Input.InputPromptHelper.Localize($"[E] Dig — {siteName}"), new Color(0.3f, 1f, 0.4f));
 
             // Pulsing bob animation
             marker.AddComponent<BobbingMarker>();
@@ -1820,7 +1820,7 @@ namespace Tartaria.Integration
         public string SiteName;
         bool _excavated;
 
-        public string GetInteractPrompt() => _excavated ? $"{SiteName} — already excavated" : $"[E] Excavate — {SiteName}";
+        public string GetInteractPrompt() => _excavated ? $"{SiteName} — already excavated" : $"{Tartaria.Input.InputPromptHelper.Interact} Excavate — {SiteName}";
 
         public void Interact(GameObject player)
         {
@@ -1863,7 +1863,7 @@ namespace Tartaria.Integration
         public string displayName = "Shovel";
         bool _picked;
 
-        public string GetInteractPrompt() => _picked ? $"{displayName} acquired" : $"[E] Pick Up {displayName}";
+        public string GetInteractPrompt() => _picked ? $"{displayName} acquired" : $"{Tartaria.Input.InputPromptHelper.Interact} Pick Up {displayName}";
 
         public void Interact(GameObject player)
         {
@@ -1898,9 +1898,8 @@ namespace Tartaria.Integration
     {
         public string GetInteractPrompt()
         {
-            return MiloController.Instance != null && MiloController.Instance.HasIntroduced
-                ? "[E] Talk to Milo"
-                : "[E] Greet Milo";
+            string verb = (MiloController.Instance != null && MiloController.Instance.HasIntroduced) ? "Talk to" : "Greet";
+            return $"{Tartaria.Input.InputPromptHelper.Interact} {verb} Milo";
         }
 
         public void Interact(GameObject player)
