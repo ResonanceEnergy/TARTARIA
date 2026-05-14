@@ -132,9 +132,25 @@ namespace Tartaria.Editor
             if (buildingSpawner != null)
             {
                 SetSerializedField(buildingSpawner, "kayKitRockPrefabs", rocks);
-                SetSerializedField(buildingSpawner, "kayKitTreePrefabs", new GameObject[0]); // No trees in packs yet
+                
+                // Wire tree prefabs
+                string[] treePaths = {
+                    "Assets/_Project/Prefabs/Props/KayKit/Forest/Prop_Tree_1_A_Color1.prefab",
+                    "Assets/_Project/Prefabs/Props/KayKit/Forest/Prop_Tree_2_A_Color1.prefab",
+                    "Assets/_Project/Prefabs/Props/KayKit/Forest/Prop_Tree_3_A_Color1.prefab",
+                    "Assets/_Project/Prefabs/Props/KayKit/Forest/Prop_Tree_Bare_1_A_Color1.prefab"
+                };
+                var trees = new GameObject[treePaths.Length];
+                for (int i = 0; i < treePaths.Length; i++)
+                {
+                    trees[i] = AssetDatabase.LoadAssetAtPath<GameObject>(treePaths[i]);
+                    if (trees[i] == null)
+                        Debug.LogWarning($"[KayKitWirer] Tree prefab not found: {treePaths[i]}");
+                }
+                SetSerializedField(buildingSpawner, "kayKitTreePrefabs", trees);
+                
                 SetSerializedField(buildingSpawner, "kayKitBushPrefabs", foliage);
-                Debug.Log("[KayKitWirer] ✓ BuildingSpawner rocks/bushes wired for compositing.");
+                Debug.Log($"[KayKitWirer] ✓ BuildingSpawner wired: {rocks.Length} rocks, {trees.Length} trees, {foliage.Length} bushes.");
             }
             else
             {
