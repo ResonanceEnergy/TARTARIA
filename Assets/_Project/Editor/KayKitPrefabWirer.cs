@@ -161,18 +161,26 @@ namespace Tartaria.Editor
             var prop = so.FindProperty(fieldName);
             if (prop != null)
             {
-                if (value is GameObject[] arr)
+                prop.objectReferenceValue = value;
+                so.ApplyModifiedProperties();
+            }
+            else
+            {
+                Debug.LogError($"[KayKitWirer] Field not found: {fieldName} on {target.GetType().Name}");
+            }
+        }
+
+        static void SetSerializedField(Object target, string fieldName, GameObject[] arr)
+        {
+            var so = new SerializedObject(target);
+            var prop = so.FindProperty(fieldName);
+            if (prop != null)
+            {
+                prop.arraySize = arr.Length;
+                for (int i = 0; i < arr.Length; i++)
                 {
-                    prop.arraySize = arr.Length;
-                    for (int i = 0; i < arr.Length; i++)
-                    {
-                        var elem = prop.GetArrayElementAtIndex(i);
-                        elem.objectReferenceValue = arr[i];
-                    }
-                }
-                else
-                {
-                    prop.objectReferenceValue = value;
+                    var elem = prop.GetArrayElementAtIndex(i);
+                    elem.objectReferenceValue = arr[i];
                 }
                 so.ApplyModifiedProperties();
             }
