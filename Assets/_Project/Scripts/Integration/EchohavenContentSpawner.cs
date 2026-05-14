@@ -86,6 +86,7 @@ namespace Tartaria.Integration
             RegisterEchohavenExcavationSites();                         // Gap 6: register dig sites
             PlaceDigSiteMarkers();                                      // Visual markers over dig sites
             SpawnAnastasia();                                           // Anastasia ghost companion
+            SpawnKayKitScatter();                                       // KayKit rocks + foliage runtime scatter
             SubscribeVFXEvents();
             ActivateStartingQuest();                                    // Gap 11: activate first quest on HUD
             AdaptiveMusicController.Instance?.SetZone(0);              // Gap 14: Moon 1 zone music
@@ -537,6 +538,7 @@ namespace Tartaria.Integration
             {
                 miloGO = Instantiate(kayKitMiloPrefab, spawnPos, Quaternion.identity);
                 miloGO.transform.localScale = Vector3.one * 0.85f;
+                EnsureNPCAnimator(miloGO);
                 Debug.Log("[EchohavenContentSpawner] Milo spawned from KayKit prefab.");
             }
             else
@@ -656,6 +658,7 @@ namespace Tartaria.Integration
                 cassianGO = Instantiate(kayKitCassianPrefab, cassianPosition, Quaternion.identity);
                 cassianGO.name = "Cassian";
                 cassianGO.transform.localScale = Vector3.one * 1.1f;
+                EnsureNPCAnimator(cassianGO);
                 Debug.Log("[EchohavenContentSpawner] Cassian spawned from KayKit prefab.");
             }
             else
@@ -1304,6 +1307,7 @@ namespace Tartaria.Integration
             {
                 golem = Instantiate(kayKitMudGolemPrefab, pos, Quaternion.identity);
                 golem.transform.localScale = Vector3.one * 1.3f;
+                EnsureNPCAnimator(golem);
                 Debug.Log("[EchohavenContentSpawner] MudGolem spawned from KayKit skeleton prefab.");
             }
             else
@@ -1656,15 +1660,30 @@ namespace Tartaria.Integration
 
             GameObject anastasiaGO = null;
 
+            // Prefer wired KayKit Mage prefab for AAA quality.
+            if (kayKitAnastasiaPrefab != null)
+            {
+                anastasiaGO = Instantiate(kayKitAnastasiaPrefab, new Vector3(-4f, 0f, 8f), Quaternion.identity);
+                AddGhostlyTint(anastasiaGO);
+                EnsureNPCAnimator(anastasiaGO);
+                Debug.Log("[EchohavenContentSpawner] Anastasia spawned from KayKit mage prefab.");
+            }
+
             #if UNITY_EDITOR
-            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/_Project/Prefabs/Characters/Anastasia.prefab");
-            if (prefab != null)
-                anastasiaGO = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            if (anastasiaGO == null)
+            {
+                var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+                    "Assets/_Project/Prefabs/Characters/Anastasia.prefab");
+                if (prefab != null)
+                    anastasiaGO = Instantiate(prefab, Vector3.zero, Quaternion.identity);
+            }
             #endif
 
             if (anastasiaGO == null)
+            {
                 anastasiaGO = CreateAnastasiaPrimitiveFallback();
+                Debug.LogWarning("[EchohavenContentSpawner] Anastasia spawned from primitive fallback — assign kayKitAnastasiaPrefab for AAA quality.");
+            }
 
             anastasiaGO.name = "Anastasia";
 
@@ -1740,6 +1759,121 @@ namespace Tartaria.Integration
             shape.radius = 0.8f;
 
             return root;
+        }
+
+        // ─── KayKit Runtime Visual Helpers ───────────────────────────
+
+        /// <summary>
+        /// Ensure an NPC has an Animator with a controller so it doesn't appear frozen.
+        /// If no controller is wired, leave it for Mecanim defaults to drive the bound clips.
+        /// </summary>
+        void EnsureNPCAnimator(GameObject npc)
+        {
+            if (npc == null) return;
+            var anim = npc.GetComponentInChildren<Animator>();
+            if (anim == null)
+            {
+                // Find a SkinnedMeshRenderer to find the rig root.
+                var smr = npc.GetComponentInChildren<SkinnedMeshRenderer>();
+                var rigRoot = smr != null && smr.rootBone != null ? smr.rootBone.gameObject : npc;
+                anim = rigRoot.GetComponent<Animator>();
+                if (anim == null) anim = rigRoot.AddComponent<Animator>();
+            }
+            // Apply player's RuntimeAnimatorController as a fallback so KayKit characters animate
+            // the same locomotion clips wired by KayKitMixamoIntegrator.
+            if (anim.runtimeAnimatorController == null)
+            {
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player != null)
+                {
+                    var pAnim = player.GetComponentInChildren<Animator>();
+                    if (pAnim != null && pAnim.runtimeAnimatorController != null)
+                        anim.runtimeAnimatorController = pAnim.runtimeAnimatorController;
+                }
+            }
+            anim.applyRootMotion = false;
+            anim.cullingMode = AnimatorCullingMode.CullUpdateTransforms;
+        }
+
+        /// <summary>
+        /// Apply translucent ghostly tint to all renderers under the prefab so
+        /// Anastasia reads as a spectral figure even with KayKit's solid materials.
+        /// </summary>
+        void AddGhostlyTint(GameObject root)
+        {
+            if (root == null) return;
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) return;
+            foreach (var r in root.GetComponentsInChildren<Renderer>(true))
+            {
+                var mat = new Material(shader);
+                mat.SetColor("_BaseColor", new Color(0.75f, 0.85f, 1f, 0.6f));
+                mat.EnableKeyword("_EMISSION");
+                mat.SetColor("_EmissionColor", new Color(0.4f, 0.55f, 1f) * 0.7f);
+                mat.SetFloat("_Surface", 1f);
+                mat.SetOverrideTag("RenderType", "Transparent");
+                mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                r.material = mat;
+            }
+            // Add a soft blue point light for spectral glow.
+            var glow = new GameObject("AnastasiaGlow");
+            glow.transform.SetParent(root.transform, false);
+            glow.transform.localPosition = new Vector3(0f, 1.4f, 0f);
+            var l = glow.AddComponent<Light>();
+            l.type = LightType.Point;
+            l.color = new Color(0.7f, 0.85f, 1f);
+            l.intensity = 2.2f;
+            l.range = 6f;
+            l.shadows = LightShadows.None;
+        }
+
+        /// <summary>
+        /// Scatter wired KayKit rocks and foliage around Echohaven so the
+        /// environment reads as populated rather than barren primitives.
+        /// </summary>
+        public void SpawnKayKitScatter()
+        {
+            int rocks = kayKitRockPrefabs != null ? kayKitRockPrefabs.Length : 0;
+            int foliage = kayKitFoliagePrefabs != null ? kayKitFoliagePrefabs.Length : 0;
+            if (rocks == 0 && foliage == 0)
+            {
+                Debug.LogWarning("[EchohavenContentSpawner] SpawnKayKitScatter: no KayKit rock or foliage prefabs wired.");
+                return;
+            }
+
+            var parent = new GameObject("KayKit_Scatter").transform;
+
+            // Deterministic seed so layout is consistent across runs.
+            var rng = new System.Random(13_2026);
+
+            // Rocks: 24 large scattered with 35-unit spread.
+            for (int i = 0; i < 24 && rocks > 0; i++)
+            {
+                var prefab = kayKitRockPrefabs[rng.Next(rocks)];
+                if (prefab == null) continue;
+                var pos = new Vector3((float)(rng.NextDouble() * 70f - 35f), 0f, (float)(rng.NextDouble() * 70f - 35f));
+                if (pos.magnitude < 6f) continue; // keep player spawn clear
+                var rot = Quaternion.Euler(0f, (float)(rng.NextDouble() * 360f), 0f);
+                var go = Instantiate(prefab, pos, rot, parent);
+                float s = 0.8f + (float)rng.NextDouble() * 1.6f;
+                go.transform.localScale = Vector3.one * s;
+            }
+
+            // Foliage: 80 bushes/grass with tighter spread.
+            for (int i = 0; i < 80 && foliage > 0; i++)
+            {
+                var prefab = kayKitFoliagePrefabs[rng.Next(foliage)];
+                if (prefab == null) continue;
+                var pos = new Vector3((float)(rng.NextDouble() * 60f - 30f), 0f, (float)(rng.NextDouble() * 60f - 30f));
+                if (pos.magnitude < 4f) continue;
+                var rot = Quaternion.Euler(0f, (float)(rng.NextDouble() * 360f), 0f);
+                var go = Instantiate(prefab, pos, rot, parent);
+                float s = 0.7f + (float)rng.NextDouble() * 0.9f;
+                go.transform.localScale = Vector3.one * s;
+            }
+
+            Debug.Log($"[EchohavenContentSpawner] KayKit scatter spawned: rocks={rocks}, foliage={foliage}.");
         }
     }
 
