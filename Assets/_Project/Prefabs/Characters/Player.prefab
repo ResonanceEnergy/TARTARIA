@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2044215831266186495
+--- !u!1 &2339787645202482170
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,342 +8,9 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 7634975755969800824}
-  m_Layer: 0
-  m_Name: CameraTarget
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7634975755969800824
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2044215831266186495}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.8, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4426108420300710007}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &2068426204763493605
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4426108420300710007}
-  - component: {fileID: 6474710690566492787}
-  - component: {fileID: 6198866777218920146}
-  - component: {fileID: 2672739884853560408}
-  - component: {fileID: 6139061288210336765}
-  - component: {fileID: 3782651058747533835}
-  - component: {fileID: 9119430166241749924}
-  - component: {fileID: 2127206779161762882}
-  - component: {fileID: 1798038783748308238}
-  - component: {fileID: 7122772595925005477}
-  - component: {fileID: 5341571827550664469}
-  - component: {fileID: 5429031913342704365}
-  - component: {fileID: 784101037130851089}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Player
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4426108420300710007
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 7634975755969800824}
-  - {fileID: 2424753981907998144}
-  - {fileID: 9170423817016029117}
-  - {fileID: 2470945349574583787}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!143 &6474710690566492787
-CharacterController:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 2
-  m_Radius: 0.4
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 1, z: 0}
---- !u!114 &6198866777218920146
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 05fce6928f67f0a40af9265384088e4d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Input::Tartaria.Input.PlayerInputHandler
-  inputActions: {fileID: -944628639613478452, guid: 73c6ae0651cdf2b49abd31611293157c, type: 3}
-  moveSpeed: 6
-  sprintMultiplier: 1.6
-  rotationSpeed: 720
-  gravity: -20
-  interactRadius: 3
-  interactableLayer:
-    serializedVersion: 2
-    m_Bits: 0
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 0
---- !u!114 &2672739884853560408
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 176f0cf48193c95408ee5b6ff6e54a3b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerHealth
-  maxHealth: 100
-  regenDelay: 5
-  regenAmountPerSecond: 5
---- !u!114 &6139061288210336765
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f653fae905155994aa1a14361b135b95, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerCombat
-  meleeDamage: 25
-  reach: 2.6
-  radius: 1.4
-  cooldown: 0.45
-  swingDuration: 0.25
---- !u!114 &3782651058747533835
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 522e425d92e6526429ee0fe64599b552, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerStamina
-  maxStamina: 100
-  regenPerSecond: 18
-  regenDelay: 0.8
-  sprintCostPerSecond: 22
-  dodgeCost: 30
-  dodgeSpeed: 12
-  dodgeDuration: 0.35
-  dodgeCooldown: 0.6
---- !u!114 &9119430166241749924
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 78fe034c4aedc6740b1698484181e5f8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerDodge
-  dodgeDuration: 0.35
-  dodgeSpeed: 12
-  iFrameDuration: 0.3
-  cooldown: 0.8
---- !u!114 &2127206779161762882
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5471298bc9af75640b7be0ab575d91ab, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerRanged
-  arrowPrefab: {fileID: 0}
-  firePoint: {fileID: 0}
-  poolSize: 16
-  aimFOVMultiplier: 0.7
-  aimSensitivityMultiplier: 0.5
---- !u!114 &1798038783748308238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c986b404c61299438124fbcd5464cc8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerWeaponSwitcher
-  currentWeapon: 0
---- !u!114 &7122772595925005477
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseSource
-  ImpulseDefinition:
-    ImpulseChannel: 1
-    ImpulseShape: 2
-    CustomImpulseShape:
-      serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    ImpulseDuration: 0.2
-    ImpulseType: 0
-    DissipationRate: 0.25
-    RawSignal: {fileID: 0}
-    AmplitudeGain: 1
-    FrequencyGain: 1
-    RepeatMode: 0
-    Randomize: 1
-    TimeEnvelope:
-      AttackShape:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      DecayShape:
-        serializedVersion: 2
-        m_Curve: []
-        m_PreInfinity: 2
-        m_PostInfinity: 2
-        m_RotationOrder: 4
-      AttackTime: 0
-      SustainTime: 0.2
-      DecayTime: 0.7
-      ScaleWithImpact: 1
-      HoldForever: 0
-    ImpactRadius: 100
-    DirectionMode: 0
-    DissipationMode: 2
-    DissipationDistance: 100
-    PropagationSpeed: 343
-  DefaultVelocity: {x: 0, y: -1, z: 0}
---- !u!114 &5341571827550664469
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5f896fe4672c3c34abb07e2dbab52108, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerAnimator
-  walkFrequency: 8
-  idleFrequency: 0.8
-  armSwingDeg: 35
-  legSwingDeg: 28
-  bodyBobAmp: 0.06
-  idleBobAmp: 0.015
-  aetherPulseSpeed: 2.2
---- !u!95 &5429031913342704365
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 6d81ce9265bb0e044895bb3ac10de438, type: 2}
-  m_CullingMode: 1
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
---- !u!114 &784101037130851089
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2068426204763493605}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab141598d13eaef46b0d2c6dbf87eeeb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerAnimatorBridge
-  inputHandler: {fileID: 0}
-  characterController: {fileID: 0}
---- !u!1 &6612279589055654941
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9170423817016029117}
-  - component: {fileID: 2507295344115546388}
-  - component: {fileID: 3225182405580164141}
+  - component: {fileID: 3538944919344473528}
+  - component: {fileID: 715213937205271069}
+  - component: {fileID: 1049747084984048038}
   m_Layer: 0
   m_Name: FootstepDust
   m_TagString: Untagged
@@ -351,28 +18,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &9170423817016029117
+--- !u!4 &3538944919344473528
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612279589055654941}
+  m_GameObject: {fileID: 2339787645202482170}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.05, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4426108420300710007}
+  m_Father: {fileID: 4532754453546530543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!198 &2507295344115546388
+--- !u!198 &715213937205271069
 ParticleSystem:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612279589055654941}
+  m_GameObject: {fileID: 2339787645202482170}
   serializedVersion: 8
   lengthInSec: 1
   simulationSpeed: 1
@@ -5089,14 +4756,14 @@ ParticleSystem:
         m_PostInfinity: 2
         m_RotationOrder: 4
     vectorLabel1_3: W
---- !u!199 &3225182405580164141
+--- !u!199 &1049747084984048038
 ParticleSystemRenderer:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6612279589055654941}
+  m_GameObject: {fileID: 2339787645202482170}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -5169,7 +4836,7 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
---- !u!1 &7197250684609338354
+--- !u!1 &2672457136304864616
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -5177,8 +4844,310 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2424753981907998144}
-  - component: {fileID: 2518068934642416125}
+  - component: {fileID: 4532754453546530543}
+  - component: {fileID: 7492182058485244297}
+  - component: {fileID: 1069027561872916316}
+  - component: {fileID: 8882391651849221101}
+  - component: {fileID: 6754753253677024063}
+  - component: {fileID: 1841812202429085687}
+  - component: {fileID: 2660526531478844881}
+  - component: {fileID: 3085667534371117220}
+  - component: {fileID: 7330540909579359109}
+  - component: {fileID: 8641057843207774834}
+  - component: {fileID: 6995301832653042679}
+  - component: {fileID: 3268391061194866765}
+  - component: {fileID: 5301452155052748294}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4532754453546530543
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3589894314026330785}
+  - {fileID: 4299107797688149237}
+  - {fileID: 3538944919344473528}
+  - {fileID: 970064138411215412}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!143 &7492182058485244297
+CharacterController:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Height: 2
+  m_Radius: 0.4
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &1069027561872916316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05fce6928f67f0a40af9265384088e4d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Input::Tartaria.Input.PlayerInputHandler
+  inputActions: {fileID: -944628639613478452, guid: 73c6ae0651cdf2b49abd31611293157c, type: 3}
+  moveSpeed: 6
+  sprintMultiplier: 1.6
+  rotationSpeed: 720
+  gravity: -20
+  interactRadius: 3
+  interactableLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!114 &8882391651849221101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 176f0cf48193c95408ee5b6ff6e54a3b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerHealth
+  maxHealth: 100
+  regenDelay: 5
+  regenAmountPerSecond: 5
+--- !u!114 &6754753253677024063
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f653fae905155994aa1a14361b135b95, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerCombat
+  meleeDamage: 25
+  reach: 2.6
+  radius: 1.4
+  cooldown: 0.45
+  swingDuration: 0.25
+--- !u!114 &1841812202429085687
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 522e425d92e6526429ee0fe64599b552, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerStamina
+  maxStamina: 100
+  regenPerSecond: 18
+  regenDelay: 0.8
+  sprintCostPerSecond: 22
+  dodgeCost: 30
+  dodgeSpeed: 12
+  dodgeDuration: 0.35
+  dodgeCooldown: 0.6
+--- !u!114 &2660526531478844881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78fe034c4aedc6740b1698484181e5f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerDodge
+  dodgeDuration: 0.35
+  dodgeSpeed: 12
+  iFrameDuration: 0.3
+  cooldown: 0.8
+--- !u!114 &3085667534371117220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5471298bc9af75640b7be0ab575d91ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerRanged
+  arrowPrefab: {fileID: 0}
+  firePoint: {fileID: 0}
+  poolSize: 16
+  aimFOVMultiplier: 0.7
+  aimSensitivityMultiplier: 0.5
+--- !u!114 &7330540909579359109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c986b404c61299438124fbcd5464cc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerWeaponSwitcher
+  currentWeapon: 0
+--- !u!114 &8641057843207774834
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 180ecf9b41d478f468eb3e9083753217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineImpulseSource
+  ImpulseDefinition:
+    ImpulseChannel: 1
+    ImpulseShape: 2
+    CustomImpulseShape:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    ImpulseDuration: 0.2
+    ImpulseType: 0
+    DissipationRate: 0.25
+    RawSignal: {fileID: 0}
+    AmplitudeGain: 1
+    FrequencyGain: 1
+    RepeatMode: 0
+    Randomize: 1
+    TimeEnvelope:
+      AttackShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      DecayShape:
+        serializedVersion: 2
+        m_Curve: []
+        m_PreInfinity: 2
+        m_PostInfinity: 2
+        m_RotationOrder: 4
+      AttackTime: 0
+      SustainTime: 0.2
+      DecayTime: 0.7
+      ScaleWithImpact: 1
+      HoldForever: 0
+    ImpactRadius: 100
+    DirectionMode: 0
+    DissipationMode: 2
+    DissipationDistance: 100
+    PropagationSpeed: 343
+  DefaultVelocity: {x: 0, y: -1, z: 0}
+--- !u!114 &6995301832653042679
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f896fe4672c3c34abb07e2dbab52108, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerAnimator
+  walkFrequency: 8
+  idleFrequency: 0.8
+  armSwingDeg: 35
+  legSwingDeg: 28
+  bodyBobAmp: 0.06
+  idleBobAmp: 0.015
+  aetherPulseSpeed: 2.2
+--- !u!95 &3268391061194866765
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6d81ce9265bb0e044895bb3ac10de438, type: 2}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5301452155052748294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2672457136304864616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab141598d13eaef46b0d2c6dbf87eeeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.PlayerAnimatorBridge
+  inputHandler: {fileID: 0}
+  characterController: {fileID: 0}
+--- !u!1 &3057684303688848776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4299107797688149237}
+  - component: {fileID: 9111046619121053683}
   m_Layer: 0
   m_Name: InteractionTrigger
   m_TagString: Untagged
@@ -5186,28 +5155,28 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2424753981907998144
+--- !u!4 &4299107797688149237
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197250684609338354}
+  m_GameObject: {fileID: 3057684303688848776}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 4426108420300710007}
+  m_Father: {fileID: 4532754453546530543}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!135 &2518068934642416125
+--- !u!135 &9111046619121053683
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7197250684609338354}
+  m_GameObject: {fileID: 3057684303688848776}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -5222,13 +5191,44 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 3
   m_Center: {x: 0, y: 0, z: 0}
---- !u!1001 &2720234413231604224
+--- !u!1 &4829044403172944850
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3589894314026330785}
+  m_Layer: 0
+  m_Name: CameraTarget
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3589894314026330785
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4829044403172944850}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.8, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4532754453546530543}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &791759752410820063
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 4426108420300710007}
+    m_TransformParent: {fileID: 4532754453546530543}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 464b763e729b6284690556fbdc75cc19, type: 3}
       propertyPath: m_LocalPosition.x
@@ -5279,8 +5279,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 464b763e729b6284690556fbdc75cc19, type: 3}
---- !u!4 &2470945349574583787 stripped
+--- !u!4 &970064138411215412 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 464b763e729b6284690556fbdc75cc19, type: 3}
-  m_PrefabInstance: {fileID: 2720234413231604224}
+  m_PrefabInstance: {fileID: 791759752410820063}
   m_PrefabAsset: {fileID: 0}

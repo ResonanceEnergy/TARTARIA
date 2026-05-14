@@ -156,24 +156,10 @@ namespace Tartaria.Editor
             // KayKit Rogue is ~1.7m tall — scale to fit CharacterController height of 2m
             meshInstance.transform.localScale = Vector3.one * 1.0f;
 
-            // 4) Tint primary body materials with Aether glow accent (cape + body)
-            // User complaint: "Player has no color" — apply cyan/blue-violet tint so player pops vs brown world
+            // 4) Tint primary body materials with Aether glow accent (cape)
             string aetherMaterialPath = "Assets/_Project/Materials/M_AetherVein.mat";
             Material aetherMaterial = AssetDatabase.LoadAssetAtPath<Material>(aetherMaterialPath);
-            Material bodyTintMaterial = null;
-
-            // Create body tint material (desaturated blue-violet)
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader != null)
-            {
-                bodyTintMaterial = new Material(shader);
-                bodyTintMaterial.name = "Player_BodyTint";
-                bodyTintMaterial.SetColor("_BaseColor", new Color(0.45f, 0.55f, 0.7f)); // Blue-violet
-                bodyTintMaterial.SetFloat("_Smoothness", 0.3f);
-                bodyTintMaterial.SetFloat("_Metallic", 0.0f);
-            }
-
-            if (aetherMaterial != null || bodyTintMaterial != null)
+            if (aetherMaterial != null)
             {
                 var renderers = meshInstance.GetComponentsInChildren<SkinnedMeshRenderer>();
                 foreach (var renderer in renderers)
@@ -181,25 +167,12 @@ namespace Tartaria.Editor
                     var mats = renderer.sharedMaterials;
                     for (int i = 0; i < mats.Length; i++)
                     {
-                        if (mats[i] == null) continue;
-                        string matName = mats[i].name.ToLowerInvariant();
-                        
-                        // Cape/accent gets cyan Aether glow
-                        if (matName.Contains("cape") || matName.Contains("accent"))
-                        {
-                            if (aetherMaterial != null) mats[i] = aetherMaterial;
-                        }
-                        // Body/limbs get blue-violet tint
-                        else if (matName.Contains("body") || matName.Contains("limb") || matName.Contains("torso"))
-                        {
-                            if (bodyTintMaterial != null) mats[i] = bodyTintMaterial;
-                        }
+                        if (mats[i] != null && mats[i].name.ToLowerInvariant().Contains("cape"))
+                            mats[i] = aetherMaterial;
                     }
                     renderer.sharedMaterials = mats;
                 }
             }
-
-            Debug.Log("[Integration] Applied Aether glow (cape) + blue-violet tint (body) to player mesh.");
 
             // 5) Build the KayKit animator controller from the pack's own (Generic-rigged) anims
             //    and assign to root Animator. This replaces the humanoid Capoeira controller
