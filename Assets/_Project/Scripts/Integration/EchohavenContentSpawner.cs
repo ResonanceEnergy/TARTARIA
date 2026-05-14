@@ -838,7 +838,119 @@ namespace Tartaria.Integration
             CreateInscriptionStone(parent.transform, new Vector3(0f, 0f, 8f));
             CreateInscriptionStone(parent.transform, new Vector3(-18f, 0f, 20f));
 
-            Debug.Log("[EchohavenContentSpawner] Environmental props placed.");
+            // HIGH DENSITY SCATTER: 30-50 rocks + 40-60 foliage (AAA standard)
+            SpawnScatterDecorator(parent.transform);
+
+            Debug.Log("[EchohavenContentSpawner] Environmental props + high-density scatter placed.");
+        }
+
+        void SpawnScatterDecorator(Transform parent)
+        {
+            var scatterParent = new GameObject("--- SCATTER ---");
+            scatterParent.transform.SetParent(parent, false);
+
+            // 30-50 small rocks
+            int rockCount = Random.Range(30, 51);
+            for (int i = 0; i < rockCount; i++)
+            {
+                Vector3 pos = new Vector3(
+                    Random.Range(-40f, 40f),
+                    0f,
+                    Random.Range(-40f, 40f)
+                );
+
+                // Skip positions within 2m of NPCs/buildings
+                if (IsTooCloseToSpawnPoint(pos, 2f)) continue;
+
+                float groundY = SampleGroundY(pos.x, pos.z);
+                if (!float.IsNaN(groundY)) pos.y = groundY;
+
+                // Use KayKit rock prefabs if available, else fallback primitive
+                if (kayKitRockPrefabs != null && kayKitRockPrefabs.Length > 0)
+                {
+                    var prefab = kayKitRockPrefabs[Random.Range(0, kayKitRockPrefabs.Length)];
+                    if (prefab != null)
+                    {
+                        var rock = Instantiate(prefab, pos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f), scatterParent.transform);
+                        rock.name = $"Rock_{i}";
+                        rock.transform.localScale = Vector3.one * Random.Range(0.6f, 1.2f);
+                        rock.isStatic = true;
+                    }
+                }
+                else
+                {
+                    var rock = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    rock.name = $"Rock_{i}";
+                    rock.transform.SetParent(scatterParent.transform, false);
+                    rock.transform.position = pos;
+                    float s = Random.Range(0.3f, 0.7f);
+                    rock.transform.localScale = new Vector3(s, s * 0.7f, s);
+                    rock.isStatic = true;
+                    SetLitMaterial(rock, new Color(0.4f, 0.35f, 0.3f), 0.15f);
+                }
+            }
+
+            // 40-60 foliage clusters
+            int foliageCount = Random.Range(40, 61);
+            for (int i = 0; i < foliageCount; i++)
+            {
+                Vector3 pos = new Vector3(
+                    Random.Range(-40f, 40f),
+                    0f,
+                    Random.Range(-40f, 40f)
+                );
+
+                if (IsTooCloseToSpawnPoint(pos, 2f)) continue;
+
+                float groundY = SampleGroundY(pos.x, pos.z);
+                if (!float.IsNaN(groundY)) pos.y = groundY;
+
+                // Use KayKit foliage prefabs if available, else fallback
+                if (kayKitFoliagePrefabs != null && kayKitFoliagePrefabs.Length > 0)
+                {
+                    var prefab = kayKitFoliagePrefabs[Random.Range(0, kayKitFoliagePrefabs.Length)];
+                    if (prefab != null)
+                    {
+                        var foliage = Instantiate(prefab, pos, Quaternion.Euler(0f, Random.Range(0f, 360f), 0f), scatterParent.transform);
+                        foliage.name = $"Foliage_{i}";
+                        foliage.transform.localScale = Vector3.one * Random.Range(0.8f, 1.3f);
+                        foliage.isStatic = true;
+                    }
+                }
+                else
+                {
+                    var bush = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    bush.name = $"Foliage_{i}";
+                    bush.transform.SetParent(scatterParent.transform, false);
+                    bush.transform.position = pos + Vector3.up * 0.3f;
+                    float s = Random.Range(0.4f, 0.9f);
+                    bush.transform.localScale = new Vector3(s, s * 0.6f, s);
+                    bush.isStatic = true;
+                    SetLitMaterial(bush, new Color(0.2f, 0.35f, 0.15f), 0.2f);
+                }
+            }
+
+            Debug.Log($"[EchohavenContentSpawner] Scatter: {rockCount} rocks, {foliageCount} foliage");
+        }
+
+        bool IsTooCloseToSpawnPoint(Vector3 pos, float minDist)
+        {
+            // Check distance to known spawn points (buildings, NPCs)
+            Vector3[] spawnPoints = {
+                new Vector3(30f, 0f, 20f),   // dome
+                new Vector3(-20f, 0f, 35f),  // fountain
+                new Vector3(0f, 0f, -30f),   // spire
+                new Vector3(0f, 0f, 0f),     // player spawn origin
+                cassianPosition,
+                new Vector3(12f, 0f, 7f)     // shovel spawn
+            };
+
+            foreach (var sp in spawnPoints)
+            {
+                if (Vector3.Distance(new Vector3(pos.x, 0f, pos.z), new Vector3(sp.x, 0f, sp.z)) < minDist)
+                    return true;
+            }
+            return false;
         }
 
         void CreateRuinedColumn(Transform parent, Vector3 pos, float height)
@@ -1291,7 +1403,7 @@ namespace Tartaria.Integration
             }
         }
 
-        public void SpawnMudGolem(Vector3 pos)
+        void SpawnMudGolem(Vector3 pos)
         {
             float y = SampleGroundY(pos.x, pos.z);
             if (!float.IsNaN(y)) pos.y = y + 0.1f;

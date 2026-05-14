@@ -3,8 +3,8 @@ namespace Tartaria.Core
 {
     public static class BuildInfo
     {
-        public const string Version = "v1.0.0-138-ga15b46e";
-        public const string Hash = "a15b46e";
-        public const string BuildTime = "2026-05-14 01:04:59 UTC";
+        public const string Version = "v1.0.0-142-g81fef8d-dirty";
+        public const string Hash = "81fef8d";
+        public const string BuildTime = "2026-05-14 01:38:08 UTC";
     }
 }
