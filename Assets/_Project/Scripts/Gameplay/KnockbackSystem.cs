@@ -20,6 +20,7 @@ namespace Tartaria.Gameplay
         public void OnUpdate(ref SystemState state)
         {
             float dt = SystemAPI.Time.DeltaTime;
+            var ecb = new EntityCommandBuffer(Unity.Collections.Allocator.Temp);
 
             foreach (var (knockback, transform, entity) in
                 SystemAPI.Query<RefRW<KnockbackImpulse>, RefRW<LocalTransform>>()
@@ -35,7 +36,7 @@ namespace Tartaria.Gameplay
                 // Remove if below threshold
                 if (knockback.ValueRO.Magnitude < RemovalThreshold)
                 {
-                    state.EntityManager.RemoveComponent<KnockbackImpulse>(entity);
+                    ecb.RemoveComponent<KnockbackImpulse>(entity);
                 }
             }
 
@@ -47,9 +48,12 @@ namespace Tartaria.Gameplay
                 hitstun.ValueRW.Remaining -= dt;
                 if (hitstun.ValueRO.Remaining <= 0f)
                 {
-                    state.EntityManager.RemoveComponent<HitStunTimer>(entity);
+                    ecb.RemoveComponent<HitStunTimer>(entity);
                 }
             }
+
+            ecb.Playback(state.EntityManager);
+            ecb.Dispose();
         }
     }
 }
