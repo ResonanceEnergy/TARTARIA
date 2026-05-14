@@ -199,7 +199,10 @@ namespace Tartaria.Camera
             float zoomInput = _zoomAction != null ? _zoomAction.ReadValue<float>() : 0f;
             if (Mathf.Abs(zoomInput) > 0.01f)
             {
-                _zoomOffset -= zoomInput * zoomSpeed;
+                // Use gamepadZoomSpeed for gamepad, zoomSpeed for mouse
+                bool isGamepad = Gamepad.current != null && (Gamepad.current.dpad.up.isPressed || Gamepad.current.dpad.down.isPressed);
+                float speed = isGamepad ? gamepadZoomSpeed : zoomSpeed;
+                _zoomOffset -= zoomInput * speed;
                 _zoomOffset = Mathf.Clamp(_zoomOffset, zoomMin - exploreDistance, zoomMax - exploreDistance);
             }
 
