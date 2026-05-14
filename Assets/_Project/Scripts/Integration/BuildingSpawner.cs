@@ -43,11 +43,46 @@ namespace Tartaria.Integration
             _mudCracking = CreateBuildingMaterial("M_Mud_Cracking");
             _stoneActive = CreateBuildingMaterial("M_Stone_Active");
 
-            WireBuilding("dome", domePosition, DomeNames, PrimitiveType.Sphere, new Vector3(8f, 6f, 8f));
-            WireBuilding("fountain", fountainPosition, FountainNames, PrimitiveType.Cylinder, new Vector3(4f, 3f, 4f));
-            WireBuilding("spire", spirePosition, SpireNames, PrimitiveType.Cylinder, new Vector3(3f, 12f, 3f));
+            // Spawn 8-12 buildings around Echohaven (not 3) for visual density
+            SpawnBuildingCluster("dome", domePosition, DomeNames, new Vector3(8f, 6f, 8f), count: 4);
+            SpawnBuildingCluster("fountain", fountainPosition, FountainNames, new Vector3(4f, 3f, 4f), count: 4);
+            SpawnBuildingCluster("spire", spirePosition, SpireNames, new Vector3(3f, 12f, 3f), count: 4);
 
-            Debug.Log("[BuildingSpawner] 3 buildings wired with interaction + discovery triggers.");
+            Debug.Log("[BuildingSpawner] 12 buildings spawned (4 per zone) with interaction + discovery triggers.");
+        }
+
+        void SpawnBuildingCluster(string buildingId, Vector3 centerPos, string[] sceneNames,
+            Vector3 baseScale, int count)
+        {
+            // First building is the primary interactable (original WireBuilding logic)
+            WireBuilding(buildingId, centerPos, sceneNames, PrimitiveType.Sphere, baseScale);
+
+            // Spawn additional background buildings in a ring (visual variety, no interaction)
+            for (int i = 1; i < count; i++)
+            {
+                float angle = (i / (float)count) * Mathf.PI * 2f;
+                float radius = Random.Range(10f, 18f);
+                Vector3 offset = new Vector3(Mathf.Cos(angle) * radius, 0f, Mathf.Sin(angle) * radius);
+                Vector3 pos = centerPos + offset;
+
+                float scaleVariation = Random.Range(0.8f, 1.4f);
+                Vector3 variedScale = baseScale * scaleVariation;
+
+                var building = CreateGreyboxBuilding($"{buildingId}_bg_{i}", pos, PrimitiveType.Sphere, variedScale);
+                building.name = $"Building_{buildingId}_background_{i}";
+                building.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+
+                // Apply mud material to all renderers
+                ApplyMudMaterialRecursive(building, _mudFresh);
+            }
+        }
+
+        void ApplyMudMaterialRecursive(GameObject go, Material mat)
+        {
+            if (mat == null) return;
+            var renderers = go.GetComponentsInChildren<MeshRenderer>();
+            foreach (var r in renderers)
+                r.material = mat;
         }
 
         void WireBuilding(string buildingId, Vector3 position, string[] sceneNames,
@@ -222,20 +257,92 @@ namespace Tartaria.Integration
         GameObject CreateGreyboxBuilding(string id, Vector3 position,
             PrimitiveType shape, Vector3 scale)
         {
-            var go = GameObject.CreatePrimitive(shape);
-            go.transform.position = position + Vector3.up * (scale.y * 0.5f);
-            go.transform.localScale = scale;
+            // No longer a single primitive — compose REAL ruined building from wall segments.
+            var root = new GameObject($"Building_{id}");
+            root.transform.position = position;
 
-            // Mud-colored material
-            var renderer = go.GetComponent<MeshRenderer>();
-            if (renderer != null)
+            // Mud material (warm brown, low smoothness)
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            var mudMat = shader != null ? new Material(shader) : null;
+            if (mudMat != null)
             {
-                var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                mat.color = new Color(0.45f, 0.35f, 0.25f); // Mud brown
-                renderer.material = mat;
+                mudMat.SetColor("_BaseColor", new Color(0.35f, 0.25f, 0.18f));
+                mudMat.SetFloat("_Smoothness", 0.2f);
+                mudMat.SetFloat("_Metallic", 0.0f);
             }
 
-            return go;
+            // 4 wall segments (scaled cubes)
+            float wallHeight = scale.y * 0.6f;
+            float wallThick = 0.3f;
+            float sizeX = scale.x;
+            float sizeZ = scale.z;
+
+            CreateWall(root, "Wall_North", new Vector3(0f, wallHeight * 0.5f, sizeZ * 0.5f), new Vector3(sizeX, wallHeight, wallThick), mudMat);
+            CreateWall(root, "Wall_South", new Vector3(0f, wallHeight * 0.5f, -sizeZ * 0.5f), new Vector3(sizeX, wallHeight, wallThick), mudMat);
+            CreateWall(root, "Wall_East", new Vector3(sizeX * 0.5f, wallHeight * 0.5f, 0f), new Vector3(wallThick, wallHeight, sizeZ), mudMat);
+            CreateWall(root, "Wall_West", new Vector3(-sizeX * 0.5f, wallHeight * 0.5f, 0f), new Vector3(wallThick, wallHeight, sizeZ), mudMat);
+
+            // Partial roof (tilted plane)
+            var roof = GameObject.CreatePrimitive(PrimitiveType.Plane);
+            roof.name = "Roof";
+            roof.transform.SetParent(root.transform, false);
+            roof.transform.localPosition = new Vector3(0f, wallHeight + 0.2f, 0f);
+            roof.transform.localRotation = Quaternion.Euler(15f, 0f, 0f);
+            roof.transform.localScale = new Vector3(sizeX * 0.4f, 1f, sizeZ * 0.4f);
+            if (mudMat != null) roof.GetComponent<MeshRenderer>().material = mudMat;
+
+            // Broken doorway (scaled cube with cut)
+            var door = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            door.name = "Doorway";
+            door.transform.SetParent(root.transform, false);
+            door.transform.localPosition = new Vector3(0f, wallHeight * 0.4f, sizeZ * 0.5f);
+            door.transform.localScale = new Vector3(1.5f, wallHeight * 0.7f, 0.2f);
+            var doorCol = door.GetComponent<BoxCollider>();
+            if (doorCol != null) Object.Destroy(doorCol); // Open doorway
+            if (mudMat != null) door.GetComponent<MeshRenderer>().material = mudMat;
+
+            // 2-3 debris piles around base
+            int debrisCount = Random.Range(2, 4);
+            for (int i = 0; i < debrisCount; i++)
+            {
+                float angle = (i / (float)debrisCount) * Mathf.PI * 2f;
+                float radius = Mathf.Max(sizeX, sizeZ) * 0.6f;
+                Vector3 debrisPos = new Vector3(Mathf.Cos(angle) * radius, 0.15f, Mathf.Sin(angle) * radius);
+                CreateDebrisPile(root, $"Debris_{i}", debrisPos, mudMat);
+            }
+
+            return root;
+        }
+
+        void CreateWall(GameObject parent, string name, Vector3 localPos, Vector3 localScale, Material mat)
+        {
+            var wall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            wall.name = name;
+            wall.transform.SetParent(parent.transform, false);
+            wall.transform.localPosition = localPos;
+            wall.transform.localScale = localScale;
+            if (mat != null) wall.GetComponent<MeshRenderer>().material = mat;
+        }
+
+        void CreateDebrisPile(GameObject parent, string name, Vector3 localPos, Material mat)
+        {
+            var pile = new GameObject(name);
+            pile.transform.SetParent(parent.transform, false);
+            pile.transform.localPosition = localPos;
+
+            for (int i = 0; i < 3; i++)
+            {
+                var rock = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                rock.name = $"Rock_{i}";
+                rock.transform.SetParent(pile.transform, false);
+                float s = Random.Range(0.2f, 0.5f);
+                rock.transform.localPosition = new Vector3(
+                    Random.Range(-0.3f, 0.3f),
+                    s * 0.4f,
+                    Random.Range(-0.3f, 0.3f));
+                rock.transform.localScale = new Vector3(s, s * 0.8f, s);
+                if (mat != null) rock.GetComponent<MeshRenderer>().material = mat;
+            }
         }
 
         static Material CreateBuildingMaterial(string name)
