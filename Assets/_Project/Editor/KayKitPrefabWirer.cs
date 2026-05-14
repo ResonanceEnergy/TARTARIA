@@ -127,6 +127,20 @@ namespace Tartaria.Editor
             SetSerializedField(spawner, "kayKitFoliagePrefabs", foliage);
             Debug.Log($"[KayKitWirer] ✓ Foliage wired: {foliage.Length} prefabs");
 
+            // Wire BuildingSpawner KayKit fields (rocks, trees, bushes for composing + scatter)
+            var buildingSpawner = Object.FindFirstObjectByType<Tartaria.Integration.BuildingSpawner>();
+            if (buildingSpawner != null)
+            {
+                SetSerializedField(buildingSpawner, "kayKitRockPrefabs", rocks);
+                SetSerializedField(buildingSpawner, "kayKitTreePrefabs", new GameObject[0]); // No trees in packs yet
+                SetSerializedField(buildingSpawner, "kayKitBushPrefabs", foliage);
+                Debug.Log("[KayKitWirer] ✓ BuildingSpawner rocks/bushes wired for compositing.");
+            }
+            else
+            {
+                Debug.LogWarning("[KayKitWirer] BuildingSpawner not found in scene.");
+            }
+
             // Save scene
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);

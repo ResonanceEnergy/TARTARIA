@@ -69,14 +69,15 @@ namespace Tartaria.Camera
         {
             // Runtime safety: older scenes may carry stale serialized camera values
             // (18m distance / 55 deg pitch). Clamp to the intended tighter framing.
-            exploreDistance = 9f;
-            explorePitch = 28f;
-            exploreFOV = 65f;
-            combatDistance = 12f;
-            combatPitch = 32f;
-            combatFOV = 65f;
+            exploreDistance = 6.5f;  // Was 9f — tighter for 2026 AAA feel
+            explorePitch = 18f;      // Was 28f — lower, more horizon visibility
+            exploreFOV = 70f;        // Was 65f — wider FOV
+            combatDistance = 10f;    // Was 12f — adjusted proportionally
+            combatPitch = 25f;       // Was 32f
+            combatFOV = 70f;         // Was 65f
             zoomMin = 4f;
             zoomMax = 18f;
+            smoothSpeed = 12f;       // Was 8f — faster interpolation
 
             _camera = GetComponent<UnityEngine.Camera>();
             if (_camera == null)

@@ -175,7 +175,7 @@ namespace Tartaria.Editor
             else
             {
                 ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                ground.transform.localScale = new Vector3(20f, 1f, 20f);
+                ground.transform.localScale = new Vector3(100f, 1f, 100f); // 1000x1000m play area
             }
             ground.name = "GroundPlane";
             ground.transform.SetParent(parent.transform);
