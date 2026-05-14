@@ -57,7 +57,7 @@ namespace Tartaria.Camera
         void TryResolveDialogueManager()
         {
             if (_dialogueManagerInstance != null || _dmInstanceProp == null) return;
-            try { _dialogueManagerInstance = _dmInstanceProp.GetValue(null); } catch { /* not ready */ }
+            try { _dialogueManagerInstance = _dmInstanceProp.GetValue(null); } catch (System.Exception ex) { Debug.LogWarning($"[DialogueCameraRig] DialogueManager resolution failed: {ex.Message}"); }
         }
 
         void LateUpdate()

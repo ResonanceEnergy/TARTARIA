@@ -142,7 +142,7 @@ namespace Tartaria.Integration
                     (_failed == 0 ? "ALL SYSTEMS GO\n" : $"WARNING: {_failed} system(s) missing\n") +
                     _report);
             }
-            catch { /* ignore IO errors during diagnostics */ }
+            catch (System.Exception ex) { Debug.LogWarning($"[RuntimeBootValidator] Canary write failed: {ex.Message}"); }
         }
 
         void Check(StringBuilder sb, string name, bool present)

@@ -108,7 +108,7 @@ namespace Tartaria.UI
                 var m = t.GetMethod(methodName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
                 m?.Invoke(inst, null);
             }
-            catch { /* best effort */ }
+            catch (System.Exception ex) { Debug.LogWarning($"[MainMenuOverlay] TryInvoke({typeName}.{methodName}) failed: {ex.Message}"); }
         }
     }
 }

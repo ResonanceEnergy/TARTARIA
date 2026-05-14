@@ -42,7 +42,7 @@ namespace Tartaria.Core
                 File.AppendAllText(Path.Combine(dir, "sceneloader-canary.txt"),
                     $"[{Time.realtimeSinceStartup:F2}] {msg}\n");
             }
-            catch { /* ignore IO errors during diagnostics */ }
+            catch (System.Exception ex) { Debug.LogWarning($"[SceneLoader] Canary write failed: {ex.Message}"); }
         }
 
         void Awake()

@@ -57,7 +57,7 @@ namespace Tartaria.Integration
                 PlayerPrefs.SetInt(PrefKeyPrefix + moonNumber, 1);
                 PlayerPrefs.Save();
                 Debug.Log($"[MoonProgress] ✓ Moon {moonNumber:D2} marked cleared. Total: {_cleared.Count}/{MoonCount}");
-                try { OnMoonCleared?.Invoke(moonNumber); } catch { /* swallow listener errors */ }
+                try { OnMoonCleared?.Invoke(moonNumber); } catch (System.Exception ex) { Debug.LogWarning($"[MoonProgress] OnMoonCleared listener failed: {ex.Message}"); }
                 // Achievements: per-moon K01…K13 + final True Ending H12 trigger when all cleared.
                 AchievementSystem.Instance?.Unlock($"K{moonNumber:D2}");
                 if (_cleared.Count >= MoonCount)

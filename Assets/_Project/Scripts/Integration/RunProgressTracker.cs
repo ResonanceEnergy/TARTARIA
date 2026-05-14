@@ -65,7 +65,7 @@ namespace Tartaria.Integration
             TotalRS = Mathf.Max(0f, TotalRS + delta);
             PlayerPrefs.SetFloat(PrefRS, TotalRS);
             // Cheap save — fine for ~few writes/sec; flush on scene change too.
-            try { OnTotalRSChanged?.Invoke(TotalRS); } catch { /* swallow */ }
+            try { OnTotalRSChanged?.Invoke(TotalRS); } catch (System.Exception ex) { Debug.LogWarning($"[RunProgress] OnTotalRSChanged listener failed: {ex.Message}"); }
         }
 
         void HandleSceneLoaded(Scene s, LoadSceneMode mode)

@@ -57,7 +57,7 @@ namespace Tartaria.Gameplay
             using (s_SwingMarker.Auto())
             {
                 _lastSwingStart = Time.time;
-                try { OnSwing?.Invoke(); } catch { }
+                try { OnSwing?.Invoke(); } catch (System.Exception ex) { Debug.LogWarning($"[PlayerCombat] OnSwing listener failed: {ex.Message}"); }
                 AudioManager.Instance?.PlaySFX("CombatHit", transform.position);
 
                 // Sphere swept forward in front of player chest
