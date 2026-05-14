@@ -352,9 +352,9 @@ namespace Tartaria.AI
                 {
                     // Lost line of sight — continue to last known position
                     _lostTargetTime += Time.deltaTime;
-                    if (_lostTargetTime >= lostTargetSearchDuration)
+                    if (_lostTargetTime >= lostTargetSearchDuration || distToPlayer > chaseRange)
                     {
-                        Debug.Log("[MudGolem] Lost player for 8s, returning to patrol");
+                        Debug.Log($"[MudGolem] Lost player (search={_lostTargetTime:F1}s, dist={distToPlayer:F1}m), returning to patrol");
                         TransitionTo(GolemState.Patrol);
                         return;
                     }
