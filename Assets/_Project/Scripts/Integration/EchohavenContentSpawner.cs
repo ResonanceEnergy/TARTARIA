@@ -65,8 +65,7 @@ namespace Tartaria.Integration
             SpawnParticleEffects();
             SpawnAmbientAudio();
             SpawnInitialEnemies();                                      // Spawn 2 golems at game start
-            // TODO Wave4(b): Spawn Aurora.prefab here (VFX not yet created)
-            // SpawnAuroraPermanent();
+            SpawnAuroraPermanent();                                     // Aurora VFX in sky
             SetupEnemyWaveEncounters();
             RegisterEchohavenExcavationSites();                         // Gap 6: register dig sites
             PlaceDigSiteMarkers();                                      // Visual markers over dig sites
@@ -948,6 +947,35 @@ namespace Tartaria.Integration
             InvokeRepeating(nameof(TriggerAmbientScanPulse), 5f, 10f);
 
             Debug.Log("[EchohavenContentSpawner] Particle effects spawned (wisps, dust, aurora, periodic scan).");
+        }
+
+        void SpawnAuroraPermanent()
+        {
+            // Idempotent: don't spawn if already exists
+            if (GameObject.Find("Sky_Aurora") != null) return;
+
+            // Ensure VFX parent exists
+            var vfxRoot = GameObject.Find("VFX");
+            if (vfxRoot == null)
+            {
+                vfxRoot = new GameObject("VFX");
+            }
+
+            // Load Aurora prefab from Resources
+            var auroraPrefab = Resources.Load<GameObject>("VFX/Aurora");
+            if (auroraPrefab == null)
+            {
+                Debug.LogWarning("[EchohavenContentSpawner] Aurora prefab not found in Resources/VFX/Aurora");
+                return;
+            }
+
+            // Spawn at high altitude (y=200)
+            var aurora = Instantiate(auroraPrefab, new Vector3(0, 200, 0), Quaternion.identity);
+            aurora.name = "Sky_Aurora";
+            aurora.transform.SetParent(vfxRoot.transform, true);
+
+            _environmentalVFX.AddRange(aurora.GetComponentsInChildren<ParticleSystem>());
+            Debug.Log("[EchohavenContentSpawner] Aurora VFX spawned in sky at (0, 200, 0).");
         }
 
         void SpawnAuroraVFX()
