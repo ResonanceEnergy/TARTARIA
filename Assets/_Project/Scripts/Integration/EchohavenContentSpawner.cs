@@ -33,6 +33,22 @@ namespace Tartaria.Integration
         [SerializeField] float collectRadius = 2.5f;
         [SerializeField] float collectRSReward = 2f;
 
+        [Header("KayKit Asset Prefabs (2026 AAA Quality)")]
+        [SerializeField, Tooltip("KayKit shovel prefab — field tool for excavation")]
+        GameObject kayKitShovelPrefab;
+        [SerializeField, Tooltip("KayKit character for Milo companion")]
+        GameObject kayKitMiloPrefab;
+        [SerializeField, Tooltip("KayKit character for Cassian NPC")]
+        GameObject kayKitCassianPrefab;
+        [SerializeField, Tooltip("KayKit skeleton/enemy for MudGolem")]
+        GameObject kayKitMudGolemPrefab;
+        [SerializeField, Tooltip("KayKit character for Anastasia ghost")]
+        GameObject kayKitAnastasiaPrefab;
+        [SerializeField, Tooltip("KayKit rocks for environment scatter")]
+        GameObject[] kayKitRockPrefabs;
+        [SerializeField, Tooltip("KayKit grass/bushes for environment scatter")]
+        GameObject[] kayKitFoliagePrefabs;
+
         // Cached for VFX event wiring
         readonly List<GameObject> _aetherShards = new();
         readonly List<ParticleSystem> _environmentalVFX = new();
@@ -126,26 +142,40 @@ namespace Tartaria.Integration
             if (playerSpawn != null)
                 spawn = playerSpawn.transform.position + new Vector3(2.5f, 0.2f, 1.2f);
 
-            var root = new GameObject("ShovelPickup");
-            root.transform.position = spawn;
+            GameObject root;
+            if (kayKitShovelPrefab != null)
+            {
+                root = Instantiate(kayKitShovelPrefab);
+                root.name = "ShovelPickup";
+                root.transform.position = spawn + new Vector3(0f, 0.3f, 0f);
+                root.transform.rotation = Quaternion.Euler(45f, 0f, 0f);
+                root.transform.localScale = Vector3.one * 1.2f;
+            }
+            else
+            {
+                // Fallback: procedural shovel if prefab missing
+                root = new GameObject("ShovelPickup");
+                root.transform.position = spawn;
 
-            var handle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            handle.name = "Handle";
-            handle.transform.SetParent(root.transform, false);
-            handle.transform.localPosition = new Vector3(0f, 0.65f, 0f);
-            handle.transform.localRotation = Quaternion.Euler(0f, 0f, 18f);
-            handle.transform.localScale = new Vector3(0.06f, 0.65f, 0.06f);
+                var handle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                handle.name = "Handle";
+                handle.transform.SetParent(root.transform, false);
+                handle.transform.localPosition = new Vector3(0f, 0.65f, 0f);
+                handle.transform.localRotation = Quaternion.Euler(0f, 0f, 18f);
+                handle.transform.localScale = new Vector3(0.06f, 0.65f, 0.06f);
 
-            var blade = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            blade.name = "Blade";
-            blade.transform.SetParent(root.transform, false);
-            blade.transform.localPosition = new Vector3(0f, 0.15f, 0f);
-            blade.transform.localScale = new Vector3(0.26f, 0.18f, 0.10f);
+                var blade = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                blade.name = "Blade";
+                blade.transform.SetParent(root.transform, false);
+                blade.transform.localPosition = new Vector3(0f, 0.15f, 0f);
+                blade.transform.localScale = new Vector3(0.26f, 0.18f, 0.10f);
 
-            SetLitMaterial(handle, new Color(0.35f, 0.25f, 0.12f), 0.12f);
-            SetEmissiveMaterial(blade, new Color(0.9f, 0.85f, 0.65f), 0.5f);
+                SetLitMaterial(handle, new Color(0.35f, 0.25f, 0.12f), 0.12f);
+                SetEmissiveMaterial(blade, new Color(0.9f, 0.85f, 0.65f), 0.5f);
+            }
 
-            var c = root.AddComponent<SphereCollider>();
+            var c = root.GetComponent<SphereCollider>();
+            if (c == null) c = root.AddComponent<SphereCollider>();
             c.isTrigger = true;
             c.radius = 1.2f;
             root.layer = LayerMask.NameToLayer("Interactable");
@@ -501,19 +531,19 @@ namespace Tartaria.Integration
                 ? playerSpawn.transform.position + miloSpawnOffset
                 : new Vector3(12f, 1f, 4f);
 
-            // Try loading prefab
+            // Use KayKit prefab if assigned (2026 AAA quality)
             GameObject miloGO = null;
-            #if UNITY_EDITOR
-            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/_Project/Prefabs/Milo.prefab");
-            if (prefab != null)
-                miloGO = Instantiate(prefab, spawnPos, Quaternion.identity);
-            #endif
-
-            if (miloGO == null)
+            if (kayKitMiloPrefab != null)
             {
-                // Runtime fallback: create from primitives
+                miloGO = Instantiate(kayKitMiloPrefab, spawnPos, Quaternion.identity);
+                miloGO.transform.localScale = Vector3.one * 0.85f;
+                Debug.Log("[EchohavenContentSpawner] Milo spawned from KayKit prefab.");
+            }
+            else
+            {
+                // Fallback: primitives if prefab not assigned
                 miloGO = CreateMiloFallback(spawnPos);
+                Debug.LogWarning("[EchohavenContentSpawner] Milo spawned from primitive fallback — assign kayKitMiloPrefab for AAA quality.");
             }
 
             miloGO.name = "Milo";
@@ -620,11 +650,21 @@ namespace Tartaria.Integration
         {
             if (CassianNPCController.Instance != null) return;
 
-            var cassianGO = new GameObject("Cassian");
-            cassianGO.transform.position = cassianPosition;
+            GameObject cassianGO;
+            if (kayKitCassianPrefab != null)
+            {
+                cassianGO = Instantiate(kayKitCassianPrefab, cassianPosition, Quaternion.identity);
+                cassianGO.name = "Cassian";
+                cassianGO.transform.localScale = Vector3.one * 1.1f;
+                Debug.Log("[EchohavenContentSpawner] Cassian spawned from KayKit prefab.");
+            }
+            else
+            {
+                // Fallback: primitive robed figure
+                cassianGO = new GameObject("Cassian");
+                cassianGO.transform.position = cassianPosition;
 
-            // Visual: tall robed figure (capsule)
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             body.name = "Body";
             body.transform.SetParent(cassianGO.transform);
             body.transform.localPosition = new Vector3(0f, 1f, 0f);
@@ -1258,17 +1298,18 @@ namespace Tartaria.Integration
 
             GameObject golem = null;
 
-            #if UNITY_EDITOR
-            var prefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
-                "Assets/_Project/Prefabs/MudGolem.prefab");
-            if (prefab != null)
-                golem = Instantiate(prefab, pos, Quaternion.identity);
-            #endif
-
-            if (golem == null)
+            // Use KayKit skeleton prefab for AAA enemy visuals
+            if (kayKitMudGolemPrefab != null)
             {
-                // Runtime fallback
+                golem = Instantiate(kayKitMudGolemPrefab, pos, Quaternion.identity);
+                golem.transform.localScale = Vector3.one * 1.3f;
+                Debug.Log("[EchohavenContentSpawner] MudGolem spawned from KayKit skeleton prefab.");
+            }
+            else
+            {
+                // Fallback: primitive golem
                 golem = CreateMudGolemFallback(pos);
+                Debug.LogWarning("[EchohavenContentSpawner] MudGolem spawned from primitive fallback — assign kayKitMudGolemPrefab for AAA quality.");
             }
 
             golem.name = "MudGolem";
