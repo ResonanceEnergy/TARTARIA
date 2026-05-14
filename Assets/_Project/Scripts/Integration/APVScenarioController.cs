@@ -38,7 +38,9 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogWarning($"[Tartaria] APV scenario '{awakeningScenario}' is unavailable or unbaked; runtime blend disabled.");
+                // Expected when APV scenarios haven't been baked yet (manual Lighting window step).
+                // DayNightAPVBlender provides the RenderSettings ambient-lerp fallback.
+                Debug.Log($"[Tartaria] APV scenario '{awakeningScenario}' not baked; using ambient-lerp fallback.");
             }
         }
 

@@ -113,10 +113,13 @@ namespace Tartaria.Editor
             shape.rotation = new Vector3(-90f, 0f, 0f); // point upward
 
             // Velocity over lifetime: spiral (approximate with noise)
+            // NOTE: All 3 axes must share the same MinMaxCurveMode or Unity logs
+            // "Particle Velocity curves must all be in the same mode". Use Curve mode for y too.
             var velocityOverLifetime = ps.velocityOverLifetime;
             velocityOverLifetime.enabled = true;
             velocityOverLifetime.space = ParticleSystemSimulationSpace.Local;
             velocityOverLifetime.x = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, -1f, 1f, 1f));
+            velocityOverLifetime.y = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 0f, 1f, 0f));
             velocityOverLifetime.z = new ParticleSystem.MinMaxCurve(1f, AnimationCurve.Linear(0f, 1f, 1f, -1f));
 
             // Color over lifetime: sparkle fade
