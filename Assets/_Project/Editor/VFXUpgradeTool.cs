@@ -370,11 +370,15 @@ namespace Tartaria.Editor
             shape.position = new Vector3(0f, 50f, 0f);
 
             // Velocity over lifetime: horizontal wave motion
+            // All 3 axes must share the same MinMaxCurveMode (Curve here).
             var velocityOverLifetime = ps.velocityOverLifetime;
             velocityOverLifetime.enabled = true;
             velocityOverLifetime.space = ParticleSystemSimulationSpace.World;
             AnimationCurve xCurve = AnimationCurve.EaseInOut(0f, -5f, 1f, 5f);
+            AnimationCurve flat  = AnimationCurve.Linear(0f, 0f, 1f, 0f);
             velocityOverLifetime.x = new ParticleSystem.MinMaxCurve(1.0f, xCurve);
+            velocityOverLifetime.y = new ParticleSystem.MinMaxCurve(1.0f, flat);
+            velocityOverLifetime.z = new ParticleSystem.MinMaxCurve(1.0f, flat);
 
             // Color over lifetime: aurora gradient (green-gold-violet)
             var colorOverLifetime = ps.colorOverLifetime;
