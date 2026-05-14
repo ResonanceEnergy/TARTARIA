@@ -46,9 +46,9 @@ namespace Tartaria.EditorTools
                 return;
             }
 
-            // Assign to all standalone icon kinds.
-            PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Standalone, new[] { existing });
-            PlayerSettings.SetIconsForTargetGroup(BuildTargetGroup.Unknown,    new[] { existing });
+            // Assign to standalone builds (Unity 6+ API).
+            var icons = new[] { existing };
+            PlayerSettings.SetIcons(UnityEditor.Build.NamedBuildTarget.Standalone, icons, IconKind.Any);
 
             EditorUtility.SetDirty(existing);
             AssetDatabase.SaveAssets();

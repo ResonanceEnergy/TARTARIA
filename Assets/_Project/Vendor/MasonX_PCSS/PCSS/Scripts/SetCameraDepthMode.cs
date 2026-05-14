@@ -5,7 +5,7 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class SetCameraDepthMode : MonoBehaviour
 {
-	public bool enabled;
+	public new bool enabled;
 	public DepthTextureMode depthMode = DepthTextureMode.Depth;
 	public DepthTextureMode depthMode2 = DepthTextureMode.None;
 	public enum antiAliasing
