@@ -723,6 +723,7 @@ namespace Tartaria.Integration
             AddNameplate(cassianGO, "Cassian", new Color(0.6f, 0.4f, 0.9f));
 
             Debug.Log($"[EchohavenContentSpawner] Cassian NPC spawned at {cassianPosition}");
+            }
         }
 
         // ─── Collectible Aether Shards (Gap 7) ──────
