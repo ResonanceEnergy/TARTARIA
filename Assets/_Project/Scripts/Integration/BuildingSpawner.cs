@@ -359,9 +359,9 @@ namespace Tartaria.Integration
 
                 // Apply mud material to all renderers
                 var renderers = rock.GetComponentsInChildren<MeshRenderer>();
-                foreach (var r in renderers)
+                foreach (var rend in renderers)
                 {
-                    if (_mudFresh != null) r.material = _mudFresh;
+                    if (_mudFresh != null) rend.material = _mudFresh;
                 }
             }
 
