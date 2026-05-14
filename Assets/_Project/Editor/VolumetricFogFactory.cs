@@ -96,7 +96,7 @@ namespace Tartaria.Editor
                 {
                     prop.SetValue(obj, value);
                 }
-                catch { /* Ignore reflection errors */ }
+                catch (System.Exception ex) { Debug.LogWarning($"[VolumetricFogFactory] SetProperty({propName}) failed: {ex.Message}"); }
             }
         }
     }

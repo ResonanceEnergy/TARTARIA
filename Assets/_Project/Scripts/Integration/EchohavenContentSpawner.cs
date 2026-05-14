@@ -1778,7 +1778,7 @@ namespace Tartaria.Integration
                 ach.SetProgress("C02", Mathf.Clamp01(_golemKillCount / 25f));
             }
 
-            try { OnAnyGolemDied?.Invoke(this); } catch { /* listener errors should not block death */ }
+            try { OnAnyGolemDied?.Invoke(this); } catch (System.Exception ex) { Debug.LogWarning($"[MudGolemAI] OnAnyGolemDied listener failed: {ex.Message}"); }
 
             Destroy(gameObject, 0.15f);
         }

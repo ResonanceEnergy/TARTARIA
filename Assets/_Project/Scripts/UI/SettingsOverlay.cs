@@ -295,7 +295,7 @@ namespace Tartaria.UI
                 if (inst == null) return;
                 t.GetMethod(method)?.Invoke(inst, new[] { arg });
             }
-            catch { }
+            catch (System.Exception ex) { Debug.LogWarning($"[SettingsOverlay] TryInvoke({typeName}.{method}) failed: {ex.Message}"); }
         }
 
         static void TryInvokeEnum(string typeName, string method, string enumTypeName, int value)
@@ -310,7 +310,7 @@ namespace Tartaria.UI
                 object enumVal = System.Enum.ToObject(et, value);
                 t.GetMethod(method)?.Invoke(inst, new[] { enumVal });
             }
-            catch { }
+            catch (System.Exception ex) { Debug.LogWarning($"[SettingsOverlay] TryInvokeEnum({typeName}.{method}) failed: {ex.Message}"); }
         }
     }
 }

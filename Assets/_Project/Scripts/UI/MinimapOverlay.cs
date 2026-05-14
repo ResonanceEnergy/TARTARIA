@@ -115,7 +115,7 @@ namespace Tartaria.UI
         {
             GameObject[] arr;
             try { arr = GameObject.FindGameObjectsWithTag(tag); }
-            catch { return; }
+            catch (System.Exception ex) { Debug.LogWarning($"[MinimapOverlay] PlotByTag({tag}) failed: {ex.Message}"); return; }
             int n = 0;
             foreach (var go in arr)
             {

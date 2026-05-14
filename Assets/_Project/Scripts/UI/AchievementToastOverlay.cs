@@ -48,7 +48,7 @@ namespace Tartaria.UI
                 var del = System.Delegate.CreateDelegate(ev.EventHandlerType, handler.Target, handler.Method, false);
                 if (del != null) ev.AddEventHandler(inst, del);
             }
-            catch { /* best effort */ }
+            catch (System.Exception ex) { Debug.LogWarning($"[AchievementToastOverlay] Event wiring failed: {ex.Message}"); }
         }
 
         void Update()

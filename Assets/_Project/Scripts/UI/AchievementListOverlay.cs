@@ -74,7 +74,7 @@ namespace Tartaria.UI
                     _rsField = _defType.GetField("rsReward");
                 }
             }
-            catch { /* best effort */ }
+            catch (System.Exception ex) { Debug.LogWarning($"[AchievementListOverlay] Reflection init failed: {ex.Message}"); }
         }
 
         void Update()

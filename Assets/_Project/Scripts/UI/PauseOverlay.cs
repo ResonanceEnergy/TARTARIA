@@ -133,7 +133,7 @@ namespace Tartaria.UI
                 var m = t.GetMethod(method, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
                 m?.Invoke(inst, null);
             }
-            catch { /* best effort */ }
+            catch (System.Exception ex) { Debug.LogWarning($"[PauseOverlay] CallSaveManager({method}) failed: {ex.Message}"); }
         }
     }
 }
