@@ -49,6 +49,10 @@ namespace Tartaria.Integration
         [SerializeField, Tooltip("KayKit grass/bushes for environment scatter")]
         GameObject[] kayKitFoliagePrefabs;
 
+        [Header("Authoring Mode")]
+        [SerializeField, Tooltip("Skip procedural spawn if scene already authored")]
+        bool _sceneAlreadyAuthored = false;
+
         // Cached for VFX event wiring
         readonly List<GameObject> _aetherShards = new();
         readonly List<ParticleSystem> _environmentalVFX = new();
@@ -69,6 +73,15 @@ namespace Tartaria.Integration
 
         void Start()
         {
+            // Phase-0 guard: if scene already authored, skip procedural spawns
+            if (_sceneAlreadyAuthored)
+            {
+                Debug.Log("[EchohavenContentSpawner] Scene marked as authored — skipping procedural content spawn.");
+                // Still run animator fix for any runtime-spawned NPCs
+                EnsureNPCAnimator(gameObject);
+                return;
+            }
+
             EnsureRuntimeVisuals();
             EnsureTraversalFreedom();
             EnsureGameplayMissingPieces();

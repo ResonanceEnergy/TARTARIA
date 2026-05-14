@@ -522,6 +522,17 @@ namespace Tartaria.Editor
                 HDROutputConfigurator.Run();
             });
 
+            // ── Phase 9j20: NavMesh Baking — enables MudGolem navigation ──
+            BuildReport.RunPhase("Phase 9j20/19: NavMesh Baking", () =>
+            {
+                if (AssetDatabase.LoadAssetAtPath<SceneAsset>(echohavenPath) != null)
+                {
+                    EditorSceneManager.OpenScene(echohavenPath, OpenSceneMode.Single);
+                    NavMeshBaker.BakeNavMesh();
+                    EditorSceneManager.SaveOpenScenes();
+                }
+            });
+
             // ── Finalize ──
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();

@@ -156,22 +156,29 @@ namespace Tartaria.Editor
             // KayKit Rogue is ~1.7m tall — scale to fit CharacterController height of 2m
             meshInstance.transform.localScale = Vector3.one * 1.0f;
 
-            // 4) Tint primary body materials with Aether glow accent (cape)
-            string aetherMaterialPath = "Assets/_Project/Materials/M_AetherVein.mat";
-            Material aetherMaterial = AssetDatabase.LoadAssetAtPath<Material>(aetherMaterialPath);
-            if (aetherMaterial != null)
+            // 4) Apply Aether-tinted URP materials to mesh renderers
+            // Clone materials with distinctive AetherCore colors (cyan-violet palette)
+            var renderers = meshInstance.GetComponentsInChildren<SkinnedMeshRenderer>();
+            var shader = Shader.Find("Universal Render Pipeline/Lit");
+            if (shader == null) shader = Shader.Find("Standard");
+            foreach (var renderer in renderers)
             {
-                var renderers = meshInstance.GetComponentsInChildren<SkinnedMeshRenderer>();
-                foreach (var renderer in renderers)
+                var mats = renderer.sharedMaterials;
+                for (int i = 0; i < mats.Length; i++)
                 {
-                    var mats = renderer.sharedMaterials;
-                    for (int i = 0; i < mats.Length; i++)
-                    {
-                        if (mats[i] != null && mats[i].name.ToLowerInvariant().Contains("cape"))
-                            mats[i] = aetherMaterial;
-                    }
-                    renderer.sharedMaterials = mats;
+                    if (mats[i] == null) continue;
+                    var newMat = new Material(shader);
+                    newMat.name = $"{mats[i].name}_AetherTint";
+                    // Base: cyan-violet gradient
+                    newMat.SetColor("_BaseColor", new Color(0.49f, 0.72f, 1f)); // #7FB8FF
+                    newMat.SetFloat("_Smoothness", 0.4f);
+                    newMat.SetFloat("_Metallic", 0.1f);
+                    // Emission: violet accent
+                    newMat.EnableKeyword("_EMISSION");
+                    newMat.SetColor("_EmissionColor", new Color(0.62f, 0.45f, 1f) * 0.3f); // #9F73FF
+                    mats[i] = newMat;
                 }
+                renderer.sharedMaterials = mats;
             }
 
             // 5) Build the KayKit animator controller from the pack's own (Generic-rigged) anims

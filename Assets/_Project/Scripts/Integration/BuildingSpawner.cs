@@ -23,6 +23,14 @@ namespace Tartaria.Integration
         [Header("Discovery Radius")]
         [SerializeField] float discoveryRadius = 15f;
 
+        [Header("KayKit Building Composition (2026 AAA)")]
+        [SerializeField, Tooltip("KayKit rock prefabs for composing structures")]
+        GameObject[] kayKitRockPrefabs;
+        [SerializeField, Tooltip("KayKit trees for ambient scatter")]
+        GameObject[] kayKitTreePrefabs;
+        [SerializeField, Tooltip("KayKit bushes for ambient scatter")]
+        GameObject[] kayKitBushPrefabs;
+
         // Scene object names from EchohavenScenePopulator
         static readonly string[] DomeNames = { "StarDome_Placeholder", "Echohaven_StarDome" };
         static readonly string[] FountainNames = { "HarmonicFountain_Placeholder", "Echohaven_HarmonicFountain" };
@@ -47,7 +55,9 @@ namespace Tartaria.Integration
             WireBuilding("fountain", fountainPosition, FountainNames, PrimitiveType.Cylinder, new Vector3(4f, 3f, 4f));
             WireBuilding("spire", spirePosition, SpireNames, PrimitiveType.Cylinder, new Vector3(3f, 12f, 3f));
 
-            Debug.Log("[BuildingSpawner] 3 buildings wired with interaction + discovery triggers.");
+            SpawnAmbientVillage();
+
+            Debug.Log("[BuildingSpawner] 3 buildings wired + ambient village scattered.");
         }
 
         void WireBuilding(string buildingId, Vector3 position, string[] sceneNames,
@@ -219,9 +229,86 @@ namespace Tartaria.Integration
             marker.AddComponent<BobbingMarker>();
         }
 
+        /// <summary>
+        /// Scatters 40-80 KayKit props (rocks, trees, bushes) around Echohaven plaza.
+        /// Deterministic seeded RNG for consistent placement.
+        /// </summary>
+        void SpawnAmbientVillage()
+        {
+            if (kayKitRockPrefabs == null || kayKitRockPrefabs.Length == 0)
+            {
+                Debug.LogWarning("[BuildingSpawner] SpawnAmbientVillage: kayKitRockPrefabs not assigned — skipping scatter.");
+                return;
+            }
+
+            var rng = new System.Random(0xABBA);
+            var root = new GameObject("AmbientVillage");
+
+            int rockCount = 30 + rng.Next(15);
+            int bushCount = 20 + rng.Next(15);
+            int treeCount = 8 + rng.Next(5);
+
+            // Scatter rocks
+            for (int i = 0; i < rockCount; i++)
+            {
+                var prefab = kayKitRockPrefabs[rng.Next(kayKitRockPrefabs.Length)];
+                if (prefab == null) continue;
+                float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
+                float dist = 15f + (float)rng.NextDouble() * 45f;
+                Vector3 pos = new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
+                var rock = Instantiate(prefab, pos, Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f));
+                rock.name = $"Rock_{i}";
+                rock.transform.SetParent(root.transform);
+                rock.transform.localScale *= 0.7f + (float)rng.NextDouble() * 0.8f;
+            }
+
+            // Scatter bushes
+            if (kayKitBushPrefabs != null && kayKitBushPrefabs.Length > 0)
+            {
+                for (int i = 0; i < bushCount; i++)
+                {
+                    var prefab = kayKitBushPrefabs[rng.Next(kayKitBushPrefabs.Length)];
+                    if (prefab == null) continue;
+                    float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
+                    float dist = 12f + (float)rng.NextDouble() * 50f;
+                    Vector3 pos = new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
+                    var bush = Instantiate(prefab, pos, Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f));
+                    bush.name = $"Bush_{i}";
+                    bush.transform.SetParent(root.transform);
+                    bush.transform.localScale *= 0.8f + (float)rng.NextDouble() * 0.6f;
+                }
+            }
+
+            // Scatter trees
+            if (kayKitTreePrefabs != null && kayKitTreePrefabs.Length > 0)
+            {
+                for (int i = 0; i < treeCount; i++)
+                {
+                    var prefab = kayKitTreePrefabs[rng.Next(kayKitTreePrefabs.Length)];
+                    if (prefab == null) continue;
+                    float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
+                    float dist = 25f + (float)rng.NextDouble() * 35f;
+                    Vector3 pos = new Vector3(Mathf.Cos(angle) * dist, 0f, Mathf.Sin(angle) * dist);
+                    var tree = Instantiate(prefab, pos, Quaternion.identity);
+                    tree.name = $"Tree_{i}";
+                    tree.transform.SetParent(root.transform);
+                    tree.transform.localScale *= 0.9f + (float)rng.NextDouble() * 0.4f;
+                }
+            }
+
+            Debug.Log($"[BuildingSpawner] Ambient village scattered: {rockCount} rocks, {bushCount} bushes, {treeCount} trees.");
+        }
+
         GameObject CreateGreyboxBuilding(string id, Vector3 position,
             PrimitiveType shape, Vector3 scale)
         {
+            // If KayKit rocks assigned, compose building from them
+            if (kayKitRockPrefabs != null && kayKitRockPrefabs.Length > 0)
+            {
+                return ComposeKayKitBuilding(id, position, scale);
+            }
+
+            // Fallback: primitives
             var go = GameObject.CreatePrimitive(shape);
             go.transform.position = position + Vector3.up * (scale.y * 0.5f);
             go.transform.localScale = scale;
@@ -236,6 +323,54 @@ namespace Tartaria.Integration
             }
 
             return go;
+        }
+
+        /// <summary>
+        /// Compose a building from stacked KayKit rock meshes for 2026 AAA visuals.
+        /// </summary>
+        GameObject ComposeKayKitBuilding(string id, Vector3 position, Vector3 scale)
+        {
+            var root = new GameObject($"Building_{id}_Composite");
+            root.transform.position = position;
+
+            var rng = new System.Random(id.GetHashCode());
+            int rockCount = id == "spire" ? 12 : 8;
+            float height = scale.y;
+            float baseRadius = Mathf.Max(scale.x, scale.z) * 0.5f;
+
+            for (int i = 0; i < rockCount; i++)
+            {
+                var prefab = kayKitRockPrefabs[rng.Next(kayKitRockPrefabs.Length)];
+                if (prefab == null) continue;
+
+                float t = (float)i / rockCount;
+                float y = t * height;
+                float angle = (float)rng.NextDouble() * Mathf.PI * 2f;
+                float r = baseRadius * (1f - t * 0.3f);
+                Vector3 offset = new Vector3(Mathf.Cos(angle) * r, y, Mathf.Sin(angle) * r);
+
+                var rock = Instantiate(prefab, position + offset, Quaternion.Euler(
+                    (float)rng.NextDouble() * 30f,
+                    (float)rng.NextDouble() * 360f,
+                    (float)rng.NextDouble() * 30f));
+                rock.name = $"Rock_{i}";
+                rock.transform.SetParent(root.transform);
+                rock.transform.localScale *= 1.2f + (float)rng.NextDouble() * 0.6f;
+
+                // Apply mud material to all renderers
+                var renderers = rock.GetComponentsInChildren<MeshRenderer>();
+                foreach (var r in renderers)
+                {
+                    if (_mudFresh != null) r.material = _mudFresh;
+                }
+            }
+
+            // Add collider to root
+            var col = root.AddComponent<BoxCollider>();
+            col.size = scale;
+            col.center = Vector3.up * (scale.y * 0.5f);
+
+            return root;
         }
 
         static Material CreateBuildingMaterial(string name)
