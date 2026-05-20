@@ -270,6 +270,15 @@ namespace Tartaria.Integration
             RememberSong();
         }
 
+        // Round 6: Lirael (ID=2) roof singer escort for train + 17th Hour solidification support
+        public void BoardTrainLiraelEscort(Vector3 railPos, bool is17th = false)
+        {
+            if (transform) transform.position = railPos + new Vector3(1.1f, 2.8f, 0.4f);
+            CompanionManager.Instance?.TriggerCompanionTrainEscort(2, railPos, is17th);
+            DialogueManager.Instance?.PlayContextDialogue(is17th ? "lirael_17th_sing_rail" : "lirael_train_escort");
+            Debug.Log("[Lirael] Escort ID=2 DOTS bridge + 17th complete.");
+        }
+
         // ─── Internal Helpers ────────────────────────
 
         void UpdateSolidity(float newSolidity)

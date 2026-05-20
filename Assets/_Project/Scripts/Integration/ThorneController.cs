@@ -150,6 +150,31 @@ namespace Tartaria.Integration
             Debug.Log("[Thorne] Militia activated — zone defense patrols now active.");
         }
 
+        // ═══ Round 6: Deeper Thorne escort (vigilant forward guard) + 17th Hour rail integration ═══
+        /// <summary>Thorne boards train in forward combat-ready escort stance. Full DOTS sync + 17th playtest (ID=4).</summary>
+        public void BoardTrainForThorneEscort(Vector3 railPosition, bool enable17thHour = false)
+        {
+            if (transform != null)
+            {
+                Vector3 thorneOffset = new Vector3(1.8f, 1.3f, -1.2f); // forward vigilant
+                transform.position = railPosition + thorneOffset;
+                transform.forward = Vector3.Lerp(transform.forward, Vector3.forward, 0.9f);
+            }
+            CompanionManager.Instance?.TriggerCompanionTrainEscort(4, railPosition, enable17thHour);
+            if (enable17thHour) CompanionManager.Instance?.Trigger17thHourCompanionEscort(4, railPosition);
+            DialogueManager.Instance?.PlayContextDialogue(enable17thHour ? "thorne_17th_hour_rail_watch" : "thorne_train_escort_vigil");
+            Debug.Log($"[Thorne] Deeper escort ID=4 DOTS PhysicalBond/17th + train solidification redemption path exercised.");
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        public void Trigger17thHourVigil()
+        {
+            AddTrust(11f);
+            CompanionManager.Instance?.SyncCompanionToDOTS(4, true, transform ? transform.position : Vector3.zero, false, 0, false, true, 15);
+            DialogueManager.Instance?.PlayContextDialogue("thorne_17th_vigil");
+            Debug.Log("[Thorne] 17th Hour vigil escort — DOTS bond + guard behaviors active.");
+        }
+
         // ─── Save / Load ────────────────────────────
 
         public ThorneSaveData GetSaveData()

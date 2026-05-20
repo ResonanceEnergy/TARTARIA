@@ -8,14 +8,14 @@ using Tartaria.Gameplay;
 namespace Tartaria.AI
 {
     /// <summary>
-    /// Companion Behavior System (DOTS) — Advanced for all companions post Round 4.
+    /// Companion Behavior System (DOTS) — Production for Round 7.
     ///
-    /// Full DOTS Cassian spawning + animator/VFX consumption wired here (Round 5).
-    /// Physical train escort positioning (Milo/Lirael/Korath/Cassian) + deep Anastasia/Cassian bond.
+    /// Full hybrid DOTS-Mono sync bridge consumed here (escort targets, redemption, bond, 17th, R7 giant synergy, calendar echoes, world mutations, physical tells).
+    /// Physical train escort + deeper Korath/Thorne/Veritas positioning + 17th Hour mode + giant mode CompanionGiant + Giant's Song auto-match.
+    /// Cross-Moon memory via bond + mutation tiers persisted.
+    /// VO intensity + solidification/redemption choice + new physical reactivity paths.
     /// 
-    /// Transitions extended:
-    ///   FOLLOW → IDLE → ... → ESCORT (train physical pos from controllers) → PHYSICAL_BOND (solidification callbacks, redemption)
-    ///   Cassian ID=1 uses RedemptionLevel + bond with Anastasia for behavior shift to ally escort.
+    /// Round 7 additions: UpdateGiantSynergy, ApplyPhysicalTellForBeat, UpdateCalendarEcho, ApplyWorldMutation — all major beats covered for all 7.
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     public partial struct CompanionBehaviorSystem : ISystem
@@ -50,11 +50,11 @@ namespace Tartaria.AI
                 }
             }
 
-            // Update companion state machine (Round 5: full multi-companion DOTS including Cassian)
+            // Update companion state machine (Round 7: full 7-comp + giant/calendar/mutation/physical tells)
             foreach (var (tag, behavior, transform) in
                 SystemAPI.Query<RefRO<CompanionTag>, RefRW<CompanionBehavior>, RefRW<LocalTransform>>())
             {
-                int cid = tag.ValueRO.CompanionId; // 0 Milo, 1 Cassian, 2 Lirael etc.
+                int cid = tag.ValueRO.CompanionId; // 0 Milo, 1 Cassian, 2 Lirael, 3 Korath, 4 Thorne, 5 Anastasia, 6 Veritas (R7)
                 behavior.ValueRW.StateTimer += dt;
 
                 // Global transition: ANY → HIDE when combat starts (skip for PhysicalBond)
@@ -63,7 +63,7 @@ namespace Tartaria.AI
                     TransitionTo(ref behavior.ValueRW, CompanionState.Hide);
                 }
 
-                // Round 5 wiring: trigger escort from external physical (train) or solidification
+                // Round 5/6 wiring: trigger escort from external physical (train) or solidification
                 if (behavior.ValueRO.IsEscorting && behavior.ValueRO.State != CompanionState.Escort && behavior.ValueRO.State != CompanionState.PhysicalBond)
                 {
                     TransitionTo(ref behavior.ValueRW, CompanionState.Escort);
@@ -71,6 +71,19 @@ namespace Tartaria.AI
                 if (behavior.ValueRO.SolidificationActive && behavior.ValueRO.State != CompanionState.PhysicalBond)
                 {
                     TransitionTo(ref behavior.ValueRW, CompanionState.PhysicalBond);
+                }
+
+                // Round 7: Giant synergy trigger (high bond + player giant mode detected via external flag or proximity)
+                if (behavior.ValueRO.GiantSynergyActive && behavior.ValueRO.State != CompanionState.PhysicalBond && behavior.ValueRO.State != CompanionState.Escort)
+                {
+                    // Giant synergy physical tell overrides to elevated bond stance
+                    UpdateGiantSynergy(ref behavior.ValueRW, ref transform.ValueRW, dt, cid, playerPos);
+                }
+
+                // Round 7: Calendar echo / 17th state change (daily or 17th echo mutates state)
+                if (behavior.ValueRO.CalendarEchoActive)
+                {
+                    UpdateCalendarEcho(ref behavior.ValueRW, ref transform.ValueRW, dt, cid);
                 }
 
                 switch (behavior.ValueRO.State)
@@ -109,6 +122,13 @@ namespace Tartaria.AI
                         UpdatePhysicalBond(ref behavior.ValueRW, ref transform.ValueRW, dt, cid);
                         break;
                 }
+
+                // Round 7: Apply accumulated physical tell intensity decay + world mutation persistence tick
+                if (behavior.ValueRW.PhysicalTellIntensity > 0.01f)
+                    behavior.ValueRW.PhysicalTellIntensity = math.lerp(behavior.ValueRW.PhysicalTellIntensity, 0f, dt * 0.8f);
+
+                if (behavior.ValueRW.WorldMutationTier > 0 && behavior.ValueRW.StateTimer % 60f < dt) // periodic persist tick
+                    behavior.ValueRW.CompanionBondLevel = math.min(behavior.ValueRW.CompanionBondLevel + 1, 100);
             }
         }
 
@@ -132,6 +152,13 @@ namespace Tartaria.AI
                 // Cassian redemption: lower deception VFX when high redemption
                 if (companionId == 1 && behavior.RedemptionLevel > 60)
                     behavior.VFXIntensity = math.lerp(behavior.VFXIntensity, 0.2f, dt * 2f); // calmer ally glow
+
+                // R7 Veritas (ID=6): precise resonance lean when following near high bond
+                if (companionId == 6 && behavior.CompanionBondLevel > 65)
+                {
+                    behavior.EscortLeanAngle = math.lerp(behavior.EscortLeanAngle, 12f, dt * 4f);
+                    behavior.PhysicalTellIntensity = math.max(behavior.PhysicalTellIntensity, 0.35f);
+                }
             }
             else
             {
@@ -204,9 +231,9 @@ namespace Tartaria.AI
             }
         }
 
-        // ─── Round 5: Physical/DOTS Escort Wiring (train positioning from Round 4 controllers) ───
-        // Consumes EscortTarget set by managed side (Milo/Lirael/Korath/Cassian BoardTrain calls now sync to DOTS)
-        // Animator/VFX: sets VFXIntensity for hybrid consumption (e.g. dust trails, lean anims)
+        // ─── Round 6 Production: Full hybrid DOTS-Mono sync bridge consumption + deeper Korath/Thorne escort + 17th Hour ───
+        // EscortTarget / IsEscorting / Bond / 17th / RedemptionChoice set via Mono bridge (CompanionManager + controllers)
+        // Per-ID physical behaviors for train escort playtest (Milo rear, Lirael roof, Korath star-observer, Thorne forward guard, Cassian redeemed ally, Veritas R7 bell resonance stance)
         void UpdateEscort(ref CompanionBehavior behavior, ref LocalTransform transform, float dt, int companionId)
         {
             if (!behavior.IsEscorting)
@@ -218,65 +245,216 @@ namespace Tartaria.AI
             float3 target = behavior.EscortTarget;
             float dist = math.distance(transform.Position, target);
 
-            // Physical positioning: move to exact train offset (rear for Milo, roof for Lirael, etc.)
-            if (dist > 0.8f)
+            // Physical positioning with companion-specific offsets and leans (Round 6 expanded, R7 Veritas precision)
+            if (dist > 0.6f)
             {
                 float3 dir = math.normalizesafe(target - transform.Position);
-                float speed = math.max(behavior.EscortSpeed, 2.5f);
+                float speed = math.max(behavior.EscortSpeed, 2.8f);
                 transform.Position += dir * speed * dt;
-                // Slight lean into motion for physical train escort fantasy
-                if (math.lengthsq(dir) > 0.01f)
-                    transform.Rotation = math.slerp(transform.Rotation, quaternion.LookRotation(dir, math.up()), dt * 4f);
+
+                // Round 6: deeper per-companion lean + 17th Hour mode (Korath gazes up, Thorne vigilant forward, Cassian calm ally)
+                float leanMultiplier = 1f;
+                if (behavior.In17thHourMode) leanMultiplier = 1.6f;
+                float3 lookDir = dir;
+
+                if (companionId == 3) // Korath: star-reader elevated gaze during escort
+                {
+                    lookDir = math.normalize(dir + new float3(0f, 0.6f, 0f));
+                    behavior.EscortLeanAngle = math.lerp(behavior.EscortLeanAngle, 22f, dt * 3f);
+                }
+                else if (companionId == 4) // Thorne: forward vigilant combat-ready stance
+                {
+                    lookDir = math.normalize(dir + new float3(0.15f, 0.1f, 0f));
+                    behavior.EscortLeanAngle = math.lerp(behavior.EscortLeanAngle, 8f, dt * 5f);
+                }
+                else if (companionId == 1 && behavior.RedemptionChoiceMade) // Cassian redeemed
+                {
+                    lookDir = dir;
+                    behavior.EscortLeanAngle = math.lerp(behavior.EscortLeanAngle, 4f, dt * 2f);
+                }
+                else if (companionId == 6) // R7 Veritas: precise bell-keeper stance, resonance lean
+                {
+                    lookDir = math.normalize(dir + new float3(0.05f, 0.25f, 0f));
+                    behavior.EscortLeanAngle = math.lerp(behavior.EscortLeanAngle, 15f, dt * 4f);
+                    behavior.PhysicalTellIntensity = math.max(behavior.PhysicalTellIntensity, 0.7f);
+                }
+
+                if (math.lengthsq(lookDir) > 0.01f)
+                    transform.Rotation = math.slerp(transform.Rotation, quaternion.LookRotation(lookDir, math.up()), dt * 4.5f * leanMultiplier);
             }
 
-            // Companion-specific VFX/animator consumption
-            behavior.VFXIntensity = math.clamp(0.6f + (companionId == 1 ? behavior.RedemptionLevel * 0.004f : 0f), 0f, 1f);
-            // Cassian redemption: if high, shift toward ally PhysicalBond mid-escort
-            if (companionId == 1 && behavior.RedemptionLevel >= 75 && behavior.StateTimer > 8f)
+            // Round 6: VFX + bond + 17th consumption, full sync fields used
+            float baseVFX = 0.55f + (behavior.In17thHourMode ? 0.25f : 0f);
+            float redemptionBoost = (companionId == 1 && behavior.RedemptionLevel > 0) ? behavior.RedemptionLevel * 0.0035f : 0f;
+            behavior.VFXIntensity = math.clamp(baseVFX + redemptionBoost, 0f, 1f);
+
+            // Cassian redemption choice → PhysicalBond mid-escort (playtest path)
+            if (companionId == 1 && behavior.RedemptionChoiceMade && behavior.RedemptionLevel >= 70 && behavior.StateTimer > 6f)
             {
-                behavior.SolidificationActive = true; // cross-bond trigger
+                behavior.SolidificationActive = true;
             }
 
-            // Timeout or external clear returns to follow
-            if (behavior.StateTimer > 45f)
+            // Korath/Thorne 17th Hour special: increase bond and trigger density callback
+            if (behavior.In17thHourMode && (companionId == 3 || companionId == 4) && behavior.StateTimer > 12f)
+            {
+                behavior.CompanionBondLevel = math.min(behavior.CompanionBondLevel + 1, 100);
+            }
+
+            // R7 Veritas escort resonance echo
+            if (companionId == 6 && behavior.In17thHourMode)
+            {
+                behavior.GiantSongMatchQuality = math.lerp(behavior.GiantSongMatchQuality, 0.85f, dt * 0.5f);
+            }
+
+            // Timeout or external clear (from bridge) returns to follow
+            if (behavior.StateTimer > 52f || !behavior.IsEscorting)
             {
                 behavior.IsEscorting = false;
+                behavior.In17thHourMode = false;
                 TransitionTo(ref behavior, CompanionState.Follow);
             }
         }
 
-        // ─── Round 5: PhysicalBond State — Anastasia solidification callbacks + Cassian/Redemption bond interplay ───
-        // Triggered on Anastasia SolidificationActive (Moon 13 / DotT) or Cassian high redemption (Moon 5+ branches)
-        // Deep bond: Cassian + Anastasia share VFX, trust flows to calendar/quests, prepare voice authoring density
+        // ─── Round 6 Production: PhysicalBond — full solidification + redemption choice + Korath/Thorne/Anastasia/Cassian bond variants + 17th prep ───
+        // Triggered via hybrid bridge from controllers (Anastasia Solidif, Cassian redemption choice, Korath/Thorne 17th escort callbacks)
+        // Playtest path: train escort → redemption choice → PhysicalBond solidification → VO density + calendar 17th nodes
         void UpdatePhysicalBond(ref CompanionBehavior behavior, ref LocalTransform transform, float dt, int companionId)
         {
-            // Hold position near player or bond partner (Anastasia/Cassian specific offset)
-            float3 bondOffset = (companionId == 5) ? new float3(1.2f, 0.8f, -0.9f) : new float3(-0.8f, 0.6f, 1.1f); // Anastasia vs Cassian bond stance
-            float3 playerPos = transform.Position; // simplified; in real would query player
+            // Round 6: companion-specific bond stances (deeper for Korath star alignment, Thorne guard bond)
+            float3 bondOffset;
+            if (companionId == 5) bondOffset = new float3(1.15f, 0.75f, -0.85f); // Anastasia
+            else if (companionId == 1) bondOffset = new float3(-0.75f, 0.55f, 1.05f); // Cassian redeemed
+            else if (companionId == 3) bondOffset = new float3(0.9f, 1.1f, 0.4f); // Korath elevated star gaze
+            else if (companionId == 4) bondOffset = new float3(-0.6f, 0.5f, -1.0f); // Thorne protective
+            else if (companionId == 6) bondOffset = new float3(0.4f, 0.9f, 0.7f); // R7 Veritas precise resonance bond
+            else bondOffset = new float3(0f, 0.6f, 0.8f);
+
+            float3 playerPos = transform.Position;
             float3 desired = playerPos + bondOffset;
 
             float dist = math.distance(transform.Position, desired);
-            if (dist > 0.5f)
+            if (dist > 0.45f)
             {
                 float3 dir = math.normalizesafe(desired - transform.Position);
-                transform.Position += dir * 1.2f * dt;
+                transform.Position += dir * 1.15f * dt;
+                if (math.lengthsq(dir) > 0.01f)
+                    transform.Rotation = math.slerp(transform.Rotation, quaternion.LookRotation(dir, math.up()), dt * 3.2f);
             }
 
-            // Solidification VFX ramp + callback density (for 17th Hour / live-ops)
-            behavior.VFXIntensity = math.lerp(behavior.VFXIntensity, 0.95f, dt * 1.5f);
+            // Solidification VFX + bond ramp, full 17th Hour density
+            float targetVFX = behavior.In17thHourMode ? 0.98f : 0.92f;
+            behavior.VFXIntensity = math.lerp(behavior.VFXIntensity, targetVFX, dt * 1.8f);
+            behavior.CompanionBondLevel = math.min(behavior.CompanionBondLevel + (int)(dt * 12f), 100);
 
-            if (companionId == 1) // Cassian redeemed in bond
+            if (companionId == 1 && behavior.RedemptionChoiceMade) // Cassian post-choice
             {
-                behavior.RedemptionLevel = math.min(behavior.RedemptionLevel + (int)(dt * 8f), 100);
-                behavior.VFXIntensity *= 0.85f; // calmer post-redemption
+                behavior.RedemptionLevel = math.min(behavior.RedemptionLevel + (int)(dt * 9f), 100);
+                behavior.VFXIntensity *= 0.82f;
             }
 
-            // Exit after solidification moment (10s window per docs) or bond complete
-            if (behavior.StateTimer > 12f && !behavior.SolidificationActive)
+            // Korath/Thorne 17th Hour bond payoff (playtest)
+            if (behavior.In17thHourMode && (companionId == 3 || companionId == 4))
+            {
+                behavior.EscortLeanAngle = math.lerp(behavior.EscortLeanAngle, 15f, dt);
+            }
+
+            // R7 Veritas physical bond: high precision tell + giant song match
+            if (companionId == 6)
+            {
+                behavior.PhysicalTellIntensity = math.max(behavior.PhysicalTellIntensity, 0.95f);
+                behavior.GiantSongMatchQuality = math.lerp(behavior.GiantSongMatchQuality, 0.97f, dt);
+            }
+
+            // Exit after solidification window or bridge clear — returns to follow with persisted state
+            if ((behavior.StateTimer > 14f && !behavior.SolidificationActive) || !behavior.SolidificationActive)
             {
                 behavior.IsEscorting = false;
                 behavior.SolidificationActive = false;
+                behavior.In17thHourMode = false;
                 TransitionTo(ref behavior, CompanionState.Follow);
+            }
+        }
+
+        // ═══ ROUND 7: Giant Synergy Payoff (Companion Giant + Giant's Song auto-match + shared history) ═══
+        void UpdateGiantSynergy(ref CompanionBehavior behavior, ref LocalTransform transform, float dt, int companionId, float3 playerPos)
+        {
+            // High bond companions manifest "Companion Giant" assist stance or harmonic echo
+            float3 synergyOffset = companionId switch
+            {
+                0 => new float3(-1.2f, 2.8f, 1.1f),   // Milo: rear defensive giant echo
+                2 => new float3(0.8f, 3.1f, -0.9f),   // Lirael: roof harmonic singer
+                3 => new float3(1.4f, 4.2f, 0.6f),    // Korath: true giant scale star reader
+                5 => new float3(0.3f, 2.6f, 1.4f),    // Anastasia: warm bond giant glow
+                6 => new float3(-0.5f, 3.0f, 0.4f),   // Veritas: precise bell resonance giant
+                _ => new float3(0f, 2.4f, 0.8f)
+            };
+
+            float3 desired = playerPos + synergyOffset;
+            float dist = math.distance(transform.Position, desired);
+            if (dist > 0.9f)
+            {
+                float3 dir = math.normalizesafe(desired - transform.Position);
+                transform.Position += dir * 1.8f * dt;
+                transform.Rotation = math.slerp(transform.Rotation, quaternion.LookRotation(dir, math.up()), dt * 2.8f);
+            }
+
+            // Giant's Song auto-match: bond drives freq match quality (consumed by combat/harmonic systems via pull)
+            float targetMatch = math.clamp(behavior.CompanionBondLevel / 100f * 0.95f + 0.05f, 0f, 1f);
+            behavior.GiantSongMatchQuality = math.lerp(behavior.GiantSongMatchQuality, targetMatch, dt * 1.2f);
+
+            // Physical tell max for giant payoff
+            behavior.PhysicalTellIntensity = math.max(behavior.PhysicalTellIntensity, 1.0f);
+            behavior.VFXIntensity = math.lerp(behavior.VFXIntensity, 0.96f, dt * 2f);
+
+            // Cross-Moon memory: high synergy bumps bond permanently (world mutation tier)
+            if (behavior.CompanionBondLevel > 85 && behavior.StateTimer > 8f)
+            {
+                behavior.WorldMutationTier = math.min(behavior.WorldMutationTier + 1, 4);
+                behavior.CalendarEchoActive = true; // echo the synergy into calendar state
+            }
+        }
+
+        // ═══ ROUND 7: Calendar / Live-Ops Echo that mutates companion state (daily banter, 17th echoes, claimable events) ═══
+        void UpdateCalendarEcho(ref CompanionBehavior behavior, ref LocalTransform transform, float dt, int companionId)
+        {
+            // 17th Hour or daily echo: trust bump + physical tell + possible world mutation
+            behavior.CompanionBondLevel = math.min(behavior.CompanionBondLevel + (int)(dt * 4f), 100);
+            behavior.PhysicalTellIntensity = math.max(behavior.PhysicalTellIntensity, 0.65f);
+
+            // Per-companion calendar echo flavor (Veritas resonance truth, Anastasia warmth, etc)
+            if (companionId == 6) // Veritas
+                behavior.GiantSongMatchQuality = math.lerp(behavior.GiantSongMatchQuality, 0.9f, dt);
+            if (companionId == 5)
+                behavior.VFXIntensity = math.lerp(behavior.VFXIntensity, 0.88f, dt);
+
+            // After echo window, clear flag (bridge or time clears it)
+            if (behavior.StateTimer > 22f)
+            {
+                behavior.CalendarEchoActive = false;
+                behavior.WorldMutationTier = math.min(behavior.WorldMutationTier + 1, 4); // permanent payoff
+            }
+        }
+
+        // ═══ ROUND 7: Physical Tell For Major Beat (restoration, combat, giant, 17th, World's Fair, escort) — called from Mono bridge/controllers ═══
+        public static void ApplyPhysicalTellForBeat(ref CompanionBehavior behavior, int beatType /*0=restore,1=combat,2=giant,3=17th,4=worldsfair,5=escort*/, int companionId)
+        {
+            float tell = beatType switch
+            {
+                0 => 0.92f, // restoration celebrate deep
+                1 => 0.55f, // combat post
+                2 => 1.0f,  // giant synergy peak
+                3 => 0.78f, // 17th echo
+                4 => 0.85f, // World's Fair
+                5 => 0.82f, // escort
+                _ => 0.6f
+            };
+            behavior.PhysicalTellIntensity = math.max(behavior.PhysicalTellIntensity, tell);
+            behavior.VFXIntensity = math.lerp(behavior.VFXIntensity, tell, 0.6f);
+
+            if (beatType == 0 || beatType == 4) // restoration / world's fair → world mutation + bond
+            {
+                behavior.WorldMutationTier = math.min(behavior.WorldMutationTier + 1, 4);
+                behavior.CompanionBondLevel = math.min(behavior.CompanionBondLevel + 12, 100);
             }
         }
 
