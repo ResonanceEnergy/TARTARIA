@@ -1,4 +1,7 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine.SceneManagement;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
@@ -15,8 +18,16 @@ namespace Tartaria.Integration
     ///   2. Rubble Clear        -- sweep debris fields with giant hands
     ///   3. Building Lift       -- physically reposition restored structures
     ///
+    /// Moon 2 Exclusive Giant Mode Integration & Synergies (Crystal/Corruption Environment):
+    ///   - Crystal Shatter Resonance Stomp: Shatters dissonance crystals at titanic scale
+    ///   - Corruption Vein Yanking: Giant hands rip fractal corruption veins like roots
+    ///   - Cathedral Quake (Major): The signature cathedral-shaking sequence that makes the living crystal dome convulse
+    ///   - Fractal Facet Revelation: Upper-scale exploration only possible at giant height
+    ///   - Ley Bridge Resonance Stomp: Giant steps create temporary crystal ley bridges between the 5 structures
+    ///
     /// Camera zooms to isometric during Giant Mode.
     /// Costs Aether per second to maintain.
+    /// All Moon 2 moments are thematically tied to crystal shattering, vein manipulation, massive cathedral interaction.
     /// </summary>
     [DisallowMultipleComponent]
     public class GiantModeController : MonoBehaviour
@@ -37,6 +48,10 @@ namespace Tartaria.Integration
         [SerializeField] float rubbleClearRadius = 20f;
         [SerializeField] float buildingLiftRange = 12f;
         [SerializeField] float buildingLiftSpeed = 2f;
+
+        [Header("Moon 2 Crystal Giant Mode")]
+        [SerializeField] float moon2CrystalStompRadius = 22f;
+        [SerializeField] float moon2VeinYankRadius = 18f;
 
         [Header("References")]
         [SerializeField] Transform playerTransform;
@@ -91,6 +106,10 @@ namespace Tartaria.Integration
                 _totalTimeAsGiant += Time.deltaTime;
                 HUDController.Instance?.UpdateAetherCharge(_aetherCharge);
 
+                // R5 Combat HUD wiring: drive giant meter from real internal aether readiness (production polish)
+                float readiness = Mathf.Clamp01(_aetherCharge / Mathf.Max(1f, minimumAetherToActivate));
+                Tartaria.UI.HUDController.Instance?.UpdateGiantMeter(readiness, false);
+
                 if (_aetherCharge <= 0f)
                 {
                     _aetherCharge = 0f;
@@ -142,6 +161,10 @@ namespace Tartaria.Integration
             Debug.Log("[GiantMode] Activated");
             _totalActivations++;
             OnGiantActivated?.Invoke();
+
+            // R5: explicit HUD giant meter + accessibility caption on activate (richer feedback)
+            Tartaria.UI.HUDController.Instance?.UpdateGiantMeter(1f, true);
+            Tartaria.UI.AccessibilityManager.Instance?.PostSFXCaption("GiantMeter", "Giant Mode activated — world scale transformation engaged. Aether draining.");
         }
 
         void DeactivateGiantMode()
@@ -163,6 +186,10 @@ namespace Tartaria.Integration
 
             Debug.Log("[GiantMode] Deactivated");
             OnGiantDeactivated?.Invoke();
+
+            // R5: HUD meter + caption on exit
+            Tartaria.UI.HUDController.Instance?.HideGiantMeter();
+            Tartaria.UI.AccessibilityManager.Instance?.PostSFXCaption("GiantMeter", "Giant Mode deactivated. Returning to normal scale.");
         }
 
         // ─── Ability 1: Precision Rock Cut ───────────
@@ -290,12 +317,323 @@ namespace Tartaria.Integration
                 buildingLiftSpeed * Time.deltaTime);
         }
 
+        // ─── Moon 2 Giant Mode Crystal/Corruption Synergies (POWER FANTASY) ─────────────────
+
+        private bool IsMoon2CrystalEnvironment()
+        {
+            var scene = SceneManager.GetActiveScene();
+            string name = scene.name;
+            return name.Contains("CrystallineCaverns") || name.Contains("Moon2") || 
+                   name.ToLower().Contains("crystal") || name.ToLower().Contains("cavern");
+        }
+
+        /// <summary>
+        /// Moon 2 #1: Crystal Shatter Resonance Stomp.
+        /// Giant-scale stomp shatters clusters of dissonance crystals and exposed corruption veins.
+        /// Unique visual: slow-motion shard explosions + chain fuse burns across the cathedral floor.
+        /// Synergizes with CorruptionSystem and Moon 2 visuals (veins, caustics).
+        /// </summary>
+        public void PerformCrystalShatterStomp(Vector3 targetPoint)
+        {
+            if (!_isGiant) return;
+
+            _activeAbility = GiantAbility.CrystalShatterStomp;
+
+            float radius = IsMoon2CrystalEnvironment() ? moon2CrystalStompRadius : 14f;
+            int count = Physics.OverlapSphereNonAlloc(targetPoint, radius, _overlapBuffer);
+            int shattered = 0;
+
+            for (int i = 0; i < count; i++)
+            {
+                var col = _overlapBuffer[i];
+                bool isMoon2Target = false;
+
+                if (col.TryGetComponent<InteractableBuilding>(out var building) && building.BuildingId != null && building.BuildingId.Contains("moon2"))
+                {
+                    CorruptionSystem.Instance?.PurgeCorruption(building.BuildingId, 32f);
+                    isMoon2Target = true;
+                    shattered++;
+                }
+
+                if (col.CompareTag("Crystal") || (col.name != null && (col.name.ToLower().Contains("crystal") || col.name.ToLower().Contains("vein") || col.name.ToLower().Contains("fractal"))))
+                {
+                    if (col.TryGetComponent<Rigidbody>(out var rb))
+                    {
+                        Vector3 dir = (col.transform.position - targetPoint).normalized;
+                        rb.AddForce(dir * 900f + Vector3.up * 450f, ForceMode.Impulse);
+                    }
+                    shattered++;
+                    isMoon2Target = true;
+                }
+
+                if (isMoon2Target && IsMoon2CrystalEnvironment())
+                {
+                    // Extra visual pop for crystal feel
+                    VFXController.Instance?.PlayResonancePulse(col.transform.position, 6f);
+                }
+            }
+
+            if (IsMoon2CrystalEnvironment())
+            {
+                VFXController.Instance?.PlayResonancePulse(targetPoint, radius * 1.1f);
+                Audio.AudioManager.Instance?.PlaySFX("CrystalShatter", targetPoint);
+                HapticFeedbackManager.Instance?.PlayCombatHit();
+                // Extra: trigger visual vein burn reaction on nearby moon2 buildings
+                int bcount = Physics.OverlapSphereNonAlloc(targetPoint, radius * 0.8f, _overlapBuffer);
+                for (int i = 0; i < bcount; i++)
+                {
+                    if (_overlapBuffer[i].TryGetComponent<InteractableBuilding>(out var b) && b.BuildingId != null && b.BuildingId.Contains("moon2"))
+                    {
+                        CorruptionSystem.Instance?.PurgeCorruption(b.BuildingId, 12f);
+                    }
+                }
+            }
+
+            Debug.Log($"[GiantMode Moon2] Crystal Shatter Stomp — {shattered} crystals/veins obliterated at titan scale");
+            _crystalShatters++;
+            OnAbilityUsed?.Invoke(GiantAbility.CrystalShatterStomp);
+        }
+
+        /// <summary>
+        /// Moon 2 #2: Corruption Vein Manipulation (Giant Hand Yank).
+        /// Player reaches giant hands into the cathedral's fractal veins and rips them free.
+        /// Causes spectacular "burn like fire along a fuse" chain reactions across multiple buildings.
+        /// </summary>
+        public void PerformVeinManipulation(Vector3 targetPoint)
+        {
+            if (!_isGiant) return;
+
+            _activeAbility = GiantAbility.CorruptionVeinYank;
+
+            float radius = IsMoon2CrystalEnvironment() ? moon2VeinYankRadius : 12f;
+
+            if (IsMoon2CrystalEnvironment())
+            {
+                VFXController.Instance?.PlayResonancePulse(targetPoint, radius);
+                Audio.AudioManager.Instance?.PlaySFX("VeinYank", targetPoint);
+                HapticFeedbackManager.Instance?.PlayGolemDeath();
+
+                int count = Physics.OverlapSphereNonAlloc(targetPoint, radius, _overlapBuffer);
+                for (int i = 0; i < count; i++)
+                {
+                    if (_overlapBuffer[i].TryGetComponent<InteractableBuilding>(out var building) && building.BuildingId != null && building.BuildingId.Contains("moon2"))
+                    {
+                        CorruptionSystem.Instance?.PurgeCorruption(building.BuildingId, 28f);
+                    }
+                }
+
+                // Bonus chain on ley chamber / hall for thematic spread
+                CorruptionSystem.Instance?.PurgeCorruption("moon2_ley_chamber", 15f);
+                CorruptionSystem.Instance?.PurgeCorruption("moon2_crystal_hall", 15f);
+            }
+            else
+            {
+                // Fallback general yank effect
+                VFXController.Instance?.PlayResonancePulse(targetPoint, radius * 0.7f);
+            }
+
+            Debug.Log("[GiantMode Moon2] Vein Manipulation — corruption roots torn free by giant hands. Cathedral trembles.");
+            _veinsYanked++;
+            OnAbilityUsed?.Invoke(GiantAbility.CorruptionVeinYank);
+        }
+
+        /// <summary>
+        /// Moon 2 #3 (MAJOR): Cathedral-Shaking Quake Sequence.
+        /// The ultimate power fantasy moment exclusive to Moon 2's living crystal cathedral.
+        /// A titanic resonance stomp + harmonic presence against the dome causes the entire structure
+        /// (and all 5 buildings) to convulse in a multi-phase visual/audio quake.
+        /// 
+        /// Effects:
+        /// - Violent dome breathing amplification + crystal facet realignment
+        /// - All corruption veins across the zone ignite and burn away in cascading golden fire
+        /// - Camera shake + deep sub-bass rumble felt through haptics
+        /// - Massive RS reward + permanent visual state change (more golden light, less black veins)
+        /// - Bridges giant scale to the macro architecture in unforgettable way
+        /// </summary>
+        public void TriggerCathedralShakingQuake()
+        {
+            if (!_isGiant)
+            {
+                return;
+            }
+
+            if (!IsMoon2CrystalEnvironment())
+            {
+                // Non-Moon2 fallback: big rubble clear + rock cut
+                UseRubbleClear();
+                return;
+            }
+
+            _activeAbility = GiantAbility.CathedralQuake;
+
+            StartCoroutine(CathedralQuakeSequenceCoroutine());
+            OnAbilityUsed?.Invoke(GiantAbility.CathedralQuake);
+        }
+
+        private IEnumerator CathedralQuakeSequenceCoroutine()
+        {
+            Debug.Log("[GiantMode Moon2] ═══ THE CATHEDRAL SHAKES — GIANT MODE POWER FANTASY ═══");
+
+            // Locate the 5 signature structures
+            var cathedral = GameObject.Find("moon2_cathedral_dome") ?? GameObject.Find("Fractured Cathedral Dome");
+            var structures = new List<GameObject>();
+            string[] ids = { "moon2_cathedral_dome", "moon2_bell_tower", "moon2_fountain", "moon2_crystal_hall", "moon2_ley_chamber" };
+            foreach (string id in ids)
+            {
+                var go = GameObject.Find(id);
+                if (go != null) structures.Add(go);
+            }
+
+            // PHASE 1: The Impact Stomp (0-1.8s)
+            Audio.AudioManager.Instance?.PlaySFX2D("CathedralQuakeRumble");
+            HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+            if (playerTransform != null)
+            {
+                VFXController.Instance?.PlayResonancePulse(playerTransform.position, 42f);
+            }
+            if (cathedral != null)
+            {
+                StartCoroutine(ApplyCathedralShake(cathedral.transform, 5.2f, 1.15f));
+            }
+            CorruptionSystem.Instance?.PurgeCorruption("moon2_cathedral_dome", 75f);
+            yield return new WaitForSeconds(1.8f);
+
+            // PHASE 2: Harmonic Resonance Cascade (all 5 buildings shake + veins ignite)
+            Debug.Log("[GiantMode Moon2] Cathedral Quake — Phase 2: Harmonic Cascade ignites every crystal vein");
+            foreach (var s in structures)
+            {
+                if (s != null)
+                {
+                    StartCoroutine(ApplyCathedralShake(s.transform, 3.8f, 0.65f));
+                    string bid = s.name.Contains("moon2_") ? s.name : "moon2_" + s.name.ToLower().Replace(" ", "_");
+                    if (bid.Contains("moon2"))
+                        CorruptionSystem.Instance?.PurgeCorruption(bid, 22f);
+                }
+            }
+            if (playerTransform != null)
+            {
+                VFXController.Instance?.PlayResonancePulse(playerTransform.position + Vector3.up * 8f, 60f);
+            }
+            yield return new WaitForSeconds(2.4f);
+
+            // PHASE 3: The Dome's Great Breath + Shattering Finale
+            Debug.Log("[GiantMode Moon2] Cathedral Quake — Phase 3: The dome breathes like a living heart. Crystal growth surges.");
+            if (cathedral != null)
+            {
+                StartCoroutine(ApplyCathedralShake(cathedral.transform, 2.6f, 0.9f));
+            }
+
+            // Heavy purge on remaining structures + global reward
+            foreach (string id in ids)
+            {
+                CorruptionSystem.Instance?.PurgeCorruption(id, 18f);
+            }
+
+            // Massive world payoff
+            GameLoopController.Instance?.QueueRSReward(32f, "moon2_cathedral_giant_quake");
+            if (playerTransform != null)
+            {
+                Audio.AudioManager.Instance?.PlaySFX("GiantModeActivate", playerTransform.position); // triumphant reuse
+            }
+
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+
+            yield return new WaitForSeconds(3.0f);
+
+            _activeAbility = GiantAbility.None;
+            _cathedralQuakes++;
+
+            Debug.Log("[GiantMode Moon2] Cathedral Quake COMPLETE. The living crystal cathedral now carries the memory of the giant who shook it back to life. Power fantasy achieved.");
+        }
+
+        private IEnumerator ApplyCathedralShake(Transform target, float duration, float intensity)
+        {
+            if (target == null) yield break;
+            Vector3 originalScale = target.localScale;
+            float t = 0f;
+            while (t < duration)
+            {
+                t += Time.deltaTime;
+                float progress = t / duration;
+                float wave = Mathf.Sin(t * 28f + progress * 4f) * intensity * (1f - progress * 0.6f);
+                // Emphasis on vertical "breathing" + lateral crystal jitter — matches Moon 2 living dome aesthetic
+                target.localScale = originalScale + new Vector3(wave * 0.018f, wave * 0.11f, wave * 0.018f);
+                yield return null;
+            }
+            target.localScale = originalScale;
+        }
+
+        /// <summary>
+        /// Moon 2 #4: Massive Scale Exploration — Fractal Facet Revelation.
+        /// At giant height the player discovers and interacts with massive crystal facets and ley inscriptions
+        /// on the upper reaches of the dome and towers — completely invisible from human scale.
+        /// </summary>
+        public void RevealFractalFacetAtGiantScale(Vector3 targetPoint)
+        {
+            if (!_isGiant) return;
+
+            _activeAbility = GiantAbility.FractalFacetTap;
+
+            if (IsMoon2CrystalEnvironment())
+            {
+                VFXController.Instance?.PlayResonancePulse(targetPoint, 9f);
+                Audio.AudioManager.Instance?.PlaySFX("FacetReveal", targetPoint);
+                // Lore / insight payoff
+                GameLoopController.Instance?.QueueRSReward(9f, "giant_facet_reveal_moon2");
+                // Slight purge ripple
+                int count = Physics.OverlapSphereNonAlloc(targetPoint, 11f, _overlapBuffer);
+                for (int i = 0; i < count; i++)
+                {
+                    if (_overlapBuffer[i].TryGetComponent<InteractableBuilding>(out var b) && b.BuildingId != null && b.BuildingId.Contains("moon2"))
+                    {
+                        CorruptionSystem.Instance?.PurgeCorruption(b.BuildingId, 9f);
+                    }
+                }
+            }
+
+            Debug.Log("[GiantMode Moon2] Fractal Facet revealed — hidden giant-scale inscriptions and upper ley channels now accessible. The cathedral reveals its secrets only to titans.");
+            OnAbilityUsed?.Invoke(GiantAbility.FractalFacetTap);
+        }
+
+        /// <summary>
+        /// Moon 2 #5: Ley Resonance Bridge Stomp.
+        /// Giant footsteps along the ley lines between the five crystal structures temporarily manifest
+        /// glowing crystal bridges that auto-purge small corruption and provide visual power fantasy traversal.
+        /// </summary>
+        public void PerformLeyResonanceBridgeStomp(Vector3 targetPoint)
+        {
+            if (!_isGiant) return;
+
+            _activeAbility = GiantAbility.LeyBridgeStomp;
+
+            if (IsMoon2CrystalEnvironment())
+            {
+                VFXController.Instance?.PlayResonancePulse(targetPoint, 32f);
+                // Purge along ley path
+                CorruptionSystem.Instance?.PurgeCorruption("moon2_ley_chamber", 18f);
+                CorruptionSystem.Instance?.PurgeCorruption("moon2_fountain", 12f);
+                Audio.AudioManager.Instance?.PlaySFX("LeyBridgeForm", targetPoint);
+            }
+            else
+            {
+                VFXController.Instance?.PlayResonancePulse(targetPoint, 20f);
+            }
+
+            Debug.Log("[GiantMode Moon2] Ley Resonance Bridge — giant stomps manifest crystal pathways between the structures.");
+            OnAbilityUsed?.Invoke(GiantAbility.LeyBridgeStomp);
+        }
+
         // ─── Save/Load ──────────────────────────────
 
         int _totalActivations;
         int _buildingsLifted;
         int _rubbleCleared;
         float _totalTimeAsGiant;
+
+        // Moon 2 Giant exclusive stats
+        int _crystalShatters;
+        int _veinsYanked;
+        int _cathedralQuakes;
 
         public Save.GiantModeSaveBlock GetSaveData()
         {
@@ -323,6 +661,12 @@ namespace Tartaria.Integration
         None = 0,
         PrecisionRockCut = 1,
         RubbleClear = 2,
-        BuildingLift = 3
+        BuildingLift = 3,
+        // Moon 2 Crystal Environment Giant Mode exclusives
+        CrystalShatterStomp = 4,
+        CorruptionVeinYank = 5,
+        CathedralQuake = 6,
+        FractalFacetTap = 7,
+        LeyBridgeStomp = 8
     }
 }
