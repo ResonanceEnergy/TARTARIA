@@ -1,4 +1,43 @@
 ﻿---
+
+## Phase 3 Round 8 — Moon 2 Progression, Skill Tree & Permanent Mutations — 2026-05-20
+
+**STRICT COMPLIANCE**: ONLY worked inside . Read CONTEXT.md, 10_ROADMAP.md, relevant sections of 20_QUEST_DATABASE.md (Moon 2 Lunar quests: Purge Protocols, Cistern Crescendo) and 06_COMBAT_PROGRESSION.md (skill trees, Cymatic Lens Moon 2, Dissonance Crystal Core boss, Synaesthesia) FIRST. Exclusive domain: **Progression systems, Skill Tree integration, permanent world/player changes specific to Moon 2 (Crystalline Caverns)**. Zero visuals, zero other moons, zero unrelated mechanics.
+
+**R8 Deliverables (progression hooks tied to "purge the corruption")**:
+- Extended SkillTreeSystem with 6 new SkillId (M2_* 500+) + nodes in Resonator/Guardian trees + 3 new SkillModifierType (CorruptionResistance, LunarRSBonus, MicroGiantExtend) + ForceUnlockMoon2Blessing API. Nodes appear automatically in SkillTreeUI.
+- Created Moon2ProgressionSystem.cs — singleton bootstrap, listens to GameEvents.OnBuildingRestored + CorruptionSystem.OnCorruptionPurged for moon2_* buildings.
+- 5 key sites (moon2_cathedral_dome, moon2_bell_tower, moon2_fountain, moon2_crystal_hall, moon2_ley_chamber) each grant a unique permanent blessing/mutation on full purge:
+  - Cathedral: Eternal Breath (+RS, breathing sigil)
+  - Bell: Cleansing Chime (pulse damage + chime VFX)
+  - Fountain: Aetheric Spring (corruption resist + regen)
+  - Crystal Hall: Fractal Lens (see corruption without tool)
+  - Ley: Heart Bond (micro-giant extend + orbiting ley sparks)
+- Capstone on all 5: True Lunar Purifier (auto-purge, big RS, golden effects) — ultimate "you have become the purge" fantasy payoff.
+- Extended Moon2SaveBlock (purgedSites, 6 blessing bools, purgeCount) + schema v12 migration in SaveManager + wiring in GameLoopController (Populate/Restore + ReapplyMutations).
+- Cosmetic persistent mutations: runtime Light + ParticleSystem sigils attached to player on grant/restore (Moon2 domain only, re-applied on load).
+- All bonuses feed existing modifier cache, RS, haptic, audio, HUD. Query API for secrets/micro-giant. Wires cleanly into CorruptionSystem resistance, Skill save, Quest rewards.
+- Updated SaveData + GameLoop + CONTEXT.
+
+**Files edited/added (Moon 2 progression domain ONLY)**:
+-  (~80 net new): 6 nodes + force unlock + modifiers + docs.
+- : Moon2SaveBlock extended + Moon3 for compat.
+- : v12 migration + init.
+- : save/load hooks.
+-  (new, ~280 LOC): full system.
+- : this note.
+
+**How to verify**:
+- Open CrystallineCaverns.unity, restore + fully purge any moon2_* key building (via tuning + CorruptionSystem purge or micro-giant nodes).
+- Open Skill Tree: new M2_* nodes visible and unlocked with flavor text.
+- Save/Load: blessings persist, player carries glowing sigils, modifiers active (check GetModifier in console or combat).
+- Full 5 sites: capstone + big cascade.
+
+**Git verification**: cd C:\dev\TARTARIA_new && git add ... && git commit ...
+
+Production readiness: Moon 2 now has meaningful, persistent, fantasy-tied progression that makes every purge feel like it changes the player forever. Perfect bridge to DLC 7 "The Parasite Within".
+
+---
 ## Moon 2 Giant Mode Integration & Synergies (R9 â€” Crystal Power Fantasy) â€” 2026-05-20
 
 **STRICT COMPLIANCE**: ONLY worked inside `C:\dev\TARTARIA_new`. Read CONTEXT.md FIRST. Exclusive non-overlapping domain: **All Giant Mode content, synergies, and power fantasy moments specific to Moon 2** (GiantModeController.cs Moon 2 crystal extensions + detailed documentation in 03C_MOON_MECHANICS_DETAILED.md and 06_COMBAT_PROGRESSION.md). Zero other moons, zero micro-giant core changes, zero visuals-only work (built on top of R7 living crystal cathedral polish). 
