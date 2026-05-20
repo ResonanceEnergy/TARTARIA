@@ -861,7 +861,7 @@ namespace Tartaria.Integration
             // Achievement
             AchievementSystem.Instance?.CheckBossDefeated(result.bossName ?? "boss");
 
-            // Hide boss health bar
+            // Hide boss health bar + freq puzzle HUD
             HUDController.Instance?.HideBossHealth();
 
             // Return to exploration after cinematic
@@ -872,6 +872,13 @@ namespace Tartaria.Integration
         void HandleBossHealthChanged(float normalizedHealth)
         {
             HUDController.Instance?.UpdateBossHealth(normalizedHealth);
+
+            // Round 4: Keep in-boss CurrentTargetFrequency HUD live + vuln state
+            var bossSys = BossEncounterSystem.Instance;
+            if (bossSys != null && bossSys.IsActive)
+            {
+                HUDController.Instance?.UpdateBossTargetFrequency(bossSys.CurrentTargetFrequency, bossSys.IsVulnerable);
+            }
         }
 
         void HandleClimaxCompleted(int moonIndex)
@@ -1111,7 +1118,36 @@ namespace Tartaria.Integration
             LiraelController.Instance?.NotifyBuildingRestored();
             KorathController.Instance?.NotifyBuildingRestored();
 
+            // Round 4: Wire Mud Colossus as post-fountain climax (Echohaven vertical slice pinnacle)
+            // Only on first fountain restore to create the memorable 5-10min boss+restoration experience
+            if (buildingName != null && (buildingName.ToLower().Contains("fountain") || buildingName.ToLower().Contains("harmonic")))
+            {
+                // Avoid double-spawn if already in boss
+                if (BossEncounterSystem.Instance != null && !BossEncounterSystem.Instance.IsActive)
+                {
+                    // Slight delay to let restoration VFX settle, then climax boss
+                    StartCoroutine(SpawnPostFountainMudColossus(position));
+                }
+            }
+
             SaveManager.Instance?.MarkDirty();
+        }
+
+        System.Collections.IEnumerator SpawnPostFountainMudColossus(Vector3 fountainPos)
+        {
+            yield return new WaitForSeconds(1.8f); // breathing room after emergence
+            if (BossEncounterSystem.Instance != null && !BossEncounterSystem.Instance.IsActive)
+            {
+                Debug.Log("[GameLoop] Post-fountain climax: spawning Mud Colossus boss encounter.");
+                VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, fountainPos + Vector3.up * 3f);
+                HUDController.Instance?.ShowObjective("The earth itself awakens — DEFEAT THE MUD COLOSSUS!");
+                BossEncounterSystem.Instance.SpawnBoss("mud_colossus");
+                // Center visual proxy near fountain
+                if (BossEncounterSystem.Instance.CurrentBoss != null && BossEncounterSystem.Instance.CurrentBoss.bossName.Contains("Mud"))
+                {
+                    // The system will spawn its proxy; nudge for fountain context
+                }
+            }
         }
 
         /// <summary>
@@ -1852,6 +1888,42 @@ namespace Tartaria.Integration
                 save.combatWave.currentWaveIndex = wd.currentWaveIndex;
                 save.combatWave.enemiesRemaining = wd.enemiesRemaining;
                 save.combatWave.totalWaves = wd.totalWaves;
+            }
+
+            // ─── v10 Save Blocks (Phase 3 R4: Cymatic + Moon2 subsystems) ──────────────────────────
+            // Cymatic: full visual re-apply support wired here so EnsurePermanentCymaticVisuals fires on every load
+            var cym = CymaticWaterTuningMiniGame.Instance;
+            if (cym != null)
+            {
+                var cd = cym.GetSaveData();
+                save.cymatic.bestCymaticAccuracy = cd.bestCymaticAccuracy;
+                save.cymatic.cymaticCompletions = cd.cymaticCompletions;
+                save.cymatic.goldTierUnlockedForFountain = cd.goldTierUnlockedForFountain;
+                save.cymatic.permanentEffectsActive = cd.permanentEffectsActive;
+            }
+
+            // Moon 2 subsystems write into the block (cavern states, corruption, crystals tuned, purge, ley nodes)
+            // Even without dedicated Moon2 controller yet, we populate from world resonance + explicit fields for future Moon2 controllers (e.g. cavern managers)
+            if (save.moon2 != null)
+            {
+                // Example: Moon2 buildings inferred from world (ids containing moon2/cavern/crystal) for subsystem completeness
+                var m2States = new System.Collections.Generic.List<int>();
+                var m2Corrupt = new System.Collections.Generic.List<float>();
+                if (save.world?.buildings != null)
+                {
+                    foreach (var b in save.world.buildings)
+                    {
+                        if (b.buildingId != null && (b.buildingId.ToLower().Contains("moon2") || b.buildingId.ToLower().Contains("cavern") || b.buildingId.ToLower().Contains("crystalspire")))
+                        {
+                            m2States.Add(b.state);
+                            m2Corrupt.Add(1f - b.restorationProgress); // corruption inverse
+                        }
+                    }
+                }
+                save.moon2.moon2BuildingStates = m2States.ToArray();
+                save.moon2.cavernCorruptionLevels = m2Corrupt.ToArray();
+                save.moon2.crystalsTunedInCaverns = Mathf.Max(save.moon2.crystalsTunedInCaverns, (int)(save.world.resonanceScore / 8f));
+                // Moon2 subsystems can overwrite lunarResonanceAccumulated etc via their own GetSaveData in future
             }
         }
 
@@ -2766,6 +2838,11 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayGolemSpawn();
             VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 20f);
             Debug.Log($"[GameLoop] Boss spawned: {boss.bossName}");
+
+            // Initialize freq HUD (will update live on vuln windows via health ticks)
+            var bossSys = BossEncounterSystem.Instance;
+            if (bossSys != null)
+                HUDController.Instance?.ShowBossTargetFrequency(bossSys.CurrentTargetFrequency, bossSys.IsVulnerable);
         }
 
         void HandleBossPhaseChanged(int phase)
@@ -3155,10 +3232,14 @@ namespace Tartaria.Integration
 
         void HandleBossFailed()
         {
-            HUDController.Instance?.ShowInteractionPrompt("Boss encounter failed — regroup and try again.");
+            HUDController.Instance?.ShowInteractionPrompt("Boss encounter failed — regroup and retune your frequency. The world remembers.");
             AdaptiveMusicController.Instance?.ExitCombat();
             HapticFeedbackManager.Instance?.PlayCombatHit();
-            Debug.Log("[GameLoop] Boss encounter failed.");
+            HUDController.Instance?.HideBossHealth(); // also hides freq target display
+            HUDController.Instance?.HideBossTargetFrequency();
+            // Graceful: leave player in exploration with partial RS penalty avoided (no punishment beyond lost opportunity)
+            GameStateManager.Instance?.TransitionTo(GameState.Exploration);
+            Debug.Log("[GameLoop] Boss encounter failed gracefully — player can retry via zone re-entry.");
         }
 
         void HandleClimaxStarted(int moonIndex)

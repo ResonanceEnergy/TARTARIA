@@ -38,6 +38,11 @@ namespace Tartaria.UI
         [SerializeField] Color bossHealthColor = new Color(0.8f, 0.15f, 0.1f);
         [SerializeField] Color bossHealthLowColor = new Color(0.9f, 0.3f, 0.05f);
 
+        // Round 4: In-boss HUD for CurrentTargetFrequency (puzzle integration visual polish)
+        [SerializeField] TMPro.TextMeshProUGUI bossTargetFrequencyText; // optional UI element (wire in scene or runtime builder)
+        float _displayTargetFreq;
+        bool _freqDisplayActive;
+
         [Header("Wave Counter")]
         [SerializeField] RectTransform waveCounterPanel;
         [SerializeField] TMPro.TextMeshProUGUI waveCounterText;
@@ -153,6 +158,7 @@ namespace Tartaria.UI
             UpdateAetherDisplay();
             UpdatePromptFade();
             UpdateBossHealthBar();
+            UpdateBossFrequencyDisplay(); // Round 4 in-boss puzzle HUD
             UpdateAchievementToast();
             UpdateMoonTrophy();
         }
@@ -252,6 +258,28 @@ namespace Tartaria.UI
                 interactionText.text = text;
         }
 
+        /// <summary>
+        /// Round 4 enhanced live-ops claim prompt with real-time cooldown/timer display + fair/world mutation notes.
+        /// Calendar & Live-Ops domain. Supports World's Fair, monthly, daily with timers.
+        /// </summary>
+        public void ShowLiveOpsClaimPrompt(string title, string flavor, string claimAction)
+        {
+            string full = $"{title}\n{flavor}\n{claimAction}";
+            if (full.Length > 160) full = full.Substring(0, 157) + "...";
+            ShowInteractionPrompt(full);
+        }
+
+        /// <summary>
+        /// Round 4: prompt variant that appends live cooldown/timer text (real-time from calendar).
+        /// </summary>
+        public void ShowLiveOpsClaimPromptWithTimer(string title, string flavor, string claimAction, string cooldownText)
+        {
+            string timerLine = string.IsNullOrEmpty(cooldownText) ? "" : $"\n[{cooldownText}]";
+            string full = $"{title}\n{flavor}\n{claimAction}{timerLine}";
+            if (full.Length > 170) full = full.Substring(0, 167) + "...";
+            ShowInteractionPrompt(full);
+        }
+
         public void HideInteractionPrompt()
         {
             _promptVisible = false;
@@ -303,6 +331,50 @@ namespace Tartaria.UI
             _bossBarVisible = false;
             if (bossHealthPanel != null)
                 bossHealthPanel.gameObject.SetActive(false);
+            HideBossTargetFrequency();
+        }
+
+        // ─── Round 4 Boss Frequency Puzzle HUD ─────────────────────
+
+        public void ShowBossTargetFrequency(float targetHz, bool isVulnerable)
+        {
+            _freqDisplayActive = isVulnerable;
+            _displayTargetFreq = targetHz;
+            if (bossTargetFrequencyText != null)
+            {
+                bossTargetFrequencyText.gameObject.SetActive(_freqDisplayActive);
+                bossTargetFrequencyText.text = isVulnerable
+                    ? $"<b>TARGET FREQ:</b> {targetHz:F0} Hz — MATCH WITH STRIKE!"
+                    : "";
+            }
+        }
+
+        public void UpdateBossTargetFrequency(float targetHz, bool isVulnerable)
+        {
+            if (!_freqDisplayActive && !isVulnerable) return;
+            _displayTargetFreq = targetHz;
+            _freqDisplayActive = isVulnerable;
+            if (bossTargetFrequencyText != null)
+            {
+                bossTargetFrequencyText.gameObject.SetActive(_freqDisplayActive);
+                if (_freqDisplayActive)
+                    bossTargetFrequencyText.text = $"<b>TARGET FREQ:</b> {targetHz:F0} Hz";
+            }
+        }
+
+        public void HideBossTargetFrequency()
+        {
+            _freqDisplayActive = false;
+            if (bossTargetFrequencyText != null)
+                bossTargetFrequencyText.gameObject.SetActive(false);
+        }
+
+        void UpdateBossFrequencyDisplay()
+        {
+            if (!_freqDisplayActive || bossTargetFrequencyText == null) return;
+            // Subtle pulse on the freq text during vuln window (visual polish)
+            float pulse = 1f + Mathf.Sin(Time.time * 6f) * 0.06f;
+            bossTargetFrequencyText.transform.localScale = Vector3.one * pulse;
         }
 
         void UpdateBossHealthBar()
