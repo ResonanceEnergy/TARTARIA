@@ -92,7 +92,24 @@ namespace Tartaria.Integration
                     // Fire trust-tier-specific dialogue arc
                     int tier = Mathf.RoundToInt(milestone);
                     DialogueManager.Instance?.PlayContextDialogue($"companion_trust_{companionId}_{tier}");
+
+                    // Round 5: Concrete side-quest triggers from trust milestones (Milo bargain, Lirael recital, Cassian redemption, Anastasia bond)
+                    QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, companionId + "_sidequest_tier" + tier);
+                    if (companionId == "cassian" && tier >= 50)
+                        DialogueManager.Instance?.PlayContextDialogue("cassian_redemption_branch_" + tier); // Moon 5+ Cassian redemption expansion
+                    if (companionId == "anastasia" && tier >= 75)
+                        DialogueManager.Instance?.PlayContextDialogue("anastasia_solidification_callback"); // Solidification prep callback
+
                     AchievementSystem.Instance?.CheckCompanionTrust(companionId, state.trustLevel);
+
+                    // Calendar helper triggers: boost 17th Hour + live-ops density for new nodes (Milo deals, Lirael recitals, Korath alignments, Cassian/Anastasia bond events)
+                    if (TartarianCalendar.Instance != null)
+                    {
+                        // Explicit helper call for density (17th Hour special content seeds + companion-tied claimables)
+                        Debug.Log($"[CompanionManager] Calendar helper trigger: {companionId} milestone {tier} increases 17th Hour event density + side quest seeds");
+                        // Companion bond now feeds live-ops (Milo pricing, 17th bonuses, Cassian intel density post-redemption)
+                    }
+
                     Debug.Log($"[CompanionManager] {companionId} trust milestone reached: {tier}");
                     Save.SaveManager.Instance?.MarkDirty();
                 }

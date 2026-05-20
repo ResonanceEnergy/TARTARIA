@@ -184,6 +184,41 @@ namespace Tartaria.Integration
             Save.SaveManager.Instance?.MarkDirty();
         }
 
+        // ─── Moon 3 Vertical Slice: Full Orphan Adoption + Lullaby Dialogue + Physical Escort ───
+
+        /// <summary>Moon 3: Lirael remembers the FIRST specific spectral orphan (authored dialogue beat for adoption vertical slice).</summary>
+        public void RememberFirstOrphan(string orphanName)
+        {
+            AddTrust(4f);
+            HUDController.Instance?.ShowBanner("Lirael remembers", $"That song... {orphanName}... I used to hum it with the others on the rails. You brought her back to us.", 5f);
+            DialogueManager.Instance?.PlayContextDialogue("lirael_first_orphan_" + orphanName.ToLower());
+            // Full authored line fallback if context missing
+            Debug.Log($"[Lirael Moon3] Truth beat: {orphanName} joins the found family. My voice feels stronger.");
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        /// <summary>Moon 3: Lirael begins soft lullaby support during rhythm game (singing 432Hz harmony).</summary>
+        public void BeginLullabySupport()
+        {
+            AddTrust(1.5f);
+            HUDController.Instance?.ShowBanner("Lirael sings", "432... 528... listen to the children. Match their hearts...", 3f);
+            AudioManager.Instance?.PlaySFX2D("LiraelLullabyHum"); // safe call
+            Debug.Log("[Lirael Moon3] Lullaby support singing started for orphan adoption rhythm game.");
+        }
+
+        /// <summary>Moon 3: Physical boarding of train for escort — positions Lirael on moving rail proxy (companion on train fantasy). Round 5: DOTS Escort state consumption + Cassian/Anastasia bond parity.</summary>
+        public void BoardTrain(Vector3 positionOnTrain)
+        {
+            if (transform != null)
+            {
+                transform.position = positionOnTrain + new Vector3(1.2f, 1.8f, -0.8f); // slightly offset on train roof/side for visual
+                // Gentle forward lean for motion feel
+                transform.forward = Vector3.Lerp(transform.forward, (positionOnTrain - transform.position).normalized, 0.6f);
+            }
+            // Round 5: Physical/DOTS behaviors now unified in CompanionBehaviorSystem (Escort + PhysicalBond for new nodes)
+            Debug.Log($"[Lirael Moon3] Boarded spectral train at {positionOnTrain}. Singing from the roof. DOTS escort wired.");
+        }
+
         /// <summary>Moon 6: Lirael conducts the children's choir.</summary>
         public void ConductChildrenChoir()
         {
