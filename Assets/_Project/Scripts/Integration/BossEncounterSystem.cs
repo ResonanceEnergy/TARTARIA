@@ -54,12 +54,22 @@ namespace Tartaria.Integration
         float _patternTimer;
         int _patternIndex;
 
+        // Round 4: Frequency puzzle integration + visual sync state (Bosses & Advanced Enemies)
+        float _currentTargetFrequency;
+        bool _frequencyPuzzleActive;
+        float _lastHealthSync;
+        GameObject _colossusVisualProxy; // for Mud Colossus dynamic health visuals (procedural)
+        GameObject _railWraithVisual;    // procedural/DOTS-style visual proxy for RailWraith 3-phase
+        GameObject _sludgeVisual;        // procedural/DOTS-style for SludgeLeviathan 3-phase
+
         // ─── Public Getters ───
         public bool IsActive => _isActive;
         public float BossHPNormalized => _bossMaxHP > 0 ? _bossHP / _bossMaxHP : 0f;
         public int CurrentPhase => _currentPhase;
         public bool IsVulnerable => _isVulnerable;
         public BossDefinition CurrentBoss => _currentBoss;
+        public float CurrentTargetFrequency => _currentTargetFrequency;
+        public bool IsFrequencyPuzzleActive => _frequencyPuzzleActive && _isVulnerable;
 
         void Awake()
         {
@@ -143,6 +153,12 @@ namespace Tartaria.Integration
             _patternTimer = 0f;
             _patternIndex = 0;
 
+            // Round 4 frequency puzzle + visual state reset
+            _currentTargetFrequency = 432f;
+            _frequencyPuzzleActive = false;
+            _lastHealthSync = 1f;
+            CleanupBossVisualProxies();
+
             GameStateManager.Instance?.TransitionTo(GameState.Combat);
             OnBossSpawned?.Invoke(_currentBoss);
             OnBossDialogue?.Invoke(_currentBoss.phases[0].entranceDialogue);
@@ -154,8 +170,197 @@ namespace Tartaria.Integration
         public void AbortBoss()
         {
             _isActive = false;
+            CleanupBossVisualProxies();
             OnBossFailed?.Invoke();
             GameStateManager.Instance?.ReturnToPrevious();
+            Debug.Log("[Boss] Encounter aborted gracefully (player retreat / manual).");
+        }
+
+        /// <summary>
+        /// Graceful fail with reason (time-out, too many hits, puzzle abort). Called from external or internal timers.
+        /// </summary>
+        public void FailBoss(string reason)
+        {
+            if (!_isActive) return;
+            _isActive = false;
+            CleanupBossVisualProxies();
+            OnBossDialogue?.Invoke($"The encounter ends... {reason}");
+            OnBossFailed?.Invoke();
+            GameStateManager.Instance?.ReturnToPrevious();
+            Debug.Log($"[Boss] Encounter failed gracefully: {reason}");
+            VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
+        }
+
+        void CleanupBossVisualProxies()
+        {
+            if (_colossusVisualProxy != null) { Destroy(_colossusVisualProxy); _colossusVisualProxy = null; }
+            if (_railWraithVisual != null) { Destroy(_railWraithVisual); _railWraithVisual = null; }
+            if (_sludgeVisual != null) { Destroy(_sludgeVisual); _sludgeVisual = null; }
+        }
+
+        /// <summary>
+        /// Round 4: Wire frequency puzzle submission into real combat via HarmonicStrike/ResonancePulse hooks.
+        /// Call this from CombatBridge when boss is active + vulnerable: match quality drives scaled DealDamage.
+        /// </summary>
+        public void SubmitFrequencyPuzzle(float submittedFreq, float baseDamageMultiplier = 1f)
+        {
+            if (!_isActive || !_isVulnerable || !_frequencyPuzzleActive) return;
+
+            float delta = Mathf.Abs(submittedFreq - _currentTargetFrequency);
+            float tolerance = 55f; // forgiving but rewarding window for boss puzzle
+            float matchQuality = (delta < tolerance) ? Mathf.Clamp01(1f - (delta / tolerance)) : 0f;
+
+            if (matchQuality > 0.05f)
+            {
+                float damage = 35f * (0.6f + matchQuality * 1.8f) * baseDamageMultiplier;
+                DealDamage(damage);
+
+                OnBossDialogue?.Invoke($"Harmonic lock: {matchQuality:P0} match @ {_currentTargetFrequency:F0}Hz");
+                HapticFeedbackManager.Instance?.PlayPerfectTune();
+                VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 2f);
+
+                // Keep puzzle window open but nudge target slightly on strong hits (dynamic)
+                if (matchQuality > 0.7f)
+                    _currentTargetFrequency = Mathf.Lerp(_currentTargetFrequency, _currentTargetFrequency + UnityEngine.Random.Range(-18f, 18f), 0.3f);
+            }
+            else
+            {
+                OnBossDialogue?.Invoke("Dissonant — retune your strike!");
+                // small feedback damage even on miss for tension (graceful)
+                DealDamage(4f);
+            }
+        }
+
+        // ─── Round 4 Boss Visuals & Health Sync (procedural, no new assets) ───
+
+        void SpawnOrUpdateBossVisuals(string phaseName)
+        {
+            if (_currentBoss == null) return;
+            string name = _currentBoss.bossName.ToLowerInvariant();
+
+            Vector3 spawnPos = transform.position + new Vector3(0, 1.2f, 8f); // forward of system for arena feel
+
+            if (name.Contains("mud") || name.Contains("colossus"))
+            {
+                if (_colossusVisualProxy == null)
+                {
+                    _colossusVisualProxy = new GameObject("MudColossus_VisualProxy");
+                    _colossusVisualProxy.transform.position = spawnPos;
+                    var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                    body.transform.SetParent(_colossusVisualProxy.transform);
+                    body.transform.localScale = new Vector3(2.8f, 3.2f, 2.8f);
+                    body.GetComponent<Renderer>().material.color = new Color(0.35f, 0.28f, 0.18f, 1f); // deep mud
+                    body.name = "ColossusBody";
+                    Debug.Log("[Boss] Mud Colossus procedural visual proxy spawned (post-fountain climax).");
+                }
+                SyncMudColossusVisuals(BossHPNormalized);
+            }
+            else if (name.Contains("rail"))
+            {
+                if (_railWraithVisual == null)
+                {
+                    _railWraithVisual = new GameObject("RailWraith_VisualProxy");
+                    _railWraithVisual.transform.position = spawnPos + new Vector3(4f, 2f, 0);
+                    var railBody = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    railBody.transform.SetParent(_railWraithVisual.transform);
+                    railBody.transform.localScale = new Vector3(0.6f, 1.8f, 0.6f);
+                    railBody.GetComponent<Renderer>().material.color = new Color(0.25f, 0.22f, 0.3f);
+                    Debug.Log("[Boss] RailWraith procedural 3-phase visual spawned.");
+                }
+                UpdateRailWraithVisualPhase(phaseName);
+            }
+            else if (name.Contains("sludge"))
+            {
+                if (_sludgeVisual == null)
+                {
+                    _sludgeVisual = new GameObject("SludgeLeviathan_VisualProxy");
+                    _sludgeVisual.transform.position = spawnPos + new Vector3(-4f, 0.8f, 0);
+                    var sludgeBody = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    sludgeBody.transform.SetParent(_sludgeVisual.transform);
+                    sludgeBody.transform.localScale = new Vector3(3.5f, 1.6f, 3.5f);
+                    sludgeBody.GetComponent<Renderer>().material.color = new Color(0.18f, 0.32f, 0.22f);
+                    Debug.Log("[Boss] SludgeLeviathan procedural 3-phase visual spawned.");
+                }
+                UpdateSludgeLeviathanVisualPhase(phaseName);
+            }
+        }
+
+        void SyncMudColossusVisuals(float normalizedHP)
+        {
+            if (_colossusVisualProxy == null) return;
+            // Dynamic scale (shrinks as damaged) + emission-like color shift
+            float scale = Mathf.Lerp(1.4f, 2.8f, normalizedHP);
+            var body = _colossusVisualProxy.transform.Find("ColossusBody");
+            if (body != null)
+            {
+                body.localScale = new Vector3(scale, scale * 1.15f, scale);
+                var rend = body.GetComponent<Renderer>();
+                if (rend != null)
+                {
+                    // "Emission" via color brightening on high HP, dark on low (mud cracking)
+                    Color c = Color.Lerp(new Color(0.12f, 0.1f, 0.07f), new Color(0.55f, 0.45f, 0.22f), normalizedHP);
+                    rend.material.color = c;
+                }
+            }
+            _lastHealthSync = normalizedHP;
+
+            // Occasional procedural VFX pulse on health change (DOTS-like visual reactivity)
+            if (Mathf.Abs(normalizedHP - _lastHealthSync) > 0.08f || normalizedHP < 0.4f)
+            {
+                VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, _colossusVisualProxy.transform.position);
+            }
+        }
+
+        void UpdateRailWraithVisualPhase(string phaseName)
+        {
+            if (_railWraithVisual == null) return;
+            var rend = _railWraithVisual.GetComponentInChildren<Renderer>();
+            if (rend == null) return;
+            // 3-phase procedural visuals: phase 0 dark rail, phase1 sparking, phase2 enraged red
+            if (phaseName.ToLower().Contains("true") || phaseName.ToLower().Contains("collapse"))
+                rend.material.color = new Color(0.7f, 0.15f, 0.1f);
+            else if (phaseName.ToLower().Contains("multi") || phaseName.ToLower().Contains("decon"))
+                rend.material.color = new Color(0.9f, 0.85f, 0.3f); // sparks
+            else
+                rend.material.color = new Color(0.25f, 0.22f, 0.3f);
+            // Procedural "DOTS" bob for rail motion feel
+            _railWraithVisual.transform.position = transform.position + new Vector3(4f + Mathf.Sin(Time.time * 4f) * 0.8f, 2f, 0);
+        }
+
+        void UpdateSludgeLeviathanVisualPhase(string phaseName)
+        {
+            if (_sludgeVisual == null) return;
+            var rend = _sludgeVisual.GetComponentInChildren<Renderer>();
+            if (rend == null) return;
+            // 3-phase: initial murky, mid bubbling, final enraged viscous
+            if (phaseName.ToLower().Contains("truth") || phaseName.ToLower().Contains("void"))
+                rend.material.color = new Color(0.45f, 0.1f, 0.08f);
+            else if (phaseName.ToLower().Contains("demo") || phaseName.ToLower().Contains("decon"))
+                rend.material.color = new Color(0.15f, 0.42f, 0.28f); // bubbling green
+            else
+                rend.material.color = new Color(0.18f, 0.32f, 0.22f);
+            // Procedural pulse scale for sludge breathing / DOTS reactivity
+            float pulse = 1f + Mathf.Sin(Time.time * 2.2f) * 0.08f * (1f - BossHPNormalized * 0.5f);
+            _sludgeVisual.transform.localScale = Vector3.one * pulse;
+        }
+
+        void UpdateBossVisuals()
+        {
+            if (!_isActive) return;
+            // Lightweight per-frame procedural animation for RailWraith / SludgeLeviathan (DOTS-feel without DOTS overhead)
+            if (_railWraithVisual != null)
+            {
+                _railWraithVisual.transform.position = transform.position + new Vector3(4f + Mathf.Sin(Time.time * 4.5f) * 1.1f, 2f + Mathf.Cos(Time.time * 1.8f) * 0.4f, Mathf.Sin(Time.time * 1.2f) * 0.6f);
+            }
+            if (_sludgeVisual != null)
+            {
+                _sludgeVisual.transform.position = transform.position + new Vector3(-4f, 0.8f + Mathf.Sin(Time.time * 3f) * 0.35f, 0);
+            }
+            // Colossus already synced on health; occasional idle pulse if low
+            if (_colossusVisualProxy != null && BossHPNormalized < 0.35f && Time.frameCount % 18 == 0)
+            {
+                VFXController.Instance?.PlayEffect(VFXEffect.Spark, _colossusVisualProxy.transform.position);
+            }
         }
 
         void Update()
@@ -163,6 +368,18 @@ namespace Tartaria.Integration
             if (!_isActive) return;
 
             _encounterTime += Time.deltaTime;
+
+            // Round 4: Graceful fail handling (timeout / excessive hits)
+            if (_encounterTime > (_currentBoss?.parTime ?? 90f) * 2.8f)
+            {
+                FailBoss("the frequencies grow too wild — time runs out");
+                return;
+            }
+            if (_playerHits > 14)
+            {
+                FailBoss("overwhelmed by dissonance — retreat and retune");
+                return;
+            }
 
             // Phase transition cinematic
             if (_phaseTransitionTimer > 0f)
@@ -173,6 +390,7 @@ namespace Tartaria.Integration
 
             UpdateBossAI();
             UpdateVulnerability();
+            UpdateBossVisuals();
         }
 
         // ─── Damage ─────────────────────────────────
@@ -184,6 +402,12 @@ namespace Tartaria.Integration
 
             _bossHP -= damage;
             OnBossHealthChanged?.Invoke(BossHPNormalized);
+
+            // Round 4: Dynamic health sync for Mud Colossus visuals (scale + emission intensity)
+            if (_currentBoss != null && _currentBoss.bossName.Contains("Mud") && _currentBoss.bossName.Contains("Colossus"))
+            {
+                SyncMudColossusVisuals(BossHPNormalized);
+            }
 
             if (_bossHP <= 0f)
             {
@@ -306,6 +530,7 @@ namespace Tartaria.Integration
                 if (_vulnerableTimer <= 0f)
                 {
                     _isVulnerable = false;
+                    _frequencyPuzzleActive = false; // puzzle window closed
                 }
             }
             else
@@ -319,9 +544,25 @@ namespace Tartaria.Integration
                     {
                         _isVulnerable = true;
                         _vulnerableTimer = phase.vulnerableDuration;
-                        OnBossDialogue?.Invoke("The boss staggers! Strike now!");
+                        _frequencyPuzzleActive = true;
+
+                        // Round 4: Deepened frequency puzzle — assign target on each vuln window
+                        // Boss-specific ranges for flavor (Mud low earth, Rail high rail hum, Sludge mid sludge gurgle)
+                        float bossBase = 280f;
+                        if (_currentBoss != null)
+                        {
+                            if (_currentBoss.bossName.Contains("Mud") || _currentBoss.bossName.Contains("Colossus")) bossBase = 174f;
+                            else if (_currentBoss.bossName.Contains("Rail") || _currentBoss.bossName.Contains("Leviathan")) bossBase = 210f;
+                            else if (_currentBoss.bossName.Contains("Sludge")) bossBase = 155f;
+                        }
+                        _currentTargetFrequency = bossBase + UnityEngine.Random.Range(-35f, 95f);
+
+                        OnBossDialogue?.Invoke($"The boss staggers! Strike now — target ~{_currentTargetFrequency:F0} Hz!");
                         HapticFeedbackManager.Instance?.PlayCombatHit();
                         AudioManager.Instance?.PlayTone(528f, 0.3f);
+
+                        // Spawn/refresh procedural visuals for advanced bosses (RailWraith + SludgeLeviathan 3-phase + Mud Colossus)
+                        SpawnOrUpdateBossVisuals(phase.phaseName);
                     }
                 }
             }
@@ -352,6 +593,9 @@ namespace Tartaria.Integration
                 HapticFeedbackManager.Instance?.PlayGolemSpawn();
 
                 Debug.Log($"[Boss] Phase {_currentPhase + 1}: {newPhase.phaseName}");
+
+                // Refresh procedural visuals for Rail/Sludge 3-phase behavior on phase shift
+                SpawnOrUpdateBossVisuals(newPhase.phaseName);
             }
         }
 
@@ -393,6 +637,8 @@ namespace Tartaria.Integration
             EconomySystem.Instance?.AddCurrency(CurrencyType.AetherShards, Mathf.RoundToInt(rsReward / 5f));
 
             Debug.Log($"[Boss] {_currentBoss.bossName} DEFEATED! Score: {performanceScore:P0}, RS: {rsReward:F0}");
+
+            CleanupBossVisualProxies();
 
             // Restore ley lines severed during fight
             // (handled by ClimaxSequenceSystem EnvironmentShift)

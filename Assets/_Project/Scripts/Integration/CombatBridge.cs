@@ -162,6 +162,13 @@ namespace Tartaria.Integration
             float dmgMod = 1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.PulseDamage) ?? 0f);
             DamageNearbyEnemies(playerPos, pulseRange, pulseDamage * dmgMod, DamageType.ResonancePulse);
 
+            // Round 4: Wire frequency puzzle submission into ResonancePulse hook for active boss vuln windows
+            if (BossEncounterSystem.Instance != null && BossEncounterSystem.Instance.IsActive && BossEncounterSystem.Instance.IsFrequencyPuzzleActive)
+            {
+                float tunedFreq = 432f; // could pull from player HarmonicCombatant.CurrentFrequency in future
+                BossEncounterSystem.Instance.SubmitFrequencyPuzzle(tunedFreq, 1.1f);
+            }
+
             // Haptic feedback
             AdvanceCombo();
             HapticFeedbackManager.Instance?.PlayCombatHit();
@@ -180,6 +187,13 @@ namespace Tartaria.Integration
             var forward = GetPlayerForward();
             float rangeMod = 1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.StrikeRange) ?? 0f);
             DamageEnemiesInCone(playerPos, forward, strikeRange * rangeMod, 60f, strikeDamage, DamageType.HarmonicStrike);
+
+            // Round 4: Wire frequency puzzle submission into HarmonicStrike hook for active boss (CurrentTargetFrequency match)
+            if (BossEncounterSystem.Instance != null && BossEncounterSystem.Instance.IsActive && BossEncounterSystem.Instance.IsFrequencyPuzzleActive)
+            {
+                float tunedFreq = 432f; // HarmonicStrike uses player's tuned strike frequency (deepened puzzle)
+                BossEncounterSystem.Instance.SubmitFrequencyPuzzle(tunedFreq, 1.35f); // strikes hit harder on match
+            }
 
             AdvanceCombo();
             HapticFeedbackManager.Instance?.PlayCombatHit();
@@ -407,6 +421,11 @@ namespace Tartaria.Integration
 
         float GetGiantModeDamageMultiplier() => _giantModeActive ? 3f : 1f;
         float GetGiantModeRangeMultiplier() => _giantModeActive ? 5f : 1f;
+
+        float _giantSynergyMult = 1f;
+        /// <summary>Round 4 synergy buff hook for harmony / Colossus (Cassian/Anastasia giant resonance).</summary>
+        public void ApplyGiantSynergyBuff(float mult) { _giantSynergyMult = Mathf.Clamp(mult, 1f, 2.5f); }
+        public void ResetGiantSynergy() { _giantSynergyMult = 1f; }
 
         // ─── Combo System ─────────────────────────────
 
