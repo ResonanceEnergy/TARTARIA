@@ -8,6 +8,7 @@ namespace Tartaria.Audio
     /// Generates all gameplay SFX procedurally at startup — no .wav assets required.
     /// Uses 432 Hz tuning, golden ratio harmonics, and shaped noise.
     /// Clips are cached by name for O(1) lookup.
+    /// Moon 2 additions: rich corrupted crystal cathedral atmosphere (R8 audio/env polish).
     /// </summary>
     public static class ProceduralSFXLibrary
     {
@@ -21,6 +22,10 @@ namespace Tartaria.Audio
         const float F_HEALING   = 528f;
         const float F_CELESTIAL = 1296f;
         const float PHI = GoldenRatioValidator.PHI;
+
+        // Moon 2 Lunar Moon (from C_AUDIO_DESIGN.md) — keynote E4 for melancholy purification
+        const float F_MOON2_KEY = 324f; // E4 solo-cello character
+        const float TRITONE = 1.41421356f; // augmented 4th / devil's interval for corruption
 
         public static void Initialize()
         {
@@ -75,6 +80,24 @@ namespace Tartaria.Audio
             // Ambient
             Register("AetherVisionOn",  GenAetherVisionOn());
             Register("AetherVisionOff", GenAetherVisionOff());
+
+            // ═══ Moon 2 Atmosphere, Audio & Environmental Polish (Crystal Cathedral) ═══
+            // Unique per-area ambiences, reactive restore/purge, crystal resonance, wind, corruption, subtle shifts
+            // Keynote 324 Hz + tritone corruption per C_AUDIO_DESIGN + 12_VIVID_VISUALS fractal purge
+            Register("Moon2_CorruptionDrone", GenMoon2CorruptionDrone());
+            Register("Moon2_CrystalHum", GenMoon2CrystalHum());
+            Register("Moon2_WindCrystals", GenMoon2WindThroughCrystals());
+            Register("Moon2_BellOvertone", GenMoon2BellOvertone());
+            Register("Moon2_FountainChime", GenMoon2FountainChime());
+            Register("Moon2_LeyPulse", GenMoon2LeyPulse());
+            Register("Moon2_PurgeCrackle", GenMoon2PurgeCrackle());
+            Register("Moon2_RestoreHarmonic", GenMoon2RestoreHarmonic());
+            Register("Moon2_MuralWhisper", GenMoon2MuralWhisper());
+            Register("Moon2_AreaCathedral", GenMoon2AreaAmbience(324f, 0.13f, true));
+            Register("Moon2_AreaBell", GenMoon2AreaAmbience(486f, 0.10f, false));
+            Register("Moon2_AreaFountain", GenMoon2AreaAmbience(216f, 0.15f, true));
+            Register("Moon2_AreaHall", GenMoon2AreaAmbience(648f, 0.08f, false));
+            Register("Moon2_AreaLey", GenMoon2AreaAmbience(162f, 0.12f, true));
 
             _initialized = true;
             Debug.Log($"[ProceduralSFX] Generated {_clips.Count} SFX clips.");
@@ -598,6 +621,204 @@ namespace Tartaria.Audio
                 data[i] = env * shimmer;
             }
             return MakeClip("SFX_AetherVisionOff", data);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // MOON 2 — LUNAR MOON CRYSTAL CATHEDRAL ATMOSPHERE (R8 Audio/Env Polish)
+        // Per C_AUDIO_DESIGN.md Moon 2: E4 324Hz keynote, solo cello melancholy,
+        // bell echoes, night wind. Corruption = tritone anti-harmonics + static.
+        // Reactive to restoration/purge (visuals R6/R7 "burn like fire along fuse").
+        // Unique ambiences for 5 areas + crystal resonance + wind + mural whispers.
+        // ═══════════════════════════════════════════════════════════════
+
+        /// <summary>Deep pulsing corruption drone with tritone beats and sub-bass rumble. Starts heavy in corrupted state.</summary>
+        static AudioClip GenMoon2CorruptionDrone()
+        {
+            int len = Samples(5.2f); // long looping ambience
+            var data = new float[len];
+            float baseF = F_MOON2_KEY * 0.5f;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float slowPulse = Mathf.Sin(2f * Mathf.PI * 0.18f * t) * 0.5f + 0.5f;
+                float dissonant = Sine(i, baseF * TRITONE) * 0.22f;
+                float fundamental = Sine(i, baseF) * 0.28f;
+                float sub = FilteredNoise(i, 38f) * 0.19f * (0.6f + 0.4f * slowPulse);
+                float staticHiss = FilteredNoise(i, 1200f) * 0.07f * (0.3f + Mathf.Sin(t * 19f) * 0.1f);
+                float env = 0.82f + 0.18f * Mathf.Sin(2f * Mathf.PI * 0.07f * t);
+                data[i] = (fundamental + dissonant + sub + staticHiss) * env * 0.55f;
+            }
+            return MakeClip("SFX_Moon2_CorruptionDrone", data);
+        }
+
+        /// <summary>Pure crystal hum cluster — warm amber tones, 3-Band/6-Band shimmer. Used for restored interiors.</summary>
+        static AudioClip GenMoon2CrystalHum()
+        {
+            int len = Samples(4.8f);
+            var data = new float[len];
+            float[] tones = { F_MOON2_KEY, F_MOON2_KEY * 1.25f, F_MOON2_KEY * 1.5f, F_HEALING * 0.65f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float v = 0f;
+                for (int k = 0; k < tones.Length; k++)
+                {
+                    float phase = t * 0.4f * (k + 1);
+                    v += Sine(i, tones[k] + Mathf.Sin(phase) * 0.8f) * (0.18f - k * 0.025f);
+                }
+                float shimmer = FilteredNoise(i, 2400f) * 0.035f * (0.7f + Mathf.Sin(t * 7.3f) * 0.3f);
+                float env = 0.9f + 0.1f * Mathf.Sin(2f * Mathf.PI * 0.11f * t);
+                data[i] = (v + shimmer) * env * 0.42f;
+            }
+            return MakeClip("SFX_Moon2_CrystalHum", data);
+        }
+
+        /// <summary>Wind through crystal formations — high glassy whooshes, gusts with harmonic ring. Reactive intensity.</summary>
+        static AudioClip GenMoon2WindThroughCrystals()
+        {
+            int len = Samples(3.9f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float gust = Mathf.Pow(Mathf.Abs(Mathf.Sin(t * 1.7f + Mathf.Sin(t * 0.6f) * 1.4f)), 1.8f);
+                float whoosh = FilteredNoise(i, 1650f) * gust * 0.32f;
+                float ring = Sine(i, F_MOON2_KEY * 2.03f) * gust * 0.19f + Sine(i, F_MOON2_KEY * 3.1f) * gust * 0.11f;
+                float lowWind = FilteredNoise(i, 95f) * 0.14f * (0.5f + gust * 0.5f);
+                data[i] = (whoosh + ring + lowWind) * 0.48f;
+            }
+            return MakeClip("SFX_Moon2_WindCrystals", data);
+        }
+
+        /// <summary>Metallic bell tower overtones — long ringing decay with 324 Hz root + rich partials. Height wind layer.</summary>
+        static AudioClip GenMoon2BellOvertone()
+        {
+            int len = Samples(6.1f);
+            var data = new float[len];
+            float root = F_MOON2_KEY * 1.5f;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float decay = Mathf.Exp(-1.15f * t);
+                float strike = (t < 0.018f) ? 0.9f : 0f;
+                float fundamental = Sine(i, root) * decay * 0.38f;
+                float p2 = Sine(i, root * 2.0f) * decay * 0.27f;
+                float p3 = Sine(i, root * 2.97f + 0.3f) * decay * 0.18f; // slight detune for living bell
+                float p4 = Sine(i, root * 4.12f) * decay * 0.12f;
+                float highRing = FilteredNoise(i, 3100f) * decay * 0.06f * (0.6f + Mathf.Sin(t * 23f) * 0.2f);
+                data[i] = (fundamental + p2 + p3 + p4 + highRing + strike) * 0.51f;
+            }
+            return MakeClip("SFX_Moon2_BellOvertone", data);
+        }
+
+        /// <summary>Liquid crystal fountain chimes + soft bubbles. Watery 216 Hz base with sparkle overtones.</summary>
+        static AudioClip GenMoon2FountainChime()
+        {
+            int len = Samples(4.4f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float bubble = Mathf.Sin(t * 11.4f) * 0.5f + 0.5f;
+                float drip = FilteredNoise(i, 620f) * 0.11f * bubble;
+                float baseTone = Sine(i, 216f) * 0.29f + Sine(i, 324f) * 0.17f;
+                float sparkle = Sine(i, 648f + Mathf.Sin(t * 2.1f) * 4f) * 0.13f * (0.4f + 0.6f * bubble);
+                float water = FilteredNoise(i, 180f) * 0.09f;
+                data[i] = (drip + baseTone + sparkle + water) * 0.46f;
+            }
+            return MakeClip("SFX_Moon2_FountainChime", data);
+        }
+
+        /// <summary>Deep ley chamber pulse — low gold resonance with slow 3-6-9 modulation.</summary>
+        static AudioClip GenMoon2LeyPulse()
+        {
+            int len = Samples(5.7f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float phase = t * 0.09f;
+                float pulse = (Mathf.Sin(2f * Mathf.PI * phase) * 0.5f + 0.5f);
+                float low = Sine(i, 162f) * 0.33f * pulse;
+                float mid = Sine(i, 324f) * 0.21f * (0.7f + 0.3f * pulse);
+                float gold = Sine(i, 486f) * 0.14f * pulse;
+                float subRumble = FilteredNoise(i, 29f) * 0.22f * (0.4f + 0.6f * pulse);
+                data[i] = (low + mid + gold + subRumble) * 0.49f;
+            }
+            return MakeClip("SFX_Moon2_LeyPulse", data);
+        }
+
+        /// <summary>Erratic purge crackle + violet static. Used during corruption re-ignition / purge events.</summary>
+        static AudioClip GenMoon2PurgeCrackle()
+        {
+            int len = Samples(1.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float chaos = FilteredNoise(i, 950f) * (0.6f + Mathf.Sin(t * 47f) * 0.35f);
+                float disson = Sine(i, F_MOON2_KEY * TRITONE * 0.7f) * 0.27f + Sine(i, F_MOON2_KEY * TRITONE * 1.3f) * 0.19f;
+                float pop = (Random.value < 0.03f ? 0.8f : 0f); // micro bursts
+                float env = Mathf.Sin(t * Mathf.PI) * 0.9f;
+                data[i] = (chaos + disson + pop) * env * 0.47f;
+            }
+            return MakeClip("SFX_Moon2_PurgeCrackle", data);
+        }
+
+        /// <summary>Majestic restore swell — golden harmonic bloom, fuse-burn resolution into pure tone. Ties to R7 visuals.</summary>
+        static AudioClip GenMoon2RestoreHarmonic()
+        {
+            int len = Samples(2.6f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float attack = Mathf.Clamp01(t * 3.8f);
+                float release = 1f - Mathf.Pow(Mathf.Max(0f, t - 0.55f) / 0.45f, 1.6f);
+                float env = attack * release;
+                float core = Sine(i, F_MOON2_KEY) * 0.38f + Sine(i, F_HEALING * 0.62f) * 0.29f;
+                float over = Sine(i, F_MOON2_KEY * 2.03f) * 0.22f + Sine(i, 1296f * 0.25f) * 0.15f;
+                float bloom = FilteredNoise(i, 1850f) * 0.07f * (1f - t * 0.6f);
+                data[i] = (core + over + bloom) * env * 0.52f;
+            }
+            return MakeClip("SFX_Moon2_RestoreHarmonic", data);
+        }
+
+        /// <summary>Subtle mural whisper / abandoned site sigh — faint Old Tartarian fragments + soft sorrow. Environmental storytelling layer.</summary>
+        static AudioClip GenMoon2MuralWhisper()
+        {
+            int len = Samples(3.3f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float breath = (Mathf.Sin(t * 1.9f) * 0.5f + 0.5f) * 0.6f;
+                float voiceLike = Sine(i, 187f) * 0.21f * breath + Sine(i, 291f) * 0.13f * breath; // soft vocal formants
+                float reverbTail = FilteredNoise(i, 780f) * 0.09f * breath;
+                float distant = Sine(i, F_MOON2_KEY * 0.5f) * 0.07f * (0.3f + 0.7f * breath);
+                data[i] = (voiceLike + reverbTail + distant) * 0.33f;
+            }
+            return MakeClip("SFX_Moon2_MuralWhisper", data);
+        }
+
+        /// <summary>Generic per-area long ambience generator. Varies by building (cathedral, bell, fountain, hall, ley).</summary>
+        static AudioClip GenMoon2AreaAmbience(float baseFreq, float amp, bool hasWateryMod)
+        {
+            int len = Samples(7.4f); // very long seamless loop
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float mod = 0.82f + 0.18f * Mathf.Sin(2f * Mathf.PI * 0.023f * t + baseFreq * 0.0007f);
+                float v = Sine(i, baseFreq) * 0.31f + Sine(i, baseFreq * 1.5f) * 0.19f + Sine(i, baseFreq * 2.03f) * 0.12f;
+                if (hasWateryMod)
+                {
+                    v += FilteredNoise(i, 310f) * 0.08f * (0.5f + Mathf.Sin(t * 2.7f) * 0.5f);
+                }
+                float windGhost = FilteredNoise(i, 920f) * 0.05f * mod;
+                data[i] = (v + windGhost) * amp * mod;
+            }
+            return MakeClip($"SFX_Moon2_Area_{baseFreq:F0}", data);
         }
 
         // ═══════════════════════════════════════════════
