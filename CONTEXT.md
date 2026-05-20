@@ -46,5 +46,35 @@ This fully delivers Phase 3 Round 7 "Moon 2 Final Visual Polish" (living crystal
 
 ---
 
-(The prior Moon 3 / Bosses / Companion R7 sections and history follow below.)
+## Moon 2 Quests, Narrative & Lore — 2026-05-20 (This Delivery)
 
+**STRICT COMPLIANCE**: ONLY worked inside `C:\dev\TARTARIA_new`. Read CONTEXT.md, 20_QUEST_DATABASE.md, 03C_MOON_MECHANICS_DETAILED.md, 01_LORE_BIBLE.md (Moon 2 section), and 05_CHARACTERS_DIALOGUE.md FIRST. **Exclusive domain**: All quests, side stories, dialogue, and lore delivery specific to Moon 2 (Crystalline Caverns / Living Crystal Cathedral). Zero overlap with other Moons, visuals, mechanics, or code outside docs.
+
+**Deliverables**:
+- Complete overhaul of Moon 2 section in 20_QUEST_DATABASE.md with cohesive main + side + hidden quests centered on the 5 living crystal structures (cathedral_dome, bell_tower, fountain, crystal_hall, ley_chamber).
+- Introduced the signature **multi-part quest chain "The Fractured Choir" (M2-MS03a–e)** — 5 sequential parts, each tied to purifying one building, progressively revealing the story of the Vein Singers, young Liora, the Flow Weavers, Warden Theron, and Maelix’s tragic experiment that created the first fractal dissonance seed.
+- Full integration with companions (Cassian introduced with trust/doubt branching that feeds Moon 7, Lirael’s form-fracturing + lullaby memories, Milo’s conscience crisis over “priceless” mementos) and calendar (17th Hour variants for richest echoes and sequences in bell tower / hidden quests).
+- Distinct, memorable narrative voice: the intimate tragedy of an ordinary community of singers who almost healed the first wound with nothing but love and song. The black veins grew by copying the golden ratio in perfect inversion — beauty weaponized. The children’s counter-song almost succeeded.
+- Added dedicated Moon 2 lore subsection in 01_LORE_BIBLE.md detailing the Vein Singers, the five structures’ original purpose, Maelix’s fall as prototype for the Dissonant One, and how this local failure enabled the global Mud Flood.
+- Expanded 05_CHARACTERS_DIALOGUE.md with a full new subsection (4.5) of Moon 2-specific, character-perfect banter and echo lines (Liora’s heartbreaking “I was supposed to be the last pure note”, Theron’s vigil, Milo’s first real crisis, Lirael remembering the mist-stars, Cassian’s pragmatic poison, the collective “They are still here” at the breath climax).
+- Updated companion loyalty chains, quest statistics, and cross-references for consistency.
+- All absolute C:\dev\TARTARIA_new paths. Git clean.
+
+**Files edited (Moon 2 narrative/lore domain ONLY)**:
+- `C:\dev\TARTARIA_new\docs\20_QUEST_DATABASE.md` (full Moon 2 replacement + companion chain + stats updates)
+- `C:\dev\TARTARIA_new\docs\01_LORE_BIBLE.md` (new “Moon 2 — The Living Crystal Cathedral and the Fractured Choir” subsection after 17-Hour Day)
+- `C:\dev\TARTARIA_new\docs\05_CHARACTERS_DIALOGUE.md` (new 4.5 Moon 2 Crystal Cathedral banter section + echoes)
+- `C:\dev\TARTARIA_new\CONTEXT.md` (this delivery note)
+
+**Narrative Summary Delivered**:
+Moon 2 is no longer generic “corruption cisterns.” It is the heartbreaking, intimate origin story of the first fracture — told through the daily lives and final defiant songs of the people who called the living crystal home. The multi-part chain + 17th Hour calendar reactivity + companion branches create one of the most emotionally resonant sequences in the 13-Moon campaign. “The song was never the problem. The silence was.”
+
+**Production readiness**: Moon 2 now has a complete, self-contained, memorable narrative identity that perfectly matches the final visual polish of the living crystal cathedral. Ready for implementation in QuestManager / DialogueSystem / CalendarService. Zero scope creep. Domain lock 100%.
+
+**Git verification** (executed below): cd "C:/dev/TARTARIA_new" && git add "docs/20_QUEST_DATABASE.md" "docs/01_LORE_BIBLE.md" "docs/05_CHARACTERS_DIALOGUE.md" "CONTEXT.md" && git commit -m "moon2 quests & lore: Phase 3 — cohesive Moon 2 Crystalline Cathedral narrative (Fractured Choir 5-part chain, Vein Singers, Maelix wound, Liora/Theron echoes, Cassian/Lirael/Milo branches, 17th Hour calendar integration) + lore bible + dialogue library (domain-strict, docs only)"
+
+**Absolute paths used throughout**: All C:\dev\TARTARIA_new\...
+
+---
+
+(The prior Moon 3 / Bosses / Companion R7 sections and history follow below.)

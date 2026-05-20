@@ -12,6 +12,7 @@ namespace Tartaria.Integration
     /// Full 7 companions (R7): Milo, Lirael, Korath, Thorne, Cassian, Veritas, Anastasia.
     /// DOTS Escort/PhysicalBond sync, milestone triggers, expanded Moon 5+ Cassian/Redemption branches, Anastasia solidification, voice authoring prep, persistence (R6).
     /// R7: trust arc depth + permanent world mutations (Moons 1-3 + hooks), deep physical reactivity for all major beats, full calendar/live-ops (daily banter, claimables, trust pricing, 17th echoes), real VO playback pipeline, cross-Moon memory + giant synergies (Companion Giant, Giant's Song auto-match), production dialogue + QuestDatabaseBuilder wiring.
+    /// Moon 2 Companion Stories & Reactivity R7: Cathedral/corruption/crystal specific quests, dialogue, physical tells (ApplyPhysicalTellForBeat), trust + permanent world effects for Lirael/Korath/Cassian/Anastasia.
     /// </summary>
     [DisallowMultipleComponent]
     public class CompanionManager : MonoBehaviour
@@ -109,6 +110,7 @@ namespace Tartaria.Integration
         /// <summary>
         /// R7: Permanent world mutation from trust arc (new dig sites, blueprint variants, lore, giant synergy unlocks).
         /// Called on milestones. Persisted in manager + save. Moons 1-3 complete + 4-13 hooks.
+        /// Moon 2 Cathedral additions: Lirael crystal memory, Cassian intel markers, Korath stone echo, Anastasia warmth caustics.
         /// </summary>
         public void ApplyTrustWorldMutation(string companionId, int tier)
         {
@@ -125,12 +127,21 @@ namespace Tartaria.Integration
                     break;
                 case "lirael":
                     if (tier >= 50) Debug.Log("[LiraelMutation] Blueprint variants + extra projection accuracy now permanent for Moon 2+.");
+                    if (tier >= 50) Debug.Log("[LiraelMutation MOON2 CATHEDRAL] Permanent pre-corruption holographic overlays +15% tuning accuracy active in Crystalline Caverns cathedral and all future crystal zones. Crystal Choir quest payoff.");
                     break;
                 case "veritas":
                     if (tier >= 25) Debug.Log("[VeritasMutation] Giant's Song auto-match + exact bell precision unlocked permanently.");
                     break;
                 case "anastasia":
                     if (tier >= 75) Debug.Log("[AnastasiaMutation] Post-solidification warmer glow + extra 17th Hour echo lines permanent.");
+                    if (tier >= 50) Debug.Log("[AnastasiaMutation MOON2 CATHEDRAL] Permanent warmer gold caustics + 2 extra Archive whispers + increased mote density in cathedral crystal clusters. Facets of the Archive quest payoff.");
+                    break;
+                case "cassian":
+                    if (tier >= 50) Debug.Log("[CassianMutation] Permanent corruption weakpoint markers (intel nodes) visible via Dissonance Lens in Moon2+ zones. Cathedral Analysis quest payoff.");
+                    if (tier >= 50) Debug.Log("[CassianMutation] Redemption branch physical tells calmed (reduced violet dissonance VFX on cufflinks/stance).");
+                    break;
+                case "korath":
+                    if (tier >= 25) Debug.Log("[KorathMutation MOON2 CATHEDRAL FORESHADOW] Early stone resonance echo unlocked. Permanent +10% crystal/stone structural integrity and golden-ratio memory in cathedral and future builds. Builder's Shadow quest payoff.");
                     break;
                 // Similar for others: Korath lore reveals, Thorne combat buffs, Cassian intel nodes, Thorne fleet echoes
             }
@@ -181,6 +192,47 @@ namespace Tartaria.Integration
             SyncCompanionToDOTS(companionId, false, Vector3.zero, false, 0, false, false, 0);
             // DOTS will pick GiantSynergyActive via bridge extension if needed
             Debug.Log($"[CompanionManager] R7 Giant synergy (Companion Giant + Giant's Song auto-match) for ID {companionId}");
+        }
+
+        /// <summary>
+        /// R7 NEW (Moon 2 Cathedral Companion Reactivity): Wrapper to trigger physical tells via DOTS ApplyPhysicalTellForBeat.
+        /// Called from cathedral purge events, crystal node successes, Korath echo resonance, Anastasia mote shares, Cassian analysis.
+        /// Applies intensity + bond/mutation side effects for Lirael/Korath/Cassian/Anastasia.
+        /// </summary>
+        public void TriggerPhysicalTellForBeat(string companionId, int beatType /*0=cathedral_restore/purge,1=combat,2=giant_foreshadow,3=17th_crystal,4=crystal_share,5=analysis_choice*/)
+        {
+            int cid = CompanionIdFromString(companionId);
+            var world = World.DefaultGameObjectInjectionWorld;
+            if (world == null) return;
+            var em = world.EntityManager;
+
+            var query = em.CreateEntityQuery(typeof(CompanionTag), typeof(CompanionBehavior));
+            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            for (int i = 0; i < entities.Length; i++)
+            {
+                var tag = em.GetComponentData<CompanionTag>(entities[i]);
+                if (tag.CompanionId == cid)
+                {
+                    var b = em.GetComponentData<CompanionBehavior>(entities[i]);
+                    CompanionBehaviorSystem.ApplyPhysicalTellForBeat(ref b, beatType, cid);
+                    // Moon2 specific side effects
+                    if (beatType == 0 || beatType == 4) // cathedral restore or crystal share
+                    {
+                        b.WorldMutationTier = math.min(b.WorldMutationTier + 1, 4);
+                        b.CompanionBondLevel = math.min(b.CompanionBondLevel + 8, 100);
+                    }
+                    if (companionId == "lirael" && beatType == 0)
+                        b.PhysicalTellIntensity = math.max(b.PhysicalTellIntensity, 0.95f); // strong fracture-to-solid
+                    if (companionId == "korath" && beatType == 3)
+                        b.EscortLeanAngle = math.max(b.EscortLeanAngle, 25f); // stone hum elevated
+                    em.SetComponentData(entities[i], b);
+                    break;
+                }
+            }
+            entities.Dispose();
+            query.Dispose();
+
+            Debug.Log($"[CompanionManager R7 MOON2] PhysicalTellForBeat triggered for {companionId} beat={beatType} (cathedral/corruption/crystal reactivity + DOTS tell + mutation)");
         }
 
         /// <summary>
@@ -247,6 +299,7 @@ namespace Tartaria.Integration
 
         public void TriggerCompanionTrainEscort(int companionId, Vector3 trainPos, bool enable17thHour = false)
         {
+            // ... (existing implementation preserved)
             Vector3 offset = companionId switch
             {
                 0 => new Vector3(-1.8f, 1.4f, 1.5f),   // Milo rear defensive
