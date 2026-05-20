@@ -4,26 +4,23 @@ using UnityEngine;
 using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
+using Tartaria.Gameplay; // for RailEscortController Moon 3 boss synergy hook (R5)
 
 namespace Tartaria.Integration
 {
     /// <summary>
     /// Boss Encounter System — multi-phase boss fights at Moon climaxes.
     ///
-    /// Design per GDD §06 (Combat), §11 (Scripted Climaxes):
-    ///   - Each Moon ends with a boss encounter before the climax sequence
-    ///   - Bosses have multiple phases with unique mechanics
-    ///   - Phase transitions at HP thresholds with cinematic beats
-    ///   - Vulnerability windows tied to frequency-matching mechanics
-    ///   - RS rewards scale with performance (no-hit bonus, time bonus)
+    /// Design per GDD §06 (Combat), §11 (Scripted Climaxes), 03C Moon Mechanics, 10 Roadmap Phase 3 polish:
+    ///   - Each boss teaches frequency puzzle mastery while the world reacts
+    ///   - Live player freq submissions via HarmonicCombatant (R5)
+    ///   - Dedicated phase AI per major boss with telegraph VFX, vuln windows, desperation
+    ///   - Golden Cascade payoffs on masterful solves
+    ///   - Full persistence via hardened BossSaveState (all bosses, puzzle state)
+    ///   - Moon 3 rail/leviathan synergy (internal + escort hook)
     ///
-    /// Boss types:
-    ///   - CorruptionTitan (Moon 1-4): brute force + corruption AOE
-    ///   - MirrorSovereign (Moon 5-8): reflection/clone mechanics
-    ///   - VoidArchitect (Moon 9-12): reality-warping, ley line disruption
-    ///   - TrueHistoryGuardian (Moon 13): all mechanics combined
-    ///
-    /// Performance budget: 2ms (within Combat 2ms budget, takes over from normal combat)
+    /// Boss types supported (R6 full coverage): Mud Colossus, RailWraith (swarm), SludgeLeviathan,
+    /// SkyReaver (aerial), ResetSeeker, Dissonance Leviathan + future.
     /// </summary>
     public class BossEncounterSystem : MonoBehaviour
     {
@@ -62,6 +59,25 @@ namespace Tartaria.Integration
         GameObject _railWraithVisual;    // procedural/DOTS-style visual proxy for RailWraith 3-phase
         GameObject _sludgeVisual;        // procedural/DOTS-style for SludgeLeviathan 3-phase
 
+        // Round 5: Dedicated boss AI state (Mud Colossus phases) + telegraph + persistence prep
+        float _mudColossusSpecialTimer;
+        int _mudColossusQuakeCount;
+        float _telegraphPulseTimer;
+        float _lastTelegraphHz;
+
+        // ─── R6: Extended live frequency + dedicated AI for RailWraith swarm, Dissonance Leviathan, SkyReaver aerial + full persistence harden ───
+        float _railWraithSwarmTimer;
+        int _railWraithSwarmSize;
+        float _leviathanResonanceTimer;
+        int _leviathanSynergyLevel; // internal Moon 3 escort/rail synergy payoff (narrative + mechanical world react without external scaffolding edits)
+        float _skyReaverAltitude;
+        GameObject _skyReaverVisual; // aerial proxy for SkyReaver (high-frequency dives)
+        float _desperationTimer;
+        List<float> _submittedFrequenciesThisFight;
+        float _bestMatchAccuracy;
+        int _puzzleAttempts;
+        bool _goldenCascadeTriggered;
+
         // ─── Public Getters ───
         public bool IsActive => _isActive;
         public float BossHPNormalized => _bossMaxHP > 0 ? _bossHP / _bossMaxHP : 0f;
@@ -77,6 +93,7 @@ namespace Tartaria.Integration
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+            _submittedFrequenciesThisFight = new List<float>();
         }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -110,12 +127,17 @@ namespace Tartaria.Integration
             { "anti_resonance", 11 },
             { "guardian_of_true_history", 12 },
             { "rift_walker", 9 },
-            { "ley_devourer", 10 }
+            { "ley_devourer", 10 },
+            // R6: full coverage for advanced bosses
+            { "sky_reaver", 8 },
+            { "reset_seeker", 4 },
+            { "dissonance_leviathan", 9 },
+            { "rail_wraith", 9 }
         };
 
         // ─── Start / Stop ────────────────────────────
 
-        /// <summary>Begin a boss encounter by string ID (e.g. "sludge_leviathan").</summary>
+        /// <summary>Begin a boss encounter by string ID (e.g. "sludge_leviathan", "sky_reaver", "rail_wraith").</summary>
         public void SpawnBoss(string bossId)
         {
             if (string.IsNullOrEmpty(bossId))
@@ -159,11 +181,29 @@ namespace Tartaria.Integration
             _lastHealthSync = 1f;
             CleanupBossVisualProxies();
 
+            // Round 5 dedicated AI reset
+            _mudColossusSpecialTimer = 0f;
+            _mudColossusQuakeCount = 0;
+            _telegraphPulseTimer = 0f;
+            _lastTelegraphHz = 0f;
+
+            // R6: full reset for extended bosses + puzzle tracking
+            _railWraithSwarmTimer = 0f;
+            _railWraithSwarmSize = 0;
+            _leviathanResonanceTimer = 0f;
+            _leviathanSynergyLevel = 0;
+            _skyReaverAltitude = 4.2f;
+            _desperationTimer = 0f;
+            _submittedFrequenciesThisFight.Clear();
+            _bestMatchAccuracy = 0f;
+            _puzzleAttempts = 0;
+            _goldenCascadeTriggered = false;
+
             GameStateManager.Instance?.TransitionTo(GameState.Combat);
             OnBossSpawned?.Invoke(_currentBoss);
             OnBossDialogue?.Invoke(_currentBoss.phases[0].entranceDialogue);
 
-            Debug.Log($"[Boss] {_currentBoss.bossName} spawned — {_currentBoss.phases.Count} phases, {_bossMaxHP} HP");
+            Debug.Log($"[Boss] {_currentBoss.bossName} spawned — {_currentBoss.phases.Count} phases, {_bossMaxHP} HP (R6: live freq + dedicated AI for Rail/Sky/Leviathan)");
         }
 
         /// <summary>Force-abort the boss encounter.</summary>
@@ -196,11 +236,110 @@ namespace Tartaria.Integration
             if (_colossusVisualProxy != null) { Destroy(_colossusVisualProxy); _colossusVisualProxy = null; }
             if (_railWraithVisual != null) { Destroy(_railWraithVisual); _railWraithVisual = null; }
             if (_sludgeVisual != null) { Destroy(_sludgeVisual); _sludgeVisual = null; }
+            if (_skyReaverVisual != null) { Destroy(_skyReaverVisual); _skyReaverVisual = null; }
         }
+
+        // ─── Round 5: Persistence for active boss state + current target frequency ───
+        // R6: Hardened for ALL current bosses (Mud, RailWraith swarm, Leviathan synergy, SkyReaver altitude, full puzzle stats)
+        /// <summary>Serializable snapshot for SaveManager / GameLoop wiring (resumable boss encounters). v11-ready full puzzle state.</summary>
+        [Serializable]
+        public class BossSaveState
+        {
+            public bool isActive;
+            public string bossName;
+            public int currentPhase;
+            public float currentHP;
+            public float maxHP;
+            public float currentTargetFrequency;
+            public float encounterTime;
+            public int playerHitsReceived;
+            public bool frequencyPuzzleWasActive;
+
+            // R6 hardened persistence (all bosses)
+            public int railWraithSwarmSize;
+            public int leviathanSynergyLevel;
+            public float skyReaverAltitude;
+            public float bestMatchAccuracy;
+            public int puzzleAttempts;
+            public int submittedCount;
+            public bool goldenCascadeTriggeredThisFight;
+        }
+
+        public BossSaveState GetSaveState()
+        {
+            return new BossSaveState
+            {
+                isActive = _isActive,
+                bossName = _currentBoss?.bossName ?? "",
+                currentPhase = _currentPhase,
+                currentHP = _bossHP,
+                maxHP = _bossMaxHP,
+                currentTargetFrequency = _currentTargetFrequency,
+                encounterTime = _encounterTime,
+                playerHitsReceived = _playerHits,
+                frequencyPuzzleWasActive = _frequencyPuzzleActive,
+
+                // R6 full state for resume (swarm, synergy, aerial, puzzle history)
+                railWraithSwarmSize = _railWraithSwarmSize,
+                leviathanSynergyLevel = _leviathanSynergyLevel,
+                skyReaverAltitude = _skyReaverAltitude,
+                bestMatchAccuracy = _bestMatchAccuracy,
+                puzzleAttempts = _puzzleAttempts,
+                submittedCount = _submittedFrequenciesThisFight != null ? _submittedFrequenciesThisFight.Count : 0,
+                goldenCascadeTriggeredThisFight = _goldenCascadeTriggered
+            };
+        }
+
+        /// <summary>Restore mid-fight boss exactly as left (persistent satisfying encounter resume). R6: restores swarm/synergy/aerial/puzzle state for all bosses.</summary>
+        public void LoadSaveState(BossSaveState state)
+        {
+            if (state == null || !state.isActive || string.IsNullOrEmpty(state.bossName)) return;
+
+            // Seed via normal spawn (establishes definition/phases) then override live values
+            SpawnBoss(state.bossName.ToLowerInvariant().Replace(' ', '_'));
+
+            _currentPhase = Mathf.Clamp(state.currentPhase, 0, 10);
+            _bossHP = Mathf.Max(10f, state.currentHP);
+            if (state.maxHP > 10f) _bossMaxHP = state.maxHP;
+            _currentTargetFrequency = state.currentTargetFrequency > 20f ? state.currentTargetFrequency : _currentTargetFrequency;
+            _encounterTime = state.encounterTime;
+            _playerHits = Mathf.Max(0, state.playerHitsReceived);
+            _frequencyPuzzleActive = state.frequencyPuzzleWasActive;
+            _isActive = true;
+            _isVulnerable = _frequencyPuzzleActive;
+            _vulnerableTimer = _isVulnerable ? 1.8f : 0f;
+
+            // R6 restore
+            _railWraithSwarmSize = Mathf.Max(0, state.railWraithSwarmSize);
+            _leviathanSynergyLevel = Mathf.Clamp(state.leviathanSynergyLevel, 0, 6);
+            _skyReaverAltitude = state.skyReaverAltitude > 0.2f ? state.skyReaverAltitude : 3.8f;
+            _bestMatchAccuracy = state.bestMatchAccuracy;
+            _puzzleAttempts = state.puzzleAttempts;
+            _goldenCascadeTriggered = state.goldenCascadeTriggeredThisFight;
+            _submittedFrequenciesThisFight.Clear();
+
+            // Rebuild visuals for resumed boss (Colossus scale sync, Rail/Sludge/Sky phases)
+            if (_currentBoss != null)
+            {
+                string phaseName = (_currentPhase < _currentBoss.phases.Count) ? _currentBoss.phases[_currentPhase].phaseName : "Resumed";
+                SpawnOrUpdateBossVisuals(phaseName);
+            }
+
+            OnBossHealthChanged?.Invoke(BossHPNormalized);
+            Debug.Log($"[Boss] PERSISTENCE: Resumed active boss '{_currentBoss?.bossName}' phase {_currentPhase} target~{_currentTargetFrequency:F0}Hz (HP {BossHPNormalized:P0}) | R6: swarm={_railWraithSwarmSize} synergy={_leviathanSynergyLevel} skyAlt={_skyReaverAltitude:F1} bestMatch={_bestMatchAccuracy:P0}");
+        }
+
+        bool IsMudColossus() => _currentBoss != null && _currentBoss.bossName.ToLowerInvariant().Contains("mud") && _currentBoss.bossName.ToLowerInvariant().Contains("colossus");
+        // R6: dedicated per-boss type checks for full puzzle + AI coverage
+        bool IsRailWraith() => _currentBoss != null && (_currentBoss.bossName.ToLowerInvariant().Contains("rail") || _currentBoss.bossName.ToLowerInvariant().Contains("wraith"));
+        bool IsDissonanceLeviathan() => _currentBoss != null && _currentBoss.bossName.ToLowerInvariant().Contains("leviathan");
+        bool IsSkyReaver() => _currentBoss != null && (_currentBoss.bossName.ToLowerInvariant().Contains("sky") || _currentBoss.bossName.ToLowerInvariant().Contains("reaver"));
+        bool IsResetSeeker() => _currentBoss != null && _currentBoss.bossName.ToLowerInvariant().Contains("reset") || _currentBoss.bossName.ToLowerInvariant().Contains("seeker");
 
         /// <summary>
         /// Round 4: Wire frequency puzzle submission into real combat via HarmonicStrike/ResonancePulse hooks.
         /// Call this from CombatBridge when boss is active + vulnerable: match quality drives scaled DealDamage.
+        /// R6: Full per-boss puzzle integration (Rail dissonance swarm clear, Leviathan resonance synergy payoff, SkyReaver aerial dive, Golden Cascade on mastery).
         /// </summary>
         public void SubmitFrequencyPuzzle(float submittedFreq, float baseDamageMultiplier = 1f)
         {
@@ -222,6 +361,72 @@ namespace Tartaria.Integration
                 // Keep puzzle window open but nudge target slightly on strong hits (dynamic)
                 if (matchQuality > 0.7f)
                     _currentTargetFrequency = Mathf.Lerp(_currentTargetFrequency, _currentTargetFrequency + UnityEngine.Random.Range(-18f, 18f), 0.3f);
+
+                // R6: Full puzzle integration + world-reacting payoffs
+                if (IsRailWraith())
+                {
+                    int cleared = Mathf.RoundToInt(matchQuality * 3.5f);
+                    _railWraithSwarmSize = Mathf.Max(0, _railWraithSwarmSize - cleared);
+                    if (_railWraithSwarmSize <= 1)
+                    {
+                        OnBossDialogue?.Invoke("Swarm shattered! You solved the living dissonance frequency!");
+                        VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 3f);
+                    }
+                }
+
+                if (IsDissonanceLeviathan())
+                {
+                    _leviathanSynergyLevel = Mathf.Min(6, _leviathanSynergyLevel + (matchQuality > 0.65f ? 1 : 0));
+                    if (_leviathanSynergyLevel >= 3)
+                    {
+                        // Real mechanical + narrative payoff for good freq play during escort (Moon 3 synergy fantasy)
+                        OnBossDialogue?.Invoke(_leviathanSynergyLevel >= 5 ? "The rails sing with the orphans' lullaby! Full Golden resonance!" : "Leviathan resonance builds — the train feels your frequency!");
+                        VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.forward * 2.5f);
+                        // Extra world react on high synergy (escalating payoff)
+                        if (_leviathanSynergyLevel % 2 == 0)
+                            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position);
+                    }
+                }
+
+                if (IsSkyReaver())
+                {
+                    // Aerial frequency puzzle: high match forces dive (lowers altitude, opens bigger vuln next)
+                    _skyReaverAltitude = Mathf.Max(0.8f, _skyReaverAltitude - matchQuality * 1.6f);
+                    OnBossDialogue?.Invoke(matchQuality > 0.75f ? "Sky Reaver dives! Frequency mastery pulls it from the clouds!" : "Aerial lock — the reaver wavers!");
+                    if (_skyReaverVisual != null)
+                        _skyReaverVisual.transform.position = transform.position + new Vector3(0, _skyReaverAltitude, 6f);
+                }
+
+                if (IsResetSeeker())
+                {
+                    // Seeker freq: strong match disrupts its seeking patterns
+                    OnBossDialogue?.Invoke("Seeker pattern broken! Precise frequency shatters its scan!");
+                }
+
+                // R6: Golden Cascade payoff — the satisfying "I solved the living frequency puzzle while the world reacts"
+                if (matchQuality > 0.85f && !_goldenCascadeTriggered)
+                {
+                    _goldenCascadeTriggered = true;
+                    VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 4f);
+                    VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.right * 2.2f);
+                    VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position + Vector3.forward * 1.8f);
+                    OnBossDialogue?.Invoke("GOLDEN CASCADE! You solved the living frequency — the world sings back in harmony!");
+                    // Extra payoff damage + phase nudge for climax feel
+                    DealDamage(22f);
+                    if (_currentPhase < _currentBoss.phases.Count - 1)
+                        _currentTargetFrequency += UnityEngine.Random.Range(-40f, 40f);
+                }
+
+                // Track for R6 hardened persistence
+                _submittedFrequenciesThisFight.Add(submittedFreq);
+                _bestMatchAccuracy = Mathf.Max(_bestMatchAccuracy, matchQuality);
+                _puzzleAttempts++;
+
+                // Round 5: Moon 3 boss synergy with escort — live freq submissions on rail bosses empower the orphan train defense
+                if (_currentBoss != null && (_currentBoss.bossName.ToLowerInvariant().Contains("rail") || _currentBoss.bossName.ToLowerInvariant().Contains("leviathan")))
+                {
+                    RailEscortController.Instance?.ApplyRailBossSynergy(matchQuality);
+                }
             }
             else
             {
@@ -282,6 +487,22 @@ namespace Tartaria.Integration
                     Debug.Log("[Boss] SludgeLeviathan procedural 3-phase visual spawned.");
                 }
                 UpdateSludgeLeviathanVisualPhase(phaseName);
+            }
+            // R6: SkyReaver aerial visual proxy (high altitude, dives on freq mastery)
+            else if (name.Contains("sky") || name.Contains("reaver"))
+            {
+                if (_skyReaverVisual == null)
+                {
+                    _skyReaverVisual = new GameObject("SkyReaver_VisualProxy");
+                    _skyReaverVisual.transform.position = spawnPos + new Vector3(0, _skyReaverAltitude, 6f);
+                    var reaverBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    reaverBody.transform.SetParent(_skyReaverVisual.transform);
+                    reaverBody.transform.localScale = new Vector3(1.1f, 0.6f, 2.4f); // sleek aerial
+                    reaverBody.GetComponent<Renderer>().material.color = new Color(0.15f, 0.18f, 0.35f);
+                    Debug.Log("[Boss] SkyReaver aerial procedural visual proxy spawned (high-freq puzzle).");
+                }
+                // position respects current altitude
+                _skyReaverVisual.transform.position = spawnPos + new Vector3(0, _skyReaverAltitude, 6f);
             }
         }
 
@@ -356,6 +577,12 @@ namespace Tartaria.Integration
             {
                 _sludgeVisual.transform.position = transform.position + new Vector3(-4f, 0.8f + Mathf.Sin(Time.time * 3f) * 0.35f, 0);
             }
+            // R6: SkyReaver aerial bob + altitude dive reactivity
+            if (_skyReaverVisual != null)
+            {
+                float bob = Mathf.Sin(Time.time * 3.8f) * 0.35f;
+                _skyReaverVisual.transform.position = transform.position + new Vector3(0, _skyReaverAltitude + bob, 6f + Mathf.Cos(Time.time * 1.6f) * 0.4f);
+            }
             // Colossus already synced on health; occasional idle pulse if low
             if (_colossusVisualProxy != null && BossHPNormalized < 0.35f && Time.frameCount % 18 == 0)
             {
@@ -391,6 +618,53 @@ namespace Tartaria.Integration
             UpdateBossAI();
             UpdateVulnerability();
             UpdateBossVisuals();
+
+            // Round 5: Frequency telegraph VFX pulse driver (real Hz-synced rings during vuln windows for satisfying encounters)
+            if (_isVulnerable && _frequencyPuzzleActive)
+            {
+                _telegraphPulseTimer += Time.deltaTime;
+                float pulseRate = Mathf.Clamp(1.8f - Mathf.Clamp01((_currentTargetFrequency - 80f) / 420f) * 0.9f, 0.35f, 1.6f); // higher target Hz = faster, more urgent telegraph
+                if (_telegraphPulseTimer >= pulseRate)
+                {
+                    _telegraphPulseTimer = 0f;
+                    Vector3 basePos = transform.position + Vector3.up * 2.2f;
+                    VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, basePos);
+                    // Secondary ring offset for "pulsing at exact frequency" depth
+                    if (_currentTargetFrequency > 140f)
+                        VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, basePos + Vector3.right * 1.8f);
+                    // R6 deepen: extra layer for aerial/sky and high-freq urgency
+                    if (_currentTargetFrequency > 320f || IsSkyReaver())
+                        VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, basePos + Vector3.up * 1.4f);
+                    if (IsRailWraith() && _railWraithSwarmSize > 2)
+                        VFXController.Instance?.PlayEffect(VFXEffect.Spark, basePos + Vector3.left * 1.4f);
+                }
+            }
+
+            // Dedicated Mud Colossus AI tick (post-fountain climax now has real phases)
+            if (IsMudColossus())
+                UpdateMudColossusDedicatedAI();
+
+            // R6: Dedicated AI for remaining major bosses (swarm + resonance + aerial)
+            if (IsRailWraith())
+                UpdateRailWraithDedicatedAI();
+            if (IsDissonanceLeviathan())
+                UpdateDissonanceLeviathanDedicatedAI();
+            if (IsSkyReaver())
+                UpdateSkyReaverDedicatedAI();
+            if (IsResetSeeker())
+                UpdateResetSeekerDedicatedAI();
+
+            // R6 shared desperation (all bosses)
+            if (BossHPNormalized < 0.32f)
+            {
+                _desperationTimer -= Time.deltaTime;
+                if (_desperationTimer <= 0f)
+                {
+                    _desperationTimer = 7.5f;
+                    VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, transform.position + Vector3.up * 1.1f);
+                    OnBossDialogue?.Invoke("The boss frenzies — only perfect frequency solves this now!");
+                }
+            }
         }
 
         // ─── Damage ─────────────────────────────────
@@ -439,6 +713,160 @@ namespace Tartaria.Integration
             {
                 ExecuteAttackPattern(phase);
                 _attackCooldown = phase.attackInterval;
+            }
+        }
+
+        // ─── Round 5: Dedicated Mud Colossus AI (phases feel like a real persistent boss encounter) ───
+        void UpdateMudColossusDedicatedAI()
+        {
+            if (!_isActive || _currentBoss == null) return;
+
+            _mudColossusSpecialTimer -= Time.deltaTime;
+
+            // Phase-aware special behaviors for Mud Colossus (post-fountain climax)
+            float hpNorm = BossHPNormalized;
+            int phase = _currentPhase;
+
+            // Special timer fires unique mechanics (telegraphed, satisfying counters via frequency puzzle)
+            if (_mudColossusSpecialTimer <= 0f)
+            {
+                _mudColossusSpecialTimer = (phase == 0) ? 6.5f : 4.2f;
+
+                if (phase == 0) // Awakening: Mud Siphon + sink telegraph
+                {
+                    // Slows player + minor corruption; visual sink ring
+                    var combat = CombatBridge.Instance;
+                    if (combat != null) combat.DamagePlayer(6f, "mud_siphon");
+                    VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, transform.position + Vector3.down * 0.5f);
+                    OnBossDialogue?.Invoke("The earth drinks your resonance...");
+                    _mudColossusQuakeCount = 0;
+                }
+                else // Frenzy: Resonance Quake (multiple pulses synced to current target freq for puzzle tie-in)
+                {
+                    _mudColossusQuakeCount++;
+                    VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position);
+                    var combat = CombatBridge.Instance;
+                    if (combat != null) combat.DamagePlayer(9f + _mudColossusQuakeCount * 2f, "colossus_quake");
+
+                    // Quake telegraphs the exact current target frequency (player must match to counter effectively)
+                    OnBossDialogue?.Invoke(_mudColossusQuakeCount >= 3 ? "The colossus cracks! Match its buried frequency!" : "Quake — retune or sink!");
+                    HapticFeedbackManager.Instance?.PlayGolemSpawn();
+
+                    if (_mudColossusQuakeCount >= 3 && _isVulnerable)
+                    {
+                        // Bonus: during vuln, quake nudges target slightly (dynamic puzzle)
+                        _currentTargetFrequency = Mathf.Lerp(_currentTargetFrequency, _currentTargetFrequency + UnityEngine.Random.Range(-25f, 25f), 0.6f);
+                    }
+                }
+            }
+
+            // Low HP desperation: occasional extra mud wave that rewards precise frequency strikes
+            if (hpNorm < 0.35f && Time.frameCount % 45 == 0)
+            {
+                VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position + Vector3.up * 0.8f);
+            }
+        }
+
+        // ─── R6: Dedicated RailWraith Swarm AI (swarm grows, freq solve thins it, dissonance vuln) ───
+        void UpdateRailWraithDedicatedAI()
+        {
+            if (!_isActive || !IsRailWraith()) return;
+
+            _railWraithSwarmTimer -= Time.deltaTime;
+
+            if (_railWraithSwarmTimer <= 0f)
+            {
+                _railWraithSwarmTimer = IsDissonanceLeviathan() ? 4.8f : 5.8f;
+                _railWraithSwarmSize = Mathf.Min(7, _railWraithSwarmSize + ( _currentPhase + 1 ));
+                VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position + Vector3.up * 1.6f);
+                OnBossDialogue?.Invoke(_railWraithSwarmSize > 4 ? "The wraiths multiply — solve the dissonance frequency to break the swarm!" : "Rail wraiths converge!");
+                var combat = CombatBridge.Instance;
+                if (combat != null && _railWraithSwarmSize > 1)
+                    combat.DamagePlayer(3f + _railWraithSwarmSize * 0.6f, "rail_swarm");
+            }
+
+            // During vuln, swarm size influences target (more chaotic when thick)
+            if (_isVulnerable && _railWraithSwarmSize > 3)
+            {
+                _currentTargetFrequency = Mathf.Lerp(_currentTargetFrequency, _currentTargetFrequency + 28f, 0.12f);
+            }
+        }
+
+        // ─── R6: Dedicated Dissonance Leviathan AI (Moon 3 train escort climax — phases + resonance synergy) ───
+        void UpdateDissonanceLeviathanDedicatedAI()
+        {
+            if (!_isActive || !IsDissonanceLeviathan()) return;
+
+            _leviathanResonanceTimer -= Time.deltaTime;
+
+            float hp = BossHPNormalized;
+            int phase = _currentPhase;
+
+            if (_leviathanResonanceTimer <= 0f)
+            {
+                _leviathanResonanceTimer = (phase == 0) ? 5.2f : (phase == 1 ? 3.8f : 3.1f);
+
+                // Phase-driven resonance waves that shift target freq (player solves living puzzle)
+                float shift = (hp < 0.4f ? 45f : 22f) * (phase + 1);
+                _currentTargetFrequency = Mathf.Lerp(_currentTargetFrequency, 155f + UnityEngine.Random.Range(-shift, shift), 0.55f);
+
+                VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position + Vector3.up * 1.3f);
+                OnBossDialogue?.Invoke(hp < 0.45f ? "Leviathan screams! Match its buried grief frequency!" : "Resonance wave — retune or the rails fracture!");
+
+                var combat = CombatBridge.Instance;
+                if (combat != null)
+                    combat.DamagePlayer(7f + phase * 2.5f + (_leviathanSynergyLevel > 2 ? -1.5f : 0), "leviathan_wave"); // synergy reduces incoming on good play
+
+                // High synergy (from good freq during escort) = world reacts with golden payoff
+                if (_leviathanSynergyLevel >= 4 && _isVulnerable)
+                {
+                    VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position);
+                    OnBossDialogue?.Invoke("The orphans' lullaby answers your frequency! The leviathan weakens!");
+                }
+            }
+
+            // Desperation on low HP: faster resonance shifts + telegraph emphasis
+            if (hp < 0.28f && Time.frameCount % 32 == 0)
+            {
+                VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, transform.position);
+            }
+        }
+
+        // ─── R6: Dedicated SkyReaver Aerial AI (high-freq aerial puzzle, altitude dives on mastery) ───
+        void UpdateSkyReaverDedicatedAI()
+        {
+            if (!_isActive || !IsSkyReaver()) return;
+
+            // Aerial bob + occasional dive when low or after strong solve
+            if (_skyReaverVisual != null)
+            {
+                // Dynamic altitude from puzzle solves already handled in Submit
+                float targetY = _skyReaverAltitude + Mathf.Sin(Time.time * 4.1f) * 0.25f;
+                _skyReaverVisual.transform.position = Vector3.Lerp(_skyReaverVisual.transform.position, transform.position + new Vector3(0, targetY, 6.4f), 0.08f);
+            }
+
+            // Desperation dive attack that rewards aerial freq precision
+            _desperationTimer -= Time.deltaTime * 0.6f; // faster in air
+            if (BossHPNormalized < 0.38f && _desperationTimer <= 0f)
+            {
+                _desperationTimer = 6.8f;
+                _currentTargetFrequency = 410f + UnityEngine.Random.Range(-60f, 85f); // high aerial signature
+                VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 3.5f);
+                OnBossDialogue?.Invoke("Sky Reaver dives from the aether! Match its high-frequency cry!");
+                var c = CombatBridge.Instance;
+                if (c != null) c.DamagePlayer(11f, "sky_dive");
+            }
+        }
+
+        // ─── R6: Dedicated ResetSeeker AI (scanning/seeking patterns disrupted by precise freq) ───
+        void UpdateResetSeekerDedicatedAI()
+        {
+            if (!_isActive || !IsResetSeeker()) return;
+
+            if (Time.frameCount % 48 == 0 && _isVulnerable)
+            {
+                _currentTargetFrequency += UnityEngine.Random.Range(-15f, 15f);
+                OnBossDialogue?.Invoke("Seeker retunes its scan — stay precise!");
             }
         }
 
@@ -547,13 +975,16 @@ namespace Tartaria.Integration
                         _frequencyPuzzleActive = true;
 
                         // Round 4: Deepened frequency puzzle — assign target on each vuln window
-                        // Boss-specific ranges for flavor (Mud low earth, Rail high rail hum, Sludge mid sludge gurgle)
+                        // R6: Boss-specific ranges for flavor (Mud earth, Rail dissonance, Sludge gurgle, Sky aerial high, Reset scan)
                         float bossBase = 280f;
                         if (_currentBoss != null)
                         {
                             if (_currentBoss.bossName.Contains("Mud") || _currentBoss.bossName.Contains("Colossus")) bossBase = 174f;
-                            else if (_currentBoss.bossName.Contains("Rail") || _currentBoss.bossName.Contains("Leviathan")) bossBase = 210f;
+                            else if (_currentBoss.bossName.Contains("Rail") || _currentBoss.bossName.Contains("Wraith")) bossBase = 210f;
                             else if (_currentBoss.bossName.Contains("Sludge")) bossBase = 155f;
+                            else if (IsSkyReaver()) bossBase = 410f; // aerial high signature
+                            else if (IsResetSeeker() || _currentBoss.bossName.Contains("Reset")) bossBase = 320f;
+                            else if (_currentBoss.bossName.Contains("Leviathan")) bossBase = 188f;
                         }
                         _currentTargetFrequency = bossBase + UnityEngine.Random.Range(-35f, 95f);
 
@@ -561,8 +992,20 @@ namespace Tartaria.Integration
                         HapticFeedbackManager.Instance?.PlayCombatHit();
                         AudioManager.Instance?.PlayTone(528f, 0.3f);
 
-                        // Spawn/refresh procedural visuals for advanced bosses (RailWraith + SludgeLeviathan 3-phase + Mud Colossus)
+                        // Spawn/refresh procedural visuals for advanced bosses (RailWraith + SludgeLeviathan 3-phase + Mud Colossus + SkyReaver R6)
                         SpawnOrUpdateBossVisuals(phase.phaseName);
+
+                        // Round 5: Improved telegraph VFX — frequency-synced pulsing rings (satisfying "hear the target" moment)
+                        // R6: Deepened with multi-layer per-type telegraphs
+                        _telegraphPulseTimer = 0f;
+                        _lastTelegraphHz = _currentTargetFrequency;
+                        // Initial strong telegraph burst (harmonic rings at exact target freq feel)
+                        VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 1.5f);
+                        VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position + Vector3.forward * 1.2f);
+                        if (IsSkyReaver() || _currentTargetFrequency > 350f)
+                            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 3.1f);
+                        if (IsRailWraith())
+                            VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position + Vector3.left * 1.9f);
                     }
                 }
             }
@@ -594,7 +1037,7 @@ namespace Tartaria.Integration
 
                 Debug.Log($"[Boss] Phase {_currentPhase + 1}: {newPhase.phaseName}");
 
-                // Refresh procedural visuals for Rail/Sludge 3-phase behavior on phase shift
+                // Refresh procedural visuals for Rail/Sludge/Sky 3-phase behavior on phase shift
                 SpawnOrUpdateBossVisuals(newPhase.phaseName);
             }
         }
@@ -636,7 +1079,14 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             EconomySystem.Instance?.AddCurrency(CurrencyType.AetherShards, Mathf.RoundToInt(rsReward / 5f));
 
-            Debug.Log($"[Boss] {_currentBoss.bossName} DEFEATED! Score: {performanceScore:P0}, RS: {rsReward:F0}");
+            // R6: final Golden Cascade if puzzle was mastered
+            if (_bestMatchAccuracy > 0.78f || _goldenCascadeTriggered)
+            {
+                VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 2.8f);
+                OnBossDialogue?.Invoke("Perfect frequency mastery! The boss dissolves into golden light.");
+            }
+
+            Debug.Log($"[Boss] {_currentBoss.bossName} DEFEATED! Score: {performanceScore:P0}, RS: {rsReward:F0} | R6 puzzle stats: best={_bestMatchAccuracy:P0} attempts={_puzzleAttempts} cascade={_goldenCascadeTriggered}");
 
             CleanupBossVisualProxies();
 
