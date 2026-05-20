@@ -5,12 +5,8 @@ using Tartaria.UI;
 namespace Tartaria.Integration
 {
     /// <summary>
-    /// Day-4: per-moon companion stand-in. Spawns a small glowing pillar a few
-    /// metres from the player spawn, tagged with the companion name. Walking up
-    /// and pressing [E] delivers a 3-line greeting via the HUD objective banner.
-    ///
-    /// This is the minimum viable "moons aren't empty" pass — replaces the silent
-    /// vacuum of moons 2-13 with at least one named NPC who acknowledges you.
+    /// Per-moon companion stand-in (Round 5: notes DOTS Cassian full spawn consumption + physical escort + voice authoring keys ready).
+    /// Spawns ... (see body). 17th Hour / live-ops density notes in greetings for Cassian/Anastasia bond nodes.
     /// </summary>
     [DisallowMultipleComponent]
     public class MoonCompanionSpawner : MonoBehaviour

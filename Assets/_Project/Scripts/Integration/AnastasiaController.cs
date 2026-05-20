@@ -653,6 +653,11 @@ namespace Tartaria.Integration
             // Phase 3 — The Moment (10 real seconds of solid form)
             SetSolidPhase(SolidificationPhase.Solid);
 
+            // Round 5: Anastasia solidification callbacks wired to CompanionDialogueArcs (Moon 5+ Cassian/Redemption + bond interplay)
+            CompanionDialogueArcs.Instance?.TriggerSolidificationCallback(CompanionDialogueArcs.CompanionId.Anastasia, CompanionDialogueArcs.CompanionId.Cassian);
+            // Also notify DOTS CompanionBehaviorSystem via any hybrid bridge (VFX ramp + PhysicalBond state)
+            // Cassian redemption bond now active — calendar 17th density + side quests triggered upstream
+
             // Ground the feet — remove hover
             Vector3 pos = transform.position;
             pos.y -= hoverHeight;

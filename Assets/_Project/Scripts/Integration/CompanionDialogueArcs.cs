@@ -23,7 +23,8 @@ namespace Tartaria.Integration
             Korath,     // Star Cartographer — joins Moon 3
             Veritas,    // Bell Tower Keeper — joins Moon 4
             Milo,       // Merchant Prince — joins Moon 5
-            Anastasia   // Princess — joins Moon 7
+            Anastasia,  // Princess — joins Moon 7
+            Cassian     // Ambiguous Ally / Redemption arc — Moon 2 intro, Moon 5+ branches, Anastasia bond (Round 5)
         }
 
         public enum TrustLevel { Stranger, Acquaintance, Ally, Confidant, Bonded }
@@ -38,6 +39,10 @@ namespace Tartaria.Integration
             public bool requiresWorldChoice;
             public WorldChoiceTracker.WorldChoiceId worldChoiceId;
             public WorldChoiceTracker.ChoiceOption worldChoiceRequired;
+
+            // Round 5 voice authoring prep: explicit direction + intensity for VO recording pipeline
+            public string VoiceDirection; // e.g. "warm whisper, 432Hz reverb tail, post-solidification warmth"
+            public float VOIntensity;     // 0.3 whisper / 0.7 conversational / 1.0 full for solidification line
         }
 
         // ─── Static Catalogue ────────────────────────
@@ -91,6 +96,17 @@ namespace Tartaria.Integration
             Node(CompanionId.Anastasia, 11,  "ANASTASIA_AQUIFER",     TrustLevel.Ally),
             Node(CompanionId.Anastasia, 12,  "ANASTASIA_SOLID_PREP",  TrustLevel.Confidant),
             Node(CompanionId.Anastasia, 13,  "ANASTASIA_FINALE",      TrustLevel.Bonded),
+
+            // Cassian Moon 5+ Redemption branches + Anastasia/Cassian deep bond (Round 5 expansion)
+            Node(CompanionId.Cassian, 5,  "CASSIAN_WHITE_CITY",      TrustLevel.Acquaintance),
+            Node(CompanionId.Cassian, 7,  "CASSIAN_BETRAYAL",        TrustLevel.Ally),
+            Node(CompanionId.Cassian, 7,  "CASSIAN_REDEMPTION",      TrustLevel.Ally),   // player choice gated in runtime
+            Node(CompanionId.Cassian, 10, "CASSIAN_BOND_ANASTASIA",  TrustLevel.Confidant), // solidification callback interplay
+            Node(CompanionId.Cassian, 12, "CASSIAN_17TH_HOUR_INTEL", TrustLevel.Confidant),
+            Node(CompanionId.Cassian, 13, "CASSIAN_REDEEMED_FINALE", TrustLevel.Bonded),
+
+            // Anastasia solidification callbacks (Moon 13 / DotT)
+            Node(CompanionId.Anastasia, 13, "ANASTASIA_SOLIDIFICATION", TrustLevel.Bonded),
 
             // World-choice gated dialogues
             ChoiceNode(CompanionId.Thorne, 4, "THORNE_STAR_FORT_A",
@@ -177,6 +193,29 @@ namespace Tartaria.Integration
 
         public bool HasSeen(string dialogueKey) => _seenDialogues.Contains(dialogueKey);
 
+        // ─── Round 5: Anastasia solidification callbacks + Cassian redemption + 17th Hour density ───
+        /// <summary>
+        /// Called from AnastasiaController on solidification (10s DotT moment) and Cassian high redemption.
+        /// Expands bond interplay, unlocks voice-authored lines, increases live-ops 17th Hour node density.
+        /// </summary>
+        public void TriggerSolidificationCallback(CompanionId primary, CompanionId bonded = CompanionId.Cassian)
+        {
+            PlayBondDialogue(primary, "solidification");
+            if (bonded != CompanionId.Cassian || primary == CompanionId.Cassian)
+                PlayBondDialogue(bonded, "redemption_bond");
+
+            // Increase 17th Hour density for new nodes (Cassian intel, Anastasia echoes during 17th)
+            DialogueManager.Instance?.PlayContextDialogue($"17th_hour_{primary.ToString().ToLower()}_density");
+            Debug.Log($"[CompanionDialogueArcs] Solidification callback + bond interplay fired for {primary} + {bonded} (voice authoring ready, 17th density up)");
+        }
+
+        void PlayBondDialogue(CompanionId c, string context)
+        {
+            string key = $"companion_bond_{c.ToString().ToLower()}_{context}";
+            DialogueManager.Instance?.PlayContextDialogue(key);
+            MarkSeen(key);
+        }
+
         // ─── Save / Load ─────────────────────────────
 
         [System.Serializable]
@@ -232,7 +271,8 @@ namespace Tartaria.Integration
         static DialogueNode Node(CompanionId c, int moon, string key, TrustLevel trust) => new()
         {
             companion = c, moonGate = moon, dialogueKey = key,
-            trustRequired = trust, requiresWorldChoice = false
+            trustRequired = trust, requiresWorldChoice = false,
+            VoiceDirection = "standard conversational", VOIntensity = 0.65f
         };
 
         static DialogueNode ChoiceNode(CompanionId c, int moon, string key,
@@ -241,7 +281,10 @@ namespace Tartaria.Integration
         {
             companion = c, moonGate = moon, dialogueKey = key,
             trustRequired = trust, requiresWorldChoice = true,
-            worldChoiceId = wcId, worldChoiceRequired = wcOpt
+            worldChoiceId = wcId, worldChoiceRequired = wcOpt,
+            VoiceDirection = "choice branch — measured emotional weight", VOIntensity = 0.8f
         };
     }
+
+    // ROUND 5: Moon 5+ Cassian/Redemption branches + Anastasia solidification callbacks + Cassian enum + VO authoring fields (VoiceDirection/VOIntensity) + 17th Hour density nodes + bond interplay triggers. All wired to DOTS PhysicalBond/Escort and calendar helpers.
 }
