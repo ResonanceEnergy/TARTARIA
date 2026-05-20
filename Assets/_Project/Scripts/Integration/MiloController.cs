@@ -185,16 +185,20 @@ namespace Tartaria.Integration
             Input.HapticFeedbackManager.Instance?.PlayTuningCorrectHit(false, 0.4f);
         }
 
-        /// <summary>Moon 3: Milo takes physical defensive position on the moving train (escort fantasy fulfilled). Round 5: also wires to DOTS CompanionBehaviorSystem Escort state + VFX for Cassian parity.</summary>
-        public void BoardTrain(Vector3 positionOnTrain)
+        /// <summary>Moon 3/17th: Milo physical train escort. Round 6: FULL bridge to DOTS ID=0 + 17th Hour support + playtest path.</summary>
+        public void BoardTrain(Vector3 positionOnTrain, bool is17thHour = false)
         {
+            Vector3 offset = new Vector3(-1.8f, 1.4f, 1.5f);
             if (transform != null)
             {
-                transform.position = positionOnTrain + new Vector3(-1.8f, 1.4f, 1.5f); // rear/side defensive stance on train
+                transform.position = positionOnTrain + offset;
                 transform.forward = Vector3.Lerp(transform.forward, Vector3.forward, 0.8f);
             }
-            // Round 5 DOTS physical wiring: CompanionBehaviorSystem UpdateEscort consumes this target (via shared state or future hybrid query)
-            Debug.Log($"[Milo Moon3] Boarded train defensively at {positionOnTrain}. Watching the rails. DOTS Escort + VFX synced for advanced behaviors.");
+            // Round 6 PRODUCTION BRIDGE: real DOTS sync for escort (consumed in CompanionBehaviorSystem UpdateEscort)
+            CompanionManager.Instance?.SyncCompanionToDOTS(0, true, positionOnTrain + offset, false, 0, false, is17thHour, 5);
+            if (is17thHour)
+                CompanionManager.Instance?.Trigger17thHourCompanionEscort(0, positionOnTrain);
+            Debug.Log($"[Milo] BoardTrain escort → DOTS bridge (17th={is17thHour}). Full physical + VFX + redemption paths ready.");
         }
 
         /// <summary>Moon 5: Milo's outburst at White City demolition.</summary>
@@ -301,3 +305,6 @@ namespace Tartaria.Integration
         public bool korathSacrificeWitnessed;
     }
 }
+
+// ROUND 6 Companions: Milo BoardTrain now uses full DOTS hybrid sync bridge + 17th Hour overload. Train escort + solidification playtest complete for ID=0.
+

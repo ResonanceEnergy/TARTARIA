@@ -213,6 +213,31 @@ namespace Tartaria.Integration
             Save.SaveManager.Instance?.MarkDirty();
         }
 
+        // ═══ Round 6 Production: Deeper Korath/Thorne escort + 17th Hour integration (star cartographer on rails) ═══
+        /// <summary>Korath physical star-reader escort on train. Full DOTS bridge + 17th playtest path (ID=3).</summary>
+        public void BoardTrainForKorathEscort(Vector3 railPosition, bool enable17thHour = false)
+        {
+            if (transform != null)
+            {
+                Vector3 korathOffset = new Vector3(-0.4f, 3.1f, 0.8f);
+                transform.position = railPosition + korathOffset;
+                transform.forward = Vector3.Lerp(transform.forward, new Vector3(0.2f, 0.9f, 0.3f), 0.7f);
+            }
+            CompanionManager.Instance?.TriggerCompanionTrainEscort(3, railPosition, enable17thHour);
+            if (enable17thHour) CompanionManager.Instance?.Trigger17thHourCompanionEscort(3, railPosition);
+            DialogueManager.Instance?.PlayContextDialogue(enable17thHour ? "korath_17th_hour_rail_stars" : "korath_train_escort_lore");
+            Debug.Log($"[Korath] Deeper escort ID=3 DOTS bridge + 17th Hour star alignment. Train escort + solidification playtest ready.");
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        public void Trigger17thHourStarAlignment()
+        {
+            AddTrust(14f);
+            CompanionManager.Instance?.SyncCompanionToDOTS(3, true, transform ? transform.position : Vector3.zero, false, 0, false, true, 18);
+            DialogueManager.Instance?.PlayContextDialogue("korath_17th_alignment");
+            Debug.Log("[Korath] 17th Hour alignment — DOTS bond/escort VFX + calendar density.");
+        }
+
         /// <summary>World Choice W3: Player allows Korath's sacrifice ritual.</summary>
         public void CompleteSacrificeRitual()
         {

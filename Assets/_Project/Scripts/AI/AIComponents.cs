@@ -7,6 +7,8 @@ namespace Tartaria.AI
     //  Companion States (DOTS State Machine)
     //  FOLLOW → IDLE → REACT → SPEAK → HIDE → CELEBRATE → ESCORT (physical train positioning) → PHYSICAL_BOND (Anastasia/Cassian solidification interplay, Moon 5+ redemption)
     //  Round 5: Wired full DOTS Cassian spawning consumption + animator/VFX flags + escort for Milo/Lirael/Korath + Cassian
+    //  Round 6: Production hybrid DOTS-Mono full sync bridge + save persistence for all new states + Korath/Thorne deeper escort + 17th Hour integration + VO prep + redemption/solidif playtest paths
+    //  Round 7: Full 7-companion (Veritas ID=6) + trust arc world mutations + deep physical tells for all major beats (restoration/combat/giant/17th/World's Fair/escort) + calendar/live-ops + real VO playback + giant synergies (Companion Giant, Giant's Song) + cross-Moon memory
     // ─────────────────────────────────────────────
     public enum CompanionState : byte
     {
@@ -22,7 +24,7 @@ namespace Tartaria.AI
 
     public struct CompanionTag : IComponentData
     {
-        public int CompanionId;  // 0 = Milo, 1 = Cassian (DOTS full spawn Round 4), 2 = Lirael, 3 = Korath, 4 = Thorne, 5 = Anastasia
+        public int CompanionId;  // 0 = Milo, 1 = Cassian, 2 = Lirael, 3 = Korath, 4 = Thorne, 5 = Anastasia, 6 = Veritas (R7 full 7-companion)
     }
 
     public struct CompanionBehavior : IComponentData
@@ -49,6 +51,19 @@ namespace Tartaria.AI
         public int RedemptionLevel;           // Cassian: 0 neutral, higher = redeemed ally bond (Moon 5+ branches)
         public bool SolidificationActive;     // Anastasia: triggers solidification callback into DOTS PhysicalBond state
         public float VFXIntensity;            // For animator/VFX bridge (0-1, consumed by hybrid renderers)
+
+        // Round 6: Production DOTS-Mono hybrid sync bridge, persistence fields, deeper Korath/Thorne escort + 17th Hour
+        public int CompanionBondLevel;        // 0-100 trust mirrored from Mono for DOTS behaviors (all companions)
+        public bool In17thHourMode;           // Triggers special 17th Hour escort positioning, VFX density, dialogue density hooks
+        public bool RedemptionChoiceMade;     // Cassian player redemption choice flag (unlocks PhysicalBond ally path)
+        public float EscortLeanAngle;         // Per-companion physical lean for train (Korath star-gaze, Thorne vigilant)
+
+        // Round 7: Deep physical tells + giant synergy + world mutation flags + calendar echoes
+        public bool GiantSynergyActive;       // High-trust Companion Giant assist / Giant's Song auto-match active
+        public float GiantSongMatchQuality;   // 0-1 freq match quality from bond (auto-matches player harmonic during giant)
+        public int WorldMutationTier;         // Permanent world mutation level (trust arc payoffs: 0-4) persisted cross-Moon
+        public bool CalendarEchoActive;       // 17th Hour / daily live-ops echo changed this companion's state (trust bump or tell)
+        public float PhysicalTellIntensity;   // Per-beat reactivity (restoration 0.9, combat 0.6, escort 0.8, giant 1.0)
     }
 
     /// <summary>
@@ -71,6 +86,16 @@ namespace Tartaria.AI
         public float Redemption;    // 0-1, rises on Moon 5+ Cassian/Redemption branches; high = ally escort
         public float IntelAccuracy; // Dynamic based on bond with Anastasia solidification callbacks
         public float BondStrength;  // With Anastasia (deep Milo/Lirael/Korath + Anastasia/Cassian interplay)
+    }
+
+    /// <summary>
+    /// Veritas (R7) bell/organ keeper personality — precision, truth through resonance.
+    /// </summary>
+    public struct VeritasPersonality : IComponentData
+    {
+        public float Precision;     // High = exact freq matches in giant song / bell sync
+        public float TruthWeight;   // Influences shared history reveals and calendar echoes
+        public float ResonanceEcho; // 17th Hour + giant synergy multiplier
     }
 
     // ─────────────────────────────────────────────

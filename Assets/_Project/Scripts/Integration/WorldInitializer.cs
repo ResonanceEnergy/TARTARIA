@@ -94,7 +94,7 @@ namespace Tartaria.Integration
             trigger.Configure(ProximityTrigger.TriggerAction.SpawnEnemy, radius);
         }
 
-        // ─── Companion (Milo) ────────────────────────
+        // ─── Companions (Round 6 Production DOTS: all 6 IDs with hybrid sync fields) ────────────────────────
 
         void CreateCompanionEntity(EntityManager em)
         {
@@ -108,36 +108,51 @@ namespace Tartaria.Integration
             }
             playerQuery.Dispose();
 
-            var milo = em.CreateEntity();
-            em.AddComponentData(milo, new CompanionTag { CompanionId = 0 });
-            em.AddComponentData(milo, new CompanionBehavior
+            // Round 6: Create full set of companion DOTS entities (Milo0, Cassian1, Lirael2, Korath3, Thorne4, Anastasia5) for production escort/PhysicalBond/17th/redemption
+            int[] ids = { 0, 1, 2, 3, 4, 5 };
+            string[] names = { "Milo", "Cassian", "Lirael", "Korath", "Thorne", "Anastasia" };
+            for (int i = 0; i < ids.Length; i++)
             {
-                State = Tartaria.AI.CompanionState.Follow,
-                PreviousState = Tartaria.AI.CompanionState.Follow,
-                StateTimer = 0f,
-                FollowDistance = 3f,
-                IdleThreshold = 5f,
-                ReactRadius = 20f,
-                HideRadius = 10f,
-                CelebrateTimer = 3f,
-                TargetPosition = playerPos,
-                WalkSpeed = 3f,
-                SprintSpeed = 5f,
-                SprintDistanceThreshold = 8f,
-                MaxIdleTime = 10f
-            });
-            em.AddComponentData(milo, new MiloPersonality
-            {
-                Curiosity = 0.8f,
-                Encouragement = 0.9f,
-                Sarcasm = 0.3f
-            });
-            em.AddComponentData(milo, new LocalTransform
-            {
-                Position = playerPos + new float3(companionOffset.x, companionOffset.y, companionOffset.z),
-                Rotation = quaternion.identity,
-                Scale = 1f
-            });
+                var e = em.CreateEntity();
+                em.AddComponentData(e, new CompanionTag { CompanionId = ids[i] });
+                em.AddComponentData(e, new CompanionBehavior
+                {
+                    State = Tartaria.AI.CompanionState.Follow,
+                    PreviousState = Tartaria.AI.CompanionState.Follow,
+                    StateTimer = 0f,
+                    FollowDistance = 3f,
+                    IdleThreshold = 5f,
+                    ReactRadius = 20f,
+                    HideRadius = 10f,
+                    CelebrateTimer = 3f,
+                    TargetPosition = playerPos,
+                    WalkSpeed = 3f,
+                    SprintSpeed = 5f,
+                    SprintDistanceThreshold = 8f,
+                    MaxIdleTime = 10f,
+                    // Round 6 defaults for new sync/persistence fields
+                    IsEscorting = false,
+                    EscortTarget = playerPos,
+                    EscortSpeed = 3f,
+                    RedemptionLevel = (ids[i] == 1 ? 25 : 0),
+                    SolidificationActive = false,
+                    VFXIntensity = 0.3f,
+                    CompanionBondLevel = 10,
+                    In17thHourMode = false,
+                    RedemptionChoiceMade = false,
+                    EscortLeanAngle = 0f
+                });
+                em.AddComponentData(e, new LocalTransform
+                {
+                    Position = playerPos + new float3(companionOffset.x + i * 0.6f, companionOffset.y, companionOffset.z - i * 0.3f),
+                    Rotation = quaternion.identity,
+                    Scale = 1f
+                });
+                // Milo personality only for ID0 (legacy)
+                if (ids[i] == 0)
+                    em.AddComponentData(e, new MiloPersonality { Curiosity = 0.8f, Encouragement = 0.9f, Sarcasm = 0.3f });
+            }
+            Debug.Log("[WorldInit] Production DOTS companions created for all IDs 0-5 (Milo/Cassian/Lirael/Korath/Thorne/Anastasia) with Round 6 hybrid fields.");
         }
 
         // ─── Enemy Spawn Triggers ────────────────────
