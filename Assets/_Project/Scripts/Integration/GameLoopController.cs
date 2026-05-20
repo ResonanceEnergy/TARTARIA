@@ -1202,6 +1202,18 @@ namespace Tartaria.Integration
             Vector3 spawnPos = player.transform.position + spawnOffset;
             spawnPos.y = player.transform.position.y; // Keep on same plane
 
+            // Round 5: Full lifecycle pooling across more systems — delegate to EchohavenContentSpawner (pooled + LOD+impostor)
+            // for wave spawns and all golem creation paths. Falls back to direct if spawner not in scene.
+            var contentSpawner = EchohavenContentSpawner.Instance;
+            if (contentSpawner != null)
+            {
+                contentSpawner.SpawnMudGolem(spawnPos);
+                if (TutorialController.Instance != null)
+                    TutorialController.Instance.TriggerEnemyStep();
+                Debug.Log($"[GameLoop] Spawned Mud Golem (via pooled spawner) at {spawnPos}");
+                return;
+            }
+
             // Instantiate from prefab or build proper procedural golem
             GameObject golem;
             if (mudGolemPrefab != null)
@@ -1834,6 +1846,16 @@ namespace Tartaria.Integration
                 save.rail.trainCurrentStation = rd.trainCurrentStation;
             }
 
+            // Moon 3 (Spectral Orphans / Rail Escort / Leviathan / Giant Echo) — R5 SaveData block hardening (replaces PlayerPrefs)
+            var moon3Orphans = Tartaria.Gameplay.SpectralOrphanAdoption.GetMoon3SaveData();
+            save.moon3.adoptedCount = moon3Orphans.adoptedCount;
+            save.moon3.ariaAdopted = moon3Orphans.ariaAdopted;
+            save.moon3.torenAdopted = moon3Orphans.torenAdopted;
+            save.moon3.sylAdopted = moon3Orphans.sylAdopted;
+            save.moon3.firstEscortCompleted = moon3Orphans.escortCompleted;
+            save.moon3.dissonanceLeviathanDefeated = moon3Orphans.leviathanDefeated;
+            save.moon3.giantEchoFreed = moon3Orphans.giantEchoFreed;
+
             // Aquifer Purge
             var aquifer = AquiferPurgeMiniGame.Instance;
             if (aquifer != null)
@@ -1890,6 +1912,22 @@ namespace Tartaria.Integration
                 save.combatWave.totalWaves = wd.totalWaves;
             }
 
+            // Phase 3 R5 Bosses & Advanced Enemies: persist active boss + exact target frequency for resumable fights
+            var bossSys = BossEncounterSystem.Instance;
+            if (bossSys != null)
+            {
+                var bs = bossSys.GetSaveState();
+                save.boss.isActive = bs.isActive;
+                save.boss.bossName = bs.bossName ?? "";
+                save.boss.currentPhase = bs.currentPhase;
+                save.boss.currentHP = bs.currentHP;
+                save.boss.maxHP = bs.maxHP;
+                save.boss.currentTargetFrequency = bs.currentTargetFrequency;
+                save.boss.encounterTime = bs.encounterTime;
+                save.boss.playerHitsReceived = bs.playerHitsReceived;
+                save.boss.frequencyPuzzleWasActive = bs.frequencyPuzzleWasActive;
+            }
+
             // ─── v10 Save Blocks (Phase 3 R4: Cymatic + Moon2 subsystems) ──────────────────────────
             // Cymatic: full visual re-apply support wired here so EnsurePermanentCymaticVisuals fires on every load
             var cym = CymaticWaterTuningMiniGame.Instance;
@@ -1925,7 +1963,16 @@ namespace Tartaria.Integration
                 save.moon2.crystalsTunedInCaverns = Mathf.Max(save.moon2.crystalsTunedInCaverns, (int)(save.world.resonanceScore / 8f));
                 // Moon2 subsystems can overwrite lunarResonanceAccumulated etc via their own GetSaveData in future
             }
+
+                // Moon 2 Progression System (purge blessings, skill unlocks, permanent mutations)
+                var m2prog = Moon2ProgressionSystem.Instance;
+                if (m2prog != null && save.moon2 != null)
+                {
+                    m2prog.PopulateSaveBlock(save.moon2);
+                }
+            }
         }
+
 
         void OnAfterLoad(SaveData save)
         {
@@ -1943,6 +1990,14 @@ namespace Tartaria.Integration
                     postSolidWarmGlow = save.anastasia.postSolidWarmGlow,
                     solidPhase = save.anastasia.solidPhase
                 });
+            }
+
+
+            // Moon 2 Progression restore (blessings, mutations, force skill unlocks)
+            var m2prog = Moon2ProgressionSystem.Instance;
+            if (m2prog != null && save.moon2 != null)
+            {
+                m2prog.RestoreFromSaveBlock(save.moon2);
             }
 
             // Quests
@@ -2398,6 +2453,21 @@ namespace Tartaria.Integration
                 });
             }
 
+            // Moon 3 SaveData block load (R5 hardening) — feeds statics for SpectralOrphanAdoption instances + escort/leviathan state
+            if (save.moon3 != null)
+            {
+                Tartaria.Gameplay.SpectralOrphanAdoption.LoadMoon3SaveData(new Tartaria.Gameplay.SpectralOrphanAdoption.Moon3AdoptionPayload
+                {
+                    adoptedCount = save.moon3.adoptedCount,
+                    ariaAdopted = save.moon3.ariaAdopted,
+                    torenAdopted = save.moon3.torenAdopted,
+                    sylAdopted = save.moon3.sylAdopted,
+                    escortCompleted = save.moon3.firstEscortCompleted,
+                    leviathanDefeated = save.moon3.dissonanceLeviathanDefeated,
+                    giantEchoFreed = save.moon3.giantEchoFreed
+                });
+            }
+
             // Aquifer Purge
             var aquiferLoad = AquiferPurgeMiniGame.Instance;
             if (aquiferLoad != null && save.aquiferPurge != null)
@@ -2461,6 +2531,24 @@ namespace Tartaria.Integration
                     currentWaveIndex = save.combatWave.currentWaveIndex,
                     enemiesRemaining = save.combatWave.enemiesRemaining,
                     totalWaves = save.combatWave.totalWaves
+                });
+            }
+
+            // Phase 3 R5 Boss persistence: resume exact boss state + live target frequency (persistent satisfying encounters)
+            var bossLoad = BossEncounterSystem.Instance;
+            if (bossLoad != null && save.boss != null && save.boss.isActive)
+            {
+                bossLoad.LoadSaveState(new BossEncounterSystem.BossSaveState
+                {
+                    isActive = save.boss.isActive,
+                    bossName = save.boss.bossName,
+                    currentPhase = save.boss.currentPhase,
+                    currentHP = save.boss.currentHP,
+                    maxHP = save.boss.maxHP,
+                    currentTargetFrequency = save.boss.currentTargetFrequency,
+                    encounterTime = save.boss.encounterTime,
+                    playerHitsReceived = save.boss.playerHitsReceived,
+                    frequencyPuzzleWasActive = save.boss.frequencyPuzzleWasActive
                 });
             }
 

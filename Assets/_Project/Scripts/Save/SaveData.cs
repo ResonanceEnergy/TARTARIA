@@ -525,4 +525,39 @@ namespace Tartaria.Save
         // Cumulative RS earned (used by ArchiveManager for tier unlock tracking)
         public float cumulativeRS;
     }
+    // Moon 2 Progression Save Block (Crystalline Caverns purge blessings)
+    [Serializable]
+    public class Moon2SaveBlock
+    {
+        public int[] moon2BuildingStates = System.Array.Empty<int>();
+        public float[] cavernCorruptionLevels = System.Array.Empty<float>();
+        public int crystalsTunedInCaverns;
+        public bool moon2ZonePurged;
+        public float lunarResonanceAccumulated;
+        public bool[] leyLineNodesActive = System.Array.Empty<bool>();
+        public string[] purgedMoon2Sites = System.Array.Empty<string>();
+        public bool cathedralBreathGranted;
+        public bool bellCleansingGranted;
+        public bool fountainSpringGranted;
+        public bool crystalLensGranted;
+        public bool leyBondGranted;
+        public bool trueLunarPurifierGranted;
+        public int moon2PurgeCount;
+    }
+
+    [Serializable]
+    public class Moon3SaveBlock
+    {
+        public int adoptedCount;
+        public bool ariaAdopted;
+        public bool torenAdopted;
+        public bool sylAdopted;
+        public bool firstEscortCompleted;
+        public bool dissonanceLeviathanDefeated;
+        public bool giantEchoFreed;
+        public float lullabyShieldLastUsed;
+        public bool seventeenthHourInitiated;
+        public string[] seventeenthHourEventIds = System.Array.Empty<string>();
+    }
+
 }
