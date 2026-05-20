@@ -1,3 +1,17 @@
+using System.Collections.Generic;
+using Tartaria.Core;
+
+namespace Tartaria.Integration
+{
+    /// <summary>
+    /// Builds the complete quest database for all Moons and R7 companion systems.
+    /// </summary>
+    public static class QuestDatabaseBuilder
+    {
+        public static QuestDefinition[] BuildAll()
+        {
+            var quests = new List<QuestDefinition>();
+
             // R7 Companions & Reactivity: New production-quality companion milestone, trust arc, physical beat, giant synergy, calendar claimable, world mutation quests (Moons 1-3 depth + 4-13 hooks)
             // All wired to CompanionManager trust/mutation/calendar/giant + DialogueArcs + QuestManager CompanionMilestone type
 
@@ -17,6 +31,31 @@
                 "Advance Cassian trust to 50 during Moon 2 corruption purge — redemption branch + world intel mutation.",
                 rsReward: 150f,
                 new QuestObjective { description = "Cassian trust + physical combat react", type = QuestObjectiveType.CompanionMilestone, targetId = "cassian", targetCount = 50 }));
+
+            // === NEW MOON 2 COMPANION CATHEDRAL / CORRUPTION / CRYSTAL ARCS (Moon 2 Companion Stories & Reactivity R7) ===
+            // Lirael: Crystal Choir — corruption nodes inside cathedral, song + purge, physical fracture/solidify tells
+            quests.Add(Build("r7_m2_lirael_crystal_choir", "Lirael's Fractured Crystal Choir",
+                "Accompany Lirael to 3 corrupted crystal nodes deep in the cathedral. Tune while she sings pre-corruption memories. Ties directly to Moon 2 cathedral theme and purge.",
+                rsReward: 180f,
+                new QuestObjective { description = "Lirael crystal node purges (3) + physical tell on success", type = QuestObjectiveType.CompanionMilestone, targetId = "lirael", targetCount = 3 }));
+
+            // Cassian expansion: Cathedral Analysis — ambiguous path choice with physical tells and trust branch
+            quests.Add(Build("r7_m2_cassian_cathedral_analysis", "Cassian's Cathedral Fracture Analysis",
+                "Work with (or confront) Cassian mapping corruption veins in the living crystal cathedral. Choice impacts trust and unlocks permanent intel markers.",
+                rsReward: 160f,
+                new QuestObjective { description = "Cassian cathedral analysis quest + trust branch + physical dissonance tell", type = QuestObjectiveType.CompanionMilestone, targetId = "cassian", targetCount = 1 }));
+
+            // Korath foreshadow (early echo): Builder's Shadow in crystal heart — inscription resonance, permanent stone memory
+            quests.Add(Build("r7_m2_korath_builder_echo", "Korath's Stone Shadow in the Cathedral",
+                "Discover Korath's giant echo inscription in the deepest cathedral crystal chamber during purge. Resonates 'the song inverted'. Early trust seed + world mutation foreshadow.",
+                rsReward: 140f,
+                new QuestObjective { description = "Korath cathedral echo resonance + physical stone hum tell + early trust", type = QuestObjectiveType.CompanionMilestone, targetId = "korath", targetCount = 1 }));
+
+            // Anastasia: Archive Facets — 17th Hour crystal interaction + Golden Mote #2 extension, motes + warmth
+            quests.Add(Build("r7_m2_anastasia_crystal_archive", "Anastasia's Facets of the Archive",
+                "During 17th Hour in the cathedral, share resonance with Anastasia among living crystals. Motes interact with veins; unlocks permanent warmer caustics + extra whispers.",
+                rsReward: 130f,
+                new QuestObjective { description = "Anastasia cathedral crystal mote share + 17th physical glow + world warmth mutation", type = QuestObjectiveType.CompanionMilestone, targetId = "anastasia", targetCount = 1 }));
 
             // Moon 3 R7 escort physical + giant song + Veritas intro synergy
             quests.Add(Build("r7_m3_escort_giant_song", "Orphan Train Giant Song Match",
