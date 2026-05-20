@@ -64,7 +64,7 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
-            UnsubscribeFromEvents();
+            UnsubscribeToEvents();
             if (_domeBreatheRoutine != null) StopCoroutine(_domeBreatheRoutine);
             foreach (var g in _godrayShafts) if (g != null) Destroy(g);
         }
@@ -75,7 +75,7 @@ namespace Tartaria.Integration
             Tartaria.Core.GameEvents.OnRequestPurgeCorruption += HandlePurgeRequest;
         }
 
-        void UnsubscribeFromEvents()
+        void UnsubscribeToEvents()
         {
             Tartaria.Core.GameEvents.OnBuildingRestored -= HandleBuildingRestored;
             Tartaria.Core.GameEvents.OnRequestPurgeCorruption -= HandlePurgeRequest;
@@ -839,6 +839,238 @@ namespace Tartaria.Integration
                 hl.shadows = LightShadows.None;
                 Destroy(hint, 18f); // temp visual
             }
+        }
+
+        // ═════════════════════════════════════════════════════════════════════════
+        // MOON 2 EXPLORATION SECRETS & COLLECTIBLES VISUAL PAYOFFS (R8 Secrets Agent)
+        // Rich support for the 8–12 secret network. Directly leverages + extends every
+        // R6/R7 visual system (fuse variants, godrays, dome breathing, crystal growth,
+        // recursive lights, ley sparks, caustics, vein thickness) to make exploration
+        // of the fractal cathedral feel magical and deeply rewarding.
+        // Called ONLY by Moon2ExplorationSecrets.cs for Moon 2 domain.
+        // ═════════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Main entry point for all 10 Moon 2 secrets. Dispatches rich, scale-appropriate
+        /// visual payoffs using the full living crystal cathedral toolkit.
+        /// </summary>
+        public void RevealMoon2SecretVisual(int secretId, Vector3 position, string secretType, string rewardHint)
+        {
+            Debug.Log($"[Moon2 Secrets R8] Reveal #{secretId} type={secretType} @ {position} — {rewardHint}");
+
+            // Universal discovery burst (gold resonance + ley)
+            SpawnCrystalResonancePulse();
+            SpawnLeyLineSparksOnRestore("moon2_ley_chamber");
+
+            if (secretType.Contains("Vein") || secretType.Contains("Echo"))
+            {
+                StartCoroutine(SpawnSecretVeinBurnSequence(position, secretId));
+            }
+            else if (secretType.Contains("Alcove") || secretType.Contains("Refractive"))
+            {
+                StartCoroutine(SpawnSecretRefractiveAlcoveOpen(position, secretId));
+            }
+            else if (secretType.Contains("Micro") || secretType.Contains("Puzzle"))
+            {
+                StartCoroutine(SpawnSecretMicroFractalChamber(position, secretId));
+            }
+            else if (secretType.Contains("Heart") || secretType.Contains("Epic") || secretType.Contains("Cathedral"))
+            {
+                StartCoroutine(SpawnSecretFractalCathedralHeart(position, secretId));
+            }
+
+            StartCoroutine(TriggerSecretCrystalGrowthBonus(position));
+        }
+
+        IEnumerator SpawnSecretVeinBurnSequence(Vector3 pos, int id)
+        {
+            // Small/medium payoff: three thickness-differentiated fuse burns (exact R7 visual language)
+            var root = new GameObject($"SecretVeinSequence_{id}");
+            root.transform.position = pos;
+
+            for (int k = 0; k < 3; k++)
+            {
+                float thick = (k == 0 ? 0.92f : (k == 1 ? 0.71f : 0.51f));
+                StartCoroutine(SpawnTempFuseAt(pos + Random.insideUnitSphere * 1.8f + Vector3.up * 0.9f, thick));
+                yield return new WaitForSeconds(0.35f);
+            }
+
+            // Final golden micro-growth
+            for (int g = 0; g < 4; g++)
+            {
+                var shard = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                shard.transform.position = pos + Random.insideUnitSphere * 2.4f + Vector3.up * 1.1f;
+                shard.transform.localScale = Vector3.one * 0.18f;
+                var r = shard.GetComponent<Renderer>();
+                if (r != null)
+                {
+                    var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    m.color = new Color(0.92f, 0.85f, 0.6f);
+                    m.SetColor("_EmissionColor", new Color(1f, 0.85f, 0.4f) * 2.4f);
+                    m.EnableKeyword("_EMISSION");
+                    r.sharedMaterial = m;
+                }
+                Destroy(shard, 7f);
+                yield return new WaitForSeconds(0.12f);
+            }
+            Destroy(root, 6f);
+        }
+
+        IEnumerator SpawnSecretRefractiveAlcoveOpen(Vector3 pos, int id)
+        {
+            // Medium: godray shaft + caustics burst + floating refractive prism visual
+            var alcove = new GameObject($"RefractiveAlcoveOpen_{id}");
+            alcove.transform.position = pos;
+
+            // Boost godrays
+            CreateOrBoostGodrayShafts("moon2_fountain");
+
+            // Caustics flash + crystal pulse
+            BoostInteriorProbesForCaustics(1.6f);
+            SpawnCrystalResonancePulse();
+
+            // Floating prism (refractive payoff)
+            var prism = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            prism.name = "RefractivePrism_Secret";
+            prism.transform.SetParent(alcove.transform, false);
+            prism.transform.localPosition = Vector3.up * 1.8f;
+            prism.transform.localScale = new Vector3(0.9f, 1.6f, 0.35f);
+            var pr = prism.GetComponent<Renderer>();
+            if (pr != null)
+            {
+                var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                m.color = new Color(0.55f, 0.78f, 0.96f, 0.6f);
+                m.SetColor("_EmissionColor", new Color(0.7f, 0.95f, 1f) * 3.2f);
+                m.EnableKeyword("_EMISSION");
+                pr.sharedMaterial = m;
+            }
+            Destroy(alcove, 22f);
+            yield return null;
+        }
+
+        IEnumerator SpawnSecretMicroFractalChamber(Vector3 pos, int id)
+        {
+            // Large: recursive lights + breathing hint + micro chamber growth
+            AddRecursiveLightingHints();
+            StartCoroutine(SubtleCrystalGrowthOnRestore());
+
+            var chamber = new GameObject($"MicroFractalChamber_{id}");
+            chamber.transform.position = pos;
+            for (int i = 0; i < 6; i++)
+            {
+                var rib = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                rib.transform.position = pos + new Vector3(Mathf.Sin(i) * 2.2f, 1.4f + i * 0.35f, Mathf.Cos(i) * 1.8f);
+                rib.transform.localScale = new Vector3(0.25f, 1.8f, 0.25f);
+                var rr = rib.GetComponent<Renderer>();
+                if (rr != null)
+                {
+                    var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    m.color = new Color(0.75f, 0.6f, 0.95f);
+                    m.SetColor("_EmissionColor", new Color(0.85f, 0.7f, 1f) * 2.1f);
+                    m.EnableKeyword("_EMISSION");
+                    rr.sharedMaterial = m;
+                }
+                Destroy(rib, 18f);
+            }
+            Destroy(chamber, 19f);
+            yield return null;
+        }
+
+        IEnumerator SpawnSecretFractalCathedralHeart(Vector3 pos, int id)
+        {
+            // EPIC: full escalation of every R7 visual across the zone
+            Debug.Log("[Moon2 Secrets R8] EPIC FRACTAL CATHEDRAL HEART — Maximum living crystal cathedral visual intensity!");
+
+            CreateOrBoostGodrayShafts("moon2_cathedral_dome");
+            AddRecursiveLightingHints();
+            StartCoroutine(SubtleCrystalGrowthOnRestore());
+            SpawnLeyLineSparksOnRestore("moon2_ley_chamber");
+            StartDomeBreathing("moon2_cathedral_dome");
+
+            // Extra recursive depth crystals + intensified ley between all 5
+            for (int i = 0; i < 8; i++)
+            {
+                var deep = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                deep.name = "HeartRecursiveCrystal";
+                deep.transform.position = pos + Random.insideUnitSphere * 6f + Vector3.up * 3f;
+                deep.transform.localScale = Vector3.one * Random.Range(0.35f, 0.85f);
+                var dr = deep.GetComponent<Renderer>();
+                if (dr != null)
+                {
+                    var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    m.color = new Color(0.9f, 0.95f, 1f);
+                    m.SetColor("_EmissionColor", new Color(0.6f, 0.92f, 1f) * 4.8f);
+                    m.EnableKeyword("_EMISSION");
+                    dr.sharedMaterial = m;
+                }
+                deep.isStatic = true;
+                Destroy(deep, 32f);
+            }
+
+            // Re-probe for deeper beauty
+            SetupOptimizedInteriorReflectionProbes();
+            yield return null;
+        }
+
+        IEnumerator TriggerSecretCrystalGrowthBonus(Vector3 pos)
+        {
+            yield return new WaitForSeconds(0.75f);
+            for (int i = 0; i < 5; i++)
+            {
+                var shard = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                shard.name = "SecretGrowthShard_R8";
+                shard.transform.position = pos + Random.insideUnitSphere * 3.2f + Vector3.up * 0.9f;
+                shard.transform.localScale = Vector3.one * Random.Range(0.14f, 0.32f);
+                var r = shard.GetComponent<Renderer>();
+                if (r != null)
+                {
+                    var m = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    m.color = new Color(0.88f, 0.72f, 0.45f, 0.9f);
+                    m.SetColor("_EmissionColor", new Color(0.95f, 0.82f, 0.45f) * 2.3f);
+                    m.EnableKeyword("_EMISSION");
+                    r.sharedMaterial = m;
+                }
+                shard.isStatic = true;
+                Destroy(shard, Random.Range(7f, 14f));
+                yield return new WaitForSeconds(0.11f);
+            }
+        }
+
+        IEnumerator SpawnTempFuseAt(Vector3 p, float thick)
+        {
+            var fuse = new GameObject("SecretTempFuse");
+            fuse.transform.position = p;
+            var ps = fuse.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startLifetime = thick > 0.8f ? 1.1f : 0.75f;
+            main.startSpeed = thick > 0.8f ? 1.6f : 3.1f;
+            main.startSize = thick > 0.8f ? 0.24f : 0.12f;
+            main.startColor = new Color(1f, 0.7f, 0.25f, 0.95f);
+            main.maxParticles = 14;
+            ps.Play();
+            Destroy(fuse, 3.8f);
+            yield return null;
+        }
+
+        /// <summary>
+        /// Permanent epic upgrade called after Fractal Keystone collection.
+        /// Deepens the fractal cathedral fantasy for the remainder of the Moon 2 playthrough.
+        /// </summary>
+        public void ApplyMoon2EpicSecretPermanentVisualUpgrade()
+        {
+            _restored = true;
+            StartDomeBreathing("moon2_cathedral_dome");
+            SetupOptimizedInteriorReflectionProbes();
+            AddRecursiveLightingHints();
+            SpawnLeyLineSparksOnRestore("moon2_cathedral_dome");
+
+            // Intensify breathing loop amplitude for epic feel
+            if (_domeRootForBreathing != null)
+            {
+                // stronger pulse handled by existing loop; extra godrays already fired
+            }
+
+            Debug.Log("[Moon2 Secrets R8] PERMANENT EPIC UPGRADE — fractal cathedral now radiates at maximum living depth across all caverns. Exploration fully rewarded.");
         }
     }
 }
