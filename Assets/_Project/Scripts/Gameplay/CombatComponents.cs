@@ -51,7 +51,16 @@ namespace Tartaria.Gameplay
         LivingSludge        = 14, // Moon 11: sentient corruption, regenerates unless purified at source
         SludgeLeviathan     = 15, // Moon 11 boss: massive corruption entity in deepest aquifer
         TitanGolem          = 16, // Moon 7,12: 20ft giant requiring Giant Mode
-        FrequencyWraith     = 17  // Moon 7-11: shifts frequency every 5s mid-combat
+        FrequencyWraith     = 17, // Moon 7-11: shifts frequency every 5s mid-combat
+
+        // ─── Moon 2 Crystalline Caverns Exclusive (Corruption / Crystal / Dissonance theme) ───
+        // These use the environment (crystals, veins, wind, gravity wells, narrow corridors)
+        // to create distinct, memorable encounters unlike Echohaven mud arenas or Moon 3 rail escorts.
+        CrystalShardling      = 18, // Moon 2: fragile swarming shards that cluster in corridors and on veins; shatter on matched frequency
+        VeinCrawler           = 19, // Moon 2: burrows/drags along corruption veins, gravity drops from ceilings, latches + drains
+        ResonanceDisruptor    = 20, // Moon 2: crystal singer emits scrambling pulses; acoustics in caverns amplify in narrow spaces
+        WindveilPhantom       = 21, // Moon 2: wind-current propelled crystal wraith; intangible/fast in gusts, ranged shard volleys
+        GravityPillar         = 22  // Moon 2: rooted crystal anchor; creates shifting gravity wells; toppled by Giant Mode or 9-band combos
     }
 
     public struct EnemyTag : IComponentData
@@ -269,6 +278,97 @@ namespace Tartaria.Gameplay
         public float ShiftTimer;
         public float FrequencyTolerance;       // Hz window for player to match
         public bool IsVulnerable;              // True when player matches frequency
+    }
+
+    // ─── Moon 2 Crystalline Caverns Exclusive Enemy Components ─────────────────
+    // Theme: Corruption crystals + dissonance. Environment is a combatant.
+    // Narrow corridors amplify swarms and echoes. Veins provide pathing/high ground.
+    // Wind gusts and gravity wells force positioning and timing mastery.
+    // Distinct from Echohaven (open mud brawls) and Moon 3 (linear rail defense).
+    // Integrate with frequency system (unique weakness Hz) and Giant Mode (stomps topple pillars).
+
+    /// <summary>
+    /// CrystalShardling — Moon 2 swarm enemy. Fragile crystal fragments that cluster
+    /// aggressively in narrow corridors and along veins. Individually weak but deadly in numbers.
+    /// Death can leave temporary resonant spike hazards. Shatters spectacularly on correct frequency.
+    /// </summary>
+    public struct CrystalShardling : IComponentData
+    {
+        public float AttackDamage;             // 6 — low per hit, high volume
+        public float MoveSpeed;                // 4.2f — fast skitter
+        public float SwarmRadius;              // 4m — stay close for pack bonus damage + slow aura
+        public float ShatterFreq;              // 528 Hz (Green) — primary weakness per frequency table
+        public float HazardChance;             // 0.25 — on death, small crystal hazard spawns (env obstacle)
+        public float PackBonus;                // Damage multiplier when 4+ nearby
+    }
+
+    /// <summary>
+    /// VeinCrawler — Moon 2 ambush predator. Travels exclusively along fractal corruption veins
+    /// (environment pathing). Uses gravity anomalies to drop/swing from ceiling veins.
+    /// Latches to player and drains Aether + applies brief dissonance (freq scramble).
+    /// </summary>
+    public struct VeinCrawler : IComponentData
+    {
+        public float AttackDamage;             // 14
+        public float MoveSpeed;                // 3.8f on veins (faster than off)
+        public float DrainRate;                // Aether/s when latched
+        public float LatchDuration;            // 3s before auto-release unless pried
+        public float GravityDropCooldown;      // Uses cavern gravity shifts for ambushes
+        public float DislodgeFreq;             // 396 Hz (Yellow) — shakes it off veins
+        public bool IsLatched;                 // State
+        public float3 CurrentVeinTarget;       // Follows visible corruption veins in level
+    }
+
+    /// <summary>
+    /// ResonanceDisruptor — Moon 2 support caster. Geometric crystal "singer" that emits
+    /// corrupting overtones. Scrambles the player's active frequency wheel temporarily.
+    /// Cavern acoustics (narrow corridors, crystal walls) cause pulses to echo and affect larger area.
+    /// Can be silenced into a temporary healing beacon on correct counter-frequency.
+    /// </summary>
+    public struct ResonanceDisruptor : IComponentData
+    {
+        public float AttackDamage;             // 10 — light contact
+        public float MoveSpeed;                // 2.2f — hovers slowly
+        public float PulseCooldown;            // 4.5s between dissonance pulses
+        public float PulseTimer;
+        public float ScrambleDuration;         // 1.8s — player freq forced random wrong
+        public float EchoAmplifyFactor;        // 1.6x radius in corridors or near intact crystals
+        public float SilenceFreq;              // 741 Hz (Indigo) turns it into +heal beacon 6s
+        public bool IsSilenced;                // Becomes ally beacon
+    }
+
+    /// <summary>
+    /// WindveilPhantom — Moon 2 ranged wraith variant. Crystal dust wraith that rides
+    /// natural wind currents and vents in the caverns. Becomes fast/intangible while in gusts.
+    /// Fires boosted crystal shard projectiles. Uses side wind tunnels for flanking in complex cavern layouts.
+    /// </summary>
+    public struct WindveilPhantom : IComponentData
+    {
+        public float AttackDamage;             // 15
+        public float MoveSpeed;                // 3.5f base; +2.5f in wind
+        public float WindBoost;                // Multiplier when environment wind active
+        public bool IsIntangible;              // During gusts — dodges projectiles
+        public float MaterializeTimer;         // Window to fire volleys
+        public float ProjectileSpeed;          // Wind-boosted shards
+        public float GustAffinity;             // Seeks wind tunnels for advantage
+    }
+
+    /// <summary>
+    /// GravityPillar — Moon 2 heavy tank/anchor. Massive rooted crystal obelisk that generates
+    /// localized gravity distortion fields. Pulls player and light enemies toward it (or repels),
+    /// turning narrow corridors and dead-ends into deathtraps. Requires Giant Mode ground slam
+    /// or perfect 9-band combo to topple and expose weak core. Perfect for Giant Mode integration.
+    /// </summary>
+    public struct GravityPillar : IComponentData
+    {
+        public float AttackDamage;             // 28 — heavy slam when close
+        public float MoveSpeed;                // 1.8f — very slow, rooted
+        public float GravityWellRadius;        // 12m — shifting pull field
+        public float PullStrength;             // Force applied toward/away pillar
+        public float ToppleHPThreshold;        // When reduced to this, topples (expose core)
+        public bool IsToppled;                 // Core vulnerable, no more gravity
+        public bool RequiresGiantMode;         // Giant stomp or 9-band combo to topple faster
+        public float CoreVulnerabilityMult;    // 3.0x when toppled
     }
 
     // ─── Knockback + Hitstun ─────────────────────

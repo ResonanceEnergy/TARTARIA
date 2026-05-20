@@ -243,6 +243,9 @@ namespace Tartaria.Gameplay
     /// Enemy Spawn System — spawns enemies when RS thresholds are crossed.
     /// Phase 1: 1 Mud Golem each at RS 25, 50, 75.
     /// Uses deferred structural changes to avoid modifying entities mid-iteration.
+    ///
+    /// Moon 2: Now spawns Crystal Caverns themed enemies (Shardling, VeinCrawler, etc.)
+    /// when appropriate moon context triggers them via CombatWaveManager / MoonMechanicActivator.
     /// </summary>
     [UpdateInGroup(typeof(SimulationSystemGroup))]
     [BurstCompile]
@@ -378,6 +381,80 @@ namespace Tartaria.Gameplay
                     hp = 75f; moveSpeed = 3.6f; freq = 200f;
                     em.AddComponentData(entity, new FrequencyWraith { AttackDamage = 20f, MoveSpeed = 3.6f, FrequencyShiftInterval = 5f, FrequencyTolerance = 15f });
                     break;
+
+                // ─── Moon 2 Crystalline Caverns Exclusive (Corruption/Crystal/Dissonance) ───
+                // These enemies are ONLY used for Moon 2. They leverage crystals, veins,
+                // wind tunnels, gravity anomalies and narrow corridors for unique danger.
+                // Frequency weaknesses chosen to teach the 6-band table. GravityPillar + Giant Mode synergy.
+                case EnemyType.CrystalShardling:
+                    hp = 22f; moveSpeed = 4.2f; freq = 528f; // Green — perfect shatter on match
+                    em.AddComponentData(entity, new CrystalShardling
+                    {
+                        AttackDamage = 6f,
+                        MoveSpeed = 4.2f,
+                        SwarmRadius = 4f,
+                        ShatterFreq = 528f,
+                        HazardChance = 0.25f,
+                        PackBonus = 1.6f
+                    });
+                    break;
+                case EnemyType.VeinCrawler:
+                    hp = 55f; moveSpeed = 3.8f; freq = 396f; // Yellow — dislodge key
+                    em.AddComponentData(entity, new VeinCrawler
+                    {
+                        AttackDamage = 14f,
+                        MoveSpeed = 3.8f,
+                        DrainRate = 4f,
+                        LatchDuration = 3f,
+                        GravityDropCooldown = 6f,
+                        DislodgeFreq = 396f,
+                        IsLatched = false,
+                        CurrentVeinTarget = trigger.SpawnPosition
+                    });
+                    break;
+                case EnemyType.ResonanceDisruptor:
+                    hp = 65f; moveSpeed = 2.2f; freq = 741f; // Indigo — silence = beacon
+                    em.AddComponentData(entity, new ResonanceDisruptor
+                    {
+                        AttackDamage = 10f,
+                        MoveSpeed = 2.2f,
+                        PulseCooldown = 4.5f,
+                        PulseTimer = 2f,
+                        ScrambleDuration = 1.8f,
+                        EchoAmplifyFactor = 1.6f,
+                        SilenceFreq = 741f,
+                        IsSilenced = false
+                    });
+                    break;
+                case EnemyType.WindveilPhantom:
+                    hp = 48f; moveSpeed = 3.5f; freq = 285f; // Orange — wind synergy
+                    em.AddComponentData(entity, new WindveilPhantom
+                    {
+                        AttackDamage = 15f,
+                        MoveSpeed = 3.5f,
+                        WindBoost = 2.8f,
+                        IsIntangible = false,
+                        MaterializeTimer = 0f,
+                        ProjectileSpeed = 12f,
+                        GustAffinity = 1f
+                    });
+                    break;
+                case EnemyType.GravityPillar:
+                    hp = 280f; moveSpeed = 1.8f; freq = 0f; // Dissonant black — multi-band or Giant
+                    attackRange = 6f;
+                    em.AddComponentData(entity, new GravityPillar
+                    {
+                        AttackDamage = 28f,
+                        MoveSpeed = 1.8f,
+                        GravityWellRadius = 12f,
+                        PullStrength = 9f,
+                        ToppleHPThreshold = 90f,
+                        IsToppled = false,
+                        RequiresGiantMode = true,
+                        CoreVulnerabilityMult = 3.0f
+                    });
+                    break;
+
                 default:
                     em.AddComponentData(entity, new MudGolem { AttackWindup = 1f, AttackDamage = 20f, StunDuration = 2f, PatrolRadius = 20f });
                     break;
