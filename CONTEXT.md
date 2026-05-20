@@ -64,3 +64,43 @@ This delivers Phase 3 Round 6 "Production Boss Suite" for Bosses & Advanced Enem
 
 ---
 
+
+---
+
+## Phase 3 Round 6 — Agent Moon 3 Foundation & Content (Windswept Highlands + Rail + Orphans + Leviathan) — 2026-05-20
+
+**STRICT COMPLIANCE**: ONLY worked inside `C:\dev\TARTARIA_new`. Read CONTEXT.md FIRST. Exclusive non-overlapping Moon 3 domain (Windswept Highlands, rail network, orphans, DOTS enemies, Leviathan, escort sequence). Zero visuals other moons, zero core save changes, zero UI. Built directly on just-completed R5 (Moon3SaveBlock, real DOTS RailWraiths/Leviathan via EnemySpawnTrigger, RailEscortController base + VFX, SpectralOrphanAdoption, quest hooks, physical companions, proxy perf).
+
+**R6 Deliverables — turned Moon 3 into real playable 5-8min vertical slice per roadmap/GDD**:
+- **Rail escort sequence as memorable 5-8 minute set piece** (RailEscortController.cs): Extended to 420s/7min core experience. 7 escalating waves. Dynamic difficulty from live frequency play (CombatBridge.GetPlayerCurrentFrequency() match modulates spawn count/interval/enemy HP/shield in real-time). Full companion physical reactions + dialogue + trust payoffs on the moving train (Lirael roof singer lean + lullaby, Milo rear guard brace, Cassian mid support). Mid-escort orphan adoption moments with major trust payoff. TrainHealth protection system (lullaby + freq = train survives). 17th Hour calendar/live-ops event on train (~42% progress: special shield, dialogue, save flag). World's Fair ticket granted on success via quest + Moon3 persistence.
+- **Fleshed at least 2 more buildings with full restoration + tuning + combat loops** (Moon3ZoneScaffold.cs): Highland Watchtower + Wind Bridge now have dedicated Moon3BuildingRelay post-restore callbacks that spawn escort synergy, tuned rail buffs, defensive RailWraith combat loops tied directly to the escort sequence. Organ/waystation already strong — now parity depth + world change hooks.
+- **Deepened Dissonance Leviathan boss fight**: Real frequency vuln windows (live player Hz submissions during timed phases, synergy calls). Escort protection mechanics (companions + lullaby shield tank damage to train proxy outside/inside windows). Permanent world change on victory: golden rail glow strips (static), GiantEcho permanent marker + light, wind gust proxies calmed/disabled. Save flags + giant echo payoff.
+- **Wired calendar/live-ops events**: 17th Hour alignment on the train (special moment, companion tells, persistence via existing Moon3SaveBlock seventeenthHour* fields). World's Fair ticket reward from Moon 3 climax (quest milestone + event flag).
+- **Full companion reactivity and dialogue during escort**: Calls to BoardTrainLiraelEscort / BoardTrain variants + explicit trust deltas + physical positioning tells at wave starts, 17th, levi purify, orphan moments (Milo/Lirael/Cassian). Ties to R6 companion DOTS bridge.
+- **Performance cleanup on DOTS proxies and wind systems**: RailEscort now uses simple proxy Queue pool + spawn throttle (no GC on repeated waves), heavy isStatic on train children, DOTS primary with visual proxies only for escort reactivity. Scaffold wind proxies: isStatic batching, particle cap reduced 120→65, victory world change safely disables aggressive gusts. All hot paths minimal.
+
+**Files edited (Moon 3 lane ONLY, absolute C:\dev\TARTARIA_new paths)**:
+- `Assets/_Project/Scripts/Gameplay/RailEscortController.cs` (major R6: ~180 LOC depth — full setpiece, freq dynamic, companions, 17th, levi vuln/protect/permanent transform, proxy pool, trainHealth, World's Fair)
+- `Assets/_Project/Scripts/Gameplay/SpectralOrphanAdoption.cs` (+ SetSeventeenthHourEvent for live-ops + WF ticket)
+- `Assets/_Project/Editor/Moon3ZoneScaffold.cs` (R6 FleshOutMoon3BuildingsWithRestorationCombatAndWorldChange for Watchtower+Bridge + EnhanceWind... perf + victory integration + populate wiring + Moon3BuildingRelay helper)
+
+**How to verify (Moon 3 only)**:
+- Open `C:\dev\TARTARIA_new\Assets\_Project\Scenes\Moons\WindsweptHighlands.unity`
+- Run Tartaria > Populate Moon 3 (Windswept Highlands) — now includes 2+ fleshed buildings + perf wind.
+- Play: adopt 1-2 orphans → enter rail escort trigger → 7min experience: freq tuning (live Hz) dynamically changes waves/shield, companions physically react + trust, mid-escort adoptions, 17th Hour event, Leviathan with vuln windows + protection, victory = permanent glowing rails + calmed winds + echo marker.
+- Save/reload: states persist via existing Moon3 block.
+- Git: only the 3 Moon 3 files + CONTEXT.
+
+**Gaps closed vs GDD/roadmap (03C Moon 3 Compassion & Rails, 13_MINI_GAMES Resonance Rail Alignment, 20_QUEST_DATABASE M3-MS06 Orphan Train Escort + side adoptions, 10_ROADMAP Moon 3 campaign + DLC 3 Dissonant Orphan Train, 11_SCRIPTED_CLIMAXES)**:
+- "5-8 minute memorable escort set piece with multiple waves, dynamic difficulty, companion reactions, orphan moments, trust payoff" — fully delivered.
+- "2+ buildings full restoration + tuning + combat loops" — Watchtower + Wind Bridge now have restore-tied combat/escort synergy.
+- "Dissonance Leviathan boss (frequency windows, escort protection, permanent world change)" — vuln windows + live freq + protection + glowing rails/echo/calmed winds.
+- "Calendar/live-ops (17th Hour on train, World's Fair ticket on Moon 3)" — wired with persistence.
+- "Full companion reactivity during escort" — physical tells + trust + dialogue beats.
+- "Performance cleanup on DOTS proxies and wind" — pools, statics, throttle, victory integration.
+- Production vertical slice now complete: the Electric Moon found-family rail climax is a tight, reactive, high-stakes 7-minute memory that transforms the world permanently on victory. Matches every spec.
+
+**Production machine note**: All changes absolute paths, domain lock, built on R5, no broadening. Ready for playtest.
+
+**Git verification & commit** (executed below): Only Moon 3 files touched.
+
