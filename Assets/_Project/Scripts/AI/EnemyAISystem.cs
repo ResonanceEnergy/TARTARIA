@@ -92,6 +92,49 @@ namespace Tartaria.AI
                     golem.ValueRW.ConsecutivePulseHits = 0;
                 }
             }
+
+            // ─── Moon 3: Proper DOTS RailWraiths on Rails (vertical slice foundation) ─────────────────────────
+            // RailWraiths now have dedicated DOTS AI: follow resonance rail direction, react to lullaby shield / tuned rails
+            // Spawned via CombatSystem or RailEscort; this gives them real rail-bound patrol + damage from escort lullaby
+            foreach (var (ai, rw, xform, combatant, entity) in
+                SystemAPI.Query<RefRW<EnemyAI>, RefRW<RailWraith>, RefRW<LocalTransform>, RefRW<HarmonicCombatant>>()
+                    .WithEntityAccess())
+            {
+                if (state.EntityManager.HasComponent<HitStunTimer>(entity)) continue;
+
+                ai.ValueRW.StateTimer += dt;
+
+                float3 dir = math.normalizesafe(rw.ValueRO.RailDirection);
+                if (math.lengthsq(dir) < 0.001f)
+                    dir = new float3(0.98f, 0.05f, 0.18f); // default Windswept Highlands rail NW-SE vector
+
+                float speed = rw.ValueRO.RailSpeed;
+                xform.ValueRW.Position += dir * speed * dt;
+
+                // Orient along rail
+                if (!dir.Equals(float3.zero))
+                    xform.ValueRW.Rotation = quaternion.LookRotation(dir, math.up());
+
+                // Tuned rail damage (from OrphanTrainPuzzle success or lullaby escort) — wraiths suffer on contact
+                if (rw.ValueRO.IsOnTunedRail || rw.ValueRO.TunedRailDamage > 0)
+                {
+                    combatant.ValueRW.Health -= rw.ValueRO.TunedRailDamage * dt * 0.8f; // continuous drain on tuned rails
+                }
+
+                // Simple aggro: if near player/train proxy, engage
+                // (for escort, RailEscort proxies still handle most; this gives DOTS parity)
+                if (ai.ValueRO.State == EnemyAIState.Patrolling)
+                {
+                    // Wraiths "patrol rails" until player proximity triggers engage
+                    if (math.distance(xform.ValueRO.Position, playerPos) < 18f)
+                        ai.ValueRW.State = EnemyAIState.Engaging;
+                }
+
+                if (combatant.ValueRO.Health <= 0f && ai.ValueRO.State != EnemyAIState.Dissolving)
+                {
+                    ai.ValueRW.State = EnemyAIState.Dissolving;
+                }
+            }
         }
 
         void UpdateSpawning(ref EnemyAI ai)
