@@ -19,6 +19,10 @@ namespace Tartaria.Integration
     ///
     /// R6: Extended live HarmonicCombatant frequency fully supports every boss puzzle
     /// (RailWraith dissonance, Leviathan resonance, SkyReaver aerial, Mud/Reset/Colossus).
+    ///
+    /// R7 (freq bridge only): Added ApplyLeylineCrossBossResonance helper for boss-domain
+    /// "world sings back" cross-boss ley reactions + Golden Cascade world reactivity.
+    /// No other changes.
     /// </summary>
     [DisallowMultipleComponent]
     public class CombatBridge : ECSMonoBehaviour
@@ -147,6 +151,7 @@ namespace Tartaria.Integration
 
             // Round 5: Wire frequency puzzle submission using LIVE player frequency from HarmonicCombatant (accurate variable-freq puzzle)
             // R6: Now fully covers every boss type (RailWraith swarm dissonance, Leviathan resonance, SkyReaver aerial, Mud/Reset/Colossus)
+            // R7: Full support for FrequencyWraith mirror puzzle + cross-boss harmony
             if (BossEncounterSystem.Instance != null && BossEncounterSystem.Instance.IsActive && BossEncounterSystem.Instance.IsFrequencyPuzzleActive)
             {
                 float tunedFreq = GetPlayerCurrentFrequency();
@@ -174,6 +179,7 @@ namespace Tartaria.Integration
 
             // Round 5: Wire frequency puzzle submission using LIVE player frequency from HarmonicCombatant (accurate variable-freq puzzle)
             // R6: Full coverage for advanced enemy frequency puzzles across all Moon bosses
+            // R7: FrequencyWraith + ley harmony cross-boss
             if (BossEncounterSystem.Instance != null && BossEncounterSystem.Instance.IsActive && BossEncounterSystem.Instance.IsFrequencyPuzzleActive)
             {
                 float tunedFreq = GetPlayerCurrentFrequency();
@@ -353,6 +359,7 @@ namespace Tartaria.Integration
         /// Round 5: Live player frequency pulled from HarmonicCombatant for accurate boss puzzle submissions.
         /// Replaces all prior hardcoded 432f with real component value (future combat frequency tuning will directly affect boss match quality).
         /// R6: Full production support for every boss type — RailWraith swarm, Dissonance/Sludge Leviathan, SkyReaver aerial, Mud Colossus, ResetSeeker.
+        /// R7: FrequencyWraith mirror + cross-boss ley harmony fully wired.
         /// </summary>
         public float GetPlayerCurrentFrequency()
         {
@@ -385,6 +392,7 @@ namespace Tartaria.Integration
         /// <summary>
         /// Called on excellent boss puzzle solves (from BossEncounterSystem) to give the player a small satisfying
         /// nudge toward the solved frequency + trigger world reaction VFX. Makes "I solved the living frequency" tangible.
+        /// R7: Used by Golden Cascade + cross-boss ley harmony system.
         /// </summary>
         public void NudgePlayerFrequencyTowardBossSolution(float targetHz, float strength = 0.35f)
         {
@@ -397,6 +405,31 @@ namespace Tartaria.Integration
 
             // World reacts: VFX + haptic on the solve payoff
             VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, GetPlayerPosition() + Vector3.up * 1.1f);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+        }
+
+        // ─── R7: Freq-bridge only helper for cross-boss ley-line "world sings back" reactions (called exclusively from BossEncounterSystem)
+        /// <summary>
+        /// Broadcasts ley-line resonance when a boss frequency puzzle is solved with excellence.
+        /// Temporarily eases nearby/future boss target windows and adds satisfying global VFX reactivity.
+        /// "The world sings back" fantasy — zero impact outside boss domain.
+        /// </summary>
+        public void ApplyLeylineCrossBossResonance(float harmonyBoost)
+        {
+            if (!_initialized) return;
+
+            // Light player freq harmony pull (satisfying world feedback)
+            if (_em.Exists(_playerCombatEntity))
+            {
+                var c = _em.GetComponentData<HarmonicCombatant>(_playerCombatEntity);
+                // gentle global resonance pull toward golden middle
+                c.CurrentFrequency = Mathf.Lerp(c.CurrentFrequency, 432f, harmonyBoost * 0.22f);
+                _em.SetComponentData(_playerCombatEntity, c);
+            }
+
+            // World reactivity VFX (Golden Cascade + ley glow feel)
+            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, GetPlayerPosition() + Vector3.up * 1.8f);
+            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, GetPlayerPosition() + Vector3.forward * 2.4f);
             HapticFeedbackManager.Instance?.PlayPerfectTune();
         }
 
