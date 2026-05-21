@@ -69,6 +69,13 @@ namespace Tartaria.Integration
 
         void OnEnable()
         {
+            // Moon 1 Echohaven FTUE: defer to TutorialSystem (primary modern onboarding per 27_TUTORIAL) to avoid prompt conflicts
+            if (TutorialSystem.Instance != null && !TutorialSystem.Instance.IsComplete)
+            {
+                Debug.Log("[TutorialController] Legacy controller deferring to TutorialSystem for Echohaven onboarding coherence.");
+                return;
+            }
+
             // Wire player spawn event
             var spawner = FindFirstObjectByType<PlayerSpawner>();
             if (spawner != null)

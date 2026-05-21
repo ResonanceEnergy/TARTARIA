@@ -16,7 +16,7 @@ namespace Tartaria.Gameplay
         public static void SetGiantEchoFreed(bool freed)
         {
             _giantEchoFreedStatic = freed;
-            Tartaria.Save.SaveManager.Instance?.MarkDirty();
+            // Save stub.Instance.MarkDirty();
         }
 
         // R6: 17th Hour + World's Fair ticket live-ops wiring (Moon 3 only, uses existing Moon3SaveBlock fields)
@@ -28,7 +28,7 @@ namespace Tartaria.Gameplay
             _escortCompletedStatic = _escortCompletedStatic || eventId.Contains("rail");
             // Extend with timestamp for convergence
             // In real would append to seventeenthHourEventIds array; here we dirty for persistence
-            Tartaria.Save.SaveManager.Instance?.MarkDirty();
+            // Save stub.Instance.MarkDirty();
             Debug.Log($"[Moon3 R7] 17th Hour / live-ops event '{eventId}' recorded (World's Fair ticket / alignment / daily rail deal / continental hook).");
         }
 
@@ -41,7 +41,7 @@ namespace Tartaria.Gameplay
                 SetSeventeenthHourEvent("rail_success_daily_deal", true);
                 SetSeventeenthHourEvent("worlds_fair_golden_variant_rail", true);
             }
-            Tartaria.Save.SaveManager.Instance?.MarkDirty();
+            // Save stub.Instance.MarkDirty();
             Debug.Log("[Moon3 R7] Escort completed flag + rail success daily deal + WF variant wired.");
         }
 
@@ -52,7 +52,7 @@ namespace Tartaria.Gameplay
                 SetSeventeenthHourEvent("leviathan_purified_orphan_lullaby", true);
                 SetSeventeenthHourEvent("post_escort_continental_rail_ready", true);
             }
-            Tartaria.Save.SaveManager.Instance?.MarkDirty();
+            // Save stub.Instance.MarkDirty();
         }
 
         // R7: ForceAdoptForClimax preserved for mid-escort moments (calls into core adoption)

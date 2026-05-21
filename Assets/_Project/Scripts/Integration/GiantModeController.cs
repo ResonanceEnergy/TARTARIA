@@ -642,7 +642,9 @@ namespace Tartaria.Integration
                 totalActivations = _totalActivations,
                 buildingsLifted = _buildingsLifted,
                 rubbleCleared = _rubbleCleared,
-                totalTimeAsGiant = _totalTimeAsGiant
+                totalTimeAsGiant = _totalTimeAsGiant,
+                isActiveOnSave = _isGiant,
+                aetherOnSave = _aetherCharge
             };
         }
 
@@ -653,6 +655,19 @@ namespace Tartaria.Integration
             _buildingsLifted = data.buildingsLifted;
             _rubbleCleared = data.rubbleCleared;
             _totalTimeAsGiant = data.totalTimeAsGiant;
+
+            // Echohaven Moon1 giant polish + save persistence (v14+): restore active giant state + aether so power fantasy + abilities survive reload without crash or lost scale.
+            if (data.isActiveOnSave && data.aetherOnSave > 0f)
+            {
+                _isGiant = true;
+                _aetherCharge = data.aetherOnSave;
+                _targetScale = giantScale;
+                _currentScale = giantScale;
+                if (playerTransform != null) playerTransform.localScale = Vector3.one * giantScale;
+                cameraController?.SetGiantMode(true);
+                CombatBridge.Instance?.SetGiantMode(true);
+                Debug.Log("[GiantMode] Restored active Giant state from save (Echohaven persistence).");
+            }
         }
     }
 

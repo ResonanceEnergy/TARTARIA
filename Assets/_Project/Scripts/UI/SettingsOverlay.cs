@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.InputSystem;
+using Tartaria.Core;
 
 namespace Tartaria.UI
 {
@@ -214,6 +215,27 @@ namespace Tartaria.UI
             }
             row += 28;
 
+            // Round 4: Hardware Tier + Fallback UI feedback (persisted + auto)
+            GUI.Label(new Rect(lx, row, 260, 24), $"Hardware Tier (auto): {GetCurrentPerfTier()}");
+            row += 22;
+            int fb = PlayerPrefs.GetInt("TARTARIA_FallbackCount", 0);
+            GUI.Label(new Rect(lx, row, 260, 22), $"Auto-Fallbacks: {fb} (persisted)");
+            row += 22;
+            if (GUI.Button(new Rect(lx, row, 180, 20), "Force Tier Downgrade"))
+            {
+                GameBootstrap.TriggerAutoQualityFallback("Manual UI downgrade (dev)");
+            }
+            row += 24;
+
+            // Round 5: Dynamic runtime tier switches (production hardening, no restart)
+            GUI.Label(new Rect(lx, row, 260, 20), "Runtime Tier Switch:");
+            row += 20;
+            if (GUI.Button(new Rect(lx, row, 60, 18), "Low")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Low); }
+            if (GUI.Button(new Rect(lx + 65, row, 60, 18), "Med")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Medium); }
+            if (GUI.Button(new Rect(lx + 130, row, 60, 18), "High")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.High); }
+            if (GUI.Button(new Rect(lx + 195, row, 60, 18), "Ultra")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Ultra); }
+            row += 24;
+
             // Fullscreen
             bool newFS = GUI.Toggle(new Rect(lx, row, 200, 22), _fullscreen, "Fullscreen");
             if (newFS != _fullscreen) { _fullscreen = newFS; }
@@ -311,6 +333,16 @@ namespace Tartaria.UI
                 t.GetMethod(method)?.Invoke(inst, new[] { enumVal });
             }
             catch (System.Exception ex) { Debug.LogWarning($"[SettingsOverlay] TryInvokeEnum({typeName}.{method}) failed: {ex.Message}"); }
+        }
+
+        // Round 4/5 Perf UI feedback helper — prefers live profile from bootstrap for dynamic switches
+        static string GetCurrentPerfTier()
+        {
+            var live = GameBootstrap.GetActivePerformanceProfile();
+            if (live != null) return live.GetTierSummary();
+            int saved = PlayerPrefs.GetInt("TARTARIA_ActivePerfTier", PlayerPrefs.GetInt("TARTARIA_LastHardwareTier", 1));
+            var t = (PerformanceProfile.HardwareTier)Mathf.Clamp(saved, 0, 3);
+            return t.ToString();
         }
     }
 }

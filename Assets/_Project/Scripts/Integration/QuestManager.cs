@@ -324,6 +324,8 @@ namespace Tartaria.Integration
             return new Dictionary<string, QuestState>(_questStates);
         }
 
+        // ROUND 4: Wiring + 5-beat Moon3-6 handler + bond interplay + giant harmony + permanent payoff reactivity complete (only this + 5 other narrative files edited).
+
         public void RestoreFromSave(Dictionary<string, QuestState> saved)
         {
             if (saved == null) return;

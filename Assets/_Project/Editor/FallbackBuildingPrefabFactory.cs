@@ -8,6 +8,9 @@ namespace Tartaria.Editor
     /// Factory for creating fallback building placeholder prefabs.
     /// Menu: Tartaria → Build → Create Fallback Building Prefabs
     /// CLI: Unity -executeMethod Tartaria.Editor.FallbackBuildingPrefabFactory.CreateAll
+    /// 
+    /// Note: Placeholders are name-based fallbacks used by BuildingSpawner/EchohavenContentSpawner.
+    /// No runtime tag component needed (removed to avoid editor-only script references in prefabs).
     /// </summary>
     public static class FallbackBuildingPrefabFactory
     {
@@ -46,10 +49,6 @@ namespace Tartaria.Editor
             var renderer = go.GetComponent<Renderer>();
             renderer.sharedMaterial = mat;
 
-            // Tag identifier
-            var tag = go.AddComponent<FallbackBuildingTag>();
-            tag.buildingType = "StarDome";
-
             SavePrefab(go, "StarDome_Placeholder.prefab");
         }
 
@@ -68,10 +67,6 @@ namespace Tartaria.Editor
 
             var renderer = go.GetComponent<Renderer>();
             renderer.sharedMaterial = mat;
-
-            // Tag identifier
-            var tag = go.AddComponent<FallbackBuildingTag>();
-            tag.buildingType = "HarmonicFountain";
 
             SavePrefab(go, "HarmonicFountain_Placeholder.prefab");
         }
@@ -92,10 +87,6 @@ namespace Tartaria.Editor
             var renderer = go.GetComponent<Renderer>();
             renderer.sharedMaterial = mat;
 
-            // Tag identifier
-            var tag = go.AddComponent<FallbackBuildingTag>();
-            tag.buildingType = "CrystalSpire";
-
             SavePrefab(go, "CrystalSpire_Placeholder.prefab");
         }
 
@@ -106,13 +97,5 @@ namespace Tartaria.Editor
             Object.DestroyImmediate(go);
             Debug.Log($"[FallbackBuildingPrefabFactory] Saved {path}");
         }
-    }
-
-    /// <summary>
-    /// Simple tag component to identify fallback building prefabs.
-    /// </summary>
-    public class FallbackBuildingTag : MonoBehaviour
-    {
-        public string buildingType;
     }
 }

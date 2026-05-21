@@ -144,7 +144,8 @@ namespace Tartaria.Integration
 
             var playerPos = GetPlayerPosition();
             float dmgMod = 1f;
-            var skillMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.ResonanceDamage) ?? 0f;
+            // Fixed: use PulseDamage (Echohaven Spire E_SpireResonance +10% + Guardian nodes) instead of removed ResonanceDamage. Ties Moon1 blessings to combat feel.
+            var skillMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.PulseDamage) ?? 0f;
             dmgMod += skillMod;
 
             DamageNearbyEnemies(playerPos, pulseRange, pulseDamage * dmgMod, DamageType.ResonancePulse);
@@ -170,12 +171,13 @@ namespace Tartaria.Integration
 
             var playerPos = GetPlayerPosition();
             var forward = GetPlayerForward();
-            float rangeMod = 1f;
+            float rangeMod = 1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.StrikeRange) ?? 0f);
             float dmgMod = 1f;
-            var skillMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.HarmonicDamage) ?? 0f;
+            // Fixed: use PulseDamage (aligns E_SpireResonance blessing + Pulse nodes) for strike damage; range now correctly uses StrikeRange skill. Removes broken HarmonicDamage ref.
+            var skillMod = Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.PulseDamage) ?? 0f;
             dmgMod += skillMod;
 
-            DamageEnemiesInCone(playerPos, forward, strikeRange * rangeMod, 60f, strikeDamage, DamageType.HarmonicStrike);
+            DamageEnemiesInCone(playerPos, forward, strikeRange * rangeMod, 60f, strikeDamage * dmgMod, DamageType.HarmonicStrike);
 
             // Round 5: Wire frequency puzzle submission using LIVE player frequency from HarmonicCombatant (accurate variable-freq puzzle)
             // R6: Full coverage for advanced enemy frequency puzzles across all Moon bosses

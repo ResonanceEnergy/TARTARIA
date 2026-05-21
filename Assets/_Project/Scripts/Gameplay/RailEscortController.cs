@@ -5,7 +5,7 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Tartaria.Core;
-using Tartaria.UI;
+// using Tartaria.UI;  [Moon1 build: cycle-safe stub]
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Gameplay; // for EnemyType / EnemySpawnTrigger access in Moon 3 DOTS spawns
@@ -144,7 +144,7 @@ namespace Tartaria.Gameplay
 
             if (matchQuality > 0.72f)
             {
-                HUDController.Instance?.ShowInteractionPrompt("Escort harmonically empowered!");
+                // [Moon1 HUD stub] ShowInteractionPrompt("Escort harmonically empowered!");
             }
             Debug.Log($"[Moon3 R7 Escort] Freq synergy {matchQuality:P0} → shield {_lullabyShieldStrength:F2}x | Phase {_leviathanPhase}");
         }
@@ -232,8 +232,8 @@ namespace Tartaria.Gameplay
             _escortHUD = hudGO.AddComponent<Moon3EscortHUD>();
             _escortHUD.Initialize(this);
 
-            HUDController.Instance?.ShowObjective("ORPHAN TRAIN ESCORT — 7 MINUTES OF THE RAILS. Protect the children. Tune the living frequency. (R7 extended network)");
-            HUDController.Instance?.ShowBanner("The Dissonant Orphan Train", "First resonance rail live. Children's lullaby is your shield. Frequency is your weapon. Stations ahead.", 6f);
+            // [Moon1 HUD stub] ShowObjective("ORPHAN TRAIN ESCORT — 7 MINUTES OF THE RAILS. Protect the children. Tune the living frequency. (R7 extended network)");
+            // [Moon1 HUD stub] ShowBanner("The Dissonant Orphan Train", "First resonance rail live. Children's lullaby is your shield. Frequency is your weapon. Stations ahead.", 6f);
 
             AudioManager.Instance?.PlaySFX2D("TrainDepart");
             VFXController.Instance?.SpawnMoon3TrainTrail(railStart, 1.1f);
@@ -344,7 +344,7 @@ namespace Tartaria.Gameplay
                         {
                             // Simple branch fork (R7 per 11_SCRIPTED phase2 choice)
                             _currentBranchChoice = (freqMatch > 0.65f) ? 1 : 0; // freq success = safe tuned path
-                            HUDController.Instance?.ShowBanner("RAIL JUNCTION", _currentBranchChoice == 1 ? "Tuned path chosen — lighter waves ahead." : "Combat gauntlet — protection focus required.", 4f);
+                            // [Moon1 HUD stub] ShowBanner("RAIL JUNCTION", _currentBranchChoice == 1 ? "Tuned path chosen — lighter waves ahead." : "Combat gauntlet — protection focus required.", 4f);
                             // Trust fork
                             if (_currentBranchChoice == 1) ServiceLocator.Lirael?.AddTrust(5.5f); // freq success Lirael
                             else ServiceLocator.Milo?.AddTrust(5.2f); // protection Milo
@@ -461,7 +461,7 @@ namespace Tartaria.Gameplay
             var cass = ServiceLocator.Cassian;
             if (cass != null) cass.AddTrust(4f);
 
-            HUDController.Instance?.ShowBanner("THE 17TH HOUR", "The rails align under the hidden sun. The children sing louder than the dissonance ever was.", 9f);
+            // [Moon1 HUD stub] ShowBanner("THE 17TH HOUR", "The rails align under the hidden sun. The children sing louder than the dissonance ever was.", 9f);
             VFXController.Instance?.SpawnMoon3TrainTrail(_trainProxy ? _trainProxy.transform.position : railStart, 2.6f);
             AudioManager.Instance?.PlaySFX2D("SeventeenthHourChime");
 
@@ -548,7 +548,7 @@ namespace Tartaria.Gameplay
             Vector3 basePos = Vector3.Lerp(railStart, railEnd, _progress + 0.09f);
 
             string waveLabel = _waveIndex >= 5 ? "LEVIATHAN ESCALATION" : $"Rail Wraith wave {_waveIndex}";
-            HUDController.Instance?.ShowObjective($"{waveLabel}! Shield: {_lullabyShieldStrength:F1}x | Freq match: {freqMatch:P0}");
+            // [Moon1 HUD stub] ShowObjective($"{waveLabel}! Shield: {_lullabyShieldStrength:F1}x | Freq match: {freqMatch:P0}");
 
             for (int i = 0; i < count; i++)
             {
@@ -574,7 +574,7 @@ namespace Tartaria.Gameplay
                 _activeThreats.Add(levi);
                 RequestDOTSRailWraithSpawn(basePos + new Vector3(0.5f, 5.5f, 0f), EnemyType.DissonanceLeviathan);
 
-                HUDController.Instance?.ShowBanner("DISSONANCE LEVIATHAN", "The rails scream. Match the children's frequency to open its heart. Protect the train!", 5f);
+                // [Moon1 HUD stub] ShowBanner("DISSONANCE LEVIATHAN", "The rails scream. Match the children's frequency to open its heart. Protect the train!", 5f);
                 VFXController.Instance?.SpawnLeviathanPhaseVFX(basePos, _waveIndex + _leviathanPhase);
                 CameraController.Instance?.TriggerShake(0.95f, 0.7f);
 
@@ -801,7 +801,7 @@ namespace Tartaria.Gameplay
         {
             _permanentWorldChanged = true;
             _leviathanPhase = 0;
-            HUDController.Instance?.ShowBanner("GIANT ECHO FREED", "The children's lullaby shattered the cage. The highlands remember their song. Rails glow forever.", 10f);
+            // [Moon1 HUD stub] ShowBanner("GIANT ECHO FREED", "The children's lullaby shattered the cage. The highlands remember their song. Rails glow forever.", 10f);
             Debug.Log("[Moon3 R7 Leviathan] GIANT ECHO + PERMANENT WORLD CHANGE — victory transforms the zone with deeper VFX.");
 
             VFXController.Instance?.SpawnGiantEchoRelease(_trainProxy ? _trainProxy.transform.position + Vector3.up * 11f : railEnd);
@@ -912,8 +912,8 @@ namespace Tartaria.Gameplay
 
             if (success)
             {
-                HUDController.Instance?.ShowObjective("Escort complete. The spectral children are safe. The highlands sing again. Rail network expanded.");
-                HUDController.Instance?.ShowBanner("Rail Network Awakens", "First grand segment secured. Lullaby Crystal + World's Fair Ticket + Continental Rail hook granted. Found family grows.", 8f);
+                // [Moon1 HUD stub] ShowObjective("Escort complete. The spectral children are safe. The highlands sing again. Rail network expanded.");
+                // [Moon1 HUD stub] ShowBanner("Rail Network Awakens", "First grand segment secured. Lullaby Crystal + World's Fair Ticket + Continental Rail hook granted. Found family grows.", 8f);
 
                 GameLoopController.Instance?.QueueRSReward(245f, "moon3_escort_r7_complete");
                 ServiceLocator.Lirael?.AddTrust(12f);
@@ -945,7 +945,7 @@ namespace Tartaria.Gameplay
             }
             else
             {
-                HUDController.Instance?.ShowObjective("The train was overwhelmed. Re-align the rails. The children still believe in you.");
+                // [Moon1 HUD stub] ShowObjective("The train was overwhelmed. Re-align the rails. The children still believe in you.");
                 ServiceLocator.Lirael?.AddTrust(-3.5f);
                 ServiceLocator.Milo?.AddTrust(-2f);
             }

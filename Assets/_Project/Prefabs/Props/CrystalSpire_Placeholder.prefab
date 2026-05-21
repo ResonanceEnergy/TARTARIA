@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3546379275781922339}
   - component: {fileID: 2986365769027677110}
   - component: {fileID: 4274758934214936341}
-  - component: {fileID: 1747218014346382771}
   m_Layer: 0
   m_Name: CrystalSpire_Placeholder
   m_TagString: Untagged
@@ -115,16 +114,3 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1747218014346382771
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7221359483579564421}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Editor::Tartaria.Editor.FallbackBuildingTag
-  buildingType: CrystalSpire

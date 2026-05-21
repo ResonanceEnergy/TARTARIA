@@ -91,6 +91,13 @@ namespace Tartaria.Input
             PlayPulse(0.6f, 0.15f);
         }
 
+        // Round 4 Giant haptics for flight, terrain deformation, Cassian/Anastasia synergy
+        public void PlayTitanFlightAscent() { PlayRamp(0.25f, 0.95f, 1.8f); }
+        public void PlayEarthShaperDeform() { PlayCascade(0.4f, 0.95f, 0.1f, 2.2f); }
+        public void PlayWorldMoverSurge() { PlayRamp(0.6f, 0.2f, 3.0f); }
+        public void PlaySynergyResonanceHarmony() { PlayCascade(0.35f, 0.75f, 0.45f, 2.8f); }
+        public void PlayTitanStabilityPulse() { PlayPulse(0.85f, 0.9f); }
+
         public void StopAll()
         {
             if (_activeGamepad != null)

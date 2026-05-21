@@ -12,6 +12,14 @@ namespace Tartaria.Integration
         {
             var quests = new List<QuestDefinition>();
 
+            // Moon 1 Echohaven Onboarding / FTUE starter quest (per 27_TUTORIAL_ONBOARDING + 03_CAMPAIGN Moon1 start + 07_PC_UX)
+            quests.Add(Build("echohaven_awakening", "Echohaven Awakening",
+                "Meet Milo, discover the first buried structure, and complete your first restoration to awaken the Aether field.",
+                50f,
+                new QuestObjective { description = "Meet Milo the companion", type = QuestObjectiveType.CompanionMilestone, targetId = "milo", targetCount = 1 },
+                new QuestObjective { description = "Discover a Tartarian building", type = QuestObjectiveType.DiscoverBuilding, targetCount = 1 },
+                new QuestObjective { description = "Complete first building restoration", type = QuestObjectiveType.RestoreBuilding, targetCount = 1 }));
+
             // R7 Companions & Reactivity: New production-quality companion milestone, trust arc, physical beat, giant synergy, calendar claimable, world mutation quests (Moons 1-3 depth + 4-13 hooks)
             // All wired to CompanionManager trust/mutation/calendar/giant + DialogueArcs + QuestManager CompanionMilestone type
 
