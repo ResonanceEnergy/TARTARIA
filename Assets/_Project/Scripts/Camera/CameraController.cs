@@ -334,6 +334,25 @@ namespace Tartaria.Camera
         }
 
         /// <summary>
+        /// Round 4 production Titan flight camera support (soaring chase, dynamic for giant input/physics).
+        /// </summary>
+        public void SetGiantFlight(bool flying)
+        {
+            if (flying)
+            {
+                _currentDistance = zoomMax * 2.2f;
+                _currentPitch = 42f;
+                _targetFOV = 78f;
+            }
+            else
+            {
+                _currentDistance = zoomMax * 1.5f;
+                _currentPitch = 65f;
+                _targetFOV = 70f;
+            }
+        }
+
+        /// <summary>
         /// Switch camera to Micro Mode — extreme zoom-in for shrunken player.
         /// Called by MicroGiantController for ant-scale exploration segments.
         /// </summary>

@@ -1104,6 +1104,9 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayBuildingEmergence(position);
             DialogueManager.Instance?.PlayContextDialogue("restoration");
 
+            // Moon 1 Echohaven onboarding: first restoration delivers early Giant Mode + calendar hint (matches 27_TUTORIAL + 03_CAMPAIGN)
+            DialogueManager.Instance?.PlayContextDialogue("milo_giant_hint");
+
             // Anastasia: first restoration triggers manifestation, subsequent ones get memory fragments
             if (AnastasiaController.Instance != null)
             {
@@ -1472,6 +1475,17 @@ namespace Tartaria.Integration
                     buildingSaves[bi] = ib.ToSaveState();
                 }
                 save.world.buildings = buildingSaves;
+
+            // Moon 1 Echohaven hub progression save (permanent blessings from fountain/dome/spire restores)
+            var eh = EchohavenProgressionSystem.Instance;
+            if (eh != null)
+            {
+                var d = eh.GetSaveData();
+                save.echohaven.fountainRestored = d.fountainRestored;
+                save.echohaven.domeRestored = d.domeRestored;
+                save.echohaven.spireRestored = d.spireRestored;
+                save.echohaven.hubFullyRestored = d.hubFullyRestored;
+                save.echohaven.hubRestorations = d.hubRestorations;
             }
 
             // Zone
@@ -1735,7 +1749,7 @@ namespace Tartaria.Integration
                 save.bellTowerSync.cascadeTriggered = bd.cascadeTriggered;
             }
 
-            // GiantMode
+            // GiantMode (extended for Echohaven Moon1 active state + aether persistence post v14)
             var giant = GiantModeController.Instance;
             if (giant != null)
             {
@@ -1744,6 +1758,8 @@ namespace Tartaria.Integration
                 save.giantMode.buildingsLifted = gd.buildingsLifted;
                 save.giantMode.rubbleCleared = gd.rubbleCleared;
                 save.giantMode.totalTimeAsGiant = gd.totalTimeAsGiant;
+                save.giantMode.isActiveOnSave = gd.isActiveOnSave;
+                save.giantMode.aetherOnSave = gd.aetherOnSave;
             }
 
             // WorldChoice
@@ -2007,6 +2023,13 @@ namespace Tartaria.Integration
             if (m2prog != null && save.moon2 != null)
             {
                 m2prog.RestoreFromSaveBlock(save.moon2);
+            }
+
+            // Moon 1 Echohaven early progression restore (hub blessings + Skill Tree + permanent changes)
+            var ehprog = EchohavenProgressionSystem.Instance;
+            if (ehprog != null && save.echohaven != null)
+            {
+                ehprog.RestoreFromSaveBlock(save.echohaven);
             }
 
             // Quests
@@ -2343,7 +2366,7 @@ namespace Tartaria.Integration
                 });
             }
 
-            // GiantMode
+            // GiantMode (Echohaven persistence: active state + aether now roundtripped via extended block + LoadSaveData)
             var giantLoad = GiantModeController.Instance;
             if (giantLoad != null && save.giantMode != null)
             {

@@ -7,6 +7,8 @@ namespace Tartaria.Save
     /// Save Data schema — serialized to JSON at Application.persistentDataPath.
     /// Schema v8 — see version blocks below for incremental additions.
     /// Forward-compatible: v1.0 saves must load in v5.0.
+    /// 
+    /// v14+: Added EchohavenSaveBlock for Moon 1 early progression + save compatibility.
     /// </summary>
     [Serializable]
     public class SaveData
@@ -63,13 +65,20 @@ namespace Tartaria.Save
 
         // v9 save blocks
         public ArchiveSaveBlock archive = new();
+
+        // v10+
+        public Moon2SaveBlock moon2 = new();
+        public Moon3SaveBlock moon3 = new();
+
+        // v14: Moon 1 Echohaven early progression + save compatibility block
+        public EchohavenSaveBlock echohaven = new();
     }
 
     [Serializable]
     public class SaveHeader
     {
-        public int schemaVersion = 9;
-        public string gameVersion = "0.8.0";
+        public int schemaVersion = 14;
+        public string gameVersion = "0.14.0";
         public string platform = "windows";
         public int saveSlot;
         public string createdUtc;
@@ -121,7 +130,7 @@ namespace Tartaria.Save
     {
         public float x, y, z;
 
-        public SerializableVector3(float x, float y, float z)
+        public SerializableVector3(float x, float y, z)
         {
             this.x = x; this.y = y; this.z = z;
         }
@@ -401,6 +410,9 @@ namespace Tartaria.Save
         public int buildingsLifted;
         public int rubbleCleared;
         public float totalTimeAsGiant;
+        // Moon1 Echohaven Combat/Giant polish + v14+ persistence: active state + aether roundtrip so Giant Mode survives save/load without crash or lost power fantasy state.
+        public bool isActiveOnSave;
+        public float aetherOnSave;
     }
 
     [Serializable]
@@ -569,6 +581,21 @@ namespace Tartaria.Save
         public float lullabyShieldLastUsed;
         public bool seventeenthHourInitiated;
         public string[] seventeenthHourEventIds = System.Array.Empty<string>();
+    }
+
+    // ─── v14 Echohaven (Moon 1) Early Progression Save Block ─────────────────
+    /// <summary>
+    /// Persists the permanent progression hooks and state from restoring the Echohaven hub.
+    /// Enables reliable save/load for early progression and Skill Tree blessings granted by restoring fountain/dome/spire.
+    /// </summary>
+    [Serializable]
+    public class EchohavenSaveBlock
+    {
+        public bool fountainRestored;
+        public bool domeRestored;
+        public bool spireRestored;
+        public bool hubFullyRestored;
+        public int hubRestorations;
     }
 
 }

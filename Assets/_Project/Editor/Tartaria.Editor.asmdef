@@ -20,7 +20,8 @@
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Universal.Editor",
         "Unity.Cinemachine",
-        "Unity.AI.Navigation"
+        "Unity.AI.Navigation",
+        "Unity.Addressables.Editor"
     ],
     "includePlatforms": [
         "Editor"

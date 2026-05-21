@@ -547,7 +547,108 @@ namespace Tartaria.Integration
             objTextRT.offsetMin = new Vector2(8f, 4f);
             objTextRT.offsetMax = new Vector2(-8f, -2f);
 
-            // ─── Inject references via reflection ────
+            // ─── Phase 3 R5 Combat HUD Wiring & Production Polish: Frequency Wheel + Giant Meter + Accessibility Hint (runtime prefab integration) ───
+            // Creates all R4/R5 combat HUD elements dynamically so no scene-prefab dependency. Supports extreme scale, gamepad, colorblind, captions.
+            // Giant meter (left): vertical readiness for Tartarian scale transformation.
+            var giantMeterRT = CreatePanel(canvasRT, "GiantMeterPanel", new Vector2(0f, 0f), new Vector2(0f, 0f),
+                new Vector2(18f, 95f), new Vector2(38f, 155f));
+            giantMeterRT.gameObject.SetActive(false);
+            var giantBG = giantMeterRT.gameObject.AddComponent<Image>();
+            giantBG.color = new Color(0.08f, 0.08f, 0.12f, 0.82f);
+            var giantFillGO = CreateChild(giantMeterRT, "GiantFill");
+            var giantFill = giantFillGO.AddComponent<Image>();
+            giantFill.color = new Color(0.2f, 0.6f, 0.9f);
+            giantFill.type = Image.Type.Filled;
+            giantFill.fillMethod = Image.FillMethod.Vertical;
+            SetStretchAll(giantFillGO.GetComponent<RectTransform>());
+            var giantLabelGO = CreateChild(giantMeterRT, "GiantLabel");
+            var giantLabel = giantLabelGO.AddComponent<TextMeshProUGUI>();
+            giantLabel.text = "GIANT 0%";
+            giantLabel.fontSize = 10;
+            giantLabel.alignment = TextAlignmentOptions.Center;
+            giantLabel.color = Color.white;
+            var giantLabelRT = giantLabelGO.GetComponent<RectTransform>();
+            giantLabelRT.anchorMin = new Vector2(0f, 0f);
+            giantLabelRT.anchorMax = new Vector2(1f, 0.13f);
+            giantLabelRT.offsetMin = Vector2.zero;
+            giantLabelRT.offsetMax = Vector2.zero;
+            var giantFlashGO = CreateChild(giantMeterRT, "GiantReadyFlash");
+            var giantFlash = giantFlashGO.AddComponent<Image>();
+            giantFlash.color = new Color(1f, 0.85f, 0.2f, 0f);
+            giantFlash.raycastTarget = false;
+            SetStretchAll(giantFlashGO.GetComponent<RectTransform>());
+            giantFlash.gameObject.SetActive(false);
+
+            // Frequency Wheel (combat radial tuning HUD, positioned for dynamic nav + gamepad without overlap)
+            var freqWheelRT = CreatePanel(canvasRT, "FrequencyWheelPanel", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(195f, 72f), new Vector2(215f, 82f));
+            freqWheelRT.gameObject.SetActive(false);
+            var freqBG = freqWheelRT.gameObject.AddComponent<Image>();
+            freqBG.color = new Color(0.04f, 0.08f, 0.18f, 0.88f);
+            var freqWheelImgGO = CreateChild(freqWheelRT, "WheelVisual");
+            var freqWheelImg = freqWheelImgGO.AddComponent<Image>();
+            freqWheelImg.color = new Color(0.4f, 0.7f, 0.9f);
+            var freqWheelImgRT = freqWheelImgGO.GetComponent<RectTransform>();
+            freqWheelImgRT.anchorMin = new Vector2(0.08f, 0.22f);
+            freqWheelImgRT.anchorMax = new Vector2(0.42f, 0.92f);
+            freqWheelImgRT.offsetMin = Vector2.zero;
+            freqWheelImgRT.offsetMax = Vector2.zero;
+            // Visual needle (thin rect) for radial "wheel" metaphor + future telegraph rotation
+            var needleGO = CreateChild(freqWheelImgRT, "FreqNeedle");
+            var needleImg = needleGO.AddComponent<Image>();
+            needleImg.color = new Color(1f, 0.95f, 0.4f);
+            var needleRT = needleGO.GetComponent<RectTransform>();
+            needleRT.sizeDelta = new Vector2(3f, 26f);
+            needleRT.anchorMin = new Vector2(0.5f, 0.5f);
+            needleRT.anchorMax = new Vector2(0.5f, 0.5f);
+            needleRT.anchoredPosition = Vector2.zero;
+            var freqTextGO = CreateChild(freqWheelRT, "FreqText");
+            var freqText = freqTextGO.AddComponent<TextMeshProUGUI>();
+            freqText.text = "440 Hz";
+            freqText.fontSize = 16;
+            freqText.alignment = TextAlignmentOptions.Left;
+            freqText.color = Color.white;
+            var freqTextRT = freqTextGO.GetComponent<RectTransform>();
+            freqTextRT.anchorMin = new Vector2(0.48f, 0.52f);
+            freqTextRT.anchorMax = new Vector2(0.96f, 0.82f);
+            freqTextRT.offsetMin = Vector2.zero;
+            freqTextRT.offsetMax = Vector2.zero;
+            var matchTextGO = CreateChild(freqWheelRT, "MatchText");
+            var matchText = matchTextGO.AddComponent<TextMeshProUGUI>();
+            matchText.text = "";
+            matchText.fontSize = 12;
+            matchText.alignment = TextAlignmentOptions.Left;
+            matchText.color = new Color(0.3f, 1f, 0.55f);
+            var matchTextRT = matchTextGO.GetComponent<RectTransform>();
+            matchTextRT.anchorMin = new Vector2(0.48f, 0.18f);
+            matchTextRT.anchorMax = new Vector2(0.96f, 0.48f);
+            matchTextRT.offsetMin = Vector2.zero;
+            matchTextRT.offsetMax = Vector2.zero;
+
+            // Accessibility hint / SFX captions area (bottom center, richer feedback, supports extreme text scale + screen reader)
+            var hintRT = CreatePanel(canvasRT, "HUDAccessibilityHint", new Vector2(0.5f, 0f), new Vector2(0.5f, 0f),
+                new Vector2(0f, 3f), new Vector2(640f, 26f));
+            hintRT.gameObject.SetActive(false);
+            var hintBG = hintRT.gameObject.AddComponent<Image>();
+            hintBG.color = new Color(0f, 0f, 0f, 0.62f);
+            var hintText = hintRT.gameObject.AddComponent<TextMeshProUGUI>();
+            hintText.text = "";
+            hintText.fontSize = 11;
+            hintText.alignment = TextAlignmentOptions.Center;
+            hintText.color = new Color(0.82f, 0.9f, 1f);
+            hintText.raycastTarget = false;
+
+            // Boss target frequency text (Round 4 puzzle HUD, re-wired here for completeness + R5 telegraph prep)
+            var bossFreqRT = CreatePanel(canvasRT, "BossTargetFreqText", new Vector2(0.5f, 1f), new Vector2(0.5f, 1f),
+                new Vector2(0f, -128f), new Vector2(390f, 24f));
+            bossFreqRT.gameObject.SetActive(false);
+            var bossFreqText = bossFreqRT.gameObject.AddComponent<TextMeshProUGUI>();
+            bossFreqText.text = "";
+            bossFreqText.fontSize = 15;
+            bossFreqText.alignment = TextAlignmentOptions.Center;
+            bossFreqText.color = new Color(0.55f, 0.92f, 1f);
+
+            // ─── Inject references via reflection (R5 full combat HUD + accessibility) ────
             SetField(hud, "rsGauge", rsGaugeRT);
             SetField(hud, "rsFillImage", rsFill);
             SetField(hud, "rsValueText", rsText);
@@ -569,7 +670,19 @@ namespace Tartaria.Integration
             SetField(hud, "objectivePanel", objRT);
             SetField(hud, "objectiveText", objText);
 
-            Debug.Log("[RuntimeHUDBuilder] HUD Canvas + all panels wired to HUDController.");
+            // R4/R5 Combat HUD + Accessibility (wheel/meter/captions/telegraph prep)
+            SetField(hud, "frequencyWheelPanel", freqWheelRT);
+            SetField(hud, "frequencyWheelImage", freqWheelImg);
+            SetField(hud, "frequencyText", freqText);
+            SetField(hud, "frequencyMatchText", matchText);
+            SetField(hud, "giantMeterPanel", giantMeterRT);
+            SetField(hud, "giantMeterFill", giantFill);
+            SetField(hud, "giantMeterReadyFlash", giantFlash);
+            SetField(hud, "giantMeterLabel", giantLabel);
+            SetField(hud, "hudAccessibilityHint", hintText);
+            SetField(hud, "bossTargetFrequencyText", bossFreqText);
+
+            Debug.Log("[RuntimeHUDBuilder] HUD Canvas + all panels wired to HUDController. (R5: wheel + giant meter + accessibility hint + boss freq + dynamic runtime creation complete)");
         }
 
         // ─── Pause Menu ─────────────────────────────

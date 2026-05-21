@@ -21,6 +21,9 @@ namespace Tartaria.Editor
     /// All stubs are placed in <c>Assets/_Project/Scenes/Moons/</c>.
     /// Build Settings is then rewritten to:
     ///   Boot(0) → Echohaven(1) → all 12 other moons (2..13) → UI_Overlay(14)
+    ///
+    /// Moon 1 Dev: Echohaven_VerticalSlice can be explicitly set as first scene
+    /// for clean direct-launch Development Builds of the vertical slice.
     /// </summary>
     public static class MoonScenesFactory
     {
@@ -199,6 +202,27 @@ namespace Tartaria.Editor
 
             Debug.Log($"[MoonScenes] BuildSettings now has {list.Count} scenes "
                       + $"(Boot + Echohaven + 12 moons + UI_Overlay).");
+        }
+
+        /// <summary>
+        /// Configures EditorBuildSettings for a clean Moon 1 Development Build:
+        /// Echohaven_VerticalSlice as the very first scene (index 0).
+        /// This allows the built Development player to launch *directly* into
+        /// the Echohaven vertical slice gameplay without Boot overhead.
+        /// RuntimeInitialize bootstraps (GameBootstrap, SceneLoader, etc.) auto-create.
+        /// UI_Overlay follows for HUD. Other moons omitted for focused Moon 1 dev iteration.
+        /// </summary>
+        [MenuItem("Tartaria/Configure Moon 1 Dev Build Settings (Echohaven first)")]
+        public static void ConfigureMoon1DevBuildSettings()
+        {
+            var list = new List<EditorBuildSettingsScene>();
+            TryAdd(list, EchohavenScene);
+            TryAdd(list, UIOverlayScene);
+            // Note: Boot intentionally not first (and can be omitted) so Echohaven starts the player.
+            // Full pipeline still available via normal UpdateBuildSettings.
+            EditorBuildSettings.scenes = list.ToArray();
+
+            Debug.Log("[MoonScenes] Moon 1 Dev Build Settings configured: Echohaven_VerticalSlice as FIRST scene for clean direct-launch Development Build.");
         }
 
         static void TryAdd(List<EditorBuildSettingsScene> list, string path)

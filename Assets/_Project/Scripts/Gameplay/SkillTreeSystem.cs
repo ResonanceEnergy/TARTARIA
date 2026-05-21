@@ -19,10 +19,12 @@ namespace Tartaria.Gameplay
     /// Each tree has 5 tiers with prerequisites.
     ///
     /// Moon 2 Extension (Progression Agent): 6 Lunar Purge Blessings/Mutations (500+) auto-granted
-    /// by Moon2ProgressionSystem upon restoring/purging the 5 key Crystalline Caverns sites
-    /// (cathedral_dome, bell_tower, fountain, crystal_hall, ley_chamber). These represent permanent
-    /// "echoes of the purge" — the corruption you cleanse leaves lasting power and visual mutations in the player.
-    /// Tied directly to "purge the corruption" fantasy. Nodes integrate seamlessly with existing save/restore/UI/modifier system.
+    /// by Moon2ProgressionSystem upon restoring/purging the 5 key Crystalline Caverns sites.
+    ///
+    /// Moon 1 Echohaven Extension (Progression & Save Compatibility Agent): 4 Early Hub Blessings (600+)
+    /// auto-granted by EchohavenProgressionSystem upon restoring the 3 core starting hub buildings
+    /// (fountain, dome, spire). These provide meaningful permanent early progression and power that
+    /// carries through the entire game. Full save/load compatibility via dedicated EchohavenSaveBlock.
     /// </summary>
     public class SkillTreeSystem : MonoBehaviour
     {
@@ -102,9 +104,32 @@ namespace Tartaria.Gameplay
         }
 
         /// <summary>
-        /// Moon 2 Progression Hook: Force-unlock a cavern purge blessing (0 RS cost, no prereq gate for blessings).
-        /// Called exclusively by Moon2ProgressionSystem when a key site (cathedral/bell/fountain/crystal/ley) is restored + purged.
-        /// The blessing persists via normal GetSaveData / skill save. Feels like a true earned permanent mutation.
+        /// Get current modifier value (sum of all unlocked nodes affecting the type).
+        /// </summary>
+        public float GetModifier(SkillModifierType type)
+        {
+            if (_modifierCacheDirty) RebuildModifierCache();
+            return _modifierCache.TryGetValue(type, out float val) ? val : 0f;
+        }
+
+        void RebuildModifierCache()
+        {
+            _modifierCache.Clear();
+            foreach (var tree in _trees.Values)
+            {
+                foreach (var node in tree.nodes)
+                {
+                    if (!node.isUnlocked) continue;
+                    if (!_modifierCache.ContainsKey(node.modifierType))
+                        _modifierCache[node.modifierType] = 0f;
+                    _modifierCache[node.modifierType] += node.modifierValue;
+                }
+            }
+            _modifierCacheDirty = false;
+        }
+
+        /// <summary>
+        /// Force-unlock used by Moon 2 purge progression (kept for compat).
         /// </summary>
         public void ForceUnlockMoon2Blessing(SkillId id)
         {
@@ -121,62 +146,40 @@ namespace Tartaria.Gameplay
         }
 
         /// <summary>
-        /// Get all nodes in a given tree.
+        /// General force-unlock for progression systems (Echohaven Moon1 early hub restorations, future moons).
+        /// Skips all costs and prerequisites. Blessings are permanent and persist via normal skill save.
         /// </summary>
-        static readonly List<SkillNode> EmptyNodes = new();
-
-        public IReadOnlyList<SkillNode> GetTree(SkillTreeType tree)
+        public void ForceUnlockSkill(SkillId id)
         {
-            return _trees.TryGetValue(tree, out var t) ? t.nodes.AsReadOnly() : EmptyNodes.AsReadOnly();
-        }
+            var node = FindNode(id);
+            if (node == null || node.isUnlocked) return;
 
-        /// <summary>
-        /// Get the cumulative modifier for a given stat from all unlocked skills.
-        /// </summary>
-        public float GetModifier(SkillModifierType mod)
-        {
-            if (_modifierCacheDirty)
-                RebuildModifierCache();
-            return _modifierCache.TryGetValue(mod, out float val) ? val : 0f;
+            node.isUnlocked = true;
+            _modifierCacheDirty = true;
+            ApplySkillEffect(node);
+            OnSkillUnlocked?.Invoke(id);
+            AudioManager.Instance?.PlaySFX2D("SkillUnlocked");
+            HapticFeedbackManager.Instance?.PlayDiscovery();
+            Debug.Log($"[SkillTree] Progression blessing granted (permanent early/late): {node.displayName}");
         }
-
-        void RebuildModifierCache()
-        {
-            _modifierCache.Clear();
-            foreach (var tree in _trees.Values)
-                foreach (var node in tree.nodes)
-                    if (node.isUnlocked)
-                    {
-                        if (!_modifierCache.ContainsKey(node.modifierType))
-                            _modifierCache[node.modifierType] = 0f;
-                        _modifierCache[node.modifierType] += node.modifierValue;
-                    }
-            _modifierCacheDirty = false;
-        }
-
-        // ─── Save / Restore ─────────────────────────
 
         public SkillTreeSaveData GetSaveData()
         {
-            var data = new SkillTreeSaveData { unlockedSkills = new List<int>() };
+            var unlocked = new List<int>();
             foreach (var tree in _trees.Values)
                 foreach (var node in tree.nodes)
                     if (node.isUnlocked)
-                        data.unlockedSkills.Add((int)node.id);
-            return data;
+                        unlocked.Add((int)node.id);
+            return new SkillTreeSaveData { unlockedSkills = unlocked };
         }
 
         public void RestoreFromSave(SkillTreeSaveData data)
         {
-            // Reset all first
-            foreach (var tree in _trees.Values)
-                foreach (var node in tree.nodes)
-                    node.isUnlocked = false;
-
             if (data?.unlockedSkills == null) return;
-            foreach (int id in data.unlockedSkills)
+            foreach (int raw in data.unlockedSkills)
             {
-                var node = FindNode((SkillId)id);
+                var id = (SkillId)raw;
+                var node = FindNode(id);
                 if (node != null)
                 {
                     node.isUnlocked = true;
@@ -220,7 +223,6 @@ namespace Tartaria.Gameplay
                 SkillId.Res_Cascade));
 
             // Moon 2 Cavern Purge Blessings (Resonator lunar theme) — granted by Moon2ProgressionSystem on key site purge/restore.
-            // These are the permanent mutations: player literally carries the purified power of the caverns forever.
             tree.nodes.Add(new SkillNode(SkillId.M2_CathedralBreath, 3, 0f,
                 "Cathedral's Eternal Breath", "Moon 2 Purge Blessing (cathedral_dome): The Grand Cathedral's living dome now breathes within you. +15% Resonance Score from all cavern restorations and purges. The corruption you burned away empowers your future.",
                 SkillModifierType.LunarRSBonus, 0.15f));
@@ -230,6 +232,12 @@ namespace Tartaria.Gameplay
             tree.nodes.Add(new SkillNode(SkillId.M2_FountainSpring, 4, 0f,
                 "Aetheric Spring's Grace", "Moon 2 Purge Blessing (fountain): Living water from the fountain flows through your blood. -25% corruption spread rate globally + passive Aether regeneration near restored Moon 2 fountains. You have become a living counter-current to the Mud.",
                 SkillModifierType.CorruptionResistance, 0.25f));
+
+            // Moon 1 Echohaven Early Hub Progression Blessings (Resonator)
+            // Granted automatically on restoring the Harmonic Fountain — meaningful permanent early-game power.
+            tree.nodes.Add(new SkillNode(SkillId.E_FountainEcho, 1, 0f,
+                "Fountain's Harmonic Echo", "Echohaven Hub Blessing (fountain): The Harmonic Fountain's first restored song echoes forever in your core. +15% tuning precision on every mini-game from the start. Restoring the heart of the hub made frequency mastery second nature.",
+                SkillModifierType.TuningPrecision, 0.15f));
 
             return tree;
         }
@@ -293,16 +301,22 @@ namespace Tartaria.Gameplay
             tree.nodes.Add(new SkillNode(SkillId.Grd_TitanStability, 4, 450f, "Titan Endurance", "180s Titan stability + flight efficiency.", SkillModifierType.ShieldDuration, 2f, SkillId.Grd_Invulnerable));
             tree.nodes.Add(new SkillNode(SkillId.Grd_AbilityCooldownMastery, 3, 290f, "Giant's Reflex", "40% faster giant ability cooldowns.", SkillModifierType.StrikeRange, 0.1f, SkillId.Grd_StrongPulse));
 
-            // Moon 2 Cavern Purge Blessings (Guardian micro-giant + combat theme) — permanent mutations from deep cavern purges
+            // Moon 2 Cavern Purge Blessings (Guardian micro-giant + combat theme)
             tree.nodes.Add(new SkillNode(SkillId.M2_CrystalLens, 3, 0f,
                 "Fractal Crystal Lens", "Moon 2 Purge Blessing (crystal_hall): The Crystal Hall's fractal geometry now lives in your eyes. Corruption nodes, veins and hidden fractal structures glow visibly without needing the Dissonance Lens inside the caverns. Permanent mutation — you see the world's wounds clearly.",
                 SkillModifierType.StrikeRange, 0.15f, SkillId.Grd_AOEPurge));
+
             tree.nodes.Add(new SkillNode(SkillId.M2_LeyBond, 4, 0f,
                 "Ley Heart Bond", "Moon 2 Purge Blessing (ley_chamber): Your spirit is now bound to the ancient ley grid of the caverns. +20% micro-giant duration while inside Moon 2 + living ley sparks orbit your form as a visible sigil of the purge. You walk the veins of the world.",
                 SkillModifierType.MicroGiantExtend, 0.20f, SkillId.Grd_TitanFlight));
             tree.nodes.Add(new SkillNode(SkillId.M2_TrueLunarPurifier, 5, 0f,
                 "True Lunar Purifier", "Moon 2 Capstone Blessing: All five key sites of the Crystalline Caverns purged. You have become the living antithesis to corruption. Minor corruption auto-purges on any restore, +50% RS from Moon 2 activities, and every cavern purge triggers a golden cascade visual. The Mud itself recoils from your presence. Permanent ultimate mutation.",
                 SkillModifierType.RSMultiplier, 0.5f, SkillId.M2_LeyBond));
+
+            // Moon 1 Echohaven Early Hub Progression Blessings (Guardian)
+            tree.nodes.Add(new SkillNode(SkillId.E_SpireResonance, 1, 0f,
+                "Spire's Resonance Call", "Echohaven Hub Blessing (spire): The Crystal Spire's restored harmonic call permanently strengthens your strikes. +10% Resonance Pulse damage from the earliest moments. Restoring the spire armed you for everything that follows.",
+                SkillModifierType.PulseDamage, 0.10f, SkillId.Grd_StrongPulse));
 
             return tree;
         }
@@ -329,6 +343,16 @@ namespace Tartaria.Gameplay
                 "True History", "All lore auto-collected. +100% RS from discoveries.",
                 SkillModifierType.RSMultiplier, 1.0f,
                 SkillId.His_AncientMap));
+
+            // Moon 1 Echohaven Early Hub Progression Blessings (Historian / Capstone)
+            tree.nodes.Add(new SkillNode(SkillId.E_DomeInsight, 1, 0f,
+                "Dome's Insight", "Echohaven Hub Blessing (dome): StarDome's light permanently sharpens your eyes for secrets and lore. Early discoveries grant more RS. The plaza's awakening made the world more readable from the first visit.",
+                SkillModifierType.RSMultiplier, 0.12f, SkillId.His_LoreReveal));
+
+            tree.nodes.Add(new SkillNode(SkillId.E_HubAwakened, 2, 0f,
+                "Echohaven Fully Awakened", "Echohaven Hub Capstone Blessing: Fountain, Dome and Spire all restored. The starting hub sings in perfect harmony. Permanent +8% global Resonance Score multiplier for your entire journey + early Skill Tree mastery feels earned. Your first restoration changed you and the world forever.",
+                SkillModifierType.RSMultiplier, 0.08f, SkillId.His_LoreReveal));
+
             return tree;
         }
 
@@ -361,7 +385,7 @@ namespace Tartaria.Gameplay
         Architect = 1,   // Building enhancement
         Guardian  = 2,   // Combat skills
         Historian = 3    // Lore and discovery
-    }
+    };
 
     public enum SkillId : int
     {
@@ -413,7 +437,16 @@ namespace Tartaria.Gameplay
         M2_FountainSpring    = 502,
         M2_CrystalLens       = 503,
         M2_LeyBond           = 504,
-        M2_TrueLunarPurifier = 505
+        M2_TrueLunarPurifier = 505,
+
+        // Moon 1 Echohaven Early Progression Permanent Hub Blessings (600+)
+        // Auto-granted by EchohavenProgressionSystem on restoring the 3 core buildings of the starting hub (fountain/dome/spire).
+        // Provides meaningful, permanent early-game player power growth and world-state changes that persist via Skill save/load.
+        // Restoring the hub now feels like a foundational, lasting transformation rather than a one-off event.
+        E_FountainEcho   = 600,
+        E_DomeInsight    = 601,
+        E_SpireResonance = 602,
+        E_HubAwakened    = 603
     }
 
     public enum SkillModifierType : byte

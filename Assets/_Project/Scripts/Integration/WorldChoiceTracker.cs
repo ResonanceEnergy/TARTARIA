@@ -223,7 +223,7 @@ namespace Tartaria.Integration
                     break;
             }
 
-            // Notify consequence visuals
+            // Notify consequence visuals (ROUND 4 permanent bond + giant narrative payoffs wired)
             ConsequenceVisuals.Instance?.OnWorldChoiceChanged(id, option);
         }
 

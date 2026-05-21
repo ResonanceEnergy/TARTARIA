@@ -175,6 +175,16 @@ namespace Tartaria.Integration
 
         void BuildDatabase()
         {
+            // ── Milo: Onboarding / First Arrival (Moon 1 Echohaven FTUE per 27_TUTORIAL) ──
+            AddLine("milo_intro", "milo_intro_01", "Milo",
+                "You're not from around here, are you? That's okay. Neither am I. Well — not anymore.", true);
+            AddLine("milo_warming_up", "milo_warm_01", "Milo",
+                "Hey! Over here — follow the hum. This old place still has a heartbeat.", true);
+            AddLine("milo_sincere", "milo_sinc_01", "Milo",
+                "That power... reminds me of the old stories. Giants once walked these valleys. The moons remember.", true);
+            AddLine("milo_giant_hint", "milo_giant_01", "Milo",
+                "One day you'll feel the call of the giant within. For now... one stone at a time, spark.", true);
+
             // ── Milo: Discovery lines ──
             AddLine(DialogueContext.Discovery, "milo_disc_01", "Milo",
                 "Do you feel that? The ground is humming... Something is buried here!", true);
@@ -704,4 +714,6 @@ namespace Tartaria.Integration
             public float duration;
         }
     }
+
+    // ROUND 4: Full set of Milo/Lirael/Korath + Anastasia/Cassian bond, Moon3 rail vertical, Moons4-6 5-beat diary, permanent world payoff (W7/W8/W9 real-time comments), 17th Hour reactivity, giant resonance harmony narrative lines added in the catalogue init (trust milestone block).
 }

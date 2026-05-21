@@ -492,7 +492,7 @@ namespace Tartaria.Integration
         static CompanionData[] CreateDefaultCompanions()
         {
             return new[] { 
-                new CompanionData { companionId = "milo", displayName = "Milo", description = "Loyal scout and excavator. Unlocks early dig sites and discovery range in Echohaven.", unlockMoon = 1, passiveBuffType = CompanionBuffType.DiscoveryRange, passiveDescription = "Increased aether shard and POI detection range." },
+                new CompanionData { companionId = "milo", displayName = "Milo", description = "Loyal scout and excavator. Unlocks early dig sites and discovery range in Echohaven.", unlockMoon = 0, passiveBuffType = CompanionBuffType.DiscoveryRange, passiveDescription = "Increased aether shard and POI detection range." },
                 new CompanionData { companionId = "lirael", displayName = "Lirael", description = "Crystal singer and tuning expert.", unlockMoon = 2, passiveBuffType = CompanionBuffType.TuningAccuracy, passiveDescription = "Higher accuracy and faster node completion in tuning mini-games." },
                 new CompanionData { companionId = "thorne", displayName = "Thorne", description = "Fleet tactician and combat support.", unlockMoon = 4, passiveBuffType = CompanionBuffType.CombatDamage, passiveDescription = "Bonus damage and wave clear speed." },
                 new CompanionData { companionId = "korath", displayName = "Korath", description = "Stone weaver and structural guardian.", unlockMoon = 8, passiveBuffType = CompanionBuffType.MoteDetection, passiveDescription = "Enhanced mote and secret resonance detection." },

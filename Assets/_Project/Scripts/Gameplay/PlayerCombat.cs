@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Profiling;
 using Tartaria.Audio;
+using Tartaria.Core;
 
 namespace Tartaria.Gameplay
 {
@@ -39,6 +40,7 @@ namespace Tartaria.Gameplay
 
         void Update()
         {
+            using (PerformanceGuard.Profile(SystemTag.Player))
             using (s_UpdateMarker.Auto())
             {
                 bool fire = false;
@@ -60,6 +62,10 @@ namespace Tartaria.Gameplay
                 try { OnSwing?.Invoke(); } catch (System.Exception ex) { Debug.LogWarning($"[PlayerCombat] OnSwing listener failed: {ex.Message}"); }
                 AudioManager.Instance?.PlaySFX("CombatHit", transform.position);
 
+                // Moon1 Echohaven polish: light benefit from PulseDamage (E_SpireResonance +10% from spire restore) for player melee feel + power fantasy consistency with pulse/strike.
+                float dmgMod = 1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.PulseDamage) ?? 0f) * 0.5f;
+                int effectiveDamage = Mathf.RoundToInt(meleeDamage * dmgMod);
+
                 // Sphere swept forward in front of player chest
                 Vector3 origin = transform.position + Vector3.up * 1.2f + transform.forward * (reach * 0.5f);
                 int hit = 0;
@@ -71,11 +77,11 @@ namespace Tartaria.Gameplay
                     if (c.transform.IsChildOf(transform) || c.transform == transform) continue;
                     
                     // Bridge to enemy components living in AI / Integration asmdefs
-                    c.SendMessageUpwards("TakeDamage", (int)meleeDamage, SendMessageOptions.DontRequireReceiver);
-                    c.SendMessageUpwards("TakeDamage", (float)meleeDamage, SendMessageOptions.DontRequireReceiver);
+                    c.SendMessageUpwards("TakeDamage", (int)effectiveDamage, SendMessageOptions.DontRequireReceiver);
+                    c.SendMessageUpwards("TakeDamage", (float)effectiveDamage, SendMessageOptions.DontRequireReceiver);
                     
                     // Sprint: Spawn damage number at hit position
-                    DamageNumberPool.Spawn(meleeDamage, c.transform.position);
+                    DamageNumberPool.Spawn(effectiveDamage, c.transform.position);
                     
                     hit++;
                 }
@@ -83,7 +89,7 @@ namespace Tartaria.Gameplay
                 if (hit > 0)
                 {
                     AudioManager.Instance?.PlaySFX("EnemyDeath", origin);
-                    Debug.Log($"[PlayerCombat] Hit {hit} target(s) for {meleeDamage}");
+                    Debug.Log($"[PlayerCombat] Hit {hit} target(s) for {effectiveDamage} (base {meleeDamage}, mod {dmgMod:F2} from PulseDamage)");
                     
                     // Sprint: Hit-stop on confirmed hit
                     HitStopController.Trigger(meleeDamage);

@@ -223,6 +223,7 @@ namespace Tartaria.AI
 
         void Update()
         {
+            using (PerformanceGuard.Profile(SystemTag.MudGolem))
             using (s_UpdateMarker.Auto())
             {
                 if (_state == GolemState.Dead) return;
@@ -574,10 +575,34 @@ namespace Tartaria.AI
             // to avoid an asmdef cycle (AI must NOT reference Integration).
             SendMessage("KillFromAI", SendMessageOptions.DontRequireReceiver);
 
-            // Destroy after 4s (longer for ragdoll to settle)
-            Destroy(gameObject, 4f);
+            // Round 5: Health owns death cleanup (KillFromAI -> Die) for full pooling lifecycle.
+            // AI no longer schedules its own Destroy — prevents race with pool return.
+            // (Health will ReturnToPool or fallback Destroy.)
 
-            Debug.Log("[MudGolem] Dead");
+            Debug.Log("[MudGolem] Dead (health-managed lifecycle for pooling)");
+        }
+
+        /// <summary>
+        /// Round 5 Production: Reset AI FSM/state when re-pooled and re-activated from EchohavenContentSpawner.
+        /// Ensures clean Patrol state, fresh health sync, no stale timers/targets. Full lifecycle pooling.
+        /// </summary>
+        public void ResetForPoolReuse()
+        {
+            _currentHealth = maxHealth;
+            _state = GolemState.Patrol;
+            _stateEnterTime = Time.time;
+            _lastAttackTime = 0f;
+            _knockbackVelocity = Vector3.zero;
+            _lostTargetTime = 0f;
+            _telegraphing = false;
+            _lastKnownPlayerPosition = Vector3.zero;
+            if (_player == null)
+            {
+                var p = GameObject.FindGameObjectWithTag("Player");
+                if (p != null) _player = p.transform;
+            }
+            TransitionTo(GolemState.Patrol);
+            Debug.Log("[MudGolemAI] Reset for pool reuse (Round 5 lifecycle)");
         }
 
         /// <summary>Sprint Batch 2: Enable ragdoll on death</summary>

@@ -86,6 +86,7 @@ namespace Tartaria.Integration
                 ? LayerMask.NameToLayer("Building") : 0;
 
             UpdateVisuals();
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
             RestoreFromSave();
             RegisterWithScanner();
             TryRegisterExcavationCallbacks();
@@ -284,6 +285,7 @@ namespace Tartaria.Integration
             AudioManager.Instance?.PlaySFX("BuildingReveal", transform.position);
             HUDController.Instance?.ShowInteractionPrompt($"The mud crumbles! {GetDisplayName()} is revealed!");
             UpdateVisuals();
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
             Save.SaveManager.Instance?.MarkDirty();
         }
 
@@ -378,6 +380,7 @@ namespace Tartaria.Integration
                 GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
             UpdateVisuals();
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
         }
 
         void OnTuningFailed()
@@ -394,6 +397,7 @@ namespace Tartaria.Integration
         {
             _state = BuildingRestorationState.Emerging;
             UpdateVisuals();
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
 
             // 5-second dissolution sequence (modified by repair speed skill)
             float duration = definition != null ? definition.dissolutionDuration : 5f;
@@ -498,6 +502,7 @@ namespace Tartaria.Integration
                 Instantiate(restoreSparkleVFX, transform.position, Quaternion.identity);
             
             UpdateVisuals();
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
 
             // Register building for passive income
             EconomySystem.Instance?.RegisterBuilding(
@@ -615,7 +620,10 @@ namespace Tartaria.Integration
                         if (bs.nodesComplete[i]) _nodesCompleted++;
                     }
                     _isDiscovered = _state != BuildingRestorationState.Buried;
+                    if (_state == BuildingRestorationState.Active)
+                        EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
                     UpdateVisuals();
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
                     return;
                 }
             }

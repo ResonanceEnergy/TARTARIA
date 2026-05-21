@@ -526,8 +526,8 @@ namespace Tartaria.Save
             {
                 header = new SaveHeader
                 {
-                    schemaVersion = 11,
-                    gameVersion = "0.11.0",
+                    schemaVersion = 14,
+                    gameVersion = "0.14.0",
                     platform = "windows",
                     saveSlot = 0,
                     createdUtc = DateTime.UtcNow.ToString("o"),
@@ -626,7 +626,7 @@ namespace Tartaria.Save
                 if (data.airshipFleet == null) data.airshipFleet = new AirshipFleetSaveBlock();
                 if (data.leyLineProphecy == null) data.leyLineProphecy = new LeyLineProphecySaveBlock();
                 if (data.bellTowerSync == null) data.bellTowerSync = new BellTowerSyncSaveBlock();
-                if (data.giantMode == null) data.giantMode = new GiantModeSaveBlock();
+                if (data.giantMode == null) data.giantMode = new GiantModeSaveBlock(); // now includes isActiveOnSave + aether for Echohaven giant persistence
                 if (data.worldChoice == null) data.worldChoice = new WorldChoiceSaveBlock();
                 if (data.achievementData == null) data.achievementData = new AchievementSaveBlock();
                 if (data.dialogueArcs == null) data.dialogueArcs = new DialogueArcSaveBlock();
@@ -723,6 +723,14 @@ namespace Tartaria.Save
                 if (cm.calendarEchoStates == null) cm.calendarEchoStates = System.Array.Empty<bool>();
                 data.header.schemaVersion = 13;
                 data.header.gameVersion = "0.13.0";
+                MarkDirty();
+            }
+            if (data.header.schemaVersion < 14)
+            {
+                // v13 -> v14: Moon 1 Echohaven early progression (fountain/dome/spire hub restorations) + EchohavenSaveBlock for clean save/load of Skill Tree blessings and permanent hub changes.
+                if (data.echohaven == null) data.echohaven = new EchohavenSaveBlock();
+                data.header.schemaVersion = 14;
+                data.header.gameVersion = "0.14.0";
                 MarkDirty();
             }
         }
