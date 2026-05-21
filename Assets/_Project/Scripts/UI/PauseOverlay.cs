@@ -46,6 +46,9 @@ namespace Tartaria.UI
             // Don't compete with the main menu in the Boot scene.
             if (GameBootstrap.MainMenuActive) return;
 
+            // M2: Defer to the new PauseMenu (requested foundation) if present to avoid double-Esc handling.
+            if (PauseMenu.Instance != null) return;
+
             bool kb = Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame;
             bool gp = Gamepad.current  != null && Gamepad.current.startButton.wasPressedThisFrame;
             if (kb || gp) Toggle();

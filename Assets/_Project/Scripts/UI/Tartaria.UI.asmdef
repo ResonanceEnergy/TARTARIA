@@ -6,6 +6,7 @@
         "Tartaria.Gameplay",
         "Tartaria.Input",
         "Tartaria.Audio",
+        "Tartaria.Camera",
         "Unity.TextMeshPro",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",

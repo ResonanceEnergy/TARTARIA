@@ -143,6 +143,20 @@ namespace Tartaria.Audio
             AudioManager.Instance?.PlayTone(freq, duration);
         }
 
+        /// <summary>
+        /// Moon 3 exclusive emotional peak — "The Aether Remembers" triumphant motif hook.
+        /// Called by Moon3RailAudioManager on leviathan purify / escort victory.
+        /// Boosts layers to max and plays golden 432-derived cascade.
+        /// </summary>
+        public void PlayAetherRemembersMotif()
+        {
+            SetResonanceScore(99f);
+            ExitBossEncounter();
+            PlayStinger(StingerType.BossDefeat);
+            PlayStinger(StingerType.ZoneComplete);
+            Debug.Log("[AdaptiveMusic] Moon 3 — THE AETHER REMEMBERS motif triggered (triumphant 432Hz layers).");
+        }
+
         // ─── State Change Handler ────────────────────
 
         void HandleStateChange(GameState prev, GameState current)

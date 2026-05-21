@@ -34,8 +34,33 @@ namespace Tartaria.Gameplay
         public void OnTuningInput(float freq, float amp) { }
         public float GetCurrentAccuracy() => _bestAccuracy;
         public void ForceFullCymaticVisualReapply() { EnsurePermanentCymaticVisuals(); }
-        public object GetSaveData() { return null; }
-        public void LoadSaveData(object data) { }
+        [System.Serializable]
+        public class CymaticSaveData
+        {
+            public float bestCymaticAccuracy;
+            public int cymaticCompletions;
+            public bool goldTierUnlockedForFountain;
+            public bool permanentEffectsActive;
+        }
+        public CymaticSaveData GetSaveData()
+        {
+            return new CymaticSaveData
+            {
+                bestCymaticAccuracy = _bestAccuracy,
+                cymaticCompletions = _completions,
+                goldTierUnlockedForFountain = _goldTierForFountain,
+                permanentEffectsActive = _permanentEffectsActive
+            };
+        }
+        public void LoadSaveData(CymaticSaveData data)
+        {
+            if (data == null) return;
+            _bestAccuracy = data.bestCymaticAccuracy;
+            _completions = data.cymaticCompletions;
+            _goldTierForFountain = data.goldTierUnlockedForFountain;
+            _permanentEffectsActive = data.permanentEffectsActive;
+            EnsurePermanentCymaticVisuals();
+        }
         public void EnsurePermanentCymaticVisuals() { }
         void PulseFountainCrystals(float strength) { }
         void FinishCymatic() { }

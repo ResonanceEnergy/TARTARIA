@@ -4,6 +4,7 @@ using UnityEngine;
 using Tartaria.Integration; // For BossDefinition, BossPhase, BossAttackPattern, BossEncounterSystem
 using Tartaria.Core;
 using Tartaria.Input;
+using Tartaria.Audio; // AudioManager + Procedural for Moon2 crystal resonance tones, bell scalar, fountain storm, dissonance, 432 lullaby, giant tuning haptics
 
 namespace Tartaria.Integration
 {
@@ -317,7 +318,7 @@ namespace Tartaria.Integration
                 // Ley roots: bell synergy
                 if (matchQuality > 0.65f)
                 {
-                    Core.LeyLineManager.Instance?.HarmonizeNode(2); // ley_chamber
+                    Core.LeyLineManager.Instance?.RestoreNode(2); // ley_chamber
                     VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, new Vector3(19f, 1f, 27f));
                 }
                 if (nodesPurifiedThisSolve >= 3 && !LeyChamberPurified)
@@ -337,7 +338,55 @@ namespace Tartaria.Integration
                 // CombatBridge.Instance?.NudgeGiantMeter(0.12f);
             }
 
-            Debug.Log($"[Moon2Boss] {currentBoss.bossName} vein solve: quality={matchQuality:P0}, nodes+={nodesPurifiedThisSolve}, total sectors={Moon2PurifiedVeinSectors}");
+            // ═══ Strong AVH Wiring for Moon 2 Vein Bosses (crystal resonance tones, dissonance corruption, bell scalar, giant haptics) ═══
+            Vector3 bossCenter = new Vector3(0f, 6f, 40f); // approx cathedral heart; adjust per boss if extended
+            if (IsMoon2RootCore(currentBoss)) bossCenter = new Vector3(19f, 2f, 27f);
+            else if (IsMoon2FractalMirror(currentBoss)) bossCenter = new Vector3(-14f, 4f, 47f);
+
+            if (AudioManager.Instance != null)
+            {
+                if (matchQuality > 0.75f)
+                {
+                    AudioManager.Instance.PlaySFX("Moon2_CrystalResonanceTone", bossCenter, 0.47f);
+                    AudioManager.Instance.PlaySFX("Moon2_TuningResonance", bossCenter + Vector3.right * 2f, 0.33f);
+                }
+                else if (matchQuality < 0.4f)
+                {
+                    AudioManager.Instance.PlaySFX("Moon2_DissonanceCorruption", bossCenter, 0.39f);
+                }
+
+                // Bell scalar waves on high quality bell/ley solves (Dissonance Root Core + Bell Sever phase)
+                if (IsMoon2RootCore(currentBoss) && matchQuality > 0.7f)
+                    AudioManager.Instance.PlaySFX("Moon2_BellScalarWave", bossCenter, 0.44f);
+            }
+
+            var haptics = HapticFeedbackManager.Instance;
+            if (haptics != null)
+            {
+                if (matchQuality > 0.78f)
+                {
+                    haptics.PlayCrystalResonanceTuning();
+                    if (IsMoon2CathedralBoss(currentBoss) && (BossEncounterSystem.Instance?.CurrentPhase ?? 0) >= 2) // fractal/giant descent
+                        haptics.PlayMicroGiantCrystalTear();
+                    if (IsMoon2RootCore(currentBoss))
+                        haptics.PlayGiantVeinSurge();
+                }
+                else if (matchQuality < 0.35f)
+                {
+                    haptics.PlayDissonanceCorruptionHit();
+                }
+                if (IsMoon2RootCore(currentBoss) && matchQuality > 0.65f)
+                    haptics.PlayBellScalarToll();
+            }
+
+            // 432Hz lullaby layer on exceptional solves (companion synergy payoff)
+            if (matchQuality > 0.9f && AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX2D("Moon2_432LullabyLayer", 0.48f);
+                haptics?.PlayLullabyPulse();
+            }
+
+            Debug.Log($"[Moon2Boss] {currentBoss.bossName} vein solve: quality={matchQuality:P0}, nodes+={nodesPurifiedThisSolve}, total sectors={Moon2PurifiedVeinSectors} (AVH: resonance tones / scalar bells / dissonance / giant haptics / 432 lullaby wired)");
         }
 
         /// <summary>
@@ -377,7 +426,7 @@ namespace Tartaria.Integration
             if (currentPhase == 2 && IsMoon2CathedralBoss(currentBoss)) // Fractal Descent
             {
                 // Micro-Giant synergy moment
-                OnBossDialogue?.Invoke("The Warden opens its heart! Use Micro-Giant now — Lirael will guide the nodes inside!");
+                OnBossDialogue("The Warden opens its heart! Use Micro-Giant now — Lirael will guide the nodes inside!");
                 // Real: set flag that enables micro-giant entry in the zone scaffold / player input
             }
 
@@ -385,13 +434,52 @@ namespace Tartaria.Integration
             {
                 // Giant Mode root tear window
                 if (bossHPNorm < 0.25f)
-                    OnBossDialogue?.Invoke("The roots are exposed! Giant Mode — tear them free while your companions ring the bells!");
+                    OnBossDialogue("The roots are exposed! Giant Mode — tear them free while your companions ring the bells!");
             }
 
             // Cassian unreliable hint (foreshadow)
             if (UnityEngine.Random.value < 0.12f && IsMoon2CathedralBoss(currentBoss))
             {
-                OnBossDialogue?.Invoke("Cassian: \"Try 285 Hz... no wait, perhaps 396?\" (his advice feels slightly off)");
+                OnBossDialogue("Cassian: \"Try 285 Hz... no wait, perhaps 396?\" (his advice feels slightly off)");
+            }
+
+            // ═══ Moon 2 AVH Phase Telegraphs (dissonance corruption sounds, bell scalar waves, giant haptics, crystal tones) ═══
+            var audio = AudioManager.Instance;
+            var haptic = HapticFeedbackManager.Instance;
+
+            // Desperation / low HP dissonance spikes
+            if (bossHPNorm < 0.28f && UnityEngine.Random.value < 0.18f)
+            {
+                Vector3 p = IsMoon2RootCore(currentBoss) ? new Vector3(19f, 1f, 27f) : new Vector3(0f, 5f, 40f);
+                audio?.PlaySFX("Moon2_DissonanceCorruption", p, 0.44f);
+                haptic?.PlayDissonanceCorruptionHit();
+            }
+
+            // Bell Sever / root phases: scalar bell waves + toll haptic
+            if (currentPhase == 1 && IsMoon2RootCore(currentBoss) && UnityEngine.Random.value < 0.22f) // Bell Sever phase
+            {
+                audio?.PlaySFX("Moon2_BellScalarWave", new Vector3(19f, 3f, 27f), 0.51f);
+                haptic?.PlayBellScalarToll();
+            }
+
+            // Fractal Descent / Giant Heart: micro-giant + giant haptics + resonance tones
+            if ((currentPhase == 2 && IsMoon2CathedralBoss(currentBoss)) || (currentPhase == 2 && IsMoon2RootCore(currentBoss)))
+            {
+                if (UnityEngine.Random.value < 0.25f)
+                {
+                    audio?.PlaySFX("Moon2_CrystalResonanceTone", Vector3.up * 7f, 0.36f);
+                    haptic?.PlayMicroGiantCrystalTear();
+                    haptic?.PlayGiantVeinSurge();
+                }
+            }
+
+            // Final Purge / Warden's Lament: ionized storm accents + lullaby resolution hint
+            if (currentPhase >= 3 && bossHPNorm < 0.15f && UnityEngine.Random.value < 0.14f)
+            {
+                audio?.PlaySFX2D("Moon2_IonizedFountainStorm", 0.29f);
+                audio?.PlaySFX2D("Moon2_432LullabyLayer", 0.22f);
+                haptic?.PlayFountainStormRumble();
+                haptic?.PlayLullabyPulse();
             }
         }
 
@@ -416,10 +504,18 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, new Vector3(0, 15f, 40f));
             VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, new Vector3(0, 10f, 42f)); // dome crown
 
+            // Strong AVH Golden Cascade payoff — crystal resonance + 432 lullaby layer + giant stability haptic
+            AudioManager.Instance?.PlaySFX("Moon2_CrystalResonanceTone", new Vector3(0, 12f, 40f), 0.62f);
+            AudioManager.Instance?.PlaySFX2D("Moon2_432LullabyLayer", 0.47f);
+            AudioManager.Instance?.PlaySFX("Moon2_BellScalarWave", new Vector3(2f, 18f, 38f), 0.41f);
+            HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+            HapticFeedbackManager.Instance?.PlayGiantVeinSurge();
+            HapticFeedbackManager.Instance?.PlayLullabyPulse();
+
             // Hook to existing Moon2 visuals (R7 polish): veins stay golden, dome breathes majestically
             // In practice: set static flag read by TartarianArchitectureBuilder / VFX Moon2 manager on load
-            Core.LeyLineManager.Instance?.HarmonizeNode(0); // cathedral node
-            ResonanceScoreSystem.Instance?.AddResonance(22f, "Cathedral Vein Warden purified");
+            Core.LeyLineManager.Instance?.RestoreNode(0); // cathedral node
+            GameLoopController.Instance?.QueueRSReward(22f, "Cathedral Vein Warden purified");
 
             Debug.Log("[Moon2Boss PAYOFF] Cathedral Vein Warden defeated — PERMANENT: golden veins, +22 RS, Architect Resonance Chamber unlocked, Micro-Giant II duration +25s, corruption immunity in cathedral zone.");
             // Real: unlock sub-chamber GameObject activate, achievement, save flag
@@ -429,7 +525,7 @@ namespace Tartaria.Integration
         {
             CrystalCavernsResonant = true;
             VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, new Vector3(-12f, 4f, 48f));
-            ResonanceScoreSystem.Instance?.AddResonance(14f, "Fractal Mirror purified");
+            GameLoopController.Instance?.QueueRSReward(14f, "Fractal Mirror purified");
             Debug.Log("[Moon2Boss PAYOFF] Fractal Vein Mirror — PERMANENT: resonant crystal grove (bonus Aether harvest, -30% wraith spawns in sector, golden crystals remain lit).");
         }
 
@@ -437,8 +533,8 @@ namespace Tartaria.Integration
         {
             LeyChamberPurified = true;
             VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, new Vector3(19f, 2f, 27f));
-            Core.LeyLineManager.Instance?.HarmonizeNode(2);
-            ResonanceScoreSystem.Instance?.AddResonance(18f, "Root Core purged");
+            Core.LeyLineManager.Instance?.RestoreNode(2);
+            GameLoopController.Instance?.QueueRSReward(18f, "Root Core purged");
             Debug.Log("[Moon2Boss PAYOFF] Dissonance Root Core — PERMANENT: ley_chamber fully purified, new fractal passage to deeper caverns, +global grid resonance, bell towers now grant area-wide corruption shield.");
         }
 
@@ -475,7 +571,7 @@ namespace Tartaria.Integration
         // Helper for dialogue (routes to system event)
         private static void OnBossDialogue(string line)
         {
-            BossEncounterSystem.Instance?.OnBossDialogue?.Invoke(line);
+            BossEncounterSystem.Instance?.RaiseBossDialogue(line);
         }
     }
 }

@@ -40,7 +40,13 @@ namespace Tartaria.Integration
                 if (PlayerPrefs.GetInt(PrefKeyPrefix + n, 0) == 1)
                     _cleared.Add(n);
             }
-            Debug.Log($"[MoonProgress] Loaded {_cleared.Count}/{MoonCount} cleared moons.");
+            // B1 — load per-beat bits
+            _beatCleared.Clear();
+            for (int n = 1; n <= MoonCount; n++)
+                for (int b = 0; b < BeatCount; b++)
+                    if (PlayerPrefs.GetInt(BeatKey(n, b), 0) == 1)
+                        _beatCleared.Add(BeatPackedKey(n, b));
+            Debug.Log($"[MoonProgress] Loaded {_cleared.Count}/{MoonCount} cleared moons; {_beatCleared.Count} beat bits.");
         }
 
         public bool IsCleared(int moonNumber) => _cleared.Contains(moonNumber);
@@ -70,9 +76,83 @@ namespace Tartaria.Integration
         {
             for (int n = 1; n <= MoonCount; n++)
                 PlayerPrefs.DeleteKey(PrefKeyPrefix + n);
+            for (int n = 1; n <= MoonCount; n++)
+                for (int b = 0; b < BeatCount; b++)
+                    PlayerPrefs.DeleteKey(BeatKey(n, b));
             PlayerPrefs.Save();
             _cleared.Clear();
+            _beatCleared.Clear();
             Debug.Log("[MoonProgress] All progression reset.");
+        }
+
+        // ─── B1 Moon Framework v2: per-beat persistence ───
+        public const int BeatCount = 5;
+        const string BeatKeyPrefix = "TARTARIA_MoonBeat_";
+        readonly HashSet<long> _beatCleared = new HashSet<long>();
+        public static event System.Action<int /*moon*/, int /*beat*/> OnBeatCleared;
+
+        static string BeatKey(int moon, int beat) => $"{BeatKeyPrefix}{moon}_{beat}";
+        static long   BeatPackedKey(int moon, int beat) => ((long)moon << 8) | (long)beat;
+
+        public bool IsBeatCleared(int moon, int beat)
+        {
+            if (moon < 1 || moon > MoonCount || beat < 0 || beat >= BeatCount) return false;
+            return _beatCleared.Contains(BeatPackedKey(moon, beat));
+        }
+
+        public void MarkBeatCleared(int moon, int beat)
+        {
+            if (moon < 1 || moon > MoonCount || beat < 0 || beat >= BeatCount) return;
+            var k = BeatPackedKey(moon, beat);
+            if (_beatCleared.Add(k))
+            {
+                PlayerPrefs.SetInt(BeatKey(moon, beat), 1);
+                PlayerPrefs.Save();
+                Debug.Log($"[MoonProgress] beat {beat} on Moon {moon:D2} cleared.");
+                try { OnBeatCleared?.Invoke(moon, beat); } catch (System.Exception ex) { Debug.LogWarning($"[MoonProgress] OnBeatCleared listener failed: {ex.Message}"); }
+
+                // Final beat (Revelation = 4) implies whole-moon clear.
+                if (beat == BeatCount - 1 && !IsCleared(moon))
+                    MarkCleared(moon);
+            }
+        }
+
+        public int BeatsCleared(int moon)
+        {
+            if (moon < 1 || moon > MoonCount) return 0;
+            int n = 0;
+            for (int b = 0; b < BeatCount; b++)
+                if (_beatCleared.Contains(BeatPackedKey(moon, b))) n++;
+            return n;
+        }
+
+        // ─── Moon 3 Specific Payoff Hooks (Continental Rail fast travel, golden rails, post-escort) ───
+        const string Moon3FastTravelKey = "TARTARIA_Moon3_ContinentalRailFastTravel";
+        const string Moon3GoldenRailsKey = "TARTARIA_Moon3_GoldenRailsPermanent";
+
+        public bool IsContinentalRailFastTravelUnlocked =>
+            PlayerPrefs.GetInt(Moon3FastTravelKey, 0) == 1 ||
+            (Tartaria.Save.SaveManager.Instance?.CurrentSave?.moon3?.continentalFastTravelUnlocked ?? false);
+
+        public bool HasGoldenRailsPermanent =>
+            PlayerPrefs.GetInt(Moon3GoldenRailsKey, 0) == 1 ||
+            (Tartaria.Save.SaveManager.Instance?.CurrentSave?.moon3?.goldenRailsPermanent ?? false);
+
+        public void MarkMoon3ContinentalRailUnlocked()
+        {
+            PlayerPrefs.SetInt(Moon3FastTravelKey, 1);
+            PlayerPrefs.SetInt(Moon3GoldenRailsKey, 1);
+            PlayerPrefs.Save();
+            Debug.Log("[MoonProgress] Moon 3 Continental Rail fast travel + golden rails permanent world changes unlocked (Campaign + SpectralOrphan payoff).");
+            // Fire any listeners for rail UI / zone portals
+        }
+
+        /// <summary>Resets Moon 3 specific progression (debug/new game support).</summary>
+        public void ResetMoon3Progress()
+        {
+            PlayerPrefs.DeleteKey(Moon3FastTravelKey);
+            PlayerPrefs.DeleteKey(Moon3GoldenRailsKey);
+            PlayerPrefs.Save();
         }
     }
 }

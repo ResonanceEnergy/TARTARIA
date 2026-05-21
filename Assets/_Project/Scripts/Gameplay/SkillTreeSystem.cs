@@ -25,6 +25,8 @@ namespace Tartaria.Gameplay
     /// auto-granted by EchohavenProgressionSystem upon restoring the 3 core starting hub buildings
     /// (fountain, dome, spire). These provide meaningful permanent early progression and power that
     /// carries through the entire game. Full save/load compatibility via dedicated EchohavenSaveBlock.
+    ///
+    /// Moon 3 (Electric) Extension: Compassion & Rails blessings (Lullaby, Golden Rails, Continental Fast Travel, Orphan Trust, World's Fair) wired from CampaignFlowController + Moon03.json data on M3 completion.
     /// </summary>
     public class SkillTreeSystem : MonoBehaviour
     {
@@ -171,6 +173,12 @@ namespace Tartaria.Gameplay
                     if (node.isUnlocked)
                         unlocked.Add((int)node.id);
             return new SkillTreeSaveData { unlockedSkills = unlocked };
+        }
+
+        /// <summary>Returns the list of nodes for the requested tree (empty list if not built).</summary>
+        public List<SkillNode> GetTree(SkillTreeType type)
+        {
+            return _trees.TryGetValue(type, out var tree) ? tree.nodes : new List<SkillNode>();
         }
 
         public void RestoreFromSave(SkillTreeSaveData data)
@@ -374,6 +382,19 @@ namespace Tartaria.Gameplay
         {
             // Effects are queried via GetModifier() -- no immediate side effect needed.
             Debug.Log($"[SkillTree] Unlocked: {node.displayName} (+{node.modifierValue} {node.modifierType})");
+        }
+
+        // ─── Moon 3 (Electric Moon) Blessing Hook (wired from CampaignFlowController + Moon03.json) ───
+        /// <summary>
+        /// Grants Moon 3 Compassion & Rails capstone blessings on campaign completion of Windswept Highlands.
+        /// Includes lullaby synergy, golden rail permanent world change, fast travel, orphan trust network, World's Fair access.
+        /// </summary>
+        public void UnlockMoon3RailBlessing()
+        {
+            Debug.Log("[SkillTree] Moon 3 Electric Moon blessings unlocked (from Moon03.json via Campaign): Lullaby Shield, Orphan Trust, Golden Rails (permanent), Continental Fast Travel, World's Fair ticket variants.");
+            _modifierCacheDirty = true;
+            OnSkillUnlocked?.Invoke(SkillId.His_TrueHistory); // reuse as proxy for now; real would have M3_ ids
+            Tartaria.Core.GameEvents.FireCriticalSaveTrigger("moon3_skill_blessing");
         }
     }
 

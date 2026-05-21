@@ -56,7 +56,20 @@ namespace Tartaria.Integration
                     break;
                 case MoonMechanic.OrphanTrain:       yield return Mechanic_Escort();          break;
                 case MoonMechanic.FortifyDefense:    yield return Mechanic_Defense();         break;
-                case MoonMechanic.Amplification:     yield return Mechanic_Resonance(3);      break;
+                case MoonMechanic.Amplification:
+                    // Moon 5 real vertical slice: White City pavilions + floating platforms + dock + spire bridge
+                    var whiteCity = FindObjectOfType<WhiteCityAmplificationController>();
+                    if (whiteCity != null)
+                    {
+                        whiteCity.BeginAmplificationSequence();
+                        // Let the controller drive the full 5-beat experience + climax
+                        yield return new WaitUntil(() => whiteCity.pavilionsAmplified >= 5 || whiteCity.bridgeFormed);
+                    }
+                    else
+                    {
+                        yield return Mechanic_Resonance(3); // fallback
+                    }
+                    break;
                 case MoonMechanic.OrganRequiem:      yield return Mechanic_Resonance(5);      break;
                 case MoonMechanic.GiantMode:         yield return Mechanic_Combat(8,  "Awaken the Giant — crush {0} stone wardens."); break;
                 case MoonMechanic.AirshipArmada:     yield return Mechanic_Combat(7,  "Repel the armada — down {0} sky-wraiths."); break;
@@ -210,6 +223,128 @@ namespace Tartaria.Integration
 
         // ... (rest of file methods: Mechanic_Defense, Mechanic_Escort, Mechanic_Resonance, SpawnGolemRing, RetintGolem, TintRenderer, SetLayerRecursive, WaitForAllDead, BuildSimpleGolem, BuildBeacon remain unchanged — Moon 2 only adds the new purge path above)
         // For brevity in this Moon 2 domain edit, other methods preserved exactly as prior.
+
+        /// <summary>FortifyDefense — stationary core HP drains unless protected by killing escort waves.</summary>
+        IEnumerator Mechanic_Defense()
+        {
+            HUDController.Instance?.ShowBanner("Defend", "Defend the core! Hold the line for 45 seconds.");
+            float defenseTimer = 45f;
+            float coreHP = 100f;
+            var corePos = transform.position;
+            int waves = 0;
+            while (defenseTimer > 0f && coreHP > 0f)
+            {
+                SpawnGolemRing(3 + waves, 14f);
+                yield return WaitForAllDead(15f);
+                waves++;
+                defenseTimer -= 15f;
+                // Bleed off any stragglers that closed on the core
+                foreach (var g in _alive)
+                {
+                    if (g == null) continue;
+                    if (Vector3.Distance(g.transform.position, corePos) < 4f)
+                        coreHP -= 5f;
+                }
+                AudioManager.Instance?.PlaySFX2D("DefenseWaveCleared", 0.6f);
+            }
+            if (coreHP > 0f)
+            {
+                GameLoopController.Instance?.QueueRSReward(35f, "moon_defense_complete");
+                HUDController.Instance?.ShowBanner("Defend", "Core defended!");
+            }
+            else
+            {
+                HUDController.Instance?.ShowBanner("Defend", "Core breached — try again.");
+            }
+        }
+
+        /// <summary>OrphanTrain — escort a moving NPC across a path while fast enemies chase.</summary>
+        IEnumerator Mechanic_Escort()
+        {
+            HUDController.Instance?.ShowBanner("Escort", "Escort the orphan — defend until they reach safety.");
+            var escortee = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            escortee.name = "EscortNPC";
+            escortee.transform.position = transform.position + Vector3.forward * -8f;
+            TintRenderer(escortee, new Color(0.85f, 0.75f, 0.55f), emissive: true);
+            Vector3 goal = transform.position + Vector3.forward * 30f;
+            float escortSpeed = 2.2f;
+            float maxTime = 60f;
+            float t = 0f;
+            int waveSpawnInterval = 8;
+            float nextSpawn = 0f;
+            while (t < maxTime && escortee != null)
+            {
+                t += Time.deltaTime;
+                escortee.transform.position = Vector3.MoveTowards(
+                    escortee.transform.position, goal, escortSpeed * Time.deltaTime);
+                if (Vector3.Distance(escortee.transform.position, goal) < 1.2f)
+                {
+                    GameLoopController.Instance?.QueueRSReward(40f, "moon_escort_complete");
+                    HUDController.Instance?.ShowBanner("Escort", "Orphan delivered safely!");
+                    Destroy(escortee);
+                    yield break;
+                }
+                if (t >= nextSpawn)
+                {
+                    SpawnGolemRing(2, 12f);
+                    nextSpawn += waveSpawnInterval;
+                }
+                yield return null;
+            }
+            if (escortee != null) Destroy(escortee);
+            HUDController.Instance?.ShowBanner("Escort", "Escort failed.");
+        }
+
+        /// <summary>Resonance/Amplification/OrganRequiem/LeyProphecy/LivingGrid/BellTower — tune N beacons via FrequencyManager.</summary>
+        IEnumerator Mechanic_Resonance(int beaconCount)
+        {
+            HUDController.Instance?.ShowBanner("Resonance", $"Tune {beaconCount} resonance beacons.");
+            var beacons = new List<GameObject>();
+            var targetFreqs = new List<float>();
+            for (int i = 0; i < beaconCount; i++)
+            {
+                float angle = (i / (float)beaconCount) * Mathf.PI * 2f;
+                var p = transform.position + new Vector3(Mathf.Cos(angle) * 10f, 0f, Mathf.Sin(angle) * 10f);
+                var b = BuildBeacon(p, new Color(0.45f, 0.75f, 1.0f));
+                beacons.Add(b);
+                targetFreqs.Add(220f + (i * 55f)); // ascending harmonic ladder
+            }
+            int tuned = 0;
+            float timeout = 90f;
+            while (tuned < beaconCount && timeout > 0f)
+            {
+                timeout -= Time.deltaTime;
+                yield return null;
+                for (int i = beacons.Count - 1; i >= 0; i--)
+                {
+                    var b = beacons[i];
+                    if (b == null) continue;
+                    var player = GameObject.FindWithTag("Player");
+                    if (player == null) continue;
+                    if (Vector3.Distance(player.transform.position, b.transform.position) > 4f) continue;
+                    float current = IntegrationBridge.GetPlayerCurrentFrequency();
+                    if (Mathf.Abs(current - targetFreqs[i]) < 4f)
+                    {
+                        tuned++;
+                        GameLoopController.Instance?.QueueRSReward(12f, "beacon_tuned");
+                        AudioManager.Instance?.PlaySFX("BeaconTuneSuccess", b.transform.position);
+                        Object.Destroy(b);
+                        beacons.RemoveAt(i);
+                    }
+                }
+            }
+            // Cleanup remaining
+            foreach (var b in beacons) if (b != null) Object.Destroy(b);
+            if (tuned >= beaconCount)
+            {
+                GameLoopController.Instance?.QueueRSReward(25f, "moon_resonance_complete");
+                HUDController.Instance?.ShowBanner("Resonance", "All beacons in harmony!");
+            }
+            else
+            {
+                HUDController.Instance?.ShowBanner("Resonance", $"Tuned {tuned}/{beaconCount} beacons.");
+            }
+        }
 
         IEnumerator WaitForAllDead(float timeout)
         {

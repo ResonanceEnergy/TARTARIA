@@ -53,7 +53,26 @@ namespace Tartaria.Input
             // Catch-all: any Logitech HID gamepad by product name substring
             InputSystem.onDeviceChange += OnDeviceChange;
 
-            Debug.Log("[Logitech] Controller layout matchers registered (F310/F510/F710 DirectInput).");
+            Debug.Log("[Logitech] Controller layout matchers registered (F310/F510/F710 DirectInput + catch-all).");
+        }
+
+        /// <summary>
+        /// M2-M4: Explicit helper to force F310 recognition and test rumble if connected.
+        /// Call from debug or on first gamepad connect.
+        /// </summary>
+        public static void EnsureF310Setup()
+        {
+            var gamepad = Gamepad.current;
+            if (gamepad == null) return;
+
+            var desc = gamepad.description;
+            if (desc.product != null && desc.product.ToUpperInvariant().Contains("F310"))
+            {
+                Debug.Log("[Logitech F310] Detected and mapped as Gamepad. Rumble supported via XInput or custom layout.");
+                // Quick rumble test (low-high motors)
+                gamepad.SetMotorSpeeds(0.3f, 0.6f);
+                // Stop after short time (caller can manage)
+            }
         }
 
         static void OnDeviceChange(InputDevice device, InputDeviceChange change)

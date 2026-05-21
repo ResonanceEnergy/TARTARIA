@@ -1,5 +1,7 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.UI;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -268,6 +270,56 @@ namespace Tartaria.Integration
             AddTrust(5f);
             Save.SaveManager.Instance?.MarkDirty();
             RememberSong();
+        }
+
+        // === MOON 2 LUNAR FTUE: Lirael memory solidifies + physical relief/fracture tells (for Moon2LunarContentSpawner 5-beat) ===
+        // Ties to Cassian trust/doubt arc, fountain climax, and replayable Crystal Remembers.
+
+        /// <summary>Discovery beat: Lirael fracture from first dissonance — cracks memory, triggers visual/physical tell.</summary>
+        public void OnMoon2LiraelFracture()
+        {
+            DialogueManager.Instance?.PlayContextDialogue("lirael_moon2_fracture");
+            AddTrust(-2f); // stress from corruption echo
+            UpdateSolidity(Mathf.Max(0.05f, _solidity - 0.12f));
+            CompanionManager.Instance?.TriggerPhysicalTellForBeat("lirael", 0); // fracture tell
+            Debug.Log("[LiraelController OnMoon2LiraelFracture] FTUE Discovery: memory fracture + physical tell. (beat 1)");
+        }
+
+        /// <summary>Climax/Relief beat: After ionized fountain storm purify — memory solidifies, song relief, trust surge.</summary>
+        public void OnMoon2FountainRelief(bool fullPurgeSuccess)
+        {
+            string key = fullPurgeSuccess ? "lirael_moon2_fountain_relief_full" : "lirael_moon2_fountain_relief";
+            DialogueManager.Instance?.PlayContextDialogue(key);
+            AddTrust(fullPurgeSuccess ? 14f : 7f);
+            UpdateSolidity(Mathf.Min(0.72f, _solidity + 0.28f)); // solidifies significantly
+            CompanionManager.Instance?.TriggerPhysicalTellForBeat("lirael", 0); // relief/solidify tell
+            RememberSong(); // memory solidifies
+
+            // Strong Moon 2 AVH lullaby + resonance for fountain storm relief (432Hz layers + haptic)
+            AudioManager.Instance?.PlaySFX2D("LiraelLullabyHum", fullPurgeSuccess ? 0.78f : 0.45f);
+            AudioManager.Instance?.PlaySFX2D("Moon2_432LullabyLayer", 0.52f);
+            Input.HapticFeedbackManager.Instance?.PlayLullabyPulse();
+            Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+
+            Debug.Log("[LiraelController OnMoon2FountainRelief] FTUE Climax: memory solidifies post-purge. (beat 4) + 432Hz lullaby AVH");
+        }
+
+        /// <summary>Revelation tie-in: Reacts to Cassian diary choice during The Crystal Remembers — deepens memory based on path.</summary>
+        public void OnMoon2CrystalRemembers(bool trustPathChosen, string variantEcho)
+        {
+            string key = trustPathChosen ? "lirael_crystal_remembers_hope" : "lirael_crystal_remembers_sad";
+            DialogueManager.Instance?.PlayContextDialogue(key);
+            AddTrust(trustPathChosen ? 6f : 3f);
+            UpdateSolidity(0.82f);
+            CompanionManager.Instance?.TriggerPhysicalTellForBeat("lirael", trustPathChosen ? 4 : 1);
+
+            // Revelation 432Hz lullaby layer + haptic (ties to spawner beat 5 Crystal Remembers payoff)
+            AudioManager.Instance?.PlaySFX2D("Moon2_432LullabyLayer", trustPathChosen ? 0.71f : 0.39f);
+            AudioManager.Instance?.PlaySFX2D("LiraelLullabyHum", 0.58f);
+            Input.HapticFeedbackManager.Instance?.PlayLullabyPulse();
+            Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+
+            Debug.Log($"[LiraelController OnMoon2CrystalRemembers] FTUE Revelation: memory solidifies on '{variantEcho}'. (beat 5) Trust path={trustPathChosen} + 432 lullaby AVH");
         }
 
         // Round 6: Lirael (ID=2) roof singer escort for train + 17th Hour solidification support

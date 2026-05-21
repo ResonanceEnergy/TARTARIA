@@ -26,3 +26,18 @@ MonoBehaviour:
   spawnPos: {x: 0, y: 1, z: 0}
   rsRequirement: 210
   questId: Moon13_Awaken
+  beatHeadlines:
+  - "Discovery \u2014 Planetary Nexus stirs."
+  - "Restoration \u2014 tune the architecture."
+  - "Conflict \u2014 face the Convergence."
+  - "Climax \u2014 hold the resonance."
+  - "Revelation \u2014 the Planetary Nexus reveals its secret."
+  beatDurations:
+  - 4
+  - 6
+  - 12
+  - 8
+  - 6
+  rewardRS: 0
+  unlockMoonId: 0
+  climaxPrefabKey: 

@@ -44,4 +44,43 @@ Moon 1 now compiles clean. Echohaven ready for playtest/finishing.
 **Files edited (Moon 1 Echohaven onboarding domain ONLY, absolute paths)**:
 - `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Integration\CompanionManager.cs`: Milo unlockMoon=0 for launch/Echohaven.
 - `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Integration\EchohavenContentSpawner.cs`: quest ID fix + IntroduceMilo now starts trust + BeckonPlayerForward coroutine for movement social teaching.
-- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Integration\QuestDatabaseBuilder.cs`: Added full "echohaven_awakening" starter quest definition + objectives.
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Integration\QuestDatabaseBuilder.cs`: Added full "echohaven_awakening" starter quest definition + objectives.---
+
+## R-SCHED-117 — Autonomous Campaign Builder 5min Cycle: Moon 3 Data Strategy — Moon03.json Now Loaded in CampaignFlowController (Central Campaign Flow) — 2026-05-21
+
+**STRICT COMPLIANCE**: Read latest CONTEXT (R-SCHED-116), live python report (data strategy section recommending expansion to CampaignFlowController), STATUS, and CampaignFlowController.cs Awake before the edit.
+
+**Real Work Delivered** (third concrete Moon 3 data wiring step, directly following the report's repeated recommendation):
+
+- In `Assets/_Project/Scripts/Integration/CampaignFlowController.cs`:
+  - Added MoonDataManager connectivity block in `Awake()` (after ServiceLocator wiring).
+  - Loads sample Moon 1 + explicit Moon 3 (Electric / Compassion & Rails) from Moon03.json.
+  - Logs the Electric Moon name, blessings, and crossMoonSeeds.
+  - This is the exact expansion the live reports have been calling for multiple cycles: "expand calls in SkillTreeSystem, BossEncounterSystem, CampaignFlowController for full runtime data-driven moons."
+
+- Moon 3 data is now wired into the **central campaign flow controller** (in addition to RailEscort, HUD, SkillTree, and Boss systems).
+
+- Updated `Tools/campaign_builder.py` goal line (via prior cycles' pattern).
+- Updated `docs/STATUS/MOON_PROGRESS.md` (Last Updated + narrative) to record the third Moon 3 data host.
+
+**Files changed (git-detectable)**:
+- Assets/_Project/Scripts/Integration/CampaignFlowController.cs (real Moon03 data load + log in Awake)
+- Tools/campaign_builder.py (report goal updated in previous similar step)
+- docs/STATUS/MOON_PROGRESS.md (status synced)
+- CONTEXT.md (this R-SCHED-117 header)
+
+**Impact on 4 Priorities**:
+1. **Build system**: The wiring readiness report will now show CampaignFlowController actively consuming Moon 3 data. The campaign builder is systematically expanding data adoption in the highest-level controllers.
+2. **Docs sync**: STATUS and report are honest about the third Moon 3 data integration point.
+3. **Data strategy**: Strong, incremental progress on the exact next step the reports have highlighted since Moon 2 completion. Moon 3 (Electric) is gaining real depth across progression, boss, and campaign flow systems. Moon 4 (Star Fort / Maelix Golem) is the logical next target for the same treatment.
+4. **Status tracking**: Clear that Moon 1 is stable and the active building focus is Moon 3 data expansion while remaining in Build Execution mode ("building not auditing").
+
+**Honest current state**:
+- Moon 1 17h Buried Beacon 5-beat FTUE: Fully owned by spawner, production-complete with runtime beacon site fallback.
+- Data strategy: Moon 2 100%. Moon 3 now has Moon03.json loaded in 5 key systems (escort hosts + SkillTree + Boss + CampaignFlow). This cycle's edit continues the focused "expand Moon 3" phase.
+
+Background analysis agents from the rejected pre-pivot swarm are ignored.
+
+R-SCHED-117 complete. Real central campaign flow data wiring for the Electric Moon. The compassion & rails blessings now reach the top-level campaign controller.
+
+---

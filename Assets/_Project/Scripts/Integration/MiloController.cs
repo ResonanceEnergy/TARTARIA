@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -186,7 +187,9 @@ namespace Tartaria.Integration
         }
 
         /// <summary>Moon 3/17th: Milo physical train escort. Round 6: FULL bridge to DOTS ID=0 + 17th Hour support + playtest path.</summary>
-        public void BoardTrain(Vector3 positionOnTrain, bool is17thHour = false)
+        public void BoardTrain(Vector3 positionOnTrain) => BoardTrain(positionOnTrain, false);
+
+        public void BoardTrain(Vector3 positionOnTrain, bool is17thHour)
         {
             Vector3 offset = new Vector3(-1.8f, 1.4f, 1.5f);
             if (transform != null)

@@ -443,16 +443,9 @@ namespace Tartaria.Editor
         struct BuildingData { public string id, name, lore; public BuildingArchetype archetype; public float width, height, aetherStrength, aetherRadius, dissolutionDuration; public HarmonicBand band; public int nodeCount; public TuningPuzzleConfig[] nodes; }
 
         // NOTE: Full helper bodies (CreateBuildingSlot etc.) and old R6 Apply* preserved for compilation — they call the new R8 perf functions above.
-        static void CreateBuildingSlot(GameObject p, string n, Vector3 pos, string id) { var go = new GameObject(n); go.transform.SetParent(p.transform, false); go.transform.localPosition = pos; /* attach perf-ready tags */ }
-        static void CreateSpawnPoint(GameObject p, string n, Vector3 pos, float t) { var go = new GameObject(n); go.transform.SetParent(p.transform, false); go.transform.localPosition = pos; }
         static void CreateSecretSlot(GameObject p, string n, Vector3 pos, string lore) { var go = new GameObject(n); go.transform.SetParent(p.transform, false); go.transform.localPosition = pos; /* secret culling + pooling ready */ }
-        static void CreateTrigger(GameObject p, string n, Vector3 pos, float r, string tt) { var go = new GameObject(n); go.transform.SetParent(p.transform, false); go.transform.localPosition = pos; }
-        static void CreateMoteSlot(GameObject p, string n, Vector3 pos) { }
         static void ValidateMoon2DenseScatterPerformance(GameObject r) { Debug.Log("[Moon2 PERF] Legacy validate redirected to ultra-dense."); }
         static void FinalizeLODImpostorAndStaticBatching(GameObject r) { /* redirects to new full */ }
-        static void CreateMoon2SpecificPostProcessVolume(GameObject r) { }
-        static int PlaceAdvancedMoon2KayKitClusters(GameObject p) { return 70; }
-        static int PlaceAdvancedGlobalForestScatter(GameObject p, int t) { return t; }
     }
 
     // Lightweight runtime components for Moon2 pooling + culling (added to scene by perf pass — domain safe)
@@ -484,8 +477,8 @@ namespace Tartaria.Editor
         public float secretCullingDistance = 50f;
         public float foliageCullingDistance = 95f;
         public bool enableFrustum = true;
-        Camera _cam;
-        void Start() { _cam = Camera.main; InvokeRepeating(nameof(Cull), 0.8f, 1.1f); }
+        UnityEngine.Camera _cam;
+        void Start() { _cam = UnityEngine.Camera.main; InvokeRepeating(nameof(Cull), 0.8f, 1.1f); }
         void Cull()
         {
             if (_cam == null) return;

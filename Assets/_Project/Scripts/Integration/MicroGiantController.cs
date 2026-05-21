@@ -204,8 +204,11 @@ namespace Tartaria.Integration
 
                     VFXController.Instance?.PlayTuningSuccess(node.position, true);
                     HapticFeedbackManager.Instance?.PlayPerfectTune();
+                    HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+                    Audio.AudioManager.Instance?.PlaySFX("Moon2_CrystalResonanceTone", node.position, 0.43f);
+                    Audio.AudioManager.Instance?.PlaySFX("Moon2_TuningResonance", node.position, 0.36f);
 
-                    Debug.Log($"[MicroGiant] Node purged: {_nodesPurged}/{corruptionNodesToPurge}");
+                    Debug.Log($"[MicroGiant] Node purged: {_nodesPurged}/{corruptionNodesToPurge} (Moon2 crystal resonance AVH)");
                     OnNodePurged?.Invoke(_nodesPurged);
                     return true;
                 }
@@ -251,6 +254,13 @@ namespace Tartaria.Integration
             CorruptionSystem.Instance?.PurgeCorruption(_activeBuildingId, 100f);
             Save.SaveManager.Instance?.MarkDirty();
             Audio.AudioManager.Instance?.PlaySFX2D("MicroPurgeComplete");
+            Audio.AudioManager.Instance?.PlaySFX("Moon2_TuningResonance", transform.position, 0.51f);
+            Audio.AudioManager.Instance?.PlaySFX("Moon2_CrystalResonanceTone", transform.position, 0.38f);
+
+            // Moon 2 giant tuning haptic AVH
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+            HapticFeedbackManager.Instance?.PlayMicroGiantCrystalTear();
 
             ExitMicroMode();
         }

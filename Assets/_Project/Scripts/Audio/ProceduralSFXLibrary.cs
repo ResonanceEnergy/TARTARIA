@@ -99,6 +99,40 @@ namespace Tartaria.Audio
             Register("Moon2_AreaHall", GenMoon2AreaAmbience(648f, 0.08f, false));
             Register("Moon2_AreaLey", GenMoon2AreaAmbience(162f, 0.12f, true));
 
+            // ═══ Moon 2 Expanded AVH — Crystal Resonance Tones, Bell Scalar Waves, Fountain Storm, Dissonance Corruption, 432Hz Lullaby Layers ═══
+            // Wired for bosses (vein wardens freq puzzles), micro-giant tuning, ionized fountain storm climax (spawner beat 4), Lirael/Cassian 432Hz lullaby, giant synergy haptics
+            // All 432 Hz / 324 Hz keynote family + PHI harmonics + tritone dissonance for corruption. Procedural, no assets.
+            Register("Moon2_IonizedFountainStorm", GenMoon2IonizedFountainStorm());
+            Register("Moon2_CrystalResonanceTone", GenMoon2CrystalResonanceTone());
+            Register("Moon2_BellScalarWave", GenMoon2BellScalarWave());
+            Register("Moon2_FountainStorm", GenMoon2FountainStorm());
+            Register("Moon2_DissonanceCorruption", GenMoon2DissonanceCorruption());
+            Register("LiraelLullabyHum", GenLiraelLullabyHum());
+            Register("Moon2_432LullabyLayer", GenMoon2LullabyLayer());
+            Register("Moon2_TuningResonance", GenMoon2TuningResonance());
+
+            // ═══ Moon 3 (Compassion & Rails — Windswept Highlands / Orphan Train Escort / Leviathan) — EXCLUSIVE ═══
+            // 432Hz base lullaby rhythm system, dynamic train (wheel clack / whistle / stress), reactive Highlands wind,
+            // layered Leviathan roars/attacks, emotional "The Aether Remembers" motif, tension/warmth/triumph layers.
+            // All integrated to RailEscortController + AdaptiveMusicController. Zero other moons touched.
+            Register("Moon3_TrainDepart", GenMoon3TrainDepart());
+            Register("Moon3_TrainWheelClack", GenMoon3WheelClack());
+            Register("Moon3_TrainWhistle", GenMoon3TrainWhistle());
+            Register("Moon3_TrainStress", GenMoon3TrainStress());
+            Register("Moon3_LullabyPulse", GenMoon3LullabyPulse());
+            Register("Moon3_LullabySuccess", GenMoon3LullabySuccess());
+            Register("Moon3_LullabyWarmth", GenMoon3LullabyWarmth());
+            Register("Moon3_HighlandsWind", GenMoon3HighlandsWind());
+            Register("Moon3_WindCalm", GenMoon3WindCalm());
+            Register("Moon3_LeviathanRoar", GenMoon3LeviathanRoar());
+            Register("Moon3_LeviathanScream", GenMoon3LeviathanScream());
+            Register("Moon3_LeviathanImpact", GenMoon3LeviathanImpact());
+            Register("Moon3_SeventeenthHourChime", GenMoon3SeventeenthHourChime());
+            Register("Moon3_AetherRemembers", GenMoon3AetherRemembersMotif());
+            Register("Moon3_RailTuning", GenMoon3RailTuning());
+            Register("Moon3_WraithShriek", GenMoon3WraithShriek());
+            Register("Moon3_TrainRestored", GenMoon3TrainRestored());
+
             _initialized = true;
             Debug.Log($"[ProceduralSFX] Generated {_clips.Count} SFX clips.");
         }
@@ -819,6 +853,480 @@ namespace Tartaria.Audio
                 data[i] = (v + windGhost) * amp * mod;
             }
             return MakeClip($"SFX_Moon2_Area_{baseFreq:F0}", data);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // MOON 2 EXPANDED AVH GENERATORS — Crystal resonance tones, bell scalar waves,
+        // fountain storm (ionized dome climax), dissonance corruption, 432Hz lullaby layers,
+        // micro-giant tuning resonance. All tied to 432 Hz harmonic series + Moon2 324 Hz keynote.
+        // Scalar waves = slow beating/phase interference for living bell feel.
+        // ═══════════════════════════════════════════════════════════════
+
+        /// <summary>Ionized fountain storm for Moon2 climax dome purify (spawner beat 4, fountain storm). Intense sparkling + rumbling storm chimes.</summary>
+        static AudioClip GenMoon2IonizedFountainStorm()
+        {
+            int len = Samples(4.1f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float stormMod = Mathf.Pow(Mathf.Abs(Mathf.Sin(t * 4.1f + Mathf.Sin(t * 1.3f) * 2.2f)), 0.65f);
+                float baseChime = Sine(i, 216f) * 0.19f + Sine(i, 324f) * 0.16f + Sine(i, 648f + Mathf.Sin(t * 5f) * 3f) * 0.11f;
+                float ionSpark = FilteredNoise(i, 1620f) * stormMod * 0.31f;
+                float highGlint = FilteredNoise(i, 2850f) * stormMod * 0.09f * (0.5f + Mathf.Sin(t * 19f) * 0.5f);
+                float rumble = FilteredNoise(i, 48f) * 0.17f * (0.3f + 0.7f * stormMod);
+                float env = 0.65f + 0.35f * Mathf.Sin(t * 6.8f);
+                data[i] = (baseChime + ionSpark + highGlint + rumble) * env * stormMod * 0.58f;
+            }
+            return MakeClip("SFX_Moon2_IonizedFountainStorm", data);
+        }
+
+        /// <summary>Crystal resonance tone cluster — pulsing 324/432 family with shimmer overtones for tuning feedback and vein solves.</summary>
+        static AudioClip GenMoon2CrystalResonanceTone()
+        {
+            int len = Samples(2.8f);
+            var data = new float[len];
+            float[] baseTones = { 324f, 405f, 432f, 486f, F_HEALING * 0.81f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float pulse = 0.7f + 0.3f * Mathf.Sin(2f * Mathf.PI * 0.9f * t);
+                float v = 0f;
+                for (int k = 0; k < baseTones.Length; k++)
+                {
+                    float f = baseTones[k] + Mathf.Sin(t * 1.7f + k) * 1.2f;
+                    v += Sine(i, f) * (0.22f - k * 0.028f) * pulse;
+                }
+                float shimmer = FilteredNoise(i, 2100f) * 0.04f * (0.6f + Mathf.Sin(t * 11f) * 0.4f);
+                data[i] = (v + shimmer) * 0.48f;
+            }
+            return MakeClip("SFX_Moon2_CrystalResonanceTone", data);
+        }
+
+        /// <summary>Bell scalar wave — long ringing bell with slow phase-beat "scalar" interference (detuned partials) for Moon2 bell tower / root core phases.</summary>
+        static AudioClip GenMoon2BellScalarWave()
+        {
+            int len = Samples(7.8f);
+            var data = new float[len];
+            float root = F_MOON2_KEY * 1.5f; // ~486 Hz bell root
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float decay = Mathf.Exp(-0.92f * t);
+                float scalarBeat = Mathf.Sin(2f * Mathf.PI * 0.28f * t) * 0.5f + 0.5f; // slow scalar modulation
+                float fundamental = Sine(i, root) * decay * 0.41f;
+                float p2 = Sine(i, root * 2.0f + scalarBeat * 1.8f) * decay * 0.29f; // detuned for beat
+                float p3 = Sine(i, root * 2.97f) * decay * 0.17f;
+                float scalarTail = Sine(i, root * 4.05f + Mathf.Sin(t * 0.9f) * 2.1f) * decay * 0.11f * scalarBeat;
+                float metalRing = FilteredNoise(i, 2650f) * decay * 0.05f * (0.4f + scalarBeat * 0.6f);
+                data[i] = (fundamental + p2 + p3 + scalarTail + metalRing) * 0.53f;
+            }
+            return MakeClip("SFX_Moon2_BellScalarWave", data);
+        }
+
+        /// <summary>Fountain storm variant — even more intense storm dome for ionized fountain climax + giant synergy payoff.</summary>
+        static AudioClip GenMoon2FountainStorm()
+        {
+            int len = Samples(3.6f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float intensity = Mathf.Pow(0.4f + 0.6f * Mathf.Abs(Mathf.Sin(t * 5.3f + Mathf.Sin(t * 0.8f) * 1.9f)), 1.1f);
+                float chimes = Sine(i, 216f) * 0.17f * intensity + Sine(i, 324f) * 0.14f * intensity + Sine(i, 540f) * 0.09f * intensity;
+                float stormNoise = FilteredNoise(i, 1780f) * 0.33f * intensity;
+                float subRumble = FilteredNoise(i, 42f) * 0.19f * (0.5f + intensity * 0.5f);
+                float sparkles = FilteredNoise(i, 3200f) * 0.07f * (0.3f + Mathf.Sin(t * 27f) * 0.7f) * intensity;
+                data[i] = (chimes + stormNoise + subRumble + sparkles) * 0.61f;
+            }
+            return MakeClip("SFX_Moon2_FountainStorm", data);
+        }
+
+        /// <summary>Deep aggressive dissonance corruption — tritone + rapid chaos static for boss desperation / re-corruption phases.</summary>
+        static AudioClip GenMoon2DissonanceCorruption()
+        {
+            int len = Samples(2.3f);
+            var data = new float[len];
+            float baseF = F_MOON2_KEY * 0.5f;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float chaos = FilteredNoise(i, 1100f) * (0.65f + Mathf.Sin(t * 61f) * 0.4f);
+                float trit1 = Sine(i, baseF * TRITONE * 0.68f) * 0.31f;
+                float trit2 = Sine(i, baseF * TRITONE * 1.27f) * 0.24f;
+                float subBeat = FilteredNoise(i, 33f) * 0.21f * (0.5f + Mathf.Sin(t * 3.8f) * 0.5f);
+                float pop = (Random.value < 0.04f ? 0.9f : 0f) * (1f - t * 0.6f);
+                float env = Mathf.Sin(t * Mathf.PI) * 0.95f;
+                data[i] = (chaos + trit1 + trit2 + subBeat + pop) * env * 0.51f;
+            }
+            return MakeClip("SFX_Moon2_DissonanceCorruption", data);
+        }
+
+        /// <summary>Soft 432Hz lullaby hum layers for Lirael relief / Cassian revelation / orphan memory moments. Gentle 3-voice canon with vibrato.</summary>
+        static AudioClip GenLiraelLullabyHum()
+        {
+            int len = Samples(6.5f);
+            var data = new float[len];
+            float f1 = F_HARMONIC;           // 432
+            float f2 = F_HARMONIC * 1.25f;   // ~540
+            float f3 = F_HARMONIC * 1.5f;    // 648
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float breath = (Mathf.Sin(t * 0.7f) * 0.5f + 0.5f);
+                float vib = Mathf.Sin(t * 4.2f) * 1.8f;
+                float v1 = Sine(i, f1 + vib) * 0.28f * breath;
+                float v2 = Sine(i, f2 + vib * 0.7f) * 0.21f * breath;
+                float v3 = Sine(i, f3 + vib * 0.4f) * 0.16f * breath;
+                float warmth = FilteredNoise(i, 420f) * 0.03f * breath;
+                data[i] = (v1 + v2 + v3 + warmth) * 0.39f;
+            }
+            return MakeClip("SFX_LiraelLullabyHum", data);
+        }
+
+        /// <summary>Layered 432Hz lullaby variant for Moon2 revelation / Crystal Remembers banner — richer harmony for 5-beat FTUE payoff.</summary>
+        static AudioClip GenMoon2LullabyLayer()
+        {
+            int len = Samples(5.9f);
+            var data = new float[len];
+            float[] notes = { F_HARMONIC, F_HARMONIC * 1.2f, F_HEALING * 0.82f, F_HARMONIC * 1.618f * 0.5f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * 0.11f * t);
+                float v = 0f;
+                for (int k = 0; k < notes.Length; k++)
+                {
+                    float phase = t * (0.6f + k * 0.1f);
+                    v += Sine(i, notes[k] + Mathf.Sin(phase) * 2.3f) * (0.19f - k * 0.022f) * env;
+                }
+                float softBreath = FilteredNoise(i, 280f) * 0.025f * env;
+                data[i] = (v + softBreath) * 0.44f;
+            }
+            return MakeClip("SFX_Moon2_432LullabyLayer", data);
+        }
+
+        /// <summary>Short bright resonance tone burst for micro-giant crystal tuning successes and vein node solves.</summary>
+        static AudioClip GenMoon2TuningResonance()
+        {
+            int len = Samples(1.1f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI) * (1f - t * 0.4f);
+                float core = Sine(i, 432f) * 0.42f + Sine(i, 324f * 1.25f) * 0.31f + Sine(i, 540f) * 0.18f;
+                float ring = FilteredNoise(i, 1350f) * 0.08f * env;
+                data[i] = (core + ring) * env * 0.55f;
+            }
+            return MakeClip("SFX_Moon2_TuningResonance", data);
+        }
+
+        // ═══════════════════════════════════════════════
+        // Moon 3 (Rail Escort / Orphan Train / Leviathan) Generators — 432Hz Lullaby Rhythm, Dynamic Train, Reactive Ambience, Emotional Motifs
+        // Moon 3 exclusive. Do not reference from other moons.
+        // ═══════════════════════════════════════════════
+
+        /// <summary>Train departure whoosh + initial wheel rumble + orphan hum undertone. 432 base.</summary>
+        static AudioClip GenMoon3TrainDepart()
+        {
+            int len = Samples(3.2f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI) * (1f - t * 0.3f);
+                float rumble = FilteredNoise(i, 85f) * 0.6f * env;
+                float whoosh = Mathf.Sin(2f * Mathf.PI * 180f * t) * 0.22f * env;
+                float orphanHum = (Sine(i, 432f) + Sine(i, 540f)) * 0.08f * (0.7f + 0.3f * Mathf.Sin(t * 3.8f));
+                data[i] = (rumble + whoosh + orphanHum) * 0.65f;
+            }
+            return MakeClip("SFX_Moon3_TrainDepart", data);
+        }
+
+        /// <summary>Short metallic wheel clack for rhythmic train movement. Speed modulates via source pitch/interval in manager.</summary>
+        static AudioClip GenMoon3WheelClack()
+        {
+            int len = Samples(0.18f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t) * (1f - t * 0.6f);
+                float click = FilteredNoise(i, 1200f) * 0.9f;
+                float ring = Sine(i, 980f) * 0.45f * Mathf.Exp(-t * 18f);
+                data[i] = (click * 0.7f + ring) * env * 0.8f;
+            }
+            return MakeClip("SFX_Moon3_TrainWheelClack", data);
+        }
+
+        /// <summary>Proud steam whistle — long tone with 432 harmonic overtones for station arrival / morale.</summary>
+        static AudioClip GenMoon3TrainWhistle()
+        {
+            int len = Samples(2.4f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 0.9f) * (1f - t * 0.2f);
+                float fundamental = Sine(i, 432f * 0.5f) * 0.55f; // low whistle fundamental
+                float harm1 = Sine(i, 432f) * 0.35f;
+                float harm2 = Sine(i, 432f * 1.5f) * 0.22f;
+                float steam = FilteredNoise(i, 650f) * 0.12f * env;
+                data[i] = (fundamental + harm1 + harm2 + steam) * env * 0.7f;
+            }
+            return MakeClip("SFX_Moon3_TrainWhistle", data);
+        }
+
+        /// <summary>Train stress groan — dissonant creak + low rumble when taking damage or shield low.</summary>
+        static AudioClip GenMoon3TrainStress()
+        {
+            int len = Samples(1.6f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t * 0.7f) * 0.9f;
+                float groan = FilteredNoise(i, 95f) * 0.75f * env;
+                float creak = Mathf.Sin(2f * Mathf.PI * (140f + t * 40f) * i / _sampleRate) * 0.4f * env;
+                float dissonance = Sine(i, 432f * 0.7f) * 0.18f + Sine(i, 432f * 1.05f) * 0.12f; // slight sour interval
+                data[i] = (groan + creak + dissonance) * 0.6f;
+            }
+            return MakeClip("SFX_Moon3_TrainStress", data);
+        }
+
+        /// <summary>Core 432Hz lullaby pulse — soft heartbeat for rhythm system base. Gentle sine + breath.</summary>
+        static AudioClip GenMoon3LullabyPulse()
+        {
+            int len = Samples(1.1f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI) * 0.85f;
+                float vib = Mathf.Sin(2f * Mathf.PI * 3.2f * t) * 1.4f;
+                float core = Sine(i, 432f + vib) * 0.48f;
+                float sub = Sine(i, 216f) * 0.32f;
+                float breath = FilteredNoise(i, 380f) * 0.06f * env;
+                data[i] = (core + sub + breath) * env * 0.55f;
+            }
+            return MakeClip("SFX_Moon3_LullabyPulse", data);
+        }
+
+        /// <summary>Successful lullaby tap — bright warm harmonic bloom, strengthens shield emotionally.</summary>
+        static AudioClip GenMoon3LullabySuccess()
+        {
+            int len = Samples(1.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 1.05f) * (1f - t * 0.15f);
+                float[] notes = { 432f, 432f * 1.25f, 528f * 0.92f, 432f * 1.5f };
+                float v = 0f;
+                for (int k = 0; k < notes.Length; k++)
+                {
+                    float vib = Mathf.Sin(t * 2.8f + k) * (1.2f - k * 0.2f);
+                    v += Sine(i, notes[k] + vib) * (0.22f - k * 0.03f);
+                }
+                float shimmer = FilteredNoise(i, 1650f) * 0.04f * env;
+                data[i] = (v + shimmer) * env * 0.72f;
+            }
+            return MakeClip("SFX_Moon3_LullabySuccess", data);
+        }
+
+        /// <summary>Warm sustained lullaby layer for high shield success — emotional heart, reactive to player rhythm.</summary>
+        static AudioClip GenMoon3LullabyWarmth()
+        {
+            int len = Samples(7.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = 0.75f + 0.25f * Mathf.Sin(2f * Mathf.PI * 0.07f * t);
+                float vib = Mathf.Sin(2f * Mathf.PI * 1.9f * t) * 0.9f;
+                float v1 = Sine(i, 432f + vib) * 0.32f;
+                float v2 = Sine(i, 540f + vib * 0.6f) * 0.24f;
+                float v3 = Sine(i, 648f + vib * 0.3f) * 0.18f;
+                float pad = (v1 + v2 + v3) * env;
+                float soft = FilteredNoise(i, 310f) * 0.04f * env;
+                data[i] = (pad + soft) * 0.48f;
+            }
+            return MakeClip("SFX_Moon3_LullabyWarmth", data);
+        }
+
+        /// <summary>Highlands wind ambience — gusty noise with subtle 432 harmonic ring. Reacts to lullaby (calmer = sweeter tone).</summary>
+        static AudioClip GenMoon3HighlandsWind()
+        {
+            int len = Samples(9.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float gust = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * 0.09f * t + Mathf.Sin(t * 1.3f));
+                float low = FilteredNoise(i, 68f) * 0.55f * gust;
+                float high = FilteredNoise(i, 1850f) * 0.18f * (0.4f + 0.6f * Mathf.Sin(t * 2.4f));
+                float ring = Sine(i, 432f * 0.25f) * 0.07f * gust; // subtle harmonic tie to lullaby
+                data[i] = (low + high + ring) * 0.42f;
+            }
+            return MakeClip("SFX_Moon3_HighlandsWind", data);
+        }
+
+        /// <summary>Calmed post-lullaby / post-victory wind — gentler, warmer, "the highlands remember".</summary>
+        static AudioClip GenMoon3WindCalm()
+        {
+            int len = Samples(8.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float calm = 0.35f + 0.2f * Mathf.Sin(2f * Mathf.PI * 0.04f * t);
+                float low = FilteredNoise(i, 55f) * 0.42f * calm;
+                float sweet = Sine(i, 432f * 0.5f) * 0.11f * calm + Sine(i, 528f * 0.5f) * 0.07f;
+                data[i] = (low + sweet) * 0.38f;
+            }
+            return MakeClip("SFX_Moon3_WindCalm", data);
+        }
+
+        /// <summary>Deep Leviathan roar — multi-layer low growl + chest resonance for approach / tail sweep.</summary>
+        static AudioClip GenMoon3LeviathanRoar()
+        {
+            int len = Samples(3.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 0.95f) * (1f - t * 0.25f);
+                float low1 = FilteredNoise(i, 42f) * 0.85f * env;
+                float low2 = FilteredNoise(i, 78f) * 0.65f * env;
+                float growl = Mathf.Sin(2f * Mathf.PI * (38f + Mathf.Sin(t * 1.8f) * 7f) * i / _sampleRate) * 0.55f * env;
+                data[i] = (low1 + low2 + growl) * 0.7f;
+            }
+            return MakeClip("SFX_Moon3_LeviathanRoar", data);
+        }
+
+        /// <summary>High piercing Leviathan scream for sonic attack / phase 2.</summary>
+        static AudioClip GenMoon3LeviathanScream()
+        {
+            int len = Samples(2.1f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t) * Mathf.Sin(t * 3.2f * Mathf.PI);
+                float scream = Sine(i, 1650f + Mathf.Sin(t * 14f) * 220f) * 0.6f * env;
+                float dissonant = Sine(i, 1650f * 1.07f) * 0.35f * env; // tritone-ish
+                float air = FilteredNoise(i, 2100f) * 0.25f * env;
+                data[i] = (scream + dissonant + air) * 0.68f;
+            }
+            return MakeClip("SFX_Moon3_LeviathanScream", data);
+        }
+
+        /// <summary>Leviathan attack impact / barrage hit — heavy low thud + crystal shatter layer.</summary>
+        static AudioClip GenMoon3LeviathanImpact()
+        {
+            int len = Samples(1.4f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t * 0.8f) * Mathf.Exp(-t * 3.5f);
+                float thud = FilteredNoise(i, 58f) * 0.9f * env;
+                float shatter = FilteredNoise(i, 1450f) * 0.55f * env;
+                data[i] = (thud + shatter) * 0.82f;
+            }
+            return MakeClip("SFX_Moon3_LeviathanImpact", data);
+        }
+
+        /// <summary>17th Hour alignment chime — celestial 432 + golden harmonics for calendar moment on the train.</summary>
+        static AudioClip GenMoon3SeventeenthHourChime()
+        {
+            int len = Samples(4.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = 0.9f * Mathf.Sin(t * Mathf.PI * 0.65f) * (1f - t * 0.1f);
+                float fundamental = Sine(i, 432f) * 0.42f;
+                float golden = Sine(i, 432f * 1.618f) * 0.28f;
+                float high = Sine(i, 1296f) * 0.15f;
+                float shimmer = FilteredNoise(i, 920f) * 0.07f * env;
+                data[i] = (fundamental + golden + high + shimmer) * env * 0.6f;
+            }
+            return MakeClip("SFX_Moon3_SeventeenthHourChime", data);
+        }
+
+        /// <summary>THE AETHER REMEMBERS — triumphant victory motif. Ascending 432 golden-ratio cascade for emotional payoff.</summary>
+        static AudioClip GenMoon3AetherRemembersMotif()
+        {
+            int len = Samples(6.8f);
+            var data = new float[len];
+            float[] motif = { 432f, 432f * PHI, 528f, 432f * 2f, 648f, 432f * PHI * 1.5f, 1296f * 0.5f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 0.7f) * (1f - t * 0.18f);
+                float v = 0f;
+                for (int k = 0; k < motif.Length; k++)
+                {
+                    float delay = k * 0.28f;
+                    float localT = Mathf.Max(0f, t - delay * 0.12f);
+                    float localEnv = Mathf.Sin(localT * Mathf.PI * 1.6f) * (1f - localT * 0.3f);
+                    if (localT > 0.01f)
+                        v += Sine(i, motif[k] + Mathf.Sin(localT * 3.1f + k) * 1.8f) * (0.18f - k * 0.014f) * localEnv;
+                }
+                float pad = FilteredNoise(i, 260f) * 0.035f * env;
+                data[i] = (v + pad) * env * 0.78f;
+            }
+            return MakeClip("SFX_Moon3_AetherRemembers", data);
+        }
+
+        /// <summary>Rail tuning success click — bright harmonic for station restores / lullaby synergy.</summary>
+        static AudioClip GenMoon3RailTuning()
+        {
+            int len = Samples(0.9f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 1.4f) * (1f - t * 0.4f);
+                float tone = Sine(i, 432f) * 0.6f + Sine(i, 540f) * 0.35f + Sine(i, 648f) * 0.22f;
+                float click = FilteredNoise(i, 1650f) * 0.18f * env;
+                data[i] = (tone + click) * env * 0.65f;
+            }
+            return MakeClip("SFX_Moon3_RailTuning", data);
+        }
+
+        /// <summary>Wraith shriek replacement / variant for Moon3 rail threats — dissonant but tied to 432 context.</summary>
+        static AudioClip GenMoon3WraithShriek()
+        {
+            int len = Samples(0.7f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t) * Mathf.Exp(-t * 4f);
+                float shriek = Sine(i, 920f + t * 180f) * 0.7f * env;
+                float sub = FilteredNoise(i, 140f) * 0.4f * env;
+                data[i] = (shriek + sub) * 0.75f;
+            }
+            return MakeClip("SFX_Moon3_WraithShriek", data);
+        }
+
+        /// <summary>Train restored / victory arrival — warm resolved chord with golden resonance.</summary>
+        static AudioClip GenMoon3TrainRestored()
+        {
+            int len = Samples(3.6f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 0.85f) * (1f - t * 0.12f);
+                float chord = Sine(i, 432f) * 0.38f + Sine(i, 540f) * 0.29f + Sine(i, 648f) * 0.21f + Sine(i, 864f) * 0.15f;
+                float resolve = FilteredNoise(i, 420f) * 0.05f * env;
+                data[i] = (chord + resolve) * env * 0.7f;
+            }
+            return MakeClip("SFX_Moon3_TrainRestored", data);
         }
 
         // ═══════════════════════════════════════════════

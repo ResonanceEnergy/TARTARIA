@@ -4,7 +4,6 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
-using Tartaria.Integration; // for SteamBridge cloud sync in CloudSaveService
 using Tartaria.Core; // R5: GameEvents for critical save triggers + cloud conflict UI events
 
 namespace Tartaria.Save
@@ -24,7 +23,7 @@ namespace Tartaria.Save
     ///   - Alt-tab / minimize (emergency serialize < 2s)
     ///   - Application quit
     /// </summary>
-    public class SaveManager : MonoBehaviour
+    public class SaveManager : MonoBehaviour, Tartaria.Core.ISaveService
     {
         public static SaveManager Instance { get; private set; }
 
@@ -60,6 +59,7 @@ namespace Tartaria.Save
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            Tartaria.Core.ServiceLocator.Save = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
@@ -278,17 +278,6 @@ namespace Tartaria.Save
             FireAfterLoad();
         }
 
-        /// <summary>
-        /// Deletes save data for a slot (requires explicit confirmation).
-        /// </summary>
-        public void DeleteSave()
-        {
-            if (File.Exists(_savePath)) File.Delete(_savePath);
-            if (File.Exists(_backupPath)) File.Delete(_backupPath);
-            _currentSave = CreateNewSave();
-            Debug.Log("[SaveManager] Save deleted.");
-        }
-
         // ═══════════════════════════════════════════════════════════════
         // Phase 3 R6 (Agent 10): Full bidirectional player choice API, archived conflicts,
         // slot management, large-save performance (compression + giant transient handling),
@@ -423,6 +412,88 @@ namespace Tartaria.Save
             if (!slots.Contains(0)) slots.Insert(0, 0); // always offer 0
             return slots.ToArray();
         }
+
+        /// <summary>
+        /// M2 UX: Quick check for menu "Continue" button state and save existence.
+        /// </summary>
+        public bool HasAnySave()
+        {
+            var slots = GetAvailableSlots();
+            return slots.Length > 0 && File.Exists(Path.Combine(Application.persistentDataPath, $"save_slot_{slots[0]}.json"));
+        }
+
+        /// <summary>ISaveService: brief "Slot N • MM/dd HH:mm" label for the active slot (used by MainMenu CONTINUE button).</summary>
+        public string GetCurrentSaveLabel()
+        {
+            if (!HasAnySave()) return string.Empty;
+            var info = GetSaveInfo(_currentSlot);
+            string ts = !string.IsNullOrEmpty(info.modifiedUtc) && System.DateTime.TryParse(info.modifiedUtc, out var dt)
+                ? dt.ToString("MM/dd HH:mm")
+                : "";
+            return ts.Length > 0 ? $"Slot {info.slot} • {ts}" : $"Slot {info.slot}";
+        }
+
+        // ─── M2 UX Polish: Menu-facing Save API (GetSaveInfo, DeleteSlot, Timestamps) ────
+
+        /// <summary>M2: Returns full slot metadata for menus (lists, timestamps, playtime). Does not switch active slot.</summary>
+        public SaveSlotInfo GetSaveInfo(int slot)
+        {
+            if (slot < 0) slot = 0;
+            string p = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.json");
+            var info = new SaveSlotInfo { slot = slot, exists = File.Exists(p) };
+            if (!info.exists) return info;
+
+            try
+            {
+                // Reuse robust loader (handles backup fallback + checksum validation internally via TryLoad)
+                var data = TryLoadFromPath(p);
+                if (data?.header != null)
+                {
+                    info.exists = true;
+                    info.createdUtc = data.header.createdUtc;
+                    info.modifiedUtc = data.header.modifiedUtc;
+                    info.playTimeSeconds = data.header.playTimeSeconds;
+                    info.schemaVersion = data.header.schemaVersion;
+                    info.gameVersion = data.header.gameVersion;
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[SaveManager] GetSaveInfo({slot}) partial read failed: {ex.Message}");
+            }
+            return info;
+        }
+
+        /// <summary>M2: Timestamp string (modifiedUtc) for simple menu display of a slot. "Never" if none.</summary>
+        public string GetSaveTimestamp(int slot)
+        {
+            var info = GetSaveInfo(slot);
+            return string.IsNullOrEmpty(info.modifiedUtc) ? "Never" : info.modifiedUtc;
+        }
+
+        /// <summary>M2: Playtime in seconds for a given slot (0 if none).</summary>
+        public float GetSavePlayTime(int slot) => GetSaveInfo(slot).playTimeSeconds;
+
+        /// <summary>M2: Delete specific save slot (clears json + backup). If active slot, resets in-memory to fresh.</summary>
+        public void DeleteSlot(int slot)
+        {
+            if (slot < 0) slot = 0;
+            string sp = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.json");
+            string bp = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.backup.json");
+            bool hadFile = File.Exists(sp) || File.Exists(bp);
+            if (File.Exists(sp)) File.Delete(sp);
+            if (File.Exists(bp)) File.Delete(bp);
+
+            if (slot == _currentSlot)
+            {
+                _currentSave = CreateNewSave();
+                _isDirty = false;
+            }
+            Debug.Log($"[SaveManager] M2: Deleted slot {slot} (had data: {hadFile}).");
+        }
+
+        /// <summary>M2: Convenience — DeleteSave now delegates to DeleteSlot for current.</summary>
+        public void DeleteSave() => DeleteSlot(_currentSlot);
 
         // ─── R6 Large Save Performance (giant transient + cloud chunking hooks) ──────────
 
@@ -691,6 +762,7 @@ namespace Tartaria.Save
                 if (data.boss.submissionAccuracies == null) data.boss.submissionAccuracies = System.Array.Empty<float>();
                 if (data.boss.phaseSpecialEvents == null) data.boss.phaseSpecialEvents = System.Array.Empty<string>();
                 if (data.moon3.seventeenthHourEventIds == null) data.moon3.seventeenthHourEventIds = System.Array.Empty<string>();
+                if (data.moon3.seventeenthHourVariants == null) data.moon3.seventeenthHourVariants = System.Array.Empty<string>();
                 data.header.schemaVersion = 11;
                 data.header.gameVersion = "0.11.0";
                 MarkDirty();
@@ -702,6 +774,8 @@ namespace Tartaria.Save
                 if (data.moon2 == null) data.moon2 = new Moon2SaveBlock();
                 if (data.moon2.purgedMoon2Sites == null) data.moon2.purgedMoon2Sites = System.Array.Empty<string>();
                 if (data.moon3 == null) data.moon3 = new Moon3SaveBlock();
+                if (data.moon3.seventeenthHourEventIds == null) data.moon3.seventeenthHourEventIds = System.Array.Empty<string>();
+                if (data.moon3.seventeenthHourVariants == null) data.moon3.seventeenthHourVariants = System.Array.Empty<string>();
                 data.header.schemaVersion = 12;
                 data.header.gameVersion = "0.12.0";
                 MarkDirty();

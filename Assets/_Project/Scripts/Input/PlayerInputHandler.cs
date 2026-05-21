@@ -79,6 +79,8 @@ namespace Tartaria.Input
         public event System.Action OnHarmonicStrike;
         public event System.Action OnFrequencyShield;
         public event System.Action<float> OnFrequencyAdjust;
+        /// <summary>Pause toggle event — UI tier (PauseMenu) subscribes; keeps Input asmdef free of UI references.</summary>
+        public static event System.Action OnPauseToggled;
 
         // Key state for edge-detect
         bool _prevEKey, _prevEscKey, _prevTabKey, _prevGKey;
@@ -90,6 +92,10 @@ namespace Tartaria.Input
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+
+            // M2-M4: Logitech F310 full support (DirectInput + XInput + rumble)
+            LogitechControllerSupport.EnsureF310Setup();
+
             _controller = GetComponent<CharacterController>();
             _mainCamera = Camera.main;
             EnsureSafetyFloor();
@@ -180,7 +186,11 @@ namespace Tartaria.Input
 
         void OnInteractPerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { if (GameStateManager.Instance?.IsPlaying == true) TryInteract(); }
         void OnAetherVisionPerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { AetherVisionActive = !AetherVisionActive; }
-        void OnPausePerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { /* pause handled elsewhere */ }
+        void OnPausePerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx)
+        {
+            // M2: Real pause menu — published via static event so UI tier owns the toggle (asmdef-safe).
+            OnPauseToggled?.Invoke();
+        }
         void OnResonancePulsePerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { OnResonancePulse?.Invoke(); }
         void OnHarmonicStrikePerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { OnHarmonicStrike?.Invoke(); }
         void OnFrequencyShieldPerformed(UnityEngine.InputSystem.InputAction.CallbackContext ctx) { OnFrequencyShield?.Invoke(); }

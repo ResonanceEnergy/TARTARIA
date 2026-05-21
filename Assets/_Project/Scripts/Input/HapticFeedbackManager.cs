@@ -14,12 +14,24 @@ namespace Tartaria.Input
 
         Gamepad _activeGamepad;
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("HapticFeedbackManager");
+            DontDestroyOnLoad(go);
+            Instance = go.AddComponent<HapticFeedbackManager>();
+        }
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+
+            // Ensure Logitech F310 (and similar) is properly recognized for rumble
+            Tartaria.Input.LogitechControllerSupport.EnsureF310Setup();
         }
 
         void OnDestroy()
@@ -66,6 +78,16 @@ namespace Tartaria.Input
             PlayCascade(0.6f, 1.0f, 0.0f, 1.0f);
         }
 
+        /// <summary>
+        /// Short "thunk" haptic for a missed tuning attempt (rail escort wrong-note,
+        /// puzzle reject, etc.). Lower amplitude than <see cref="PlayDissonanceAlert"/>
+        /// so it reads as feedback, not failure.
+        /// </summary>
+        public void PlayTuningMiss()
+        {
+            PlayPulse(0.45f, 0.12f, lowFrequency: true);
+        }
+
         public void PlayBuildingEmergence()
         {
             PlayEmergencePattern();
@@ -89,6 +111,44 @@ namespace Tartaria.Input
         public void PlayDissonanceAlert()
         {
             PlayPulse(0.6f, 0.15f);
+        }
+
+        // ─── Moon 2 Lunar AVH Haptics: tuning/giant, crystal resonance, fountain storm, lullaby, boss vein phases, giant synergy ───
+        public void PlayClimaxRumble() { PlayCascade(0.45f, 0.95f, 0.15f, 2.8f); }
+        public void PlayCrystalResonanceTuning() { PlayCascade(0.32f, 0.88f, 0.12f, 1.15f); }
+        public void PlayMicroGiantCrystalTear() { PlayRamp(0.68f, 0.22f, 1.1f); }
+        public void PlayGiantVeinSurge() { PlayCascade(0.55f, 0.92f, 0.08f, 2.1f); }
+        public void PlayBellScalarToll() { PlayPulse(0.58f, 1.05f); }
+        public void PlayFountainStormRumble() { PlayCascade(0.28f, 0.91f, 0.0f, 3.2f); }
+        public void PlayLullabyPulse() { PlayPulse(0.22f, 0.95f); } // gentle 432Hz companion support
+        public void PlayDissonanceCorruptionHit() { PlayRamp(0.75f, 0.18f, 0.7f); }
+
+        /// <summary>
+        /// Direct F310-style rumble: low + high motor intensities held for a duration, then released.
+        /// Used by NPC radio chatter, climax cinematics, and amplification controllers.
+        /// </summary>
+        public void TriggerF310Rumble(float lowMotor, float highMotor, float duration)
+        {
+            if (_activeGamepad == null) return;
+            _currentPattern = new HapticPattern
+            {
+                Duration = Mathf.Max(0.05f, duration),
+                LowMotorStart = Mathf.Clamp01(lowMotor),
+                LowMotorEnd = 0f,
+                HighMotorStart = Mathf.Clamp01(highMotor),
+                HighMotorEnd = 0f
+            };
+            _patternTime = 0f;
+        }
+
+        /// <summary>Moon-agnostic tuning hit used by companions / legacy (perfect vs regular success).</summary>
+        public void PlayTuningCorrectHit(bool perfect, float strength = 0.5f)
+        {
+            strength = Mathf.Clamp01(strength);
+            if (perfect || strength > 0.82f)
+                PlayPerfectTune();
+            else
+                PlayCascade(0.28f * strength, 0.72f * strength, 0.08f, 0.65f);
         }
 
         // Round 4 Giant haptics for flight, terrain deformation, Cassian/Anastasia synergy
@@ -290,6 +350,42 @@ namespace Tartaria.Input
                     HighMotorEnd = baseIntensity,
                     IsCascade = true
                 },
+                HapticContext.BossPhase when moonIndex == 3 => new HapticPattern // Moon3 Leviathan / Rail specific
+                {
+                    Duration = 2.2f,
+                    LowMotorStart = 0.78f,
+                    LowMotorEnd = 0.25f,
+                    HighMotorStart = 0.45f,
+                    HighMotorEnd = 0.82f,
+                    IsCascade = true
+                },
+                HapticContext.LullabyRhythmTap when moonIndex == 3 => new HapticPattern
+                {
+                    Duration = 0.95f,
+                    LowMotorStart = 0.28f,
+                    LowMotorEnd = 0.12f,
+                    HighMotorStart = 0.68f,
+                    HighMotorEnd = 0.35f,
+                    IsCascade = false
+                },
+                HapticContext.TrainImpact when moonIndex == 3 => new HapticPattern
+                {
+                    Duration = 0.6f,
+                    LowMotorStart = 0.85f,
+                    LowMotorEnd = 0.1f,
+                    HighMotorStart = 0.4f,
+                    HighMotorEnd = 0.15f,
+                    IsCascade = false
+                },
+                HapticContext.LeviathanRoar when moonIndex == 3 => new HapticPattern
+                {
+                    Duration = 1.8f,
+                    LowMotorStart = 0.92f,
+                    LowMotorEnd = 0.35f,
+                    HighMotorStart = 0.22f,
+                    HighMotorEnd = 0.55f,
+                    IsCascade = true
+                },
                 _ => new HapticPattern
                 {
                     Duration = 0.5f,
@@ -309,6 +405,11 @@ namespace Tartaria.Input
         BossPhaseShift = 1,
         EnvironmentShake = 2,
         ClimaxCinematic = 3,
-        ZoneTransition = 4
+        ZoneTransition = 4,
+        // Moon 3 Rail Escort / Leviathan / Lullaby specific (full F310 rumble mapping)
+        BossPhase = 5,
+        LullabyRhythmTap = 6,
+        TrainImpact = 7,
+        LeviathanRoar = 8
     }
 }

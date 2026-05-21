@@ -6174,27 +6174,21 @@ MonoBehaviour:
   bossNameText: {fileID: 406570523}
   bossHealthColor: {r: 0.8, g: 0.15, b: 0.1, a: 1}
   bossHealthLowColor: {r: 0.9, g: 0.3, b: 0.05, a: 1}
+  bossTargetFrequencyText: {fileID: 0}
   waveCounterPanel: {fileID: 345204225}
-  waveCounterText: {fileID: 963525003}
-  waveEnemiesText: {fileID: 789866015}
-  achievementToastPanel: {fileID: 1101527478}
-  achievementToastText: {fileID: 1742616129}
-  achievementDisplayDuration: 3
-  moonTrophyPanel: {fileID: 298840646}
-  moonTrophyText: {fileID: 1014252653}
-  moonTrophySubtext: {fileID: 938448540}
-  trophyDisplayDuration: 5
-  objectivePanel: {fileID: 1640198537}
-  objectiveText: {fileID: 1495560444}
-  weaponIcon: {fileID: 0}
-  meleeWeaponSprite: {fileID: 0}
-  bowWeaponSprite: {fileID: 0}
-  thresholdMarkers: []
-  rsLowColor: {r: 0.3, g: 0.2, b: 0.4, a: 1}
-  rsMidColor: {r: 0.6, g: 0.5, b: 0.1, a: 1}
-  rsHighColor: {r: 0.9, g: 0.85, b: 0.3, a: 1}
-  rsMaxColor: {r: 1, g: 0.95, b: 0.6, a: 1}
-  aetherColor: {r: 0.2, g: 0.6, b: 0.9, a: 1}
+  frequencyWheelPanel: {fileID: 0}
+  frequencyWheelImage: {fileID: 0}
+  frequencyText: {fileID: 0}
+  frequencyMatchText: {fileID: 0}
+  giantMeterPanel: {fileID: 0}
+  giantMeterFill: {fileID: 0}
+  giantMeterReadyFlash: {fileID: 0}
+  giantMeterLabel: {fileID: 0}
+  hudAccessibilityHint: {fileID: 0}
+  giantReadyFlashDuration: 1.2
+  wheelBaseColor: {r: 0.4, g: 0.7, b: 0.9, a: 1}
+  meterReadyColor: {r: 1, g: 0.85, b: 0.2, a: 1}
+  synergyHintText: {fileID: 0}
 --- !u!114 &2090584037
 MonoBehaviour:
   m_ObjectHideFlags: 0

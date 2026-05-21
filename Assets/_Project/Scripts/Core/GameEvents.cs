@@ -47,6 +47,10 @@ namespace Tartaria.Core
 
         // R6: Push / remote event (deeper offline + production cloud polish)
         public static void FireRemotePushNotification(string payload) => OnRemotePushNotificationReceived?.Invoke(payload);
+
+        // Moon 3 payoff: continental rail fast travel unlocked (gameplay → integration decoupling)
+        public static event System.Action OnMoon3FastTravelUnlocked;
+        public static void FireMoon3FastTravelUnlocked() => OnMoon3FastTravelUnlocked?.Invoke();
     }
 
     /// <summary>

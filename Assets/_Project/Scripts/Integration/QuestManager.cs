@@ -18,7 +18,7 @@ namespace Tartaria.Integration
     ///   - Side: "Golem Graveyard" (defeat all wave enemies)
     /// </summary>
     [DisallowMultipleComponent]
-    public class QuestManager : MonoBehaviour, IQuestProvider
+    public class QuestManager : MonoBehaviour, IQuestProvider, IQuestService
     {
         public static QuestManager Instance { get; private set; }
 
@@ -43,11 +43,13 @@ namespace Tartaria.Integration
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
             QuestProviderLocator.Current = this;
+            ServiceLocator.Quest = this;
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+            if (ServiceLocator.Quest == (IQuestService)this) ServiceLocator.Quest = null;
         }
 
         void Start()

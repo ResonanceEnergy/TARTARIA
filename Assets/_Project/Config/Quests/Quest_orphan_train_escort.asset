@@ -1,0 +1,49 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20fad75016a22ef41b778380002fbad8, type: 3}
+  m_Name: Quest_orphan_train_escort
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.QuestDefinition
+  questId: orphan_train_escort
+  displayName: 'Compassion & Rails: The Orphan Train Escort (M3-MS06)'
+  description: Discover the Dissonant Orphan Train in the Windswept Highlands. Build
+    trust with spectral orphans Aria, Toren and Syl through lullaby and protection.
+    Escort the train through corruption, defeat the Dissonance Leviathan with collective
+    song, and unlock the Continental Rail network + permanent golden rails + World's
+    Fair access as Moon 3 completion payoffs.
+  isMainQuest: 0
+  autoActivate: 0
+  rsRequirement: 0
+  objectives:
+  - description: Discover the spectral orphan train and rail stations
+    type: 0
+    targetId: orphan_train
+    targetCount: 1
+  - description: Adopt spectral orphans via trust-building and lullaby contributions
+      (3)
+    type: 10
+    targetId: spectral_orphans
+    targetCount: 3
+  - description: Complete the full rail escort climax (protect train, lullaby shield)
+    type: 7
+    targetId: rail_escort
+    targetCount: 1
+  - description: Defeat Dissonance Leviathan with orphan lullaby synergy
+    type: 15
+    targetId: leviathan_moon3
+    targetCount: 1
+  - description: Unlock post-escort Continental Rail fast travel + golden rails permanent
+      change + World's Fair ticket
+    type: 10
+    targetId: continental_rail_m3
+    targetCount: 1
+  rsReward: 380
+  followUpQuestIds: []

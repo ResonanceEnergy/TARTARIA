@@ -13,6 +13,8 @@ namespace Tartaria.UI
     [DisallowMultipleComponent]
     public class SettingsOverlay : MonoBehaviour
     {
+        public static bool IsReducedMotion => PlayerPrefs.GetInt("TARTARIA_ReducedMotion", 0) == 1;
+
         const string PP_VOLUME = "TARTARIA_MasterVolume";
         const string PP_MUSIC  = "TARTARIA_MusicVolume";
         const string PP_SFX    = "TARTARIA_SFXVolume";
@@ -48,6 +50,16 @@ namespace Tartaria.UI
 
         AudioMixer _mixer;
         Vector2 _scroll;
+
+        // M2 beta polish: dirty tracking, confirm, toast, golden Tartarian theme
+        float _initialVolume, _initialMusic, _initialSfx, _initialAmb, _initialSens, _initialText;
+        int _initialCB, _initialRes, _initialQual;
+        bool _initialFS;
+        bool _dirty;
+        bool _showConfirmClose;
+        string _toastMessage;
+        float _toastTimer;
+        const float TOAST_DURATION = 1.6f;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
@@ -85,28 +97,62 @@ namespace Tartaria.UI
             // Locate mixer for runtime SetFloat on exposed parameters.
             _mixer = Tartaria.Audio.MasterMixerLocator.Load();
 
+            ApplyMouseSensitivity(); // wire on bootstrap
             ApplyAll();
         }
 
         public static void Open()
         {
             if (_instance == null) Bootstrap();
-            _instance!._visible = true;
-            _instance.UnlockCursorForUI();
+            var inst = _instance!;
+            inst._visible = true;
+            inst.UnlockCursorForUI();
+            inst.CaptureInitials();
+            inst._dirty = false;
+            inst._showConfirmClose = false;
+        }
+
+        public static void CloseIfOpen()
+        {
+            if (_instance != null && _instance._visible)
+            {
+                _instance._visible = false;
+                _instance.RestoreCursor();
+            }
+        }
+
+        void CaptureInitials()
+        {
+            _initialVolume = _volume; _initialMusic = _music; _initialSfx = _sfx; _initialAmb = _amb;
+            _initialSens = _sens; _initialText = _textScale;
+            _initialCB = _colorblind; _initialRes = _resIdx; _initialQual = _qualityIdx;
+            _initialFS = _fullscreen;
         }
 
         void Update()
         {
             var kb = Keyboard.current;
+            var gp = Gamepad.current;
             if (kb != null && kb.f10Key.wasPressedThisFrame)
             {
                 _visible = !_visible;
-                if (_visible) UnlockCursorForUI(); else RestoreCursor();
+                if (_visible) { UnlockCursorForUI(); CaptureInitials(); _dirty = false; _showConfirmClose = false; _toastTimer = 0; }
+                else RestoreCursor();
             }
-            if (_visible && kb != null && kb.escapeKey.wasPressedThisFrame)
+            bool backPressed = (kb != null && kb.escapeKey.wasPressedThisFrame) || (gp != null && gp.buttonEast.wasPressedThisFrame);
+            if (_visible && backPressed)
             {
-                _visible = false;
-                RestoreCursor();
+                if (_dirty && !_showConfirmClose)
+                {
+                    _showConfirmClose = true; // trigger inline confirm
+                }
+                else
+                {
+                    _visible = false;
+                    _showConfirmClose = false;
+                    PlayerPrefs.Save();
+                    RestoreCursor();
+                }
             }
         }
 
@@ -130,134 +176,222 @@ namespace Tartaria.UI
         {
             if (!_visible) return;
 
-            const int W = 560, H = 600;
+            const int W = 560, H = 620; // extra for polished sections + toast/confirm
             int x = (Screen.width - W) / 2;
             int y = (Screen.height - H) / 2;
 
             // Dim
             var c = GUI.color;
-            GUI.color = new Color(0, 0, 0, 0.7f);
+            GUI.color = new Color(0.02f, 0.01f, 0.04f, 0.78f);
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
             GUI.color = c;
 
+            // Golden Tartarian double-frame
+            GUI.color = new Color(0.95f, 0.85f, 0.5f, 0.92f);
+            GUI.Box(new Rect(x - 3, y - 3, W + 6, H + 6), "");
+            GUI.color = c;
             GUI.Box(new Rect(x, y, W, H), "");
-            var title = new GUIStyle(GUI.skin.label) { fontSize = 22, alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold, normal = { textColor = Color.white } };
-            GUI.Label(new Rect(x, y + 8, W, 32), "SETTINGS", title);
+            GUI.color = new Color(0.6f, 0.5f, 0.3f, 0.6f);
+            GUI.Box(new Rect(x + 3, y + 3, W - 6, H - 6), "");
+            GUI.color = c;
 
-            int row = y + 56;
+            var title = new GUIStyle(GUI.skin.label) 
+            { 
+                fontSize = 22, 
+                alignment = TextAnchor.MiddleCenter, 
+                fontStyle = FontStyle.Bold, 
+                normal = { textColor = new Color(0.98f, 0.9f, 0.55f) } 
+            };
+            GUI.Label(new Rect(x, y + 8, W, 28), "SETTINGS — TARTARIA", title);
+
+            var sub = new GUIStyle(GUI.skin.label) { fontSize = 10, alignment = TextAnchor.MiddleCenter, normal = { textColor = new Color(0.75f, 0.72f, 0.6f) } };
+            GUI.Label(new Rect(x, y + 34, W, 16), "Golden Age • Accessible • Immersive", sub);
+
+            var sub2 = new GUIStyle(GUI.skin.label) 
+            { 
+                fontSize = 11, 
+                alignment = TextAnchor.MiddleCenter, 
+                normal = { textColor = new Color(0.65f, 0.62f, 0.55f) } 
+            };
+            GUI.Label(new Rect(x, y + 36, W, 18), "Tune the Resonance", sub2);
+
+            int row = y + 58;
             int lx = x + 24, sx = x + 200, sw = W - 240;
 
+            DrawSectionHeader("AUDIO", ref row, lx, W - 48);
+
             // Master
-            GUI.Label(new Rect(lx, row, 180, 24), $"Master Volume: {_volume:P0}");
-            float v = GUI.HorizontalSlider(new Rect(sx, row + 6, sw, 18), _volume, 0f, 1f);
-            if (!Mathf.Approximately(v, _volume)) { _volume = v; AudioListener.volume = _volume; SetMixer("MasterVol", v); PlayerPrefs.SetFloat(PP_VOLUME, v); }
-            row += 32;
+            GUI.Label(new Rect(lx, row, 180, 22), $"Master Volume: {_volume:P0}");
+            float v = GUI.HorizontalSlider(new Rect(sx, row + 5, sw, 16), _volume, 0f, 1f);
+            if (!Mathf.Approximately(v, _volume)) { _volume = v; AudioListener.volume = _volume; SetMixer("MasterVol", v); PlayerPrefs.SetFloat(PP_VOLUME, v); SetToast("Audio Applied"); }
+            row += 28;
 
             // Music
-            GUI.Label(new Rect(lx, row, 180, 24), $"Music: {_music:P0}");
-            float mu = GUI.HorizontalSlider(new Rect(sx, row + 6, sw, 18), _music, 0f, 1f);
-            if (!Mathf.Approximately(mu, _music)) { _music = mu; SetMixer("MusicVol", mu); PlayerPrefs.SetFloat(PP_MUSIC, mu); }
-            row += 32;
+            GUI.Label(new Rect(lx, row, 180, 22), $"Music: {_music:P0}");
+            float mu = GUI.HorizontalSlider(new Rect(sx, row + 5, sw, 16), _music, 0f, 1f);
+            if (!Mathf.Approximately(mu, _music)) { _music = mu; SetMixer("MusicVol", mu); PlayerPrefs.SetFloat(PP_MUSIC, mu); SetToast("Audio Applied"); }
+            row += 28;
 
             // SFX
-            GUI.Label(new Rect(lx, row, 180, 24), $"SFX: {_sfx:P0}");
-            float sf = GUI.HorizontalSlider(new Rect(sx, row + 6, sw, 18), _sfx, 0f, 1f);
-            if (!Mathf.Approximately(sf, _sfx)) { _sfx = sf; SetMixer("SFXVol", sf); PlayerPrefs.SetFloat(PP_SFX, sf); }
-            row += 32;
+            GUI.Label(new Rect(lx, row, 180, 22), $"SFX: {_sfx:P0}");
+            float sf = GUI.HorizontalSlider(new Rect(sx, row + 5, sw, 16), _sfx, 0f, 1f);
+            if (!Mathf.Approximately(sf, _sfx)) { _sfx = sf; SetMixer("SFXVol", sf); PlayerPrefs.SetFloat(PP_SFX, sf); SetToast("Audio Applied"); }
+            row += 28;
 
             // Ambience
-            GUI.Label(new Rect(lx, row, 180, 24), $"Ambience: {_amb:P0}");
-            float am = GUI.HorizontalSlider(new Rect(sx, row + 6, sw, 18), _amb, 0f, 1f);
-            if (!Mathf.Approximately(am, _amb)) { _amb = am; SetMixer("AmbienceVol", am); PlayerPrefs.SetFloat(PP_AMB, am); }
-            row += 40;
-
-            // Mouse sens
-            GUI.Label(new Rect(lx, row, 180, 24), $"Mouse Sensitivity: {_sens:F2}");
-            float s = GUI.HorizontalSlider(new Rect(sx, row + 6, sw, 18), _sens, 0.25f, 3f);
-            if (!Mathf.Approximately(s, _sens)) { _sens = s; PlayerPrefs.SetFloat(PP_SENS, _sens); }
+            GUI.Label(new Rect(lx, row, 180, 22), $"Ambience: {_amb:P0}");
+            float am = GUI.HorizontalSlider(new Rect(sx, row + 5, sw, 16), _amb, 0f, 1f);
+            if (!Mathf.Approximately(am, _amb)) { _amb = am; SetMixer("AmbienceVol", am); PlayerPrefs.SetFloat(PP_AMB, am); SetToast("Audio Applied"); }
             row += 32;
 
-            // Text scale
-            GUI.Label(new Rect(lx, row, 180, 24), $"Text Scale: {_textScale:F2}x");
-            float t = GUI.HorizontalSlider(new Rect(sx, row + 6, sw, 18), _textScale, 0.7f, 2f);
-            if (!Mathf.Approximately(t, _textScale)) { _textScale = t; PlayerPrefs.SetFloat(PP_TEXT, _textScale); ApplyTextScale(); }
-            row += 32;
+            DrawSectionHeader("CONTROLS & ACCESSIBILITY", ref row, lx, W - 48);
 
-            // Colorblind
-            GUI.Label(new Rect(lx, row, 180, 24), "Colorblind Mode:");
+            // Mouse sens — wired
+            GUI.Label(new Rect(lx, row, 180, 22), $"Mouse Sensitivity: {_sens:F2}");
+            float s = GUI.HorizontalSlider(new Rect(sx, row + 5, sw, 16), _sens, 0.25f, 3f);
+            if (!Mathf.Approximately(s, _sens)) { _sens = s; PlayerPrefs.SetFloat(PP_SENS, _sens); Tartaria.Camera.CameraController.SetMouseSensitivity(_sens); SetToast("Mouse Sensitivity Applied"); }
+            row += 28;
+
+            // Text scale — routes to HUD/dialogue via AM event
+            GUI.Label(new Rect(lx, row, 180, 22), $"Text Scale: {_textScale:F2}x");
+            float t = GUI.HorizontalSlider(new Rect(sx, row + 5, sw, 16), _textScale, 0.7f, 2f);
+            if (!Mathf.Approximately(t, _textScale)) { _textScale = t; PlayerPrefs.SetFloat(PP_TEXT, _textScale); ApplyTextScale(); SetToast("Text Scale Applied"); }
+            row += 28;
+
+            // Colorblind (stays in same section)
+            GUI.Label(new Rect(lx, row, 180, 22), "Colorblind Mode:");
             int newCB = _colorblind;
             for (int i = 0; i < _cbLabels.Length; i++)
             {
-                if (GUI.Toggle(new Rect(sx + i * 80, row, 78, 22), _colorblind == i, _cbLabels[i]))
+                if (GUI.Toggle(new Rect(sx + i * 80, row, 78, 20), _colorblind == i, _cbLabels[i]))
                     newCB = i;
             }
-            if (newCB != _colorblind) { _colorblind = newCB; PlayerPrefs.SetInt(PP_CB, _colorblind); ApplyColorblind(); }
-            row += 36;
+            if (newCB != _colorblind) { _colorblind = newCB; PlayerPrefs.SetInt(PP_CB, _colorblind); ApplyColorblind(); SetToast("Accessibility Applied"); }
+            row += 30;
+
+            // Reduced motion (M2 from UX doc accessibility section)
+            bool reduced = PlayerPrefs.GetInt("TARTARIA_ReducedMotion", 0) == 1;
+            if (GUI.Toggle(new Rect(lx, row, 280, 20), reduced, "Reduced Motion (less shake/particles)"))
+            {
+                reduced = !reduced;
+                PlayerPrefs.SetInt("TARTARIA_ReducedMotion", reduced ? 1 : 0);
+                SetToast("Accessibility Applied");
+            }
+            row += 26;
+
+            DrawSectionHeader("DISPLAY & PERFORMANCE", ref row, lx, W - 48);
 
             // Resolution
-            GUI.Label(new Rect(lx, row, 180, 24), "Resolution:");
+            GUI.Label(new Rect(lx, row, 180, 22), "Resolution:");
             if (_resolutions.Length > 0)
             {
-                if (GUI.Button(new Rect(sx, row, 26, 24), "<")) { _resIdx = (_resIdx - 1 + _resolutions.Length) % _resolutions.Length; }
-                GUI.Label(new Rect(sx + 30, row + 2, sw - 90, 22), _resLabels[_resIdx]);
-                if (GUI.Button(new Rect(sx + sw - 26, row, 26, 24), ">")) { _resIdx = (_resIdx + 1) % _resolutions.Length; }
+                if (GUI.Button(new Rect(sx, row, 26, 22), "<")) { _resIdx = (_resIdx - 1 + _resolutions.Length) % _resolutions.Length; _dirty = true; }
+                GUI.Label(new Rect(sx + 30, row + 2, sw - 90, 20), _resLabels[_resIdx]);
+                if (GUI.Button(new Rect(sx + sw - 26, row, 26, 22), ">")) { _resIdx = (_resIdx + 1) % _resolutions.Length; _dirty = true; }
             }
-            row += 28;
+            row += 26;
 
             // Quality
-            GUI.Label(new Rect(lx, row, 180, 24), "Quality:");
+            GUI.Label(new Rect(lx, row, 180, 22), "Quality:");
             string[] qNames = QualitySettings.names;
             if (qNames.Length > 0)
             {
-                if (GUI.Button(new Rect(sx, row, 26, 24), "<")) { _qualityIdx = (_qualityIdx - 1 + qNames.Length) % qNames.Length; }
-                GUI.Label(new Rect(sx + 30, row + 2, sw - 90, 22), qNames[Mathf.Clamp(_qualityIdx, 0, qNames.Length - 1)]);
-                if (GUI.Button(new Rect(sx + sw - 26, row, 26, 24), ">")) { _qualityIdx = (_qualityIdx + 1) % qNames.Length; }
+                if (GUI.Button(new Rect(sx, row, 26, 22), "<")) { _qualityIdx = (_qualityIdx - 1 + qNames.Length) % qNames.Length; _dirty = true; }
+                GUI.Label(new Rect(sx + 30, row + 2, sw - 90, 20), qNames[Mathf.Clamp(_qualityIdx, 0, qNames.Length - 1)]);
+                if (GUI.Button(new Rect(sx + sw - 26, row, 26, 22), ">")) { _qualityIdx = (_qualityIdx + 1) % qNames.Length; _dirty = true; }
             }
-            row += 28;
+            row += 26;
 
             // Round 4: Hardware Tier + Fallback UI feedback (persisted + auto)
-            GUI.Label(new Rect(lx, row, 260, 24), $"Hardware Tier (auto): {GetCurrentPerfTier()}");
-            row += 22;
+            GUI.Label(new Rect(lx, row, 260, 20), $"Hardware Tier (auto): {GetCurrentPerfTier()}");
+            row += 20;
             int fb = PlayerPrefs.GetInt("TARTARIA_FallbackCount", 0);
-            GUI.Label(new Rect(lx, row, 260, 22), $"Auto-Fallbacks: {fb} (persisted)");
-            row += 22;
-            if (GUI.Button(new Rect(lx, row, 180, 20), "Force Tier Downgrade"))
+            GUI.Label(new Rect(lx, row, 260, 18), $"Auto-Fallbacks: {fb} (persisted)");
+            row += 20;
+            if (GUI.Button(new Rect(lx, row, 170, 18), "Force Tier Downgrade"))
             {
                 GameBootstrap.TriggerAutoQualityFallback("Manual UI downgrade (dev)");
+                SetToast("Tier Downgraded");
             }
-            row += 24;
+            row += 22;
 
             // Round 5: Dynamic runtime tier switches (production hardening, no restart)
-            GUI.Label(new Rect(lx, row, 260, 20), "Runtime Tier Switch:");
-            row += 20;
-            if (GUI.Button(new Rect(lx, row, 60, 18), "Low")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Low); }
-            if (GUI.Button(new Rect(lx + 65, row, 60, 18), "Med")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Medium); }
-            if (GUI.Button(new Rect(lx + 130, row, 60, 18), "High")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.High); }
-            if (GUI.Button(new Rect(lx + 195, row, 60, 18), "Ultra")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Ultra); }
-            row += 24;
+            GUI.Label(new Rect(lx, row, 260, 18), "Runtime Tier Switch:");
+            row += 18;
+            if (GUI.Button(new Rect(lx, row, 55, 17), "Low")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Low); SetToast("Tier: Low"); }
+            if (GUI.Button(new Rect(lx + 58, row, 55, 17), "Med")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Medium); SetToast("Tier: Med"); }
+            if (GUI.Button(new Rect(lx + 116, row, 55, 17), "High")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.High); SetToast("Tier: High"); }
+            if (GUI.Button(new Rect(lx + 174, row, 55, 17), "Ultra")) { GameBootstrap.ApplyRuntimePerformanceTier(PerformanceProfile.HardwareTier.Ultra); SetToast("Tier: Ultra"); }
+            row += 22;
 
             // Fullscreen
-            bool newFS = GUI.Toggle(new Rect(lx, row, 200, 22), _fullscreen, "Fullscreen");
-            if (newFS != _fullscreen) { _fullscreen = newFS; }
-            row += 28;
+            bool newFS = GUI.Toggle(new Rect(lx, row, 200, 20), _fullscreen, "Fullscreen");
+            if (newFS != _fullscreen) { _fullscreen = newFS; _dirty = true; }
+            row += 26;
 
-            if (GUI.Button(new Rect(lx, row, 240, 26), "Apply Display Settings"))
+            if (GUI.Button(new Rect(lx, row, 220, 24), "Apply Display Settings"))
             {
                 ApplyDisplaySettings();
+                SetToast("Display Settings Applied");
+                _dirty = false; // applied
             }
-            row += 36;
+            row += 30;
 
             // Skip-menu toggle for dev
             bool skip = PlayerPrefs.GetInt("TARTARIA_SkipMainMenu", 0) == 1;
-            bool newSkip = GUI.Toggle(new Rect(lx, row, W - 48, 22), skip, "Skip main menu next launch (dev)");
+            bool newSkip = GUI.Toggle(new Rect(lx, row, W - 48, 20), skip, "Skip main menu next launch (dev)");
             if (newSkip != skip) PlayerPrefs.SetInt("TARTARIA_SkipMainMenu", newSkip ? 1 : 0);
-            row += 36;
+            row += 28;
 
-            if (GUI.Button(new Rect(x + W - 120, y + H - 40, 96, 28), "Close"))
+            // Defaults (high-impact beta safety net)
+            if (GUI.Button(new Rect(lx, row, 110, 22), "Defaults"))
             {
-                _visible = false;
-                PlayerPrefs.Save();
-                RestoreCursor();
+                ResetToDefaults();
+            }
+
+            // Close with dirty confirm
+            Rect closeRect = new Rect(x + W - 115, y + H - 38, 100, 26);
+            if (GUI.Button(closeRect, _showConfirmClose ? "CONFIRM CLOSE" : "Close"))
+            {
+                if (_showConfirmClose)
+                {
+                    _visible = false;
+                    _showConfirmClose = false;
+                    PlayerPrefs.Save();
+                    RestoreCursor();
+                }
+                else if (_dirty)
+                {
+                    _showConfirmClose = true;
+                }
+                else
+                {
+                    _visible = false;
+                    PlayerPrefs.Save();
+                    RestoreCursor();
+                }
+            }
+
+            // Inline confirm hint
+            if (_showConfirmClose)
+            {
+                var confirmStyle = new GUIStyle(GUI.skin.label) { fontSize = 10, normal = { textColor = new Color(1f, 0.85f, 0.5f) } };
+                GUI.Label(new Rect(lx, y + H - 56, W - 48, 16), "Changes auto-saved. Close panel?", confirmStyle);
+            }
+
+            // Visible "Applied" toast / status (golden, auto-fade)
+            if (_toastTimer > 0f)
+            {
+                _toastTimer -= Time.deltaTime;
+                float a = Mathf.Clamp01(_toastTimer / TOAST_DURATION);
+                var toastStyle = new GUIStyle(GUI.skin.label)
+                {
+                    fontSize = 11,
+                    alignment = TextAnchor.MiddleCenter,
+                    normal = { textColor = new Color(0.98f, 0.92f, 0.6f, a) }
+                };
+                GUI.Label(new Rect(x + 20, y + H - 22, W - 40, 18), _toastMessage ?? "Applied", toastStyle);
+                if (_toastTimer <= 0f) _toastMessage = null;
             }
         }
 
@@ -343,6 +477,71 @@ namespace Tartaria.UI
             int saved = PlayerPrefs.GetInt("TARTARIA_ActivePerfTier", PlayerPrefs.GetInt("TARTARIA_LastHardwareTier", 1));
             var t = (PerformanceProfile.HardwareTier)Mathf.Clamp(saved, 0, 3);
             return t.ToString();
+        }
+
+        // ─── M2 Beta Polish Helpers (minimal high-impact) ───
+        void DrawSectionHeader(string label, ref int r, int leftX, int wide)
+        {
+            var hdr = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 12,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.95f, 0.85f, 0.5f) }
+            };
+            GUI.Label(new Rect(leftX, r, wide, 17), "▸ " + label, hdr);
+            r += 18;
+            // subtle gold underline
+            var oldC = GUI.color;
+            GUI.color = new Color(0.75f, 0.65f, 0.35f, 0.45f);
+            GUI.DrawTexture(new Rect(leftX + 12, r - 2, wide - 60, 1), Texture2D.whiteTexture);
+            GUI.color = oldC;
+            r += 3;
+        }
+
+        void SetToast(string msg)
+        {
+            _toastMessage = msg;
+            _toastTimer = TOAST_DURATION;
+            _dirty = true;
+        }
+
+        void ResetToDefaults()
+        {
+            _volume = 1f; AudioListener.volume = 1f; SetMixer("MasterVol", 1f); PlayerPrefs.SetFloat(PP_VOLUME, 1f);
+            _music = 0.85f; SetMixer("MusicVol", _music); PlayerPrefs.SetFloat(PP_MUSIC, _music);
+            _sfx = 1f; SetMixer("SFXVol", 1f); PlayerPrefs.SetFloat(PP_SFX, 1f);
+            _amb = 0.7f; SetMixer("AmbienceVol", _amb); PlayerPrefs.SetFloat(PP_AMB, _amb);
+            _sens = 1f; PlayerPrefs.SetFloat(PP_SENS, 1f); Tartaria.Camera.CameraController.SetMouseSensitivity(1f);
+            _textScale = 1f; PlayerPrefs.SetFloat(PP_TEXT, 1f); ApplyTextScale();
+            _colorblind = 0; PlayerPrefs.SetInt(PP_CB, 0); ApplyColorblind();
+            // Reduced motion default
+            PlayerPrefs.SetInt("TARTARIA_ReducedMotion", 0);
+            _qualityIdx = Mathf.Clamp(1, 0, QualitySettings.names.Length - 1);
+            _fullscreen = true;
+            PlayerPrefs.Save();
+            ApplyAll();
+            CaptureInitials();
+            _dirty = false;
+            SetToast("Defaults Restored — Golden Feel");
+        }
+
+        void ApplyMouseSensitivity()
+        {
+            // CameraController now reads "TARTARIA_MouseSens" on mouse delta for immediate effect.
+            // Reflection for direct setter (safe no-op if absent).
+            try
+            {
+                var t = System.Type.GetType("Tartaria.Camera.CameraController, Tartaria.Camera")
+                     ?? System.Type.GetType("Tartaria.Camera.CameraController");
+                if (t == null) return;
+                var m = t.GetMethod("SetMouseSensitivity", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
+                if (m != null)
+                {
+                    var inst = FindObjectOfType(t) as MonoBehaviour;
+                    m.Invoke(inst, new object[] { _sens });
+                }
+            }
+            catch { /* non-fatal for beta */ }
         }
     }
 }

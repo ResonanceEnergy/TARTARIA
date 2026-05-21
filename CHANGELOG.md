@@ -4,6 +4,46 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [0.9.0-beta] — 2026-05-21
+
+**12-Hour Autonomous Beta Vertical Slice Sprint — Echohaven Moon 1 Closed Beta Candidate**  
+*Autonomous Unity Crew (10 specialized agents) — full vertical slice polish, compile hygiene, menus, save, juice, 60 fps gate, OneClickBuild validation*
+
+### Added
+- `KNOWN_ISSUES.md` (live P0/P1 tracker for the sprint, updated per cycle)
+- 12-hour sprint section to `docs/10_ROADMAP.md` with exact schedule, gates, and agent assignments
+- Cycle 1 execution: full compile/runtime audit of Echohaven_VerticalSlice + Moon framework integration review
+
+### Changed
+- ServiceLocator (Core) already exposes full companion/VFX/GameLoop/Quest/MoonMechanic interfaces — RailEscortController (and other Moon 3 files) now route exclusively through it (no more direct Integration namespace usage in Gameplay)
+- HapticBridge.cs + VFXBridge.cs (Audio assembly) + MoonBeatRunner.cs + MoonProgressTracker.cs + MoonRewardService.cs + MoonFrameworkBinder.cs (Editor) staged/integrated for lunar calendar, beat-synced rewards, and progress during Moon 1 hints
+- Echohaven onboarding (Milo trust arc, beckon coroutine, "echohaven_awakening" quest, tutorial guard) from prior R10 work confirmed in current codebase
+
+### Known at Sprint Start
+- Moon 3 heavy files (RailEscortController etc.) historically polluted full builds; current disk state much cleaner via ServiceLocator pattern. Verification is Cycle 1 priority.
+- MainMenuOverlay remains IMGUI (functional but needs UX polish pass).
+- New Moon* services and bridges require explicit registration in GameBootstrap / Echohaven flow for zero-null experience.
+
+**Crew Status:** Continuing M2-M4 execution autonomously on Echohaven Vertical Slice.
+
+Recent autonomous work (M2 polish + M3 juice + F310):
+- PauseMenu: Improved visuals, F310 gamepad debounce navigation, better slot display.
+- Restoration sequence: Cleaned duplication, stronger F310 rumble, full reduced motion support (shorter camera, less VFX).
+- Settings: Reduced motion toggle wired and exposed.
+- Logitech F310: Startup ensure + rumble paths active.
+- Main Menu: Richer Continue label with playtime.
+
+Pushing next: Full accessibility propagation + restoration audio/VFX timing sync per roadmap.
+
+## M1 Stabilization Deliverables (2026-05-21)
+- GameLoopController: runtime FindAnyObjectByType for cameraController + playerInput + re-bind (cinematics on restore now functional)
+- EchohavenContentSpawner: _contentSpawned guard + load race comment (prevents duplicate Milo/quest/intro on resume)
+- Moon 1 decision: **Enabled** — runtime creation of "MoonFramework" + MoonBeatRunner in Echohaven_VerticalSlice (5-beat lunar structure now active for beta even without editor binder pass)
+- Haptic + VFX: production bootstrap creation + prominent [M1-SMOKE] Debug.Logs on OnBuildingRestored / tuning paths
+- All changes keep asmdef hygiene and ServiceLocator pattern. Core loop (menu → spawn → Milo → tune 3 nodes → dome restore with haptics/VFX + lunar beat + save) is now far more solid for in-editor smoke testing.
+
+---
+
 ## [1.9.0] — 2025-07-28
 
 **Roadmap v11 — HUD Combat Panels, Event Wiring, Wave Persistence & Companion Fixes**  
