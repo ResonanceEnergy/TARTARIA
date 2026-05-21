@@ -365,10 +365,35 @@ namespace Tartaria.Integration
             "milo" => 0, "cassian" => 1, "lirael" => 2, "korath" => 3, "thorne" => 4, "anastasia" => 5, "veritas" => 6, _ => 0
         };
 
+        bool IsUnlocked(string companionId)
+        {
+            return _states.TryGetValue(companionId, out var state) && state.unlocked;
+        }
+
+        /// <summary>
+        /// R7 integration fix: Called from EchohavenContentSpawner (zone 0), ZoneController, ZoneTransitionSystem on load/transition.
+        /// Unlocks companions based on unlockMoon <= currentMoonIndex so Milo (Moon1) and early companions work in Echohaven core loop (exploration/tuning/restoration/combat/Giant).
+        /// </summary>
+        public void CheckUnlocks(int currentMoonIndex)
+        {
+            if (companions == null || companions.Length == 0)
+                companions = CreateDefaultCompanions();
+
+            int unlockedCount = 0;
+            foreach (var c in companions)
+            {
+                if (c.unlockMoon <= currentMoonIndex)
+                {
+                    UnlockCompanion(c.companionId);
+                    unlockedCount++;
+                }
+            }
+            Debug.Log($"[CompanionManager] CheckUnlocks(moon/zone={currentMoonIndex}) — {unlockedCount} companions unlocked/verified for Echohaven stability.");
+        }
+
         // R7 extended save payload (includes new fields)
         public CompanionManagerSavePayload GetSaveData()
         {
-            // ... (same as R6 extended with mutation tiers, giant, calendar arrays)
             var ids = new System.Collections.Generic.List<string>();
             var unlocked = new System.Collections.Generic.List<bool>();
             var trust = new System.Collections.Generic.List<float>();
@@ -399,25 +424,83 @@ namespace Tartaria.Integration
                 giants.Add(pulled.giant);
                 calendars.Add(pulled.calendar);
             }
-            return new CompanionManagerSavePayload { /* full arrays including R7 */ companionIds = ids.ToArray() /* ... */ };
-        }
 
-        // Load extended similarly, calling Sync with R7 fields.
-
-        static CompanionData[] CreateDefaultCompanions()
-        {
-            return new[] { /* full 7 as in my earlier partial */ 
-                new CompanionData { companionId = "milo", displayName = "Milo", description = "...", unlockMoon = 1, passiveBuffType = CompanionBuffType.DiscoveryRange, passiveDescription = "..." },
-                new CompanionData { companionId = "lirael", displayName = "Lirael", description = "...", unlockMoon = 2, passiveBuffType = CompanionBuffType.TuningAccuracy, passiveDescription = "..." },
-                new CompanionData { companionId = "thorne", displayName = "Thorne", description = "...", unlockMoon = 4, passiveBuffType = CompanionBuffType.CombatDamage, passiveDescription = "..." },
-                new CompanionData { companionId = "korath", displayName = "Korath", description = "...", unlockMoon = 8, passiveBuffType = CompanionBuffType.MoteDetection, passiveDescription = "..." },
-                new CompanionData { companionId = "cassian", displayName = "Cassian", description = "...", unlockMoon = 2, passiveBuffType = CompanionBuffType.MoteDetection, passiveDescription = "..." },
-                new CompanionData { companionId = "anastasia", displayName = "Anastasia", description = "...", unlockMoon = 7, passiveBuffType = CompanionBuffType.TuningAccuracy, passiveDescription = "..." },
-                new CompanionData { companionId = "veritas", displayName = "Veritas", description = "Bell Keeper of truth and resonance. R7 precision giant song + calendar echoes.", unlockMoon = 6, passiveBuffType = CompanionBuffType.TuningAccuracy, passiveDescription = "Exact frequency matching and Giant's Song auto-sync." }
+            return new CompanionManagerSavePayload
+            {
+                companionIds = ids.ToArray(),
+                companionUnlocked = unlocked.ToArray(),
+                companionTrust = trust.ToArray(),
+                redemptionLevels = reds.ToArray(),
+                bondLevels = bonds.ToArray(),
+                escortingStates = escorts.ToArray(),
+                solidificationStates = solids.ToArray(),
+                redemptionChoices = choices.ToArray(),
+                in17thHourStates = hours.ToArray(),
+                worldMutationTiers = mutations.ToArray(),
+                giantSynergyStates = giants.ToArray(),
+                calendarEchoStates = calendars.ToArray()
             };
         }
 
-        // ... (other R6 methods preserved in full)
+        /// <summary>
+        /// R7: Full load of extended companion save (basic + redemption/bond/escort/solid/giant/mutation/calendar).
+        /// Restores _states + _worldMutationTiers and pushes to DOTS so Echohaven load + Giant Mode + combat + tuning all see correct companion state.
+        /// Called from GameLoopController.OnAfterLoad after scene bootstrap.
+        /// </summary>
+        public void LoadSaveData(CompanionManagerSavePayload payload)
+        {
+            if (payload == null) return;
+
+            // Restore basic states for all companions
+            for (int i = 0; i < (payload.companionIds?.Length ?? 0); i++)
+            {
+                string id = payload.companionIds[i];
+                bool isUnlocked = i < (payload.companionUnlocked?.Length ?? 0) && payload.companionUnlocked[i];
+                float tr = i < (payload.companionTrust?.Length ?? 0) ? payload.companionTrust[i] : 0f;
+
+                _states[id] = new CompanionState { unlocked = isUnlocked, trustLevel = tr };
+            }
+
+            // Restore R7 advanced state into local trackers and push into live DOTS entities (safe if entities not spawned yet — controllers re-sync)
+            for (int i = 0; i < (payload.companionIds?.Length ?? 0); i++)
+            {
+                string id = payload.companionIds[i];
+                int cid = CompanionIdFromString(id);
+
+                int mut = (i < (payload.worldMutationTiers?.Length ?? 0)) ? payload.worldMutationTiers[i] : 0;
+                if (mut > 0) _worldMutationTiers[id] = mut;
+
+                bool esc = i < (payload.escortingStates?.Length ?? 0) && payload.escortingStates[i];
+                bool sol = i < (payload.solidificationStates?.Length ?? 0) && payload.solidificationStates[i];
+                bool ch = i < (payload.redemptionChoices?.Length ?? 0) && payload.redemptionChoices[i];
+                bool h17 = i < (payload.in17thHourStates?.Length ?? 0) && payload.in17thHourStates[i];
+                bool gi = i < (payload.giantSynergyStates?.Length ?? 0) && payload.giantSynergyStates[i];
+                bool cal = i < (payload.calendarEchoStates?.Length ?? 0) && payload.calendarEchoStates[i];
+                int red = (i < (payload.redemptionLevels?.Length ?? 0)) ? payload.redemptionLevels[i] : 0;
+                int bo = (i < (payload.bondLevels?.Length ?? 0)) ? payload.bondLevels[i] : 0;
+
+                if (_states.TryGetValue(id, out var st) && st.unlocked)
+                {
+                    SyncCompanionToDOTS(cid, esc, Vector3.zero, sol, red, ch, h17, bo, gi, mut, cal);
+                }
+            }
+
+            Debug.Log("[CompanionManager] R7 extended save data loaded and DOTS-synced for Echohaven/Moon1+ stability (companions, trust, mutations, giant, calendar). Core loop (exploration/tuning/restoration/combat/Giant) now stable.");
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        static CompanionData[] CreateDefaultCompanions()
+        {
+            return new[] { 
+                new CompanionData { companionId = "milo", displayName = "Milo", description = "Loyal scout and excavator. Unlocks early dig sites and discovery range in Echohaven.", unlockMoon = 1, passiveBuffType = CompanionBuffType.DiscoveryRange, passiveDescription = "Increased aether shard and POI detection range." },
+                new CompanionData { companionId = "lirael", displayName = "Lirael", description = "Crystal singer and tuning expert.", unlockMoon = 2, passiveBuffType = CompanionBuffType.TuningAccuracy, passiveDescription = "Higher accuracy and faster node completion in tuning mini-games." },
+                new CompanionData { companionId = "thorne", displayName = "Thorne", description = "Fleet tactician and combat support.", unlockMoon = 4, passiveBuffType = CompanionBuffType.CombatDamage, passiveDescription = "Bonus damage and wave clear speed." },
+                new CompanionData { companionId = "korath", displayName = "Korath", description = "Stone weaver and structural guardian.", unlockMoon = 8, passiveBuffType = CompanionBuffType.MoteDetection, passiveDescription = "Enhanced mote and secret resonance detection." },
+                new CompanionData { companionId = "cassian", displayName = "Cassian", description = "Archivist and redemption arc companion.", unlockMoon = 2, passiveBuffType = CompanionBuffType.MoteDetection, passiveDescription = "Intel markers and analysis for corruption weakpoints." },
+                new CompanionData { companionId = "anastasia", displayName = "Anastasia", description = "Echo of the lost princess, archive and giant catalyst.", unlockMoon = 7, passiveBuffType = CompanionBuffType.TuningAccuracy, passiveDescription = "Warm caustics and solidification support for giant mode." },
+                new CompanionData { companionId = "veritas", displayName = "Veritas", description = "Bell Keeper of truth and resonance. R7 precision giant song + calendar echoes.", unlockMoon = 6, passiveBuffType = CompanionBuffType.TuningAccuracy, passiveDescription = "Exact frequency matching and Giant's Song auto-sync." }
+            };
+        }
 
         public class CompanionManagerSavePayload
         {
