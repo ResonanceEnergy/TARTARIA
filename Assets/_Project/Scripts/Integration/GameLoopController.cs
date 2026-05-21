@@ -1889,7 +1889,7 @@ namespace Tartaria.Integration
                 save.dayOutOfTime.bestChallengeScore = dd2.bestChallengeScore;
             }
 
-            // Companion Manager
+            // Companion Manager (R7 full extended save for Echohaven stability)
             var comp = CompanionManager.Instance;
             if (comp != null)
             {
@@ -1897,6 +1897,15 @@ namespace Tartaria.Integration
                 save.companionManager.companionIds = cmd.companionIds ?? System.Array.Empty<string>();
                 save.companionManager.companionUnlocked = cmd.companionUnlocked ?? System.Array.Empty<bool>();
                 save.companionManager.companionTrust = cmd.companionTrust ?? System.Array.Empty<float>();
+                save.companionManager.redemptionLevels = cmd.redemptionLevels ?? System.Array.Empty<int>();
+                save.companionManager.bondLevels = cmd.bondLevels ?? System.Array.Empty<int>();
+                save.companionManager.escortingStates = cmd.escortingStates ?? System.Array.Empty<bool>();
+                save.companionManager.solidificationStates = cmd.solidificationStates ?? System.Array.Empty<bool>();
+                save.companionManager.redemptionChoices = cmd.redemptionChoices ?? System.Array.Empty<bool>();
+                save.companionManager.in17thHourStates = cmd.in17thHourStates ?? System.Array.Empty<bool>();
+                save.companionManager.worldMutationTiers = cmd.worldMutationTiers ?? System.Array.Empty<int>();
+                save.companionManager.giantSynergyStates = cmd.giantSynergyStates ?? System.Array.Empty<bool>();
+                save.companionManager.calendarEchoStates = cmd.calendarEchoStates ?? System.Array.Empty<bool>();
             }
 
             // ─── v8 Save Blocks ──────────────────────────
@@ -2507,7 +2516,7 @@ namespace Tartaria.Integration
                 });
             }
 
-            // Companion Manager
+            // Companion Manager (R7 full extended load for Echohaven + Giant/Combat/Tuning stability)
             var compLoad = CompanionManager.Instance;
             if (compLoad != null && save.companionManager != null)
             {
@@ -2515,7 +2524,16 @@ namespace Tartaria.Integration
                 {
                     companionIds = save.companionManager.companionIds,
                     companionUnlocked = save.companionManager.companionUnlocked,
-                    companionTrust = save.companionManager.companionTrust
+                    companionTrust = save.companionManager.companionTrust,
+                    redemptionLevels = save.companionManager.redemptionLevels,
+                    bondLevels = save.companionManager.bondLevels,
+                    escortingStates = save.companionManager.escortingStates,
+                    solidificationStates = save.companionManager.solidificationStates,
+                    redemptionChoices = save.companionManager.redemptionChoices,
+                    in17thHourStates = save.companionManager.in17thHourStates,
+                    worldMutationTiers = save.companionManager.worldMutationTiers,
+                    giantSynergyStates = save.companionManager.giantSynergyStates,
+                    calendarEchoStates = save.companionManager.calendarEchoStates
                 });
             }
 

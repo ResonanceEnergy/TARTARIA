@@ -706,6 +706,25 @@ namespace Tartaria.Save
                 data.header.gameVersion = "0.12.0";
                 MarkDirty();
             }
+
+            if (data.header.schemaVersion < 13)
+            {
+                // v12 -> v13: R7 CompanionManager extended save fields (redemption/bond/escort/giant/mutation/calendar for full Echohaven + cross-moon persistence)
+                if (data.companionManager == null) data.companionManager = new CompanionManagerSaveBlock();
+                var cm = data.companionManager;
+                if (cm.redemptionLevels == null) cm.redemptionLevels = System.Array.Empty<int>();
+                if (cm.bondLevels == null) cm.bondLevels = System.Array.Empty<int>();
+                if (cm.escortingStates == null) cm.escortingStates = System.Array.Empty<bool>();
+                if (cm.solidificationStates == null) cm.solidificationStates = System.Array.Empty<bool>();
+                if (cm.redemptionChoices == null) cm.redemptionChoices = System.Array.Empty<bool>();
+                if (cm.in17thHourStates == null) cm.in17thHourStates = System.Array.Empty<bool>();
+                if (cm.worldMutationTiers == null) cm.worldMutationTiers = System.Array.Empty<int>();
+                if (cm.giantSynergyStates == null) cm.giantSynergyStates = System.Array.Empty<bool>();
+                if (cm.calendarEchoStates == null) cm.calendarEchoStates = System.Array.Empty<bool>();
+                data.header.schemaVersion = 13;
+                data.header.gameVersion = "0.13.0";
+                MarkDirty();
+            }
         }
 
 

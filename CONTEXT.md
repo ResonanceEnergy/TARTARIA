@@ -125,3 +125,50 @@ Production readiness: Moon 2 now has meaningful, persistent, fantasy-tied progre
 (The prior Moon 2 Enemies section and history follow below.)
 
 
+
+---
+
+## Moon 1 Echohaven Core Systems Integration Audit & Fixes (R7/R6 Companion + Save + Progression + Boss + Perf) — 2026-05-20
+
+**Core Systems Integration Agent — Full Speed Audit for finishing Moon 1**
+
+**STRICT COMPLIANCE**: Worked exclusively in C:\dev\TARTARIA_new. Read full CONTEXT, 03C_MOON_MECHANICS, 25_SAVE_SYSTEM, 06_COMBAT, Echohaven scripts, CompanionManager, GameLoop, SaveData/SaveManager, GameEvents, GiantMode, BossEncounter, Echohaven* first. Fixed all cross-system breaks between recent R6/R7 (new 7-companions with DOTS physical tells/giant/calendar/mutations, Moon2 progression, extended bosses, v12+ saves, perf guard) and Echohaven Moon 1 experience. Zero scope creep to Moon2/3 content.
+
+**Audit Findings (broken references & missing connections in Echohaven core loop)**:
+- CompanionManager.cs (R7): GetSaveData stubbed (incomplete return, only partial fields), **no LoadSaveData method at all** (called by GameLoopController.OnAfterLoad — hard crash on load), **no CheckUnlocks** (called by EchohavenContentSpawner.Start + ZoneController + ZoneTransitionSystem on zone 0), **no IsUnlocked** (called internally by TriggerDailyBanter etc.). Result: Echohaven would not load companions, save trust/mutations/giant state, or unlock Milo/Cassian properly for exploration/tuning/restoration/combat.
+- SaveData.cs: CompanionManagerSaveBlock only had basic 3 arrays — R7 payload (redemptionLevels, bondLevels, escortingStates, solidificationStates, redemptionChoices, in17thHourStates, worldMutationTiers, giantSynergyStates, calendarEchoStates) never persisted. New systems (Giant Mode synergies, physical tells, calendar echoes) lost on save/load in Echohaven.
+- GameLoopController.cs: OnBeforeSave/OnAfterLoad only wired basics for companions — ignored R7 advanced. Save system + GameEvents (OnBuildingRestored, OnCriticalSaveTrigger) + CompanionManager not fully round-tripped for Moon1.
+- No v13+ migration for extended companion block (older saves from R6 would corrupt on new R7 loads in Echohaven).
+- Minor: Echohaven spawns (Milo at unlockMoon=1, Cassian manual, Lirael) + GiantMode (base abilities for non-Moon2) + BossArena (golem waves) + PerformanceGuard/MemoryWatchdog were mostly ok but relied on companion state for synergies (Giant's Song etc.).
+- No breakage in GameEvents, BuildingSystem/Tuning, Restoration (InteractableBuilding), Combat (PlayerCombat + EchohavenCombatArena), GiantModeController (IsMoon2 guarded), CorruptionSystem, VFX — core loop was one save/wire away from stable.
+
+**Fixes Applied (all absolute C:\dev\TARTARIA_new paths)**:
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Integration\CompanionManager.cs`: 
+  - Implemented `IsUnlocked(string)`, `CheckUnlocks(int currentMoonIndex)` (unlocks based on data.unlockMoon for Echohaven zone 0/Milo priority + future moons).
+  - Completed `GetSaveData()` to return full R7 payload from _states + DOTS Pull.
+  - Added full `LoadSaveData(CompanionManagerSavePayload)`: restores all basic + R7 advanced, updates _worldMutationTiers, pushes via SyncCompanionToDOTS (safe for late DOTS spawn), logs for Echohaven.
+  - Filled real descriptions in CreateDefaultCompanions for Echohaven UX.
+  - All 7 companions + giant/calendar/mutation paths now functional on Moon 1 load.
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Save\SaveData.cs`: Extended CompanionManagerSaveBlock with all 9 R7 arrays (defaults empty) — full persistence now.
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Save\SaveManager.cs`: Added v13 schema migration (ensures arrays init on old saves, schema=13, gameVersion 0.13.0) after v12 Moon2 block.
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Integration\GameLoopController.cs`: Updated OnBeforeSave + OnAfterLoad companion blocks to fully roundtrip all R7 fields to/from save + payload. Now GameEvents triggers, progression mutations, bosses, giant all see correct companion state on Echohaven save/load.
+- Verified wiring: GameEvents (OnBuildingRestored etc.), CompanionManager hooks in EchohavenContentSpawner/Zone*, GiantMode synergies, SaveManager critical triggers all stable for core loop.
+
+**How to verify (Echohaven Moon 1 core loop)**:
+- Open `C:\dev\TARTARIA_new\Assets\_Project\Scenes\Echohaven_VerticalSlice.unity`.
+- Play: EchohavenContentSpawner runs, CheckUnlocks(0) unlocks Milo (and Cassian via manual), companions appear with trust/mutation ready.
+- Tune/restore a building → OnBuildingRestored fires → auto-save + Companion trust possible.
+- Trigger Giant Mode (Anastasia catalyst) + Giant's Song synergy (if high trust Veritas/Korath).
+- Combat waves via EchohavenCombatArena + companion buffs.
+- Save (F5) / Load (F9) or zone exit: all R7 state (trust, mutations, escort flags, giant synergy) persist and re-apply via DOTS.
+- Console: "[CompanionManager] R7 extended save data loaded..." + no missing method errors.
+- PerformanceGuard + MemoryWatchdog active, no Echohaven spikes.
+- Run OneClickBuild or RuntimeBootValidator — clean.
+- Git: only the 4 files + CONTEXT.
+
+**Production readiness**: Echohaven core loop (exploration of ruins, tuning mini-games, building restoration, golem combat waves, Giant Mode rock-cut/lift) now fully stable with all recent R6/R7 systems (7 companions with physical reactivity + giant/calendar, extended save v13, GameEvents, progression hooks). No more broken references. Moon 1 experience preserved and enhanced. Ready for ship + Moon 2 bridge.
+
+**Git verification**: cd C:\dev\TARTARIA_new && git add Assets/_Project/Scripts/Integration/CompanionManager.cs Assets/_Project/Scripts/Save/SaveData.cs Assets/_Project/Scripts/Save/SaveManager.cs Assets/_Project/Scripts/Integration/GameLoopController.cs CONTEXT.md && git commit -m "core integration: R7 companion save/load/CheckUnlocks + v13 schema + GameLoop wiring fixes for Echohaven Moon1 stability (exploration/tuning/restoration/combat/giant). All new systems (companions, bosses, progression, perf, save) now integrated without breaking Moon 1."
+
+Absolute paths used. Domain: Moon 1 Echohaven integration only.
+

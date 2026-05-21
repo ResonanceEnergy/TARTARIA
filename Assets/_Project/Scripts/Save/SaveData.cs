@@ -502,6 +502,17 @@ namespace Tartaria.Save
         public string[] companionIds = Array.Empty<string>();
         public bool[] companionUnlocked = Array.Empty<bool>();
         public float[] companionTrust = Array.Empty<float>();
+
+        // R7 extended companion save fields for full persistence of redemption, bonds, escort, giant, mutations, calendar echoes (ensures Echohaven + all moons save/load correctly with new R7 systems)
+        public int[] redemptionLevels = Array.Empty<int>();
+        public int[] bondLevels = Array.Empty<int>();
+        public bool[] escortingStates = Array.Empty<bool>();
+        public bool[] solidificationStates = Array.Empty<bool>();
+        public bool[] redemptionChoices = Array.Empty<bool>();
+        public bool[] in17thHourStates = Array.Empty<bool>();
+        public int[] worldMutationTiers = Array.Empty<int>();
+        public bool[] giantSynergyStates = Array.Empty<bool>();
+        public bool[] calendarEchoStates = Array.Empty<bool>();
     }
 
     // ─── v8 Save Blocks (CombatWave) ─────────────
