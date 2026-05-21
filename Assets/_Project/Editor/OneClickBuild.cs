@@ -1,4 +1,5 @@
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
@@ -533,6 +534,14 @@ namespace Tartaria.Editor
                 }
             });
 
+            // ── Phase 9j21: Moon Framework v2 — attach MoonBeatRunner to every moon scene ──
+            //    B1: 5-beat orchestrator (Discovery → Restoration → Conflict → Climax → Revelation)
+            //    + per-beat persistence + single reward funnel. Idempotent.
+            BuildReport.RunPhase("Phase 9j21/19: Moon Framework v2 (Beat Runner)", () =>
+            {
+                Tartaria.EditorTools.MoonFrameworkBinder.AttachAll();
+            });
+
             // ── Finalize ──
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
@@ -649,6 +658,8 @@ namespace Tartaria.Editor
             // Delegate to MoonScenesFactory so Build Settings always reflects
             // the canonical Boot → Echohaven → Moons 2–13 → UI_Overlay order.
             MoonScenesFactory.UpdateBuildSettings();
+        }
+
         /// <summary>
         /// Applies recommended Player Settings for Moon 1 Development Builds
         /// and general performance-friendly configuration.
@@ -664,7 +675,7 @@ namespace Tartaria.Editor
                 ? "TARTARIA - Moon 1 Vertical Slice (Dev)"
                 : "TARTARIA";
             PlayerSettings.companyName = "Resonance Forge";
-            PlayerSettings.applicationVersion = forDevelopment ? "0.9.0-Moon1-Dev" : "1.0.0";
+            PlayerSettings.bundleVersion = forDevelopment ? "0.9.0-Moon1-Dev" : "1.0.0";
 
             // Development / iteration friendly
             PlayerSettings.defaultScreenWidth = 1280;

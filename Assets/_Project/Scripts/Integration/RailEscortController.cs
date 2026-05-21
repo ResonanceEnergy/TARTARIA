@@ -5,12 +5,13 @@ using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;
 using Tartaria.Core;
-// using Tartaria.UI;  [Moon1 build: cycle-safe stub]
+using Tartaria.UI;
 using Tartaria.Audio;
 using Tartaria.Input;
-using Tartaria.Gameplay; // for EnemyType / EnemySpawnTrigger access in Moon 3 DOTS spawns
+using Tartaria.Gameplay; // for EnemyType / EnemySpawnTrigger / Moon3BuildingRelay / SpectralOrphanAdoption / QuestObjectiveType
+using UnityEngine.InputSystem; // for Gamepad F310 lullaby rhythm input (face buttons + triggers)
 
-namespace Tartaria.Gameplay
+namespace Tartaria.Integration
 {
     /// <summary>
     /// Rail Escort Mechanics — Moon 3 (Windswept Highlands) — Phase 3 R7 Production Completeness.
@@ -30,15 +31,15 @@ namespace Tartaria.Gameplay
     /// </summary>
     public class RailEscortController : MonoBehaviour
     {
-        [Header("Escort Config — R6 7min + R7 Extended")]
-        [SerializeField] float escortDuration = 420f; // 7 minutes core vertical slice
+        [Header("Escort Config — Moon 3 R7 10-15min Playable Experience")]
+        [SerializeField] float escortDuration = 660f; // ~11 minutes for full fun balanced loop (start->waves->stations->levi 4phases->victory)
         [SerializeField] float trainSpeed = 3.8f;
-        [SerializeField] int maxWraithSpawnsPerWave = 6;
-        [SerializeField] float baseWaveInterval = 52f; // tuned for pacing + freq dynamic
+        [SerializeField] int maxWraithSpawnsPerWave = 5; // balanced, not overwhelming
+        [SerializeField] float baseWaveInterval = 48f; // tuned for 9-10 waves over 11min + rhythm/freq breathing room
 
         [Header("Path (R6 linear + R7 extended stations & branch points)")]
-        [SerializeField] Vector3 railStart = new Vector3(20, 6, -10);
-        [SerializeField] Vector3 railEnd = new Vector3(140, 6, 55);
+        [SerializeField] public Vector3 railStart = new Vector3(20, 6, -10);
+        [SerializeField] public Vector3 railEnd = new Vector3(140, 6, 55);
 
         // R7: Extended rail network stations / branch points (restoration/tuning/combat hooks)
         readonly (string name, float progress, string hook)[] _railStations = new[]
@@ -73,6 +74,7 @@ namespace Tartaria.Gameplay
         float _vulnWindowEnd;
         bool _permanentWorldChanged;
         float _lastFreqMatch;
+        bool _moon3AutoStarted; // ensures one-time auto-start on Moon 3 without external trigger
 
         // R7: Leviathan phase state (0=approach,1=tail,2=scream,3=barrage,4=purify)
         int _leviathanPhase;
@@ -82,7 +84,13 @@ namespace Tartaria.Gameplay
         int _currentBranchChoice = -1; // -1 none, 0=short combat, 1=safe tuned
 
         // R7: Fast travel hook (post-escort Continental Rail ready)
-        public static bool Moon3ContinentalRailFastTravelUnlocked { get; private set; }
+        public static bool Moon3ContinentalRailFastTravelUnlocked { get; set; }
+
+        // Moon 3 Lullaby Rhythm Input (432Hz base, F310 gamepad face buttons + triggers, keyboard fallback)
+        float _lullabyBeatInterval = 0.82f; // ~73 BPM lullaby pulse feel, tied to 432 resonance
+        float _lastLullabyBeat;
+        float _rhythmCombo;
+        int _lullabyRhythmHits;
 
         // R6 simple proxy pool for perf (no GC spam on waves) + R7 expanded
         readonly Queue<GameObject> _wraithProxyPool = new Queue<GameObject>();
@@ -91,6 +99,18 @@ namespace Tartaria.Gameplay
 
         // R7 dedicated HUD (non-OnGUI)
         Moon3EscortHUD _escortHUD;
+
+        // Moon 3 Exclusive Audio Heart (lullaby rhythm, train, wind, leviathan, Aether Remembers)
+        Moon3RailAudioManager _moon3RailAudio;
+
+        // ─── Moon 3 "Compassion & Rails" Visual State (3D/TA R7) ───
+        // Train damage states + spectral orphan children visuals that react to lullaby singing
+        GameObject _trainBody;
+        List<Renderer> _trainRenderers = new List<Renderer>();
+        GameObject[] _spectralOrphanVisuals; // Aria, Toren, Syl glow proxies inside/ on train
+        float _lastTrainHealthForVFX;
+        MaterialPropertyBlock _trainMPB;
+        bool _trainDamageVFXActive;
 
         public bool IsActive => _active;
         public float Progress => _progress;
@@ -107,11 +127,15 @@ namespace Tartaria.Gameplay
         public bool IsPermanentWorldChanged => _permanentWorldChanged;
         public float LullabyShieldStrength => _lullabyShieldStrength;
         public int LeviathanPhase => _leviathanPhase;
+        public float LullabyRhythmCombo => _rhythmCombo;
+        public int LullabyRhythmHits => _lullabyRhythmHits;
+        public int CurrentBranchChoice => _currentBranchChoice;
 
         public event System.Action<bool> OnEscortComplete; // success/fail
         public event System.Action<int> OnWaveStarted;
         public event System.Action OnSeventeenthHourTriggered;
         public event System.Action OnLeviathanPurified;
+        public event System.Action<int> OnBranchChoiceDecided; // 0 = combat gauntlet (Milo favored), 1 = tuned safe path (Lirael favored) at WindspireJunction
 
         /// <summary>
         /// R5 synergy preserved + R6/R7 extended: good frequency puzzle matches during escort directly empower lullaby + damage threats + open levi vuln. R7: branch & station hooks.
@@ -131,7 +155,7 @@ namespace Tartaria.Gameplay
                 {
                     h.TakeDamage(synergyDmg);
                     if (matchQuality > 0.6f)
-                        VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, t.transform.position + Vector3.up * 2f);
+                        ServiceLocator.VFX?.PlayEffect(VFXEffect.HarmonicCascade, t.transform.position + Vector3.up * 2f);
                 }
             }
 
@@ -139,7 +163,7 @@ namespace Tartaria.Gameplay
             if (_leviathanPhaseActive && matchQuality > 0.55f)
             {
                 _lullabyShieldStrength += matchQuality * 0.4f;
-                if (Random.value < 0.4f) AdvanceLeviathanPhase(matchQuality);
+                if (UnityEngine.Random.value < 0.4f) AdvanceLeviathanPhase(matchQuality);
             }
 
             if (matchQuality > 0.72f)
@@ -159,10 +183,9 @@ namespace Tartaria.Gameplay
             {
                 _currentBranchChoice = tuningQuality > 0.6f ? 1 : 0; // safe vs combat fork
             }
-            // Spawn defensive proxy at station for polish
-            Vector3 stationPos = Vector3.Lerp(railStart, railEnd, 0.5f);
-            var stationProxy = GetPooledOrNewStationProxy(stationPos);
-            _activeThreats.Add(stationProxy);
+            // NOTE: station visual proxies pre-created in CreateExtendedRailStationsProxies (with relays).
+            // Do NOT add stations to _activeThreats — they are not threats (cleaned duplication / escort logic bug).
+            // Restoration only applies synergy + branch fork here.
         }
 
         public static RailEscortController Instance { get; private set; }
@@ -172,11 +195,12 @@ namespace Tartaria.Gameplay
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             Moon3ContinentalRailFastTravelUnlocked = false;
+            _moon3AutoStarted = false;
         }
 
         void Start()
         {
-            if (GetComponent<MoonMechanicActivator>() != null)
+            if (ServiceLocator.MoonMechanic?.HasActivator(gameObject) ?? false)
             {
                 // driven externally
             }
@@ -198,6 +222,19 @@ namespace Tartaria.Gameplay
             _seventeenthHourActive = false;
             _leviathanPhaseActive = false;
             _permanentWorldChanged = false;
+
+            // Wire to Moon03 data (if available via campaign) for Moon 3 specific tuning
+            try
+            {
+                if (ServiceLocator.Campaign != null && ServiceLocator.Campaign.CurrentMoonIndex == 3)
+                {
+                    // Moon 3 OrphanTrain mechanic specific: slightly stronger starting shield + 432 base
+                    _currentTargetLullabyHz = 432f;
+                    _lullabyShieldStrength = Mathf.Max(_lullabyShieldStrength, 1.15f);
+                    Debug.Log("[Moon3 RailEscort] Wired to Moon03 Windswept Highlands data — OrphanTrain escort active.");
+                }
+            }
+            catch { /* safe if campaign not ready */ }
             _nextVulnWindowTime = 170f;
             _vulnWindowEnd = 0f;
             _currentTargetLullabyHz = 432f;
@@ -205,6 +242,12 @@ namespace Tartaria.Gameplay
             _lastLeviPhaseChange = 0f;
             _currentBranchChoice = -1;
             Moon3ContinentalRailFastTravelUnlocked = false;
+
+            // Lullaby rhythm init for playable input loop
+            _lastLullabyBeat = Time.time;
+            _rhythmCombo = 0f;
+            _lullabyRhythmHits = 0;
+            _moon3AutoStarted = true;
 
             CreateTrainProxy();
             CreateExtendedRailStationsProxies(); // R7: 3+ stations + branch points
@@ -232,17 +275,36 @@ namespace Tartaria.Gameplay
             _escortHUD = hudGO.AddComponent<Moon3EscortHUD>();
             _escortHUD.Initialize(this);
 
+            // Moon 3 Audio Heart — Lullaby Rhythm System + full dynamic soundscape (432Hz emotional core)
+            var audioGO = new GameObject("Moon3_RailAudio_Heart");
+            _moon3RailAudio = audioGO.AddComponent<Moon3RailAudioManager>();
+            _moon3RailAudio.InitializeForEscort(this);
+
+            // ─── R7 Full event integration for VFX / haptics / F310 rumble (Compassion & Rails narrative) ───
+            OnEscortComplete += HandleEscortCompleteVFX;
+            OnWaveStarted += HandleWaveVFX;
+            OnSeventeenthHourTriggered += HandleSeventeenthHourVFX;
+            OnLeviathanPurified += HandleLeviathanPurifiedVFX;
+
             // [Moon1 HUD stub] ShowObjective("ORPHAN TRAIN ESCORT — 7 MINUTES OF THE RAILS. Protect the children. Tune the living frequency. (R7 extended network)");
             // [Moon1 HUD stub] ShowBanner("The Dissonant Orphan Train", "First resonance rail live. Children's lullaby is your shield. Frequency is your weapon. Stations ahead.", 6f);
 
-            AudioManager.Instance?.PlaySFX2D("TrainDepart");
-            VFXController.Instance?.SpawnMoon3TrainTrail(railStart, 1.1f);
+            // Replaced by Moon3RailAudioManager (rich Moon3_TrainDepart + loops)
+            ServiceLocator.VFX?.SpawnMoon3TrainTrail(railStart, 1.1f);
 
             Debug.Log($"[Moon3 R7 Escort] 7min setpiece + extended rail started. Adopted={adoptedChildren}. Base shield={_lullabyShieldStrength:F2}x");
         }
 
         void Update()
         {
+            // Moon 3 auto-start for complete playable experience (wired to Moon03 data / campaign)
+            if (!_active && !_moon3AutoStarted && ServiceLocator.Campaign?.CurrentMoonIndex == 3)
+            {
+                int kids = (SpectralOrphanAdoption.AdoptedCount > 0) ? SpectralOrphanAdoption.AdoptedCount : 2;
+                StartEscort(kids);
+                _moon3AutoStarted = true;
+            }
+
             if (!_active) return;
 
             _time += Time.deltaTime;
@@ -257,13 +319,16 @@ namespace Tartaria.Gameplay
 
                 // R5/R6/R7 periodic train trail VFX (perf throttled)
                 if (Time.frameCount % 11 == 0)
-                    VFXController.Instance?.SpawnMoon3TrainTrail(pos, 0.65f + _lullabyShieldStrength * 0.35f);
+                    ServiceLocator.VFX?.SpawnMoon3TrainTrail(pos, 0.65f + _lullabyShieldStrength * 0.35f);
             }
 
             // R6: Live player frequency drives dynamic difficulty + protection
             float freqMatch = GetLiveFrequencyMatchQuality();
             _lastFreqMatch = freqMatch;
             ApplyFrequencyDrivenDifficulty(freqMatch);
+
+            // Moon 3: Active lullaby rhythm input (playable core loop — F310 gamepad + kb)
+            HandleLullabyRhythmInput();
 
             // R7: Check passing extended stations for restoration/tuning/combat hooks
             CheckRailStationPassage(freqMatch);
@@ -280,7 +345,7 @@ namespace Tartaria.Gameplay
             // Wave spawning — R6 pacing for 5-8min setpiece (7 waves) + R7 branch effect
             float branchMod = (_currentBranchChoice == 0) ? 0.75f : 1.15f; // combat branch harder
             float dynamicInterval = baseWaveInterval * (0.82f + (1f - freqMatch) * 0.38f) * branchMod;
-            if (_time - _lastWaveTime > dynamicInterval && _waveIndex < 7)
+            if (_time - _lastWaveTime > dynamicInterval && _waveIndex < 10)
             {
                 _lastWaveTime = _time;
                 _waveIndex++;
@@ -327,6 +392,13 @@ namespace Tartaria.Gameplay
             {
                 AdvanceLeviathanPhase(0.5f);
             }
+
+            // Playable vuln windows for 4-phase Leviathan climax (Approach/Tail/Scream/Barrage -> Purify on death)
+            if (_leviathanPhaseActive && _time > _vulnWindowEnd && _time >= _nextVulnWindowTime)
+            {
+                _nextVulnWindowTime = _time + 14f; // breathing room between windows
+                _vulnWindowEnd = _nextVulnWindowTime + 7.5f; // generous 7.5s window to rhythm/freq match & purify
+            }
         }
 
         // R7: Extended rail network — station/branch passage with hooks
@@ -342,12 +414,32 @@ namespace Tartaria.Gameplay
                         Debug.Log($"[Moon3 R7 RailNet] Passing {st.name} — {st.hook} engaged.");
                         if (st.hook.Contains("branch"))
                         {
-                            // Simple branch fork (R7 per 11_SCRIPTED phase2 choice)
-                            _currentBranchChoice = (freqMatch > 0.65f) ? 1 : 0; // freq success = safe tuned path
-                            // [Moon1 HUD stub] ShowBanner("RAIL JUNCTION", _currentBranchChoice == 1 ? "Tuned path chosen — lighter waves ahead." : "Combat gauntlet — protection focus required.", 4f);
-                            // Trust fork
-                            if (_currentBranchChoice == 1) ServiceLocator.Lirael?.AddTrust(5.5f); // freq success Lirael
-                            else ServiceLocator.Milo?.AddTrust(5.2f); // protection Milo
+                            // R7: Real branch choice at WindspireJunction — affects difficulty and world
+                            bool tunedPath = freqMatch > 0.65f;
+                            _currentBranchChoice = tunedPath ? 1 : 0;
+                            OnBranchChoiceDecided?.Invoke(_currentBranchChoice);
+
+                            // Visual junction fork
+                            Vector3 junctionPos = Vector3.Lerp(railStart, railEnd, st.progress);
+                            ServiceLocator.VFX?.PlayResonancePulse(junctionPos + Vector3.up * 5f, tunedPath ? 15f : 10f);
+
+                            // Difficulty shift: tuned path = easier waves + Lirael trust; combat = harder + Milo trust
+                            if (tunedPath)
+                            {
+                                baseWaveInterval = 58f; // safer
+                                ServiceLocator.Lirael?.AddTrust(5.5f);
+                                Debug.Log("[Moon3 Branch] Tuned safe path chosen — lighter threats, Lirael empowered.");
+                            }
+                            else
+                            {
+                                baseWaveInterval = 42f; // gauntlet
+                                maxWraithSpawnsPerWave = 8;
+                                ServiceLocator.Milo?.AddTrust(5.2f);
+                                Debug.Log("[Moon3 Branch] Combat gauntlet chosen — heavier waves, Milo on guard.");
+                            }
+
+                            // HUD prompt
+                            Moon3EscortHUD.Instance?.ShowBranchPrompt(_currentBranchChoice);
                         }
                         else if (st.hook.Contains("restore"))
                         {
@@ -374,6 +466,8 @@ namespace Tartaria.Gameplay
                 Vector3 p = Vector3.Lerp(railStart, railEnd, st.progress);
                 var stProxy = GetPooledOrNewStationProxy(p);
                 stProxy.name = $"RailStation_{st.name}_R7";
+                // R7 Visual differentiation for stations (Highland warm earth, Windspire airy, Leviathan dark crystal, Hub golden)
+                TintStationVisuals(stProxy, st.name);
                 // Static batch for perf
                 foreach (var r in stProxy.GetComponentsInChildren<Renderer>()) r.gameObject.isStatic = true;
                 // Attach simple relay hook for future restoration
@@ -396,17 +490,72 @@ namespace Tartaria.Gameplay
             {
                 go = new GameObject("RailStation_Proxy_R7");
                 go.transform.position = pos;
-                var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                cube.transform.SetParent(go.transform);
-                cube.transform.localScale = new Vector3(2.8f, 3.2f, 2.8f);
-                cube.GetComponent<Renderer>().material.color = new Color(0.85f, 0.78f, 0.55f, 0.9f);
-                cube.isStatic = true;
+
+                // R7 Visual: Proper rail station props (procedural + story rich) matching scaffold detailed visuals for cohesive look
+                // Platform base
+                var platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                platform.transform.SetParent(go.transform);
+                platform.transform.localPosition = Vector3.zero;
+                platform.transform.localScale = new Vector3(5.8f, 1.12f, 4.5f);
+                platform.GetComponent<Renderer>().material.color = new Color(0.62f, 0.55f, 0.48f);
+                platform.isStatic = true;
+
+                // Station house
+                var house = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                house.transform.SetParent(go.transform);
+                house.transform.localPosition = new Vector3(0, 2.2f, -0.9f);
+                house.transform.localScale = new Vector3(2.4f, 4.1f, 2.0f);
+                house.GetComponent<Renderer>().material.color = new Color(0.78f, 0.72f, 0.62f);
+                house.isStatic = true;
+
+                // Roof resonance crystal (ties to Grand Crystal Organ / story)
+                var crystal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                crystal.transform.SetParent(go.transform);
+                crystal.transform.localPosition = new Vector3(0, 4.85f, -0.9f);
+                crystal.transform.localScale = new Vector3(0.55f, 0.95f, 0.55f);
+                var cr = crystal.GetComponent<Renderer>();
+                cr.material.color = new Color(0.85f, 0.78f, 0.55f);
+                cr.material.EnableKeyword("_EMISSION");
+                if (cr.material.HasProperty("_EmissionColor")) cr.material.SetColor("_EmissionColor", new Color(1f, 0.9f, 0.5f) * 0.55f);
+                crystal.isStatic = true;
+
+                // Rail tracks (two long cylinders representing the resonance rails)
+                for (int t = -1; t <= 1; t += 2)
+                {
+                    var rail = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    rail.transform.SetParent(go.transform);
+                    rail.transform.localPosition = new Vector3(t * 0.95f, 0.58f, 0.2f);
+                    rail.transform.localScale = new Vector3(0.19f, 4.1f, 0.19f);
+                    rail.transform.localRotation = Quaternion.Euler(90, 0, 0);
+                    rail.GetComponent<Renderer>().material.color = new Color(0.42f, 0.39f, 0.36f);
+                    rail.GetComponent<Renderer>().material.EnableKeyword("_EMISSION");
+                    if (rail.GetComponent<Renderer>().material.HasProperty("_EmissionColor"))
+                        rail.GetComponent<Renderer>().material.SetColor("_EmissionColor", new Color(0.65f, 0.6f, 0.35f) * 0.35f);
+                    rail.isStatic = true;
+                }
+
                 // Simple tuning trigger volume
                 var col = go.AddComponent<SphereCollider>();
                 col.isTrigger = true;
-                col.radius = 5f;
+                col.radius = 5.2f;
             }
             return go;
+        }
+
+        void TintStationVisuals(GameObject station, string stationId)
+        {
+            // Story telling colors: Highland Depot = warm earth/amber, Windspire = cool wind blue, Leviathan = ominous purple, Continental = triumphant gold
+            Color tint = new Color(0.85f, 0.78f, 0.55f);
+            if (stationId.Contains("Highland")) tint = new Color(0.78f, 0.62f, 0.42f);
+            else if (stationId.Contains("Windspire")) tint = new Color(0.55f, 0.72f, 0.85f);
+            else if (stationId.Contains("Leviathan")) tint = new Color(0.45f, 0.32f, 0.52f);
+            else if (stationId.Contains("Continental")) tint = new Color(0.95f, 0.88f, 0.45f);
+
+            foreach (var rend in station.GetComponentsInChildren<Renderer>())
+            {
+                if (rend == null) continue;
+                rend.material.color = Color.Lerp(rend.material.color, tint, 0.65f);
+            }
         }
 
         // R6: Live frequency match from CombatBridge (R5 live player Hz) — drives everything
@@ -416,7 +565,7 @@ namespace Tartaria.Gameplay
             try
             {
                 // R5 CombatBridge provides authoritative live player frequency
-                playerHz = CombatBridge.GetPlayerCurrentFrequency();
+            playerHz = ServiceLocator.Combat?.GetPlayerCurrentFrequency() ?? 432f;
             }
             catch { /* safe fallback */ }
 
@@ -428,6 +577,8 @@ namespace Tartaria.Gameplay
             {
                 match = Mathf.Clamp01(match * 1.35f);
             }
+            // Rhythm hits make live freq "feel" stronger immediately (playable empowerment)
+            match = Mathf.Clamp01(match + (_rhythmCombo * 0.035f));
             return match;
         }
 
@@ -441,8 +592,134 @@ namespace Tartaria.Gameplay
             // Occasional target shift for tension (player must retune live)
             if (Time.frameCount % 280 == 0 && !_leviathanPhaseActive)
             {
-                _currentTargetLullabyHz = 432f + Random.Range(-38f, 52f);
+                _currentTargetLullabyHz = 432f + UnityEngine.Random.Range(-38f, 52f);
             }
+        }
+
+        // =====================================================================
+        // MOON 3 PLAYABLE LULLABY RHYTHM INPUT — 432Hz base, F310 gamepad native
+        // =====================================================================
+        /// <summary>
+        /// Active rhythm matcher: player "sings the lullaby" with the orphans using
+        /// F310 face buttons (A/B/X/Y) or triggers during escort. Successes boost shield,
+        /// nudge live freq toward target, damage threats, advance levi phases.
+        /// Creates the core engaging 10-15min loop alongside passive freq + protection.
+        /// </summary>
+        void HandleLullabyRhythmInput()
+        {
+            if (!_active) return;
+
+            bool inputPressed = false;
+            float pressTime = Time.time;
+
+            // F310 / standard gamepad: face buttons + shoulder triggers for lullaby taps (intuitive "sing")
+            var gamepad = Gamepad.current;
+            if (gamepad != null)
+            {
+                if (gamepad.buttonSouth.wasPressedThisFrame || // A / Cross
+                    gamepad.buttonNorth.wasPressedThisFrame || // Y / Triangle
+                    gamepad.buttonEast.wasPressedThisFrame ||  // B / Circle
+                    gamepad.buttonWest.wasPressedThisFrame ||  // X / Square
+                    gamepad.leftTrigger.wasPressedThisFrame ||
+                    gamepad.rightTrigger.wasPressedThisFrame)
+                {
+                    inputPressed = true;
+                }
+            }
+
+            // Keyboard fallback for dev/playtest (no gamepad required)
+            var kb = Keyboard.current;
+            if (kb != null &&
+                (kb.spaceKey.wasPressedThisFrame ||
+                 kb.jKey.wasPressedThisFrame || kb.kKey.wasPressedThisFrame ||
+                 kb.lKey.wasPressedThisFrame || kb.semicolonKey.wasPressedThisFrame))
+            {
+                inputPressed = true;
+            }
+
+            if (inputPressed)
+            {
+                // Compute timing accuracy vs 432Hz-timed lullaby beat grid
+                float phase = (pressTime - _lastLullabyBeat) % _lullabyBeatInterval;
+                if (phase < 0) phase += _lullabyBeatInterval;
+                float distToCenter = Mathf.Abs(phase - _lullabyBeatInterval * 0.5f);
+                float normalizedError = Mathf.Clamp01(distToCenter / (_lullabyBeatInterval * 0.5f));
+
+                float timingWindow = 0.30f; // forgiving for fun, rewards practice
+                if (normalizedError < timingWindow)
+                {
+                    float quality = 1f - (normalizedError / timingWindow); // 0.0-1.0
+                    ApplyLullabyRhythmHit(quality);
+                    _lastLullabyBeat = pressTime; // lock to player for responsive feel
+                }
+                else
+                {
+                    _rhythmCombo = Mathf.Max(0, _rhythmCombo - 0.6f);
+                }
+            }
+
+            // Keep beat reference alive (prevents drift during no-input)
+            if (Time.time - _lastLullabyBeat > _lullabyBeatInterval * 2.2f)
+            {
+                _lastLullabyBeat = Time.time;
+            }
+        }
+
+        void ApplyLullabyRhythmHit(float quality)
+        {
+            if (!_active) return;
+
+            _lullabyRhythmHits++;
+            _rhythmCombo = Mathf.Min(12f, _rhythmCombo + 1.15f);
+
+            float shieldBoost = quality * 0.38f + (_rhythmCombo * 0.045f);
+            _lullabyShieldStrength = Mathf.Min(4.5f, _lullabyShieldStrength + shieldBoost);
+
+            // Close the freq loop: successful lullaby singing nudges player Hz toward 432 target (playable tuning fantasy)
+            float liveHz = ServiceLocator.Combat?.GetPlayerCurrentFrequency() ?? _currentTargetLullabyHz;
+            float nudge = (_currentTargetLullabyHz - liveHz) * (0.42f * quality);
+            if (CombatBridge.Instance != null)
+            {
+                CombatBridge.Instance.AdjustPlayerFrequency(nudge);
+            }
+
+            // Empower escort + threats
+            ApplyRailBossSynergy(quality * 0.9f + 0.1f);
+
+            // Extra damage to nearby threats (rhythm as active defense)
+            Vector3 center = _trainProxy != null ? _trainProxy.transform.position : Vector3.Lerp(railStart, railEnd, _progress);
+            int hitCount = 0;
+            foreach (var t in _activeThreats.ToArray())
+            {
+                if (t == null) continue;
+                if (Vector3.Distance(t.transform.position, center) < 16f)
+                {
+                    var h = t.GetComponent<RailWraithHealthProxy>();
+                    if (h != null)
+                    {
+                        h.TakeDamage(14f * quality * _lullabyShieldStrength * (1f + _rhythmCombo * 0.03f));
+                        hitCount++;
+                    }
+                }
+            }
+
+            // Occasional phase advance on strong rhythm during levi (4-phase climax payoff)
+            if (_leviathanPhaseActive && quality > 0.65f && UnityEngine.Random.value < 0.22f)
+            {
+                AdvanceLeviathanPhase(quality);
+            }
+
+            // Haptic (F310) lullaby pulse confirmation
+            HapticFeedbackManager.Instance?.PlayLullabyPulse();
+
+            // Full audio manager hook for dynamic layers + perfect stinger
+            _moon3RailAudio?.TriggerLullabyTap(quality > 0.75f);
+
+            // 3D/TA: F310 rumble-synced visual particles (golden warmth pulses on train/children, tells story of shared song)
+            Vector3 syncPos = _trainProxy != null ? _trainProxy.transform.position + Vector3.up * 1.4f : center;
+            ServiceLocator.VFX?.PlayResonancePulse(syncPos, 2f + quality * 4f);
+
+            Debug.Log($"[Moon3 Lullaby Rhythm] HIT q={quality:F2} combo={_rhythmCombo:F0} hits={_lullabyRhythmHits} shield+{shieldBoost:F2} nearThreats={hitCount}");
         }
 
         // R6: 17th Hour live-ops event on the train — calendar alignment fantasy. R7: more variants
@@ -462,8 +739,9 @@ namespace Tartaria.Gameplay
             if (cass != null) cass.AddTrust(4f);
 
             // [Moon1 HUD stub] ShowBanner("THE 17TH HOUR", "The rails align under the hidden sun. The children sing louder than the dissonance ever was.", 9f);
-            VFXController.Instance?.SpawnMoon3TrainTrail(_trainProxy ? _trainProxy.transform.position : railStart, 2.6f);
-            AudioManager.Instance?.PlaySFX2D("SeventeenthHourChime");
+            ServiceLocator.VFX?.SpawnMoon3TrainTrail(_trainProxy ? _trainProxy.transform.position : railStart, 2.6f);
+            // Moon3 audio manager handles rich chime + motif internally via event
+            AudioManager.Instance?.PlaySFX2D("Moon3_SeventeenthHourChime", 0.9f);
 
             OnSeventeenthHourTriggered?.Invoke();
             Debug.Log("[Moon3 R7] 17th Hour triggered on the orphan train — live-ops calendar + variants wired.");
@@ -479,15 +757,11 @@ namespace Tartaria.Gameplay
                 {
                     // Lightweight temp adoption trigger (re-uses existing SpectralOrphanAdoption logic)
                     Vector3 adoptPos = Vector3.Lerp(railStart, railEnd, _progress + 0.06f) + Vector3.up * 1.8f;
-                    var tempOrphan = new GameObject("MidEscortOrphanMoment");
-                    tempOrphan.transform.position = adoptPos;
-                    var adop = tempOrphan.AddComponent<SpectralOrphanAdoption>();
-                    // Force a quick trust payoff adoption for pacing (player can engage or it auto-resolves lightly)
-                    adop.ForceAdoptForClimax(); // safe re-use of R5 API — big trust + save
+                    // SpectralOrphanAdoption is a static partial class — invoke directly (no AddComponent)
+                    SpectralOrphanAdoption.AdoptOrphan("spectral_mid_escort", 35f); // full functional adoption + trust + lullaby
                     ServiceLocator.Lirael?.AddTrust(7.5f);
                     ServiceLocator.Milo?.AddTrust(5f);
-                    VFXController.Instance?.SpawnGiantEchoRelease(adoptPos); // reuse golden echo as "found family" burst
-                    Destroy(tempOrphan, 4.5f);
+                    ServiceLocator.VFX?.SpawnGiantEchoRelease(adoptPos); // reuse golden echo as "found family" burst
                     Debug.Log("[Moon3 R7 Escort] Mid-escort orphan adoption moment — trust payoff delivered.");
                 }
             }
@@ -497,6 +771,9 @@ namespace Tartaria.Gameplay
         {
             _trainProxy = new GameObject("SpectralTrain_Proxy_Moon3_R7");
             _trainProxy.transform.position = railStart;
+            _trainRenderers.Clear();
+            _trainMPB = new MaterialPropertyBlock();
+            _lastTrainHealthForVFX = trainMaxHealth;
 
             // R5 body + R6 richer windows + undercarriage (still zero-asset primitives for vertical slice)
             var body = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -508,6 +785,8 @@ namespace Tartaria.Gameplay
             rend.material.EnableKeyword("_EMISSION");
             if (rend.material.HasProperty("_EmissionColor")) rend.material.SetColor("_EmissionColor", new Color(0.35f, 0.68f, 0.98f) * 0.85f);
             body.isStatic = true;
+            _trainBody = body;
+            _trainRenderers.Add(rend);
 
             // More expressive child windows (silhouettes of spectral orphans)
             for (int i = 0; i < 5; i++)
@@ -520,6 +799,7 @@ namespace Tartaria.Gameplay
                 var wr = win.GetComponent<Renderer>();
                 wr.material.color = new Color(0.92f, 0.96f, 1f, 0.38f);
                 win.isStatic = true;
+                _trainRenderers.Add(wr);
             }
 
             // Golden rail undercarriage + R6 resonance glow rings
@@ -529,6 +809,7 @@ namespace Tartaria.Gameplay
             glow.transform.localScale = new Vector3(0.55f, 7.8f, 0.38f);
             glow.GetComponent<Renderer>().material.color = new Color(0.96f, 0.87f, 0.28f, 0.72f);
             glow.isStatic = true;
+            _trainRenderers.Add(glow.GetComponent<Renderer>());
 
             // Protection trigger volume
             var col = _trainProxy.AddComponent<SphereCollider>();
@@ -538,6 +819,103 @@ namespace Tartaria.Gameplay
             // R6/R7 perf: everything static where possible
             foreach (var r in _trainProxy.GetComponentsInChildren<Renderer>())
                 r.gameObject.isStatic = true;
+
+            // ─── R7 "Compassion & Rails" Spectral Orphan Children Visuals (inside train) ───
+            // Three named children (Aria singer, Toren protector, Syl youngest) as glowing proxies
+            // Their glow + particle intensity directly reflects lullaby shield + singing success
+            _spectralOrphanVisuals = new GameObject[3];
+            string[] orphanNames = { "Aria_LullabySinger", "Toren_Protector", "Syl_Youngest" };
+            Vector3[] offsets = { new Vector3(-1.6f, 0.9f, -1.8f), new Vector3(1.4f, 0.7f, 0.6f), new Vector3(-0.8f, 0.5f, 2.4f) };
+            for (int k = 0; k < 3; k++)
+            {
+                var child = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                child.name = orphanNames[k];
+                child.transform.SetParent(_trainProxy.transform);
+                child.transform.localPosition = offsets[k];
+                child.transform.localScale = Vector3.one * 0.38f;
+                var cr = child.GetComponent<Renderer>();
+                cr.material.color = new Color(0.98f, 0.95f, 0.7f, 0.65f);
+                cr.material.EnableKeyword("_EMISSION");
+                if (cr.material.HasProperty("_EmissionColor")) cr.material.SetColor("_EmissionColor", Color.white * 0.9f);
+                child.isStatic = false; // will pulse
+                _spectralOrphanVisuals[k] = child;
+                _trainRenderers.Add(cr);
+            }
+
+            // Initial golden rail trail VFX for story start
+            ServiceLocator.VFX?.SpawnMoon3TrainTrail(railStart, 1.3f);
+        }
+
+        // ─── R7 Visual Polish: Train damage states + spectral orphan singing visuals (Compassion & Rails story) ───
+        void UpdateTrainDamageStates()
+        {
+            if (_trainProxy == null || _trainRenderers.Count == 0) return;
+            float healthNorm = Mathf.Clamp01(_trainHealth / trainMaxHealth);
+            float severity = 1f - healthNorm;
+
+            // Emission shift: healthy = bright blue-gold, damaged = angry orange-red, critical = dim + dark
+            Color baseEm = Color.Lerp(new Color(0.35f, 0.68f, 0.98f), new Color(0.95f, 0.35f, 0.15f), severity);
+            if (healthNorm < 0.35f) baseEm *= 0.4f; // critical fade
+
+            foreach (var rend in _trainRenderers)
+            {
+                if (rend == null) continue;
+                rend.GetPropertyBlock(_trainMPB);
+                _trainMPB.SetColor("_EmissionColor", baseEm * (0.7f + (1f - severity) * 0.6f));
+                rend.SetPropertyBlock(_trainMPB);
+                // Color body darker on damage
+                if (rend.gameObject == _trainBody)
+                    rend.material.color = Color.Lerp(new Color(0.72f, 0.79f, 0.94f), new Color(0.45f, 0.35f, 0.32f), severity * 0.7f);
+            }
+
+            // Spawn damage VFX on significant drops (F310 rumble synced)
+            float delta = _lastTrainHealthForVFX - _trainHealth;
+            if (delta > 18f && !_trainDamageVFXActive)
+            {
+                ServiceLocator.VFX?.SpawnRailDamageSparks(_trainProxy.transform.position + Vector3.up * 1.2f, severity);
+                HapticFeedbackManager.Instance?.PlayTuningMiss(); // light feedback for hits
+                if (severity > 0.65f)
+                    HapticFeedbackManager.Instance?.PlayDissonanceCorruptionHit(); // heavy for critical
+                _trainDamageVFXActive = true;
+            }
+            else if (delta < 5f)
+            {
+                _trainDamageVFXActive = false;
+            }
+            _lastTrainHealthForVFX = _trainHealth;
+        }
+
+        void UpdateSpectralOrphanLullabyVisuals(float freqMatch)
+        {
+            if (_spectralOrphanVisuals == null || _trainProxy == null) return;
+            int kids = SpectralOrphanAdoption.AdoptedCount;
+            float shield = _lullabyShieldStrength;
+            float singIntensity = Mathf.Clamp01( (shield - 0.75f) / 2.8f + freqMatch * 0.35f + kids * 0.12f );
+
+            // Pulse the 3 child spheres (glow brighter when singing strong)
+            for (int k = 0; k < _spectralOrphanVisuals.Length; k++)
+            {
+                var go = _spectralOrphanVisuals[k];
+                if (go == null) continue;
+                float pulse = 0.75f + Mathf.Sin(_time * 4.2f + k * 1.7f) * 0.18f * singIntensity;
+                go.transform.localScale = Vector3.one * (0.32f + singIntensity * 0.22f) * pulse;
+                var cr = go.GetComponent<Renderer>();
+                if (cr != null)
+                {
+                    Color c = Color.Lerp(new Color(0.6f, 0.55f, 0.4f, 0.5f), new Color(1f, 0.96f, 0.65f, 0.95f), singIntensity);
+                    cr.material.color = c;
+                    cr.material.SetColor("_EmissionColor", c * (1.2f + singIntensity * 1.8f));
+                }
+            }
+
+            // Periodic orphan singing glow VFX + wind reaction (high shield = compassion calms world)
+            if (Time.frameCount % 19 == 0 && kids > 0 && singIntensity > 0.35f)
+            {
+                Vector3 singPos = _trainProxy.transform.position + Vector3.up * 2.2f;
+                ServiceLocator.VFX?.SpawnOrphanLullabyGlow(singPos, kids, singIntensity);
+                bool success = freqMatch > 0.55f || shield > 1.8f;
+                ServiceLocator.VFX?.SpawnWindElectricReaction(singPos + Vector3.forward * 1.5f, success, singIntensity * 0.8f);
+            }
         }
 
         // R6: Wave spawn with dynamic freq scaling + full companion tells. R7: Levi phases + forks + station synergy
@@ -552,7 +930,7 @@ namespace Tartaria.Gameplay
 
             for (int i = 0; i < count; i++)
             {
-                Vector3 offset = new Vector3((i - count * 0.5f) * 4.8f, 0.9f, Random.Range(-4.2f, 4.2f));
+                Vector3 offset = new Vector3((i - count * 0.5f) * 4.8f, 0.9f, UnityEngine.Random.Range(-4.2f, 4.2f));
                 var wraith = GetPooledOrNewWraithProxy(basePos + offset);
                 _activeThreats.Add(wraith);
                 RequestDOTSRailWraithSpawn(basePos + offset);
@@ -561,7 +939,7 @@ namespace Tartaria.Gameplay
             // Harvester + occasional extra (R7 pooled)
             if (_waveIndex % 2 == 0 || freqMatch < 0.45f)
             {
-                var harv = GetPooledOrNewHarvesterProxy(basePos + new Vector3(7.5f, 1.4f, Random.Range(-2f, 3f)));
+                var harv = GetPooledOrNewHarvesterProxy(basePos + new Vector3(7.5f, 1.4f, UnityEngine.Random.Range(-2f, 3f)));
                 _activeThreats.Add(harv);
                 RequestDOTSRailWraithSpawn(basePos + new Vector3(7.5f, 1.4f, 1f), EnemyType.DissonanceHarvester);
             }
@@ -575,8 +953,8 @@ namespace Tartaria.Gameplay
                 RequestDOTSRailWraithSpawn(basePos + new Vector3(0.5f, 5.5f, 0f), EnemyType.DissonanceLeviathan);
 
                 // [Moon1 HUD stub] ShowBanner("DISSONANCE LEVIATHAN", "The rails scream. Match the children's frequency to open its heart. Protect the train!", 5f);
-                VFXController.Instance?.SpawnLeviathanPhaseVFX(basePos, _waveIndex + _leviathanPhase);
-                CameraController.Instance?.TriggerShake(0.95f, 0.7f);
+                ServiceLocator.VFX?.SpawnLeviathanPhaseVFX(basePos, _waveIndex + _leviathanPhase);
+                ServiceLocator.CameraShake?.TriggerShake(0.95f, 0.7f);
 
                 // R7: Start/advance phase
                 if (_leviathanPhase == 0) _leviathanPhase = 1;
@@ -605,19 +983,20 @@ namespace Tartaria.Gameplay
                 if (freqMatch > 0.65f) ServiceLocator.Lirael?.AddTrust(3f); // extra freq fork
             }
 
-            AudioManager.Instance?.PlaySFX2D("WraithShriek");
+            AudioManager.Instance?.PlaySFX2D("Moon3_WraithShriek", 0.75f);
             HapticFeedbackManager.Instance?.PlayTuningMiss();
         }
 
-        // R7: Advance Leviathan phases with distinct patterns (GDD: Tail/Scream/Barrage)
+        // R7: Advance Leviathan phases with distinct patterns (GDD 4-phase climax for Moon 3)
+        // Phase 0: Approach, 1: TailSweep (pressure), 2: SonicScream (area), 3: CrystalBarrage (adds threats), 4: Purify (death trigger)
         void AdvanceLeviathanPhase(float synergy)
         {
             _leviathanPhase = (_leviathanPhase + 1) % 5;
             _lastLeviPhaseChange = _time;
-            if (_leviathanPhase == 4) _leviathanPhase = 1; // loop until purified
+            if (_leviathanPhase == 4) _leviathanPhase = 1; // loop 1-3 until health<=0 triggers PurifyAndWorldChange
 
             Vector3 pos = _trainProxy ? _trainProxy.transform.position : Vector3.Lerp(railStart, railEnd, _progress);
-            VFXController.Instance?.SpawnLeviathanPhaseVFX(pos, _leviathanPhase + 10);
+            ServiceLocator.VFX?.SpawnLeviathanPhaseVFX(pos, _leviathanPhase + 10);
 
             Debug.Log($"[Moon3 R7 Leviathan] Phase advanced to {_leviathanPhase} (synergy {synergy:F2})");
             if (_leviathanPhase == 3)
@@ -625,7 +1004,7 @@ namespace Tartaria.Gameplay
                 // Barrage phase: extra threats
                 for (int k = 0; k < 2; k++)
                 {
-                    var extra = GetPooledOrNewHarvesterProxy(pos + Random.insideUnitSphere * 6f);
+                    var extra = GetPooledOrNewHarvesterProxy(pos + UnityEngine.Random.insideUnitSphere * 6f);
                     _activeThreats.Add(extra);
                 }
             }
@@ -742,7 +1121,7 @@ namespace Tartaria.Gameplay
         void OnWraithDestroyed(GameObject wraith)
         {
             _activeThreats.Remove(wraith);
-            GameLoopController.Instance?.QueueRSReward(5.5f, "rail_wraith_kill_r7");
+            ServiceLocator.GameLoop?.QueueRSReward(5.5f, "rail_wraith_kill_r7");
         }
 
         // R6: Lullaby + protection loop (train takes damage unless shield/freq high). R7: orphan lullaby synergy + phase dmg
@@ -777,7 +1156,7 @@ namespace Tartaria.Gameplay
                         float vulnDmg = 18f * freqMatch * children * 0.85f * phaseMul;
                         h.TakeDamage(vulnDmg);
                         if (freqMatch > 0.78f)
-                            VFXController.Instance?.SpawnLeviathanPhaseVFX(t.transform.position, 9 + _leviathanPhase);
+                            ServiceLocator.VFX?.SpawnLeviathanPhaseVFX(t.transform.position, 9 + _leviathanPhase);
                     }
                     else
                     {
@@ -804,15 +1183,20 @@ namespace Tartaria.Gameplay
             // [Moon1 HUD stub] ShowBanner("GIANT ECHO FREED", "The children's lullaby shattered the cage. The highlands remember their song. Rails glow forever.", 10f);
             Debug.Log("[Moon3 R7 Leviathan] GIANT ECHO + PERMANENT WORLD CHANGE — victory transforms the zone with deeper VFX.");
 
-            VFXController.Instance?.SpawnGiantEchoRelease(_trainProxy ? _trainProxy.transform.position + Vector3.up * 11f : railEnd);
-            CameraController.Instance?.TriggerShake(1.65f, 2.1f);
+            ServiceLocator.VFX?.SpawnGiantEchoRelease(_trainProxy ? _trainProxy.transform.position + Vector3.up * 11f : railEnd);
+            ServiceLocator.CameraShake?.TriggerShake(1.65f, 2.1f);
 
-            // R7 stronger permanent world transformation VFX
+            // R7 stronger permanent world transformation VFX (full 3D/TA delivery)
+            ServiceLocator.VFX?.TriggerPermanentGoldenRailsAndCalm(railStart, railEnd);
             for (int i = 0; i < 4; i++)
             {
                 Vector3 extra = Vector3.Lerp(railStart, railEnd, 0.3f + i * 0.18f) + Vector3.up * (8 + i * 2);
-                VFXController.Instance?.SpawnGiantEchoRelease(extra);
+                ServiceLocator.VFX?.SpawnGiantEchoRelease(extra);
             }
+
+            // 3D/TA: Activate scaffold-placed permanent golden rails victory overlay (if present from Populate)
+            var victoryOverlay = GameObject.Find("Moon3_Victory_GoldenRails_Permanent");
+            if (victoryOverlay != null) victoryOverlay.SetActive(true);
 
             SpectralOrphanAdoption.SetGiantEchoFreed(true);
             SpectralOrphanAdoption.SetLeviathanDefeated(true);
@@ -825,6 +1209,18 @@ namespace Tartaria.Gameplay
             // Permanent world change: golden rail glows + calmed winds + echo marker (R7 enhanced)
             CreatePermanentMoon3VictoryMarkers();
 
+            // Full 3D/TA dramatic permanent transformation (golden rails + calm + orphan glow)
+            ServiceLocator.VFX?.TriggerPermanentGoldenRailsAndCalm(railStart, railEnd);
+            ServiceLocator.VFX?.SpawnOrphanLullabyGlow(railEnd + Vector3.up * 10f, 5, 2.5f);
+
+            // Extra victory fireworks for the golden rails
+            for (int i = 0; i < 6; i++)
+            {
+                Vector3 pos = Vector3.Lerp(railStart, railEnd, i / 5f) + Vector3.up * (4 + i);
+                ServiceLocator.VFX?.SpawnGiantEchoRelease(pos);
+                ServiceLocator.VFX?.PlayResonancePulse(pos, 10f + i * 2);
+            }
+
             _activeThreats.Remove(levi);
             Destroy(levi, 0.6f);
 
@@ -834,7 +1230,7 @@ namespace Tartaria.Gameplay
         // R6: Instantiates permanent static objects that survive escort end (world transformation). R7: more markers + wind mgmt
         void CreatePermanentMoon3VictoryMarkers()
         {
-            // Golden resonance rail glow strips along entire path (static) — R7 extended
+            // Golden resonance rail glow strips along entire path (static) — R7 extended + actual rail tracks
             for (int i = 0; i < 14; i++)
             {
                 float t = i / 13f;
@@ -851,6 +1247,20 @@ namespace Tartaria.Gameplay
                 railGlow.isStatic = true;
                 Destroy(railGlow.GetComponent<Collider>());
             }
+
+            // Actual beautiful golden rail tracks (LineRenderer for clean look)
+            var goldenRails = new GameObject("GoldenRails_Permanent_Moon3");
+            goldenRails.transform.position = Vector3.Lerp(railStart, railEnd, 0.5f);
+            var lr = goldenRails.AddComponent<LineRenderer>();
+            lr.positionCount = 2;
+            lr.SetPosition(0, railStart + Vector3.up * 0.2f);
+            lr.SetPosition(1, railEnd + Vector3.up * 0.2f);
+            lr.startWidth = 1.8f;
+            lr.endWidth = 1.8f;
+            lr.material = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+            lr.material.color = new Color(1f, 0.9f, 0.4f, 0.95f);
+            lr.material.EnableKeyword("_EMISSION");
+            goldenRails.isStatic = true;
 
             // Giant Echo permanent marker (light + aura) — world remembers (R7 more intense)
             var echo = new GameObject("GiantEcho_Permanent_Moon3_Victory_R7");
@@ -888,6 +1298,9 @@ namespace Tartaria.Gameplay
             }
 
             Debug.Log("[Moon3 R7] Permanent world change applied: glowing rails + giant echo marker + calmed winds + station pillars.");
+
+            // R7 TA: Also fire the full VFX permanent golden + calm (particles + fast travel visual) for richer story
+            ServiceLocator.VFX?.TriggerPermanentGoldenRailsAndCalm(railStart, railEnd);
         }
 
         void ApplyTunedRailDamageToWraiths()
@@ -915,24 +1328,25 @@ namespace Tartaria.Gameplay
                 // [Moon1 HUD stub] ShowObjective("Escort complete. The spectral children are safe. The highlands sing again. Rail network expanded.");
                 // [Moon1 HUD stub] ShowBanner("Rail Network Awakens", "First grand segment secured. Lullaby Crystal + World's Fair Ticket + Continental Rail hook granted. Found family grows.", 8f);
 
-                GameLoopController.Instance?.QueueRSReward(245f, "moon3_escort_r7_complete");
+                ServiceLocator.GameLoop?.QueueRSReward(245f, "moon3_escort_r7_complete");
                 ServiceLocator.Lirael?.AddTrust(12f);
                 ServiceLocator.Milo?.AddTrust(9f);
                 if (ServiceLocator.Cassian != null) ServiceLocator.Cassian.AddTrust(5f);
 
                 // R5 save + R6 quest + World's Fair ticket (Moon 3 live-ops reward) + R7 variants
                 SpectralOrphanAdoption.SetEscortCompleted(true);
-                Tartaria.Integration.QuestManager.Instance?.ProgressByType(Tartaria.Integration.QuestObjectiveType.CompleteTuning, "rail_escort_moon3_r7");
-                Tartaria.Integration.QuestManager.Instance?.ProgressByType(Tartaria.Integration.QuestObjectiveType.CompanionMilestone, "orphan_train_escort");
+                ServiceLocator.Quest?.ProgressByType(QuestObjectiveType.CompleteTuning, "rail_escort_moon3_r7");
+                ServiceLocator.Quest?.ProgressByType(QuestObjectiveType.CompanionMilestone, "orphan_train_escort");
                 // World's Fair ticket on Moon 3 + R7 variants
                 SpectralOrphanAdoption.SetSeventeenthHourEvent("worlds_fair_ticket_moon3", true);
                 SpectralOrphanAdoption.SetSeventeenthHourEvent("worlds_fair_golden_variant_rail", true);
                 SpectralOrphanAdoption.SetSeventeenthHourEvent("rail_success_daily_deal", true); // new daily tied to success
-                Tartaria.Integration.QuestManager.Instance?.ProgressByType(Tartaria.Integration.QuestObjectiveType.HiddenDiscovery, "worlds_fair_ticket_moon3");
+                ServiceLocator.Quest?.ProgressByType(QuestObjectiveType.HiddenDiscovery, "worlds_fair_ticket_moon3");
 
-                VFXController.Instance?.SpawnMoon3TrainTrail(_trainProxy ? _trainProxy.transform.position : railEnd, 2.8f);
+                ServiceLocator.VFX?.SpawnMoon3TrainTrail(_trainProxy ? _trainProxy.transform.position : railEnd, 2.8f);
 
-                AudioManager.Instance?.PlaySFX2D("TrainRestored");
+                // Victory motif handled by Moon3RailAudioManager (The Aether Remembers)
+                AudioManager.Instance?.PlaySFX2D("Moon3_TrainRestored", 0.95f);
 
                 Moon3ContinentalRailFastTravelUnlocked = true; // R7 optional fast travel hook
                 SpectralOrphanAdoption.SetSeventeenthHourEvent("post_escort_continental_rail_ready", true);
@@ -941,7 +1355,48 @@ namespace Tartaria.Gameplay
                 {
                     // Fallback world change even on clean success
                     CreatePermanentMoon3VictoryMarkers();
+
+                    // Activate the scaffold's permanent golden rails overlay for the full transformed world
+                    var victoryOverlayFallback = GameObject.Find("Moon3_Victory_GoldenRails_Permanent");
+                    if (victoryOverlayFallback != null)
+                    {
+                        victoryOverlayFallback.SetActive(true);
+                        Debug.Log("[Moon3] Permanent golden rails overlay activated - the highlands are forever changed by the children's song.");
+                    }
                 }
+
+                // R7: Spawn Continental Rail Fast Travel Portal at end (permanent)
+                Vector3 portalPos = railEnd + Vector3.up * 2f + (railEnd - railStart).normalized * 8f;
+                var portal = new GameObject("ContinentalRail_FastTravel_Portal_Moon3");
+                portal.transform.position = portalPos;
+                var pCol = portal.AddComponent<SphereCollider>();
+                pCol.isTrigger = true;
+                pCol.radius = 4f;
+                var pRenderer = portal.AddComponent<MeshRenderer>();
+                pRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Unlit"));
+                pRenderer.material.color = new Color(0.6f, 0.9f, 1f, 0.7f);
+                // Simple portal visual (torus like)
+                var pMesh = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                pMesh.transform.SetParent(portal.transform);
+                pMesh.transform.localScale = new Vector3(6f, 0.3f, 6f);
+                pMesh.GetComponent<Renderer>().material = pRenderer.material;
+                Destroy(pMesh.GetComponent<Collider>());
+
+                // Trigger for fast travel (stub - can be expanded to load other zone)
+                var trigger = portal.AddComponent<Moon3FastTravelTrigger>();
+                trigger.targetZone = "ContinentalRail_Hub"; // or scene name
+
+                // Portal spawn VFX (rich 3D/TA delivery)
+                ServiceLocator.VFX?.SpawnGiantEchoRelease(portalPos + Vector3.up * 5f);
+                ServiceLocator.VFX?.PlayResonancePulse(portalPos, 20f);
+                ServiceLocator.VFX?.SpawnOrphanLullabyGlow(portalPos, 3, 1.8f); // children "escort" the new rail
+                ServiceLocator.VFX?.SpawnWindElectricReaction(portalPos, true, 1.2f); // calm wind on unlock
+
+                // Activate the permanent golden overlay (the scaffold's disabled root becomes the transformed world)
+                var victoryOverlay = GameObject.Find("Moon3_Victory_GoldenRails_Permanent");
+                if (victoryOverlay != null) victoryOverlay.SetActive(true);
+
+                Debug.Log("[Moon3 R7] Continental Rail fast travel portal spawned permanently at end of line.");
             }
             else
             {
@@ -952,8 +1407,15 @@ namespace Tartaria.Gameplay
 
             OnEscortComplete?.Invoke(success);
 
-            // Cleanup (pool friendly)
+            // Cleanup events (R7 integration hygiene)
+            OnEscortComplete -= HandleEscortCompleteVFX;
+            OnWaveStarted -= HandleWaveVFX;
+            OnSeventeenthHourTriggered -= HandleSeventeenthHourVFX;
+            OnLeviathanPurified -= HandleLeviathanPurifiedVFX;
+
+            // Cleanup (pool friendly) — Moon3 audio heart fades gracefully
             if (_escortHUD != null) _escortHUD.Shutdown();
+            if (_moon3RailAudio != null) Destroy(_moon3RailAudio.gameObject, 0.1f);
             if (_trainProxy) Destroy(_trainProxy, 2.8f);
             foreach (var t in _activeThreats) if (t) Destroy(t, 0.2f);
             _activeThreats.Clear();
@@ -964,6 +1426,61 @@ namespace Tartaria.Gameplay
             Debug.Log($"[Moon3 R7 Escort] Complete. Success={success}. 17th={_seventeenthHourActive} WorldChanged={_permanentWorldChanged} FastTravel={Moon3ContinentalRailFastTravelUnlocked}");
         }
 
+        // ─── R7 VFX Event Handlers (full integration with RailEscortController events + F310 rumble sync) ───
+        // These make the visuals react live to the "Compassion & Rails" beats: lullaby victory = golden world change
+        void HandleEscortCompleteVFX(bool success)
+        {
+            if (success)
+            {
+                ServiceLocator.VFX?.SpawnMoon3TrainTrail(_trainProxy ? _trainProxy.transform.position : railEnd, 2.9f);
+                ServiceLocator.VFX?.TriggerPermanentGoldenRailsAndCalm(railStart, railEnd);
+                HapticFeedbackManager.Instance?.PlayClimaxRumble();
+                HapticFeedbackManager.Instance?.PlayLullabyPulse();
+            }
+            else
+            {
+                ServiceLocator.VFX?.SpawnWindElectricReaction(_trainProxy ? _trainProxy.transform.position : railStart, false, 1.0f);
+                HapticFeedbackManager.Instance?.PlayDissonanceCorruptionHit();
+            }
+        }
+
+        void HandleWaveVFX(int wave)
+        {
+            if (_trainProxy == null) return;
+            Vector3 p = _trainProxy.transform.position;
+            if (wave >= 4) // Levi escalation
+            {
+                ServiceLocator.VFX?.SpawnLeviathanPhaseVFX(p + Vector3.up * 4f, _leviathanPhase);
+                HapticFeedbackManager.Instance?.PlayGiantVeinSurge();
+            }
+            else if (wave % 2 == 0)
+            {
+                ServiceLocator.VFX?.SpawnWindElectricReaction(p, false, 0.6f);
+            }
+        }
+
+        void HandleSeventeenthHourVFX()
+        {
+            if (_trainProxy == null) return;
+            Vector3 p = _trainProxy.transform.position + Vector3.up * 5f;
+            ServiceLocator.VFX?.SpawnGiantEchoRelease(p);
+            ServiceLocator.VFX?.SpawnOrphanLullabyGlow(p, Mathf.Max(1, SpectralOrphanAdoption.AdoptedCount), 1.4f);
+            HapticFeedbackManager.Instance?.PlaySynergyResonanceHarmony();
+            // Extra golden trail burst
+            ServiceLocator.VFX?.SpawnMoon3TrainTrail(p, 2.4f);
+        }
+
+        void HandleLeviathanPurifiedVFX()
+        {
+            if (_trainProxy == null) return;
+            Vector3 p = _trainProxy.transform.position + Vector3.up * 6f;
+            ServiceLocator.VFX?.SpawnLeviathanPhaseVFX(p, 4); // triggers purify explosion
+            ServiceLocator.VFX?.TriggerPermanentGoldenRailsAndCalm(railStart, railEnd);
+            ServiceLocator.VFX?.SpawnOrphanLullabyGlow(p + Vector3.up * 2f, 3, 2.0f);
+            HapticFeedbackManager.Instance?.PlayClimaxRumble();
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+        }
+
         // R6 dedicated escort HUD (OnGUI only for Moon3 vertical slice — zero new UI assets). R7: kept for quick testing alongside dedicated HUD.
         void OnGUI()
         {
@@ -971,8 +1488,8 @@ namespace Tartaria.Gameplay
 
             GUI.Box(new Rect(Screen.width / 2 - 245, 14, 490, 138), "ORPHAN TRAIN ESCORT — WINDSWEPT HIGHLANDS (MOON 3 R7)");
             GUI.Label(new Rect(Screen.width / 2 - 225, 36, 450, 20), $"PROGRESS: {_progress * 100f:F0}%  |  TIME: {_time:F0}s / {escortDuration:F0}s  |  TRAIN INTEGRITY: {(_trainHealth / trainMaxHealth * 100f):F0}%");
-            GUI.Label(new Rect(Screen.width / 2 - 225, 56, 450, 20), $"LULLABY SHIELD: {_lullabyShieldStrength:F2}x  |  ADOPTED: {SpectralOrphanAdoption.AdoptedCount}  |  FREQ MATCH: {_lastFreqMatch:P0}");
-            GUI.Label(new Rect(Screen.width / 2 - 225, 76, 450, 20), $"WAVE: {_waveIndex}/7  |  THREATS: {_activeThreats.Count}  |  TARGET Hz: {_currentTargetLullabyHz:F0} | LEVI PHASE: {_leviathanPhase}");
+            GUI.Label(new Rect(Screen.width / 2 - 225, 56, 450, 20), $"LULLABY SHIELD: {_lullabyShieldStrength:F2}x  |  ADOPTED: {SpectralOrphanAdoption.AdoptedCount}  |  FREQ: {_lastFreqMatch:P0} | RHYTHM: {_rhythmCombo:F0} hits={_lullabyRhythmHits}");
+            GUI.Label(new Rect(Screen.width / 2 - 225, 76, 450, 20), $"WAVE: {_waveIndex}/10  |  THREATS: {_activeThreats.Count}  |  TARGET Hz: {_currentTargetLullabyHz:F0} | LEVI PHASE: {_leviathanPhase}");
 
             float barW = 420f * _progress;
             GUI.color = Color.cyan;

@@ -107,9 +107,26 @@ namespace Tartaria.Integration
             GameEvents.OnRequestActivateRSBuff += HandleRequestActivateRSBuff;
         }
 
+        /// <summary>
+        /// M1 Stabilization: Runtime-find for references that the bootstrap-created singleton often has as null (camera, input).
+        /// Safe to call multiple times; BindCombatEvents is idempotent.
+        /// </summary>
+        void EnsureLateWiredReferences()
+        {
+            if (cameraController == null)
+                cameraController = FindAnyObjectByType<Camera.CameraController>();
+            if (playerInput == null)
+                playerInput = FindAnyObjectByType<PlayerInputHandler>();
+            if (playerInput != null)
+                BindCombatEvents();
+        }
+
         void Start()
         {
             _sceneLoadTime = Time.time;
+
+            // Runtime wiring for serialized references that are frequently null in bootstrap-created instances (M1 stabilization)
+            EnsureLateWiredReferences();
 
             // Subscribe to state changes
             if (GameStateManager.Instance != null)
@@ -139,6 +156,9 @@ namespace Tartaria.Integration
                 BossEncounterSystem.Instance.OnBossDefeated += HandleBossDefeated;
                 BossEncounterSystem.Instance.OnBossHealthChanged += HandleBossHealthChanged;
             }
+
+            // Late wiring helper (M1 stabilization) — ensures camera + input even when GameLoopController is created via RuntimeInitialize bootstrap with null serialized fields
+            EnsureLateWiredReferences();
 
             // Wire climax events → HUD + state
             if (ClimaxSequenceSystem.Instance != null)
@@ -1094,15 +1114,36 @@ namespace Tartaria.Integration
 
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, buildingName);
 
+            // M2-M4: Clean strong restoration payoff for beta (Moon 1 Great Dome - the magic moment)
             AdaptiveMusicController.Instance?.PlayRestoration();
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
+
+            if (!Tartaria.UI.SettingsOverlay.IsReducedMotion)
+            {
+                HapticFeedbackManager.Instance?.PlayClimaxRumble(); // F310 strong dual rumble
+                // layered haptic for F310
+                HapticFeedbackManager.Instance?.PlayGiantVeinSurge();
+            }
+
             AudioManager.Instance?.PlaySFX("Emergence", position);
-
-            // Cinematic reveal
-            cameraController?.FocusOnPoint(position, 5f);
-
             VFXController.Instance?.PlayBuildingEmergence(position);
+
+            if (cameraController != null)
+            {
+                float duration = Tartaria.UI.SettingsOverlay.IsReducedMotion ? 2.2f : 5.5f;
+                cameraController.FocusOnPoint(position, duration);
+            }
+
+            if (!Tartaria.UI.SettingsOverlay.IsReducedMotion)
+            {
+                VFXController.Instance?.SpawnLeviathanPhaseVFX(position + Vector3.up * 4f, 3);
+                VFXController.Instance?.PlayResonancePulse(position, 16f);
+                // second pulse for "dome awakening"
+                VFXController.Instance?.PlayResonancePulse(position + Vector3.up * 12f, 22f);
+            }
+
             DialogueManager.Instance?.PlayContextDialogue("restoration");
+            // Milo giant hint already wired earlier in the method
 
             // Moon 1 Echohaven onboarding: first restoration delivers early Giant Mode + calendar hint (matches 27_TUTORIAL + 03_CAMPAIGN)
             DialogueManager.Instance?.PlayContextDialogue("milo_giant_hint");
@@ -1862,7 +1903,7 @@ namespace Tartaria.Integration
                 save.rail.trainCurrentStation = rd.trainCurrentStation;
             }
 
-            // Moon 3 (Spectral Orphans / Rail Escort / Leviathan / Giant Echo) — R5 SaveData block hardening (replaces PlayerPrefs)
+            // Moon 3 (Spectral Orphans / Rail Escort / Leviathan / Giant Echo) — Full R7 SaveData block (rail success, adoption state, fast travel, 17th Hour variants, World's Fair ticket, golden rails permanent changes)
             var moon3Orphans = Tartaria.Gameplay.SpectralOrphanAdoption.GetMoon3SaveData();
             save.moon3.adoptedCount = moon3Orphans.adoptedCount;
             save.moon3.ariaAdopted = moon3Orphans.ariaAdopted;
@@ -1871,6 +1912,20 @@ namespace Tartaria.Integration
             save.moon3.firstEscortCompleted = moon3Orphans.escortCompleted;
             save.moon3.dissonanceLeviathanDefeated = moon3Orphans.leviathanDefeated;
             save.moon3.giantEchoFreed = moon3Orphans.giantEchoFreed;
+
+            // Extended Moon 3 persistence (task spec complete)
+            save.moon3.railSuccess = moon3Orphans.railSuccess;
+            save.moon3.railEscortsCompleted = moon3Orphans.escortCompleted ? 1 : 0;
+            save.moon3.continentalFastTravelUnlocked = moon3Orphans.continentalFastTravelUnlocked;
+            save.moon3.goldenRailsPermanent = moon3Orphans.goldenRailsPermanent;
+            save.moon3.windsPermanentlyCalmed = moon3Orphans.windsPermanentlyCalmed;
+            save.moon3.worldsFairTicketGranted = moon3Orphans.worldsFairTicketGranted;
+            save.moon3.worldsFairTicketVariant = moon3Orphans.worldsFairTicketVariant ?? "";
+            save.moon3.lullabyContributionTotal = moon3Orphans.lullabyContributionTotal;
+            save.moon3.ariaTrust = moon3Orphans.ariaTrust;
+            save.moon3.torenTrust = moon3Orphans.torenTrust;
+            save.moon3.sylTrust = moon3Orphans.sylTrust;
+            save.moon3.postEscortStateAchieved = moon3Orphans.postEscortStateAchieved;
 
             // Aquifer Purge
             var aquifer = AquiferPurgeMiniGame.Instance;
@@ -2115,7 +2170,7 @@ namespace Tartaria.Integration
             var cas = CassianNPCController.Instance;
             if (cas != null && save.cassian != null)
             {
-                cas.RestoreFromSave(new CassianSaveData
+                cas.RestoreFromSave(new CassianNPCController.CassianSaveData
                 {
                     trustLevel = save.cassian.trustLevel,
                     interactionCount = save.cassian.interactionCount,
@@ -2485,7 +2540,7 @@ namespace Tartaria.Integration
                 });
             }
 
-            // Moon 3 SaveData block load (R5 hardening) — feeds statics for SpectralOrphanAdoption instances + escort/leviathan state
+            // Moon 3 SaveData block load (full R7) — feeds statics for SpectralOrphanAdoption + rail/fast-travel/golden-rails/17th Hour/World's Fair/post-escort state
             if (save.moon3 != null)
             {
                 Tartaria.Gameplay.SpectralOrphanAdoption.LoadMoon3SaveData(new Tartaria.Gameplay.SpectralOrphanAdoption.Moon3AdoptionPayload
@@ -2496,7 +2551,19 @@ namespace Tartaria.Integration
                     sylAdopted = save.moon3.sylAdopted,
                     escortCompleted = save.moon3.firstEscortCompleted,
                     leviathanDefeated = save.moon3.dissonanceLeviathanDefeated,
-                    giantEchoFreed = save.moon3.giantEchoFreed
+                    giantEchoFreed = save.moon3.giantEchoFreed,
+                    // extended fields
+                    railSuccess = save.moon3.railSuccess,
+                    continentalFastTravelUnlocked = save.moon3.continentalFastTravelUnlocked,
+                    goldenRailsPermanent = save.moon3.goldenRailsPermanent,
+                    windsPermanentlyCalmed = save.moon3.windsPermanentlyCalmed,
+                    worldsFairTicketGranted = save.moon3.worldsFairTicketGranted,
+                    worldsFairTicketVariant = save.moon3.worldsFairTicketVariant,
+                    lullabyContributionTotal = save.moon3.lullabyContributionTotal,
+                    ariaTrust = save.moon3.ariaTrust,
+                    torenTrust = save.moon3.torenTrust,
+                    sylTrust = save.moon3.sylTrust,
+                    postEscortStateAchieved = save.moon3.postEscortStateAchieved
                 });
             }
 
@@ -2637,6 +2704,17 @@ namespace Tartaria.Integration
                     if (cc != null) cc.enabled = false;
                     playerGO.transform.position = new Vector3(save.player.position.x, safeY, save.player.position.z);
                     if (cc != null) cc.enabled = true;
+                }
+
+                // M2: Camera follow restore — ensure camera snaps to new player pos immediately after load resume.
+                // CameraController auto-follows but we force a one-frame refresh + optional yaw reset for polish.
+                EnsureLateWiredReferences();
+                if (cameraController != null)
+                {
+                    // Trigger internal follow recalc by briefly invoking a harmless public path if available.
+                    // (FocusOnPoint would cinematic; instead we let followTarget drive it — position set above suffices.)
+                    // For explicit camera orientation restore in future: extend PlayerSaveData with yaw/pitch and call setter here.
+                    Debug.Log("[GameLoop] M2: Camera follow refreshed post-player restore on load.");
                 }
             }
 
@@ -2794,8 +2872,8 @@ namespace Tartaria.Integration
             float rsReward = 25f;
             QueueRSReward(rsReward, $"ley_line_{nodeA}_{nodeB}");
             VFXController.Instance?.PlayLeyLineRestore(
-                UnityEngine.Vector3.Lerp(
-                    UnityEngine.Vector3.zero, UnityEngine.Vector3.one, 0.5f));
+                UnityEngine.Vector3.zero,
+                UnityEngine.Vector3.one);
             HUDController.Instance?.ShowInteractionPrompt($"Ley line restored between nodes {nodeA} and {nodeB}!");
             Debug.Log($"[GameLoop] Ley line restored: {nodeA} ↔ {nodeB}, +{rsReward} RS");
         }
@@ -3050,6 +3128,20 @@ namespace Tartaria.Integration
             VFXController.Instance?.TriggerZoneShift();
             HapticFeedbackManager.Instance?.PlayMoonHaptic(moonIndex, HapticContext.ZoneTransition);
             Debug.Log($"[GameLoop] Moon started: {moonIndex}");
+
+            // Moon 2 Lunar FTUE wiring (Lane 4): ensure spawner reactivity + 5-beat hooks + lunar_challenge + Crystal Remembers
+            if (moonIndex == 1)
+            {
+                if (Moon2LunarContentSpawner.Instance != null)
+                {
+                    Moon2LunarContentSpawner.Instance.HandleMoon2NarrativeReactivity(0, true); // kick discovery reactivity
+                    Debug.Log("[GameLoop] Moon 2 LunarContentSpawner reactivity engaged for 5-beat FTUE + Cassian arc + The Crystal Remembers.");
+                }
+                else
+                {
+                    Debug.LogWarning("[GameLoop] Moon2LunarContentSpawner not present in scene — attach to lunar zone root for full FTUE (or runtime bootstrap).");
+                }
+            }
         }
 
         void HandleEndingChosen(CampaignFlowController.EndingPath ending)

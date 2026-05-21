@@ -77,6 +77,29 @@ namespace Tartaria.Core
             StartCoroutine(LoadSequence());
         }
 
+        /// <summary>
+        /// M2: Called from PauseMenu "Save & Quit to Menu". Unloads gameplay + returns to Boot/main menu state.
+        /// </summary>
+        public void LoadMainMenuScene()
+        {
+            Debug.Log("[SceneLoader] Returning to Main Menu (M2 Pause flow)");
+            StartCoroutine(ReturnToMainMenu());
+        }
+
+        IEnumerator ReturnToMainMenu()
+        {
+            Time.timeScale = 1f;
+
+            // Unload additive gameplay + UI overlay if present
+            if (SceneManager.GetSceneByName(gameplayScene).isLoaded)
+                yield return SceneManager.UnloadSceneAsync(gameplayScene);
+            if (SceneManager.GetSceneByName(uiOverlayScene).isLoaded)
+                yield return SceneManager.UnloadSceneAsync(uiOverlayScene);
+
+            // Reload Boot so MainMenuOverlay re-activates cleanly
+            yield return SceneManager.LoadSceneAsync("Boot", LoadSceneMode.Single);
+        }
+
         IEnumerator LoadSequence()
         {
             Debug.Log("[SceneLoader] LoadSequence started.");

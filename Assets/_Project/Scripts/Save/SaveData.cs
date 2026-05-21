@@ -69,9 +69,76 @@ namespace Tartaria.Save
         // v10+
         public Moon2SaveBlock moon2 = new();
         public Moon3SaveBlock moon3 = new();
+        public Moon5State moon5 = new();
 
         // v14: Moon 1 Echohaven early progression + save compatibility block
         public EchohavenSaveBlock echohaven = new();
+
+        // R6: Cloud-save conflict archive (resolved conflict history)
+        public ConflictArchiveSaveBlock conflictArchive = new();
+
+        // R6 / Moon3: Cymatic puzzle progression
+        public CymaticSaveBlock cymatic = new();
+
+        // R6: Boss arena state (Moon3 17th Hour)
+        public BossSaveBlock boss = new();
+    }
+
+    [Serializable]
+    public class CymaticSaveBlock
+    {
+        public int cymaticCompletions;
+        public float lastAccuracy;
+        public string lastPattern;
+        public float bestCymaticAccuracy;
+        public bool goldTierUnlockedForFountain;
+        public bool permanentEffectsActive;
+    }
+
+    [Serializable]
+    public class BossSaveBlock
+    {
+        public bool isActive;
+        public int currentPhase;
+        public int successfulSubmissions;
+        public float[] vulnWindowStartTimes = Array.Empty<float>();
+        public float[] submittedFrequencies = Array.Empty<float>();
+        public float[] submissionAccuracies = Array.Empty<float>();
+        public string[] phaseSpecialEvents = Array.Empty<string>();
+        public string bossName;
+        public float currentHP;
+        public float maxHP;
+        public float currentTargetFrequency;
+        public float encounterTime;
+        public int playerHitsReceived;
+        public bool frequencyPuzzleWasActive;
+        public bool currentVulnWindowOpen;
+    }
+
+    [Serializable]
+    public class ConflictArchiveSaveBlock
+    {
+        public ArchivedConflict[] archivedConflicts = Array.Empty<ArchivedConflict>();
+        public int totalConflictsResolved;
+        public string lastResolutionChoice;
+    }
+
+    [Serializable]
+    public class ArchivedConflict
+    {
+        public string conflictId;
+        public string resolvedUtc;
+        public string choice;
+        public string localModified;
+        public string cloudModified;
+        public float localPlayTime;
+        public float cloudPlayTime;
+        public int localMoon;
+        public int cloudMoon;
+        public int localBuildings;
+        public int cloudBuildings;
+        public string details;
+        public string backupLocalPath;
     }
 
     [Serializable]
@@ -130,7 +197,7 @@ namespace Tartaria.Save
     {
         public float x, y, z;
 
-        public SerializableVector3(float x, float y, z)
+        public SerializableVector3(float x, float y, float z)
         {
             this.x = x; this.y = y; this.z = z;
         }
@@ -326,6 +393,17 @@ namespace Tartaria.Save
     }
 
     [Serializable]
+    public class Moon5State
+    {
+        public int pavilionsAmplified;
+        public int dockStage;
+        public bool spirePlaced;
+        public bool bridgeFormed;
+        public bool whiteCityRadianceActive;
+        public float lastAmplificationPercent;
+    }
+
+    [Serializable]
     public class LiraelSaveBlock
     {
         public float trust;
@@ -437,6 +515,7 @@ namespace Tartaria.Save
         public int[] companionIds = Array.Empty<int>();
         public int[] trustLevels = Array.Empty<int>();
         public string[] seenKeys = Array.Empty<string>();
+        public string[] chosenBranchIds = Array.Empty<string>();
     }
 
     // ─── v7 Save Blocks (Excavation, Crafting, Scanner, Rail, AquiferPurge, CosmicConvergence, DotT, Companion) ──
@@ -571,6 +650,7 @@ namespace Tartaria.Save
     [Serializable]
     public class Moon3SaveBlock
     {
+        // Core adoption & escort state (R5-R7)
         public int adoptedCount;
         public bool ariaAdopted;
         public bool torenAdopted;
@@ -579,8 +659,36 @@ namespace Tartaria.Save
         public bool dissonanceLeviathanDefeated;
         public bool giantEchoFreed;
         public float lullabyShieldLastUsed;
+        public float lullabyContributionTotal; // cumulative from SpectralOrphanAdoption lullaby moments
+
+        // Rail & progression (full Moon 3 block per spec)
+        public bool railSuccess;
+        public int railEscortsCompleted;
+        public bool continentalFastTravelUnlocked; // Continental Rail fast travel payoff
+        public bool goldenRailsPermanent; // permanent world change
+        public bool windsPermanentlyCalmed; // permanent world change post-Leviathan
+
+        // 17th Hour + live-ops variants (World's Fair ticket etc)
         public bool seventeenthHourInitiated;
         public string[] seventeenthHourEventIds = System.Array.Empty<string>();
+        public int seventeenthHourEventsCompleted;
+        public string[] seventeenthHourVariants = System.Array.Empty<string>(); // e.g. "golden_rails_variant", "orphan_chorus", "leviathan_lullaby"
+
+        // World's Fair ticket (Moon 3 reward, multiple variants)
+        public bool worldsFairTicketGranted;
+        public string worldsFairTicketVariant = ""; // "silver", "golden_rail", "compassion_badge" etc.
+
+        // Post-escort / completion state
+        public bool postEscortStateAchieved;
+        public bool finalConvergenceAchieved;
+
+        // Orphan adoption detailed state (trust/lullaby per orphan for full functional)
+        public float ariaTrust;
+        public float torenTrust;
+        public float sylTrust;
+        public bool ariaLullabyContributed;
+        public bool torenLullabyContributed;
+        public bool sylLullabyContributed;
     }
 
     // ─── v14 Echohaven (Moon 1) Early Progression Save Block ─────────────────
@@ -596,6 +704,22 @@ namespace Tartaria.Save
         public bool spireRestored;
         public bool hubFullyRestored;
         public int hubRestorations;
+    }
+
+    /// <summary>
+    /// M2 UX: Lightweight non-persistent info struct returned by SaveManager.GetSaveInfo(slot)
+    /// for menu rendering (slot list, timestamps, playtime, existence). Not serialized into saves.
+    /// </summary>
+    public struct SaveSlotInfo
+    {
+        public int slot;
+        public bool exists;
+        public string createdUtc;
+        public string modifiedUtc;   // primary "timestamp" for display
+        public float playTimeSeconds;
+        public int schemaVersion;
+        public string gameVersion;
+        // Future: currentMoon, resonance, thumbnail path etc.
     }
 
 }

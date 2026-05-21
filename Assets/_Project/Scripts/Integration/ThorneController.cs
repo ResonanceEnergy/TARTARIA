@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -67,6 +68,44 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("thorne_intro");
             OnIntroduced?.Invoke();
             Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        // ─── MOON 5 OVERTONE RADIO CAPTAIN ──────────────────────────────
+
+        /// <summary>Moon 5: Distant radio call when player first enters White City (crackling airship comms).</summary>
+        public void RadioFirstContact()
+        {
+            DialogueManager.Instance?.PlayLineById("thorne_moon5_first_contact");
+            // Light rumble for F310 "static burst"
+            HapticFeedbackManager.Instance?.TriggerF310Rumble(0.6f, 0.25f, 0.4f);
+        }
+
+        /// <summary>Moon 5: Call when a pavilion reaches full restoration / amplification (player empowers the grid).</summary>
+        public void RadioPavilionAmplified(int pavilionIndex, float newGridPercent)
+        {
+            string lineId = pavilionIndex switch
+            {
+                0 => "thorne_moon5_pavilion_01",
+                1 => "thorne_moon5_pavilion_02",
+                _ => "thorne_moon5_pavilion_generic"
+            };
+            DialogueManager.Instance?.PlayLineById(lineId);
+            AddTrust(8f + (newGridPercent > 0.8f ? 6f : 0f)); // extra trust on 80%+ light show
+        }
+
+        /// <summary>Moon 5: When floating platforms have risen and dock is taking shape.</summary>
+        public void RadioDockProgress(int dockStage)
+        {
+            DialogueManager.Instance?.PlayLineById(dockStage >= 3 ? "thorne_moon5_dock_ready" : "thorne_moon5_dock_building");
+            HapticFeedbackManager.Instance?.TriggerF310Rumble(0.5f, 0.18f, 0.35f);
+        }
+
+        /// <summary>Moon 5 Climax: Player places spire fragment — Thorne sees the lights from altitude.</summary>
+        public void RadioSpireIgnitionAndBridgeFormed()
+        {
+            DialogueManager.Instance?.PlayLineById("thorne_moon5_bridge_seen");
+            AddTrust(25f);
+            HapticFeedbackManager.Instance?.TriggerF310Rumble(0.9f, 1.2f, 0.7f); // big emotional rumble
         }
 
         /// <summary>Modify trust. Clamped 0-100.</summary>

@@ -179,6 +179,42 @@ namespace Tartaria.Integration
 
         void OnDestroy() { if (Instance == this) Instance = null; }
 
+        // ─── Save/Load (R8 persistence) ────────────────
+        [System.Serializable]
+        public class DialogueArcSaveData
+        {
+            public int[] companionIds = System.Array.Empty<int>();
+            public int[] trustLevels = System.Array.Empty<int>();
+            public string[] seenKeys = System.Array.Empty<string>();
+        }
+        public DialogueArcSaveData GetSaveData()
+        {
+            var ids = new List<int>();
+            var trusts = new List<int>();
+            foreach (var kv in _trust) { ids.Add((int)kv.Key); trusts.Add((int)kv.Value); }
+            var seen = new string[_seenDialogues.Count];
+            _seenDialogues.CopyTo(seen);
+            return new DialogueArcSaveData
+            {
+                companionIds = ids.ToArray(),
+                trustLevels = trusts.ToArray(),
+                seenKeys = seen
+            };
+        }
+        public void LoadSaveData(DialogueArcSaveData data)
+        {
+            if (data == null) return;
+            _trust.Clear();
+            if (data.companionIds != null && data.trustLevels != null)
+            {
+                int n = Mathf.Min(data.companionIds.Length, data.trustLevels.Length);
+                for (int i = 0; i < n; i++)
+                    _trust[(CompanionId)data.companionIds[i]] = (TrustLevel)data.trustLevels[i];
+            }
+            _seenDialogues.Clear();
+            if (data.seenKeys != null) foreach (var k in data.seenKeys) _seenDialogues.Add(k);
+        }
+
         public TrustLevel GetTrust(CompanionId companion) => _trust.TryGetValue(companion, out var t) ? t : TrustLevel.Stranger;
 
         public void IncreaseTrust(CompanionId companion)
@@ -268,7 +304,31 @@ namespace Tartaria.Integration
             VOIntensity = intensity
         };
 
-        static DialogueNode ChoiceNode(...) { /* same as R6 with R7 VO */ return new() { VoiceDirection = "choice branch — giant/calendar weight", VOIntensity = 0.85f /*...*/ }; }
+        static DialogueNode ChoiceNode(CompanionId c, int moon, string key, TrustLevel trust)
+        {
+            return new DialogueNode
+            {
+                companion = c, moonGate = moon, dialogueKey = key, trustRequired = trust,
+                requiresWorldChoice = true,
+                VoiceDirection = "choice branch — giant/calendar weight",
+                VOIntensity = 0.85f
+            };
+        }
+
+        // 6-arg overload used by R7 world-choice gated nodes (Thorne StarFort, Milo Aurora, etc.)
+        static DialogueNode ChoiceNode(CompanionId c, int moon, string key,
+            WorldChoiceTracker.WorldChoiceId choiceId, WorldChoiceTracker.ChoiceOption option, TrustLevel trust)
+        {
+            return new DialogueNode
+            {
+                companion = c, moonGate = moon, dialogueKey = key, trustRequired = trust,
+                requiresWorldChoice = true,
+                worldChoiceId = choiceId,
+                worldChoiceRequired = option,
+                VoiceDirection = "choice branch — world-gated giant/calendar weight",
+                VOIntensity = 0.88f
+            };
+        }
 
         // ... full save/load as R6 ...
     }

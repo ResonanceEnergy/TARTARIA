@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 using Tartaria.Core;
 
 namespace Tartaria.Integration
@@ -65,6 +66,18 @@ namespace Tartaria.Integration
                 rsReward: 130f,
                 new QuestObjective { description = "Anastasia cathedral crystal mote share + 17th physical glow + world warmth mutation", type = QuestObjectiveType.CompanionMilestone, targetId = "anastasia", targetCount = 1 }));
 
+            // === CORE MOON 2 5-BEAT FTUE QUEST: "lunar_challenge" (Lane 4 Narrative per 03C + 03_CAMPAIGN) ===
+            // Expanded with full Cassian trust/doubt arc, Lirael memory solidifies, returning player guards, rich dialogue hooks,
+            // companion physical tells, and deep replayable "The Crystal Remembers" revelation experience.
+            quests.Add(Build("lunar_challenge", "The Lunar Challenge",
+                "5-beat FTUE for Moon 2 — Lunar Moon: Shadow & Purge. Discovery (Lirael fracture + Cassian beckon), Restoration (micro-giant crystal tuning), Conflict (first Mud Golem + trust tick), Climax (ionized fountain storm dome purify), Revelation (Cassian diary ambiguity + The Crystal Remembers banner). Integrates QuestDatabase, Dialogue, CompanionManager physical tells, WorldChoice W1, and replayable crystal memory echoes.",
+                rsReward: 520f,
+                new QuestObjective { description = "Discovery: Witness Lirael fracture + Cassian scholar beckon", type = QuestObjectiveType.DiscoverBuilding, targetId = "moon2_discovery", targetCount = 1 },
+                new QuestObjective { description = "Restoration: Complete micro-giant crystal tuning", type = QuestObjectiveType.RestoreBuilding, targetId = "micro_giant_tune", targetCount = 1 },
+                new QuestObjective { description = "Conflict: Defeat first Mud Golem + Cassian trust/doubt tick", type = QuestObjectiveType.CompanionMilestone, targetId = "mud_golem_first", targetCount = 1 },
+                new QuestObjective { description = "Climax: Purify ionized fountain + storm dome cleanse", type = QuestObjectiveType.RestoreBuilding, targetId = "moon2_fountain", targetCount = 1 },
+                new QuestObjective { description = "Revelation: Cassian diary choice + The Crystal Remembers deep replayable experience", type = QuestObjectiveType.CompanionMilestone, targetId = "crystal_remembers", targetCount = 1 }));
+
             // Moon 3 R7 escort physical + giant song + Veritas intro synergy
             quests.Add(Build("r7_m3_escort_giant_song", "Orphan Train Giant Song Match",
                 "Complete rail escort with high bond (Korath/Veritas) — Giant's Song auto-match + Companion Giant payoff.",
@@ -75,6 +88,17 @@ namespace Tartaria.Integration
                 "Claim Veritas 17th Hour calendar event after first train escort — permanent resonance mutation.",
                 rsReward: 95f,
                 new QuestObjective { description = "Veritas calendar claimable + world mutation tier", type = QuestObjectiveType.CompanionMilestone, targetId = "veritas", targetCount = 1 }));
+
+            // === FULL MOON 3 "Compassion & Rails" ARC (M3-MS06 per quest DB + 20_QUEST + GDD + 03C) ===
+            // Wires orphan adoption (trust + lullaby), rail escort, Leviathan defeat, post-escort Continental + golden rails + World's Fair
+            quests.Add(Build("orphan_train_escort", "Compassion & Rails: The Orphan Train Escort (M3-MS06)",
+                "Discover the Dissonant Orphan Train in the Windswept Highlands. Build trust with spectral orphans Aria, Toren and Syl through lullaby and protection. Escort the train through corruption, defeat the Dissonance Leviathan with collective song, and unlock the Continental Rail network + permanent golden rails + World's Fair access as Moon 3 completion payoffs.",
+                rsReward: 380f,
+                new QuestObjective { description = "Discover the spectral orphan train and rail stations", type = QuestObjectiveType.DiscoverBuilding, targetId = "orphan_train", targetCount = 1 },
+                new QuestObjective { description = "Adopt spectral orphans via trust-building and lullaby contributions (3)", type = QuestObjectiveType.CompanionMilestone, targetId = "spectral_orphans", targetCount = 3 },
+                new QuestObjective { description = "Complete the full rail escort climax (protect train, lullaby shield)", type = QuestObjectiveType.CompleteTuning, targetId = "rail_escort", targetCount = 1 },
+                new QuestObjective { description = "Defeat Dissonance Leviathan with orphan lullaby synergy", type = QuestObjectiveType.HiddenDiscovery, targetId = "leviathan_moon3", targetCount = 1 },
+                new QuestObjective { description = "Unlock post-escort Continental Rail fast travel + golden rails permanent change + World's Fair ticket", type = QuestObjectiveType.CompanionMilestone, targetId = "continental_rail_m3", targetCount = 1 }));
 
             // Anastasia R7 solidification + all 112 context + giant
             quests.Add(Build("r7_anastasia_solidif_giant", "Anastasia's Ground & Giant Glow",
@@ -96,6 +120,24 @@ namespace Tartaria.Integration
         static QuestDefinition Build(string id, string name, string desc, float rsReward, params QuestObjective[] objectives)
         {
             return Build(id, name, desc, false, false, rsReward, 0f, null, objectives);
+        }
+
+        /// <summary>Full-arg Build overload used by main-quest registrations (R7 wiring).</summary>
+        static QuestDefinition Build(string id, string name, string desc,
+            bool isMainQuest, bool autoActivate, float rsReward, float rsRequirement,
+            string[] followUpQuestIds, params QuestObjective[] objectives)
+        {
+            var q = ScriptableObject.CreateInstance<QuestDefinition>();
+            q.questId = id;
+            q.displayName = name;
+            q.description = desc;
+            q.isMainQuest = isMainQuest;
+            q.autoActivate = autoActivate;
+            q.rsReward = rsReward;
+            q.rsRequirement = rsRequirement;
+            q.followUpQuestIds = followUpQuestIds ?? System.Array.Empty<string>();
+            q.objectives = objectives ?? System.Array.Empty<QuestObjective>();
+            return q;
         }
 
         // ... existing Build overloads unchanged ...

@@ -53,6 +53,9 @@ namespace Tartaria.Integration
         [SerializeField, Tooltip("Skip procedural spawn if scene already authored")]
         bool _sceneAlreadyAuthored = false;
 
+        // M1: prevents duplicate intro sequence on reload / additive load races
+        bool _contentSpawned;
+
         // Cached for VFX event wiring
         readonly List<GameObject> _aetherShards = new();
         readonly List<ParticleSystem> _environmentalVFX = new();
@@ -113,6 +116,10 @@ namespace Tartaria.Integration
                 return;
             }
 
+            // M1 Stabilization: basic re-entrancy / double-Start guard (OnAfterLoad + GameLoop restore already handles companion/quest state)
+            if (_contentSpawned) return;
+            _contentSpawned = true;
+
             EnsureRuntimeVisuals();
             EnsureTraversalFreedom();
             EnsureGameplayMissingPieces();
@@ -136,7 +143,32 @@ namespace Tartaria.Integration
             AdaptiveMusicController.Instance?.SetZone(0);              // Gap 14: Moon 1 zone music
             CompanionManager.Instance?.CheckUnlocks(0);                // Gap 25: companion unlock check
 
+            EnsureMoon1LunarFramework();                               // M1: enable 5-beat lunar structure for Echohaven even without prior editor binder pass
+
             Debug.Log("[EchohavenContentSpawner] Zone content populated.");
+        }
+
+        /// <summary>
+        /// M1 Decision: Enable the new Moon 1 5-beat lunar framework (Discovery→Restoration→Conflict→Climax→Revelation) at runtime.
+        /// This gives the vertical slice authentic "13 Moons" calendar flavor without requiring a prior editor MoonFrameworkBinder pass.
+        /// The MoonBeatRunner gracefully falls back if no full MoonDefinition is wired.
+        /// </summary>
+        void EnsureMoon1LunarFramework()
+        {
+            if (GameObject.Find("MoonFramework") != null) return;
+
+            var root = new GameObject("MoonFramework (Moon1 Runtime)");
+            var runner = root.AddComponent<MoonBeatRunner>();
+            runner.autoStart = true;
+            runner.startDelay = 2f;
+
+            // Try to load the canonical Moon 01 definition via Resources (Addressables not referenced by this asmdef).
+            // If missing the runner will log a warning and use time-based beats — sufficient for beta slice magic.
+            var moon01 = Resources.Load<MoonDefinition>("Moons/Moon01_Echohaven_VerticalSlice");
+            if (moon01 != null)
+                runner.definition = moon01;
+
+            Debug.Log("[Echohaven][Moon1] 5-beat lunar framework (MoonBeatRunner + events) is now live for the vertical slice.");
         }
 
         void EnsureRuntimeVisuals()
@@ -558,7 +590,7 @@ namespace Tartaria.Integration
             qm.ActivateQuest("echohaven_awakening");
 
             // Populate the HUD objective panel with the active quest title
-            var def = qm.GetQuestDefinition("quest_echohaven_awakening");
+            var def = qm.GetQuestDefinition("echohaven_awakening");
             if (def != null)
                 UI.HUDController.Instance?.ShowObjective($"QUEST: {def.displayName}");
 
@@ -2044,9 +2076,11 @@ namespace Tartaria.Integration
                 {
                     var src = rends[i];
                     var dst = Instantiate(src, lod1Root.transform);
-                    if (dst.sharedMesh != null)
+                    var srcMf = src.GetComponent<MeshFilter>();
+                    var dstMf = dst.GetComponent<MeshFilter>();
+                    if (srcMf != null && dstMf != null && srcMf.sharedMesh != null)
                     {
-                        dst.sharedMesh = CreateSimplifiedMesh(src.sharedMesh, 0.5f); // 50% reduction
+                        dstMf.sharedMesh = CreateSimplifiedMesh(srcMf.sharedMesh, 0.5f); // 50% reduction
                     }
                     simplifiedRends[i] = dst;
                 }
@@ -2063,7 +2097,7 @@ namespace Tartaria.Integration
 
                 // Simple billboard behavior (lightweight, no per-frame heavy)
                 var bill = impostor.AddComponent<PerfImpostorBillboard>();
-                bill.camera = Camera.main;
+                bill.camera = UnityEngine.Camera.main;
 
                 LOD lod2 = new LOD(0.04f, new[] { impostorRend }); // switch to impostor at ~4%
 
@@ -2126,10 +2160,10 @@ namespace Tartaria.Integration
     // Lightweight billboard for impostor LOD2 (perf cheap, no heavy rotation math every frame)
     public class PerfImpostorBillboard : MonoBehaviour
     {
-        public Camera camera;
+        public UnityEngine.Camera camera;
         void LateUpdate()
         {
-            if (camera == null) camera = Camera.main;
+            if (camera == null) camera = UnityEngine.Camera.main;
             if (camera != null)
             {
                 transform.LookAt(transform.position + camera.transform.forward, Vector3.up);

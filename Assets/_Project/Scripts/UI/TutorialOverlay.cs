@@ -319,7 +319,7 @@ namespace Tartaria.UI
                 _instance._visible = true;
                 _instance._currentStep = 0;
                 _instance._awaitingInputForStep = true;
-                _instance.UnlockCursor();
+                UnlockCursor();
                 AccessibilityManager.Instance?.AnnounceForScreenReader("First-launch fantasy tutorial forced. The awakening begins.", true);
             }
         }

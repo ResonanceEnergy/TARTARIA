@@ -381,7 +381,7 @@ namespace Tartaria.Integration
 
                 default:
                     // Fallback to standard Moon2 mix
-                    return BuildZoneEncounter(1, encounterId);
+                    return BuildZoneEncounter(1, variant);
             }
 
             return encounter;

@@ -24,4 +24,5 @@ MonoBehaviour:
   rsRequirement: 55
   objectives: []
   rsReward: 25
-  followUpQuestIds: []
+  followUpQuestIds:
+  - Moon06_Awaken

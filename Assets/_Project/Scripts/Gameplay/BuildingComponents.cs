@@ -22,15 +22,21 @@ namespace Tartaria.Gameplay
         Dome = 0,
         Fountain = 1,
         Spire = 2,
+        Tower = 10,
+        Gate = 11,
+        StarFort = 12,
+        Amphitheatre = 13,
+        Archive = 14,
+        Cathedral = 15,
+        Forge = 16,
+        Observatory = 17,
+        Obelisk = 18,
+        Unique = 50,
         Other = 99
     }
 
-    // Core interactable contract used by PlayerInputHandler, buildings, pickups, NPCs
-    public interface IInteractable
-    {
-        void Interact(GameObject player);
-        string GetInteractPrompt();
-    }
+    // Core interactable contract moved to Tartaria.Input.IInteractable (single source of truth).
+    // See Assets/_Project/Scripts/Input/IInteractable.cs.
 
     /// <summary>
     /// Tuning variant types for mini-games (Echohaven + Moon variants).
@@ -50,12 +56,16 @@ namespace Tartaria.Gameplay
     public struct TartarianBuilding : IComponentData
     {
         public int buildingId;
+        public BuildingArchetype Archetype;
         public BuildingRestorationState state;
         public BuildingRestorationState State;
         public float emergenceProgress;
         public int NodesCompleted;
         public int TotalNodes;
         public float RestorationProgress;
+        public float ResonanceScore;
+        public float GoldenRatioMatch;
+        public int UpgradeTier;
     }
 
     public struct MudDissolution : IComponentData
@@ -71,5 +81,6 @@ namespace Tartaria.Gameplay
         public int triggerId;
         public bool Discovered;
         public float TriggerRadius;
+        public float RSReward;
     }
 }

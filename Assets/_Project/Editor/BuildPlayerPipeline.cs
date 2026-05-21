@@ -1,5 +1,6 @@
 using System.IO;
 using System.Linq;
+using Tartaria.Editor;
 using UnityEditor;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -45,7 +46,7 @@ namespace Tartaria.EditorTools
             };
 
             Debug.Log($"[BuildPlayerPipeline] Building {scenes.Length} scenes â†’ {OutputExe}");
-            BuildReport report = BuildPipeline.BuildPlayer(opts);
+            UnityEditor.Build.Reporting.BuildReport report = BuildPipeline.BuildPlayer(opts);
 
             var summary = report.summary;
             Debug.Log($"[BuildPlayerPipeline] Result: {summary.result} | Size: {summary.totalSize / (1024 * 1024)} MB | Warnings: {summary.totalWarnings} | Errors: {summary.totalErrors}");
@@ -69,7 +70,9 @@ namespace Tartaria.EditorTools
                 EditorUtility.RevealInFinder(full);
             else
                 Debug.LogWarning($"[BuildPlayerPipeline] Output dir does not exist yet: {full}");
-        [MenuItem("Tartaria/Build Development Standalone (Windows x64) — Moon 1 (Echohaven first)")]
+        }
+
+        [MenuItem("Tartaria/Build Development Standalone (Windows x64) ï¿½ Moon 1 (Echohaven first)")]
         public static void BuildWindowsDevMoon1()
         {
             // Configure for clean Moon 1 direct launch
@@ -96,11 +99,11 @@ namespace Tartaria.EditorTools
                 locationPathName = OutputExe,
                 target           = BuildTarget.StandaloneWindows64,
                 targetGroup      = BuildTargetGroup.Standalone,
-                options          = BuildOptions.DevelopmentBuild | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler | BuildOptions.DetailedBuildReport,
+                options          = BuildOptions.Development | BuildOptions.AllowDebugging | BuildOptions.ConnectWithProfiler | BuildOptions.DetailedBuildReport,
             };
 
-            Debug.Log($"[BuildPlayerPipeline] DEV BUILD (Moon 1): {scenes.Length} scenes — Echohaven_VerticalSlice FIRST ? {OutputExe}");
-            BuildReport report = BuildPipeline.BuildPlayer(opts);
+            Debug.Log($"[BuildPlayerPipeline] DEV BUILD (Moon 1): {scenes.Length} scenes ï¿½ Echohaven_VerticalSlice FIRST ? {OutputExe}");
+            UnityEditor.Build.Reporting.BuildReport report = BuildPipeline.BuildPlayer(opts);
 
             var summary = report.summary;
             Debug.Log($"[BuildPlayerPipeline] Result: {summary.result} | Size: {summary.totalSize / (1024 * 1024)} MB | Warnings: {summary.totalWarnings} | Errors: {summary.totalErrors}");

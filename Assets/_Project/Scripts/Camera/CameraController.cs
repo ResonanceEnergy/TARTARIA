@@ -15,7 +15,7 @@ namespace Tartaria.Camera
     /// Works alongside Cinemachine for smooth blends.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CameraController : MonoBehaviour
+    public class CameraController : MonoBehaviour, ICameraShakeService
     {
         [Header("Target")]
         [SerializeField, Tooltip("Transform to follow and orbit around")] Transform followTarget;
@@ -56,6 +56,15 @@ namespace Tartaria.Camera
         float _currentYaw;
         float _targetFOV;
         float _zoomOffset;
+
+        // M2: Live mouse sensitivity from Settings
+        public static float MouseSensitivityMultiplier { get; private set; } = 1f;
+
+        public static void SetMouseSensitivity(float value)
+        {
+            MouseSensitivityMultiplier = Mathf.Clamp(value, 0.25f, 3f);
+            PlayerPrefs.SetFloat("TARTARIA_MouseSens", MouseSensitivityMultiplier);
+        }
         Coroutine _closeUpCoroutine;
         GameState _preCloseUpState;
         float _playerSearchCooldown;
@@ -67,6 +76,7 @@ namespace Tartaria.Camera
 
         void Awake()
         {
+            ServiceLocator.CameraShake = this;
             // Runtime safety: older scenes may carry stale serialized camera values
             // (18m distance / 55 deg pitch). Clamp to the intended tighter framing.
             exploreDistance = 6.5f;  // Was 9f — tighter for 2026 AAA feel
@@ -208,11 +218,13 @@ namespace Tartaria.Camera
             }
 
             // Mouse orbit: middle-button + delta (direct read — modifier gating pattern)
+            // Wired to SettingsOverlay _sens (TARTARIA_MouseSens) for production mouse feel.
             var mouse = Mouse.current;
             if (mouse != null && mouse.middleButton.isPressed)
             {
                 float mouseX = mouse.delta.ReadValue().x * 0.1f;
-                _currentYaw += mouseX * orbitSpeed * Time.deltaTime;
+                if (PlayerPrefs.GetInt("TARTARIA_ReducedMotion", 0) == 0 || !Input.GetKey(KeyCode.LeftAlt)) // reduced motion skips free look shake
+                    _currentYaw += mouseX * orbitSpeed * MouseSensitivityMultiplier * Time.deltaTime;
             }
 
             // Keyboard orbit: Q/E (direct read — dual-purpose keys shared with FrequencyShield/Interact)

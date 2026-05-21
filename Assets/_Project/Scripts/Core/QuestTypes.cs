@@ -28,6 +28,7 @@ namespace Tartaria.Core
         ExcavateRuin = 12,
         ReachAirshipDestination = 13,
         RaiseCompanionTrust = 14,
+        HiddenDiscovery = 15,
     }
 
     [Serializable]

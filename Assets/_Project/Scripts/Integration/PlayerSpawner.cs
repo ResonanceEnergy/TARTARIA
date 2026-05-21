@@ -44,6 +44,18 @@ namespace Tartaria.Integration
                 ? spawnMarker.transform.position + spawnOffset
                 : transform.position + spawnOffset;
 
+            // M2 Save/Load UX polish: On resume (playTime > 0), override marker with saved player position
+            // so load from MainMenu "Continue" or QuickLoad lands player exactly where they left off.
+            // Coordinates with GameLoopController.OnAfterLoad (which also syncs ECS + MB post-spawn).
+            var sm = Tartaria.Save.SaveManager.Instance;
+            if (sm != null && sm.CurrentSave != null && sm.CurrentSave.header != null &&
+                sm.CurrentSave.header.playTimeSeconds > 0.5f && sm.CurrentSave.player != null)
+            {
+                var p = sm.CurrentSave.player.position;
+                spawnPos = new Vector3(p.x, Mathf.Max(p.y, 1.2f), p.z);
+                Debug.Log($"[PlayerSpawner] M2 resume: overriding spawnPos with saved player pos {spawnPos}");
+            }
+
             // If Player already exists (e.g. baked in scene or DontDestroyOnLoad), destroy it
             // and let the spawner create a fresh prefab instance at the correct position.
             // Relocation via transform.position doesn't stick with CharacterController.

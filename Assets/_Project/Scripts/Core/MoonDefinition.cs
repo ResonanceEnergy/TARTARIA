@@ -58,5 +58,20 @@ namespace Tartaria.Core
         [Header("Progression")]
         public float   rsRequirement;        // resonance score threshold to unlock
         public string  questId;              // QuestDefinition asset stem ("Moon02_Awaken", etc.)
+
+        // ─── B1 Moon Framework v2 (additive, all optional w/ safe defaults) ───
+        [Header("Framework v2 — Beats")]
+        [Tooltip("Headlines shown by MoonHUDBanner for each of the 5 beats: Discovery, Restoration, Conflict, Climax, Revelation. Leave empty for auto-generated stub.")]
+        public string[] beatHeadlines = new string[5];
+        [Tooltip("Per-beat duration in seconds; the Conflict beat will instead wait for MoonProgressTracker.MarkCleared if a MoonMechanicActivator is on the same root.")]
+        public float[]  beatDurations = new float[] { 4f, 6f, 12f, 8f, 6f };
+
+        [Header("Framework v2 — Reward + Crossover")]
+        [Tooltip("Total RS payout on full clear. 0 = legacy compute (15 + number*2).")]
+        public float    rewardRS;
+        [Tooltip("Optional next-moon ID to mark unlocked on full clear. 0 = no unlock.")]
+        public int      unlockMoonId;
+        [Tooltip("Optional Addressable / Resources key for a climax set-piece prefab.")]
+        public string   climaxPrefabKey;
     }
 }

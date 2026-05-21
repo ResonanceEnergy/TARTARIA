@@ -15,9 +15,15 @@ namespace Tartaria.Core
         public static IHUDService HUD { get; set; }
         public static IMiloService Milo { get; set; }
         public static ILiraelService Lirael { get; set; }
+        public static ICassianService Cassian { get; set; }
         public static ICampaignService Campaign { get; set; }
         public static IZoneTransitionService ZoneTransition { get; set; }
         public static IAssetService Asset { get; set; }
+        public static ICameraShakeService CameraShake { get; set; }
+        public static ICombatService Combat { get; set; }
+        public static IQuestService Quest { get; set; }
+        public static IMoonMechanicService MoonMechanic { get; set; }
+        public static ISaveService Save { get; set; }
     }
 
     public interface IGameLoopService
@@ -30,6 +36,24 @@ namespace Tartaria.Core
     public interface IVFXService
     {
         void PlayEffect(VFXEffect effect, Vector3 position);
+        // Moon 3 train escort visual hooks (rebuilt with the VFXController re-implementation).
+        void SpawnMoon3TrainTrail(Vector3 position, float scale);
+        void SpawnLeviathanPhaseVFX(Vector3 position, int phaseIndex);
+        void SpawnGiantEchoRelease(Vector3 position);
+        // Moon 2 cavern visual hooks (crystal resonance, ley line restoration, discovery flourish).
+        void PlayResonancePulse(Vector3 position, float radius);
+        void PlayLeyLineRestore(Vector3 start, Vector3 end);
+        void PlayDiscoveryBurst(Vector3 position);
+
+        // ─── Moon 3 Rail Escort "Compassion & Rails" VFX (R7 full integration) ───
+        // Spectral orphans' lullaby glow + particles when singing (tells the compassion story: children 's voices calm the storm)
+        void SpawnOrphanLullabyGlow(Vector3 position, int childCount, float intensity);
+        // Train damage state sparks / cracks synced to low health (protection fantasy)
+        void SpawnRailDamageSparks(Vector3 position, float damageSeverity);
+        // Wind + electric atmosphere reacting to lullaby success (bright golden wind) vs failure (dark electric)
+        void SpawnWindElectricReaction(Vector3 position, bool success, float intensity);
+        // Post-victory permanent world transformation: golden rails across highlands + calmed wind particles + fast travel visual
+        void TriggerPermanentGoldenRailsAndCalm(Vector3 railStart, Vector3 railEnd);
     }
 
     public interface IHUDService
@@ -55,6 +79,49 @@ namespace Tartaria.Core
         void RememberFirstOrphan(string orphanName);
         void BeginLullabySupport();
         void BoardTrain(Vector3 positionOnTrain);
+        // Moon 3 R7 escort variant — board the train at escort start with optional roof position.
+        void BoardTrainLiraelEscort(Vector3 positionOnTrain, bool onRoof);
+    }
+
+    /// <summary>
+    /// Cassian companion service — Moon 3 R7 escort + later moons.
+    /// </summary>
+    public interface ICassianService
+    {
+        void AddTrust(float amount);
+        void BoardTrain(Vector3 positionOnTrain);
+    }
+
+    /// <summary>
+    /// Camera shake hook — registered by CameraController so Gameplay can trigger feedback without an asmdef dep.
+    /// </summary>
+    public interface ICameraShakeService
+    {
+        void TriggerShake(float intensity, float duration);
+    }
+
+    /// <summary>
+    /// Combat read service — registered by CombatBridge.
+    /// </summary>
+    public interface ICombatService
+    {
+        float GetPlayerCurrentFrequency();
+    }
+
+    /// <summary>
+    /// Quest progression service — registered by QuestManager.
+    /// </summary>
+    public interface IQuestService
+    {
+        void ProgressByType(QuestObjectiveType type, string targetId = null, int amount = 1);
+    }
+
+    /// <summary>
+    /// Moon mechanic activator probe — registered by Integration; Gameplay queries to detect external mechanic ownership.
+    /// </summary>
+    public interface IMoonMechanicService
+    {
+        bool HasActivator(GameObject target);
     }
 
     public interface ICampaignService
@@ -65,6 +132,18 @@ namespace Tartaria.Core
     public interface IZoneTransitionService
     {
         void TransitionToZone(int zoneIndex);
+    }
+
+    /// <summary>
+    /// Save service abstraction — registered by SaveManager so UI tier (PauseMenu) can save without an asmdef ref to Save (Save references UI, would create cycle).
+    /// </summary>
+    public interface ISaveService
+    {
+        void Save();
+        int GetCurrentSlot();
+        bool HasAnySave();
+        /// <summary>Returns a brief "Slot N • MM/dd HH:mm" label for the current slot, or empty if none.</summary>
+        string GetCurrentSaveLabel();
     }
 
     /// <summary>

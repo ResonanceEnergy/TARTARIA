@@ -18,6 +18,7 @@ namespace Tartaria.UI
         int _selected = 0;            // currently highlighted button index
         const int BUTTON_COUNT = 4;   // NEW GAME / CONTINUE / SETTINGS / QUIT
         float _navCooldown;           // debounce stick repeat
+        bool _showNewGameConfirm;     // overwrite-save confirmation modal
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
         static void Bootstrap()
@@ -83,8 +84,17 @@ namespace Tartaria.UI
         {
             switch (_selected)
             {
-                case 0: ResetProgressViaReflection(); StartGame(); break;
-                case 1: StartGame(); break;
+                case 0: // NEW GAME
+                    if (ServiceLocator.Save != null && ServiceLocator.Save.HasAnySave())
+                    {
+                        _showNewGameConfirm = true;
+                        return;
+                    }
+                    ResetProgressViaReflection();
+                    StartGame();
+                    break;
+
+                case 1: StartGame(); break; // CONTINUE
                 case 2: SettingsOverlay.Open(); break;
                 case 3: Quit(); break;
             }
@@ -130,7 +140,14 @@ namespace Tartaria.UI
             const int bw = 280, bh = 44, gap = 12;
             int bx = x + (W - bw) / 2;
 
-            string[] labels = { "NEW GAME", "CONTINUE", "SETTINGS", "QUIT" };
+            bool hasSave = ServiceLocator.Save != null && ServiceLocator.Save.HasAnySave();
+            string continueLabel = "CONTINUE (No Save Found)";
+            if (hasSave)
+            {
+                string label = ServiceLocator.Save.GetCurrentSaveLabel();
+                continueLabel = string.IsNullOrEmpty(label) ? "CONTINUE" : $"CONTINUE [{label}]";
+            }
+            string[] labels = { "NEW GAME", continueLabel, "SETTINGS", "QUIT" };
             for (int i = 0; i < labels.Length; i++)
             {
                 bool sel = (i == _selected);

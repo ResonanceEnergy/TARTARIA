@@ -399,9 +399,10 @@ namespace Tartaria.Integration
             if (_audioMgr != null)
             {
                 _audioMgr.PlaySFX(majestic ? "Moon2_RestoreHarmonic" : "Moon2_CrystalHum", pos, majestic ? 0.48f : 0.29f);
+                _audioMgr.PlaySFX("Moon2_CrystalResonanceTone", pos, majestic ? 0.39f : 0.24f);
             }
 
-            // Extra spatial tone cluster for rich cathedral feel (324 Hz keynote family)
+            // Extra spatial tone cluster for rich cathedral feel (324 Hz keynote family) + new resonance tone
             StartCoroutine(DelayedResonanceTones(pos, majestic ? 0.6f : 0.35f));
         }
 
@@ -456,6 +457,78 @@ namespace Tartaria.Integration
             {
                 _audioMgr.PlaySFX("Moon2_BellOvertone", Vector3.zero, 0.18f);
             }
+        }
+
+        // ─── New Expanded AVH Public API for Moon 2 (fountain storm, bell scalar, lullaby layers, dissonance, giant/tuning haptics) ───
+
+        public void PlayIonizedFountainStorm(Vector3 pos, bool withHaptic = true)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_IonizedFountainStorm", pos, 0.72f);
+                _audioMgr.PlaySFX("Moon2_FountainStorm", pos, 0.55f);
+                _audioMgr.PlaySFX("Moon2_CrystalResonanceTone", pos + Vector3.up * 4f, 0.41f);
+            }
+            if (withHaptic)
+            {
+                Input.HapticFeedbackManager.Instance?.PlayFountainStormRumble();
+                Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+            }
+            Debug.Log("[Moon2 Audio R8] Ionized fountain storm AVH triggered (climax dome).");
+        }
+
+        public void PlayBellScalarWave(Vector3 pos, bool heavy = false)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_BellScalarWave", pos, heavy ? 0.58f : 0.37f);
+                if (heavy) _audioMgr.PlaySFX("Moon2_BellOvertone", pos, 0.29f);
+            }
+            if (heavy)
+                Input.HapticFeedbackManager.Instance?.PlayBellScalarToll();
+            Debug.Log("[Moon2 Audio R8] Bell scalar wave played — phase interference for boss bell sever / tower phases.");
+        }
+
+        public void PlayDissonanceCorruptionBurst(Vector3 pos, float intensity = 0.7f)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_DissonanceCorruption", pos, intensity);
+                _audioMgr.PlaySFX("Moon2_PurgeCrackle", pos, intensity * 0.8f);
+            }
+            Input.HapticFeedbackManager.Instance?.PlayDissonanceCorruptionHit();
+            Debug.Log("[Moon2 Audio R8] Dissonance corruption burst AVH (boss desperation / re-ignite).");
+        }
+
+        public void Play432HzLullabyLayer(Vector3 pos, bool strong = false)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX2D("LiraelLullabyHum", strong ? 0.82f : 0.51f);
+                _audioMgr.PlaySFX2D("Moon2_432LullabyLayer", strong ? 0.61f : 0.38f);
+                if (strong) _audioMgr.PlaySFX("Moon2_CrystalResonanceTone", pos, 0.29f);
+            }
+            Input.HapticFeedbackManager.Instance?.PlayLullabyPulse();
+            Debug.Log("[Moon2 Audio R8] 432Hz lullaby layers + haptic for Lirael relief / revelation / Cassian arc.");
+        }
+
+        public void TriggerMicroGiantTuningAVH(Vector3 pos, bool success)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX(success ? "Moon2_TuningResonance" : "Moon2_PurgeCrackle", pos, success ? 0.52f : 0.34f);
+                if (success) _audioMgr.PlayTone(432f, 0.9f, 0.28f);
+            }
+            if (success)
+            {
+                Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+                Input.HapticFeedbackManager.Instance?.PlayMicroGiantCrystalTear();
+            }
+            else
+            {
+                Input.HapticFeedbackManager.Instance?.PlayTuningMiss();
+            }
+            Debug.Log($"[Moon2 Audio R8] Micro-giant crystal tuning AVH: success={success} (haptic + resonance wired).");
         }
 
         IEnumerator DelayedStingerTones()

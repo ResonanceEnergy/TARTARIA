@@ -111,6 +111,18 @@ namespace Tartaria.Integration
         public bool IsUnlocked(string entryId) => _unlocked.Contains(entryId);
         public bool IsNew(string entryId)      => _newBadge.Contains(entryId);
 
+        /// <summary>
+        /// Runtime convenience: register + unlock an entry by id with optional title/body metadata.
+        /// Title and body are used as a fallback log if no ArchiveDatabase entry exists.
+        /// </summary>
+        public void AddEntry(string entryId, string title, string body)
+        {
+            if (string.IsNullOrEmpty(entryId)) return;
+            UnlockEntry(entryId);
+            if (database == null || database.GetById(entryId) == null)
+                Debug.Log($"[Archive] Runtime entry registered: {entryId} | {title} :: {body}");
+        }
+
         /// Unlock a specific entry by id. Notifies ArchiveUI.
         public void UnlockEntry(string entryId)
         {

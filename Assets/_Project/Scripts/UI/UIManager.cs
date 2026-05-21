@@ -34,6 +34,10 @@ namespace Tartaria.UI
         [SerializeField] TMPro.TextMeshProUGUI dialogueBodyText;
         [SerializeField] UnityEngine.UI.Image dialoguePortrait;
 
+        // Text scale bases for accessibility (M2 wiring)
+        float _baseDialogueSpeakerFontSize = 22f;
+        float _baseDialogueBodyFontSize = 15f;
+
         [Header("Tutorial")]
         [SerializeField] TMPro.TextMeshProUGUI tutorialText;
 
@@ -55,6 +59,11 @@ namespace Tartaria.UI
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+
+            // Capture base font sizes for live text scale (accessibility)
+            if (dialogueSpeakerText != null) _baseDialogueSpeakerFontSize = dialogueSpeakerText.fontSize;
+            if (dialogueBodyText != null) _baseDialogueBodyFontSize = dialogueBodyText.fontSize;
+            ApplyDialogueTextScale();
         }
 
         void OnDestroy()
@@ -68,6 +77,10 @@ namespace Tartaria.UI
                 GameStateManager.Instance.OnStateChanged += HandleStateChange;
             GameEvents.OnToggleAetherVision += ToggleAetherVision;
             GameEvents.OnTogglePause += TogglePause;
+
+            // Wire text scale / accessibility for dialogue (and HUD where possible)
+            if (AccessibilityManager.Instance != null)
+                AccessibilityManager.Instance.OnSettingsChanged += ApplyDialogueTextScale;
         }
 
         void OnDisable()
@@ -76,6 +89,9 @@ namespace Tartaria.UI
                 GameStateManager.Instance.OnStateChanged -= HandleStateChange;
             GameEvents.OnToggleAetherVision -= ToggleAetherVision;
             GameEvents.OnTogglePause -= TogglePause;
+
+            if (AccessibilityManager.Instance != null)
+                AccessibilityManager.Instance.OnSettingsChanged -= ApplyDialogueTextScale;
         }
 
         void Update()
@@ -139,11 +155,26 @@ namespace Tartaria.UI
             if (dialogueSpeakerText != null) dialogueSpeakerText.text = speaker;
             if (dialogueBodyText != null) dialogueBodyText.text = text;
             if (dialoguePortrait != null && portrait != null) dialoguePortrait.sprite = portrait;
+            ApplyDialogueTextScale(); // ensure scale on show (in case changed while closed)
         }
 
         public void HideDialogue()
         {
             SetPanelActive(dialoguePanel, false);
+        }
+
+        /// <summary>
+        /// Applies accessibility text scale to dialogue labels (HUD similar pattern recommended).
+        /// Called on settings change via event for live updates.
+        /// </summary>
+        void ApplyDialogueTextScale()
+        {
+            float scale = AccessibilityManager.Instance?.TextScale ?? 1f;
+            float s = Mathf.Clamp(scale, 0.7f, 2.0f);
+            if (dialogueSpeakerText != null)
+                dialogueSpeakerText.fontSize = _baseDialogueSpeakerFontSize * s;
+            if (dialogueBodyText != null)
+                dialogueBodyText.fontSize = _baseDialogueBodyFontSize * s;
         }
 
         public void ShowTutorial(string message)

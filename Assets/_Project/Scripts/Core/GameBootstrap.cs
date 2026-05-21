@@ -319,5 +319,19 @@ namespace Tartaria.Core
         /// Exposes active profile for other systems (Round 5 singleton locator pattern).
         /// </summary>
         public static PerformanceProfile GetActivePerformanceProfile() => Instance?.performanceProfile;
+
+        /// <summary>
+        /// M2: Used by Pause Menu "Save & Quit to Menu".
+        /// </summary>
+        public static void LoadMainMenu()
+        {
+            Time.timeScale = 1f;
+            MainMenuActive = true;
+            var loader = FindAnyObjectByType<SceneLoader>();
+            if (loader != null)
+                loader.LoadMainMenuScene();
+            else
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Boot");
+        }
     }
 }

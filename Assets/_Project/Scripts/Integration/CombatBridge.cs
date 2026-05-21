@@ -25,7 +25,7 @@ namespace Tartaria.Integration
     /// No other changes.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CombatBridge : ECSMonoBehaviour
+    public class CombatBridge : ECSMonoBehaviour, ICombatService
     {
         public static CombatBridge Instance { get; private set; }
 
@@ -68,6 +68,13 @@ namespace Tartaria.Integration
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+            ServiceLocator.Combat = this;
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+            if (ServiceLocator.Combat == (ICombatService)this) ServiceLocator.Combat = null;
         }
 
         void Start()
@@ -265,7 +272,7 @@ namespace Tartaria.Integration
                 if (!_em.Exists(entities[i])) continue;
 
                 var lt = _em.GetComponentData<LocalTransform>(entities[i]);
-                Vector3 toEnemy = lt.Position - origin;
+                Vector3 toEnemy = (Vector3)lt.Position - origin;
                 float dist = toEnemy.magnitude;
 
                 if (dist <= range && dist > 0.1f)
@@ -464,6 +471,26 @@ namespace Tartaria.Integration
         }
 
         // ─── World Choice Effects ─────────────────
+        float _corruptionResistance;
+        float _corruptionResistanceUntil;
+        public float CorruptionResistance => Time.time < _corruptionResistanceUntil ? _corruptionResistance : 0f;
+        public void ApplyCorruptionResistance(float amount, float duration = 600f)
+        {
+            _corruptionResistance = Mathf.Clamp01(_corruptionResistance + amount);
+            _corruptionResistanceUntil = Time.time + duration;
+            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, GetPlayerPosition() + Vector3.up * 1.4f);
+            Debug.Log($"[CombatBridge] Corruption resistance applied: +{amount:F2} for {duration:F0}s");
+        }
+
+        float _freqShieldUntil;
+        public bool FrequencyShieldActive => Time.time < _freqShieldUntil;
+        public void ActivateFrequencyShield(float duration = 5f)
+        {
+            _freqShieldUntil = Time.time + duration;
+            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, GetPlayerPosition() + Vector3.up * 1.2f);
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            Debug.Log($"[CombatBridge] Frequency shield active for {duration:F1}s");
+        }
     }
 
     public enum DamageType

@@ -24,6 +24,40 @@
 **Ship a small, polished wonder — then expand it.**
 
 - The MVP (3 zones, Prologue + Moon 1–3) must be a complete, satisfying experience
+
+---
+
+## Beta Vertical Slice 12-Hour Sprint (May 2026) — Closed Beta Readiness
+
+**Objective:** Deliver a **complete, crash-free, fun, start-to-finish playable Echohaven Vertical Slice** (Moon 1 awakening through first major restoration + companion arc + save/resume + hints of larger systems) as a distributable Windows beta candidate for closed testing (itch.io / Steam playtest).
+
+**Target Scene:** `Echohaven_VerticalSlice.unity` (Boot → Main Menu → New Game flow → 20-40 min core loop: spawn → Milo intro + beckon → tutorial (movement/discover/tune/restore) → Great Dome / StarDome restoration → Aether harvest + VFX payoff → quest complete → auto-save checkpoint → giant/calendar hints).
+
+**Success Criteria (from GDD 15_MVP + 27_TUTORIAL + this sprint):**
+- Zero P0 crashes or softlocks in the 15-30 min playthrough.
+- Full menus (New/Continue/Settings with audio/graphics/controls/accessibility), save/load robust.
+- 60 fps on minimum profile hardware during peak VFX (restoration sequence).
+- All core systems (ResonanceScore, Building restoration, Companion trust, Quest, Tutorial, Save v8+, ServiceLocator registrations, new Moon* framework stubs for Moon 1) wired and firing.
+- OneClickBuild produces clean, iconned, versioned Windows standalone.
+- Live docs updated (this ROADMAP, CHANGELOG, KNOWN_ISSUES.md).
+
+**12-Hour Schedule (Cycles with 30-45 min integration/review):**
+
+| Cycle | Hours | Focus (Primary Agents) | Milestone / Gate |
+|-------|-------|------------------------|------------------|
+| 1 | 0-2 | Compile & Runtime Audit (Architect + QA + Systems + Gameplay) | Fresh compile clean for VS; full code walkthrough of Echohaven flow; list exact runtime risks | 
+| 2-3 | 2-5 | Core Loop Stabilization & Fun Polish (Gameplay + Designer + Systems) | **M1: End-to-end playable from menu without blockers** (tuning → restore → save → resume exact state) |
+| 4-5 | 5-8 | Menus/UX + Audio/VFX/Haptics Juice (UI/UX + Audio + TA) | **M2: Polished start-from-menu + all juice (haptics bridges, VFX sync, adaptive audio)** |
+| 6-7 | 8-10.5 | Perf Gate + Build Validation + Bug Bash (QA + Architect + All) | **M3: 60 fps validated + clean OneClickBuild .exe** |
+| 8 | 10.5-12 | Final Polish, Docs, Beta Package (Director + All) | **Final Beta Sign-off** — Windows build + README + all docs ready for closed beta distribution |
+
+**Agent Crew:** Project Director (orchestration), Game Designer, Lead Architect, Gameplay Programmer, Systems Programmer, UI/UX Engineer+Designer, 3D+TA, 2D+Animator, Audio+Composer, QA+Automation.
+
+**Rules:** Parallel sub-agents for deep audits/fixes. Prefer ServiceLocator pattern. Update docs after every cycle. Pause at each **M#** for user approval before next phase.
+
+**Current Phase:** Cycle 1 in progress (see KNOWN_ISSUES.md for live P0/P1 list).
+
+---
 - Every milestone has a playable deliverable — no "engine-only" milestones
 - Build the Aether system and golden ratio enforcement FIRST — everything else layers on top
 - Playtest every 2 weeks with real PC hardware

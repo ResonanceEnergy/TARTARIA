@@ -290,6 +290,15 @@ namespace Tartaria.Audio
                 PlaySFX2D(clip, volume);
         }
 
+        /// <summary>R7 voice line with intensity + direction metadata. Currently routes through PlayVoiceLine;
+        /// intensity scales volume, direction is logged for post-process pipeline tagging.</summary>
+        public void PlayVoiceLine(string lineId, float intensity, string voiceDirection)
+        {
+            PlayVoiceLine(lineId, Mathf.Clamp(intensity, 0.1f, 1.5f));
+            if (!string.IsNullOrEmpty(voiceDirection))
+                Debug.Log($"[AudioManager VO] {lineId} intensity={intensity:F2} dir={voiceDirection}");
+        }
+
         // ─── Procedural SFX by Name ──────────────────
 
         /// <summary>
@@ -310,6 +319,12 @@ namespace Tartaria.Audio
             var clip = ProceduralSFXLibrary.Get(name);
             if (clip != null) PlaySFX2D(clip, volume);
         }
+
+        /// <summary>
+        /// Alias for PlaySFX(string, Vector3, float) — explicit 3D-spatial name.
+        /// </summary>
+        public void PlaySFX3D(string name, Vector3 position, float volume = 1.0f)
+            => PlaySFX(name, position, volume);
 
         AudioSource GetNextPooledSource()
         {

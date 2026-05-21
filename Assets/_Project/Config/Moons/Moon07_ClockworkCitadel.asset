@@ -26,3 +26,18 @@ MonoBehaviour:
   spawnPos: {x: 0, y: 1, z: 0}
   rsRequirement: 85
   questId: Moon07_Awaken
+  beatHeadlines:
+  - "Discovery \u2014 Clockwork Citadel stirs."
+  - "Restoration \u2014 tune the architecture."
+  - "Conflict \u2014 face the GiantMode."
+  - "Climax \u2014 hold the resonance."
+  - "Revelation \u2014 the Clockwork Citadel reveals its secret."
+  beatDurations:
+  - 4
+  - 6
+  - 12
+  - 8
+  - 6
+  rewardRS: 0
+  unlockMoonId: 0
+  climaxPrefabKey: 

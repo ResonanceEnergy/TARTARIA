@@ -41,6 +41,8 @@ namespace Tartaria.Integration
         public event Action<BossResult> OnBossDefeated;
         public event Action OnBossFailed;
         public event Action<string> OnBossDialogue;       // dialogue line
+        /// <summary>Public hook so static helpers (Moon2BossEncounters) can raise the OnBossDialogue event.</summary>
+        public void RaiseBossDialogue(string line) => OnBossDialogue?.Invoke(line);
 
         // ─── State ───
         BossDefinition _currentBoss;

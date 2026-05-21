@@ -20,13 +20,13 @@ namespace Tartaria.Gameplay
     {
         [Header("Item Configuration")]
         [SerializeField, Tooltip("Unique item ID (e.g., 'shovel', 'aether_shard')")] 
-        string itemId = "unknown_item";
+        public string itemId = "unknown_item";
 
         [SerializeField, Range(1, 100), Tooltip("Quantity to add on pickup")] 
-        int quantity = 1;
+        public int quantity = 1;
 
         [SerializeField, Tooltip("Display name shown in UI prompts")] 
-        string displayName = "Item";
+        public string displayName = "Item";
 
         [Header("Feedback")]
         [SerializeField, Tooltip("Optional VFX prefab spawned on pickup")] 

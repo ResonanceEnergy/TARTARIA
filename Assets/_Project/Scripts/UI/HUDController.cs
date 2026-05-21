@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Tartaria.Core;
-using Tartaria.Integration;   // R5: CombatBridge + GiantModeController + BossEncounterSystem wiring for live HUD
+// using Tartaria.Integration;  // B1 cycle-break: replaced by IntegrationBridge reflection facade
 
 namespace Tartaria.UI
 {
@@ -98,6 +98,10 @@ namespace Tartaria.UI
             // Register richer screen-reader traits for wheel/meter
             AccessibilityManager.Instance?.SetScreenReaderTrait("frequency_wheel_hud", "Combat frequency wheel. Tune to match enemy vulnerability for amplified Harmonic Strike. Magical harmonic feedback.");
             AccessibilityManager.Instance?.SetScreenReaderTrait("giant_meter_hud", "Giant charge meter. Fills with Resonance Score. Flashes and captions when ready for Tartarian-scale transformation.");
+
+            // M2: subscribe for text scale on HUD labels (dialogue primary in UIManager)
+            if (AccessibilityManager.Instance != null)
+                AccessibilityManager.Instance.OnSettingsChanged += ApplyHUDTextScale;
             AccessibilityManager.Instance?.SetScreenReaderTrait("synergy_hint", "Combat + Restoration + Giant synergy active. Every perfect strike charges your giant stride.");
 
             // Subscribe to accessibility for dynamic updates
@@ -112,7 +116,10 @@ namespace Tartaria.UI
         {
             if (Instance == this) Instance = null;
             if (AccessibilityManager.Instance != null)
+            {
                 AccessibilityManager.Instance.OnSFXCaptionAnnounced -= ShowAccessibilityHint;
+                AccessibilityManager.Instance.OnSettingsChanged -= ApplyHUDTextScale;
+            }
             GameEvents.OnTogglePause -= HandleTogglePause;
             GameEvents.OnToggleAetherVision -= HandleAetherVisionToggle;
         }
@@ -143,25 +150,26 @@ namespace Tartaria.UI
         public void PollCombatHUD()
         {
             // Frequency wheel auto-show in combat or during active tuning (R6 extension)
-            bool shouldShowWheel = (GameState.Current == GameState.State.Combat) ||
-                                   (GameState.Current == GameState.State.Tuning && AetherFieldManager.Instance != null);
+            var curState = GameStateManager.Instance?.CurrentState ?? GameState.Exploration;
+            bool shouldShowWheel = (curState == GameState.Combat) ||
+                                   (curState == GameState.Tuning && AetherFieldManager.Instance != null);
 
             if (shouldShowWheel && !_frequencyWheelVisible)
                 ShowFrequencyWheel();
-            else if (!shouldShowWheel && _frequencyWheelVisible && GameState.Current != GameState.State.Tuning)
+            else if (!shouldShowWheel && _frequencyWheelVisible && curState != GameState.Tuning)
                 HideFrequencyWheel();
 
             if (_frequencyWheelVisible)
             {
-                // Pull live player frequency from CombatBridge (R5 wiring)
-                _currentFrequency = CombatBridge.GetPlayerCurrentFrequency();
+                // Pull live player frequency from CombatBridge via reflection (B1 cycle-break)
+                _currentFrequency = IntegrationBridge.GetPlayerCurrentFrequency();
                 if (frequencyText != null)
                     frequencyText.text = $"{_currentFrequency:0} Hz";
 
-                // Boss match % when active
-                if (BossEncounterSystem.Instance != null && BossEncounterSystem.Instance.IsActive)
+                // Boss match % when active (via reflection facade)
+                if (IntegrationBridge.IsBossActive())
                 {
-                    float target = BossEncounterSystem.Instance.CurrentTargetFrequency;
+                    float target = IntegrationBridge.BossCurrentTargetFrequency();
                     float match = Mathf.Clamp01(1f - Mathf.Abs(_currentFrequency - target) / 300f);
                     _frequencyMatch = match;
                     if (frequencyMatchText != null)
@@ -171,10 +179,10 @@ namespace Tartaria.UI
                     frequencyMatchText.text = "";
             }
 
-            // Giant meter always reflects real GiantModeController charge (R5)
-            if (GiantModeController.Instance != null)
+            // Giant meter reflects real GiantModeController charge via reflection (B1 cycle-break)
+            if (IntegrationBridge.HasGiantInstance())
             {
-                _giantMeterProgress = GiantModeController.Instance.Readiness;
+                _giantMeterProgress = IntegrationBridge.GiantReadiness();
                 _giantReady = _giantMeterProgress >= 0.99f;
 
                 if (giantMeterPanel != null && !giantMeterPanel.gameObject.activeSelf)
@@ -204,7 +212,7 @@ namespace Tartaria.UI
         {
             if (synergyHintText == null) return;
 
-            bool combat = GameState.Current == GameState.State.Combat;
+            bool combat = (GameStateManager.Instance?.CurrentState ?? GameState.Exploration) == GameState.Combat;
             bool giantReady = _giantReady;
             bool fountainRestored = false; // would be queried from GameLoop in real integration
 
@@ -356,6 +364,121 @@ namespace Tartaria.UI
                 hudAccessibilityHint.gameObject.SetActive(false);
         }
 
+        // ─── Save / Cloud / Achievement Toast Shims (used by SaveManager) ───────────
+
+        /// <summary>Toast/banner for cloud-save conflict prompt. Routes to the accessibility hint slot.</summary>
+        public void ShowSaveConflictPrompt(SaveConflictInfo info)
+        {
+            if (info == null) return;
+            ShowAccessibilityHint("save", $"Cloud conflict — {info.recommendedAction ?? "review"}");
+        }
+
+        /// <summary>3-arg overload used by SaveManager.HandleCloudConflictUI.</summary>
+        public void ShowSaveConflictPrompt(string localSummary, string cloudSummary, string recommended)
+        {
+            ShowAccessibilityHint("save", $"Cloud conflict — local: {localSummary} | cloud: {cloudSummary} | {recommended}");
+        }
+
+        /// <summary>Pop a transient achievement toast.</summary>
+        public void ShowAchievementToast(string title, string subtitle = "")
+        {
+            if (string.IsNullOrEmpty(title)) return;
+            string msg = string.IsNullOrEmpty(subtitle) ? title : $"{title} — {subtitle}";
+            ShowAccessibilityHint("achievement", $"★ {msg}");
+        }
+
+        /// <summary>Pop a cloud-save queue status toast.</summary>
+        public void ShowCloudQueueToast(string message)
+        {
+            if (string.IsNullOrEmpty(message)) return;
+            ShowAccessibilityHint("cloud", $"☁ {message}");
+        }
+
+        // ─── Pause / Aether Vision Event Handlers ─────────────────────
+
+        void HandleTogglePause()
+        {
+            var mgr = GameStateManager.Instance;
+            if (mgr == null) return;
+            var target = mgr.IsPaused ? GameState.Exploration : GameState.Paused;
+            mgr.TransitionTo(target);
+            AccessibilityManager.Instance?.PostSFXCaption("Pause", target == GameState.Paused ? "Paused" : "Resumed");
+        }
+
+        void HandleAetherVisionToggle()
+        {
+            // Visual hint only — actual Aether Vision is driven by AetherFieldManager.
+            AccessibilityManager.Instance?.PostSFXCaption("Aether Vision", "Aether Vision toggled. Hidden resonance lines revealed.");
+        }
+
+        // ─── Per-Frame HUD Updaters (lightweight; missing originals re-added) ───
+
+        void UpdateRSDisplay()
+        {
+            float rs = AetherFieldManager.Instance?.ResonanceScore ?? 0f;
+            if (rsFillImage != null) rsFillImage.fillAmount = Mathf.Clamp01(rs / 1000f);
+            if (rsValueText != null) rsValueText.text = $"RS {rs:0}";
+        }
+
+        void UpdateAetherDisplay()
+        {
+            // AetherCharge not yet exposed on AetherFieldManager; leave bars at 0 until wired.
+            if (aetherChargeBar != null) aetherChargeBar.fillAmount = 0f;
+            if (aetherValueText != null) aetherValueText.text = "0%";
+        }
+
+        void UpdatePromptFade()
+        {
+            if (interactionPrompt == null) return;
+            var cg = interactionPrompt.GetComponent<CanvasGroup>();
+            if (cg != null)
+                cg.alpha = Mathf.MoveTowards(cg.alpha, interactionPrompt.gameObject.activeSelf ? 1f : 0f, Time.deltaTime * 4f);
+        }
+
+        void UpdateBossHealthBar()
+        {
+            if (bossHealthPanel == null) return;
+            bool active = IntegrationBridge.IsBossActive();
+            if (bossHealthPanel.gameObject.activeSelf != active)
+                bossHealthPanel.gameObject.SetActive(active);
+            if (!active) return;
+            float pct = IntegrationBridge.BossHealthFraction();
+            if (bossHealthFill != null)
+            {
+                bossHealthFill.fillAmount = pct;
+                bossHealthFill.color = pct < 0.3f ? bossHealthLowColor : bossHealthColor;
+            }
+            if (bossNameText != null) bossNameText.text = IntegrationBridge.BossDisplayName();
+        }
+
+        void UpdateBossFrequencyDisplay()
+        {
+            if (bossTargetFrequencyText == null) return;
+            bool active = IntegrationBridge.IsBossActive();
+            if (active)
+            {
+                float target = IntegrationBridge.BossCurrentTargetFrequency();
+                _displayTargetFreq = Mathf.MoveTowards(_displayTargetFreq, target, Time.deltaTime * 200f);
+                bossTargetFrequencyText.text = $"TARGET {_displayTargetFreq:0} Hz";
+                _freqDisplayActive = true;
+            }
+            else if (_freqDisplayActive)
+            {
+                bossTargetFrequencyText.text = "";
+                _freqDisplayActive = false;
+            }
+        }
+
+        void UpdateAchievementToast()
+        {
+            // Toast plumbing lives in AccessibilityManager / AchievementsService; HUD just keeps the slot warm.
+        }
+
+        void UpdateMoonTrophy()
+        {
+            // Moon trophy widget updates are driven externally by Moon framework; no-op slot for now.
+        }
+
         // ─── R6 Extreme Testing Pass (call from debug console or Settings) ───
 
         [ContextMenu("R6 Extreme Accessibility & Gamepad Test Pass")]
@@ -411,6 +534,106 @@ namespace Tartaria.UI
         // Existing methods (UpdateRS, ShowInteractionPrompt, etc.) remain unchanged for compatibility.
         public void UpdateRS(float normalized) { /* existing impl */ }
         public void ShowInteractionPrompt(string text) { if (interactionText != null) interactionText.text = text; }
+        public void HideInteractionPrompt() { if (interactionText != null) interactionText.text = string.Empty; }
+
+        // === HUD API surface required by Integration tier ===
+        public void SetZoneName(string zoneName)
+        {
+            if (string.IsNullOrEmpty(zoneName)) return;
+            if (zoneNameText != null) zoneNameText.text = zoneName;
+            ShowAccessibilityHint("zone", zoneName);
+        }
+        public void ShowObjective(string objective)
+        {
+            if (string.IsNullOrEmpty(objective)) return;
+            ShowAccessibilityHint("objective", objective);
+        }
+        public void ShowBanner(string title, string body, float duration = 4f)
+        {
+            var msg = string.IsNullOrEmpty(title) ? body : title + " — " + body;
+            ShowAccessibilityHint("banner", msg);
+        }
+        public void FlashRSGain(float amount)
+        {
+            ShowAccessibilityHint("rs_gain", "+" + Mathf.RoundToInt(amount) + " RS");
+        }
+        public void UpdateAetherCharge(float charge)
+        {
+            if (aetherChargeBar != null) aetherChargeBar.fillAmount = Mathf.Clamp01(charge / 100f);
+            if (aetherValueText != null) aetherValueText.text = Mathf.RoundToInt(Mathf.Clamp(charge, 0f, 100f)) + "%";
+        }
+        public void UpdateFrequencyWheel(float frequencyHz, float accuracy)
+        {
+            ShowFrequencyWheel();
+            if (frequencyText != null) frequencyText.text = Mathf.RoundToInt(frequencyHz) + " Hz";
+            if (frequencyMatchText != null) frequencyMatchText.text = Mathf.RoundToInt(Mathf.Clamp01(accuracy) * 100f) + "%";
+        }
+        public void HideGiantMeter()
+        {
+            UpdateGiantMeter(0f, false);
+        }
+
+        // === Wave / Boss HUD (Moon Framework v2) ===
+        public void ShowWaveCounter(int waveIndex, int totalWaves, int enemiesRemaining)
+        {
+            ShowAccessibilityHint("wave", $"Wave {waveIndex + 1}/{totalWaves} — {enemiesRemaining} enemies");
+        }
+        public void UpdateWaveEnemies(int enemiesRemaining)
+        {
+            ShowAccessibilityHint("wave_enemies", enemiesRemaining.ToString());
+        }
+        public void HideWaveCounter()
+        {
+            ShowAccessibilityHint("wave", string.Empty);
+        }
+        public void ShowBossHealth(string bossName, float normalizedHealth)
+        {
+            ShowAccessibilityHint("boss", $"{bossName} {Mathf.RoundToInt(normalizedHealth * 100f)}%");
+        }
+        public void UpdateBossHealth(float normalizedHealth)
+        {
+            ShowAccessibilityHint("boss_hp", Mathf.RoundToInt(normalizedHealth * 100f) + "%");
+        }
+        public void UpdateBossTargetFrequency(float targetHz, bool isVulnerable)
+        {
+            ShowAccessibilityHint("boss_freq", $"{Mathf.RoundToInt(targetHz)}Hz {(isVulnerable ? "vulnerable" : "blocked")}");
+        }
+        public void ShowBossTargetFrequency(float targetHz)
+        {
+            ShowAccessibilityHint("boss_freq", $"{Mathf.RoundToInt(targetHz)}Hz target");
+        }
+        public void ShowBossTargetFrequency(float targetHz, bool isVulnerable)
+        {
+            ShowAccessibilityHint("boss_freq", $"{Mathf.RoundToInt(targetHz)}Hz {(isVulnerable ? "vulnerable" : "blocked")}");
+        }
+        public void HideBossTargetFrequency()
+        {
+            ShowAccessibilityHint("boss_freq", string.Empty);
+        }
+        public void HideBossHealth()
+        {
+            ShowAccessibilityHint("boss", string.Empty);
+        }
+        public void ShowMoonTrophy(string title, string subtitle)
+        {
+            ShowAccessibilityHint("moon_trophy", title + " — " + subtitle);
+        }
+
+        /// <summary>
+        /// Minimal HUD text scale application for key labels (M2). Full HUD requires per-element base storage + layout.
+        /// High-impact: scales main value/prompt/freq texts live when settings change.
+        /// </summary>
+        void ApplyHUDTextScale()
+        {
+            float scale = AccessibilityManager.Instance?.TextScale ?? 1f;
+            float s = Mathf.Clamp(scale, 0.7f, 2.0f);
+            if (rsValueText != null) rsValueText.fontSize = 14f * s; // example base
+            if (interactionText != null) interactionText.fontSize = 14f * s;
+            if (frequencyText != null) frequencyText.fontSize = 13f * s;
+            if (zoneNameText != null) zoneNameText.fontSize = 16f * s;
+            // Extend to other TMPs as needed (giantMeterLabel, etc.)
+        }
+
         // ... all other prior methods preserved exactly as before R6 edit ...
     }
 }

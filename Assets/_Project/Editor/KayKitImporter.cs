@@ -386,14 +386,15 @@ namespace Tartaria.Editor
             // LOD 1: simplified mesh
             Mesh lod1Mesh = null;
             var firstMeshRend = rends[0];
-            if (firstMeshRend.sharedMesh != null)
+            var firstMeshFilter = firstMeshRend.GetComponent<MeshFilter>();
+            if (firstMeshFilter != null && firstMeshFilter.sharedMesh != null)
             {
                 string meshName = root.name + "_LOD1_Simplified";
                 string meshPath = $"{outDir}/Meshes/{meshName}.asset";
                 lod1Mesh = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
                 if (lod1Mesh == null)
                 {
-                    lod1Mesh = CreateAndSaveSimplifiedMesh(firstMeshRend.sharedMesh, 0.55f, meshPath);
+                    lod1Mesh = CreateAndSaveSimplifiedMesh(firstMeshFilter.sharedMesh, 0.55f, meshPath);
                     newlyBaked++;
                 }
             }
@@ -456,7 +457,7 @@ namespace Tartaria.Editor
                 impostorGo.transform.SetParent(root.transform, false);
                 impostorGo.transform.localScale = Vector3.one * 2.5f;
                 impostorGo.GetComponent<MeshRenderer>().sharedMaterial = impMat;
-                DestroyImmediate(impostorGo.GetComponent<Collider>()); // no physics
+                Object.DestroyImmediate(impostorGo.GetComponent<Collider>()); // no physics
                 lods[2] = new LOD(0.04f, new Renderer[] { impostorGo.GetComponent<Renderer>() });
             }
             else if (impostorGo != null)
@@ -520,14 +521,15 @@ namespace Tartaria.Editor
                         // Simplified + impostor assets (same as before)
                         Mesh simplified = null;
                         var rends = contents.GetComponentsInChildren<MeshRenderer>(true);
-                        if (rends.Length > 0 && rends[0].sharedMesh != null)
+                        MeshFilter rendsFirstMF = rends.Length > 0 ? rends[0].GetComponent<MeshFilter>() : null;
+                        if (rendsFirstMF != null && rendsFirstMF.sharedMesh != null)
                         {
                             string meshName = contents.name + "_Simplified_LOD1";
                             string meshPath = $"{outDir}/Meshes/{meshName}.asset";
                             simplified = AssetDatabase.LoadAssetAtPath<Mesh>(meshPath);
                             if (simplified == null)
                             {
-                                simplified = CreateAndSaveSimplifiedMesh(rends[0].sharedMesh, 0.5f, meshPath);
+                                simplified = CreateAndSaveSimplifiedMesh(rendsFirstMF.sharedMesh, 0.5f, meshPath);
                                 baked++;
                             }
                         }
@@ -604,7 +606,7 @@ namespace Tartaria.Editor
         static Texture2D CaptureImpostorBillboard(GameObject prefab, string pngPath)
         {
             var tempCamGO = new GameObject("TempImpostorCam");
-            var cam = tempCamGO.AddComponent<Camera>();
+            var cam = tempCamGO.AddComponent<UnityEngine.Camera>();
             cam.orthographic = true;
             cam.orthographicSize = 2.2f;
             cam.clearFlags = CameraClearFlags.SolidColor;
@@ -636,18 +638,6 @@ namespace Tartaria.Editor
             var imported = AssetDatabase.LoadAssetAtPath<Texture2D>(pngPath);
             Debug.Log($"[PerfPrebake R6] Captured production impostor for {prefab.name}");
             return imported;
-        }
-
-        static void EnsureFolder(string folder)
-        {
-            if (!AssetDatabase.IsValidFolder(folder))
-            {
-                string parent = Path.GetDirectoryName(folder);
-                string leaf = Path.GetFileName(folder);
-                if (!string.IsNullOrEmpty(parent) && !AssetDatabase.IsValidFolder(parent))
-                    EnsureFolder(parent);
-                AssetDatabase.CreateFolder(parent ?? "Assets", leaf);
-            }
         }
     }
 }

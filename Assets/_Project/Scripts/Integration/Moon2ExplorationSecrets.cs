@@ -29,7 +29,7 @@ namespace Tartaria.Integration
     /// 
     /// All absolute paths C:\dev\TARTARIA_new. Domain-strict: Moon 2 only.
     /// </summary>
-    [DisallowMultipleComponents]
+    [DisallowMultipleComponent]
     public class Moon2ExplorationSecrets : MonoBehaviour
     {
         public static Moon2ExplorationSecrets Instance { get; private set; }
@@ -140,7 +140,7 @@ namespace Tartaria.Integration
                     }
 
                     // Auto or input-triggered discovery (E or scanner active)
-                    if (Input.GetKeyDown(KeyCode.E) || (ResonanceScannerSystem.Instance != null && ResonanceScannerSystem.Instance.IsReady))
+                    if (UnityEngine.Input.GetKeyDown(KeyCode.E) || (ResonanceScannerSystem.Instance != null && ResonanceScannerSystem.Instance.IsReady))
                     {
                         DiscoverSecret(i);
                         break;
@@ -178,11 +178,11 @@ namespace Tartaria.Integration
             {
                 var s = _secrets[i];
                 if (s.discovered) continue;
-                if (Vector3.Distance(result.position, s.pos) < 12f)
+                if (Vector3.Distance(result.worldPosition, s.pos) < 12f)
                 {
                     // Make secret glow stronger visually
                     if (_visualManager != null)
-                        _visualManager.RevealMoon2SecretVisual(s.id, s.pos, s.type, "Scanner breadcrumb: " + s.hint);
+                        _visualManager.RevealMoon2SecretVisual(s.id.ToString(), s.pos, s.type, "Scanner breadcrumb: " + s.hint);
                 }
             }
         }
@@ -249,7 +249,7 @@ namespace Tartaria.Integration
             // Core visual payoff via R7 manager (fractal cathedral fantasy)
             if (_visualManager != null)
             {
-                _visualManager.RevealMoon2SecretVisual(s.id, s.pos, s.type, s.reward);
+                _visualManager.RevealMoon2SecretVisual(s.id.ToString(), s.pos, s.type, s.reward);
             }
 
             // Spawn real PickupInteractable collectible for mechanical/narrative reward

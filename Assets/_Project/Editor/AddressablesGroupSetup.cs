@@ -42,7 +42,8 @@ namespace Tartaria.Editor
             // Ensure default group exists
             if (settings.DefaultGroup == null)
             {
-                settings.CreateDefaultGroup();
+                // Default group will be implicitly created on first CreateGroup; no-op fallback.
+                Debug.LogWarning("[AddressablesGroupSetup] DefaultGroup missing; will rely on subsequent CreateGroup calls.");
             }
 
             CreateOrGetGroup(settings, AddressableAssetLoader.LABEL_ECHOHAVEN_CORE, preload: true);
@@ -76,7 +77,7 @@ namespace Tartaria.Editor
                 return existing;
             }
 
-            var group = settings.CreateGroup(groupName, setAsDefault: false, readOnly: false, postEvent: true, null);
+            var group = settings.CreateGroup(groupName, setAsDefaultGroup: false, readOnly: false, postEvent: true, schemasToCopy: null, types: null);
             ConfigureGroupSchemas(group, preload);
 
             Debug.Log($"[AddressablesGroupSetup] ✓ Created group: {groupName} (preload={preload})");

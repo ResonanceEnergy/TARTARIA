@@ -23,7 +23,7 @@ namespace Tartaria.Integration
     /// Moon 2 Companion Stories R7: Cathedral Fracture Analysis quest + physical tells + trust branch + R7 DOTS integration.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CassianNPCController : MonoBehaviour, IInteractable
+    public class CassianNPCController : MonoBehaviour, IInteractable, ICassianService
     {
         public static CassianNPCController Instance { get; private set; }
 
@@ -56,11 +56,13 @@ namespace Tartaria.Integration
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+            ServiceLocator.Cassian = this; // Moon 3 RailEscort + companion service support (ICassianService)
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+            if (ServiceLocator.Cassian == (ICassianService)this) ServiceLocator.Cassian = null;
         }
 
         void Update()
@@ -154,6 +156,135 @@ namespace Tartaria.Integration
                 _promptDirty = false;
             }
             return _promptCache;
+        }
+
+        // IInteractable contract (Tartaria.Input.IInteractable)
+        public void Interact(GameObject player) => Interact();
+        public string GetInteractPrompt() => GetPrompt();
+
+        /// <summary>Adjust Cassian's trust level (called from dialogue consequences and quest hooks).
+        /// Mirrors AddTrust via CompanionManager so cross-system listeners stay synchronized.</summary>
+        public void AdjustTrust(float delta)
+        {
+            _trustLevel = Mathf.Clamp(_trustLevel + delta, 0f, 100f);
+            _promptDirty = true;
+            OnTrustChanged?.Invoke(_trustLevel);
+            CompanionManager.Instance?.AddTrust("cassian", delta);
+        }
+
+        // === ICassianService implementation for Moon 3 RailEscortController (and general companion service) ===
+        public void AddTrust(float amount)
+        {
+            AdjustTrust(amount);
+        }
+
+        public void BoardTrain(Vector3 positionOnTrain)
+        {
+            Debug.Log($"[CassianNPCController] Boarding orphan train for Moon 3 escort support at {positionOnTrain}. (Redemption arc physical tell)");
+            // Boarding bonus + slight trust for escort participation
+            AdjustTrust(2.8f);
+            // In full: could parent transform or animate to positionOnTrain, for vertical slice trust + log suffices
+        }
+
+        // W1 WorldChoice consequence: Cassian shares intel about scout patrols + boss patterns.
+        bool _intelSharingActive;
+        public bool IntelSharingActive => _intelSharingActive;
+        public void EnableIntelSharing()
+        {
+            if (_intelSharingActive) return;
+            _intelSharingActive = true;
+            Debug.Log("[Cassian] (intel) I'll mark the patrols on your map. Be careful with what you learn.");
+            Debug.Log("[Cassian] Intel sharing ENABLED (W1 OptionA consequence).");
+        }
+
+        // ─── Save/Load (R8 persistence) ────────────────
+        readonly System.Collections.Generic.List<string> _sharedIntelIds = new System.Collections.Generic.List<string>();
+        [System.Serializable]
+        public class CassianSaveData
+        {
+            public float trustLevel;
+            public bool intelSharingActive;
+            public int interactionCount;
+            public bool introduced;
+            public System.Collections.Generic.List<string> sharedIntelIds = new System.Collections.Generic.List<string>();
+        }
+        public CassianSaveData GetSaveData()
+        {
+            return new CassianSaveData
+            {
+                trustLevel = _trustLevel,
+                intelSharingActive = _intelSharingActive,
+                interactionCount = _interactionCount,
+                introduced = _introduced,
+                sharedIntelIds = new System.Collections.Generic.List<string>(_sharedIntelIds)
+            };
+        }
+        public void RestoreFromSave(CassianSaveData data)
+        {
+            if (data == null) return;
+            _trustLevel = Mathf.Clamp(data.trustLevel, 0f, 100f);
+            _intelSharingActive = data.intelSharingActive;
+            _interactionCount = data.interactionCount;
+            _introduced = data.introduced;
+            _sharedIntelIds.Clear();
+            if (data.sharedIntelIds != null) _sharedIntelIds.AddRange(data.sharedIntelIds);
+            _promptDirty = true;
+            OnTrustChanged?.Invoke(_trustLevel);
+        }
+
+        // === MOON 2 LUNAR FTUE HOOKS (called by Moon2LunarContentSpawner for 5-beat arc) ===
+        // Full Cassian trust/doubt arc integration + physical tells + WorldChoice W1 + dialogue hooks + Crystal Remembers replay trigger.
+
+        /// <summary>Discovery beat hook: Lirael fracture + Cassian beckon. Seeds initial trust arc.</summary>
+        public void OnMoon2Discovery(int fractureSeverity)
+        {
+            if (CompanionManager.Instance != null)
+            {
+                CompanionManager.Instance.TriggerPhysicalTellForBeat("cassian", 5); // analysis_choice style
+                float delta = fractureSeverity > 1 ? 3f : 1.5f;
+                CompanionManager.Instance.AddTrust("cassian", delta);
+            }
+            DialogueManager.Instance?.PlayContextDialogue("cassian_moon2_discovery_beckon");
+            _sharedIntel.Add("moon2_discovery");
+            Debug.Log($"[CassianNPC OnMoon2Discovery] FTUE beat 1. Trust seeded + physical tell + dialogue.");
+        }
+
+        /// <summary>Conflict beat hook: first Mud Golem kill + trust/doubt tick based on player observation.</summary>
+        public void OnMoon2ConflictMudGolem(bool playerNoticedInconsistency)
+        {
+            if (CompanionManager.Instance != null)
+            {
+                float delta = playerNoticedInconsistency ? -4f : 2f;
+                CompanionManager.Instance.AddTrust("cassian", delta);
+                CompanionManager.Instance.TriggerPhysicalTellForBeat("cassian", 1); // combat tell
+            }
+            string key = playerNoticedInconsistency ? "cassian_moon2_golem_doubt_tick" : "cassian_moon2_golem_trust_tick";
+            DialogueManager.Instance?.PlayContextDialogue(key);
+            Debug.Log($"[CassianNPC OnMoon2ConflictMudGolem] FTUE beat 3. Doubt arc delta={ (playerNoticedInconsistency ? -4 : 2) }");
+        }
+
+        /// <summary>Revelation beat hook: Cassian diary ambiguity choice. Records W1, triggers physical, unlocks Crystal Remembers variants.</summary>
+        public void OnMoon2RevelationDiaryChoice(bool choseTrustPath, string crystalMemoryVariantId)
+        {
+            if (CompanionManager.Instance != null)
+            {
+                float delta = choseTrustPath ? 8f : -6f;
+                CompanionManager.Instance.AddTrust("cassian", delta);
+                CompanionManager.Instance.TriggerPhysicalTellForBeat("cassian", choseTrustPath ? 0 : 1);
+            }
+            if (WorldChoiceTracker.Instance != null)
+            {
+                var option = choseTrustPath ? WorldChoiceTracker.ChoiceOption.OptionA : WorldChoiceTracker.ChoiceOption.OptionB;
+                WorldChoiceTracker.Instance.MakeChoice(WorldChoiceTracker.WorldChoiceId.W1_CassiansOffer, option);
+            }
+
+            string dialogueKey = choseTrustPath ? "cassian_crystal_remembers_trust" : "cassian_crystal_remembers_doubt";
+            DialogueManager.Instance?.PlayContextDialogue(dialogueKey);
+
+            // Fire replayable "The Crystal Remembers" deep experience (variants based on choice + prior beats)
+            Moon2LunarContentSpawner.Instance?.TriggerCrystalRemembersExperience(choseTrustPath, crystalMemoryVariantId);
+
+            Debug.Log($"[CassianNPC OnMoon2RevelationDiaryChoice] FTUE beat 5 COMPLETE. W1 recorded. TrustDelta={ (choseTrustPath?8:-6) }. Crystal Remembers variant '{crystalMemoryVariantId}' unlocked for deep replay.");
         }
     }
 
