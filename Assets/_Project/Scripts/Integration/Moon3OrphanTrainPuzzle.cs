@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Audio;
 using Tartaria.Input;
+using Tartaria.AI;
 
 namespace Tartaria.Integration
 {
@@ -230,22 +231,30 @@ namespace Tartaria.Integration
 
         void SpawnDissonanceEnemy(Vector3 position)
         {
+            GameObject golem;
             if (mudGolemPrefab != null)
             {
-                var golem = Instantiate(mudGolemPrefab, position + Vector3.up * 2f, Quaternion.identity);
+                golem = Instantiate(mudGolemPrefab, position + Vector3.up * 2f, Quaternion.identity);
                 golem.name = "MudGolem_WrongNote";
                 Debug.Log($"[Moon3 Train Puzzle] Spawned Mud Golem at {position}");
             }
             else
             {
-                Debug.LogWarning("[Moon3 Train Puzzle] MudGolem prefab not assigned, skipping enemy spawn");
-
-                // Fallback: create primitive golem
-                var golem = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                golem.transform.position = position + Vector3.up * 1f;
-                golem.transform.localScale = new Vector3(1.2f, 1.5f, 1.2f);
-                golem.GetComponent<Renderer>().material.color = new Color(0.3f, 0.2f, 0.15f);
-                golem.name = "MudGolem_Placeholder_WrongNote";
+                // Fallback: load KayKit Skeleton Warrior
+                GameObject skeletonPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Warrior");
+                if (skeletonPrefab != null)
+                {
+                    golem = Instantiate(skeletonPrefab, position + Vector3.up * 1f, Quaternion.identity);
+                    golem.name = "Skeleton_WrongNote";
+                    golem.AddComponent<MudGolemHealth>();
+                    golem.AddComponent<MudGolemAI>();
+                    Debug.Log("[Moon3 Train Puzzle] Spawned KayKit Skeleton (fallback)");
+                }
+                else
+                {
+                    Debug.LogError("[Moon3 Train Puzzle] Failed to load KayKit skeleton prefab");
+                    return;
+                }
             }
         }
 

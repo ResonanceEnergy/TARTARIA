@@ -10,6 +10,7 @@ using Tartaria.UI;
 using Tartaria.Input;
 using Tartaria.Gameplay;
 using Tartaria.Camera;
+using Tartaria.AI;
 
 namespace Tartaria.Integration
 {
@@ -1353,13 +1354,21 @@ namespace Tartaria.Integration
                 CombatWaveManager.Instance.SpawnSingleEnemy(position);
                 return;
             }
-            // Fallback: create greybox golem
-            var golem = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            golem.name = "DebugEnemy_MudGolem";
-            golem.transform.position = position;
-            golem.transform.localScale = Vector3.one * 1.8f;
-            golem.GetComponent<Renderer>().material.color = new Color(0.45f, 0.3f, 0.2f);
-            golem.tag = "Enemy";
+            // Fallback: load KayKit Skeleton Warrior
+            GameObject skeletonPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Warrior");
+            if (skeletonPrefab != null)
+            {
+                var golem = Instantiate(skeletonPrefab, position, Quaternion.identity);
+                golem.name = "DebugEnemy_Skeleton";
+                golem.AddComponent<MudGolemHealth>();
+                golem.AddComponent<MudGolemAI>();
+                golem.tag = "Enemy";
+                Debug.Log("[GameLoop] Debug enemy spawned (KayKit skeleton)");
+            }
+            else
+            {
+                Debug.LogError("[GameLoop] Failed to load KayKit skeleton for debug spawn");
+            }
         }
 
         // ─── Mini-Game → Building Bonus Bridge ───────
