@@ -198,52 +198,141 @@ namespace Tartaria.Integration
                 _finalNode = new GameObject("FinalNode_13thMoon");
                 _finalNode.transform.position = finalNodePoint;
 
-                // Outer dome shell
-                var domeOuter = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                domeOuter.name = "DomeOuter";
-                domeOuter.transform.SetParent(_finalNode.transform);
-                domeOuter.transform.localScale = Vector3.one * 42f;
-                domeOuter.transform.localPosition = Vector3.zero;
-
-                // Mid-layer chamber
-                var chamberMid = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                chamberMid.name = "ChamberMid";
-                chamberMid.transform.SetParent(_finalNode.transform);
-                chamberMid.transform.localScale = Vector3.one * 28f;
-                chamberMid.transform.localPosition = Vector3.zero;
-
-                // Inner sanctum
-                var chamberInner = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                chamberInner.name = "ChamberInner";
-                chamberInner.transform.SetParent(_finalNode.transform);
-                chamberInner.transform.localScale = Vector3.one * 18f;
-                chamberInner.transform.localPosition = Vector3.zero;
-
-                // Core crystal (pulsing)
-                var crystal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                crystal.name = "CoreCrystal";
-                crystal.transform.SetParent(_finalNode.transform);
-                crystal.transform.localScale = Vector3.one * 8f;
-                crystal.transform.localPosition = Vector3.zero;
-                var crystalRenderer = crystal.GetComponent<Renderer>();
-                if (crystalRenderer != null)
+                // Multi-layer convergence chamber (no primitives)
+                // Outer dome shell - large rock formation
+                GameObject outerRockPrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Rock_Large_01");
+                GameObject domeOuter;
+                if (outerRockPrefab != null)
                 {
-                    crystalRenderer.material.color = new Color(0.9f, 0.7f, 1f, 1f);  // Violet cosmic energy
+                    domeOuter = Instantiate(outerRockPrefab);
+                    domeOuter.name = "DomeOuter";
+                    domeOuter.transform.SetParent(_finalNode.transform);
+                    domeOuter.transform.localScale = Vector3.one * 21f;  // Half of 42f sphere scale for visual parity
+                    domeOuter.transform.localPosition = Vector3.zero;
+                    Debug.Log("[Moon13] Outer dome spawned using Rock_Large_01 prefab");
+                }
+                else
+                {
+                    Debug.LogWarning("[Moon13] Rock_Large_01 prefab not found - creating fallback outer dome");
+                    domeOuter = new GameObject("DomeOuter_FALLBACK");
+                    domeOuter.transform.SetParent(_finalNode.transform);
+                    domeOuter.transform.localScale = Vector3.one * 42f;
+                    domeOuter.transform.localPosition = Vector3.zero;
                 }
 
-                // Crystal spire (vertical pillar)
-                var spire = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                spire.name = "CrystalSpire";
-                spire.transform.SetParent(_finalNode.transform);
-                spire.transform.localScale = new Vector3(2f, 20f, 2f);
-                spire.transform.localPosition = Vector3.zero;
+                // Mid-layer chamber - medium rock
+                GameObject midRockPrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Rock_Medium_01");
+                GameObject chamberMid;
+                if (midRockPrefab != null)
+                {
+                    chamberMid = Instantiate(midRockPrefab);
+                    chamberMid.name = "ChamberMid";
+                    chamberMid.transform.SetParent(_finalNode.transform);
+                    chamberMid.transform.localScale = Vector3.one * 14f;  // Half of 28f sphere scale
+                    chamberMid.transform.localPosition = Vector3.zero;
+                    Debug.Log("[Moon13] Mid chamber spawned using Rock_Medium_01 prefab");
+                }
+                else
+                {
+                    Debug.LogWarning("[Moon13] Rock_Medium_01 prefab not found - creating fallback mid chamber");
+                    chamberMid = new GameObject("ChamberMid_FALLBACK");
+                    chamberMid.transform.SetParent(_finalNode.transform);
+                    chamberMid.transform.localScale = Vector3.one * 28f;
+                    chamberMid.transform.localPosition = Vector3.zero;
+                }
 
-                // Activation console
-                var console = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                console.name = "ActivationConsole";
-                console.transform.SetParent(_finalNode.transform);
-                console.transform.localPosition = new Vector3(0f, -15f, 0f);
-                console.transform.localScale = new Vector3(5f, 2f, 5f);
+                // Inner sanctum - small rock
+                GameObject innerRockPrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Rock_Small_01");
+                GameObject chamberInner;
+                if (innerRockPrefab != null)
+                {
+                    chamberInner = Instantiate(innerRockPrefab);
+                    chamberInner.name = "ChamberInner";
+                    chamberInner.transform.SetParent(_finalNode.transform);
+                    chamberInner.transform.localScale = Vector3.one * 9f;  // Half of 18f sphere scale
+                    chamberInner.transform.localPosition = Vector3.zero;
+                    Debug.Log("[Moon13] Inner sanctum spawned using Rock_Small_01 prefab");
+                }
+                else
+                {
+                    Debug.LogWarning("[Moon13] Rock_Small_01 prefab not found - creating fallback inner chamber");
+                    chamberInner = new GameObject("ChamberInner_FALLBACK");
+                    chamberInner.transform.SetParent(_finalNode.transform);
+                    chamberInner.transform.localScale = Vector3.one * 18f;
+                    chamberInner.transform.localPosition = Vector3.zero;
+                }
+
+                // Core crystal - ParticleSystem energy orb (no primitive)
+                var crystalObj = new GameObject("CoreCrystalEnergy");
+                crystalObj.transform.SetParent(_finalNode.transform);
+                crystalObj.transform.localPosition = Vector3.zero;
+                
+                var crystalPS = crystalObj.AddComponent<ParticleSystem>();
+                var crystalMain = crystalPS.main;
+                crystalMain.startColor = new ParticleSystem.MinMaxGradient(new Color(0.9f, 0.7f, 1f, 1f));  // Violet cosmic energy
+                crystalMain.startSize = 0.8f;
+                crystalMain.startLifetime = 3.0f;
+                crystalMain.startSpeed = 0.3f;
+                crystalMain.loop = true;
+                crystalMain.maxParticles = 200;
+                
+                var crystalShape = crystalPS.shape;
+                crystalShape.shapeType = ParticleSystemShapeType.Sphere;
+                crystalShape.radius = 4f;  // 8f sphere scale → 4f radius
+                
+                var crystalEmission = crystalPS.emission;
+                crystalEmission.rateOverTime = 80;
+                
+                var crystalRenderer = crystalPS.GetComponent<ParticleSystemRenderer>();
+                if (crystalRenderer != null)
+                {
+                    crystalRenderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                    crystalRenderer.material.SetColor("_BaseColor", new Color(0.9f, 0.7f, 1f, 1f));
+                    crystalRenderer.material.SetColor("_EmissionColor", new Color(0.9f, 0.7f, 1f, 1f) * 3f);
+                }
+                Debug.Log("[Moon13] Core crystal spawned as ParticleSystem energy orb");
+
+                // Crystal spire (vertical pillar) - use Props pillar
+                GameObject spirePrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Pillar_Stone_Large");
+                GameObject spire;
+                if (spirePrefab != null)
+                {
+                    spire = Instantiate(spirePrefab);
+                    spire.name = "CrystalSpire";
+                    spire.transform.SetParent(_finalNode.transform);
+                    spire.transform.localScale = new Vector3(1f, 10f, 1f);  // Tall vertical element
+                    spire.transform.localPosition = Vector3.zero;
+                    Debug.Log("[Moon13] Crystal spire spawned using Pillar_Stone_Large prefab");
+                }
+                else
+                {
+                    Debug.LogWarning("[Moon13] Pillar_Stone_Large prefab not found - creating fallback spire");
+                    spire = new GameObject("CrystalSpire_FALLBACK");
+                    spire.transform.SetParent(_finalNode.transform);
+                    spire.transform.localScale = new Vector3(2f, 20f, 2f);
+                    spire.transform.localPosition = Vector3.zero;
+                }
+
+                // Activation console (crate as terminal)
+                GameObject consolePrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Wood_Crate_Medium");
+                GameObject console;
+                if (consolePrefab != null)
+                {
+                    console = Instantiate(consolePrefab);
+                    console.name = "ActivationConsole";
+                    console.transform.SetParent(_finalNode.transform);
+                    console.transform.localPosition = new Vector3(0f, -15f, 0f);
+                    console.transform.localScale = new Vector3(2.5f, 1f, 2.5f);
+                    Debug.Log("[Moon13] Console spawned using Wood_Crate_Medium prefab");
+                }
+                else
+                {
+                    Debug.LogWarning("[Moon13] Wood_Crate_Medium prefab not found - creating fallback console");
+                    console = new GameObject("ActivationConsole_FALLBACK");
+                    console.transform.SetParent(_finalNode.transform);
+                    console.transform.localPosition = new Vector3(0f, -15f, 0f);
+                    console.transform.localScale = new Vector3(5f, 2f, 5f);
+                }
 
                 var interactable = console.AddComponent<FinalNodeConsole>();
                 interactable.spawner = this;
@@ -290,38 +379,87 @@ namespace Tartaria.Integration
             gate.transform.position = position;
 
             // Multi-part portal structure
-            // Outer ring (frame)
-            var outerRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            outerRing.name = "OuterRing";
-            outerRing.transform.SetParent(gate.transform);
-            outerRing.transform.localScale = new Vector3(6f, 0.3f, 6f);
-            outerRing.transform.localPosition = Vector3.zero;
-
-            // Inner portal disc
-            var portal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            portal.name = "Portal";
-            portal.transform.SetParent(gate.transform);
-            portal.transform.localScale = new Vector3(4.5f, 0.2f, 4.5f);
-            portal.transform.localPosition = Vector3.zero;
-            var renderer = portal.GetComponent<Renderer>();
-            if (renderer != null)
+            // Outer ring (frame) - use Props/Dungeon/Stone_Floor_Tile as circular base
+            GameObject ringPrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Stone_Floor_Tile");
+            GameObject outerRing;
+            if (ringPrefab != null)
             {
-                renderer.material.color = color;
+                outerRing = Instantiate(ringPrefab);
+                outerRing.name = "OuterRing";
+                outerRing.transform.SetParent(gate.transform);
+                outerRing.transform.localScale = new Vector3(3f, 0.15f, 3f);
+                outerRing.transform.localPosition = Vector3.zero;
+                outerRing.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                Debug.Log($"[Moon13] Echo gate ring spawned using Stone_Floor_Tile prefab");
+            }
+            else
+            {
+                Debug.LogWarning("[Moon13] Stone_Floor_Tile prefab not found - creating fallback ring");
+                outerRing = new GameObject("OuterRing_FALLBACK");
+                outerRing.transform.SetParent(gate.transform);
+                outerRing.transform.localPosition = Vector3.zero;
             }
 
-            // Support pillars (4 cardinal points)
+            // Inner portal energy field - ParticleSystem instead of primitive
+            var portalObj = new GameObject("PortalEnergyField");
+            portalObj.transform.SetParent(gate.transform);
+            portalObj.transform.localPosition = Vector3.zero;
+            
+            var ps = portalObj.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startColor = new ParticleSystem.MinMaxGradient(color);
+            main.startSize = 0.5f;
+            main.startLifetime = 2.0f;
+            main.startSpeed = 0.5f;
+            main.loop = true;
+            main.maxParticles = 150;
+            
+            var shape = ps.shape;
+            shape.shapeType = ParticleSystemShapeType.Circle;
+            shape.radius = 4.5f;
+            shape.radiusThickness = 0.8f;
+            
+            var emission = ps.emission;
+            emission.rateOverTime = 60;
+            
+            var renderer = ps.GetComponent<ParticleSystemRenderer>();
+            if (renderer != null)
+            {
+                renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                renderer.material.SetColor("_BaseColor", color);
+                renderer.material.SetColor("_EmissionColor", color * 2f);
+            }
+
+            // Support pillars (4 cardinal points) - use Props pillars
+            GameObject pillarPrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Pillar_Stone_Small");
             for (int p = 0; p < 4; p++)
             {
                 float angle = p * 90f * Mathf.Deg2Rad;
-                var pillar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                pillar.name = $"Pillar_{p}";
-                pillar.transform.SetParent(gate.transform);
-                pillar.transform.localPosition = new Vector3(
-                    Mathf.Cos(angle) * 5f,
-                    -4f,
-                    Mathf.Sin(angle) * 5f
-                );
-                pillar.transform.localScale = new Vector3(0.5f, 4f, 0.5f);
+                GameObject pillar;
+                
+                if (pillarPrefab != null)
+                {
+                    pillar = Instantiate(pillarPrefab);
+                    pillar.name = $"Pillar_{p}";
+                    pillar.transform.SetParent(gate.transform);
+                    pillar.transform.localPosition = new Vector3(
+                        Mathf.Cos(angle) * 5f,
+                        -4f,
+                        Mathf.Sin(angle) * 5f
+                    );
+                    pillar.transform.localScale = new Vector3(1f, 2f, 1f);
+                }
+                else
+                {
+                    Debug.LogWarning($"[Moon13] Pillar_Stone_Small prefab not found - creating fallback pillar {p}");
+                    pillar = new GameObject($"Pillar_{p}_FALLBACK");
+                    pillar.transform.SetParent(gate.transform);
+                    pillar.transform.localPosition = new Vector3(
+                        Mathf.Cos(angle) * 5f,
+                        -4f,
+                        Mathf.Sin(angle) * 5f
+                    );
+                }
             }
 
             return gate;
