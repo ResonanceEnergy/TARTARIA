@@ -138,42 +138,52 @@ namespace Tartaria.Integration
             _thorneFlagship.transform.position = whiteCityDock + Vector3.up * 8f;
 
             // Hull main body
-            GameObject hullMain = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            hullMain.name = "HullMain";
+            GameObject hullMain = new GameObject("HullMain");
             hullMain.transform.SetParent(_thorneFlagship.transform);
             hullMain.transform.localScale = new Vector3(10f, 3f, 25f);
             hullMain.transform.localPosition = Vector3.zero;
+            hullMain.AddComponent<MeshFilter>();
+            hullMain.AddComponent<MeshRenderer>();
+            hullMain.AddComponent<BoxCollider>();
 
             // Hull bow (front section)
-            GameObject hullBow = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            hullBow.name = "HullBow";
+            GameObject hullBow = new GameObject("HullBow");
             hullBow.transform.SetParent(_thorneFlagship.transform);
             hullBow.transform.localScale = new Vector3(8f, 2.5f, 8f);
             hullBow.transform.localPosition = new Vector3(0f, 0f, 16.5f);
+            hullBow.AddComponent<MeshFilter>();
+            hullBow.AddComponent<MeshRenderer>();
+            hullBow.AddComponent<BoxCollider>();
 
             // Hull stern (rear section)
-            GameObject hullStern = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            hullStern.name = "HullStern";
+            GameObject hullStern = new GameObject("HullStern");
             hullStern.transform.SetParent(_thorneFlagship.transform);
             hullStern.transform.localScale = new Vector3(9f, 2.8f, 6f);
             hullStern.transform.localPosition = new Vector3(0f, 0f, -15.5f);
+            hullStern.AddComponent<MeshFilter>();
+            hullStern.AddComponent<MeshRenderer>();
+            hullStern.AddComponent<BoxCollider>();
 
             // Bridge tower
-            GameObject bridge = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bridge.name = "Bridge";
+            GameObject bridge = new GameObject("Bridge");
             bridge.transform.SetParent(_thorneFlagship.transform);
             bridge.transform.localScale = new Vector3(6f, 4f, 6f);
             bridge.transform.localPosition = new Vector3(0f, 3.5f, 0f);
+            bridge.AddComponent<MeshFilter>();
+            bridge.AddComponent<MeshRenderer>();
+            bridge.AddComponent<BoxCollider>();
 
             // Mercury-orb engines (2 nacelles)
             for (int e = 0; e < 2; e++)
             {
-                GameObject engine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                engine.name = $"Engine_{e}";
+                GameObject engine = new GameObject($"Engine_{e}");
                 engine.transform.SetParent(_thorneFlagship.transform);
                 engine.transform.localScale = new Vector3(2f, 4f, 2f);
                 engine.transform.localPosition = new Vector3((e == 0 ? -6f : 6f), -1f, -10f);
                 engine.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
+                engine.AddComponent<MeshFilter>();
+                engine.AddComponent<MeshRenderer>();
+                engine.AddComponent<CapsuleCollider>();
             }
 
             // Placeholder visual: battered Tartarian airship (sacred-geometry hull, brass accents)
@@ -246,33 +256,41 @@ namespace Tartaria.Integration
                 airshipObj.transform.rotation = Quaternion.Euler(0f, i * 45f, 10f + i * 5f);
 
                 // Hull main section
-                GameObject hullMain = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                hullMain.name = "HullMain";
+                GameObject hullMain = new GameObject("HullMain");
                 hullMain.transform.SetParent(airshipObj.transform);
                 hullMain.transform.localScale = new Vector3(9f, 2.5f, 20f);
                 hullMain.transform.localPosition = Vector3.zero;
+                hullMain.AddComponent<MeshFilter>();
+                hullMain.AddComponent<MeshRenderer>();
+                hullMain.AddComponent<BoxCollider>();
 
                 // Hull fore section
-                GameObject hullFore = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                hullFore.name = "HullFore";
+                GameObject hullFore = new GameObject("HullFore");
                 hullFore.transform.SetParent(airshipObj.transform);
                 hullFore.transform.localScale = new Vector3(7f, 2f, 6f);
                 hullFore.transform.localPosition = new Vector3(0f, 0f, 13f);
+                hullFore.AddComponent<MeshFilter>();
+                hullFore.AddComponent<MeshRenderer>();
+                hullFore.AddComponent<BoxCollider>();
 
                 // Hull aft section
-                GameObject hullAft = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                hullAft.name = "HullAft";
+                GameObject hullAft = new GameObject("HullAft");
                 hullAft.transform.SetParent(airshipObj.transform);
                 hullAft.transform.localScale = new Vector3(8f, 2.2f, 5f);
                 hullAft.transform.localPosition = new Vector3(0f, 0f, -12.5f);
+                hullAft.AddComponent<MeshFilter>();
+                hullAft.AddComponent<MeshRenderer>();
+                hullAft.AddComponent<BoxCollider>();
 
                 // Broken engine (one side)
-                GameObject brokenEngine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                brokenEngine.name = "BrokenEngine";
+                GameObject brokenEngine = new GameObject("BrokenEngine");
                 brokenEngine.transform.SetParent(airshipObj.transform);
                 brokenEngine.transform.localScale = new Vector3(1.5f, 3f, 1.5f);
                 brokenEngine.transform.localPosition = new Vector3(-5f, -1f, -8f);
                 brokenEngine.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+                brokenEngine.AddComponent<MeshFilter>();
+                brokenEngine.AddComponent<MeshRenderer>();
+                brokenEngine.AddComponent<CapsuleCollider>();
 
                 // Placeholder visual: rusted hulls, mud-covered
                 Renderer[] renderers = airshipObj.GetComponentsInChildren<Renderer>();
