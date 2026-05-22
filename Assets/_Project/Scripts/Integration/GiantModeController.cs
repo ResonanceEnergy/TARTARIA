@@ -69,6 +69,7 @@ namespace Tartaria.Integration
 
         // ─── PERF: Cached references for Moon2 Cathedral + structures ───
         GameObject _moon2Cathedral;
+        GameObject cathedral;  // Alias for _moon2Cathedral for backward compat
         Dictionary<string, GameObject> _moon2Structures = new Dictionary<string, GameObject>();
         float _sceneObjectRetryTimer;
 

@@ -998,6 +998,7 @@ namespace Tartaria.Integration
     public class Moon5StartTrigger : MonoBehaviour
     {
         WhiteCityAmplificationController _cachedCtrl;
+        bool _fired;
 
         void OnTriggerEnter(Collider other)
         {
