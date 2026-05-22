@@ -97,7 +97,7 @@ namespace Tartaria.Gameplay
             OnStatusEffectApplied?.Invoke(StatusEffectType.FrequencyScramble, duration);
             
             // VFX + audio feedback
-            Input.HapticFeedbackManager.Instance?.PlayDamage();
+            Input.HapticFeedbackManager.Instance?.PlayDissonanceCorruptionHit();
             Audio.AudioManager.Instance?.PlaySFX2D("StatusEffect_Scramble");
             
             Debug.Log($"[StatusEffects] Frequency Scramble applied: {duration:F1}s, locked to {_scrambledFrequency:F0} Hz");
@@ -110,7 +110,7 @@ namespace Tartaria.Gameplay
         {
             _stunRemaining = duration;
             OnStatusEffectApplied?.Invoke(StatusEffectType.Stun, duration);
-            Input.HapticFeedbackManager.Instance?.PlayDamage();
+            Input.HapticFeedbackManager.Instance?.PlayDissonanceCorruptionHit();
             Debug.Log($"[StatusEffects] Stun applied: {duration:F1}s");
         }
 

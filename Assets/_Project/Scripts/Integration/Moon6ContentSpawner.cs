@@ -41,14 +41,14 @@ namespace Tartaria.Integration
         [Header("Audio")]
         [SerializeField] string brokenMelodyAudio = "Moon6_BrokenMelody";
         [SerializeField] string pipeRepairAudio = "Moon6_PipeRepair";
-        [SerializeField] string cymatics RequiemAudio = "Moon6_CymaticRequiem";
+        [SerializeField] string cymaticRequiemAudio = "Moon6_CymaticRequiem";
         [SerializeField] string liraelChoirAudio = "Moon6_LiraelChoir";
 
         List<CrystalPipe> _activePipes = new List<CrystalPipe>();
         List<HydraulicFountain> _activeFountains = new List<HydraulicFountain>();
         GameObject _pipeOrganCore;
         bool _organRestored;
-        bool _cymatics RequiemTriggered;
+        bool _cymaticRequiemTriggered;
         bool _revelationUnlocked;
 
         void Awake()
