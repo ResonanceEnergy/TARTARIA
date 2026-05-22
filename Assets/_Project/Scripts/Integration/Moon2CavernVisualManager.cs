@@ -89,15 +89,34 @@ namespace Tartaria.Integration
         public void RevealMoon2SecretVisual(string id, Vector3 pos, string type, string hint)
         {
             ServiceLocator.VFX?.PlayDiscoveryBurst(pos);
-            var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            marker.name = $"Moon2Secret_{id}";
-            marker.transform.position = pos;
-            marker.transform.localScale = Vector3.one * 0.35f;
-            var renderer = marker.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                var mat = renderer.material;
-                mat.color = type == "epic" ? new Color(0.95f, 0.65f, 1f, 0.85f) : new Color(0.55f, 0.85f, 1f, 0.85f);
+            
+            // VFX replacement for secret marker
+            GameObject markerVFX = new GameObject($"Moon2Secret_{id}_VFX");
+            markerVFX.transform.position = pos;
+            
+            Color markerColor = type == "epic" ? new Color(0.95f, 0.65f, 1f, 0.9f) : new Color(0.55f, 0.85f, 1f, 0.9f);
+            
+            ParticleSystem psMarker = markerVFX.AddComponent<ParticleSystem>();
+            var mainMarker = psMarker.main;
+            mainMarker.startLifetime = 1.5f;
+            mainMarker.startSpeed = 0.2f;
+            mainMarker.startSize = 0.35f;
+            mainMarker.startColor = markerColor;
+            mainMarker.maxParticles = 50;
+            mainMarker.loop = true;
+            
+            var emissionMarker = psMarker.emission;
+            emissionMarker.rateOverTime = 20f;
+            
+            var shapeMarker = psMarker.shape;
+            shapeMarker.shapeType = ParticleSystemShapeType.Sphere;
+            shapeMarker.radius = 0.175f;
+            
+            var rendererMarker = markerVFX.GetComponent<ParticleSystemRenderer>();
+            rendererMarker.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            rendererMarker.material.SetColor("_BaseColor", markerColor);
+            
+            psMarker.Play();
                 mat.EnableKeyword("_EMISSION");
                 mat.SetColor("_EmissionColor", mat.color * 2.4f);
             }

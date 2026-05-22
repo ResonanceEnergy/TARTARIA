@@ -34,26 +34,45 @@ namespace Tartaria.Integration
             var go = new GameObject($"Companion_{name}");
             go.transform.position = pos;
 
-            // Body: tall capsule
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            body.name = "Body";
-            body.transform.SetParent(go.transform, false);
-            body.transform.localPosition = new Vector3(0f, 1f, 0f);
-            body.transform.localScale = new Vector3(0.6f, 0.9f, 0.6f);
-            var bmat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            bmat.color = tint * 0.7f;
-            body.GetComponent<MeshRenderer>().sharedMaterial = bmat;
+            // Load KayKit Mage for mystical companion
+            GameObject companionPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Mage");
+            if (companionPrefab != null)
+            {
+                var body = Instantiate(companionPrefab, Vector3.zero, Quaternion.identity);
+                body.name = "Body";
+                body.transform.SetParent(go.transform, false);
+                body.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+            }
+            else
+            {
+                Debug.LogError("[MoonCompanionSpawner] CRITICAL: Char_Mage prefab missing for companion");
+            }
 
-            // Halo: glowing sphere above head
-            var halo = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            halo.name = "Halo";
-            halo.transform.SetParent(go.transform, false);
-            halo.transform.localPosition = new Vector3(0f, 2.4f, 0f);
-            halo.transform.localScale = Vector3.one * 0.4f;
-            Object.Destroy(halo.GetComponent<SphereCollider>());
-            var hmat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            hmat.color = tint;
-            hmat.EnableKeyword("_EMISSION");
+            // Halo: glowing sphere above head (VFX replacement)
+            GameObject haloVFX = new GameObject("Halo_VFX");
+            haloVFX.transform.SetParent(go.transform, false);
+            haloVFX.transform.localPosition = new Vector3(0f, 2.4f, 0f);
+            
+            ParticleSystem psHalo = haloVFX.AddComponent<ParticleSystem>();
+            var mainHalo = psHalo.main;
+            mainHalo.startLifetime = 1.8f;
+            mainHalo.startSpeed = 0.15f;
+            mainHalo.startSize = 0.4f;
+            mainHalo.startColor = new Color(tint.r, tint.g, tint.b, 0.9f);
+            mainHalo.maxParticles = 60;
+            mainHalo.loop = true;
+            
+            var emissionHalo = psHalo.emission;
+            emissionHalo.rateOverTime = 25f;
+            
+            var shapeHalo = psHalo.shape;
+            shapeHalo.shapeType = ParticleSystemShapeType.Sphere;
+            shapeHalo.radius = 0.2f;
+            
+            var rendererHalo = haloVFX.GetComponent<ParticleSystemRenderer>();
+            rendererHalo.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            rendererHalo.material.SetColor("_BaseColor", tint);
+            rendererHalo.material.EnableKeyword("_EMISSION");
             hmat.SetColor("_EmissionColor", tint * 4f);
             halo.GetComponent<MeshRenderer>().sharedMaterial = hmat;
 

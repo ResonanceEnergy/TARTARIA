@@ -733,21 +733,33 @@ namespace Tartaria.Integration
         /// </summary>
         IEnumerator PlaceSpireFragmentVisual()
         {
-            // Spawn a beautiful glowing fragment crystal near the spire base
-            var frag = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            frag.name = "Moon1_SpineFragment_Visual";
-            frag.transform.position = spireBasePosition + new Vector3(0, 2f, -4f); // slightly offset as if player brought it
-            frag.transform.localScale = Vector3.one * 0.7f;
-
-            var mr = frag.GetComponent<MeshRenderer>();
-            if (mr)
-            {
-                mr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                mr.material.color = new Color(1f, 0.95f, 0.6f);
-                mr.material.SetColor("_EmissionColor", Color.yellow * 2.5f);
-                mr.material.EnableKeyword("_EMISSION");
-            }
-            Destroy(frag.GetComponent<Collider>());
+            // Spawn a beautiful glowing fragment crystal near the spire base (VFX replacement)
+            GameObject fragVFX = new GameObject("Moon1_SpineFragment_Visual_VFX");
+            fragVFX.transform.position = spireBasePosition + new Vector3(0, 2f, -4f); // slightly offset as if player brought it
+            
+            ParticleSystem psFrag = fragVFX.AddComponent<ParticleSystem>();
+            var mainFrag = psFrag.main;
+            mainFrag.startLifetime = 2.0f;
+            mainFrag.startSpeed = 0.3f;
+            mainFrag.startSize = 0.7f;
+            mainFrag.startColor = new Color(1f, 0.95f, 0.6f, 1f);
+            mainFrag.maxParticles = 100;
+            mainFrag.loop = true;
+            
+            var emissionFrag = psFrag.emission;
+            emissionFrag.rateOverTime = 50f;
+            
+            var shapeFrag = psFrag.shape;
+            shapeFrag.shapeType = ParticleSystemShapeType.Sphere;
+            shapeFrag.radius = 0.35f;
+            
+            var rendererFrag = fragVFX.GetComponent<ParticleSystemRenderer>();
+            rendererFrag.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            rendererFrag.material.SetColor("_BaseColor", new Color(1f, 0.95f, 0.6f));
+            rendererFrag.material.EnableKeyword("_EMISSION");
+            rendererFrag.material.SetColor("_EmissionColor", Color.yellow * 2.5f);
+            
+            psFrag.Play();
 
             // Add a light for radiance
             var light = frag.AddComponent<Light>();

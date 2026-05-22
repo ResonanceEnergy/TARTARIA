@@ -22,17 +22,33 @@ namespace Tartaria.Integration
             var go = new GameObject("ReturnPortal_Echohaven");
             go.transform.position = pos;
 
-            // Visual: tall glowing cyan cylinder
-            var pillar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            pillar.name = "PortalPillar";
-            pillar.transform.SetParent(go.transform, false);
-            pillar.transform.localPosition = new Vector3(0f, 2.0f, 0f);
-            pillar.transform.localScale = new Vector3(0.6f, 2f, 0.6f);
-            Object.Destroy(pillar.GetComponent<CapsuleCollider>());
-            var renderer = pillar.GetComponent<MeshRenderer>();
-            var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            // Visual: tall glowing cyan cylinder (VFX replacement)
+            GameObject pillarVFX = new GameObject("PortalPillar_VFX");
+            pillarVFX.transform.SetParent(go.transform, false);
+            pillarVFX.transform.localPosition = new Vector3(0f, 2.0f, 0f);
+            
+            ParticleSystem psPillar = pillarVFX.AddComponent<ParticleSystem>();
+            var mainPillar = psPillar.main;
+            mainPillar.startLifetime = 3.0f;
+            mainPillar.startSpeed = 0.4f;
+            mainPillar.startSize = 0.6f;
+            mainPillar.startColor = new Color(0.25f, 0.85f, 1f, 0.9f);
+            mainPillar.maxParticles = 200;
+            mainPillar.loop = true;
+            mainPillar.simulationSpace = ParticleSystemSimulationSpace.Local;
+            
+            var emissionPillar = psPillar.emission;
+            emissionPillar.rateOverTime = 70f;
+            
+            var shapePillar = psPillar.shape;
+            shapePillar.shapeType = ParticleSystemShapeType.Cylinder;
+            shapePillar.radius = 0.3f;
+            shapePillar.length = 4f;
+            
+            var rendererPillar = pillarVFX.GetComponent<ParticleSystemRenderer>();
+            var mat = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
             var cyan = new Color(0.25f, 0.85f, 1f);
-            mat.color = cyan;
+            mat.SetColor("_BaseColor", cyan);
             mat.EnableKeyword("_EMISSION");
             mat.SetColor("_EmissionColor", cyan * 4f);
             renderer.sharedMaterial = mat;
