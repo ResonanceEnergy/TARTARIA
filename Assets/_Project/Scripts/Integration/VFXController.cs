@@ -896,5 +896,37 @@ namespace Tartaria.Integration
 
             Debug.Log("[VFX Moon5] Permanent White City radiance + aurora fountains activated. The Overtone Moon endures.");
         }
+
+        // ══════════════════════════════════════════════════════════════════════════
+        // MOON 2 — Building Restoration VFX
+        // ══════════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Cathedral transformation VFX — mud crumbles away, golden light spreads, crystal grows.
+        /// Called from Moon2BuildingRestorationSequencer during restoration animation.
+        /// </summary>
+        public void PlayMudToRestoredCathedralTransformation(Transform cathedral)
+        {
+            Debug.Log("[VFXController] Cathedral transformation VFX (stub)");
+            // TODO: Particle system — mud crumbles, golden light spreads, crystal grows
+            if (cathedral != null)
+            {
+                Vector3 pos = cathedral.position;
+                SpawnPrimitiveBurst(pos + Vector3.up * 2f, new Color(0.95f, 0.88f, 0.55f), 2.4f, 48);
+                SpawnVortex(pos + Vector3.up * 3f, new Color(0.9f, 0.85f, 0.55f, 0.9f), 2.2f);
+            }
+        }
+
+        /// <summary>
+        /// Aether pulse VFX — radial particle burst with color gradient.
+        /// Used for ley line activations, tuning success, and restoration ripples.
+        /// </summary>
+        public void PlayAetherPulse(Vector3 position, float radius, Color color)
+        {
+            Debug.Log($"[VFXController] Aether pulse at {position}, radius {radius} (stub)");
+            // TODO: Radial particle burst with color gradient
+            SpawnRing(position, color, radius);
+            SpawnPrimitiveBurst(position + Vector3.up * 0.5f, color, radius * 0.4f, 32);
+        }
     }
 }

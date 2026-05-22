@@ -14,6 +14,7 @@ namespace Tartaria.UI
         static Type _combatBridge;
         static Type _bossEncounter;
         static Type _giantMode;
+        static Type _dialogueManager;
         static bool _resolved;
 
         static void Resolve()
@@ -25,6 +26,7 @@ namespace Tartaria.UI
                 _combatBridge   = Type.GetType("Tartaria.Integration.CombatBridge, Tartaria.Integration");
                 _bossEncounter  = Type.GetType("Tartaria.Integration.BossEncounterSystem, Tartaria.Integration");
                 _giantMode      = Type.GetType("Tartaria.Integration.GiantModeController, Tartaria.Integration");
+                _dialogueManager = Type.GetType("Tartaria.Integration.DialogueManager, Tartaria.Integration");
             }
             catch (Exception e) { Debug.LogWarning($"[IntegrationBridge] resolve failed: {e.Message}"); }
         }
@@ -138,6 +140,49 @@ namespace Tartaria.UI
             }
             catch { }
             return 0f;
+        }
+
+        // --- DialogueManager -----------------------------------------------
+        static object GetDialogueManagerInstance()
+        {
+            Resolve();
+            if (_dialogueManager == null) return null;
+            try
+            {
+                var prop = _dialogueManager.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+                return prop?.GetValue(null);
+            }
+            catch { return null; }
+        }
+
+        /// <summary>
+        /// Play a dialogue line via reflection to DialogueManager.PlayLine(contextId, lineId).
+        /// Avoids direct Tartaria.Integration dependency from Tartaria.UI.
+        /// </summary>
+        public static void PlayDialogueLine(string contextId, string lineId)
+        {
+            var inst = GetDialogueManagerInstance();
+            if (inst == null)
+            {
+                Debug.LogWarning($"[IntegrationBridge] DialogueManager.Instance is null. Cannot play line: {contextId}/{lineId}");
+                return;
+            }
+            try
+            {
+                var method = inst.GetType().GetMethod("PlayLine", BindingFlags.Public | BindingFlags.Instance, null, new[] { typeof(string), typeof(string) }, null);
+                if (method != null)
+                {
+                    method.Invoke(inst, new object[] { contextId, lineId });
+                }
+                else
+                {
+                    Debug.LogWarning("[IntegrationBridge] DialogueManager.PlayLine(string, string) method not found.");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[IntegrationBridge] PlayDialogueLine failed: {e.Message}");
+            }
         }
     }
 }
