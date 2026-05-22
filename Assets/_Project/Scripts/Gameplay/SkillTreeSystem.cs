@@ -201,168 +201,52 @@ namespace Tartaria.Gameplay
 
         void BuildTrees()
         {
-            _trees[SkillTreeType.Resonator] = BuildResonatorTree();
-            _trees[SkillTreeType.Architect] = BuildArchitectTree();
-            _trees[SkillTreeType.Guardian] = BuildGuardianTree();
-            _trees[SkillTreeType.Historian] = BuildHistorianTree();
+            // Data-driven architecture: load from ScriptableObject assets in Resources/SkillTrees/
+            _trees[SkillTreeType.Resonator] = LoadTreeFromAsset("SkillTrees/Resonator");
+            _trees[SkillTreeType.Architect] = LoadTreeFromAsset("SkillTrees/Architect");
+            _trees[SkillTreeType.Guardian] = LoadTreeFromAsset("SkillTrees/Guardian");
+            _trees[SkillTreeType.Historian] = LoadTreeFromAsset("SkillTrees/Historian");
         }
 
-        SkillTree BuildResonatorTree()
+        SkillTree LoadTreeFromAsset(string resourcePath)
         {
-            var tree = new SkillTree { type = SkillTreeType.Resonator };
-            tree.nodes.Add(new SkillNode(SkillId.Res_FreqSense, 1, 50f,
-                "Frequency Sense", "See Aether frequency values on buildings.",
-                SkillModifierType.TuningPrecision, 0.1f));
-            tree.nodes.Add(new SkillNode(SkillId.Res_TuneSpeed, 2, 120f,
-                "Rapid Tuning", "+20% tuning mini-game time limit.",
-                SkillModifierType.TuningSpeed, 0.2f,
-                SkillId.Res_FreqSense));
-            tree.nodes.Add(new SkillNode(SkillId.Res_AetherPool, 2, 150f,
-                "Aether Reservoir", "+25% max Aether capacity.",
-                SkillModifierType.AetherCapacity, 0.25f,
-                SkillId.Res_FreqSense));
-            tree.nodes.Add(new SkillNode(SkillId.Res_Cascade, 3, 250f,
-                "Golden Cascade", "Golden Cascade combo extends to 15 hits.",
-                SkillModifierType.ComboDuration, 0.25f,
-                SkillId.Res_TuneSpeed));
-            tree.nodes.Add(new SkillNode(SkillId.Res_MasterFreq, 4, 500f,
-                "Master Frequency", "Tuning success rate +40%. Unlock harmonic chaining.",
-                SkillModifierType.TuningPrecision, 0.4f,
-                SkillId.Res_Cascade));
+            var asset = Resources.Load<Data.SkillTreeAsset>(resourcePath);
+            if (asset == null)
+            {
+                Debug.LogError($"[SkillTree] Failed to load tree asset: {resourcePath}");
+                return new SkillTree { type = SkillTreeType.Resonator, nodes = new List<SkillNode>() };
+            }
 
-            // Moon 2 Cavern Purge Blessings (Resonator lunar theme) — granted by Moon2ProgressionSystem on key site purge/restore.
-            tree.nodes.Add(new SkillNode(SkillId.M2_CathedralBreath, 3, 0f,
-                "Cathedral's Eternal Breath", "Moon 2 Purge Blessing (cathedral_dome): The Grand Cathedral's living dome now breathes within you. +15% Resonance Score from all cavern restorations and purges. The corruption you burned away empowers your future.",
-                SkillModifierType.LunarRSBonus, 0.15f));
-            tree.nodes.Add(new SkillNode(SkillId.M2_BellCleansing, 3, 0f,
-                "Bell of Cleansing Chime", "Moon 2 Purge Blessing (bell_tower): The Bell Tower's pure tone resonates in your staff. Perfect frequency matches now emit a cleansing chime that weakens nearby corruption nodes (especially powerful in micro-giant). Permanent echo of the purge.",
-                SkillModifierType.PulseDamage, 0.12f));
-            tree.nodes.Add(new SkillNode(SkillId.M2_FountainSpring, 4, 0f,
-                "Aetheric Spring's Grace", "Moon 2 Purge Blessing (fountain): Living water from the fountain flows through your blood. -25% corruption spread rate globally + passive Aether regeneration near restored Moon 2 fountains. You have become a living counter-current to the Mud.",
-                SkillModifierType.CorruptionResistance, 0.25f));
+            var tree = new SkillTree { type = asset.treeType };
+            
+            // Convert ScriptableObject data to runtime SkillNode instances
+            foreach (var nodeData in asset.nodes)
+            {
+                if (nodeData == null) continue;
 
-            // Moon 1 Echohaven Early Hub Progression Blessings (Resonator)
-            // Granted automatically on restoring the Harmonic Fountain — meaningful permanent early-game power.
-            tree.nodes.Add(new SkillNode(SkillId.E_FountainEcho, 1, 0f,
-                "Fountain's Harmonic Echo", "Echohaven Hub Blessing (fountain): The Harmonic Fountain's first restored song echoes forever in your core. +15% tuning precision on every mini-game from the start. Restoring the heart of the hub made frequency mastery second nature.",
-                SkillModifierType.TuningPrecision, 0.15f));
+                // Support multiple prerequisites (use first one for backward compat)
+                var prereq = nodeData.prerequisiteIds.Count > 0 ? nodeData.prerequisiteIds[0] : SkillId.None;
+                
+                tree.nodes.Add(new SkillNode(
+                    nodeData.skillId,
+                    nodeData.tier,
+                    nodeData.rsCost,
+                    nodeData.displayName,
+                    nodeData.description,
+                    nodeData.modifierType,
+                    nodeData.modifierValue,
+                    prereq
+                ));
+            }
 
+            Debug.Log($"[SkillTree] Loaded {tree.nodes.Count} nodes from {resourcePath}");
             return tree;
         }
 
-        SkillTree BuildArchitectTree()
-        {
-            var tree = new SkillTree { type = SkillTreeType.Architect };
-            tree.nodes.Add(new SkillNode(SkillId.Arc_BlueprintScan, 1, 50f,
-                "Blueprint Scanner", "See building blueprints at 50m range.",
-                SkillModifierType.RepairSpeed, 0.1f));
-            tree.nodes.Add(new SkillNode(SkillId.Arc_QuickRepair, 2, 120f,
-                "Rapid Repair", "+30% building repair speed.",
-                SkillModifierType.RepairSpeed, 0.3f,
-                SkillId.Arc_BlueprintScan));
-            tree.nodes.Add(new SkillNode(SkillId.Arc_Fortify, 2, 140f,
-                "Structural Fortify", "Repaired buildings +20% corruption resistance.",
-                SkillModifierType.BuildingResistance, 0.2f,
-                SkillId.Arc_BlueprintScan));
-            tree.nodes.Add(new SkillNode(SkillId.Arc_MassRestore, 3, 300f,
-                "Mass Restoration", "Repair 3 buildings simultaneously.",
-                SkillModifierType.RepairSpeed, 0.5f,
-                SkillId.Arc_QuickRepair));
-            tree.nodes.Add(new SkillNode(SkillId.Arc_GoldenRatio, 4, 500f,
-                "Golden Ratio Mastery", "Buildings auto-align to phi proportions. +50% RS from restored buildings.",
-                SkillModifierType.RSMultiplier, 0.5f,
-                SkillId.Arc_MassRestore));
-            return tree;
-        }
-
-        SkillTree BuildGuardianTree()
-        {
-            var tree = new SkillTree { type = SkillTreeType.Guardian };
-            tree.nodes.Add(new SkillNode(SkillId.Grd_StrongPulse, 1, 50f,
-                "Potent Pulse", "Resonance Pulse damage +15%.",
-                SkillModifierType.PulseDamage, 0.15f));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_ShieldDuration, 2, 110f,
-                "Extended Shield", "Frequency Shield lasts 5s instead of 3s.",
-                SkillModifierType.ShieldDuration, 2f,
-                SkillId.Grd_StrongPulse));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_StrikeRange, 2, 130f,
-                "Harmonic Reach", "Harmonic Strike range +30%.",
-                SkillModifierType.StrikeRange, 0.3f,
-                SkillId.Grd_StrongPulse));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_AOEPurge, 3, 280f,
-                "Purification Wave", "Resonance Pulse also purges corruption in AOE.",
-                SkillModifierType.PulseDamage, 0.25f,
-                SkillId.Grd_ShieldDuration));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_Invulnerable, 4, 500f,
-                "Harmonic Immunity", "3s invulnerability after perfect combo. 30s cooldown.",
-                SkillModifierType.ShieldDuration, 3f,
-                SkillId.Grd_AOEPurge));
-
-            // Round 4 Giant production nodes (synergies, flight, terrain, forms, 180s Titan, harmony)
-            tree.nodes.Add(new SkillNode(SkillId.Grd_TitanFlight, 3, 320f, "Titan Soar", "Unlock Titan flight (physics+input+camera) in giant.", SkillModifierType.StrikeRange, 0.2f, SkillId.Grd_StrikeRange));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_EarthShaper, 3, 340f, "Earth Shaper", "Real terrain deformation via giant.", SkillModifierType.PulseDamage, 0.1f, SkillId.Grd_AOEPurge));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_WorldMover, 4, 480f, "World Mover", "Large scale terrain + object shift.", SkillModifierType.ShieldDuration, 1.5f, SkillId.Grd_EarthShaper));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_AncestralTitan, 4, 410f, "Ancestral Titan", "Historical giant form visuals + buffs.", SkillModifierType.PulseDamage, 0.15f, SkillId.Grd_Invulnerable));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_ColossusForm, 4, 550f, "Living Colossus", "Triple synergy giant cathedral form.", SkillModifierType.PulseDamage, 0.35f, SkillId.Grd_WorldMover));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_AvatarForm, 5, 720f, "Avatar of the First", "Ultimate 180s+ avatar form.", SkillModifierType.ShieldDuration, 4f, SkillId.Grd_ColossusForm));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_GiantResonanceHarmony, 3, 380f, "Cassian/Anastasia Resonance", "Narrative giant harmony synergy.", SkillModifierType.ComboDuration, 2f, SkillId.Grd_TitanFlight));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_TitanStability, 4, 450f, "Titan Endurance", "180s Titan stability + flight efficiency.", SkillModifierType.ShieldDuration, 2f, SkillId.Grd_Invulnerable));
-            tree.nodes.Add(new SkillNode(SkillId.Grd_AbilityCooldownMastery, 3, 290f, "Giant's Reflex", "40% faster giant ability cooldowns.", SkillModifierType.StrikeRange, 0.1f, SkillId.Grd_StrongPulse));
-
-            // Moon 2 Cavern Purge Blessings (Guardian micro-giant + combat theme)
-            tree.nodes.Add(new SkillNode(SkillId.M2_CrystalLens, 3, 0f,
-                "Fractal Crystal Lens", "Moon 2 Purge Blessing (crystal_hall): The Crystal Hall's fractal geometry now lives in your eyes. Corruption nodes, veins and hidden fractal structures glow visibly without needing the Dissonance Lens inside the caverns. Permanent mutation — you see the world's wounds clearly.",
-                SkillModifierType.StrikeRange, 0.15f, SkillId.Grd_AOEPurge));
-
-            tree.nodes.Add(new SkillNode(SkillId.M2_LeyBond, 4, 0f,
-                "Ley Heart Bond", "Moon 2 Purge Blessing (ley_chamber): Your spirit is now bound to the ancient ley grid of the caverns. +20% micro-giant duration while inside Moon 2 + living ley sparks orbit your form as a visible sigil of the purge. You walk the veins of the world.",
-                SkillModifierType.MicroGiantExtend, 0.20f, SkillId.Grd_TitanFlight));
-            tree.nodes.Add(new SkillNode(SkillId.M2_TrueLunarPurifier, 5, 0f,
-                "True Lunar Purifier", "Moon 2 Capstone Blessing: All five key sites of the Crystalline Caverns purged. You have become the living antithesis to corruption. Minor corruption auto-purges on any restore, +50% RS from Moon 2 activities, and every cavern purge triggers a golden cascade visual. The Mud itself recoils from your presence. Permanent ultimate mutation.",
-                SkillModifierType.RSMultiplier, 0.5f, SkillId.M2_LeyBond));
-
-            // Moon 1 Echohaven Early Hub Progression Blessings (Guardian)
-            tree.nodes.Add(new SkillNode(SkillId.E_SpireResonance, 1, 0f,
-                "Spire's Resonance Call", "Echohaven Hub Blessing (spire): The Crystal Spire's restored harmonic call permanently strengthens your strikes. +10% Resonance Pulse damage from the earliest moments. Restoring the spire armed you for everything that follows.",
-                SkillModifierType.PulseDamage, 0.10f, SkillId.Grd_StrongPulse));
-
-            return tree;
-        }
-
-        SkillTree BuildHistorianTree()
-        {
-            var tree = new SkillTree { type = SkillTreeType.Historian };
-            tree.nodes.Add(new SkillNode(SkillId.His_LoreReveal, 1, 40f,
-                "Lore Sight", "Hidden inscriptions glow within 30m.",
-                SkillModifierType.RSMultiplier, 0.1f));
-            tree.nodes.Add(new SkillNode(SkillId.His_SecretPaths, 2, 100f,
-                "Secret Paths", "Reveal hidden passages in buildings.",
-                SkillModifierType.RSMultiplier, 0.15f,
-                SkillId.His_LoreReveal));
-            tree.nodes.Add(new SkillNode(SkillId.His_MemoryEcho, 2, 110f,
-                "Memory Echo", "Hear echoes of building history when nearby.",
-                SkillModifierType.RSMultiplier, 0.1f,
-                SkillId.His_LoreReveal));
-            tree.nodes.Add(new SkillNode(SkillId.His_AncientMap, 3, 250f,
-                "Ancient Cartography", "Full zone map revealed including buried structures.",
-                SkillModifierType.RSMultiplier, 0.2f,
-                SkillId.His_SecretPaths));
-            tree.nodes.Add(new SkillNode(SkillId.His_TrueHistory, 4, 500f,
-                "True History", "All lore auto-collected. +100% RS from discoveries.",
-                SkillModifierType.RSMultiplier, 1.0f,
-                SkillId.His_AncientMap));
-
-            // Moon 1 Echohaven Early Hub Progression Blessings (Historian / Capstone)
-            tree.nodes.Add(new SkillNode(SkillId.E_DomeInsight, 1, 0f,
-                "Dome's Insight", "Echohaven Hub Blessing (dome): StarDome's light permanently sharpens your eyes for secrets and lore. Early discoveries grant more RS. The plaza's awakening made the world more readable from the first visit.",
-                SkillModifierType.RSMultiplier, 0.12f, SkillId.His_LoreReveal));
-
-            tree.nodes.Add(new SkillNode(SkillId.E_HubAwakened, 2, 0f,
-                "Echohaven Fully Awakened", "Echohaven Hub Capstone Blessing: Fountain, Dome and Spire all restored. The starting hub sings in perfect harmony. Permanent +8% global Resonance Score multiplier for your entire journey + early Skill Tree mastery feels earned. Your first restoration changed you and the world forever.",
-                SkillModifierType.RSMultiplier, 0.08f, SkillId.His_LoreReveal));
-
-            return tree;
-        }
+        // ═══ LEGACY HARDCODED TREE BUILDERS REMOVED ═══
+        // Previously 218 lines of BuildResonatorTree() / BuildArchitectTree() / BuildGuardianTree() / BuildHistorianTree()
+        // NOW: Data-driven architecture via SkillTreeAsset ScriptableObjects in Resources/SkillTrees/
+        // Designers can modify trees in Unity Inspector without touching code.
 
         // ─── Helpers ─────────────────────────────────
 
