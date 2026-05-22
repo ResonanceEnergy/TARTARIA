@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -417,7 +418,7 @@ namespace Tartaria.Integration
 
         bool _isBeingTuned;
 
-        public string GetPrompt() => "Hold [E] to Tune Cymatic Garden";
+        public string GetInteractPrompt() => "Hold [E] to Tune Cymatic Garden";
 
         public void Interact(GameObject interactor)
         {
@@ -458,7 +459,7 @@ namespace Tartaria.Integration
     {
         bool _firstInteraction = true;
 
-        public string GetPrompt() => "Approach the Spectral Train";
+        public string GetInteractPrompt() => "Approach the Spectral Train";
 
         public void Interact(GameObject interactor)
         {

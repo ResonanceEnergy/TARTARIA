@@ -337,9 +337,9 @@ namespace Tartaria.Integration
 
         bool _isCollected;
 
-        public string InteractPrompt => _isCollected ? "Stone Collected" : $"Collect {stoneName} Stone (E)";
+        public string GetInteractPrompt() => _isCollected ? "Stone Collected" : $"Collect {stoneName} Stone (E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_isCollected) return;
 

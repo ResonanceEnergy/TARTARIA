@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -526,7 +527,7 @@ namespace Tartaria.Integration
 
         bool _isAligned;
 
-        public string GetPrompt() => _isAligned ? "Bastion Aligned" : "Hold [E] to Align Bastion";
+        public string GetInteractPrompt() => _isAligned ? "Bastion Aligned" : "Hold [E] to Align Bastion";
 
         public void Interact(GameObject interactor)
         {
@@ -578,7 +579,7 @@ namespace Tartaria.Integration
 
         bool _isFlooded;
 
-        public string GetPrompt() => _isFlooded ? "Moat Flooded" : "Hold [E] to Connect Pipe";
+        public string GetInteractPrompt() => _isFlooded ? "Moat Flooded" : "Hold [E] to Connect Pipe";
 
         public void Interact(GameObject interactor)
         {
@@ -618,7 +619,7 @@ namespace Tartaria.Integration
     {
         bool _firstInteraction = true;
 
-        public string GetPrompt() => "Talk to Echo Garrison";
+        public string GetInteractPrompt() => "Talk to Echo Garrison";
 
         public void Interact(GameObject interactor)
         {
@@ -639,7 +640,7 @@ namespace Tartaria.Integration
         public string inscriptionText;
         bool _read;
 
-        public string GetPrompt() => _read ? "Inscription Read" : "Read Inscription";
+        public string GetInteractPrompt() => _read ? "Inscription Read" : "Read Inscription";
 
         public void Interact(GameObject interactor)
         {
@@ -661,7 +662,7 @@ namespace Tartaria.Integration
     {
         bool _viewed;
 
-        public string GetPrompt() => _viewed ? "Memory Viewed" : "View Memory Crystal";
+        public string GetInteractPrompt() => _viewed ? "Memory Viewed" : "View Memory Crystal";
 
         public void Interact(GameObject interactor)
         {

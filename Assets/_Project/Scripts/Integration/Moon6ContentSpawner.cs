@@ -345,9 +345,9 @@ namespace Tartaria.Integration
 
         bool _isRepaired;
 
-        public string InteractPrompt => _isRepaired ? "Pipe Restored" : "Repair Pipe (Hold E)";
+        public string GetInteractPrompt() => _isRepaired ? "Pipe Restored" : "Repair Pipe (Hold E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_isRepaired) return;
 
@@ -391,9 +391,9 @@ namespace Tartaria.Integration
 
         bool _isRestored;
 
-        public string InteractPrompt => _isRestored ? "Fountain Flowing" : "Restore Fountain (Hold E)";
+        public string GetInteractPrompt() => _isRestored ? "Fountain Flowing" : "Restore Fountain (Hold E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_isRestored) return;
 
@@ -453,9 +453,9 @@ namespace Tartaria.Integration
     {
         bool _examined;
 
-        public string InteractPrompt => _examined ? "Records Examined" : "Examine Tuning Records (E)";
+        public string GetInteractPrompt() => _examined ? "Records Examined" : "Examine Tuning Records (E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_examined) return;
 

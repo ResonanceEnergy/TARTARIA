@@ -240,9 +240,9 @@ namespace Tartaria.Integration
 
         bool _examined;
 
-        public string InteractPrompt => _examined ? "Device Examined" : "Examine Trigger Device (E)";
+        public string GetInteractPrompt() => _examined ? "Device Examined" : "Examine Trigger Device (E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_examined) return;
 

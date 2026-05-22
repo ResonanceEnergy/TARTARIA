@@ -371,9 +371,9 @@ namespace Tartaria.Integration
 
         bool _isRepaired;
 
-        public string InteractPrompt => _isRepaired ? "Airship Operational" : "Repair Airship (Hold E)";
+        public string GetInteractPrompt() => _isRepaired ? "Airship Operational" : "Repair Airship (Hold E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_isRepaired) return;
 
@@ -440,9 +440,9 @@ namespace Tartaria.Integration
     {
         bool _introduced;
 
-        public string InteractPrompt => "Talk to Thorne (E)";
+        public string GetInteractPrompt() => "Talk to Thorne (E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (!_introduced)
             {

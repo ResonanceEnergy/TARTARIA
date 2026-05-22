@@ -318,9 +318,9 @@ namespace Tartaria.Integration
 
         bool _isRestored;
 
-        public string InteractPrompt => _isRestored ? "Pavilion Restored" : "Restore Pavilion (Hold E)";
+        public string GetInteractPrompt() => _isRestored ? "Pavilion Restored" : "Restore Pavilion (Hold E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_isRestored) return;
 
@@ -379,9 +379,9 @@ namespace Tartaria.Integration
 
         bool _thorneIntroduced;
 
-        public string InteractPrompt => _thorneIntroduced ? "Radio Signal Active" : "Listen to Radio (E)";
+        public string GetInteractPrompt() => _thorneIntroduced ? "Radio Signal Active" : "Listen to Radio (E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_thorneIntroduced) return;
 
