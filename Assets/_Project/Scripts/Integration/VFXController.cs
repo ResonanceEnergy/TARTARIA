@@ -928,5 +928,236 @@ namespace Tartaria.Integration
             SpawnRing(position, color, radius);
             SpawnPrimitiveBurst(position + Vector3.up * 0.5f, color, radius * 0.4f, 32);
         }
+
+        // ══════════════════════════════════════════════════════════════════════════
+        // MOON 4 — RESONANCE MOON (Water Temple + Golem Puzzle) VFX
+        // ══════════════════════════════════════════════════════════════════════════
+
+        public void SpawnBastionSnapVFX(Vector3 position)
+        {
+            // Resonance lock VFX — sharp golden snap + expanding ring when frequency matches
+            SpawnPrimitiveBurst(position, new Color(1f, 0.92f, 0.45f), 1.8f, 32);
+            SpawnRing(position, new Color(0.95f, 0.85f, 0.4f, 0.7f), 6f);
+        }
+
+        public void SpawnWaterFlowRestoration(Vector3 from, Vector3 to)
+        {
+            // Water channels reactivating — flowing blue-white particles along path
+            int steps = 12;
+            for (int i = 0; i <= steps; i++)
+            {
+                float t = i / (float)steps;
+                Vector3 p = Vector3.Lerp(from, to, t);
+                SpawnPrimitiveBurst(p, new Color(0.4f, 0.85f, 1f, 0.8f), 0.6f, 10);
+            }
+        }
+
+        public void SpawnGolemAwakening(Vector3 position, float intensity)
+        {
+            // Stone giant rumbles to life — earth cracks, harmonic resonance
+            SpawnPrimitiveBurst(position, new Color(0.7f, 0.6f, 0.45f), 2.2f * intensity, 36);
+            SpawnVortex(position + Vector3.up * 1.5f, new Color(0.85f, 0.75f, 0.55f, 0.8f), 1.8f);
+        }
+
+        public void SpawnMemoryCrystalActivation(Vector3 position)
+        {
+            // Memory crystal lights up — warm golden glow + soft shimmer
+            SpawnPrimitiveBurst(position, new Color(1f, 0.95f, 0.7f), 1.2f, 24);
+            var glow = new GameObject("MemoryCrystalGlow");
+            glow.transform.position = position;
+            var light = glow.AddComponent<Light>();
+            light.color = new Color(1f, 0.92f, 0.65f);
+            light.intensity = 3.5f;
+            light.range = 8f;
+            Destroy(glow, 4f);
+        }
+
+        // ══════════════════════════════════════════════════════════════════════════
+        // MOON 6 — RHYTHMIC MOON (Sunken Cathedral Organ Symphony) VFX
+        // ══════════════════════════════════════════════════════════════════════════
+
+        public void SpawnOrganPipeRepairVFX(Vector3 position, int pipeIndex)
+        {
+            // Pipe seals, water drains — blue-silver particles + steam
+            Color pipeColor = Color.Lerp(new Color(0.5f, 0.7f, 0.95f), new Color(0.9f, 0.85f, 0.7f), pipeIndex / 12f);
+            SpawnPrimitiveBurst(position, pipeColor, 1.5f, 28);
+        }
+
+        public void SpawnCymaticRequiemCrescendo(Vector3 center)
+        {
+            // The climactic 12-pipe harmony — golden-blue concentric waves + light pillars
+            for (int i = 0; i < 6; i++)
+            {
+                float radius = 4f + i * 3f;
+                SpawnRing(center, new Color(0.8f - i * 0.1f, 0.85f, 1f - i * 0.08f, 0.6f), radius);
+            }
+            SpawnVortex(center + Vector3.up * 8f, new Color(0.95f, 0.9f, 0.65f, 0.95f), 4.5f);
+        }
+
+        public void SpawnHydraulicBellowsActivation(Vector3 position)
+        {
+            // Mechanical bellows engage — steam burst + pressure release
+            SpawnPrimitiveBurst(position, new Color(0.9f, 0.95f, 1f, 0.7f), 1.4f, 20);
+        }
+
+        // ══════════════════════════════════════════════════════════════════════════
+        // MOON 7 — RESONANT MOON (Korath Awakening + Giant Stasis Vault) VFX
+        // ══════════════════════════════════════════════════════════════════════════
+
+        public void SpawnIceThawVFX(Vector3 position, float radius)
+        {
+            // Stasis ice cracks and melts — white-blue shards + water droplets
+            SpawnPrimitiveBurst(position, new Color(0.7f, 0.85f, 0.95f), radius * 0.8f, 32);
+            for (int i = 0; i < 4; i++)
+            {
+                Vector3 offset = Random.insideUnitSphere * radius;
+                SpawnPrimitiveBurst(position + offset, new Color(0.9f, 0.95f, 1f, 0.6f), 0.6f, 8);
+            }
+        }
+
+        public void SpawnKorathAwakeningVFX(Vector3 position)
+        {
+            // Ancient giant stirs — earth tremors, violet aurora pulses, harmonic resonance
+            SpawnVortex(position + Vector3.up * 5f, new Color(0.7f, 0.55f, 0.95f, 0.9f), 3.8f);
+            SpawnPrimitiveBurst(position, new Color(0.85f, 0.75f, 0.95f), 2.8f, 64);
+            SpawnRing(position, new Color(0.75f, 0.6f, 1f, 0.7f), 18f);
+        }
+
+        public void SpawnGolemSiegeImpactVFX(Vector3 position)
+        {
+            // Massive golem attack — ground shockwave + debris
+            SpawnPrimitiveBurst(position, new Color(0.6f, 0.5f, 0.4f), 2.4f, 42);
+            SpawnRing(position, new Color(0.7f, 0.6f, 0.45f, 0.8f), 12f);
+        }
+
+        public void SpawnNineBandAuroraUnlock(Vector3 position)
+        {
+            // Ultimate tuning achievement — 9-band violet aurora cascade
+            for (int i = 0; i < 9; i++)
+            {
+                float height = i * 1.8f;
+                Color bandColor = Color.Lerp(new Color(0.6f, 0.5f, 0.95f), new Color(0.95f, 0.7f, 1f), i / 8f);
+                SpawnRing(position + Vector3.up * height, bandColor, 8f + i * 2f);
+            }
+            SpawnVortex(position + Vector3.up * 12f, new Color(0.85f, 0.65f, 1f, 0.95f), 5.5f);
+        }
+
+        // ══════════════════════════════════════════════════════════════════════════
+        // MOONS 8-13 — LATE GAME VFX (Boss Encounters + Continental Scale)
+        // ══════════════════════════════════════════════════════════════════════════
+
+        public void SpawnBossPhaseTransitionVFX(Vector3 position, int phase)
+        {
+            // Boss enters new phase — intensity increases, color shifts
+            float intensity = 1f + phase * 0.4f;
+            Color phaseColor = Color.Lerp(new Color(0.95f, 0.5f, 0.45f), new Color(0.6f, 0.2f, 0.85f), phase / 3f);
+            SpawnPrimitiveBurst(position + Vector3.up * 2f, phaseColor, 2.5f * intensity, 48);
+            SpawnRing(position, phaseColor, 14f + phase * 4f);
+        }
+
+        public void SpawnAirshipLaunchVFX(Vector3 position)
+        {
+            // Airship takes flight — propulsion bursts + golden trail
+            SpawnVortex(position, new Color(0.9f, 0.85f, 0.55f, 0.85f), 2.4f);
+            for (int i = 0; i < 3; i++)
+            {
+                Vector3 enginePos = position + new Vector3(-2f + i * 2f, -0.5f, 0f);
+                SpawnPrimitiveBurst(enginePos, new Color(1f, 0.88f, 0.45f), 1.2f, 16);
+            }
+        }
+
+        public void SpawnRailNetworkActivation(Vector3 centerStation)
+        {
+            // Continental rail network lights up — golden lines spreading outward
+            for (int dir = 0; dir < 8; dir++)
+            {
+                float angle = dir * 45f * Mathf.Deg2Rad;
+                Vector3 direction = new Vector3(Mathf.Cos(angle), 0f, Mathf.Sin(angle));
+                for (int seg = 1; seg <= 12; seg++)
+                {
+                    Vector3 pos = centerStation + direction * (seg * 8f);
+                    SpawnPrimitiveBurst(pos, new Color(0.95f, 0.85f, 0.45f, 0.7f - seg * 0.04f), 0.8f, 8);
+                }
+            }
+        }
+
+        public void SpawnAquiferPurificationVFX(Vector3 fountainCenter)
+        {
+            // Corrupt water purifies — dark red fades to crystal blue
+            SpawnVortex(fountainCenter + Vector3.up * 2f, new Color(0.4f, 0.85f, 1f, 0.9f), 3.2f);
+            SpawnRing(fountainCenter, new Color(0.5f, 0.9f, 1f, 0.7f), 16f);
+        }
+
+        public void SpawnSeismicTremorVFX(Vector3 epicenter, float magnitude)
+        {
+            // Ground quake — dust clouds + expanding shockwaves
+            SpawnPrimitiveBurst(epicenter, new Color(0.65f, 0.55f, 0.45f, 0.8f), 2f * magnitude, 32);
+            for (int ring = 0; ring < 3; ring++)
+            {
+                SpawnRing(epicenter, new Color(0.7f, 0.6f, 0.5f, 0.5f - ring * 0.12f), 8f + ring * 6f);
+            }
+        }
+
+        public void SpawnBellTowerHarmonyVFX(Vector3 towerTop)
+        {
+            // Bell tower synchronized — golden resonance waves + light beam
+            SpawnVortex(towerTop + Vector3.up * 4f, new Color(0.98f, 0.9f, 0.55f, 0.9f), 2.8f);
+            SpawnRing(towerTop, new Color(0.95f, 0.88f, 0.5f, 0.7f), 24f);
+            
+            var beam = new GameObject("BellTowerBeam");
+            beam.transform.position = towerTop;
+            var light = beam.AddComponent<Light>();
+            light.type = LightType.Spot;
+            light.color = new Color(1f, 0.92f, 0.55f);
+            light.intensity = 8f;
+            light.range = 50f;
+            light.spotAngle = 25f;
+            beam.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            Destroy(beam, 6f);
+        }
+
+        public void SpawnAetherTremorPulse(Vector3 position)
+        {
+            // Reality trembles — purple-golden distortion waves
+            SpawnVortex(position, new Color(0.75f, 0.6f, 0.95f, 0.85f), 2.5f);
+            SpawnRing(position, new Color(0.95f, 0.85f, 0.55f, 0.6f), 18f);
+        }
+
+        public void SpawnContinentalFountainChain(Vector3 start, Vector3 end)
+        {
+            // Fountain chain activates — cascading blue-white energy
+            int fountains = 8;
+            for (int i = 0; i <= fountains; i++)
+            {
+                float t = i / (float)fountains;
+                Vector3 pos = Vector3.Lerp(start, end, t);
+                SpawnPrimitiveBurst(pos + Vector3.up * 2f, new Color(0.5f, 0.88f, 1f, 0.9f), 1.8f, 28);
+                SpawnVortex(pos + Vector3.up * 3f, new Color(0.6f, 0.9f, 1f, 0.8f), 2.2f);
+            }
+        }
+
+        public void SpawnLeviathanDeathVFX(Vector3 position)
+        {
+            // Massive creature dissolves — dark energy disperses into golden light
+            SpawnVortex(position + Vector3.up * 6f, new Color(0.3f, 0.2f, 0.45f, 0.9f), 5.5f);
+            for (int burst = 0; burst < 4; burst++)
+            {
+                Vector3 offset = Random.insideUnitSphere * 4f;
+                SpawnPrimitiveBurst(position + offset, new Color(0.95f, 0.85f, 0.55f), 2.8f, 32);
+            }
+        }
+
+        public void SpawnGameCompleteVFX(Vector3 centerWorld)
+        {
+            // Final victory celebration — massive golden aurora + cascading light
+            for (int layer = 0; layer < 12; layer++)
+            {
+                float height = layer * 3f;
+                float radius = 20f + layer * 5f;
+                Color layerColor = Color.Lerp(new Color(1f, 0.92f, 0.55f), new Color(0.85f, 0.95f, 1f), layer / 11f);
+                SpawnRing(centerWorld + Vector3.up * height, layerColor, radius);
+            }
+            SpawnVortex(centerWorld + Vector3.up * 40f, new Color(0.98f, 0.9f, 0.6f, 0.95f), 8f);
+        }
     }
 }

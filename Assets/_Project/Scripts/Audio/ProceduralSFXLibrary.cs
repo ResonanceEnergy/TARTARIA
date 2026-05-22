@@ -157,6 +157,18 @@ namespace Tartaria.Audio
             Register("Moon3_WraithShriek", GenMoon3WraithShriek());
             Register("Moon3_TrainRestored", GenMoon3TrainRestored());
 
+            // ═══ Moon 4 (Resonance Moon — Water Temple + Golem Puzzle) — EXCLUSIVE ═══
+            // Water flow restoration, bastion tuning snaps, golem awakening bass, bell tower harmony waves,
+            // memory crystal chimes. All 432Hz + water overtones + earth rumbles.
+            // TODO: Implement Moon 4 SFX generators
+            /*
+            Register("Moon4_BastionSnap", GenMoon4BastionSnap());
+            Register("Moon4_WaterFlow", GenMoon4WaterFlowRestoration());
+            Register("Moon4_GolemRoar", GenMoon4GolemRoar());
+            Register("Moon4_BellTowerWaves", GenMoon4BellTowerHarmony());
+            Register("Moon4_MemoryCrystal", GenMoon4MemoryCrystal());
+            */
+
             // ═══ Moon 5 (Overtone Moon — White City Echo District Amplification) — EXCLUSIVE ═══
             // 432Hz + PHI harmonic overtones for tuning stingers, 6-band healing auras (528 family),
             // aurora fountain whooshes, bridge ignition motif (rising golden chord), Thorne radio crackle/static.
@@ -200,6 +212,24 @@ namespace Tartaria.Audio
             Register("Moon7_StasisAmbience", GenMoon7StasisVaultAmbience());
             Register("Moon7_9BandUnlock", GenMoon79BandUnlock());
             Register("Moon7_VioletPulse", GenMoon7VioletPulse());
+
+            // ═══ Moons 8-13 (Late Game — Continental Scale + Boss Encounters) — EXCLUSIVE ═══
+            // Airship propulsion, rail network hum, aquifer purification, seismic tremors,
+            // bell tower harmonies, aether tremors, fountain chains, leviathan death, final victory fanfare.
+            // TODO: Implement Moons 8-13 SFX generators
+            /*
+            Register("Moon8_AirshipLaunch", GenMoon8AirshipLaunch());
+            Register("Moon9_RailHum", GenMoon9RailNetworkHum());
+            Register("Moon10_LeviathanRoar", GenMoon10LeviathanRoar());
+            Register("Moon10_LeviathanDeath", GenMoon10LeviathanDeath());
+            Register("Moon11_AquiferPurification", GenMoon11AquiferPurification());
+            Register("Moon11_FountainChainActivation", GenMoon11FountainChainActivation());
+            Register("Moon12_BellTowerSync", GenMoon12BellTowerSync());
+            Register("Moon12_TowerHarmony", GenMoon12TowerHarmonyRing());
+            Register("Moon13_AetherTremor", GenMoon13AetherTremor());
+            Register("Moon13_SeismicTremor", GenMoon13SeismicTremor());
+            */
+            Register("BossPhaseTransition", GenBossPhaseTransition());
 
             // ═══ Global — Moon Clear + End Game fanfares ═══
             Register("moon_clear",                  GenMoonClearFanfare());
@@ -2341,6 +2371,279 @@ namespace Tartaria.Audio
                 data[i] = pulse * env * 0.58f;
             }
             return MakeClip("SFX_Moon7_VioletPulse", data);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // MOON 4 GENERATORS — Resonance Moon (Water Temple + Golem Puzzle)
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        static AudioClip GenMoon4BastionSnap()
+        {
+            // Sharp resonance lock — tuning snap when frequency matches
+            int len = Samples(0.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Exp(-6f * t);
+                data[i] = env * 0.5f * (Sine(i, F_HARMONIC) + 0.4f * Sine(i, F_HEALING));
+            }
+            return MakeClip("SFX_Moon4_BastionSnap", data);
+        }
+
+        static AudioClip GenMoon4WaterFlowRestoration()
+        {
+            // Water channels reactivate — flowing bubbles + harmonic shimmer
+            int len = Samples(2.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float bubbles = FilteredNoise(i, 800f + t * 400f) * 0.3f;
+                float flow = Sine(i, 220f + t * 80f) * 0.2f;
+                float env = Mathf.Clamp01(t * 2f) * (1f - Mathf.Pow(Mathf.Max(0f, t - 0.7f) / 0.3f, 2));
+                data[i] = (bubbles + flow) * env * 0.45f;
+            }
+            return MakeClip("SFX_Moon4_WaterFlow", data);
+        }
+
+        static AudioClip GenMoon4GolemRoar()
+        {
+            // Stone giant awakens — deep bass rumble + earth cracking
+            int len = Samples(2.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float bass = Sine(i, 40f + t * 30f) * 0.6f;
+                float rumble = FilteredNoise(i, 120f) * 0.4f;
+                float env = Mathf.Sin(t * Mathf.PI) * 0.9f;
+                data[i] = (bass + rumble) * env;
+            }
+            return MakeClip("SFX_Moon4_GolemRoar", data);
+        }
+
+        static AudioClip GenMoon4BellTowerHarmony()
+        {
+            // Bell tower rings in harmony — golden waves spreading
+            int len = Samples(3.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float bell = Sine(i, F_HARMONIC) * 0.4f + Sine(i, F_HARMONIC * PHI) * 0.25f;
+                float waves = Sine(i, F_HEALING) * 0.2f;
+                float env = Mathf.Exp(-1.2f * t);
+                data[i] = (bell + waves) * env * 0.5f;
+            }
+            return MakeClip("SFX_Moon4_BellTowerWaves", data);
+        }
+
+        static AudioClip GenMoon4MemoryCrystal()
+        {
+            // Memory crystal activates — warm chime + shimmer
+            int len = Samples(1.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float chime = Sine(i, F_HEALING) * 0.35f + Sine(i, F_HEALING * PHI) * 0.2f;
+                float shimmer = Sine(i, F_CELESTIAL * 0.5f) * 0.15f;
+                float env = Mathf.Exp(-2f * t);
+                data[i] = (chime + shimmer) * env * 0.45f;
+            }
+            return MakeClip("SFX_Moon4_MemoryCrystal", data);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════════
+        // MOONS 8-13 GENERATORS — Late Game (Continental Scale + Boss Encounters)
+        // ═══════════════════════════════════════════════════════════════════════════
+
+        static AudioClip GenMoon8AirshipLaunch()
+        {
+            // Airship propulsion — rising whoosh + harmonic thrust
+            int len = Samples(3.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float freq = Mathf.Lerp(80f, F_HARMONIC, t);
+                float whoosh = FilteredNoise(i, 600f + t * 800f) * 0.5f;
+                float thrust = Sine(i, freq) * 0.35f;
+                float env = Mathf.Clamp01(t * 1.5f);
+                data[i] = (whoosh + thrust) * env * 0.6f;
+            }
+            return MakeClip("SFX_Moon8_AirshipLaunch", data);
+        }
+
+        static AudioClip GenMoon9RailNetworkHum()
+        {
+            // Continental rail network ambient — deep harmonic hum
+            int len = Samples(5.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float hum = Sine(i, F_HARMONIC * 0.5f) * 0.3f;
+                float overtone = Sine(i, F_HARMONIC) * 0.15f;
+                float modulation = 1f + 0.2f * Mathf.Sin(t * Mathf.PI * 4f);
+                data[i] = (hum + overtone) * modulation * 0.4f;
+            }
+            return MakeClip("SFX_Moon9_RailHum", data);
+        }
+
+        static AudioClip GenMoon10LeviathanRoar()
+        {
+            // Massive creature roar — layered bass + screech
+            int len = Samples(4.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float bass = Sine(i, 30f + t * 50f) * 0.7f;
+                float mid = Sine(i, 200f + t * 300f) * 0.4f;
+                float high = FilteredNoise(i, 2000f + t * 1000f) * 0.3f;
+                float env = Mathf.Sin(t * Mathf.PI) * 0.95f;
+                data[i] = (bass + mid + high) * env;
+            }
+            return MakeClip("SFX_Moon10_LeviathanRoar", data);
+        }
+
+        static AudioClip GenMoon10LeviathanDeath()
+        {
+            // Creature dissolves — falling pitch + dissipating energy
+            int len = Samples(5.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float freq = Mathf.Lerp(400f, 60f, t);
+                float dissolve = Sine(i, freq) * 0.6f;
+                float energy = FilteredNoise(i, Mathf.Lerp(1200f, 200f, t)) * 0.4f;
+                float env = (1f - t) * (1f - t);
+                data[i] = (dissolve + energy) * env * 0.7f;
+            }
+            return MakeClip("SFX_Moon10_LeviathanDeath", data);
+        }
+
+        static AudioClip GenMoon11AquiferPurification()
+        {
+            // Corrupt water purifies — dark red to crystal blue sonic shift
+            int len = Samples(4.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float darkFreq = 180f * TRITONE; // dissonant start
+                float pureFreq = F_HEALING; // healing end
+                float freq = Mathf.Lerp(darkFreq, pureFreq, t);
+                float purify = Sine(i, freq) * 0.45f;
+                float bubble = FilteredNoise(i, 600f + t * 400f) * 0.25f;
+                float env = Mathf.Sin(t * Mathf.PI);
+                data[i] = (purify + bubble) * env * 0.5f;
+            }
+            return MakeClip("SFX_Moon11_AquiferPurification", data);
+        }
+
+        static AudioClip GenMoon11FountainChainActivation()
+        {
+            // Fountain chain lights up — cascading chimes
+            int len = Samples(3.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float chime1 = Sine(i, F_HARMONIC) * 0.3f;
+                float chime2 = Sine(i, F_HEALING) * 0.25f;
+                float cascade = Sine(i, F_CELESTIAL * 0.5f) * 0.2f * Mathf.Clamp01(t * 3f);
+                float env = 1f - Mathf.Pow(t, 1.5f);
+                data[i] = (chime1 + chime2 + cascade) * env * 0.45f;
+            }
+            return MakeClip("SFX_Moon11_FountainChainActivation", data);
+        }
+
+        static AudioClip GenMoon12BellTowerSync()
+        {
+            // Bell towers synchronize — harmonic convergence
+            int len = Samples(2.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float bell1 = Sine(i, F_HARMONIC) * 0.35f;
+                float bell2 = Sine(i, F_HARMONIC * PHI) * 0.3f;
+                float sync = Sine(i, F_HEALING) * 0.25f * Mathf.Clamp01((t - 0.4f) * 3f);
+                float env = Mathf.Exp(-1f * t);
+                data[i] = (bell1 + bell2 + sync) * env * 0.5f;
+            }
+            return MakeClip("SFX_Moon12_BellTowerSync", data);
+        }
+
+        static AudioClip GenMoon12TowerHarmonyRing()
+        {
+            // Bell tower full harmony — sustained golden ring
+            int len = Samples(6.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float fundamental = Sine(i, F_HARMONIC) * 0.4f;
+                float overtone1 = Sine(i, F_HARMONIC * 2f) * 0.2f;
+                float overtone2 = Sine(i, F_HARMONIC * PHI) * 0.25f;
+                float env = Mathf.Exp(-0.8f * t);
+                data[i] = (fundamental + overtone1 + overtone2) * env * 0.45f;
+            }
+            return MakeClip("SFX_Moon12_TowerHarmony", data);
+        }
+
+        static AudioClip GenMoon13AetherTremor()
+        {
+            // Reality trembles — unstable dimensional shift
+            int len = Samples(3.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float freq = F_HARMONIC + Mathf.Sin(t * Mathf.PI * 8f) * 120f; // warbling
+                float tremor = Sine(i, freq) * 0.45f;
+                float distortion = FilteredNoise(i, 400f + t * 600f) * 0.3f;
+                float env = Mathf.Sin(t * Mathf.PI);
+                data[i] = (tremor + distortion) * env * 0.55f;
+            }
+            return MakeClip("SFX_Moon13_AetherTremor", data);
+        }
+
+        static AudioClip GenMoon13SeismicTremor()
+        {
+            // Ground quake — deep bass rumble + shockwave
+            int len = Samples(4.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float bass = Sine(i, 25f + t * 35f) * 0.7f;
+                float rumble = FilteredNoise(i, 80f + t * 120f) * 0.5f;
+                float shock = Sine(i, F_TELLURIC) * 0.3f; // Schumann resonance
+                float env = Mathf.Sin(t * Mathf.PI) * 0.9f;
+                data[i] = (bass + rumble + shock) * env;
+            }
+            return MakeClip("SFX_Moon13_SeismicTremor", data);
+        }
+
+        static AudioClip GenBossPhaseTransition()
+        {
+            // Boss enters new phase — ominous surge
+            int len = Samples(2.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float surge = Sine(i, Mathf.Lerp(60f, 240f, t)) * 0.6f;
+                float impact = FilteredNoise(i, 600f) * 0.4f * Mathf.Exp(-3f * t);
+                float env = Mathf.Sin(t * Mathf.PI);
+                data[i] = (surge + impact) * env * 0.65f;
+            }
+            return MakeClip("SFX_BossPhaseTransition", data);
         }
     }
 }

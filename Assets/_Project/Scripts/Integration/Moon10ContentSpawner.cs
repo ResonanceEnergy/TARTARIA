@@ -146,6 +146,7 @@ namespace Tartaria.Integration
 
             // Quest activation
             QuestManager.Instance?.ActivateQuest("moon10_rail_network_discovery");
+            QuestManager.Instance?.ActivateQuest("moon10_restore_12_segments");
 
             // Dialogue: children NPCs (from Moon 3) now junior engineers
             HUDController.Instance?.ShowObjective("The rails sing again. Connect the continent.");
@@ -647,6 +648,15 @@ namespace Tartaria.Integration
             // Quest complete
             QuestManager.Instance?.CompleteQuest("moon10_rail_network_complete");
 
+            // RS Reward for Moon completion
+            GameLoopController.Instance?.QueueRSReward(700f, "Moon 10 Complete: Continental Railway");
+
+            // HUD: Moon trophy
+            HUDController.Instance?.ShowMoonTrophy("MOON 10 COMPLETE", "The Manifestation of Producing");
+
+            // Audio: completion fanfare
+            AudioManager.Instance?.PlaySFX2D("MoonCompleteFanfare");
+
             // Unlock Moon 11
             SaveManager.Instance?.SetMoonProgress(10, 100f);
 
@@ -833,14 +843,19 @@ namespace Tartaria.Integration
         public List<Vector3> railPath;
 
         float _health = 5000f;
+        float _maxHealth = 5000f;
         float _attackCooldown;
         int _currentPathIndex;
         float _moveSpeed = 8f;
         bool _isDefeated;
+        int _currentPhase = 1;
 
         void Start()
         {
             Debug.Log("[RailLeviathan] Boss engaged! HP: 5000");
+
+            // Show boss health bar
+            UI.HUDController.Instance?.ShowBossHealth("Rail Leviathan", 1f);
         }
 
         void Update()
@@ -868,6 +883,16 @@ namespace Tartaria.Integration
                 }
             }
 
+            // Phase transitions
+            if (_health < 3000f && _currentPhase == 1)
+            {
+                EnterPhase2();
+            }
+            else if (_health < 1500f && _currentPhase == 2)
+            {
+                EnterPhase3();
+            }
+
             // Attack pattern
             _attackCooldown -= Time.deltaTime;
             if (_attackCooldown <= 0f)
@@ -882,6 +907,37 @@ namespace Tartaria.Integration
             {
                 light.intensity = 4f + Mathf.Sin(Time.time * 2f) * 1.5f;
             }
+        }
+
+        void EnterPhase2()
+        {
+            _currentPhase = 2;
+            Debug.Log("[RailLeviathan] PHASE 2: Leviathan speeds up — rails crack beneath!");
+
+            // Increase movement speed
+            _moveSpeed = 12f;
+
+            // VFX: rail sparks
+            // Audio phase transition
+            Audio.AudioManager.Instance?.PlaySFX3D("BossPhase2", transform.position);
+
+            // More frequent attacks
+            _attackCooldown = 3f;
+        }
+
+        void EnterPhase3()
+        {
+            _currentPhase = 3;
+            Debug.Log("[RailLeviathan] PHASE 3: ENRAGE — Network destabilization!");
+
+            // Maximum speed
+            _moveSpeed = 16f;
+
+            // Audio phase transition
+            Audio.AudioManager.Instance?.PlaySFX3D("BossPhase3", transform.position);
+
+            // Rapid attacks
+            _attackCooldown = 2f;
         }
 
         void SeismicTremor()
@@ -939,6 +995,9 @@ namespace Tartaria.Integration
             _health -= damage;
             Debug.Log($"[RailLeviathan] Took {damage} damage, {_health} HP remaining");
 
+            // Update HUD boss health
+            UI.HUDController.Instance?.UpdateBossHealth(_health / _maxHealth);
+
             if (_health <= 0f)
             {
                 DefeatBoss();
@@ -951,6 +1010,9 @@ namespace Tartaria.Integration
             _isDefeated = true;
 
             Debug.Log("[RailLeviathan] DEFEATED! Network guardian falls!");
+
+            // Hide boss health bar
+            UI.HUDController.Instance?.HideBossHealth();
 
             // Death VFX
             GameObject vfxObj = new GameObject("LeviathanDefeat_VFX");
@@ -971,6 +1033,9 @@ namespace Tartaria.Integration
 
             // Audio
             Audio.AudioManager.Instance?.PlaySFX3D("LeviathanDeath", transform.position);
+
+            // RS Reward for boss kill
+            GameLoopController.Instance?.QueueRSReward(300f, "Rail Leviathan Defeated");
 
             // Notify spawner
             spawner?.OnLeviathanDefeated();
