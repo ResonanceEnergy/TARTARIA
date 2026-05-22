@@ -158,12 +158,34 @@ namespace Tartaria.Integration
             var station = new GameObject("CentralStation_Moon10");
             station.transform.position = centralStationPoint;
 
-            // Station building visual (placeholder cube scaled large)
-            var building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            building.name = "StationBuilding";
-            building.transform.SetParent(station.transform);
-            building.transform.localScale = new Vector3(30f, 10f, 30f);
-            building.transform.localPosition = Vector3.zero;
+            // Multi-part station building (no single primitives)
+            // Main hall
+            var mainHall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            mainHall.name = "MainHall";
+            mainHall.transform.SetParent(station.transform);
+            mainHall.transform.localScale = new Vector3(25f, 8f, 25f);
+            mainHall.transform.localPosition = Vector3.up * 4f;
+
+            // East wing
+            var eastWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            eastWing.name = "EastWing";
+            eastWing.transform.SetParent(station.transform);
+            eastWing.transform.localScale = new Vector3(10f, 6f, 15f);
+            eastWing.transform.localPosition = new Vector3(17f, 3f, 0f);
+
+            // West wing
+            var westWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            westWing.name = "WestWing";
+            westWing.transform.SetParent(station.transform);
+            westWing.transform.localScale = new Vector3(10f, 6f, 15f);
+            westWing.transform.localPosition = new Vector3(-17f, 3f, 0f);
+
+            // Clock tower
+            var clockTower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            clockTower.name = "ClockTower";
+            clockTower.transform.SetParent(station.transform);
+            clockTower.transform.localScale = new Vector3(4f, 12f, 4f);
+            clockTower.transform.localPosition = new Vector3(0f, 16f, -10f);
 
             // Interactable: station console
             var console = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -193,18 +215,33 @@ namespace Tartaria.Integration
                 var station = new GameObject($"MegaStation_{i + 1}");
                 station.transform.position = stationPoints[i];
 
-                // Station building
+                // Multi-part station building
+                // Main building body
                 var building = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 building.name = "StationBuilding";
                 building.transform.SetParent(station.transform);
-                building.transform.localScale = new Vector3(20f, 8f, 20f);
-                building.transform.localPosition = Vector3.zero;
+                building.transform.localScale = new Vector3(18f, 6f, 18f);
+                building.transform.localPosition = Vector3.up * 3f;
 
-                // Platform
+                // Roof
+                var roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                roof.name = "Roof";
+                roof.transform.SetParent(station.transform);
+                roof.transform.localScale = new Vector3(20f, 1f, 20f);
+                roof.transform.localPosition = Vector3.up * 6.5f;
+
+                // Platform base
+                var platformBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                platformBase.name = "PlatformBase";
+                platformBase.transform.SetParent(station.transform);
+                platformBase.transform.localPosition = new Vector3(0f, -1.5f, 0f);
+                platformBase.transform.localScale = new Vector3(16f, 2f, 42f);
+
+                // Platform surface
                 var platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 platform.name = "Platform";
                 platform.transform.SetParent(station.transform);
-                platform.transform.localPosition = new Vector3(0f, -2f, 0f);
+                platform.transform.localPosition = new Vector3(0f, -0.3f, 0f);
                 platform.transform.localScale = new Vector3(15f, 0.5f, 40f);
 
                 _stations.Add(station);
@@ -219,19 +256,38 @@ namespace Tartaria.Integration
             _triggerRoom = new GameObject("TriggerRoom_MudFlood");
             _triggerRoom.transform.position = centralStationPoint + Vector3.down * 15f;
 
-            // Room chamber
-            var chamber = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            chamber.name = "Chamber";
-            chamber.transform.SetParent(_triggerRoom.transform);
-            chamber.transform.localScale = new Vector3(10f, 6f, 10f);
-            chamber.transform.localPosition = Vector3.zero;
+            // Multi-part chamber structure
+            // Outer chamber walls
+            var chamberOuter = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            chamberOuter.name = "ChamberOuter";
+            chamberOuter.transform.SetParent(_triggerRoom.transform);
+            chamberOuter.transform.localScale = new Vector3(12f, 7f, 12f);
+            chamberOuter.transform.localPosition = Vector3.zero;
 
-            // Trigger device (massive dissonance amplifier)
-            var device = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            device.name = "DissonanceAmplifier";
-            device.transform.SetParent(_triggerRoom.transform);
-            device.transform.localPosition = Vector3.zero;
-            device.transform.localScale = Vector3.one * 3f;
+            // Inner sanctum
+            var chamberInner = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            chamberInner.name = "ChamberInner";
+            chamberInner.transform.SetParent(_triggerRoom.transform);
+            chamberInner.transform.localScale = new Vector3(8f, 5f, 8f);
+            chamberInner.transform.localPosition = Vector3.zero;
+
+            // Device core (sphere)
+            var deviceCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            deviceCore.name = "DeviceCore";
+            deviceCore.transform.SetParent(_triggerRoom.transform);
+            deviceCore.transform.localPosition = Vector3.zero;
+            deviceCore.transform.localScale = Vector3.one * 2f;
+
+            // Device ring array (3 rings)
+            for (int i = 0; i < 3; i++)
+            {
+                var ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                ring.name = $"AmplifierRing_{i}";
+                ring.transform.SetParent(_triggerRoom.transform);
+                ring.transform.localPosition = Vector3.zero;
+                ring.transform.localScale = new Vector3(3f + i * 0.5f, 0.1f, 3f + i * 0.5f);
+                ring.transform.rotation = Quaternion.Euler(0f, i * 60f, 0f);
+            }
 
             // Control panel interactable
             var panel = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -430,18 +486,26 @@ namespace Tartaria.Integration
             platform.transform.localPosition = Vector3.zero;
             platform.transform.localScale = new Vector3(10f, 0.5f, 10f);
 
-            // 3 orphan children NPCs (from Moon 3)
+            // 3 orphan children NPCs (from Moon 3) — KayKit Rogue scaled down
             for (int i = 0; i < 3; i++)
             {
-                GameObject childObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                childObj.name = $"OrphanEngineer_{i}";
-                childObj.transform.SetParent(_orphanTrainPuzzle.transform);
-                childObj.transform.localPosition = new Vector3(i * 2f - 2f, 1.5f, 2f);
-                childObj.transform.localScale = new Vector3(0.4f, 0.8f, 0.4f);
-
-                // Child material
-                Renderer rend = childObj.GetComponent<Renderer>();
-                rend.material.color = new Color(0.85f, 0.7f, 0.6f);
+                GameObject childPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Rogue");
+                GameObject childObj;
+                if (childPrefab != null)
+                {
+                    childObj = Instantiate(childPrefab, Vector3.zero, Quaternion.identity);
+                    childObj.name = $"OrphanEngineer_{i}";
+                    childObj.transform.SetParent(_orphanTrainPuzzle.transform);
+                    childObj.transform.localPosition = new Vector3(i * 2f - 2f, 0f, 2f);
+                    childObj.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f); // Child scale
+                }
+                else
+                {
+                    Debug.LogError("[Moon10ContentSpawner] CRITICAL: Char_Rogue prefab missing for orphan children");
+                    childObj = new GameObject($"OrphanEngineer_{i}_MISSING_PREFAB");
+                    childObj.transform.SetParent(_orphanTrainPuzzle.transform);
+                    childObj.transform.localPosition = new Vector3(i * 2f - 2f, 1.5f, 2f);
+                }
 
                 OrphanEngineerNPC engineer = childObj.AddComponent<OrphanEngineerNPC>();
                 engineer.engineerIndex = i;
@@ -945,17 +1009,36 @@ namespace Tartaria.Integration
         {
             Debug.Log("[RailLeviathan] Seismic tremor! Ground shakes!");
 
-            // Spawn shockwave VFX
-            GameObject shockwave = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            shockwave.name = "SeismicShockwave";
-            shockwave.transform.position = transform.position;
-            shockwave.transform.localScale = new Vector3(20f, 0.2f, 20f);
-
-            Renderer rend = shockwave.GetComponent<Renderer>();
-            rend.material.color = new Color(0.8f, 0.4f, 0.2f, 0.6f);
+            // Spawn shockwave VFX (ParticleSystem replacement)
+            GameObject shockwaveVFX = new GameObject("SeismicShockwave_VFX");
+            shockwaveVFX.transform.position = transform.position;
+            
+            ParticleSystem psShock = shockwaveVFX.AddComponent<ParticleSystem>();
+            var mainShock = psShock.main;
+            mainShock.startLifetime = 2.5f;
+            mainShock.startSpeed = 10f;
+            mainShock.startSize = 1.0f;
+            mainShock.startColor = new Color(0.8f, 0.4f, 0.2f, 0.7f);
+            mainShock.maxParticles = 150;
+            mainShock.loop = false;
+            mainShock.duration = 2.0f;
+            
+            var emissionShock = psShock.emission;
+            emissionShock.rateOverTime = 0;
+            emissionShock.SetBursts(new ParticleSystem.Burst[] { new ParticleSystem.Burst(0f, 100) });
+            
+            var shapeShock = psShock.shape;
+            shapeShock.shapeType = ParticleSystemShapeType.Circle;
+            shapeShock.radius = 1f;
+            
+            var rendererShock = shockwaveVFX.GetComponent<ParticleSystemRenderer>();
+            rendererShock.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            rendererShock.material.SetColor("_BaseColor", new Color(0.8f, 0.4f, 0.2f));
+            
+            psShock.Play();
 
             // Expand shockwave
-            StartCoroutine(ExpandShockwave(shockwave));
+            StartCoroutine(ExpandShockwave(shockwaveVFX));
 
             // Audio
             Audio.AudioManager.Instance?.PlaySFX3D("SeismicTremor", transform.position);

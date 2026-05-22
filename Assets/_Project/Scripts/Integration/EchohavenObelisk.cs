@@ -39,30 +39,93 @@ namespace Tartaria.Integration
             var go = new GameObject("EchohavenObelisk");
             go.transform.position = pos;
 
-            // Tall obsidian shaft with glowing top
-            var shaft = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            shaft.name = "Shaft";
-            shaft.transform.SetParent(go.transform, false);
-            shaft.transform.localPosition = new Vector3(0f, 2.5f, 0f);
-            shaft.transform.localScale = new Vector3(0.7f, 5f, 0.7f);
+            // Multi-part obelisk structure (no single primitives)
             var smat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             smat.color = new Color(0.08f, 0.08f, 0.12f);
-            shaft.GetComponent<MeshRenderer>().sharedMaterial = smat;
 
-            var crown = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            crown.name = "Crown";
-            crown.transform.SetParent(go.transform, false);
-            crown.transform.localPosition = new Vector3(0f, 5.4f, 0f);
-            crown.transform.localScale = Vector3.one * 0.9f;
-            Object.Destroy(crown.GetComponent<SphereCollider>());
-            var cmat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            var gold = new Color(1f, 0.85f, 0.4f);
-            cmat.color = gold;
-            cmat.EnableKeyword("_EMISSION");
-            cmat.SetColor("_EmissionColor", gold * 3f);
-            crown.GetComponent<MeshRenderer>().sharedMaterial = cmat;
+            // Base pedestal
+            var baseObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            baseObj.name = "Base";
+            baseObj.transform.SetParent(go.transform, false);
+            baseObj.transform.localPosition = new Vector3(0f, 0.3f, 0f);
+            baseObj.transform.localScale = new Vector3(1.2f, 0.6f, 1.2f);
+            baseObj.GetComponent<MeshRenderer>().sharedMaterial = smat;
 
-            var light = crown.AddComponent<Light>();
+            // Lower shaft segment
+            var shaftLower = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shaftLower.name = "ShaftLower";
+            shaftLower.transform.SetParent(go.transform, false);
+            shaftLower.transform.localPosition = new Vector3(0f, 1.5f, 0f);
+            shaftLower.transform.localScale = new Vector3(0.8f, 2f, 0.8f);
+            shaftLower.GetComponent<MeshRenderer>().sharedMaterial = smat;
+
+            // Upper shaft segment
+            var shaftUpper = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shaftUpper.name = "ShaftUpper";
+            shaftUpper.transform.SetParent(go.transform, false);
+            shaftUpper.transform.localPosition = new Vector3(0f, 3.5f, 0f);
+            shaftUpper.transform.localScale = new Vector3(0.7f, 3f, 0.7f);
+            shaftUpper.GetComponent<MeshRenderer>().sharedMaterial = smat;
+
+            // Crown ring (torus-like) - VFX replacement
+            GameObject crownRingVFX = new GameObject("CrownRing_VFX");
+            crownRingVFX.transform.SetParent(go.transform, false);
+            crownRingVFX.transform.localPosition = new Vector3(0f, 5.2f, 0f);
+            
+            ParticleSystem psRing = crownRingVFX.AddComponent<ParticleSystem>();
+            var mainRing = psRing.main;
+            mainRing.startLifetime = 2.5f;
+            mainRing.startSpeed = 0.2f;
+            mainRing.startSize = 0.3f;
+            mainRing.startColor = new Color(1f, 0.85f, 0.4f, 0.9f);
+            mainRing.maxParticles = 100;
+            mainRing.loop = true;
+            
+            var emissionRing = psRing.emission;
+            emissionRing.rateOverTime = 40f;
+            
+            var shapeRing = psRing.shape;
+            shapeRing.shapeType = ParticleSystemShapeType.Circle;
+            shapeRing.radius = 1.1f;
+            
+            var rendererRing = crownRingVFX.GetComponent<ParticleSystemRenderer>();
+            rendererRing.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            rendererRing.material.SetColor("_BaseColor", new Color(1f, 0.85f, 0.4f));
+            rendererRing.material.EnableKeyword("_EMISSION");
+            rendererRing.material.SetColor("_EmissionColor", new Color(1f, 0.85f, 0.4f) * 2f);
+            
+            psRing.Play();
+
+            // Crown orb (glowing) - VFX replacement
+            GameObject crownOrbVFX = new GameObject("CrownOrb_VFX");
+            crownOrbVFX.transform.SetParent(go.transform, false);
+            crownOrbVFX.transform.localPosition = new Vector3(0f, 5.5f, 0f);
+            
+            ParticleSystem psOrb = crownOrbVFX.AddComponent<ParticleSystem>();
+            var mainOrb = psOrb.main;
+            mainOrb.startLifetime = 2.0f;
+            mainOrb.startSpeed = 0.3f;
+            mainOrb.startSize = 0.6f;
+            mainOrb.startColor = new Color(1f, 0.85f, 0.4f, 1f);
+            mainOrb.maxParticles = 80;
+            mainOrb.loop = true;
+            
+            var emissionOrb = psOrb.emission;
+            emissionOrb.rateOverTime = 30f;
+            
+            var shapeOrb = psOrb.shape;
+            shapeOrb.shapeType = ParticleSystemShapeType.Sphere;
+            shapeOrb.radius = 0.3f;
+            
+            var rendererOrb = crownOrbVFX.GetComponent<ParticleSystemRenderer>();
+            rendererOrb.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            rendererOrb.material.SetColor("_BaseColor", new Color(1f, 0.85f, 0.4f));
+            rendererOrb.material.EnableKeyword("_EMISSION");
+            rendererOrb.material.SetColor("_EmissionColor", new Color(1f, 0.85f, 0.4f) * 3f);
+            
+            psOrb.Play();
+
+            var light = crownOrb.AddComponent<Light>();
             light.type = LightType.Point;
             light.color = gold;
             light.intensity = 4f;

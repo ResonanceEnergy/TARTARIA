@@ -854,8 +854,11 @@ namespace Tartaria.Integration
             if (interactLayer >= 0)
             {
                 cassianGO.layer = interactLayer;
-                body.layer = interactLayer;
-                hood.layer = interactLayer;
+                // Set layer recursively for all child renderers
+                foreach (var renderer in cassianGO.GetComponentsInChildren<Renderer>())
+                {
+                    renderer.gameObject.layer = interactLayer;
+                }
             }
 
             // Subtle aura light
@@ -1876,23 +1879,34 @@ namespace Tartaria.Integration
             l.range = 12f;
             l.shadows = LightShadows.None;
 
-            // Ground ring to indicate interaction area
-            var ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            ring.name = "GroundRing";
-            ring.transform.SetParent(marker.transform);
-            ring.transform.localPosition = new Vector3(0f, 0.02f, 0f);
-            ring.transform.localScale = new Vector3(6f, 0.02f, 6f);
-            Object.Destroy(ring.GetComponent<Collider>());
-
-            var rr = ring.GetComponent<MeshRenderer>();
-            var ringShader = Shader.Find("Universal Render Pipeline/Lit");
-            if (ringShader != null)
-            {
-                var mat = new Material(ringShader);
-                mat.SetColor("_BaseColor", new Color(0.1f, 0.5f, 0.15f, 0.6f));
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", new Color(0.05f, 0.4f, 0.1f) * 1.5f);
-                mat.SetFloat("_Surface", 1f);
+            // Ground ring to indicate interaction area (VFX replacement)
+            GameObject ringVFX = new GameObject("GroundRing_VFX");
+            ringVFX.transform.SetParent(marker.transform);
+            ringVFX.transform.localPosition = new Vector3(0f, 0.02f, 0f);
+            
+            ParticleSystem psRing = ringVFX.AddComponent<ParticleSystem>();
+            var mainRing = psRing.main;
+            mainRing.startLifetime = 2.5f;
+            mainRing.startSpeed = 0.1f;
+            mainRing.startSize = 0.3f;
+            mainRing.startColor = new Color(0.1f, 0.5f, 0.15f, 0.7f);
+            mainRing.maxParticles = 120;
+            mainRing.loop = true;
+            mainRing.simulationSpace = ParticleSystemSimulationSpace.Local;
+            
+            var emissionRing = psRing.emission;
+            emissionRing.rateOverTime = 40f;
+            
+            var shapeRing = psRing.shape;
+            shapeRing.shapeType = ParticleSystemShapeType.Circle;
+            shapeRing.radius = 3f;
+            
+            var rendererRing = ringVFX.GetComponent<ParticleSystemRenderer>();
+            var mat = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            mat.SetColor("_BaseColor", new Color(0.1f, 0.5f, 0.15f));
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", new Color(0.05f, 0.4f, 0.1f) * 1.5f);
+            mat.SetFloat("_Surface", 1f);
                 mat.SetOverrideTag("RenderType", "Transparent");
                 mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
                 mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
@@ -1900,7 +1914,8 @@ namespace Tartaria.Integration
             }
 
             // Floating label
-            AddNameplate(marker, Tartaria.Input.InputPromptHelper.Localize($"[E] Dig — {siteName}"), new Color(0.3f, 1f, 0.4f));
+            string labelText = $"[E] Dig — {siteName}";
+            AddNameplate(marker, Tartaria.Input.InputPromptHelper.Localize(labelText), new Color(0.3f, 1f, 0.4f));
 
             // Pulsing bob animation
             marker.AddComponent<BobbingMarker>();
@@ -1983,60 +1998,6 @@ namespace Tartaria.Integration
                 var root = new GameObject("Anastasia_MISSING_PREFAB");
                 return root;
             }
-
-            // OLD PRIMITIVE CODE (unreachable)
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            body.name = "GhostBody";
-            body.transform.SetParent(root.transform);
-            body.transform.localPosition = new Vector3(0f, 1f, 0f);
-            body.transform.localScale = new Vector3(0.35f, 0.9f, 0.35f);
-            Object.Destroy(body.GetComponent<Collider>());
-
-            var r = body.GetComponent<MeshRenderer>();
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader != null)
-            {
-                var mat = new Material(shader);
-                mat.SetColor("_BaseColor", new Color(0.75f, 0.85f, 1f, 0.4f));
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", new Color(0.5f, 0.6f, 1f) * 0.8f);
-                mat.SetFloat("_Surface", 1f);
-                mat.SetOverrideTag("RenderType", "Transparent");
-                mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-                mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                r.material = mat;
-            }
-
-            // Golden glow
-            var glow = new GameObject("GoldenGlow");
-            glow.transform.SetParent(root.transform);
-            glow.transform.localPosition = new Vector3(0f, 1f, 0f);
-            var l = glow.AddComponent<Light>();
-            l.type = LightType.Point;
-            l.color = new Color(1f, 0.9f, 0.4f);
-            l.intensity = 1.5f;
-            l.range = 6f;
-            l.shadows = LightShadows.None;
-
-            // Golden particle halo
-            var psGO = new GameObject("GoldenMotes");
-            psGO.transform.SetParent(root.transform);
-            psGO.transform.localPosition = new Vector3(0f, 1f, 0f);
-            var ps = psGO.AddComponent<ParticleSystem>();
-            var main = ps.main;
-            main.maxParticles = 25;
-            main.startLifetime = 3f;
-            main.startSpeed = 0.2f;
-            main.startSize = 0.07f;
-            main.startColor = new Color(1f, 0.85f, 0.2f, 0.7f);
-            main.simulationSpace = ParticleSystemSimulationSpace.World;
-            var emission = ps.emission;
-            emission.rateOverTime = 6f;
-            var shape = ps.shape;
-            shape.shapeType = ParticleSystemShapeType.Sphere;
-            shape.radius = 0.8f;
-
-            return root;
         }
 
         // ─── KayKit Runtime Visual Helpers ───────────────────────────
