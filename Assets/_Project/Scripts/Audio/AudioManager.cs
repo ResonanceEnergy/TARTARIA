@@ -326,6 +326,35 @@ namespace Tartaria.Audio
         public void PlaySFX3D(string name, Vector3 position, float volume = 1.0f)
             => PlaySFX(name, position, volume);
 
+        /// <summary>
+        /// Plays a looping SFX at a world position. Returns the AudioSource for manual Stop() control.
+        /// Caller is responsible for stopping the loop when no longer needed.
+        /// Used by Moon spawners for ambient environmental sounds (water flow, crystal hum, etc.).
+        /// </summary>
+        public AudioSource PlayLoopingSFX(AudioClip clip, Vector3 position, float volume = 1.0f)
+        {
+            if (clip == null) return null;
+
+            var source = GetNextPooledSource();
+            source.transform.position = position;
+            source.spatialBlend = 1.0f;
+            source.clip = clip;
+            source.volume = volume;
+            source.loop = true;
+            source.Play();
+
+            return source; // Caller can Stop() when done
+        }
+
+        /// <summary>
+        /// Plays a looping SFX by name at a world position. Returns the AudioSource for manual Stop() control.
+        /// </summary>
+        public AudioSource PlayLoopingSFX(string name, Vector3 position, float volume = 1.0f)
+        {
+            var clip = ProceduralSFXLibrary.Get(name);
+            return PlayLoopingSFX(clip, position, volume);
+        }
+
         AudioSource GetNextPooledSource()
         {
             var source = _sfxPool[_sfxPoolIndex];
