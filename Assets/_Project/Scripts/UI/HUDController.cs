@@ -110,6 +110,9 @@ namespace Tartaria.UI
 
             GameEvents.OnTogglePause += HandleTogglePause;
             GameEvents.OnToggleAetherVision += HandleAetherVisionToggle;
+            GameEvents.OnHUDAchievementToast   += OnAchievementToastFromEvent;
+            GameEvents.OnHUDCloudQueueToast    += ShowCloudQueueToast;
+            GameEvents.OnHUDSaveConflictPrompt += OnSaveConflictFromEvent;
         }
 
         void OnDestroy()
@@ -122,6 +125,9 @@ namespace Tartaria.UI
             }
             GameEvents.OnTogglePause -= HandleTogglePause;
             GameEvents.OnToggleAetherVision -= HandleAetherVisionToggle;
+            GameEvents.OnHUDAchievementToast   -= OnAchievementToastFromEvent;
+            GameEvents.OnHUDCloudQueueToast    -= ShowCloudQueueToast;
+            GameEvents.OnHUDSaveConflictPrompt -= OnSaveConflictFromEvent;
         }
 
         void Update()
@@ -393,6 +399,13 @@ namespace Tartaria.UI
             if (string.IsNullOrEmpty(message)) return;
             ShowAccessibilityHint("cloud", $"☁ {message}");
         }
+
+        // GameEvents bridge — called by OnHUDSaveConflictPrompt event (decouples Save→UI dep)
+        private void OnSaveConflictFromEvent(string localSummary, string cloudSummary, string action)
+            => ShowSaveConflictPrompt(localSummary, cloudSummary, action);
+
+        // GameEvents bridge — called by OnHUDAchievementToast (Action<string> compat, optional subtitle omitted)
+        private void OnAchievementToastFromEvent(string title) => ShowAchievementToast(title);
 
         // ─── Pause / Aether Vision Event Handlers ─────────────────────
 

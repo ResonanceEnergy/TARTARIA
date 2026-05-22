@@ -43,7 +43,7 @@
 
 **How to report new issues during sprint:** Add to this file under the current cycle section + notify Director in chat. All P0 must be 0 before Milestone 4.
 
-**Last Updated:** M1 Stabilization complete — 2026-05-21 (Gate passed, proceeding to M2 with user approval)
+**Last Updated:** Session 4 — All 13 moon arc scripts committed, CS:0 confirmed, GameCompleteOverlay added.
 
 ---
 
@@ -68,4 +68,47 @@
 - Begin menu/settings polish.
 
 All P0 compile/runtime singletons for happy path now addressed. Proceeding to M1 polish with user gate.
+
+---
+
+## Session 4 Issue Registry (All 13 Moons — CS:0 commit `27061ef`)
+
+### KI-S4-001 — Moon arc SerializeField scene refs unassigned (all arcs)
+All 13 arc scripts have `[SerializeField]` fields (e.g. `_spectralTrainGO`, `_pavilionGOs[5]`).
+None are wired to prefabs yet. Beat transitions fire; visual/audio payoffs are silent.
+**Fix:** Wire via Inspector in each Moon scene, or add MoonRuntimeBootstrapper auto-spawn.
+
+### KI-S4-002 — PlaySFX2D string keys are stubs (no AudioClip backing)
+Every arc uses `AudioManager.Instance?.PlaySFX2D("moon3_train_derail_impact")` etc.
+AudioManager logs no error, just silent. Full manifest of ~80+ keys needs AudioClip assets.
+**Fix:** Populate AudioManager clip dictionary. See ROADMAP → Audio backlog.
+
+### KI-S4-003 — MudGolemHealth.OnAnyGolemDied delegate — wrong prefab
+Moon 3 Beat 3 spawns `_mudGolemPrefab`. If the assigned prefab lacks MudGolemHealth,
+`_golemsKilled` never increments → beat times out at 300s instead of clearing early.
+**Fix:** Ensure `_mudGolemPrefab` has MudGolemHealth component.
+
+### KI-S4-004 — `nul` device file in repo root
+`git add -A` always emits `error: short read while indexing nul`. Commit still succeeds.
+Use `git add --ignore-errors -A` in all pipeline scripts (already done across build tools).
+
+### KI-S4-005 — Moon arc AutoBoot scene-name guard is string.Contains
+Each arc's `[RuntimeInitializeOnLoadMethod]` checks `scene.name.Contains("Moon0X")`.
+If a scene is named differently (e.g. "Echohaven_VerticalSlice" for Moon 1), the arc won't
+auto-boot. Use MoonRuntimeBootstrapper.cs for production scene-to-arc routing.
+
+### KI-S4-006 — GameCompleteOverlay Time.timeScale = 0 not restored on crash
+If an exception occurs between `Show()` and the dismiss buttons, time stays paused.
+**Fix:** Add `private void OnApplicationQuit() { Time.timeScale = 1f; }` to GameCompleteOverlay.
+
+### KI-S4-007 — Moon 13 explicit GameCompleteOverlay.Show() called AFTER event
+`GameEvents.FireCriticalSaveTrigger("game_complete")` fires first (GameCompleteOverlay
+subscribes and shows). Then `GameCompleteOverlay.Instance?.Show()` is called again 0.5s later.
+`Show()` is idempotent (guarded by `_shown`), so no double-show. Belt-and-suspenders only.
+
+### RESOLVED in Session 4 ✅
+- ~~Moon3/Moon5: wrong static HUDController, ISaveService moon flags, ICompanionService.SayLine~~
+- ~~Moon3/Moon5: `Action` vs `Action<MudGolemHealth>` delegate mismatch on OnAnyGolemDied~~
+- ~~Moon7–13 build errors (scope, CameraController field, circular dep)~~
+
 

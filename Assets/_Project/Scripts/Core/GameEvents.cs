@@ -51,6 +51,14 @@ namespace Tartaria.Core
         // Moon 3 payoff: continental rail fast travel unlocked (gameplay → integration decoupling)
         public static event System.Action OnMoon3FastTravelUnlocked;
         public static void FireMoon3FastTravelUnlocked() => OnMoon3FastTravelUnlocked?.Invoke();
+
+        // HUD toast / cloud toast — fired by Save assembly so UI can display without a direct Save→UI dep
+        public static event System.Action<string>               OnHUDAchievementToast;
+        public static event System.Action<string>               OnHUDCloudQueueToast;
+        public static event System.Action<string, string, string> OnHUDSaveConflictPrompt;  // (localSummary, cloudSummary, action)
+        public static void FireHUDAchievementToast(string msg)                                             => OnHUDAchievementToast?.Invoke(msg);
+        public static void FireHUDCloudQueueToast(string msg)                                              => OnHUDCloudQueueToast?.Invoke(msg);
+        public static void FireHUDSaveConflictPrompt(string localSummary, string cloudSummary, string act) => OnHUDSaveConflictPrompt?.Invoke(localSummary, cloudSummary, act);
     }
 
     /// <summary>
