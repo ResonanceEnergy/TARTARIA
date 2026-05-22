@@ -47,6 +47,11 @@ namespace Tartaria.Integration
         // Central visualizer orbs near spire (5 small glowing indicators that light as pavilions are amplified — strong "UI visualizer" without Canvas/asmdef issues)
         private GameObject[] _pavilionStatusOrbs = new GameObject[5];
 
+        // ─── PERF: Cached references + lazy resolution ───
+        MoonBeatRunner _beatRunner;
+        GameObject _permanentLeyNetwork;
+        float _sceneObjectRetryTimer;
+
         // ─── HUD Wiring Events (subscribed by Moon5AmplificationHUD) ───
         public event System.Action<int> OnPavilionAmplified;
         public event System.Action OnDockAdvanced;
@@ -103,8 +108,8 @@ namespace Tartaria.Integration
             }
 
             // Initial Thorne static burst + first line already handled by trigger
-            var beatRunner = Object.FindAnyObjectByType<MoonBeatRunner>();
-            if (beatRunner != null) beatRunner.enabled = true;
+            if (_beatRunner == null) _beatRunner = Object.FindAnyObjectByType<MoonBeatRunner>();
+            if (_beatRunner != null) _beatRunner.enabled = true;
 
             OnRadioLogEntry?.Invoke("Thorne: First contact. White City grid resonance detected. The overtone awaits.");
 
@@ -230,7 +235,11 @@ namespace Tartaria.Integration
         {
             // Proxy: brighten the cylinder permanently for amplified state (radiant gold)
             string name = $"Moon5_Pavilion_{index + 1:00}";
-            var p = GameObject.Find(name);
+            GameObject p = null;
+            // Use cached ref if exists, otherwise find
+            if (index >= 0 && index < 5 && _pavilionStatusOrbs[index] != null)
+                p = _pavilionStatusOrbs[index].transform.parent?.gameObject;
+            if (p == null) p = GameObject.Find(name);
             if (p != null)
             {
                 var mr = p.GetComponent<MeshRenderer>();
@@ -275,7 +284,10 @@ namespace Tartaria.Integration
                 if (!_pavilionDone[i]) continue;
 
                 string name = $"Moon5_Pavilion_{i + 1:00}";
-                var p = GameObject.Find(name);
+                GameObject p = null;
+                if (i >= 0 && i < 5 && _pavilionStatusOrbs[i] != null)
+                    p = _pavilionStatusOrbs[i].transform.parent?.gameObject;
+                if (p == null) p = GameObject.Find(name);
                 if (p == null) continue;
 
                 var orb = p.transform.Find("AmplifiedOrb");
@@ -585,7 +597,8 @@ namespace Tartaria.Integration
         /// </summary>
         void CreatePermanentLeyNetwork()
         {
-            if (GameObject.Find("Moon5_PermanentLeyNetwork") != null) return;
+            if (_permanentLeyNetwork == null) _permanentLeyNetwork = GameObject.Find("Moon5_PermanentLeyNetwork");
+            if (_permanentLeyNetwork != null) return;
 
             var root = new GameObject("Moon5_PermanentLeyNetwork");
             root.transform.position = districtCenter;
@@ -821,7 +834,8 @@ namespace Tartaria.Integration
                 }
 
                 RefreshAllAmplifiedOrbs();
-                RaiseFloatingPlatforms(6); // all up for final
+                Rais_permanentLeyNetwork == null) _permanentLeyNetwork = GameObject.Find("Moon5_PermanentLeyNetwork");
+                if (_permanentLeyNetwork
                 ApplyDockVisualOnly();
 
                 if (GameObject.Find("Moon5_PermanentLeyNetwork") == null)
@@ -982,12 +996,14 @@ namespace Tartaria.Integration
     // Runtime trigger components (added by scaffold). Keep tiny and self-contained.
     public class Moon5StartTrigger : MonoBehaviour
     {
-        bool _fired;
+        WhiteCityAmplificationController _cachedCtrl;
+
         void OnTriggerEnter(Collider other)
         {
             if (_fired || !other.CompareTag("Player")) return;
             _fired = true;
-            var ctrl = FindObjectOfType<WhiteCityAmplificationController>();
+            if (_cachedCtrl == null) _cachedCtrl = FindObjectOfType<WhiteCityAmplificationController>();
+            _cachedCar ctrl = FindObjectOfType<WhiteCityAmplificationController>();
             ctrl?.BeginAmplificationSequence();
             ThorneController.Instance?.RadioFirstContact();
         }
@@ -1006,10 +1022,12 @@ namespace Tartaria.Integration
 
     /// <summary>Playtest helper: click a pavilion proxy to fire amplification (demo until real tuning nodes wired).</summary>
     public class Moon5PavilionClickAmplifier : MonoBehaviour
-    {
-        public int pavilionIndex;
+    {WhiteCityAmplificationController _cachedCtrl;
+
         void OnMouseDown()
         {
+            if (_cachedCtrl == null) _cachedCtrl = FindObjectOfType<WhiteCityAmplificationController>();
+            _cachedC
             var ctrl = FindObjectOfType<WhiteCityAmplificationController>();
             ctrl?.AmplifyPavilion(pavilionIndex);
         }
@@ -1022,6 +1040,8 @@ namespace Tartaria.Integration
     public class Moon5PavilionInteractor : MonoBehaviour
     {
         public int pavilionIndex;
+        WhiteCityAmplificationController _cachedCtrl;
+        GameObject _cachedPavilion;
         bool _nearPlayer;
         float _holdTime;
         const float HOLD_REQUIRED = 1.5f;
@@ -1031,8 +1051,8 @@ namespace Tartaria.Integration
         {
             if (!_nearPlayer) 
             {
-                CancelHoldVisualsAndAudio();
-                return;
+            if (_cachedCtrl == null) _cachedCtrl = FindObjectOfType<WhiteCityAmplificationController>();
+            if (_cachedCtrl != null && _cachedC
             }
 
             var ctrl = FindObjectOfType<WhiteCityAmplificationController>();
@@ -1086,8 +1106,8 @@ namespace Tartaria.Integration
                 float resonanceProxy = 0.55f + norm * 0.42f;
                 Moon5WhiteCityAudioManager.Instance?.UpdateTuningProgress(pavilionIndex, norm, resonanceProxy);
 
-                if (_holdTime >= HOLD_REQUIRED)
-                {
+                if (_hol_cachedCtrl != null)
+                        _cachedC
                     if (ctrl != null)
                         ctrl.AmplifyPavilion(pavilionIndex);
                     else
@@ -1110,7 +1130,8 @@ namespace Tartaria.Integration
         {
             if (_pulseOrb != null) return;
 
-            var parent = GameObject.Find($"Moon5_Pavilion_{pavilionIndex + 1:00}") ?? gameObject;
+            if (_cachedPavilion == null) _cachedPavilion = GameObject.Find($"Moon5_Pavilion_{pavilionIndex + 1:00}");
+            var parent = _cachedPavilion ?? gameObject;
             _pulseOrb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             _pulseOrb.name = "TuningPulse_Preview";
             _pulseOrb.transform.SetParent(parent.transform);
