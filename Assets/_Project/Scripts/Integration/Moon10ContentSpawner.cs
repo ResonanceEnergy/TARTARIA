@@ -4,6 +4,7 @@ using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Save;
 using Tartaria.UI;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -781,7 +782,7 @@ namespace Tartaria.Integration
             _hasSpoken = true;
             Debug.Log($"[OrphanEngineer {engineerIndex}] {_dialogues[engineerIndex]}");
 
-            UI.HUDController.Instance?.ShowDialogue($"Engineer: {_dialogues[engineerIndex]}");
+            UI.HUDController.Instance?.ShowDialogue("Engineer", _dialogues[engineerIndex]);
         }
     }
 

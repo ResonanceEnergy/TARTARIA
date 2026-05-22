@@ -3,6 +3,8 @@ using System.Collections;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.UI;
+using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
@@ -139,7 +141,7 @@ namespace Tartaria.Integration
                 HUDController.Instance?.ShowObjective($"Ice partially thawed. Return when ready for session {completedSessions + 1}.");
                 
                 // Save progress
-                SaveManager.Instance?.SetMoonData("korath_thaw_sessions", completedSessions);
+                SaveManager.Instance?.SetGameFlag($"korath_thaw_session_{completedSessions}", true);
             }
         }
 

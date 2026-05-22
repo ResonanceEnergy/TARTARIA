@@ -414,6 +414,7 @@ namespace Tartaria.Integration
     {
         public int pipeIndex;
         public event System.Action<CrystalPipe> OnRepaired;
+        public event System.Action<int> OnPlayed;
 
         bool _isRepaired;
 
@@ -449,6 +450,21 @@ namespace Tartaria.Integration
             OnRepaired?.Invoke(this);
 
             Debug.Log($"[CrystalPipe] Pipe {pipeIndex} repaired. Harmonic note resonates.");
+        }
+
+        /// <summary>
+        /// Play this pipe (trigger its note for organ puzzle).
+        /// </summary>
+        public void Play()
+        {
+            if (!_isRepaired)
+            {
+                Debug.Log($"[CrystalPipe] Pipe {pipeIndex} cannot be played - not yet repaired.");
+                return;
+            }
+
+            Debug.Log($"[CrystalPipe] Pipe {pipeIndex} played!");
+            OnPlayed?.Invoke(pipeIndex);
         }
     }
 
