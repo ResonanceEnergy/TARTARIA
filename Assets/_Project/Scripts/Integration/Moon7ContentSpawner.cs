@@ -120,7 +120,18 @@ namespace Tartaria.Integration
             var siegeBoss = gameObject.AddComponent<Moon7GolemSiegeBoss>();
             siegeBoss.OnSiegeComplete += OnGolemSiegeComplete;
 
-            Debug.Log($"[Moon7ContentSpawner] Korath stasis vault spawned. Thaw sessions: 0/{thawSessionsRequired}, siege system ready.");
+            // Initialize ice thaw multi-session system
+            var iceThaw = gameObject.AddComponent<KorathIceThawSystem>();
+
+            // Initialize 9-band aurora hum visualization
+            var auroraHum = gameObject.AddComponent<NineBandAuroraHum>();
+
+            Debug.Log($"[Moon7ContentSpawner] Korath stasis vault spawned. Thaw sessions: 0/{thawSessionsRequired}, aurora hum active, siege system ready.");
+        }
+
+        public GameObject GetKorathIceBlock()
+        {
+            return _korathIceBlock;
         }
 
         void OnGolemSiegeComplete()
@@ -147,9 +158,7 @@ namespace Tartaria.Integration
             iceLight.range = 15f;
             iceLight.intensity = 3f;
 
-            // KorathIceInteract component: multi-session thawing mechanic
-            KorathIceInteract iceInteract = _korathIceBlock.AddComponent<KorathIceInteract>();
-            iceInteract.OnThawSession += HandleThawSession;
+            // Ice thaw handled by KorathIceThawSystem component
 
             // Korath voice rattling through ice (audio loop)
             AudioSource audioSrc = _korathIceBlock.AddComponent<AudioSource>();
