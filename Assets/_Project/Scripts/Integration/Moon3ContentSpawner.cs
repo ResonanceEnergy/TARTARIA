@@ -46,6 +46,9 @@ namespace Tartaria.Integration
         [SerializeField] Vector3[] railSegmentStarts;  // 5 rail tie positions
         [SerializeField] GameObject mudGolemPrefab;  // Mud Golem enemy prefab (assign in editor)
 
+        [Header("Puzzle Systems")]
+        Gameplay.Moon3OrphanTrainPuzzle _trainPuzzle;
+
         GameObject _spectralTrain;
         readonly List<GameObject> _cymaticGardens = new();
         readonly List<GameObject> _adoptedOrphans = new();
@@ -118,11 +121,34 @@ namespace Tartaria.Integration
             // Spawn cymatic gardens (8 garden orbs to tune)
             SpawnCymaticGardens();
 
+            // Initialize orphan train puzzle (13 rail segments)
+            InitializeTrainPuzzle();
+
             // Activate sad train ambient audio (spectral train whistle + distant crying)
             var trainAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("SpectralTrainWhistle", trainSpawnPoint, 0.35f);
             if (trainAmbience != null)
             {
-                Debug.Log("[Moon 3] Spectral train ambience active");
+                Debug.Log("[Moon 3] Spectral train ambience active"); + 13 rail segments");
+        }
+
+        void InitializeTrainPuzzle()
+        {
+            // Create train puzzle system
+            var puzzleGO = new GameObject("Moon3_TrainPuzzle");
+            puzzleGO.transform.position = trainSpawnPoint;
+            _trainPuzzle = puzzleGO.AddComponent<Gameplay.Moon3OrphanTrainPuzzle>();
+            _trainPuzzle.InitializePuzzle(trainSpawnPoint);
+
+            // Subscribe to completion
+            _trainPuzzle.OnPuzzleComplete += () =>
+            {
+                Debug.Log("[Moon 3] Train puzzle complete → lullaby climax ready");
+                // May trigger lullaby climax if all orphans also freed
+                if (_orphansFreed >= totalOrphans && _segmentsReactivated >= totalRailSegments && !lullabyClimaxComplete)
+                {
+                    TriggerLullabyClimax();
+                }
+            }
             }
 
             Debug.Log($"[Moon 3] Spawned spectral Orphan Train + {totalOrphans} cymatic gardens");
@@ -388,26 +414,40 @@ namespace Tartaria.Integration
         void GrantLullabyBuff()
         {
             // Orphan Train Lullaby Crystal: passive 432 Hz healing zone
-            Debug.Log("[Moon 3] Orphan Train Lullaby Crystal granted — passive healing aura");
+            Debug.Log("[Moon 3] Orphan Train Lullaby Crystal granted — passive healing aura");, System.Collections.Generic.HashSet<string> trainPuzzleState = null)
+        {
+            moon3Unlocked = unlocked;
+            _orphansFreed = orphansFreed;
+            _segmentsReactivated = railSegments;
+            lullabyClimaxComplete = climaxComplete;
 
-            // Add persistent healing buff to player
-            var player = GameObject.FindGameObjectWithTag("Player");
-            if (player != null)
+            if (moon3Unlocked && !_contentSpawned)
             {
-                var buff = player.AddComponent<Gameplay.LullabyBuffComponent>();
-                buff.SetHealRate(1f);  // 1 HP/sec
-                buff.SetFrequency(432f);  // 432 Hz Lullaby Crystal resonance
-                Debug.Log("[Moon 3] LullabyBuff applied to player — 1 HP/sec at 432 Hz");
-            }
-            else
-            {
-                Debug.LogWarning("[Moon 3] Player not found, cannot apply LullabyBuff");
+                SpawnMoon3Content();
             }
 
-            // Achievement
-            AchievementSystem.Instance?.Unlock("orphan_train_memory");
+            // Destroy gardens that were already tuned
+            for (int i = 0; i < _orphansFreed && i < _cymaticGardens.Count; i++)
+            {
+                if (_cymaticGardens[i] != null)
+                {
+                    Destroy(_cymaticGardens[i]);
+                }
+            }
+
+            // Restore train puzzle state
+            if (_trainPuzzle != null && trainPuzzleState != null)
+            {
+                _trainPuzzle.LoadState(trainPuzzleState);
+            }
         }
 
+        /// <summary>
+        /// Save train puzzle state (for save system integration).
+        /// </summary>
+        public System.Collections.Generic.HashSet<string> GetTrainPuzzleState()
+        {
+            return _trainPuzzle != null ? _trainPuzzle.SaveState() : new System.Collections.Generic.HashSet<string>();
         /// <summary>
         /// Called by save system to restore Moon 3 state.
         /// </summary>

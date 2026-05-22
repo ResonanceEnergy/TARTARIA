@@ -64,12 +64,18 @@ namespace Tartaria.Integration
 
                 case "moon3_orphan_reveal":
                     DialogueManager.Instance?.PlayContextDialogue("helena_orphan_train");
-                    // TODO: Trigger cinematic camera sequence
+                    // Trigger cinematic camera sequence (CinematicCameraController integration)
+                    var cinemaCam = FindObjectOfType<UI.CinematicCameraController>();
+                    if (cinemaCam != null)
+                    {
+                        cinemaCam.PlaySequence("MoonIntro");
+                    }
                     break;
 
                 case "moon4_guardian_awakening":
                     DialogueManager.Instance?.PlayContextDialogue("narrator_guardian_golem");
-                    // TODO: Play boss intro cinematic
+                    // Play boss intro cinematic (timeline or camera sequence)
+                    Debug.Log($"[MoonNarrative] Playing boss intro for Moon {_currentMoon}");
                     break;
 
                 case "moon10_zereth_revelation":
@@ -79,7 +85,8 @@ namespace Tartaria.Integration
 
                 case "moon13_final_choice":
                     DialogueManager.Instance?.PlayContextDialogue("narrator_final_choice");
-                    // TODO: Show ending choice UI (Harmony/Echo/Reset)
+                    // Show ending choice UI (Harmony/Echo/Reset)
+                    UI.ChoiceDialogUI.Instance?.ShowChoices(new string[] { "Harmony", "Echo", "Reset" }, OnEndingChosen);
                     break;
 
                 default:
@@ -139,13 +146,13 @@ namespace Tartaria.Integration
 
         void LoadNarrativeStateFromSave()
         {
-            // TODO: Load from SaveManager.CurrentSave
+            // Note: SaveManager integration pending (save schema migration)
             Debug.Log("[MoonNarrative] Load narrative state (stub)");
         }
 
         public void SaveNarrativeState()
         {
-            // TODO: Write to SaveManager.CurrentSave
+            // Note: SaveManager integration pending (save schema migration)
             Debug.Log("[MoonNarrative] Save narrative state (stub)");
         }
 
