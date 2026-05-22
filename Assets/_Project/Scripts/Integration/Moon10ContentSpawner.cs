@@ -158,41 +158,110 @@ namespace Tartaria.Integration
             var station = new GameObject("CentralStation_Moon10");
             station.transform.position = centralStationPoint;
 
-            // Multi-part station building (no single primitives)
-            // Main hall
-            var mainHall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            mainHall.name = "MainHall";
-            mainHall.transform.SetParent(station.transform);
-            mainHall.transform.localScale = new Vector3(25f, 8f, 25f);
-            mainHall.transform.localPosition = Vector3.up * 4f;
+            // Main hall - large citadel structure
+            GameObject mainHallPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Citadel_MainHall");
+            GameObject mainHall;
+            if (mainHallPrefab != null)
+            {
+                mainHall = Instantiate(mainHallPrefab, Vector3.zero, Quaternion.identity);
+                mainHall.name = "MainHall";
+                mainHall.transform.SetParent(station.transform);
+                mainHall.transform.localPosition = Vector3.up * 4f;
+                mainHall.transform.localScale = new Vector3(25f, 8f, 25f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Structure_Citadel_MainHall prefab missing - using fallback cube");
+                mainHall = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                mainHall.name = "MainHall_FALLBACK";
+                mainHall.transform.SetParent(station.transform);
+                mainHall.transform.localScale = new Vector3(25f, 8f, 25f);
+                mainHall.transform.localPosition = Vector3.up * 4f;
+            }
 
-            // East wing
-            var eastWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            eastWing.name = "EastWing";
-            eastWing.transform.SetParent(station.transform);
-            eastWing.transform.localScale = new Vector3(10f, 6f, 15f);
-            eastWing.transform.localPosition = new Vector3(17f, 3f, 0f);
+            // East wing - side structure
+            GameObject eastWingPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Wing");
+            GameObject eastWing;
+            if (eastWingPrefab != null)
+            {
+                eastWing = Instantiate(eastWingPrefab, Vector3.zero, Quaternion.identity);
+                eastWing.name = "EastWing";
+                eastWing.transform.SetParent(station.transform);
+                eastWing.transform.localPosition = new Vector3(17f, 3f, 0f);
+                eastWing.transform.localScale = new Vector3(10f, 6f, 15f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Structure_Wing prefab missing - using fallback cube");
+                eastWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                eastWing.name = "EastWing_FALLBACK";
+                eastWing.transform.SetParent(station.transform);
+                eastWing.transform.localScale = new Vector3(10f, 6f, 15f);
+                eastWing.transform.localPosition = new Vector3(17f, 3f, 0f);
+            }
 
-            // West wing
-            var westWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            westWing.name = "WestWing";
-            westWing.transform.SetParent(station.transform);
-            westWing.transform.localScale = new Vector3(10f, 6f, 15f);
-            westWing.transform.localPosition = new Vector3(-17f, 3f, 0f);
+            // West wing - mirrored side structure
+            GameObject westWingPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Wing");
+            GameObject westWing;
+            if (westWingPrefab != null)
+            {
+                westWing = Instantiate(westWingPrefab, Vector3.zero, Quaternion.identity);
+                westWing.name = "WestWing";
+                westWing.transform.SetParent(station.transform);
+                westWing.transform.localPosition = new Vector3(-17f, 3f, 0f);
+                westWing.transform.localScale = new Vector3(10f, 6f, 15f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Structure_Wing prefab missing - using fallback cube");
+                westWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                westWing.name = "WestWing_FALLBACK";
+                westWing.transform.SetParent(station.transform);
+                westWing.transform.localScale = new Vector3(10f, 6f, 15f);
+                westWing.transform.localPosition = new Vector3(-17f, 3f, 0f);
+            }
 
-            // Clock tower
-            var clockTower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            clockTower.name = "ClockTower";
-            clockTower.transform.SetParent(station.transform);
-            clockTower.transform.localScale = new Vector3(4f, 12f, 4f);
-            clockTower.transform.localPosition = new Vector3(0f, 16f, -10f);
+            // Clock tower - tall spire structure
+            GameObject towerPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Tower_Tall");
+            GameObject clockTower;
+            if (towerPrefab != null)
+            {
+                clockTower = Instantiate(towerPrefab, Vector3.zero, Quaternion.identity);
+                clockTower.name = "ClockTower";
+                clockTower.transform.SetParent(station.transform);
+                clockTower.transform.localPosition = new Vector3(0f, 16f, -10f);
+                clockTower.transform.localScale = new Vector3(4f, 12f, 4f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Structure_Tower_Tall prefab missing - using fallback cylinder");
+                clockTower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                clockTower.name = "ClockTower_FALLBACK";
+                clockTower.transform.SetParent(station.transform);
+                clockTower.transform.localScale = new Vector3(4f, 12f, 4f);
+                clockTower.transform.localPosition = new Vector3(0f, 16f, -10f);
+            }
 
             // Interactable: station console
-            var console = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            console.name = "StationConsole";
-            console.transform.SetParent(station.transform);
-            console.transform.localPosition = new Vector3(0f, 1f, 0f);
-            console.transform.localScale = new Vector3(2f, 0.5f, 2f);
+            GameObject consolePrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Prop_Console");
+            GameObject console;
+            if (consolePrefab != null)
+            {
+                console = Instantiate(consolePrefab, Vector3.zero, Quaternion.identity);
+                console.name = "StationConsole";
+                console.transform.SetParent(station.transform);
+                console.transform.localPosition = new Vector3(0f, 1f, 0f);
+                console.transform.localScale = new Vector3(2f, 0.5f, 2f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Prop_Console prefab missing - using fallback cylinder");
+                console = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                console.name = "StationConsole_FALLBACK";
+                console.transform.SetParent(station.transform);
+                console.transform.localPosition = new Vector3(0f, 1f, 0f);
+                console.transform.localScale = new Vector3(2f, 0.5f, 2f);
+            }
 
             var interactable = console.AddComponent<StationConsole>();
             interactable.spawner = this;
@@ -215,34 +284,89 @@ namespace Tartaria.Integration
                 var station = new GameObject($"MegaStation_{i + 1}");
                 station.transform.position = stationPoints[i];
 
-                // Multi-part station building
                 // Main building body
-                var building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                building.name = "StationBuilding";
-                building.transform.SetParent(station.transform);
-                building.transform.localScale = new Vector3(18f, 6f, 18f);
-                building.transform.localPosition = Vector3.up * 3f;
+                GameObject buildingPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Station");
+                GameObject building;
+                if (buildingPrefab != null)
+                {
+                    building = Instantiate(buildingPrefab, Vector3.zero, Quaternion.identity);
+                    building.name = "StationBuilding";
+                    building.transform.SetParent(station.transform);
+                    building.transform.localPosition = Vector3.up * 3f;
+                    building.transform.localScale = new Vector3(18f, 6f, 18f);
+                }
+                else
+                {
+                    Debug.LogError($"[Moon10] Structure_Station prefab missing for MegaStation_{i + 1} - using fallback");
+                    building = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    building.name = "StationBuilding_FALLBACK";
+                    building.transform.SetParent(station.transform);
+                    building.transform.localScale = new Vector3(18f, 6f, 18f);
+                    building.transform.localPosition = Vector3.up * 3f;
+                }
 
                 // Roof
-                var roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                roof.name = "Roof";
-                roof.transform.SetParent(station.transform);
-                roof.transform.localScale = new Vector3(20f, 1f, 20f);
-                roof.transform.localPosition = Vector3.up * 6.5f;
+                GameObject roofPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Roof");
+                GameObject roof;
+                if (roofPrefab != null)
+                {
+                    roof = Instantiate(roofPrefab, Vector3.zero, Quaternion.identity);
+                    roof.name = "Roof";
+                    roof.transform.SetParent(station.transform);
+                    roof.transform.localPosition = Vector3.up * 6.5f;
+                    roof.transform.localScale = new Vector3(20f, 1f, 20f);
+                }
+                else
+                {
+                    Debug.LogError($"[Moon10] Structure_Roof prefab missing for MegaStation_{i + 1} - using fallback");
+                    roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    roof.name = "Roof_FALLBACK";
+                    roof.transform.SetParent(station.transform);
+                    roof.transform.localScale = new Vector3(20f, 1f, 20f);
+                    roof.transform.localPosition = Vector3.up * 6.5f;
+                }
 
                 // Platform base
-                var platformBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                platformBase.name = "PlatformBase";
-                platformBase.transform.SetParent(station.transform);
-                platformBase.transform.localPosition = new Vector3(0f, -1.5f, 0f);
-                platformBase.transform.localScale = new Vector3(16f, 2f, 42f);
+                GameObject platformBasePrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Platform_Base");
+                GameObject platformBase;
+                if (platformBasePrefab != null)
+                {
+                    platformBase = Instantiate(platformBasePrefab, Vector3.zero, Quaternion.identity);
+                    platformBase.name = "PlatformBase";
+                    platformBase.transform.SetParent(station.transform);
+                    platformBase.transform.localPosition = new Vector3(0f, -1.5f, 0f);
+                    platformBase.transform.localScale = new Vector3(16f, 2f, 42f);
+                }
+                else
+                {
+                    Debug.LogError($"[Moon10] Structure_Platform_Base prefab missing for MegaStation_{i + 1} - using fallback");
+                    platformBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    platformBase.name = "PlatformBase_FALLBACK";
+                    platformBase.transform.SetParent(station.transform);
+                    platformBase.transform.localPosition = new Vector3(0f, -1.5f, 0f);
+                    platformBase.transform.localScale = new Vector3(16f, 2f, 42f);
+                }
 
                 // Platform surface
-                var platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                platform.name = "Platform";
-                platform.transform.SetParent(station.transform);
-                platform.transform.localPosition = new Vector3(0f, -0.3f, 0f);
-                platform.transform.localScale = new Vector3(15f, 0.5f, 40f);
+                GameObject platformPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Platform");
+                GameObject platform;
+                if (platformPrefab != null)
+                {
+                    platform = Instantiate(platformPrefab, Vector3.zero, Quaternion.identity);
+                    platform.name = "Platform";
+                    platform.transform.SetParent(station.transform);
+                    platform.transform.localPosition = new Vector3(0f, -0.3f, 0f);
+                    platform.transform.localScale = new Vector3(15f, 0.5f, 40f);
+                }
+                else
+                {
+                    Debug.LogError($"[Moon10] Structure_Platform prefab missing for MegaStation_{i + 1} - using fallback");
+                    platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    platform.name = "Platform_FALLBACK";
+                    platform.transform.SetParent(station.transform);
+                    platform.transform.localPosition = new Vector3(0f, -0.3f, 0f);
+                    platform.transform.localScale = new Vector3(15f, 0.5f, 40f);
+                }
 
                 _stations.Add(station);
             }
@@ -256,45 +380,115 @@ namespace Tartaria.Integration
             _triggerRoom = new GameObject("TriggerRoom_MudFlood");
             _triggerRoom.transform.position = centralStationPoint + Vector3.down * 15f;
 
-            // Multi-part chamber structure
-            // Outer chamber walls
-            var chamberOuter = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            chamberOuter.name = "ChamberOuter";
-            chamberOuter.transform.SetParent(_triggerRoom.transform);
-            chamberOuter.transform.localScale = new Vector3(12f, 7f, 12f);
-            chamberOuter.transform.localPosition = Vector3.zero;
+            // Outer chamber walls - dungeon structure
+            GameObject chamberOuterPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Chamber_Outer");
+            GameObject chamberOuter;
+            if (chamberOuterPrefab != null)
+            {
+                chamberOuter = Instantiate(chamberOuterPrefab, Vector3.zero, Quaternion.identity);
+                chamberOuter.name = "ChamberOuter";
+                chamberOuter.transform.SetParent(_triggerRoom.transform);
+                chamberOuter.transform.localPosition = Vector3.zero;
+                chamberOuter.transform.localScale = new Vector3(12f, 7f, 12f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Structure_Chamber_Outer prefab missing - using fallback cube");
+                chamberOuter = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                chamberOuter.name = "ChamberOuter_FALLBACK";
+                chamberOuter.transform.SetParent(_triggerRoom.transform);
+                chamberOuter.transform.localScale = new Vector3(12f, 7f, 12f);
+                chamberOuter.transform.localPosition = Vector3.zero;
+            }
 
             // Inner sanctum
-            var chamberInner = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            chamberInner.name = "ChamberInner";
-            chamberInner.transform.SetParent(_triggerRoom.transform);
-            chamberInner.transform.localScale = new Vector3(8f, 5f, 8f);
-            chamberInner.transform.localPosition = Vector3.zero;
+            GameObject chamberInnerPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Chamber_Inner");
+            GameObject chamberInner;
+            if (chamberInnerPrefab != null)
+            {
+                chamberInner = Instantiate(chamberInnerPrefab, Vector3.zero, Quaternion.identity);
+                chamberInner.name = "ChamberInner";
+                chamberInner.transform.SetParent(_triggerRoom.transform);
+                chamberInner.transform.localPosition = Vector3.zero;
+                chamberInner.transform.localScale = new Vector3(8f, 5f, 8f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Structure_Chamber_Inner prefab missing - using fallback cube");
+                chamberInner = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                chamberInner.name = "ChamberInner_FALLBACK";
+                chamberInner.transform.SetParent(_triggerRoom.transform);
+                chamberInner.transform.localScale = new Vector3(8f, 5f, 8f);
+                chamberInner.transform.localPosition = Vector3.zero;
+            }
 
-            // Device core (sphere)
-            var deviceCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            deviceCore.name = "DeviceCore";
-            deviceCore.transform.SetParent(_triggerRoom.transform);
-            deviceCore.transform.localPosition = Vector3.zero;
-            deviceCore.transform.localScale = Vector3.one * 2f;
+            // Device core (sphere) - ancient orb artifact
+            GameObject deviceCorePrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Prop_Orb");
+            GameObject deviceCore;
+            if (deviceCorePrefab != null)
+            {
+                deviceCore = Instantiate(deviceCorePrefab, Vector3.zero, Quaternion.identity);
+                deviceCore.name = "DeviceCore";
+                deviceCore.transform.SetParent(_triggerRoom.transform);
+                deviceCore.transform.localPosition = Vector3.zero;
+                deviceCore.transform.localScale = Vector3.one * 2f;
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Prop_Orb prefab missing - using fallback sphere");
+                deviceCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                deviceCore.name = "DeviceCore_FALLBACK";
+                deviceCore.transform.SetParent(_triggerRoom.transform);
+                deviceCore.transform.localPosition = Vector3.zero;
+                deviceCore.transform.localScale = Vector3.one * 2f;
+            }
 
-            // Device ring array (3 rings)
+            // Device ring array (3 rings) - amplifier rings
+            GameObject ringPrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Prop_Ring");
             for (int i = 0; i < 3; i++)
             {
-                var ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                ring.name = $"AmplifierRing_{i}";
-                ring.transform.SetParent(_triggerRoom.transform);
-                ring.transform.localPosition = Vector3.zero;
-                ring.transform.localScale = new Vector3(3f + i * 0.5f, 0.1f, 3f + i * 0.5f);
-                ring.transform.rotation = Quaternion.Euler(0f, i * 60f, 0f);
+                GameObject ring;
+                if (ringPrefab != null)
+                {
+                    ring = Instantiate(ringPrefab, Vector3.zero, Quaternion.identity);
+                    ring.name = $"AmplifierRing_{i}";
+                    ring.transform.SetParent(_triggerRoom.transform);
+                    ring.transform.localPosition = Vector3.zero;
+                    ring.transform.localScale = new Vector3(3f + i * 0.5f, 0.1f, 3f + i * 0.5f);
+                    ring.transform.rotation = Quaternion.Euler(0f, i * 60f, 0f);
+                }
+                else
+                {
+                    if (i == 0) Debug.LogError("[Moon10] Prop_Ring prefab missing - using fallback cylinders");
+                    ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    ring.name = $"AmplifierRing_{i}_FALLBACK";
+                    ring.transform.SetParent(_triggerRoom.transform);
+                    ring.transform.localPosition = Vector3.zero;
+                    ring.transform.localScale = new Vector3(3f + i * 0.5f, 0.1f, 3f + i * 0.5f);
+                    ring.transform.rotation = Quaternion.Euler(0f, i * 60f, 0f);
+                }
             }
 
             // Control panel interactable
-            var panel = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            panel.name = "ControlPanel";
-            panel.transform.SetParent(_triggerRoom.transform);
-            panel.transform.localPosition = new Vector3(0f, -1f, 4f);
-            panel.transform.localScale = new Vector3(2f, 1f, 0.2f);
+            GameObject panelPrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Prop_Panel");
+            GameObject panel;
+            if (panelPrefab != null)
+            {
+                panel = Instantiate(panelPrefab, Vector3.zero, Quaternion.identity);
+                panel.name = "ControlPanel";
+                panel.transform.SetParent(_triggerRoom.transform);
+                panel.transform.localPosition = new Vector3(0f, -1f, 4f);
+                panel.transform.localScale = new Vector3(2f, 1f, 0.2f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Prop_Panel prefab missing - using fallback cube");
+                panel = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                panel.name = "ControlPanel_FALLBACK";
+                panel.transform.SetParent(_triggerRoom.transform);
+                panel.transform.localPosition = new Vector3(0f, -1f, 4f);
+                panel.transform.localScale = new Vector3(2f, 1f, 0.2f);
+            }
 
             var interactable = panel.AddComponent<TriggerRoomPanel>();
             interactable.spawner = this;
@@ -480,11 +674,25 @@ namespace Tartaria.Integration
             _orphanTrainPuzzle.transform.position = puzzlePos;
 
             // Puzzle platform
-            GameObject platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            platform.name = "PuzzlePlatform";
-            platform.transform.SetParent(_orphanTrainPuzzle.transform);
-            platform.transform.localPosition = Vector3.zero;
-            platform.transform.localScale = new Vector3(10f, 0.5f, 10f);
+            GameObject platformPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Platform");
+            GameObject platform;
+            if (platformPrefab != null)
+            {
+                platform = Instantiate(platformPrefab, Vector3.zero, Quaternion.identity);
+                platform.name = "PuzzlePlatform";
+                platform.transform.SetParent(_orphanTrainPuzzle.transform);
+                platform.transform.localPosition = Vector3.zero;
+                platform.transform.localScale = new Vector3(10f, 0.5f, 10f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Structure_Platform prefab missing for puzzle - using fallback");
+                platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                platform.name = "PuzzlePlatform_FALLBACK";
+                platform.transform.SetParent(_orphanTrainPuzzle.transform);
+                platform.transform.localPosition = Vector3.zero;
+                platform.transform.localScale = new Vector3(10f, 0.5f, 10f);
+            }
 
             // 3 orphan children NPCs (from Moon 3) — KayKit Rogue scaled down
             for (int i = 0; i < 3; i++)
@@ -513,11 +721,25 @@ namespace Tartaria.Integration
             }
 
             // Puzzle console (resonance tuning mini-game)
-            GameObject console = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            console.name = "PuzzleConsole";
-            console.transform.SetParent(_orphanTrainPuzzle.transform);
-            console.transform.localPosition = new Vector3(0f, 1f, -3f);
-            console.transform.localScale = new Vector3(2f, 1.5f, 1f);
+            GameObject consolePrefab = Resources.Load<GameObject>("Prefabs/Props/KayKit/Prop_Console");
+            GameObject console;
+            if (consolePrefab != null)
+            {
+                console = Instantiate(consolePrefab, Vector3.zero, Quaternion.identity);
+                console.name = "PuzzleConsole";
+                console.transform.SetParent(_orphanTrainPuzzle.transform);
+                console.transform.localPosition = new Vector3(0f, 1f, -3f);
+                console.transform.localScale = new Vector3(2f, 1.5f, 1f);
+            }
+            else
+            {
+                Debug.LogError("[Moon10] Prop_Console prefab missing for puzzle - using fallback");
+                console = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                console.name = "PuzzleConsole_FALLBACK";
+                console.transform.SetParent(_orphanTrainPuzzle.transform);
+                console.transform.localPosition = new Vector3(0f, 1f, -3f);
+                console.transform.localScale = new Vector3(2f, 1.5f, 1f);
+            }
 
             OrphanTrainPuzzleConsole puzzleComp = console.AddComponent<OrphanTrainPuzzleConsole>();
             puzzleComp.spawner = this;
@@ -547,15 +769,91 @@ namespace Tartaria.Integration
         {
             Debug.Log("[Moon 10] CONFLICT: Rail Leviathan awakens! Ancient guardian of the network!");
 
-            GameObject bossObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            bossObj.name = "RailLeviathan_Boss";
+            // CRITICAL: Multi-part serpent boss (7 segments)
+            GameObject bossObj = new GameObject("RailLeviathan_Boss");
             bossObj.transform.position = leviathanSpawnPoint;
-            bossObj.transform.localScale = new Vector3(8f, 15f, 8f);
             bossObj.transform.rotation = Quaternion.Euler(90f, 0f, 0f); // Horizontal
 
-            // Boss material: dark metallic serpent
-            Renderer rend = bossObj.GetComponent<Renderer>();
-            rend.material.color = new Color(0.3f, 0.25f, 0.2f);
+            // Try to load serpent segment prefabs
+            GameObject headPrefab = Resources.Load<GameObject>("Prefabs/Enemies/KayKit/Enemy_Serpent_Head");
+            GameObject bodyPrefab = Resources.Load<GameObject>("Prefabs/Enemies/KayKit/Enemy_Serpent_Body");
+            GameObject tailPrefab = Resources.Load<GameObject>("Prefabs/Enemies/KayKit/Enemy_Serpent_Tail");
+
+            bool usePrefabs = (headPrefab != null && bodyPrefab != null && tailPrefab != null);
+            if (!usePrefabs)
+            {
+                Debug.LogError("[Moon10] Rail Leviathan serpent prefabs missing - using fallback primitives");
+            }
+
+            // Head segment (largest)
+            GameObject head;
+            if (usePrefabs)
+            {
+                head = Instantiate(headPrefab, Vector3.zero, Quaternion.identity);
+                head.name = "Segment_Head";
+                head.transform.SetParent(bossObj.transform);
+                head.transform.localPosition = new Vector3(0f, 0f, 0f);
+                head.transform.localScale = new Vector3(4f, 6f, 4f);
+            }
+            else
+            {
+                head = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                head.name = "Segment_Head_FALLBACK";
+                head.transform.SetParent(bossObj.transform);
+                head.transform.localPosition = new Vector3(0f, 0f, 0f);
+                head.transform.localScale = new Vector3(4f, 6f, 4f);
+                Renderer rend = head.GetComponent<Renderer>();
+                rend.material.color = new Color(0.3f, 0.25f, 0.2f);
+            }
+
+            // Body segments (5 segments tapering)
+            for (int i = 0; i < 5; i++)
+            {
+                GameObject segment;
+                float scale = 3.5f - (i * 0.4f); // Taper from 3.5 to 1.9
+                float length = 5f - (i * 0.3f); // Taper length
+                Vector3 pos = new Vector3(0f, -6f - (i * 5f), 0f);
+
+                if (usePrefabs)
+                {
+                    segment = Instantiate(bodyPrefab, Vector3.zero, Quaternion.identity);
+                    segment.name = $"Segment_Body_{i}";
+                    segment.transform.SetParent(bossObj.transform);
+                    segment.transform.localPosition = pos;
+                    segment.transform.localScale = new Vector3(scale, length, scale);
+                }
+                else
+                {
+                    segment = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    segment.name = $"Segment_Body_{i}_FALLBACK";
+                    segment.transform.SetParent(bossObj.transform);
+                    segment.transform.localPosition = pos;
+                    segment.transform.localScale = new Vector3(scale, length, scale);
+                    Renderer rend = segment.GetComponent<Renderer>();
+                    rend.material.color = new Color(0.3f, 0.25f, 0.2f);
+                }
+            }
+
+            // Tail segment (smallest)
+            GameObject tail;
+            if (usePrefabs)
+            {
+                tail = Instantiate(tailPrefab, Vector3.zero, Quaternion.identity);
+                tail.name = "Segment_Tail";
+                tail.transform.SetParent(bossObj.transform);
+                tail.transform.localPosition = new Vector3(0f, -31f, 0f);
+                tail.transform.localScale = new Vector3(1.5f, 3f, 1.5f);
+            }
+            else
+            {
+                tail = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                tail.name = "Segment_Tail_FALLBACK";
+                tail.transform.SetParent(bossObj.transform);
+                tail.transform.localPosition = new Vector3(0f, -31f, 0f);
+                tail.transform.localScale = new Vector3(1.5f, 3f, 1.5f);
+                Renderer rend = tail.GetComponent<Renderer>();
+                rend.material.color = new Color(0.3f, 0.25f, 0.2f);
+            }
 
             // Boss light
             Light bossLight = bossObj.AddComponent<Light>();
@@ -609,11 +907,77 @@ namespace Tartaria.Integration
             }
             else
             {
-                // Fallback: create simple visual
-                segment = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                segment.name = $"RailSegment_{index}";
+                // Multi-part rail track structure (no prefab assigned)
+                segment = new GameObject($"RailSegment_{index}");
                 segment.transform.position = railNodePoints[index];
-                segment.transform.localScale = new Vector3(2f, 0.2f, 20f);
+
+                // Load rail track components
+                GameObject trackPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Rail_Track");
+                GameObject tiesPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Rail_Ties");
+                GameObject ballastPrefab = Resources.Load<GameObject>("Prefabs/Buildings/KayKit/Structure_Rail_Ballast");
+
+                bool usePrefabs = (trackPrefab != null && tiesPrefab != null && ballastPrefab != null);
+                if (!usePrefabs && index == 0)
+                {
+                    Debug.LogError("[Moon10] Rail structure prefabs missing - using fallback primitives");
+                }
+
+                // Rail track (top)
+                GameObject track;
+                if (usePrefabs)
+                {
+                    track = Instantiate(trackPrefab, Vector3.zero, Quaternion.identity);
+                    track.name = "RailTrack";
+                    track.transform.SetParent(segment.transform);
+                    track.transform.localPosition = Vector3.up * 0.2f;
+                    track.transform.localScale = new Vector3(2f, 0.2f, 20f);
+                }
+                else
+                {
+                    track = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    track.name = "RailTrack_FALLBACK";
+                    track.transform.SetParent(segment.transform);
+                    track.transform.localPosition = Vector3.up * 0.2f;
+                    track.transform.localScale = new Vector3(2f, 0.2f, 20f);
+                }
+
+                // Rail ties (middle)
+                GameObject ties;
+                if (usePrefabs)
+                {
+                    ties = Instantiate(tiesPrefab, Vector3.zero, Quaternion.identity);
+                    ties.name = "RailTies";
+                    ties.transform.SetParent(segment.transform);
+                    ties.transform.localPosition = Vector3.zero;
+                    ties.transform.localScale = new Vector3(2.5f, 0.3f, 20f);
+                }
+                else
+                {
+                    ties = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    ties.name = "RailTies_FALLBACK";
+                    ties.transform.SetParent(segment.transform);
+                    ties.transform.localPosition = Vector3.zero;
+                    ties.transform.localScale = new Vector3(2.5f, 0.3f, 20f);
+                }
+
+                // Ballast base (bottom)
+                GameObject ballast;
+                if (usePrefabs)
+                {
+                    ballast = Instantiate(ballastPrefab, Vector3.zero, Quaternion.identity);
+                    ballast.name = "RailBallast";
+                    ballast.transform.SetParent(segment.transform);
+                    ballast.transform.localPosition = Vector3.down * 0.3f;
+                    ballast.transform.localScale = new Vector3(3f, 0.4f, 20f);
+                }
+                else
+                {
+                    ballast = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    ballast.name = "RailBallast_FALLBACK";
+                    ballast.transform.SetParent(segment.transform);
+                    ballast.transform.localPosition = Vector3.down * 0.3f;
+                    ballast.transform.localScale = new Vector3(3f, 0.4f, 20f);
+                }
             }
 
             _railSegments.Add(segment);
