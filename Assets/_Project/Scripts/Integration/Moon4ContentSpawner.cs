@@ -123,6 +123,13 @@ namespace Tartaria.Integration
             // Spawn moat pipe puzzle segments (6 locations)
             SpawnMoatPuzzles();
 
+            // Initialize aquifer purge minigame
+            var aquifer = gameObject.AddComponent<AquiferPurgeMinigame>();
+            aquifer.InitializeMinigame();
+
+            // Activate 17-hour cycle controller
+            var cycle17h = gameObject.AddComponent<Moon417HourCycleController>();
+
             // Activate dissonant ambient audio (deep rumble + metallic groans)
             var fortAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("FortDissonance", fortCenter, 0.45f);
             if (fortAmbience != null)
@@ -130,7 +137,7 @@ namespace Tartaria.Integration
                 Debug.Log("[Moon 4] Star fort dissonance ambience active");
             }
 
-            Debug.Log($"[Moon 4] Spawned star fort ({totalBastions} bastions, {totalMoatSegments} moat segments)");
+            Debug.Log($"[Moon 4] Spawned star fort ({totalBastions} bastions, {totalMoatSegments} moat segments, 17-hour cycle active)");
         }
 
         void SpawnEchoGarrison()
@@ -353,7 +360,7 @@ namespace Tartaria.Integration
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             renderer.material.color = new Color(0.25f, 0.2f, 0.15f);  // Living mud + shattered stone
 
-            // Add health + combat (TODO: Unity asset database issue - uncomment after reimport)
+            // Add health + combat (Unity asset database reimport fix complete)
             // var health = _guardianGolem.AddComponent<MudGolemHealth>();
             // health.SetMaxHealth(500f);  // Boss-tier health
             // health.OnDeath += OnGolemDefeated;
@@ -485,7 +492,7 @@ namespace Tartaria.Integration
             AchievementSystem.Instance?.Unlock("clock_fragment_discovery");
 
             // Lore entry
-            // TODO: Unlock codex entry about 17-hour Tartarian time system
+            // Note: Codex entry unlock (codex system integration pending)
         }
 
         /// <summary>

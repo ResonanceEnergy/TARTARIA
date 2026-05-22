@@ -93,7 +93,7 @@ namespace Tartaria.Integration
                     }
 
         /// <summary>
-        /// Spawns all Moon 2 content: Cassian, dissonance crystals, Mud Golems.
+        /// Spawns all Moon 2 content: Cassian, dissonance crystals, Mud Golems, vein puzzle.
         /// </summary>
         void SpawnMoon2Content()
         {
@@ -109,6 +109,9 @@ namespace Tartaria.Integration
             // Spawn dissonance crystals
             SpawnDissonanceCrystals();
 
+            // Initialize dissonance vein puzzle (12 veins in fractal chambers)
+            InitializeVeinPuzzle();
+
             // Spawn ambient NPCs (Echo civilians wandering the caverns)
             SpawnAmbientNPCs(3);
 
@@ -119,7 +122,7 @@ namespace Tartaria.Integration
                 Debug.Log("[Moon 2] Crystal dissonance ambience active");
             }
 
-            Debug.Log($"[Moon 2] Spawned {totalCrystals} dissonance crystals + Cassian NPC");
+            Debug.Log($"[Moon 2] Spawned {totalCrystals} dissonance crystals + Cassian NPC + 12 vein puzzle");
         }
 
         void SpawnCassian()
@@ -256,6 +259,22 @@ namespace Tartaria.Integration
             return positions;
         }
 
+        void InitializeVeinPuzzle()
+        {
+            // Create vein puzzle system
+            var puzzleGO = new GameObject("Moon2_VeinPuzzle");
+            puzzleGO.transform.position = cassianSpawnPoint;
+            _veinPuzzle = puzzleGO.AddComponent<Gameplay.Moon2DissonanceVeinPuzzle>();
+            _veinPuzzle.InitializePuzzle(bellTowerCenter);
+
+            // Subscribe to completion
+            _veinPuzzle.OnPuzzleComplete += () =>
+            {
+                Debug.Log("[Moon 2] Vein puzzle complete → fountain purge unlocked");
+                // Completion is handled by Moon2ProgressionSystem.OnFountainPurged()
+            };
+        }
+
         void OnCrystalDestroyed(DissonanceCrystal crystal)
         {
             _crystalsDestroyed++;
@@ -269,8 +288,8 @@ namespace Tartaria.Integration
             // Progress tracking
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC /*was ClearDissonance*/, crystal.gameObject.name);
 
-            // Check if all crystals destroyed
-            if (_crystalsDestroyed >= totalCrystals && !fountainPurgeComplete)
+            // Check if all crystals destroyed AND vein puzzle complete
+            if (_crystalsDestroyed >= totalCrystals && _veinPuzzle != null && _veinPuzzle.IsComplete && !fountainPurgeComplete)
             {
                 TriggerFountainPurge();
             }
@@ -353,7 +372,7 @@ namespace Tartaria.Integration
         /// <summary>
         /// Called by save system to restore Moon 2 state.
         /// </summary>
-        public void LoadState(bool unlocked, int crystalsDestroyed, bool fountainComplete)
+        public void LoadState(bool unlocked, int crystalsDestroyed, bool fountainComplete, System.Collections.Generic.HashSet<string> veinState = null)
         {
             moon2Unlocked = unlocked;
             _crystalsDestroyed = crystalsDestroyed;
@@ -372,6 +391,20 @@ namespace Tartaria.Integration
                     Destroy(_activeCrystals[i]);
                 }
             }
+
+            // Restore vein puzzle state
+            if (_veinPuzzle != null && veinState != null)
+            {
+                _veinPuzzle.LoadState(veinState);
+            }
+        }
+
+        /// <summary>
+        /// Save vein puzzle state (for save system integration).
+        /// </summary>
+        public System.Collections.Generic.HashSet<string> GetVeinPuzzleState()
+        {
+            return _veinPuzzle != null ? _veinPuzzle.SaveState() : new System.Collections.Generic.HashSet<string>();
         }
     }
 

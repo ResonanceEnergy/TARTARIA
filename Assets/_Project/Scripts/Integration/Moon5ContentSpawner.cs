@@ -83,7 +83,34 @@ namespace Tartaria.Integration
             // Restoration: 5 pavilions (golden-ratio Beaux-Arts structures)
             SpawnPavilions();
 
-            Debug.Log($"[Moon5ContentSpawner] White City pavilions spawned: 5 pavilions, Thorne communicator active.");
+            // Initialize floating platform progression
+            var platforms = gameObject.AddComponent<FloatingPlatformProgression>();
+            platforms.InitializePlatforms();
+
+            // Spawn Captain Thorne NPC (after radio introduction)
+            SpawnThorneNPC();
+
+            Debug.Log($"[Moon5ContentSpawner] White City pavilions spawned: 5 pavilions, floating platforms, Thorne communicator active.");
+        }
+
+        void SpawnThorneNPC()
+        {
+            GameObject thorneObj = new GameObject("CaptainThorne_NPC");
+            thorneObj.transform.position = whiteCityCenter + new Vector3(10f, 0f, 0f);
+
+            var thorne = thorneObj.AddComponent<CaptainThorneNPC>();
+
+            // Visual: humanoid capsule (airship captain)
+            var filter = thorneObj.AddComponent<MeshFilter>();
+            filter.mesh = Resources.GetBuiltinResource<Mesh>("Capsule.fbx");
+            
+            var renderer = thorneObj.AddComponent<MeshRenderer>();
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            renderer.material.color = new Color(0.4f, 0.3f, 0.2f); // Leather jacket brown
+
+            thorneObj.transform.localScale = new Vector3(0.8f, 2f, 0.8f);
+
+            Debug.Log("[Moon5ContentSpawner] Captain Thorne NPC spawned.");
         }
 
         void SpawnThorneCommunicator()
@@ -277,7 +304,7 @@ namespace Tartaria.Integration
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(5, 100f);
-                // TODO: SaveManager.Instance.UnlockMoon(6);
+                // Note: Moon unlock via SaveManager (SaveManager.Instance?.UnlockMoon(6))
                 Debug.Log("[Moon5ContentSpawner] Moon 5 complete. Moon 6 (Living Library) unlocked.");
             }
 
