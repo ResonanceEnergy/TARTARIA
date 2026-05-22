@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Save;
@@ -295,7 +295,7 @@ namespace Tartaria.Integration
             // Quest completion + Moon 7 unlock
             if (QuestManager.Instance != null)
             {
-                // TODO: QuestManager.Instance.CompleteQuest("moon6_cymatic_requiem");
+                QuestManager.Instance?.CompleteQuest("moon6_cymatic_requiem");
             }
 
             if (SaveManager.Instance != null)
@@ -312,11 +312,6 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            // TODO: SaveManager.Instance.SetMoonData(6, "pipesRepaired", _pipesRepaired);
-            // TODO: SaveManager.Instance.SetMoonData(6, "fountainsRestored", _fountainsRestored);
-            // TODO: SaveManager.Instance.SetMoonData(6, "organRestored", _organRestored ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(6, "cymaticRequiemTriggered", _cymaticRequiemTriggered ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(6, "revelationUnlocked", _revelationUnlocked ? 1 : 0);
         }
 
         void LoadState()
@@ -470,3 +465,4 @@ namespace Tartaria.Integration
         }
     }
 }
+

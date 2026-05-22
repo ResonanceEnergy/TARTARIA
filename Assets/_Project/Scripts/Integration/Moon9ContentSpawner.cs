@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Save;
@@ -264,7 +264,7 @@ namespace Tartaria.Integration
             // Quest completion + Moon 10 unlock
             if (QuestManager.Instance != null)
             {
-                // TODO: QuestManager.Instance.CompleteQuest("moon9_prophecy_stones");
+                QuestManager.Instance?.CompleteQuest("moon9_prophecy_stones");
             }
 
             if (SaveManager.Instance != null)
@@ -306,10 +306,6 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            // TODO: SaveManager.Instance.SetMoonData(9, "stonesCollected", _stonesCollected);
-            // TODO: SaveManager.Instance.SetMoonData(9, "zerethContactMade", _zerethContactMade ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(9, "auroraCityTriggered", _auroraCityTriggered ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(9, "clockTowerInstalled", _clockTowerInstalled ? 1 : 0);
         }
 
         void LoadState()
@@ -384,3 +380,4 @@ namespace Tartaria.Integration
         }
     }
 }
+

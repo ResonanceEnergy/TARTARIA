@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Save;
@@ -227,7 +227,6 @@ namespace Tartaria.Integration
             // Save Cassian fate (affects Moon 9 prophecy quest)
             if (SaveManager.Instance != null)
             {
-                // TODO: SaveManager.Instance.SetMoonData(7, "cassianRedeemed", redeemed ? 1 : 0);
             }
 
             // Trigger golem siege after 3s
@@ -332,7 +331,7 @@ namespace Tartaria.Integration
             // Quest completion + Moon 8 unlock
             if (QuestManager.Instance != null)
             {
-                // TODO: QuestManager.Instance.CompleteQuest("moon7_korath_awakening");
+                QuestManager.Instance?.CompleteQuest("moon7_korath_awakening");
             }
 
             if (SaveManager.Instance != null)
@@ -349,11 +348,6 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            // TODO: SaveManager.Instance.SetMoonData(7, "thawSessionsComplete", _thawSessionsComplete);
-            // TODO: SaveManager.Instance.SetMoonData(7, "korathAwakened", _korathAwakened ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(7, "cassianConfronted", _cassianConfronted ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(7, "golemSiegeComplete", _golemSiegeComplete ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(7, "korathSacrificeComplete", _korathSacrificeComplete ? 1 : 0);
         }
 
         void LoadState()
@@ -492,3 +486,4 @@ namespace Tartaria.Integration
         }
     }
 }
+
