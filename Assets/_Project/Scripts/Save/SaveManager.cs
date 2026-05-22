@@ -219,6 +219,26 @@ namespace Tartaria.Save
             MarkDirty();
         }
 
+        /// <summary>Global game flag (not Moon-specific). Used for endings, unlocks, etc.</summary>
+        public void SetGameFlag(string key, bool value)
+        {
+            if (CurrentSave == null) return;
+            if (value)
+            {
+                if (!CurrentSave.globalFlags.Contains(key))
+                    CurrentSave.globalFlags.Add(key);
+            }
+            else
+                CurrentSave.globalFlags.Remove(key);
+            MarkDirty();
+        }
+
+        public bool GetGameFlag(string key, bool defaultValue = false)
+        {
+            if (CurrentSave == null) return defaultValue;
+            return CurrentSave.globalFlags.Contains(key);
+        }
+
         /// <summary>
         /// Immediately writes save to disk (double-write with checksum).
         /// </summary>
