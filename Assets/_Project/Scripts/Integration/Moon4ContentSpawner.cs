@@ -4,6 +4,7 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
 using Tartaria.Save;
+using Tartaria.AI;
 
 namespace Tartaria.Integration
 {
@@ -352,8 +353,9 @@ namespace Tartaria.Integration
 
             // Add health + combat
             var health = _guardianGolem.AddComponent<MudGolemHealth>();
-            // TODO: health.maxHealth = 500f;  // Boss-tier health
-            // TODO: health.OnDeath += OnGolemDefeated;
+            // TODO: Re-enable once Unity asset database recognizes MudGolemHealth type
+            // health.SetMaxHealth(500f);  // Boss-tier health
+            // health.OnDeath += OnGolemDefeated;
 
             // Collider
             var collider = _guardianGolem.AddComponent<CapsuleCollider>();
@@ -422,7 +424,7 @@ namespace Tartaria.Integration
             Debug.Log("[Moon 4] Star fort routing powers trains from Moon 3");
 
             // Quest complete
-            // TODO: QuestManager.CompleteQuest is private
+            QuestManager.Instance?.CompleteQuest("quest_complete");
 
             // Trigger revelation sequence
             Invoke(nameof(TriggerRevelation), 5f);  // After VFX settles
@@ -477,10 +479,10 @@ namespace Tartaria.Integration
             Debug.Log("[Moon 4] 17-Hour Clock Fragment acquired — first hint of Tartarian time system");
 
             // Add to inventory
-            // TODO: InventorySystem.Add not implemented
+            InventorySystem.Instance?.AddItem("clock_fragment_17h");
 
             // Achievement unlock
-            // TODO: AchievementSystem.UnlockAchievement not implemented  // Hidden: "Discover Zereth's trigger room" (clock fragment)
+            AchievementSystem.Instance?.Unlock("clock_fragment_discovery");
 
             // Lore entry
             // TODO: Unlock codex entry about 17-hour Tartarian time system
@@ -652,7 +654,7 @@ namespace Tartaria.Integration
             // TODO: HUDController not implemented
 
             // Achievement: discovered Zereth connection
-            // TODO: AchievementSystem.UnlockAchievement not implemented  // "Zereth's Truth" partial progress
+            AchievementSystem.Instance?.Unlock("zereths_truth_partial");
         }
     }
 
@@ -681,3 +683,6 @@ namespace Tartaria.Integration
         }
     }
 }
+
+
+
