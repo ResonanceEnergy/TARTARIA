@@ -165,31 +165,43 @@ namespace Tartaria.Integration
                 stoneObj.transform.position = stoneLocations[i];
 
                 // Base pedestal
-                GameObject baseObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                baseObj.name = "Base";
+                GameObject baseObj = new GameObject("Base");
                 baseObj.transform.SetParent(stoneObj.transform);
                 baseObj.transform.localPosition = Vector3.zero;
                 baseObj.transform.localScale = new Vector3(1.5f, 0.3f, 1.5f);
-                Renderer baseRend = baseObj.GetComponent<Renderer>();
-                baseRend.material.color = new Color(0.8f, 0.7f, 0.3f); // Dark golden
+                var baseMF = baseObj.AddComponent<MeshFilter>();
+                var baseMR = baseObj.AddComponent<MeshRenderer>();
+                baseObj.AddComponent<BoxCollider>();
+                var baseMat = Resources.Load<Material>("Materials/ProphecyStoneBase");
+                if (baseMat != null) baseMR.material = baseMat;
+                else baseMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.8f, 0.7f, 0.3f) };
+                Renderer baseRend = baseMR;
 
                 // Shaft
-                GameObject shaftObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                shaftObj.name = "Shaft";
+                GameObject shaftObj = new GameObject("Shaft");
                 shaftObj.transform.SetParent(stoneObj.transform);
                 shaftObj.transform.localPosition = new Vector3(0f, 1f, 0f);
                 shaftObj.transform.localScale = new Vector3(0.3f, 1f, 0.3f);
-                Renderer shaftRend = shaftObj.GetComponent<Renderer>();
-                shaftRend.material.color = new Color(1f, 0.85f, 0.3f); // Golden
+                var shaftMF = shaftObj.AddComponent<MeshFilter>();
+                var shaftMR = shaftObj.AddComponent<MeshRenderer>();
+                shaftObj.AddComponent<CapsuleCollider>();
+                var shaftMat = Resources.Load<Material>("Materials/ProphecyStoneShaft");
+                if (shaftMat != null) shaftMR.material = shaftMat;
+                else shaftMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.85f, 0.3f) };
+                Renderer shaftRend = shaftMR;
 
                 // Capstone
-                GameObject capObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                capObj.name = "Capstone";
+                GameObject capObj = new GameObject("Capstone");
                 capObj.transform.SetParent(stoneObj.transform);
                 capObj.transform.localPosition = new Vector3(0f, 2.2f, 0f);
                 capObj.transform.localScale = Vector3.one * 0.6f;
-                Renderer capRend = capObj.GetComponent<Renderer>();
-                capRend.material.color = new Color(1f, 0.9f, 0.4f); // Bright golden
+                var capMF = capObj.AddComponent<MeshFilter>();
+                var capMR = capObj.AddComponent<MeshRenderer>();
+                capObj.AddComponent<SphereCollider>();
+                var capMat = Resources.Load<Material>("Materials/ProphecyStoneCapstone");
+                if (capMat != null) capMR.material = capMat;
+                else capMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.9f, 0.4f) };
+                Renderer capRend = capMR;
 
                 // Use capstone for primary rendering reference
                 Renderer rend = capRend;
@@ -220,32 +232,44 @@ namespace Tartaria.Integration
             codexObj.transform.position = codexLocation;
 
             // Cover
-            GameObject coverObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            coverObj.name = "Cover";
+            GameObject coverObj = new GameObject("Cover");
             coverObj.transform.SetParent(codexObj.transform);
             coverObj.transform.localPosition = Vector3.zero;
             coverObj.transform.localScale = new Vector3(1.5f, 2f, 0.3f);
-            Renderer coverRend = coverObj.GetComponent<Renderer>();
-            coverRend.material.color = new Color(1f, 0.85f, 0.3f); // Golden cover
+            var coverMF = coverObj.AddComponent<MeshFilter>();
+            var coverMR = coverObj.AddComponent<MeshRenderer>();
+            coverObj.AddComponent<BoxCollider>();
+            var coverMat = Resources.Load<Material>("Materials/GoldenCodexCover");
+            if (coverMat != null) coverMR.material = coverMat;
+            else coverMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.85f, 0.3f) };
+            Renderer coverRend = coverMR;
 
             // Pages (slightly smaller, offset)
-            GameObject pagesObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            pagesObj.name = "Pages";
+            GameObject pagesObj = new GameObject("Pages");
             pagesObj.transform.SetParent(codexObj.transform);
             pagesObj.transform.localPosition = new Vector3(0f, 0f, 0.15f);
             pagesObj.transform.localScale = new Vector3(1.4f, 1.9f, 0.25f);
-            Renderer pagesRend = pagesObj.GetComponent<Renderer>();
-            pagesRend.material.color = new Color(1f, 0.95f, 0.8f); // Parchment
+            var pagesMF = pagesObj.AddComponent<MeshFilter>();
+            var pagesMR = pagesObj.AddComponent<MeshRenderer>();
+            pagesObj.AddComponent<BoxCollider>();
+            var pagesMat = Resources.Load<Material>("Materials/Parchment");
+            if (pagesMat != null) pagesMR.material = pagesMat;
+            else pagesMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.95f, 0.8f) };
+            Renderer pagesRend = pagesMR;
 
             // Binding spine
-            GameObject bindingObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            bindingObj.name = "Binding";
+            GameObject bindingObj = new GameObject("Binding");
             bindingObj.transform.SetParent(codexObj.transform);
             bindingObj.transform.localPosition = new Vector3(-0.75f, 0f, 0f);
             bindingObj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
             bindingObj.transform.localScale = new Vector3(0.2f, 1f, 0.2f);
-            Renderer bindingRend = bindingObj.GetComponent<Renderer>();
-            bindingRend.material.color = new Color(0.7f, 0.6f, 0.2f); // Dark bronze
+            var bindingMF = bindingObj.AddComponent<MeshFilter>();
+            var bindingMR = bindingObj.AddComponent<MeshRenderer>();
+            bindingObj.AddComponent<CapsuleCollider>();
+            var bindingMat = Resources.Load<Material>("Materials/Bronze");
+            if (bindingMat != null) bindingMR.material = bindingMat;
+            else bindingMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.7f, 0.6f, 0.2f) };
+            Renderer bindingRend = bindingMR;
 
             // Use cover for primary rendering reference
             Renderer rend = coverRend;
@@ -411,34 +435,40 @@ namespace Tartaria.Integration
                 platform.transform.localPosition = platformPos;
 
                 // Foundation
-                GameObject foundationObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                foundationObj.name = "Foundation";
+                GameObject foundationObj = new GameObject("Foundation");
                 foundationObj.transform.SetParent(platform.transform);
                 foundationObj.transform.localPosition = new Vector3(0f, -0.5f, 0f);
                 foundationObj.transform.localScale = new Vector3(12f, 0.5f, 12f);
-                Renderer foundRend = foundationObj.GetComponent<Renderer>();
-                foundRend.material.color = new Color(0.9f, 0.8f, 0.5f, 0.9f);
+                var foundMF = foundationObj.AddComponent<MeshFilter>();
+                var foundMR = foundationObj.AddComponent<MeshRenderer>();
+                foundationObj.AddComponent<BoxCollider>();
+                foundMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.9f, 0.8f, 0.5f, 0.9f) };
+                Renderer foundRend = foundMR;
 
                 // Surface
-                GameObject surfaceObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                surfaceObj.name = "Surface";
+                GameObject surfaceObj = new GameObject("Surface");
                 surfaceObj.transform.SetParent(platform.transform);
                 surfaceObj.transform.localPosition = Vector3.zero;
                 surfaceObj.transform.localScale = new Vector3(12f, 0.3f, 12f);
-                Renderer surfRend = surfaceObj.GetComponent<Renderer>();
-                surfRend.material.color = new Color(1f, 0.9f, 0.6f, 0.9f);
+                var surfMF = surfaceObj.AddComponent<MeshFilter>();
+                var surfMR = surfaceObj.AddComponent<MeshRenderer>();
+                surfaceObj.AddComponent<BoxCollider>();
+                surfMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.9f, 0.6f, 0.9f) };
+                Renderer surfRend = surfMR;
 
                 // 4 corner supports
                 for (int s = 0; s < 4; s++)
                 {
-                    GameObject supportObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    supportObj.name = $"Support_{s}";
+                    GameObject supportObj = new GameObject($"Support_{s}");
                     supportObj.transform.SetParent(platform.transform);
                     float sAngle = s * 90f * Mathf.Deg2Rad;
                     supportObj.transform.localPosition = new Vector3(Mathf.Cos(sAngle) * 5f, -1.5f, Mathf.Sin(sAngle) * 5f);
                     supportObj.transform.localScale = new Vector3(0.4f, 1.5f, 0.4f);
-                    Renderer supRend = supportObj.GetComponent<Renderer>();
-                    supRend.material.color = new Color(0.8f, 0.7f, 0.4f);
+                    var supMF = supportObj.AddComponent<MeshFilter>();
+                    var supMR = supportObj.AddComponent<MeshRenderer>();
+                    supportObj.AddComponent<CapsuleCollider>();
+                    supMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.8f, 0.7f, 0.4f) };
+                    Renderer supRend = supMR;
                 }
 
                 // Use surface for primary rendering reference
@@ -460,33 +490,39 @@ namespace Tartaria.Integration
                     loreObj.transform.localPosition = Vector3.up * 2f;
 
                     // Core sphere
-                    GameObject coreObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    coreObj.name = "Core";
+                    GameObject coreObj = new GameObject("Core");
                     coreObj.transform.SetParent(loreObj.transform);
                     coreObj.transform.localPosition = Vector3.zero;
                     coreObj.transform.localScale = Vector3.one * 0.8f;
-                    Renderer coreRend = coreObj.GetComponent<Renderer>();
-                    coreRend.material.color = new Color(1f, 0.95f, 0.7f);
+                    var coreMF = coreObj.AddComponent<MeshFilter>();
+                    var coreMR = coreObj.AddComponent<MeshRenderer>();
+                    coreObj.AddComponent<SphereCollider>();
+                    coreMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.95f, 0.7f) };
+                    Renderer coreRend = coreMR;
 
                     // Ring 1 (horizontal)
-                    GameObject ring1Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    ring1Obj.name = "Ring1";
+                    GameObject ring1Obj = new GameObject("Ring1");
                     ring1Obj.transform.SetParent(loreObj.transform);
                     ring1Obj.transform.localPosition = Vector3.zero;
                     ring1Obj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                     ring1Obj.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
-                    Renderer r1Rend = ring1Obj.GetComponent<Renderer>();
-                    r1Rend.material.color = new Color(1f, 0.9f, 0.5f, 0.7f);
+                    var r1MF = ring1Obj.AddComponent<MeshFilter>();
+                    var r1MR = ring1Obj.AddComponent<MeshRenderer>();
+                    ring1Obj.AddComponent<CapsuleCollider>();
+                    r1MR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.9f, 0.5f, 0.7f) };
+                    Renderer r1Rend = r1MR;
 
                     // Ring 2 (vertical)
-                    GameObject ring2Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    ring2Obj.name = "Ring2";
+                    GameObject ring2Obj = new GameObject("Ring2");
                     ring2Obj.transform.SetParent(loreObj.transform);
                     ring2Obj.transform.localPosition = Vector3.zero;
                     ring2Obj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
                     ring2Obj.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
-                    Renderer r2Rend = ring2Obj.GetComponent<Renderer>();
-                    r2Rend.material.color = new Color(1f, 0.85f, 0.4f, 0.7f);
+                    var r2MF = ring2Obj.AddComponent<MeshFilter>();
+                    var r2MR = ring2Obj.AddComponent<MeshRenderer>();
+                    ring2Obj.AddComponent<CapsuleCollider>();
+                    r2MR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.85f, 0.4f, 0.7f) };
+                    Renderer r2Rend = r2MR;
 
                     AuroraLoreFragment lore = loreObj.AddComponent<AuroraLoreFragment>();
                     lore.fragmentIndex = i / 3;
@@ -499,45 +535,54 @@ namespace Tartaria.Integration
             spire.transform.localPosition = new Vector3(0f, 30f, 0f);
 
             // Base
-            GameObject spireBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireBase.name = "Base";
+            GameObject spireBase = new GameObject("Base");
             spireBase.transform.SetParent(spire.transform);
             spireBase.transform.localPosition = new Vector3(0f, -10f, 0f);
             spireBase.transform.localScale = new Vector3(5f, 10f, 5f);
-            Renderer baseRend = spireBase.GetComponent<Renderer>();
-            baseRend.material.color = new Color(0.9f, 0.8f, 0.5f);
+            var baseMF = spireBase.AddComponent<MeshFilter>();
+            var baseMR = spireBase.AddComponent<MeshRenderer>();
+            spireBase.AddComponent<CapsuleCollider>();
+            baseMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.9f, 0.8f, 0.5f) };
+            Renderer baseRend = baseMR;
 
             // Mid shaft
-            GameObject spireMid = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireMid.name = "MidShaft";
+            GameObject spireMid = new GameObject("MidShaft");
             spireMid.transform.SetParent(spire.transform);
             spireMid.transform.localPosition = new Vector3(0f, 10f, 0f);
             spireMid.transform.localScale = new Vector3(3f, 20f, 3f);
-            Renderer midRend = spireMid.GetComponent<Renderer>();
-            midRend.material.color = new Color(1f, 0.9f, 0.6f);
+            var midMF = spireMid.AddComponent<MeshFilter>();
+            var midMR = spireMid.AddComponent<MeshRenderer>();
+            spireMid.AddComponent<CapsuleCollider>();
+            midMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.9f, 0.6f) };
+            Renderer midRend = midMR;
 
             // Top spire
-            GameObject spireTop = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireTop.name = "TopSpire";
+            GameObject spireTop = new GameObject("TopSpire");
             spireTop.transform.SetParent(spire.transform);
             spireTop.transform.localPosition = new Vector3(0f, 35f, 0f);
             spireTop.transform.localScale = new Vector3(1.5f, 15f, 1.5f);
-            Renderer topRend = spireTop.GetComponent<Renderer>();
-            topRend.material.color = new Color(1f, 0.95f, 0.7f);
+            var topMF = spireTop.AddComponent<MeshFilter>();
+            var topMR = spireTop.AddComponent<MeshRenderer>();
+            spireTop.AddComponent<CapsuleCollider>();
+            topMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.95f, 0.7f) };
+            Renderer topRend = topMR;
 
             // Capstone
-            GameObject spireCap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            spireCap.name = "Capstone";
+            GameObject spireCap = new GameObject("Capstone");
             spireCap.transform.SetParent(spire.transform);
             spireCap.transform.localPosition = new Vector3(0f, 52f, 0f);
             spireCap.transform.localScale = Vector3.one * 3f;
-            Renderer capRend = spireCap.GetComponent<Renderer>();
-            capRend.material.color = new Color(1f, 1f, 0.9f);
+            var capMF = spireCap.AddComponent<MeshFilter>();
+            var capMR = spireCap.AddComponent<MeshRenderer>();
+            spireCap.AddComponent<SphereCollider>();
+            capMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 1f, 0.9f) };
+            Renderer capRend = capMR;
 
             // Use mid shaft as reference
             Renderer spireRend = midRend;
-            Renderer sRend = spire.GetComponent<Renderer>();
-            sRend.material.color = new Color(1f, 0.85f, 0.4f, 0.95f);
+            var spireMR2 = spire.AddComponent<MeshRenderer>();
+            spireMR2.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.85f, 0.4f, 0.95f) };
+            Renderer sRend = spireMR2;
 
             // Spawn temporal guardian boss at spire top
             SpawnTemporalGuardian(spire.transform.position + Vector3.up * 45f);
@@ -595,61 +640,73 @@ namespace Tartaria.Integration
             bossObj.transform.position = position;
 
             // Core sphere (central eye)
-            GameObject coreObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            coreObj.name = "Core";
+            GameObject coreObj = new GameObject("Core");
             coreObj.transform.SetParent(bossObj.transform);
             coreObj.transform.localPosition = Vector3.zero;
             coreObj.transform.localScale = Vector3.one * 3f;
-            Renderer coreRend = coreObj.GetComponent<Renderer>();
-            coreRend.material.color = new Color(0.7f, 0.8f, 1f, 0.95f); // Blue-white core
+            var coreMF = coreObj.AddComponent<MeshFilter>();
+            var coreMR = coreObj.AddComponent<MeshRenderer>();
+            coreObj.AddComponent<SphereCollider>();
+            coreMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.7f, 0.8f, 1f, 0.95f) };
+            Renderer coreRend = coreMR;
 
             // Ring 1 (horizontal equator)
-            GameObject ring1Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            ring1Obj.name = "Ring_Equator";
+            GameObject ring1Obj = new GameObject("Ring_Equator");
             ring1Obj.transform.SetParent(bossObj.transform);
             ring1Obj.transform.localPosition = Vector3.zero;
             ring1Obj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             ring1Obj.transform.localScale = new Vector3(5f, 0.3f, 5f);
-            Renderer r1Rend = ring1Obj.GetComponent<Renderer>();
-            r1Rend.material.color = new Color(0.8f, 0.9f, 1f, 0.8f);
+            var r1MF = ring1Obj.AddComponent<MeshFilter>();
+            var r1MR = ring1Obj.AddComponent<MeshRenderer>();
+            ring1Obj.AddComponent<CapsuleCollider>();
+            r1MR.material = new Material(Shader.Find("Standard")) { color = new Color(0.8f, 0.9f, 1f, 0.8f) };
+            Renderer r1Rend = r1MR;
 
             // Ring 2 (vertical meridian 1)
-            GameObject ring2Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            ring2Obj.name = "Ring_Meridian1";
+            GameObject ring2Obj = new GameObject("Ring_Meridian1");
             ring2Obj.transform.SetParent(bossObj.transform);
             ring2Obj.transform.localPosition = Vector3.zero;
             ring2Obj.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
             ring2Obj.transform.localScale = new Vector3(5f, 0.3f, 5f);
-            Renderer r2Rend = ring2Obj.GetComponent<Renderer>();
-            r2Rend.material.color = new Color(0.75f, 0.85f, 1f, 0.75f);
+            var r2MF = ring2Obj.AddComponent<MeshFilter>();
+            var r2MR = ring2Obj.AddComponent<MeshRenderer>();
+            ring2Obj.AddComponent<CapsuleCollider>();
+            r2MR.material = new Material(Shader.Find("Standard")) { color = new Color(0.75f, 0.85f, 1f, 0.75f) };
+            Renderer r2Rend = r2MR;
 
             // Ring 3 (vertical meridian 2 - perpendicular)
-            GameObject ring3Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            ring3Obj.name = "Ring_Meridian2";
+            GameObject ring3Obj = new GameObject("Ring_Meridian2");
             ring3Obj.transform.SetParent(bossObj.transform);
             ring3Obj.transform.localPosition = Vector3.zero;
             ring3Obj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
             ring3Obj.transform.localScale = new Vector3(5f, 0.3f, 5f);
-            Renderer r3Rend = ring3Obj.GetComponent<Renderer>();
-            r3Rend.material.color = new Color(0.7f, 0.8f, 1f, 0.7f);
+            var r3MF = ring3Obj.AddComponent<MeshFilter>();
+            var r3MR = ring3Obj.AddComponent<MeshRenderer>();
+            ring3Obj.AddComponent<CapsuleCollider>();
+            r3MR.material = new Material(Shader.Find("Standard")) { color = new Color(0.7f, 0.8f, 1f, 0.7f) };
+            Renderer r3Rend = r3MR;
 
             // Top cap (crown)
-            GameObject topCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            topCapObj.name = "TopCap";
+            GameObject topCapObj = new GameObject("TopCap");
             topCapObj.transform.SetParent(bossObj.transform);
             topCapObj.transform.localPosition = new Vector3(0f, 4f, 0f);
             topCapObj.transform.localScale = Vector3.one * 1.5f;
-            Renderer topRend = topCapObj.GetComponent<Renderer>();
-            topRend.material.color = new Color(0.9f, 0.95f, 1f, 0.9f);
+            var topMF = topCapObj.AddComponent<MeshFilter>();
+            var topMR = topCapObj.AddComponent<MeshRenderer>();
+            topCapObj.AddComponent<SphereCollider>();
+            topMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.9f, 0.95f, 1f, 0.9f) };
+            Renderer topRend = topMR;
 
             // Bottom cap (anchor)
-            GameObject botCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            botCapObj.name = "BottomCap";
+            GameObject botCapObj = new GameObject("BottomCap");
             botCapObj.transform.SetParent(bossObj.transform);
             botCapObj.transform.localPosition = new Vector3(0f, -4f, 0f);
             botCapObj.transform.localScale = Vector3.one * 1.5f;
-            Renderer botRend = botCapObj.GetComponent<Renderer>();
-            botRend.material.color = new Color(0.9f, 0.95f, 1f, 0.9f);
+            var botMF = botCapObj.AddComponent<MeshFilter>();
+            var botMR = botCapObj.AddComponent<MeshRenderer>();
+            botCapObj.AddComponent<SphereCollider>();
+            botMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.9f, 0.95f, 1f, 0.9f) };
+            Renderer botRend = botMR;
 
             // Use core as primary reference
             Renderer rend = coreRend;
@@ -786,50 +843,60 @@ namespace Tartaria.Integration
             clockObj.transform.position = clockTowerPos;
 
             // Base platform
-            GameObject baseObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            baseObj.name = "Base";
+            GameObject baseObj = new GameObject("Base");
             baseObj.transform.SetParent(clockObj.transform);
             baseObj.transform.localPosition = new Vector3(0f, -10f, 0f);
             baseObj.transform.localScale = new Vector3(4f, 1f, 4f);
-            Renderer baseRend = baseObj.GetComponent<Renderer>();
-            baseRend.material.color = new Color(0.6f, 0.5f, 0.3f);
+            var baseMF = baseObj.AddComponent<MeshFilter>();
+            var baseMR = baseObj.AddComponent<MeshRenderer>();
+            baseObj.AddComponent<BoxCollider>();
+            baseMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.6f, 0.5f, 0.3f) };
+            Renderer baseRend = baseMR;
 
             // Tower shaft
-            GameObject shaftObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            shaftObj.name = "Shaft";
+            GameObject shaftObj = new GameObject("Shaft");
             shaftObj.transform.SetParent(clockObj.transform);
             shaftObj.transform.localPosition = Vector3.zero;
             shaftObj.transform.localScale = new Vector3(2f, 20f, 2f);
-            Renderer shaftRend = shaftObj.GetComponent<Renderer>();
-            shaftRend.material.color = new Color(0.85f, 0.7f, 0.3f); // Brass
+            var shaftMF = shaftObj.AddComponent<MeshFilter>();
+            var shaftMR = shaftObj.AddComponent<MeshRenderer>();
+            shaftObj.AddComponent<CapsuleCollider>();
+            shaftMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.85f, 0.7f, 0.3f) };
+            Renderer shaftRend = shaftMR;
 
             // Clock face
-            GameObject faceObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            faceObj.name = "ClockFace";
+            GameObject faceObj = new GameObject("ClockFace");
             faceObj.transform.SetParent(clockObj.transform);
             faceObj.transform.localPosition = new Vector3(0f, 15f, 2.2f);
             faceObj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             faceObj.transform.localScale = new Vector3(2.5f, 0.2f, 2.5f);
-            Renderer faceRend = faceObj.GetComponent<Renderer>();
-            faceRend.material.color = new Color(1f, 0.95f, 0.8f); // White face
+            var faceMF = faceObj.AddComponent<MeshFilter>();
+            var faceMR = faceObj.AddComponent<MeshRenderer>();
+            faceObj.AddComponent<CapsuleCollider>();
+            faceMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.95f, 0.8f) };
+            Renderer faceRend = faceMR;
 
             // Bell housing (top)
-            GameObject bellObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            bellObj.name = "BellHousing";
+            GameObject bellObj = new GameObject("BellHousing");
             bellObj.transform.SetParent(clockObj.transform);
             bellObj.transform.localPosition = new Vector3(0f, 22f, 0f);
             bellObj.transform.localScale = new Vector3(2.5f, 2f, 2.5f);
-            Renderer bellRend = bellObj.GetComponent<Renderer>();
-            bellRend.material.color = new Color(0.7f, 0.6f, 0.3f);
+            var bellMF = bellObj.AddComponent<MeshFilter>();
+            var bellMR = bellObj.AddComponent<MeshRenderer>();
+            bellObj.AddComponent<BoxCollider>();
+            bellMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.7f, 0.6f, 0.3f) };
+            Renderer bellRend = bellMR;
 
             // Spire cap
-            GameObject spireObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireObj.name = "Spire";
+            GameObject spireObj = new GameObject("Spire");
             spireObj.transform.SetParent(clockObj.transform);
             spireObj.transform.localPosition = new Vector3(0f, 25f, 0f);
             spireObj.transform.localScale = new Vector3(0.5f, 3f, 0.5f);
-            Renderer spireRend = spireObj.GetComponent<Renderer>();
-            spireRend.material.color = new Color(0.9f, 0.8f, 0.4f);
+            var spireMF = spireObj.AddComponent<MeshFilter>();
+            var spireMR = spireObj.AddComponent<MeshRenderer>();
+            spireObj.AddComponent<CapsuleCollider>();
+            spireMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.9f, 0.8f, 0.4f) };
+            Renderer spireRend = spireMR;
 
             // Use shaft as primary reference
             Renderer rend = shaftRend;
@@ -1072,35 +1139,41 @@ namespace Tartaria.Integration
                 rift.transform.position = riftPos;
 
                 // Core vortex
-                GameObject coreObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                coreObj.name = "Core";
+                GameObject coreObj = new GameObject("Core");
                 coreObj.transform.SetParent(rift.transform);
                 coreObj.transform.localPosition = Vector3.zero;
                 coreObj.transform.localScale = Vector3.one * 2f;
-                Renderer coreRend = coreObj.GetComponent<Renderer>();
-                coreRend.material.color = new Color(0.6f, 0.8f, 1f, 0.7f);
+                var coreMF = coreObj.AddComponent<MeshFilter>();
+                var coreMR = coreObj.AddComponent<MeshRenderer>();
+                coreObj.AddComponent<SphereCollider>();
+                coreMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.6f, 0.8f, 1f, 0.7f) };
+                Renderer coreRend = coreMR;
 
                 // Outer swirl ring
-                GameObject swirlObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                swirlObj.name = "Swirl";
+                GameObject swirlObj = new GameObject("Swirl");
                 swirlObj.transform.SetParent(rift.transform);
                 swirlObj.transform.localPosition = Vector3.zero;
                 swirlObj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                 swirlObj.transform.localScale = new Vector3(3.5f, 0.1f, 3.5f);
-                Renderer swirlRend = swirlObj.GetComponent<Renderer>();
-                swirlRend.material.color = new Color(0.7f, 0.9f, 1f, 0.5f);
+                var swirlMF = swirlObj.AddComponent<MeshFilter>();
+                var swirlMR = swirlObj.AddComponent<MeshRenderer>();
+                swirlObj.AddComponent<CapsuleCollider>();
+                swirlMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.7f, 0.9f, 1f, 0.5f) };
+                Renderer swirlRend = swirlMR;
 
                 // Energy tendrils (4 small spheres orbiting)
                 for (int t = 0; t < 4; t++)
                 {
                     float tAngle = t * 90f * Mathf.Deg2Rad;
-                    GameObject tendrilObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    tendrilObj.name = $"Tendril_{t}";
+                    GameObject tendrilObj = new GameObject($"Tendril_{t}");
                     tendrilObj.transform.SetParent(rift.transform);
                     tendrilObj.transform.localPosition = new Vector3(Mathf.Cos(tAngle) * 2f, 0f, Mathf.Sin(tAngle) * 2f);
                     tendrilObj.transform.localScale = Vector3.one * 0.5f;
-                    Renderer tRend = tendrilObj.GetComponent<Renderer>();
-                    tRend.material.color = new Color(0.8f, 0.95f, 1f, 0.8f);
+                    var tMF = tendrilObj.AddComponent<MeshFilter>();
+                    var tMR = tendrilObj.AddComponent<MeshRenderer>();
+                    tendrilObj.AddComponent<SphereCollider>();
+                    tMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.8f, 0.95f, 1f, 0.8f) };
+                    Renderer tRend = tMR;
                 }
             }
         }
@@ -1185,41 +1258,49 @@ namespace Tartaria.Integration
             blueprint.transform.position = transform.position;
 
             // Scroll cylinder (rolled)
-            GameObject scrollObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            scrollObj.name = "Scroll";
+            GameObject scrollObj = new GameObject("Scroll");
             scrollObj.transform.SetParent(blueprint.transform);
             scrollObj.transform.localPosition = Vector3.zero;
             scrollObj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
             scrollObj.transform.localScale = new Vector3(0.3f, 1f, 0.3f);
-            Renderer scrollRend = scrollObj.GetComponent<Renderer>();
-            scrollRend.material.color = new Color(1f, 0.95f, 0.85f);
+            var scrollMF = scrollObj.AddComponent<MeshFilter>();
+            var scrollMR = scrollObj.AddComponent<MeshRenderer>();
+            scrollObj.AddComponent<CapsuleCollider>();
+            scrollMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.95f, 0.85f) };
+            Renderer scrollRend = scrollMR;
 
             // Left endcap
-            GameObject leftCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            leftCapObj.name = "LeftCap";
+            GameObject leftCapObj = new GameObject("LeftCap");
             leftCapObj.transform.SetParent(blueprint.transform);
             leftCapObj.transform.localPosition = new Vector3(-1f, 0f, 0f);
             leftCapObj.transform.localScale = Vector3.one * 0.4f;
-            Renderer leftRend = leftCapObj.GetComponent<Renderer>();
-            leftRend.material.color = new Color(0.7f, 0.6f, 0.3f);
+            var leftMF = leftCapObj.AddComponent<MeshFilter>();
+            var leftMR = leftCapObj.AddComponent<MeshRenderer>();
+            leftCapObj.AddComponent<SphereCollider>();
+            leftMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.7f, 0.6f, 0.3f) };
+            Renderer leftRend = leftMR;
 
             // Right endcap
-            GameObject rightCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            rightCapObj.name = "RightCap";
+            GameObject rightCapObj = new GameObject("RightCap");
             rightCapObj.transform.SetParent(blueprint.transform);
             rightCapObj.transform.localPosition = new Vector3(1f, 0f, 0f);
             rightCapObj.transform.localScale = Vector3.one * 0.4f;
-            Renderer rightRend = rightCapObj.GetComponent<Renderer>();
-            rightRend.material.color = new Color(0.7f, 0.6f, 0.3f);
+            var rightMF = rightCapObj.AddComponent<MeshFilter>();
+            var rightMR = rightCapObj.AddComponent<MeshRenderer>();
+            rightCapObj.AddComponent<SphereCollider>();
+            rightMR.material = new Material(Shader.Find("Standard")) { color = new Color(0.7f, 0.6f, 0.3f) };
+            Renderer rightRend = rightMR;
 
             // Glow orb (blueprint marker)
-            GameObject glowObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            glowObj.name = "Glow";
+            GameObject glowObj = new GameObject("Glow");
             glowObj.transform.SetParent(blueprint.transform);
             glowObj.transform.localPosition = new Vector3(0f, 1f, 0f);
             glowObj.transform.localScale = Vector3.one * 0.6f;
-            Renderer glowRend = glowObj.GetComponent<Renderer>();
-            glowRend.material.color = new Color(1f, 0.9f, 0.6f);
+            var glowMF = glowObj.AddComponent<MeshFilter>();
+            var glowMR = glowObj.AddComponent<MeshRenderer>();
+            glowObj.AddComponent<SphereCollider>();
+            glowMR.material = new Material(Shader.Find("Standard")) { color = new Color(1f, 0.9f, 0.6f) };
+            Renderer glowRend = glowMR;
 
             // Use glow as primary reference
             Renderer rend = glowRend;
