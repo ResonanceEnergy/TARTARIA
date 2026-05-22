@@ -9,7 +9,7 @@ namespace Tartaria.Gameplay
     /// Singleton pattern for global access: HitVFXController.Instance.SpawnHitVFX(...).
     /// Pools 10 particle systems per VFX type (spark, blood, shield).
     /// Auto-returns particles to pool after 1s duration.
-    /// Uses Resources.Load() for VFX prefabs with graceful fallback if missing.
+    /// Uses SerializeField prefab references with graceful procedural fallback if missing.
     /// </summary>
     public class HitVFXController : MonoBehaviour
     {
@@ -19,10 +19,10 @@ namespace Tartaria.Gameplay
         [SerializeField] private int _poolSizePerType = 10;
         [SerializeField] private float _autoReturnDelay = 1f;
 
-        [Header("VFX Prefab Paths (Resources folder)")]
-        [SerializeField] private string _sparkVfxPath = "VFX/HitSpark";
-        [SerializeField] private string _bloodVfxPath = "VFX/HitBlood";
-        [SerializeField] private string _shieldVfxPath = "VFX/HitShield";
+        [Header("VFX Prefab References")]
+        [SerializeField] private GameObject _sparkVfxPrefab;
+        [SerializeField] private GameObject _bloodVfxPrefab;
+        [SerializeField] private GameObject _shieldVfxPrefab;
 
         [Header("Fallback Particle Settings (if prefabs missing)")]
         [SerializeField] private Color _sparkColor = new Color(1f, 0.8f, 0.2f, 1f); // Orange sparks
@@ -60,10 +60,36 @@ namespace Tartaria.Gameplay
 
         private void InitializePools()
         {
-            // Load VFX prefabs from Resources
-            LoadVFXPrefab(HitType.Spark, _sparkVfxPath);
-            LoadVFXPrefab(HitType.Blood, _bloodVfxPath);
-            LoadVFXPrefab(HitType.Shield, _shieldVfxPath);
+            // Cache VFX prefabs from SerializeField references
+            if (_sparkVfxPrefab != null)
+            {
+                _prefabCache[HitType.Spark] = _sparkVfxPrefab;
+                Debug.Log("[HitVFXController] Using assigned Spark VFX prefab");
+            }
+            else
+            {
+                Debug.LogWarning("[HitVFXController] Spark VFX prefab not assigned, will use procedural fallback");
+            }
+
+            if (_bloodVfxPrefab != null)
+            {
+                _prefabCache[HitType.Blood] = _bloodVfxPrefab;
+                Debug.Log("[HitVFXController] Using assigned Blood VFX prefab");
+            }
+            else
+            {
+                Debug.LogWarning("[HitVFXController] Blood VFX prefab not assigned, will use procedural fallback");
+            }
+
+            if (_shieldVfxPrefab != null)
+            {
+                _prefabCache[HitType.Shield] = _shieldVfxPrefab;
+                Debug.Log("[HitVFXController] Using assigned Shield VFX prefab");
+            }
+            else
+            {
+                Debug.LogWarning("[HitVFXController] Shield VFX prefab not assigned, will use procedural fallback");
+            }
 
             // Initialize pools for each type
             foreach (HitType hitType in System.Enum.GetValues(typeof(HitType)))
@@ -85,21 +111,6 @@ namespace Tartaria.Gameplay
 
             int totalPooled = _poolSizePerType * System.Enum.GetValues(typeof(HitType)).Length;
             Debug.Log($"[HitVFXController] Initialized VFX pools: {totalPooled} particles across {System.Enum.GetValues(typeof(HitType)).Length} types");
-        }
-
-        private void LoadVFXPrefab(HitType hitType, string resourcePath)
-        {
-            GameObject prefab = Resources.Load<GameObject>(resourcePath);
-            if (prefab != null)
-            {
-                _prefabCache[hitType] = prefab;
-                Debug.Log($"[HitVFXController] Loaded {hitType} VFX from {resourcePath}");
-            }
-            else
-            {
-                Debug.LogWarning($"[HitVFXController] VFX prefab not found at {resourcePath}, will use procedural fallback");
-                _prefabCache[hitType] = null;
-            }
         }
 
         private ParticleSystem CreateVFXInstance(HitType hitType)
