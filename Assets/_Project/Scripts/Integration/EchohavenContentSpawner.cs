@@ -250,21 +250,63 @@ namespace Tartaria.Integration
                 root = new GameObject("ShovelPickup");
                 root.transform.position = spawn;
 
-                var handle = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                handle.name = "Handle";
-                handle.transform.SetParent(root.transform, false);
-                handle.transform.localPosition = new Vector3(0f, 0.65f, 0f);
-                handle.transform.localRotation = Quaternion.Euler(0f, 0f, 18f);
-                handle.transform.localScale = new Vector3(0.06f, 0.65f, 0.06f);
+                // Multi-part shovel handle assembly (3 parts: shaft + grip + pommel)
+                var handleRoot = new GameObject("Handle");
+                handleRoot.transform.SetParent(root.transform, false);
+                handleRoot.transform.localPosition = new Vector3(0f, 0.65f, 0f);
+                handleRoot.transform.localRotation = Quaternion.Euler(0f, 0f, 18f);
 
-                var blade = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                blade.name = "Blade";
-                blade.transform.SetParent(root.transform, false);
-                blade.transform.localPosition = new Vector3(0f, 0.15f, 0f);
-                blade.transform.localScale = new Vector3(0.26f, 0.18f, 0.10f);
+                var shaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                shaft.name = "Shaft";
+                shaft.transform.SetParent(handleRoot.transform, false);
+                shaft.transform.localScale = new Vector3(0.06f, 0.65f, 0.06f);
+                SetLitMaterial(shaft, new Color(0.35f, 0.25f, 0.12f), 0.12f);
 
-                SetLitMaterial(handle, new Color(0.35f, 0.25f, 0.12f), 0.12f);
-                SetEmissiveMaterial(blade, new Color(0.9f, 0.85f, 0.65f), 0.5f);
+                var grip = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                grip.name = "Grip";
+                grip.transform.SetParent(handleRoot.transform, false);
+                grip.transform.localPosition = new Vector3(0f, 0.3f, 0f);
+                grip.transform.localScale = new Vector3(0.08f, 0.25f, 0.08f);
+                SetLitMaterial(grip, new Color(0.25f, 0.18f, 0.10f), 0.18f);
+
+                var pommel = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                pommel.name = "Pommel";
+                pommel.transform.SetParent(handleRoot.transform, false);
+                pommel.transform.localPosition = new Vector3(0f, -0.65f, 0f);
+                pommel.transform.localScale = new Vector3(0.12f, 0.12f, 0.12f);
+                SetLitMaterial(pommel, new Color(0.25f, 0.18f, 0.10f), 0.15f);
+
+                // Multi-part blade assembly (4 parts: main blade + edge + side plates)
+                var bladeRoot = new GameObject("Blade");
+                bladeRoot.transform.SetParent(root.transform, false);
+                bladeRoot.transform.localPosition = new Vector3(0f, 0.15f, 0f);
+
+                var bladeMain = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                bladeMain.name = "BladeMain";
+                bladeMain.transform.SetParent(bladeRoot.transform, false);
+                bladeMain.transform.localScale = new Vector3(0.26f, 0.18f, 0.10f);
+                SetEmissiveMaterial(bladeMain, new Color(0.9f, 0.85f, 0.65f), 0.5f);
+
+                var bladeEdge = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                bladeEdge.name = "BladeEdge";
+                bladeEdge.transform.SetParent(bladeRoot.transform, false);
+                bladeEdge.transform.localPosition = new Vector3(0f, 0f, 0.08f);
+                bladeEdge.transform.localScale = new Vector3(0.22f, 0.15f, 0.04f);
+                SetEmissiveMaterial(bladeEdge, new Color(1f, 0.95f, 0.75f), 0.8f);
+
+                var bladeSideL = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                bladeSideL.name = "BladeSideL";
+                bladeSideL.transform.SetParent(bladeRoot.transform, false);
+                bladeSideL.transform.localPosition = new Vector3(-0.12f, 0f, 0f);
+                bladeSideL.transform.localScale = new Vector3(0.04f, 0.12f, 0.08f);
+                SetEmissiveMaterial(bladeSideL, new Color(0.85f, 0.80f, 0.60f), 0.4f);
+
+                var bladeSideR = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                bladeSideR.name = "BladeSideR";
+                bladeSideR.transform.SetParent(bladeRoot.transform, false);
+                bladeSideR.transform.localPosition = new Vector3(0.12f, 0f, 0f);
+                bladeSideR.transform.localScale = new Vector3(0.04f, 0.12f, 0.08f);
+                SetEmissiveMaterial(bladeSideR, new Color(0.85f, 0.80f, 0.60f), 0.4f);
             }
 
             var c = root.GetComponent<SphereCollider>();
@@ -303,12 +345,37 @@ namespace Tartaria.Integration
                     float y = SampleGroundY(pos.x, pos.z);
                     if (!float.IsNaN(y)) pos.y = y;
 
-                    var mound = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    mound.name = $"MudMound_{c}_{i}";
+                    // Multi-part mud mound (4 parts: base + top + side chunks)
+                    var mound = new GameObject($"MudMound_{c}_{i}");
                     mound.transform.SetParent(parent.transform, false);
                     mound.transform.position = pos + new Vector3(0f, 0.3f, 0f);
-                    mound.transform.localScale = new Vector3(2.0f, 0.8f, 2.0f);
-                    SetLitMaterial(mound, new Color(0.24f, 0.17f, 0.10f), 0.06f);
+
+                    var moundBase = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    moundBase.name = "Base";
+                    moundBase.transform.SetParent(mound.transform, false);
+                    moundBase.transform.localScale = new Vector3(2.0f, 0.8f, 2.0f);
+                    SetLitMaterial(moundBase, new Color(0.24f, 0.17f, 0.10f), 0.06f);
+
+                    var moundTop = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    moundTop.name = "Top";
+                    moundTop.transform.SetParent(mound.transform, false);
+                    moundTop.transform.localPosition = new Vector3(0f, 0.4f, 0f);
+                    moundTop.transform.localScale = new Vector3(1.5f, 0.6f, 1.5f);
+                    SetLitMaterial(moundTop, new Color(0.26f, 0.19f, 0.12f), 0.05f);
+
+                    var moundChunkL = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    moundChunkL.name = "ChunkL";
+                    moundChunkL.transform.SetParent(mound.transform, false);
+                    moundChunkL.transform.localPosition = new Vector3(-0.8f, 0.2f, 0f);
+                    moundChunkL.transform.localScale = new Vector3(0.6f, 0.5f, 0.6f);
+                    SetLitMaterial(moundChunkL, new Color(0.22f, 0.16f, 0.09f), 0.04f);
+
+                    var moundChunkR = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    moundChunkR.name = "ChunkR";
+                    moundChunkR.transform.SetParent(mound.transform, false);
+                    moundChunkR.transform.localPosition = new Vector3(0.8f, 0.2f, 0f);
+                    moundChunkR.transform.localScale = new Vector3(0.6f, 0.5f, 0.6f);
+                    SetLitMaterial(moundChunkR, new Color(0.22f, 0.16f, 0.09f), 0.04f);
                 }
             }
 
@@ -419,19 +486,53 @@ namespace Tartaria.Integration
                 float y = SampleGroundY(x, z);
                 if (float.IsNaN(y)) continue;
 
-                var tuft = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                tuft.name = "Grass";
-                tuft.transform.SetParent(grassParent.transform, false);
-                tuft.transform.position = new Vector3(x, y + 0.2f, z);
+                // Multi-part grass cluster (3 blades per tuft for depth)
+                var tuftRoot = new GameObject("Grass");
+                tuftRoot.transform.SetParent(grassParent.transform, false);
+                tuftRoot.transform.position = new Vector3(x, y + 0.2f, z);
+                tuftRoot.transform.rotation = Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f);
+
                 float h = 0.25f + (float)rng.NextDouble() * 0.45f;
-                tuft.transform.localScale = new Vector3(0.07f, h, 0.07f);
-                tuft.transform.rotation = Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f);
-                var col = tuft.GetComponent<Collider>();
-                if (col != null) Destroy(col);
+
+                // Main blade
+                var blade1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                blade1.name = "Blade1";
+                blade1.transform.SetParent(tuftRoot.transform, false);
+                blade1.transform.localScale = new Vector3(0.07f, h, 0.07f);
+                var col1 = blade1.GetComponent<Collider>();
+                if (col1 != null) Destroy(col1);
                 if (grassMat != null)
                 {
-                    var mr = tuft.GetComponent<MeshRenderer>();
-                    if (mr != null) mr.material = grassMat;
+                    var mr1 = blade1.GetComponent<MeshRenderer>();
+                    if (mr1 != null) mr1.material = grassMat;
+                }
+
+                // Side blade 1
+                var blade2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                blade2.name = "Blade2";
+                blade2.transform.SetParent(tuftRoot.transform, false);
+                blade2.transform.localPosition = new Vector3(0.04f, 0f, 0f);
+                blade2.transform.localScale = new Vector3(0.06f, h * 0.85f, 0.06f);
+                var col2 = blade2.GetComponent<Collider>();
+                if (col2 != null) Destroy(col2);
+                if (grassMat != null)
+                {
+                    var mr2 = blade2.GetComponent<MeshRenderer>();
+                    if (mr2 != null) mr2.material = grassMat;
+                }
+
+                // Side blade 2
+                var blade3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                blade3.name = "Blade3";
+                blade3.transform.SetParent(tuftRoot.transform, false);
+                blade3.transform.localPosition = new Vector3(-0.04f, 0f, 0.03f);
+                blade3.transform.localScale = new Vector3(0.06f, h * 0.90f, 0.06f);
+                var col3 = blade3.GetComponent<Collider>();
+                if (col3 != null) Destroy(col3);
+                if (grassMat != null)
+                {
+                    var mr3 = blade3.GetComponent<MeshRenderer>();
+                    if (mr3 != null) mr3.material = grassMat;
                 }
             }
 
@@ -488,12 +589,44 @@ namespace Tartaria.Integration
 
             if (dome.transform.Find("Detail_AntennaSpire") == null)
             {
-                var antenna = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                antenna.name = "Detail_AntennaSpire";
-                antenna.transform.SetParent(dome.transform, false);
-                antenna.transform.localPosition = new Vector3(0f, 7.5f, 0f);
-                antenna.transform.localScale = new Vector3(0.25f, 2.0f, 0.25f);
-                SetEmissiveMaterial(antenna, new Color(0.45f, 0.85f, 1f), 1.6f);
+                // Multi-part antenna assembly (5 parts: base + shaft + mid ring + tip + crystal)
+                var antennaRoot = new GameObject("Detail_AntennaSpire");
+                antennaRoot.transform.SetParent(dome.transform, false);
+                antennaRoot.transform.localPosition = new Vector3(0f, 7.5f, 0f);
+
+                var antennaBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                antennaBase.name = "Base";
+                antennaBase.transform.SetParent(antennaRoot.transform, false);
+                antennaBase.transform.localPosition = new Vector3(0f, -1.5f, 0f);
+                antennaBase.transform.localScale = new Vector3(0.35f, 0.5f, 0.35f);
+                SetEmissiveMaterial(antennaBase, new Color(0.40f, 0.80f, 0.95f), 1.2f);
+
+                var antennaShaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                antennaShaft.name = "Shaft";
+                antennaShaft.transform.SetParent(antennaRoot.transform, false);
+                antennaShaft.transform.localScale = new Vector3(0.25f, 2.0f, 0.25f);
+                SetEmissiveMaterial(antennaShaft, new Color(0.45f, 0.85f, 1f), 1.6f);
+
+                var antennaMidRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                antennaMidRing.name = "MidRing";
+                antennaMidRing.transform.SetParent(antennaRoot.transform, false);
+                antennaMidRing.transform.localPosition = new Vector3(0f, 0f, 0f);
+                antennaMidRing.transform.localScale = new Vector3(0.38f, 0.15f, 0.38f);
+                SetEmissiveMaterial(antennaMidRing, new Color(0.50f, 0.90f, 1f), 1.8f);
+
+                var antennaTip = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                antennaTip.name = "Tip";
+                antennaTip.transform.SetParent(antennaRoot.transform, false);
+                antennaTip.transform.localPosition = new Vector3(0f, 1.8f, 0f);
+                antennaTip.transform.localScale = new Vector3(0.15f, 0.3f, 0.15f);
+                SetEmissiveMaterial(antennaTip, new Color(0.50f, 0.95f, 1f), 2.0f);
+
+                var antennaCrystal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                antennaCrystal.name = "Crystal";
+                antennaCrystal.transform.SetParent(antennaRoot.transform, false);
+                antennaCrystal.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+                antennaCrystal.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
+                SetEmissiveMaterial(antennaCrystal, new Color(0.60f, 1f, 1f), 2.5f);
             }
 
             for (int i = 0; i < 6; i++)
@@ -501,13 +634,39 @@ namespace Tartaria.Integration
                 string n = $"Detail_Buttress_{i}";
                 if (dome.transform.Find(n) != null) continue;
                 float t = (Mathf.PI * 2f / 6f) * i;
-                var b = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                b.name = n;
-                b.transform.SetParent(dome.transform, false);
-                b.transform.localPosition = new Vector3(Mathf.Cos(t) * 4.5f, 1.8f, Mathf.Sin(t) * 4.5f);
-                b.transform.localRotation = Quaternion.Euler(0f, -t * Mathf.Rad2Deg, 0f);
-                b.transform.localScale = new Vector3(0.6f, 3.2f, 1.8f);
-                SetLitMaterial(b, new Color(0.58f, 0.55f, 0.50f), 0.25f);
+
+                // Multi-part buttress (4 parts: base + column + capital + decorative band)
+                var buttressRoot = new GameObject(n);
+                buttressRoot.transform.SetParent(dome.transform, false);
+                buttressRoot.transform.localPosition = new Vector3(Mathf.Cos(t) * 4.5f, 1.8f, Mathf.Sin(t) * 4.5f);
+                buttressRoot.transform.localRotation = Quaternion.Euler(0f, -t * Mathf.Rad2Deg, 0f);
+
+                var buttressBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                buttressBase.name = "Base";
+                buttressBase.transform.SetParent(buttressRoot.transform, false);
+                buttressBase.transform.localPosition = new Vector3(0f, -1.5f, 0f);
+                buttressBase.transform.localScale = new Vector3(0.8f, 0.6f, 2.0f);
+                SetLitMaterial(buttressBase, new Color(0.55f, 0.52f, 0.47f), 0.22f);
+
+                var buttressColumn = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                buttressColumn.name = "Column";
+                buttressColumn.transform.SetParent(buttressRoot.transform, false);
+                buttressColumn.transform.localScale = new Vector3(0.6f, 3.2f, 1.8f);
+                SetLitMaterial(buttressColumn, new Color(0.58f, 0.55f, 0.50f), 0.25f);
+
+                var buttressCapital = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                buttressCapital.name = "Capital";
+                buttressCapital.transform.SetParent(buttressRoot.transform, false);
+                buttressCapital.transform.localPosition = new Vector3(0f, 1.8f, 0f);
+                buttressCapital.transform.localScale = new Vector3(0.9f, 0.4f, 2.1f);
+                SetLitMaterial(buttressCapital, new Color(0.60f, 0.57f, 0.52f), 0.28f);
+
+                var buttressBand = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                buttressBand.name = "Band";
+                buttressBand.transform.SetParent(buttressRoot.transform, false);
+                buttressBand.transform.localPosition = new Vector3(0f, 0f, 0f);
+                buttressBand.transform.localScale = new Vector3(0.7f, 0.3f, 1.9f);
+                SetLitMaterial(buttressBand, new Color(0.62f, 0.59f, 0.54f), 0.30f);
             }
         }
 
@@ -517,12 +676,43 @@ namespace Tartaria.Integration
             if (fountain == null) return;
             if (fountain.transform.Find("Detail_OrbFinial") != null) return;
 
-            var orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            orb.name = "Detail_OrbFinial";
-            orb.transform.SetParent(fountain.transform, false);
-            orb.transform.localPosition = new Vector3(0f, 4.2f, 0f);
-            orb.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
-            SetEmissiveMaterial(orb, new Color(1f, 0.82f, 0.42f), 1.8f);
+            // Multi-part fountain orb finial (5 parts: core + outer shell + 3 floating rings)
+            var orbRoot = new GameObject("Detail_OrbFinial");
+            orbRoot.transform.SetParent(fountain.transform, false);
+            orbRoot.transform.localPosition = new Vector3(0f, 4.2f, 0f);
+
+            var orbCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orbCore.name = "Core";
+            orbCore.transform.SetParent(orbRoot.transform, false);
+            orbCore.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+            SetEmissiveMaterial(orbCore, new Color(1f, 0.95f, 0.60f), 2.5f);
+
+            var orbShell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orbShell.name = "Shell";
+            orbShell.transform.SetParent(orbRoot.transform, false);
+            orbShell.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+            SetEmissiveMaterial(orbShell, new Color(1f, 0.82f, 0.42f), 1.8f);
+
+            var orbRing1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orbRing1.name = "Ring1";
+            orbRing1.transform.SetParent(orbRoot.transform, false);
+            orbRing1.transform.localPosition = new Vector3(0.6f, 0f, 0f);
+            orbRing1.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            SetEmissiveMaterial(orbRing1, new Color(1f, 0.88f, 0.50f), 1.5f);
+
+            var orbRing2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orbRing2.name = "Ring2";
+            orbRing2.transform.SetParent(orbRoot.transform, false);
+            orbRing2.transform.localPosition = new Vector3(-0.3f, 0.5f, 0.3f);
+            orbRing2.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            SetEmissiveMaterial(orbRing2, new Color(1f, 0.88f, 0.50f), 1.5f);
+
+            var orbRing3 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            orbRing3.name = "Ring3";
+            orbRing3.transform.SetParent(orbRoot.transform, false);
+            orbRing3.transform.localPosition = new Vector3(-0.3f, -0.5f, -0.3f);
+            orbRing3.transform.localScale = new Vector3(0.3f, 0.3f, 0.3f);
+            SetEmissiveMaterial(orbRing3, new Color(1f, 0.88f, 0.50f), 1.5f);
         }
 
         void EnsureSpireCrystalCluster()
@@ -537,14 +727,33 @@ namespace Tartaria.Integration
 
             for (int i = 0; i < 5; i++)
             {
-                var shard = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                shard.name = $"Shard_{i}";
-                shard.transform.SetParent(cluster.transform, false);
+                // Multi-part crystal shard (3 parts: base crystal + tip + glow accent)
                 float a = (Mathf.PI * 2f / 5f) * i;
-                shard.transform.localPosition = new Vector3(Mathf.Cos(a) * 0.5f, 0.25f, Mathf.Sin(a) * 0.5f);
-                shard.transform.localScale = new Vector3(0.14f, 0.9f + 0.3f * (i % 2), 0.14f);
-                shard.transform.localRotation = Quaternion.Euler(10f + i * 7f, -a * Mathf.Rad2Deg, 0f);
-                SetEmissiveMaterial(shard, new Color(0.75f, 0.55f, 1f), 1.5f);
+                var shardRoot = new GameObject($"Shard_{i}");
+                shardRoot.transform.SetParent(cluster.transform, false);
+                shardRoot.transform.localPosition = new Vector3(Mathf.Cos(a) * 0.5f, 0.25f, Mathf.Sin(a) * 0.5f);
+                shardRoot.transform.localRotation = Quaternion.Euler(10f + i * 7f, -a * Mathf.Rad2Deg, 0f);
+
+                var shardBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                shardBase.name = "Base";
+                shardBase.transform.SetParent(shardRoot.transform, false);
+                float baseHeight = 0.9f + 0.3f * (i % 2);
+                shardBase.transform.localScale = new Vector3(0.14f, baseHeight, 0.14f);
+                SetEmissiveMaterial(shardBase, new Color(0.75f, 0.55f, 1f), 1.5f);
+
+                var shardTip = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                shardTip.name = "Tip";
+                shardTip.transform.SetParent(shardRoot.transform, false);
+                shardTip.transform.localPosition = new Vector3(0f, baseHeight * 0.8f, 0f);
+                shardTip.transform.localScale = new Vector3(0.08f, baseHeight * 0.4f, 0.08f);
+                SetEmissiveMaterial(shardTip, new Color(0.85f, 0.65f, 1f), 2.0f);
+
+                var shardAccent = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                shardAccent.name = "Accent";
+                shardAccent.transform.SetParent(shardRoot.transform, false);
+                shardAccent.transform.localPosition = new Vector3(0f, baseHeight * 0.5f, 0f);
+                shardAccent.transform.localScale = new Vector3(0.10f, 0.10f, 0.10f);
+                SetEmissiveMaterial(shardAccent, new Color(0.95f, 0.75f, 1f), 2.5f);
             }
         }
 
@@ -731,21 +940,75 @@ namespace Tartaria.Integration
             var root = new GameObject("Milo");
             root.transform.position = pos;
 
-            // Body (small sphere)
-            var body = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            body.name = "Body";
-            body.transform.SetParent(root.transform);
-            body.transform.localPosition = new Vector3(0f, 0.5f, 0f);
-            body.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
-            SetMiloPrimitiveMaterial(body);
+            // Multi-part Milo body (5 parts: core + glow sphere + 2 floating orbs + base)
+            var bodyRoot = new GameObject("Body");
+            bodyRoot.transform.SetParent(root.transform);
+            bodyRoot.transform.localPosition = new Vector3(0f, 0.5f, 0f);
 
-            // Head (smaller sphere)
-            var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            head.name = "Head";
-            head.transform.SetParent(root.transform);
-            head.transform.localPosition = new Vector3(0f, 1.0f, 0f);
-            head.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
-            SetMiloPrimitiveMaterial(head);
+            var bodyCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyCore.name = "Core";
+            bodyCore.transform.SetParent(bodyRoot.transform);
+            bodyCore.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f);
+            SetMiloPrimitiveMaterial(bodyCore);
+
+            var bodyGlow = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyGlow.name = "Glow";
+            bodyGlow.transform.SetParent(bodyRoot.transform);
+            bodyGlow.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+            SetMiloPrimitiveMaterial(bodyGlow);
+
+            var bodyOrb1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyOrb1.name = "Orb1";
+            bodyOrb1.transform.SetParent(bodyRoot.transform);
+            bodyOrb1.transform.localPosition = new Vector3(0.35f, 0.2f, 0f);
+            bodyOrb1.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+            SetMiloPrimitiveMaterial(bodyOrb1);
+
+            var bodyOrb2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyOrb2.name = "Orb2";
+            bodyOrb2.transform.SetParent(bodyRoot.transform);
+            bodyOrb2.transform.localPosition = new Vector3(-0.35f, 0.2f, 0f);
+            bodyOrb2.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+            SetMiloPrimitiveMaterial(bodyOrb2);
+
+            var bodyBase = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyBase.name = "Base";
+            bodyBase.transform.SetParent(bodyRoot.transform);
+            bodyBase.transform.localPosition = new Vector3(0f, -0.3f, 0f);
+            bodyBase.transform.localScale = new Vector3(0.5f, 0.4f, 0.5f);
+            SetMiloPrimitiveMaterial(bodyBase);
+
+            // Multi-part Milo head (4 parts: main head + crown + 2 antenna)
+            var headRoot = new GameObject("Head");
+            headRoot.transform.SetParent(root.transform);
+            headRoot.transform.localPosition = new Vector3(0f, 1.0f, 0f);
+
+            var headMain = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            headMain.name = "Main";
+            headMain.transform.SetParent(headRoot.transform);
+            headMain.transform.localScale = new Vector3(0.4f, 0.4f, 0.4f);
+            SetMiloPrimitiveMaterial(headMain);
+
+            var headCrown = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            headCrown.name = "Crown";
+            headCrown.transform.SetParent(headRoot.transform);
+            headCrown.transform.localPosition = new Vector3(0f, 0.25f, 0f);
+            headCrown.transform.localScale = new Vector3(0.3f, 0.15f, 0.3f);
+            SetMiloPrimitiveMaterial(headCrown);
+
+            var headAntenna1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            headAntenna1.name = "Antenna1";
+            headAntenna1.transform.SetParent(headRoot.transform);
+            headAntenna1.transform.localPosition = new Vector3(0.15f, 0.3f, 0f);
+            headAntenna1.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+            SetMiloPrimitiveMaterial(headAntenna1);
+
+            var headAntenna2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            headAntenna2.name = "Antenna2";
+            headAntenna2.transform.SetParent(headRoot.transform);
+            headAntenna2.transform.localPosition = new Vector3(-0.15f, 0.3f, 0f);
+            headAntenna2.transform.localScale = new Vector3(0.08f, 0.08f, 0.08f);
+            SetMiloPrimitiveMaterial(headAntenna2);
 
             // Glow
             var light = root.AddComponent<Light>();
@@ -883,34 +1146,67 @@ namespace Tartaria.Integration
         {
             pos = ResolveShardSpawnPosition(pos);
 
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            go.name = "AetherShard";
+            // Multi-part aether shard assembly (5 parts: core + 4 energy rings)
+            var go = new GameObject("AetherShard");
             go.transform.position = pos;
-            go.transform.localScale = new Vector3(0.3f, 0.5f, 0.3f);
             go.transform.rotation = Quaternion.Euler(0f, 45f, 0f);
 
-            // Make it a trigger
-            var col = go.GetComponent<BoxCollider>();
-            col.isTrigger = true;
-            col.size = new Vector3(collectRadius / 0.3f, collectRadius / 0.5f, collectRadius / 0.3f);
+            var shardCore = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shardCore.name = "Core";
+            shardCore.transform.SetParent(go.transform, false);
+            shardCore.transform.localScale = new Vector3(0.3f, 0.5f, 0.3f);
 
-            // Crystal material
-            var r = go.GetComponent<MeshRenderer>();
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader != null)
+            var shardRing1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shardRing1.name = "Ring1";
+            shardRing1.transform.SetParent(go.transform, false);
+            shardRing1.transform.localPosition = new Vector3(0f, 0.3f, 0f);
+            shardRing1.transform.localScale = new Vector3(0.25f, 0.08f, 0.25f);
+            shardRing1.transform.localRotation = Quaternion.Euler(45f, 0f, 0f);
+
+            var shardRing2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shardRing2.name = "Ring2";
+            shardRing2.transform.SetParent(go.transform, false);
+            shardRing2.transform.localPosition = new Vector3(0f, -0.3f, 0f);
+            shardRing2.transform.localScale = new Vector3(0.25f, 0.08f, 0.25f);
+            shardRing2.transform.localRotation = Quaternion.Euler(45f, 0f, 0f);
+
+            var shardRing3 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shardRing3.name = "Ring3";
+            shardRing3.transform.SetParent(go.transform, false);
+            shardRing3.transform.localPosition = new Vector3(0f, 0.15f, 0f);
+            shardRing3.transform.localScale = new Vector3(0.35f, 0.06f, 0.35f);
+            shardRing3.transform.localRotation = Quaternion.Euler(-45f, 0f, 0f);
+
+            var shardRing4 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            shardRing4.name = "Ring4";
+            shardRing4.transform.SetParent(go.transform, false);
+            shardRing4.transform.localPosition = new Vector3(0f, -0.15f, 0f);
+            shardRing4.transform.localScale = new Vector3(0.35f, 0.06f, 0.35f);
+            shardRing4.transform.localRotation = Quaternion.Euler(-45f, 0f, 0f);
+
+            // Make trigger on root object
+            var col = go.AddComponent<BoxCollider>();
+            col.isTrigger = true;
+            col.size = new Vector3(collectRadius, collectRadius, collectRadius);
+
+            // Crystal material applied to all parts
+            foreach (var child in go.GetComponentsInChildren<MeshRenderer>())
             {
-                var mat = new Material(shader);
-                mat.SetColor("_BaseColor", new Color(0.2f, 0.5f, 0.9f, 0.7f));
-                mat.SetFloat("_Smoothness", 0.9f);
-                mat.SetFloat("_Metallic", 0.3f);
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", new Color(0.2f, 0.5f, 1f) * 2f);
-                // Transparent
-                mat.SetFloat("_Surface", 1f);
-                mat.SetOverrideTag("RenderType", "Transparent");
-                mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-                mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                r.material = mat;
+                var shader = Shader.Find("Universal Render Pipeline/Lit");
+                if (shader != null)
+                {
+                    var mat = new Material(shader);
+                    mat.SetColor("_BaseColor", new Color(0.2f, 0.5f, 0.9f, 0.7f));
+                    mat.SetFloat("_Smoothness", 0.9f);
+                    mat.SetFloat("_Metallic", 0.3f);
+                    mat.EnableKeyword("_EMISSION");
+                    mat.SetColor("_EmissionColor", new Color(0.2f, 0.5f, 1f) * 2f);
+                    mat.SetFloat("_Surface", 1f);
+                    mat.SetOverrideTag("RenderType", "Transparent");
+                    mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                    mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                    child.material = mat;
+                }
             }
 
             // Point light for visibility
@@ -972,26 +1268,60 @@ namespace Tartaria.Integration
 
         void CreateRuinedColumn(Transform parent, Vector3 pos, float height)
         {
-            var col = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            col.name = "RuinedColumn";
-            col.transform.SetParent(parent);
-            col.transform.position = pos + new Vector3(0f, height * 0.5f, 0f);
-            col.transform.localScale = new Vector3(0.8f, height, 0.8f);
-            col.isStatic = true;
+            // Multi-part ruined column (5 parts: base + shaft + cracks + capital + decorative band)
+            var colRoot = new GameObject("RuinedColumn");
+            colRoot.transform.SetParent(parent);
+            colRoot.transform.position = pos + new Vector3(0f, height * 0.5f, 0f);
+            colRoot.isStatic = true;
+            colRoot.transform.rotation = Quaternion.Euler(
+                Random.Range(-8f, 8f), Random.Range(0f, 360f), Random.Range(-5f, 5f));
 
-            var r = col.GetComponent<MeshRenderer>();
+            var colBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            colBase.name = "Base";
+            colBase.transform.SetParent(colRoot.transform, false);
+            colBase.transform.localPosition = new Vector3(0f, -height * 0.35f, 0f);
+            colBase.transform.localScale = new Vector3(1.0f, height * 0.2f, 1.0f);
+            colBase.isStatic = true;
+
+            var colShaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            colShaft.name = "Shaft";
+            colShaft.transform.SetParent(colRoot.transform, false);
+            colShaft.transform.localScale = new Vector3(0.8f, height, 0.8f);
+            colShaft.isStatic = true;
+
+            var colCrack1 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            colCrack1.name = "Crack1";
+            colCrack1.transform.SetParent(colRoot.transform, false);
+            colCrack1.transform.localPosition = new Vector3(0.3f, height * 0.2f, 0f);
+            colCrack1.transform.localScale = new Vector3(0.15f, height * 0.4f, 0.7f);
+            colCrack1.isStatic = true;
+
+            var colCrack2 = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            colCrack2.name = "Crack2";
+            colCrack2.transform.SetParent(colRoot.transform, false);
+            colCrack2.transform.localPosition = new Vector3(-0.3f, -height * 0.1f, 0f);
+            colCrack2.transform.localScale = new Vector3(0.15f, height * 0.3f, 0.7f);
+            colCrack2.isStatic = true;
+
+            var colCapital = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            colCapital.name = "Capital";
+            colCapital.transform.SetParent(colRoot.transform, false);
+            colCapital.transform.localPosition = new Vector3(0f, height * 0.4f, 0f);
+            colCapital.transform.localScale = new Vector3(1.1f, height * 0.15f, 1.1f);
+            colCapital.isStatic = true;
+
+            // Apply ruined stone material to all parts
             var shader = Shader.Find("Universal Render Pipeline/Lit");
             if (shader != null)
             {
                 var mat = new Material(shader);
                 mat.SetColor("_BaseColor", new Color(0.65f, 0.6f, 0.5f));
                 mat.SetFloat("_Smoothness", 0.2f);
-                r.material = mat;
+                foreach (var r in colRoot.GetComponentsInChildren<MeshRenderer>())
+                {
+                    r.material = mat;
+                }
             }
-
-            // Slight tilt for ruined look
-            col.transform.rotation = Quaternion.Euler(
-                Random.Range(-8f, 8f), Random.Range(0f, 360f), Random.Range(-5f, 5f));
         }
 
         void CreateRubblePile(Transform parent, Vector3 pos)
@@ -1003,16 +1333,35 @@ namespace Tartaria.Integration
 
             for (int i = 0; i < 4; i++)
             {
-                var rock = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                rock.name = $"Rock_{i}";
-                rock.transform.SetParent(pile.transform);
+                // Multi-part rubble rock (3 parts: main boulder + 2 fragments)
+                var rockRoot = new GameObject($"Rock_{i}");
+                rockRoot.transform.SetParent(pile.transform);
                 float s = Random.Range(0.3f, 0.8f);
-                rock.transform.localPosition = new Vector3(
+                rockRoot.transform.localPosition = new Vector3(
                     Random.Range(-1f, 1f), s * 0.4f, Random.Range(-1f, 1f));
-                rock.transform.localScale = new Vector3(s, s * 0.6f, s);
-                rock.isStatic = true;
+                rockRoot.isStatic = true;
 
-                var r = rock.GetComponent<MeshRenderer>();
+                var rockMain = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                rockMain.name = "Main";
+                rockMain.transform.SetParent(rockRoot.transform, false);
+                rockMain.transform.localScale = new Vector3(s, s * 0.6f, s);
+                rockMain.isStatic = true;
+
+                var rockFrag1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                rockFrag1.name = "Frag1";
+                rockFrag1.transform.SetParent(rockRoot.transform, false);
+                rockFrag1.transform.localPosition = new Vector3(s * 0.4f, s * 0.2f, s * 0.3f);
+                rockFrag1.transform.localScale = new Vector3(s * 0.4f, s * 0.3f, s * 0.4f);
+                rockFrag1.isStatic = true;
+
+                var rockFrag2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                rockFrag2.name = "Frag2";
+                rockFrag2.transform.SetParent(rockRoot.transform, false);
+                rockFrag2.transform.localPosition = new Vector3(-s * 0.3f, s * 0.15f, -s * 0.4f);
+                rockFrag2.transform.localScale = new Vector3(s * 0.35f, s * 0.25f, s * 0.35f);
+                rockFrag2.isStatic = true;
+
+                // Apply rock material to all parts
                 var shader = Shader.Find("Universal Render Pipeline/Lit");
                 if (shader != null)
                 {
@@ -1020,22 +1369,51 @@ namespace Tartaria.Integration
                     float g = Random.Range(0.3f, 0.5f);
                     mat.SetColor("_BaseColor", new Color(g + 0.1f, g, g - 0.05f));
                     mat.SetFloat("_Smoothness", 0.1f);
-                    r.material = mat;
+                    foreach (var r in rockRoot.GetComponentsInChildren<MeshRenderer>())
+                    {
+                        r.material = mat;
+                    }
                 }
             }
         }
 
         void CreateInscriptionStone(Transform parent, Vector3 pos)
         {
-            var stone = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            stone.name = "InscriptionStone";
-            stone.transform.SetParent(parent);
-            stone.transform.position = pos + new Vector3(0f, 0.4f, 0f);
-            stone.transform.localScale = new Vector3(1.5f, 0.8f, 0.3f);
-            stone.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-            stone.isStatic = true;
+            // Multi-part inscription stone (4 parts: base + slab + inscription panel + rune accent)
+            var stoneRoot = new GameObject("InscriptionStone");
+            stoneRoot.transform.SetParent(parent);
+            stoneRoot.transform.position = pos + new Vector3(0f, 0.4f, 0f);
+            stoneRoot.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
+            stoneRoot.isStatic = true;
 
-            var r = stone.GetComponent<MeshRenderer>();
+            var stoneBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            stoneBase.name = "Base";
+            stoneBase.transform.SetParent(stoneRoot.transform, false);
+            stoneBase.transform.localPosition = new Vector3(0f, -0.2f, 0f);
+            stoneBase.transform.localScale = new Vector3(1.7f, 0.4f, 0.5f);
+            stoneBase.isStatic = true;
+
+            var stoneSlab = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            stoneSlab.name = "Slab";
+            stoneSlab.transform.SetParent(stoneRoot.transform, false);
+            stoneSlab.transform.localScale = new Vector3(1.5f, 0.8f, 0.3f);
+            stoneSlab.isStatic = true;
+
+            var stonePanel = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            stonePanel.name = "Panel";
+            stonePanel.transform.SetParent(stoneRoot.transform, false);
+            stonePanel.transform.localPosition = new Vector3(0f, 0f, 0.16f);
+            stonePanel.transform.localScale = new Vector3(1.2f, 0.6f, 0.05f);
+            stonePanel.isStatic = true;
+
+            var stoneRune = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            stoneRune.name = "Rune";
+            stoneRune.transform.SetParent(stoneRoot.transform, false);
+            stoneRune.transform.localPosition = new Vector3(0f, 0f, 0.2f);
+            stoneRune.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+            stoneRune.isStatic = true;
+
+            // Apply inscription material to all parts
             var shader = Shader.Find("Universal Render Pipeline/Lit");
             if (shader != null)
             {
@@ -1044,7 +1422,21 @@ namespace Tartaria.Integration
                 mat.SetFloat("_Smoothness", 0.35f);
                 mat.EnableKeyword("_EMISSION");
                 mat.SetColor("_EmissionColor", new Color(0.3f, 0.25f, 0.1f) * 0.2f);
-                r.material = mat;
+                foreach (var r in stoneRoot.GetComponentsInChildren<MeshRenderer>())
+                {
+                    r.material = mat;
+                }
+                // Rune gets stronger emission
+                var runeRend = stoneRune.GetComponent<MeshRenderer>();
+                if (runeRend != null)
+                {
+                    var runeMat = new Material(shader);
+                    runeMat.SetColor("_BaseColor", new Color(0.6f, 0.55f, 0.5f));
+                    runeMat.SetFloat("_Smoothness", 0.5f);
+                    runeMat.EnableKeyword("_EMISSION");
+                    runeMat.SetColor("_EmissionColor", new Color(0.4f, 0.35f, 0.15f) * 0.8f);
+                    runeRend.material = runeMat;
+                }
             }
         }
 
@@ -1064,13 +1456,34 @@ namespace Tartaria.Integration
             var corruption = CorruptionSystem.Instance;
             for (int i = 0; i < corruptionCenters.Length; i++)
             {
-                // Visual: dark pulsing ground plane
-                var zone = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                zone.name = $"CorruptionZone_{buildingIds[i]}";
-                zone.transform.position = corruptionCenters[i];
-                zone.transform.localScale = new Vector3(8f, 0.05f, 8f);
+                // Multi-part corruption zone (4 parts: base cylinder + pulsing rings + particle emitters)
+                var zoneRoot = new GameObject($"CorruptionZone_{buildingIds[i]}");
+                zoneRoot.transform.position = corruptionCenters[i];
 
-                var r = zone.GetComponent<MeshRenderer>();
+                var zoneBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                zoneBase.name = "Base";
+                zoneBase.transform.SetParent(zoneRoot.transform, false);
+                zoneBase.transform.localScale = new Vector3(8f, 0.05f, 8f);
+
+                var zoneRing1 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                zoneRing1.name = "Ring1";
+                zoneRing1.transform.SetParent(zoneRoot.transform, false);
+                zoneRing1.transform.localPosition = new Vector3(0f, 0.1f, 0f);
+                zoneRing1.transform.localScale = new Vector3(6f, 0.02f, 6f);
+
+                var zoneRing2 = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                zoneRing2.name = "Ring2";
+                zoneRing2.transform.SetParent(zoneRoot.transform, false);
+                zoneRing2.transform.localPosition = new Vector3(0f, 0.15f, 0f);
+                zoneRing2.transform.localScale = new Vector3(4f, 0.02f, 4f);
+
+                var zoneCore = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                zoneCore.name = "Core";
+                zoneCore.transform.SetParent(zoneRoot.transform, false);
+                zoneCore.transform.localPosition = new Vector3(0f, 0.2f, 0f);
+                zoneCore.transform.localScale = new Vector3(2f, 0.01f, 2f);
+
+                // Apply corruption material to all zone parts
                 var shader = Shader.Find("Universal Render Pipeline/Lit");
                 if (shader != null)
                 {
@@ -1082,12 +1495,17 @@ namespace Tartaria.Integration
                     mat.SetOverrideTag("RenderType", "Transparent");
                     mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
                     mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                    r.material = mat;
+                    foreach (var r in zoneRoot.GetComponentsInChildren<MeshRenderer>())
+                    {
+                        r.material = mat;
+                    }
                 }
 
-                // Remove physics collider (visual only, CorruptionSystem handles logic)
-                var col = zone.GetComponent<Collider>();
-                if (col != null) Destroy(col);
+                // Remove physics colliders (visual only, CorruptionSystem handles logic)
+                foreach (var col in zoneRoot.GetComponentsInChildren<Collider>())
+                {
+                    Destroy(col);
+                }
 
                 // Seed corruption data in the system
                 if (corruption != null)
@@ -1547,21 +1965,76 @@ namespace Tartaria.Integration
             var root = new GameObject("MudGolem");
             root.transform.position = pos;
 
-            // Torso
-            var torso = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            torso.name = "Torso";
-            torso.transform.SetParent(root.transform);
-            torso.transform.localPosition = new Vector3(0f, 1.2f, 0f);
-            torso.transform.localScale = new Vector3(1.2f, 1.4f, 1f);
-            SetGolemMaterial(torso);
+            // Multi-part golem body (5 parts: core + armor plates + shoulder guards)
+            var bodyRoot = new GameObject("Torso");
+            bodyRoot.transform.SetParent(root.transform);
+            bodyRoot.transform.localPosition = new Vector3(0f, 1.2f, 0f);
 
-            // Head
-            var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            head.name = "Head";
-            head.transform.SetParent(root.transform);
-            head.transform.localPosition = new Vector3(0f, 2.2f, 0f);
-            head.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-            SetGolemMaterial(head);
+            var bodyCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyCore.name = "Core";
+            bodyCore.transform.SetParent(bodyRoot.transform);
+            bodyCore.transform.localScale = new Vector3(1.2f, 1.4f, 1f);
+            SetGolemMaterial(bodyCore);
+
+            var bodyChestPlate = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            bodyChestPlate.name = "ChestPlate";
+            bodyChestPlate.transform.SetParent(bodyRoot.transform);
+            bodyChestPlate.transform.localPosition = new Vector3(0f, 0.3f, 0.4f);
+            bodyChestPlate.transform.localScale = new Vector3(0.9f, 0.8f, 0.2f);
+            SetGolemMaterial(bodyChestPlate);
+
+            var bodyShoulderL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyShoulderL.name = "ShoulderL";
+            bodyShoulderL.transform.SetParent(bodyRoot.transform);
+            bodyShoulderL.transform.localPosition = new Vector3(-0.7f, 0.5f, 0f);
+            bodyShoulderL.transform.localScale = new Vector3(0.4f, 0.5f, 0.4f);
+            SetGolemMaterial(bodyShoulderL);
+
+            var bodyShoulderR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            bodyShoulderR.name = "ShoulderR";
+            bodyShoulderR.transform.SetParent(bodyRoot.transform);
+            bodyShoulderR.transform.localPosition = new Vector3(0.7f, 0.5f, 0f);
+            bodyShoulderR.transform.localScale = new Vector3(0.4f, 0.5f, 0.4f);
+            SetGolemMaterial(bodyShoulderR);
+
+            var bodyBackPlate = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            bodyBackPlate.name = "BackPlate";
+            bodyBackPlate.transform.SetParent(bodyRoot.transform);
+            bodyBackPlate.transform.localPosition = new Vector3(0f, 0.3f, -0.4f);
+            bodyBackPlate.transform.localScale = new Vector3(0.9f, 0.8f, 0.2f);
+            SetGolemMaterial(bodyBackPlate);
+
+            // Multi-part golem head (4 parts: skull + jaw + eye sockets)
+            var headRoot = new GameObject("Head");
+            headRoot.transform.SetParent(root.transform);
+            headRoot.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+
+            var headSkull = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            headSkull.name = "Skull";
+            headSkull.transform.SetParent(headRoot.transform);
+            headSkull.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+            SetGolemMaterial(headSkull);
+
+            var headJaw = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            headJaw.name = "Jaw";
+            headJaw.transform.SetParent(headRoot.transform);
+            headJaw.transform.localPosition = new Vector3(0f, -0.25f, 0.1f);
+            headJaw.transform.localScale = new Vector3(0.5f, 0.2f, 0.4f);
+            SetGolemMaterial(headJaw);
+
+            var headEyeL = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            headEyeL.name = "EyeL";
+            headEyeL.transform.SetParent(headRoot.transform);
+            headEyeL.transform.localPosition = new Vector3(-0.2f, 0.1f, 0.3f);
+            headEyeL.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+            SetEmissiveMaterial(headEyeL, new Color(0.8f, 0.3f, 0.2f), 1.2f);
+
+            var headEyeR = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            headEyeR.name = "EyeR";
+            headEyeR.transform.SetParent(headRoot.transform);
+            headEyeR.transform.localPosition = new Vector3(0.2f, 0.1f, 0.3f);
+            headEyeR.transform.localScale = new Vector3(0.15f, 0.15f, 0.15f);
+            SetEmissiveMaterial(headEyeR, new Color(0.8f, 0.3f, 0.2f), 1.2f);
 
             // Collider for combat
             var col = root.AddComponent<CapsuleCollider>();
@@ -1744,32 +2217,83 @@ namespace Tartaria.Integration
 
         void AddNameplate(GameObject target, string displayName, Color color)
         {
-            var marker = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            marker.name = "Nameplate";
-            marker.transform.SetParent(target.transform);
-            marker.transform.localPosition = new Vector3(0f, 3f, 0f);
-            marker.transform.localScale = new Vector3(2f, 0.4f, 1f);
+            // Multi-part nameplate (4 parts: background quad + frame + glow accent + text holder)
+            var nameplateRoot = new GameObject("Nameplate");
+            nameplateRoot.transform.SetParent(target.transform);
+            nameplateRoot.transform.localPosition = new Vector3(0f, 3f, 0f);
 
-            // Remove collider
-            var col = marker.GetComponent<Collider>();
-            if (col != null) Destroy(col);
+            var markerBg = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            markerBg.name = "Background";
+            markerBg.transform.SetParent(nameplateRoot.transform, false);
+            markerBg.transform.localScale = new Vector3(2f, 0.4f, 1f);
 
-            // Nameplate material with color
-            var r = marker.GetComponent<MeshRenderer>();
+            var markerFrame = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            markerFrame.name = "Frame";
+            markerFrame.transform.SetParent(nameplateRoot.transform, false);
+            markerFrame.transform.localPosition = new Vector3(0f, 0f, -0.01f);
+            markerFrame.transform.localScale = new Vector3(2.1f, 0.45f, 1f);
+
+            var markerGlow = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            markerGlow.name = "Glow";
+            markerGlow.transform.SetParent(nameplateRoot.transform, false);
+            markerGlow.transform.localPosition = new Vector3(0f, 0f, 0.01f);
+            markerGlow.transform.localScale = new Vector3(1.8f, 0.35f, 1f);
+
+            var markerText = GameObject.CreatePrimitive(PrimitiveType.Quad);
+            markerText.name = "TextHolder";
+            markerText.transform.SetParent(nameplateRoot.transform, false);
+            markerText.transform.localPosition = new Vector3(0f, 0f, 0.02f);
+            markerText.transform.localScale = new Vector3(1.9f, 0.38f, 1f);
+
+            // Remove colliders from all parts
+            foreach (var col in nameplateRoot.GetComponentsInChildren<Collider>())
+            {
+                Destroy(col);
+            }
+
+            // Nameplate material with color applied to all parts
             var shader = Shader.Find("Universal Render Pipeline/Unlit");
             if (shader != null)
             {
-                var mat = new Material(shader);
-                mat.SetColor("_BaseColor", new Color(color.r, color.g, color.b, 0.8f));
-                mat.SetFloat("_Surface", 1f);
-                mat.SetOverrideTag("RenderType", "Transparent");
-                mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-                mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                r.material = mat;
+                // Background: base color
+                var matBg = new Material(shader);
+                matBg.SetColor("_BaseColor", new Color(color.r, color.g, color.b, 0.8f));
+                matBg.SetFloat("_Surface", 1f);
+                matBg.SetOverrideTag("RenderType", "Transparent");
+                matBg.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                matBg.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                markerBg.GetComponent<MeshRenderer>().material = matBg;
+
+                // Frame: darker outline
+                var matFrame = new Material(shader);
+                matFrame.SetColor("_BaseColor", new Color(color.r * 0.6f, color.g * 0.6f, color.b * 0.6f, 0.9f));
+                matFrame.SetFloat("_Surface", 1f);
+                matFrame.SetOverrideTag("RenderType", "Transparent");
+                matFrame.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                matFrame.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                markerFrame.GetComponent<MeshRenderer>().material = matFrame;
+
+                // Glow: bright center
+                var matGlow = new Material(shader);
+                matGlow.SetColor("_BaseColor", new Color(color.r * 1.3f, color.g * 1.3f, color.b * 1.3f, 0.5f));
+                matGlow.SetFloat("_Surface", 1f);
+                matGlow.SetOverrideTag("RenderType", "Transparent");
+                matGlow.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                matGlow.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                markerGlow.GetComponent<MeshRenderer>().material = matGlow;
+
+                // Text holder: lightest
+                var matText = new Material(shader);
+                matText.SetColor("_BaseColor", new Color(color.r * 1.5f, color.g * 1.5f, color.b * 1.5f, 0.7f));
+                matText.SetFloat("_Surface", 1f);
+                matText.SetOverrideTag("RenderType", "Transparent");
+                matText.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+                matText.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                markerText.GetComponent<MeshRenderer>().material = matText;
             }
 
             // Billboard behavior
-            marker.AddComponent<BillboardFacer>();
+            nameplateRoot.AddComponent<BillboardFacer>();
         }
 
         static void SetLayerRecursive(GameObject go, int layer)
