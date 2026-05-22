@@ -1,0 +1,17 @@
+{
+  "name": "Tartaria.Data",
+  "rootNamespace": "Tartaria.Data",
+  "references": [
+    "Tartaria.Core",
+    "Tartaria.Gameplay"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}
