@@ -118,3 +118,30 @@ Background analysis agents from the rejected pre-pivot swarm are ignored.
 R-SCHED-117 complete. Real central campaign flow data wiring for the Electric Moon. The compassion & rails blessings now reach the top-level campaign controller.
 
 ---
+## Moons 7-13 Vertical Slice Arcs + CS:0 Build Fix — 2026-05-XX
+
+**Delivered**: Complete implementation of Moons 7–13 vertical slice arc scripts plus all compilation fixes to reach CS:0.
+
+**Arc files added (Assets/_Project/Scripts/Integration/)**:
+- `Moon7ResonantArc.cs` — Korath stasis thaw (3 crystal sessions), Cassian confrontation/redemption choice, golem brother reveal, golem siege (SpawnBoss), moon cleared
+- `Moon8GalacticArc.cs` — Thorne armada first contact, Mercury-Orb ship repairs (4 ships), night flight sequence, lore crystal discovery
+- `Moon9SolarArc.cs` — Prophecy stone collection (6 stones), Zereth first voice, aurora city materialisation, 17-hour clock installation
+- `Moon10PlanetaryArc.cs` — Continental rail system (5 segments), ley golem elite boss, trigger room revelation, train journey
+- `Moon11SpectralArc.cs` — Fountain chain activation (6 fountains), sludge tendril swarm boss, aquifer purge, aurora veil, Lirael semi-solid transition
+- `Moon12CrystalArc.cs` — 12-bell tower synchronisation, reset global assault boss, planetary bell ring
+- `Moon13CosmicArc.cs` — Echo Realms x3 (memory puzzles), True Timeline chamber, Zereth healing, final convergence node, Zereth redemption / campaign end
+
+**CS:0 fixes**:
+- `Moon2FirstPurgeTrigger.cs`: All 39 Integration/UI direct calls replaced with ServiceLocator routing; public field modifiers for editor scaffold
+- `LiraelController.cs`, `Moon2LunarContentSpawner.cs`, `Moon2ZoneScaffold.cs`: Literal `\r\n` syntax corruption fixed
+- Moon7-12 arc files: Added `using Tartaria.Input` + `using Tartaria.Save`; Moon13: added `using Tartaria.Save`
+- `Moon2LiraelIntroTrigger.cs`: Added `using Tartaria.UI`, removed self-referencing namespace import
+- All 9 `IInteractable` implementors: `GetInteractLabel()` → `GetInteractPrompt()` to match interface
+- `BossEncounterSystem.TriggerEncounter()` → `.SpawnBoss()` in Moon7/8/9/10/11/12
+- `SaveData.cs`: Added `MoonFlagsSaveBlock` + `MoonFlagsIntSaveBlock` + `GetMoonFlag`/`SetMoonFlag` bool and int overloads (JsonUtility-compatible, List-backed with lazy dict cache)
+- `ServiceLocator.cs`: `IHUDService`, `IVFXService`, `ISaveService`, `ILiraelService`, `ICompanionService`, `IMoonProgressService`, `IMoon2ProgressionService` + static properties
+- `CompanionManager`, `MoonProgressTracker`, `Moon2ProgressionSystem`: Interface implementations + ServiceLocator registration
+
+**Git**: commit `49ae4e0` on `main` — 41 files changed
+
+---
