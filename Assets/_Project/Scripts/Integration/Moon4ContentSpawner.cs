@@ -69,11 +69,47 @@ namespace Tartaria.Integration
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // P0 CRITICAL: 17hr clock fragment blocks Moon 9
+            sd.SetMoonFlag(4, "moatsFlooded", moatsFlooded);
+            sd.SetMoonFlag(4, "golemDefeated", golemDefeated);
+            sd.SetMoonFlag(4, "clockFragmentRecovered", clockFragmentRecovered);
+            sd.SetMoonFlag(4, "bastionsAligned", _bastionsAligned);
+            sd.SetMoonFlag(4, "moatsFloodedCount", _moatsFlooded);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 4 state (17hr clock fragment + star fort progress)
+            moatsFlooded = sd.GetMoonFlag(4, "moatsFlooded");
+            golemDefeated = sd.GetMoonFlag(4, "golemDefeated");
+            clockFragmentRecovered = sd.GetMoonFlag(4, "clockFragmentRecovered");
+            _bastionsAligned = sd.GetMoonFlag(4, "bastionsAligned", 0);
+            _moatsFlooded = sd.GetMoonFlag(4, "moatsFloodedCount", 0);
+
+            Debug.Log($"[Moon 4] State loaded: clockFragment={clockFragmentRecovered}, bastions={_bastionsAligned}/{totalBastions}, moats={_moatsFlooded}/{totalMoatSegments}");
         }
 
         void Start()

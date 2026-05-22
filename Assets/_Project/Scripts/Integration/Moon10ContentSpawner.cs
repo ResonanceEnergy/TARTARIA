@@ -54,6 +54,44 @@ namespace Tartaria.Integration
         {
             // Check save state
             moon10Unlocked = SaveManager.Instance?.GetMoonProgress(10) > 0f;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // P0 CRITICAL: Rail network blocks Moon 12
+            sd.SetMoonFlag(10, "segmentsLaid", _segmentsLaid);
+            sd.SetMoonFlag(10, "stationsBuilt", _stationsBuilt);
+            sd.SetMoonFlag(10, "railNetworkComplete", railNetworkComplete);
+            sd.SetMoonFlag(10, "orphanPuzzleSolved", orphanPuzzleSolved);
+            sd.SetMoonFlag(10, "railLeviathanDefeated", railLeviathanDefeated);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 10 rail network state
+            _segmentsLaid = sd.GetMoonFlag(10, "segmentsLaid", 0);
+            _stationsBuilt = sd.GetMoonFlag(10, "stationsBuilt", 0);
+            railNetworkComplete = sd.GetMoonFlag(10, "railNetworkComplete");
+            orphanPuzzleSolved = sd.GetMoonFlag(10, "orphanPuzzleSolved");
+            railLeviathanDefeated = sd.GetMoonFlag(10, "railLeviathanDefeated");
+
+            Debug.Log($"[Moon 10] State loaded: rail={_segmentsLaid}/{totalRailSegments}, stations={_stationsBuilt}/{totalStations}, complete={railNetworkComplete}");
         }
 
         void Start()

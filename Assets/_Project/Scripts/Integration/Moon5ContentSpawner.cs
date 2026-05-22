@@ -55,6 +55,25 @@ namespace Tartaria.Integration
                 return;
             }
             Instance = this;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
         }
 
         void Start()
@@ -311,22 +330,34 @@ namespace Tartaria.Integration
             SaveState();
         }
 
+        void OnSave(SaveData sd)
+        {
+            // Moon 5: White City pavilions + Thorne intro
+            sd.SetMoonFlag(5, "pavilionsRestored", _pavilionsRestored);
+            sd.SetMoonFlag(5, "thorneIntroduced", _thorneIntroduced);
+            sd.SetMoonFlag(5, "auroraHologramTriggered", _auroraHologramTriggered);
+            sd.SetMoonFlag(5, "centralSpireComplete", _centralSpireComplete);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 5 state
+            _pavilionsRestored = sd.GetMoonFlag(5, "pavilionsRestored", 0);
+            _thorneIntroduced = sd.GetMoonFlag(5, "thorneIntroduced");
+            _auroraHologramTriggered = sd.GetMoonFlag(5, "auroraHologramTriggered");
+            _centralSpireComplete = sd.GetMoonFlag(5, "centralSpireComplete");
+
+            Debug.Log($"[Moon5ContentSpawner] State loaded: {_pavilionsRestored}/{totalPavilions} pavilions restored.");
+        }
+
         void SaveState()
         {
-            if (SaveManager.Instance == null) return;
-
+            // Legacy method - now handled by OnSave event
         }
 
         void LoadState()
         {
-            if (SaveManager.Instance == null) return;
-
-            _pavilionsRestored = 0 /*GetMoonData returns int*/;
-            _thorneIntroduced = 0 /*GetMoonData returns int*/ == 1;
-            _auroraHologramTriggered = 0 /*GetMoonData returns int*/ == 1;
-            _centralSpireComplete = 0 /*GetMoonData returns int*/ == 1;
-
-            Debug.Log($"[Moon5ContentSpawner] State loaded: {_pavilionsRestored}/{totalPavilions} pavilions restored.");
+            // Legacy method - now handled by OnLoad event
         }
     }
 

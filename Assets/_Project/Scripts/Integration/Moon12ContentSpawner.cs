@@ -43,6 +43,42 @@ namespace Tartaria.Integration
         {
             // Check save state
             moon12Unlocked = SaveManager.Instance?.GetMoonProgress(12) > 0f;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // Moon 12: 12 bell towers synchronized
+            sd.SetMoonFlag(12, "towersSynchronized", _towersSynchronized);
+            sd.SetMoonFlag(12, "bellNetworkSynchronized", bellNetworkSynchronized);
+            sd.SetMoonFlag(12, "resetAssaultActive", _resetAssaultActive);
+            sd.SetMoonFlag(12, "planetaryRingTriggered", _planetaryRingTriggered);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 12 state
+            _towersSynchronized = sd.GetMoonFlag(12, "towersSynchronized", 0);
+            bellNetworkSynchronized = sd.GetMoonFlag(12, "bellNetworkSynchronized");
+            _resetAssaultActive = sd.GetMoonFlag(12, "resetAssaultActive");
+            _planetaryRingTriggered = sd.GetMoonFlag(12, "planetaryRingTriggered");
+
+            Debug.Log($"[Moon 12] State loaded: towers={_towersSynchronized}/{totalBellTowers}, synchronized={bellNetworkSynchronized}");
         }
 
         void Start()

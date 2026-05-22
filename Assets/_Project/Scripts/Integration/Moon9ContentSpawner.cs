@@ -66,6 +66,49 @@ namespace Tartaria.Integration
                 return;
             }
             Instance = this;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // Moon 9: 6 prophecy stones + Zereth contact + clock tower
+            sd.SetMoonFlag(9, "stonesCollected", _stonesCollected);
+            sd.SetMoonFlag(9, "zerethContactMade", _zerethContactMade);
+            sd.SetMoonFlag(9, "auroraCityTriggered", _auroraCityTriggered);
+            sd.SetMoonFlag(9, "clockTowerInstalled", _clockTowerInstalled);
+            sd.SetMoonFlag(9, "bossDefeated", _bossDefeated);
+            sd.SetMoonFlag(9, "codexPagesRestored", _codexPagesRestored);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 9 state
+            _stonesCollected = sd.GetMoonFlag(9, "stonesCollected", 0);
+            _zerethContactMade = sd.GetMoonFlag(9, "zerethContactMade");
+            _auroraCityTriggered = sd.GetMoonFlag(9, "auroraCityTriggered");
+            _clockTowerInstalled = sd.GetMoonFlag(9, "clockTowerInstalled");
+            _bossDefeated = sd.GetMoonFlag(9, "bossDefeated");
+            _codexPagesRestored = sd.GetMoonFlag(9, "codexPagesRestored", 0);
+
+            Debug.Log($"[Moon9ContentSpawner] State loaded: stones={_stonesCollected}/{totalStones}, clock={_clockTowerInstalled}");
         }
 
         void Start()

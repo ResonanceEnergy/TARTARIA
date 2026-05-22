@@ -59,6 +59,25 @@ namespace Tartaria.Integration
                 return;
             }
             Instance = this;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
         }
 
         void Start()
@@ -334,23 +353,36 @@ namespace Tartaria.Integration
             SaveState();
         }
 
+        void OnSave(SaveData sd)
+        {
+            // Moon 6: Pipe organ + fountains + Cymatic Requiem
+            sd.SetMoonFlag(6, "pipesRepaired", _pipesRepaired);
+            sd.SetMoonFlag(6, "fountainsRestored", _fountainsRestored);
+            sd.SetMoonFlag(6, "organRestored", _organRestored);
+            sd.SetMoonFlag(6, "cymaticRequiemTriggered", _cymaticRequiemTriggered);
+            sd.SetMoonFlag(6, "revelationUnlocked", _revelationUnlocked);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 6 state
+            _pipesRepaired = sd.GetMoonFlag(6, "pipesRepaired", 0);
+            _fountainsRestored = sd.GetMoonFlag(6, "fountainsRestored", 0);
+            _organRestored = sd.GetMoonFlag(6, "organRestored");
+            _cymaticRequiemTriggered = sd.GetMoonFlag(6, "cymaticRequiemTriggered");
+            _revelationUnlocked = sd.GetMoonFlag(6, "revelationUnlocked");
+
+            Debug.Log($"[Moon6ContentSpawner] State loaded: {_pipesRepaired}/{totalCrystalPipes} pipes, {_fountainsRestored}/{totalFountains} fountains.");
+        }
+
         void SaveState()
         {
-            if (SaveManager.Instance == null) return;
-
+            // Legacy method - now handled by OnSave event
         }
 
         void LoadState()
         {
-            if (SaveManager.Instance == null) return;
-
-            _pipesRepaired = 0 /*GetMoonData returns int*/;
-            _fountainsRestored = 0 /*GetMoonData returns int*/;
-            _organRestored = 0 /*GetMoonData returns int*/ == 1;
-            _cymaticRequiemTriggered = 0 /*GetMoonData returns int*/ == 1;
-            _revelationUnlocked = 0 /*GetMoonData returns int*/ == 1;
-
-            Debug.Log($"[Moon6ContentSpawner] State loaded: {_pipesRepaired}/{totalCrystalPipes} pipes, {_fountainsRestored}/{totalFountains} fountains.");
+            // Legacy method - now handled by OnLoad event
         }
     }
 
