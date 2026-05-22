@@ -12,7 +12,8 @@
     "Unity.Transforms",
     "Unity.InputSystem",
     "Unity.Cinemachine",
-    "Unity.TextMeshPro"
+    "Unity.TextMeshPro",
+    "Unity.RenderPipelines.Universal.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
