@@ -37,7 +37,8 @@ namespace Tartaria.Integration
         [SerializeField] Vector3[] crystalSpawnPoints;  // Set via editor or runtime
         [SerializeField] Vector3 bellTowerCenter = new(10f, 12f, 15f);
 
-        List<GameObject> _activeC<|endoftext|> _dissonanceCrystals = new();
+        List<GameObject> _activeCrystals = new();
+        List<DissonanceCrystal> _dissonanceCrystals = new();
         GameObject _cassianNPC;
         bool _contentSpawned;
 

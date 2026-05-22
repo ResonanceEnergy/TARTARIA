@@ -38,7 +38,7 @@ namespace Tartaria.Integration
         [Header("Audio")]
         [SerializeField] string korathVoiceAudio = "Korath_IceVoice";
         [SerializeField] string korathAwakeningAudio = "Korath_Awakening";
-        [SerializeField] string korath SacrificeAudio = "Korath_Sacrifice";
+        [SerializeField] string korathSacrificeAudio = "Korath_Sacrifice";
         [SerializeField] string golemSiegeAudio = "Moon7_GolemSiege";
         [SerializeField] string cassianConfrontAudio = "Cassian_Confrontation";
 
