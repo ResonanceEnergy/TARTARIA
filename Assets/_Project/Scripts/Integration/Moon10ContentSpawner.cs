@@ -171,12 +171,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Structure_Citadel_MainHall prefab missing - using fallback cube");
-                mainHall = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                mainHall.name = "MainHall_FALLBACK";
+                Debug.LogError("[Moon10] Structure_Citadel_MainHall prefab missing - using fallback");
+                mainHall = new GameObject("MainHall_FALLBACK");
                 mainHall.transform.SetParent(station.transform);
                 mainHall.transform.localScale = new Vector3(25f, 8f, 25f);
                 mainHall.transform.localPosition = Vector3.up * 4f;
+                
+                var mf = mainHall.AddComponent<MeshFilter>();
+                var mr = mainHall.AddComponent<MeshRenderer>();
+                var col = mainHall.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Structure");
+                if (mat != null) mr.material = mat;
             }
 
             // East wing - side structure
@@ -192,12 +199,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Structure_Wing prefab missing - using fallback cube");
-                eastWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                eastWing.name = "EastWing_FALLBACK";
+                Debug.LogError("[Moon10] Structure_Wing prefab missing - using fallback");
+                eastWing = new GameObject("EastWing_FALLBACK");
                 eastWing.transform.SetParent(station.transform);
                 eastWing.transform.localScale = new Vector3(10f, 6f, 15f);
                 eastWing.transform.localPosition = new Vector3(17f, 3f, 0f);
+                
+                var mf = eastWing.AddComponent<MeshFilter>();
+                var mr = eastWing.AddComponent<MeshRenderer>();
+                var col = eastWing.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Structure");
+                if (mat != null) mr.material = mat;
             }
 
             // West wing - mirrored side structure
@@ -213,12 +227,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Structure_Wing prefab missing - using fallback cube");
-                westWing = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                westWing.name = "WestWing_FALLBACK";
+                Debug.LogError("[Moon10] Structure_Wing prefab missing - using fallback");
+                westWing = new GameObject("WestWing_FALLBACK");
                 westWing.transform.SetParent(station.transform);
                 westWing.transform.localScale = new Vector3(10f, 6f, 15f);
                 westWing.transform.localPosition = new Vector3(-17f, 3f, 0f);
+                
+                var mf = westWing.AddComponent<MeshFilter>();
+                var mr = westWing.AddComponent<MeshRenderer>();
+                var col = westWing.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Structure");
+                if (mat != null) mr.material = mat;
             }
 
             // Clock tower - tall spire structure
@@ -234,12 +255,20 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Structure_Tower_Tall prefab missing - using fallback cylinder");
-                clockTower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                clockTower.name = "ClockTower_FALLBACK";
+                Debug.LogError("[Moon10] Structure_Tower_Tall prefab missing - using fallback");
+                clockTower = new GameObject("ClockTower_FALLBACK");
                 clockTower.transform.SetParent(station.transform);
                 clockTower.transform.localScale = new Vector3(4f, 12f, 4f);
                 clockTower.transform.localPosition = new Vector3(0f, 16f, -10f);
+                
+                var mf = clockTower.AddComponent<MeshFilter>();
+                var mr = clockTower.AddComponent<MeshRenderer>();
+                var col = clockTower.AddComponent<CapsuleCollider>();
+                col.radius = 0.5f;
+                col.height = 2f;
+                
+                Material mat = Resources.Load<Material>("Materials/Structure");
+                if (mat != null) mr.material = mat;
             }
 
             // Interactable: station console
@@ -255,12 +284,20 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Prop_Console prefab missing - using fallback cylinder");
-                console = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                console.name = "StationConsole_FALLBACK";
+                Debug.LogError("[Moon10] Prop_Console prefab missing - using fallback");
+                console = new GameObject("StationConsole_FALLBACK");
                 console.transform.SetParent(station.transform);
                 console.transform.localPosition = new Vector3(0f, 1f, 0f);
                 console.transform.localScale = new Vector3(2f, 0.5f, 2f);
+                
+                var mf = console.AddComponent<MeshFilter>();
+                var mr = console.AddComponent<MeshRenderer>();
+                var col = console.AddComponent<CapsuleCollider>();
+                col.radius = 0.5f;
+                col.height = 1f;
+                
+                Material mat = Resources.Load<Material>("Materials/Prop");
+                if (mat != null) mr.material = mat;
             }
 
             var interactable = console.AddComponent<StationConsole>();
@@ -298,11 +335,18 @@ namespace Tartaria.Integration
                 else
                 {
                     Debug.LogError($"[Moon10] Structure_Station prefab missing for MegaStation_{i + 1} - using fallback");
-                    building = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    building.name = "StationBuilding_FALLBACK";
+                    building = new GameObject("StationBuilding_FALLBACK");
                     building.transform.SetParent(station.transform);
                     building.transform.localScale = new Vector3(18f, 6f, 18f);
                     building.transform.localPosition = Vector3.up * 3f;
+                    
+                    var mf = building.AddComponent<MeshFilter>();
+                    var mr = building.AddComponent<MeshRenderer>();
+                    var col = building.AddComponent<BoxCollider>();
+                    col.size = Vector3.one;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Structure");
+                    if (mat != null) mr.material = mat;
                 }
 
                 // Roof
@@ -319,11 +363,18 @@ namespace Tartaria.Integration
                 else
                 {
                     Debug.LogError($"[Moon10] Structure_Roof prefab missing for MegaStation_{i + 1} - using fallback");
-                    roof = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    roof.name = "Roof_FALLBACK";
+                    roof = new GameObject("Roof_FALLBACK");
                     roof.transform.SetParent(station.transform);
                     roof.transform.localScale = new Vector3(20f, 1f, 20f);
                     roof.transform.localPosition = Vector3.up * 6.5f;
+                    
+                    var mf = roof.AddComponent<MeshFilter>();
+                    var mr = roof.AddComponent<MeshRenderer>();
+                    var col = roof.AddComponent<BoxCollider>();
+                    col.size = Vector3.one;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Structure");
+                    if (mat != null) mr.material = mat;
                 }
 
                 // Platform base
@@ -340,11 +391,18 @@ namespace Tartaria.Integration
                 else
                 {
                     Debug.LogError($"[Moon10] Structure_Platform_Base prefab missing for MegaStation_{i + 1} - using fallback");
-                    platformBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    platformBase.name = "PlatformBase_FALLBACK";
+                    platformBase = new GameObject("PlatformBase_FALLBACK");
                     platformBase.transform.SetParent(station.transform);
                     platformBase.transform.localPosition = new Vector3(0f, -1.5f, 0f);
                     platformBase.transform.localScale = new Vector3(16f, 2f, 42f);
+                    
+                    var mf = platformBase.AddComponent<MeshFilter>();
+                    var mr = platformBase.AddComponent<MeshRenderer>();
+                    var col = platformBase.AddComponent<BoxCollider>();
+                    col.size = Vector3.one;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Structure");
+                    if (mat != null) mr.material = mat;
                 }
 
                 // Platform surface
@@ -361,11 +419,18 @@ namespace Tartaria.Integration
                 else
                 {
                     Debug.LogError($"[Moon10] Structure_Platform prefab missing for MegaStation_{i + 1} - using fallback");
-                    platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    platform.name = "Platform_FALLBACK";
+                    platform = new GameObject("Platform_FALLBACK");
                     platform.transform.SetParent(station.transform);
                     platform.transform.localPosition = new Vector3(0f, -0.3f, 0f);
                     platform.transform.localScale = new Vector3(15f, 0.5f, 40f);
+                    
+                    var mf = platform.AddComponent<MeshFilter>();
+                    var mr = platform.AddComponent<MeshRenderer>();
+                    var col = platform.AddComponent<BoxCollider>();
+                    col.size = Vector3.one;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Structure");
+                    if (mat != null) mr.material = mat;
                 }
 
                 _stations.Add(station);
@@ -393,12 +458,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Structure_Chamber_Outer prefab missing - using fallback cube");
-                chamberOuter = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                chamberOuter.name = "ChamberOuter_FALLBACK";
+                Debug.LogError("[Moon10] Structure_Chamber_Outer prefab missing - using fallback");
+                chamberOuter = new GameObject("ChamberOuter_FALLBACK");
                 chamberOuter.transform.SetParent(_triggerRoom.transform);
                 chamberOuter.transform.localScale = new Vector3(12f, 7f, 12f);
                 chamberOuter.transform.localPosition = Vector3.zero;
+                
+                var mf = chamberOuter.AddComponent<MeshFilter>();
+                var mr = chamberOuter.AddComponent<MeshRenderer>();
+                var col = chamberOuter.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Structure");
+                if (mat != null) mr.material = mat;
             }
 
             // Inner sanctum
@@ -414,12 +486,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Structure_Chamber_Inner prefab missing - using fallback cube");
-                chamberInner = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                chamberInner.name = "ChamberInner_FALLBACK";
+                Debug.LogError("[Moon10] Structure_Chamber_Inner prefab missing - using fallback");
+                chamberInner = new GameObject("ChamberInner_FALLBACK");
                 chamberInner.transform.SetParent(_triggerRoom.transform);
                 chamberInner.transform.localScale = new Vector3(8f, 5f, 8f);
                 chamberInner.transform.localPosition = Vector3.zero;
+                
+                var mf = chamberInner.AddComponent<MeshFilter>();
+                var mr = chamberInner.AddComponent<MeshRenderer>();
+                var col = chamberInner.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Structure");
+                if (mat != null) mr.material = mat;
             }
 
             // Device core (sphere) - ancient orb artifact
@@ -435,12 +514,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Prop_Orb prefab missing - using fallback sphere");
-                deviceCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                deviceCore.name = "DeviceCore_FALLBACK";
+                Debug.LogError("[Moon10] Prop_Orb prefab missing - using fallback");
+                deviceCore = new GameObject("DeviceCore_FALLBACK");
                 deviceCore.transform.SetParent(_triggerRoom.transform);
                 deviceCore.transform.localPosition = Vector3.zero;
                 deviceCore.transform.localScale = Vector3.one * 2f;
+                
+                var mf = deviceCore.AddComponent<MeshFilter>();
+                var mr = deviceCore.AddComponent<MeshRenderer>();
+                var col = deviceCore.AddComponent<SphereCollider>();
+                col.radius = 0.5f;
+                
+                Material mat = Resources.Load<Material>("Materials/Prop");
+                if (mat != null) mr.material = mat;
             }
 
             // Device ring array (3 rings) - amplifier rings
@@ -459,13 +545,21 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    if (i == 0) Debug.LogError("[Moon10] Prop_Ring prefab missing - using fallback cylinders");
-                    ring = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    ring.name = $"AmplifierRing_{i}_FALLBACK";
+                    if (i == 0) Debug.LogError("[Moon10] Prop_Ring prefab missing - using fallback");
+                    ring = new GameObject($"AmplifierRing_{i}_FALLBACK");
                     ring.transform.SetParent(_triggerRoom.transform);
                     ring.transform.localPosition = Vector3.zero;
                     ring.transform.localScale = new Vector3(3f + i * 0.5f, 0.1f, 3f + i * 0.5f);
                     ring.transform.rotation = Quaternion.Euler(0f, i * 60f, 0f);
+                    
+                    var mf = ring.AddComponent<MeshFilter>();
+                    var mr = ring.AddComponent<MeshRenderer>();
+                    var col = ring.AddComponent<CapsuleCollider>();
+                    col.radius = 0.5f;
+                    col.height = 0.2f;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Prop");
+                    if (mat != null) mr.material = mat;
                 }
             }
 
@@ -482,12 +576,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                Debug.LogError("[Moon10] Prop_Panel prefab missing - using fallback cube");
-                panel = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                panel.name = "ControlPanel_FALLBACK";
+                Debug.LogError("[Moon10] Prop_Panel prefab missing - using fallback");
+                panel = new GameObject("ControlPanel_FALLBACK");
                 panel.transform.SetParent(_triggerRoom.transform);
                 panel.transform.localPosition = new Vector3(0f, -1f, 4f);
                 panel.transform.localScale = new Vector3(2f, 1f, 0.2f);
+                
+                var mf = panel.AddComponent<MeshFilter>();
+                var mr = panel.AddComponent<MeshRenderer>();
+                var col = panel.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Prop");
+                if (mat != null) mr.material = mat;
             }
 
             var interactable = panel.AddComponent<TriggerRoomPanel>();
@@ -687,11 +788,18 @@ namespace Tartaria.Integration
             else
             {
                 Debug.LogError("[Moon10] Structure_Platform prefab missing for puzzle - using fallback");
-                platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                platform.name = "PuzzlePlatform_FALLBACK";
+                platform = new GameObject("PuzzlePlatform_FALLBACK");
                 platform.transform.SetParent(_orphanTrainPuzzle.transform);
                 platform.transform.localPosition = Vector3.zero;
                 platform.transform.localScale = new Vector3(10f, 0.5f, 10f);
+                
+                var mf = platform.AddComponent<MeshFilter>();
+                var mr = platform.AddComponent<MeshRenderer>();
+                var col = platform.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Structure");
+                if (mat != null) mr.material = mat;
             }
 
             // 3 orphan children NPCs (from Moon 3) — KayKit Rogue scaled down
@@ -734,11 +842,18 @@ namespace Tartaria.Integration
             else
             {
                 Debug.LogError("[Moon10] Prop_Console prefab missing for puzzle - using fallback");
-                console = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                console.name = "PuzzleConsole_FALLBACK";
+                console = new GameObject("PuzzleConsole_FALLBACK");
                 console.transform.SetParent(_orphanTrainPuzzle.transform);
                 console.transform.localPosition = new Vector3(0f, 1f, -3f);
                 console.transform.localScale = new Vector3(2f, 1.5f, 1f);
+                
+                var mf = console.AddComponent<MeshFilter>();
+                var mr = console.AddComponent<MeshRenderer>();
+                var col = console.AddComponent<BoxCollider>();
+                col.size = Vector3.one;
+                
+                Material mat = Resources.Load<Material>("Materials/Prop");
+                if (mat != null) mr.material = mat;
             }
 
             OrphanTrainPuzzleConsole puzzleComp = console.AddComponent<OrphanTrainPuzzleConsole>();
@@ -797,13 +912,24 @@ namespace Tartaria.Integration
             }
             else
             {
-                head = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                head.name = "Segment_Head_FALLBACK";
+                head = new GameObject("Segment_Head_FALLBACK");
                 head.transform.SetParent(bossObj.transform);
                 head.transform.localPosition = new Vector3(0f, 0f, 0f);
                 head.transform.localScale = new Vector3(4f, 6f, 4f);
-                Renderer rend = head.GetComponent<Renderer>();
-                rend.material.color = new Color(0.3f, 0.25f, 0.2f);
+                
+                var mf = head.AddComponent<MeshFilter>();
+                var mr = head.AddComponent<MeshRenderer>();
+                var col = head.AddComponent<CapsuleCollider>();
+                col.radius = 0.5f;
+                col.height = 2f;
+                
+                Material mat = Resources.Load<Material>("Materials/Enemy");
+                if (mat != null) {
+                    mr.material = mat;
+                } else {
+                    mr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    mr.material.color = new Color(0.3f, 0.25f, 0.2f);
+                }
             }
 
             // Body segments (5 segments tapering)
@@ -824,13 +950,24 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    segment = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    segment.name = $"Segment_Body_{i}_FALLBACK";
+                    segment = new GameObject($"Segment_Body_{i}_FALLBACK");
                     segment.transform.SetParent(bossObj.transform);
                     segment.transform.localPosition = pos;
                     segment.transform.localScale = new Vector3(scale, length, scale);
-                    Renderer rend = segment.GetComponent<Renderer>();
-                    rend.material.color = new Color(0.3f, 0.25f, 0.2f);
+                    
+                    var mf = segment.AddComponent<MeshFilter>();
+                    var mr = segment.AddComponent<MeshRenderer>();
+                    var col = segment.AddComponent<CapsuleCollider>();
+                    col.radius = 0.5f;
+                    col.height = 2f;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Enemy");
+                    if (mat != null) {
+                        mr.material = mat;
+                    } else {
+                        mr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                        mr.material.color = new Color(0.3f, 0.25f, 0.2f);
+                    }
                 }
             }
 
@@ -846,13 +983,24 @@ namespace Tartaria.Integration
             }
             else
             {
-                tail = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                tail.name = "Segment_Tail_FALLBACK";
+                tail = new GameObject("Segment_Tail_FALLBACK");
                 tail.transform.SetParent(bossObj.transform);
                 tail.transform.localPosition = new Vector3(0f, -31f, 0f);
                 tail.transform.localScale = new Vector3(1.5f, 3f, 1.5f);
-                Renderer rend = tail.GetComponent<Renderer>();
-                rend.material.color = new Color(0.3f, 0.25f, 0.2f);
+                
+                var mf = tail.AddComponent<MeshFilter>();
+                var mr = tail.AddComponent<MeshRenderer>();
+                var col = tail.AddComponent<CapsuleCollider>();
+                col.radius = 0.5f;
+                col.height = 2f;
+                
+                Material mat = Resources.Load<Material>("Materials/Enemy");
+                if (mat != null) {
+                    mr.material = mat;
+                } else {
+                    mr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    mr.material.color = new Color(0.3f, 0.25f, 0.2f);
+                }
             }
 
             // Boss light
@@ -934,11 +1082,18 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    track = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    track.name = "RailTrack_FALLBACK";
+                    track = new GameObject("RailTrack_FALLBACK");
                     track.transform.SetParent(segment.transform);
                     track.transform.localPosition = Vector3.up * 0.2f;
                     track.transform.localScale = new Vector3(2f, 0.2f, 20f);
+                    
+                    var mf = track.AddComponent<MeshFilter>();
+                    var mr = track.AddComponent<MeshRenderer>();
+                    var col = track.AddComponent<BoxCollider>();
+                    col.size = Vector3.one;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Rail");
+                    if (mat != null) mr.material = mat;
                 }
 
                 // Rail ties (middle)
@@ -953,11 +1108,18 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    ties = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    ties.name = "RailTies_FALLBACK";
+                    ties = new GameObject("RailTies_FALLBACK");
                     ties.transform.SetParent(segment.transform);
                     ties.transform.localPosition = Vector3.zero;
                     ties.transform.localScale = new Vector3(2.5f, 0.3f, 20f);
+                    
+                    var mf = ties.AddComponent<MeshFilter>();
+                    var mr = ties.AddComponent<MeshRenderer>();
+                    var col = ties.AddComponent<BoxCollider>();
+                    col.size = Vector3.one;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Rail");
+                    if (mat != null) mr.material = mat;
                 }
 
                 // Ballast base (bottom)
@@ -972,11 +1134,18 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    ballast = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    ballast.name = "RailBallast_FALLBACK";
+                    ballast = new GameObject("RailBallast_FALLBACK");
                     ballast.transform.SetParent(segment.transform);
                     ballast.transform.localPosition = Vector3.down * 0.3f;
                     ballast.transform.localScale = new Vector3(3f, 0.4f, 20f);
+                    
+                    var mf = ballast.AddComponent<MeshFilter>();
+                    var mr = ballast.AddComponent<MeshRenderer>();
+                    var col = ballast.AddComponent<BoxCollider>();
+                    col.size = Vector3.one;
+                    
+                    Material mat = Resources.Load<Material>("Materials/Rail");
+                    if (mat != null) mr.material = mat;
                 }
             }
 
