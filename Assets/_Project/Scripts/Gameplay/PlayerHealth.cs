@@ -79,6 +79,13 @@ namespace Tartaria.Gameplay
             _currentHealth -= amount;
             _lastDamageTime = Time.time;
 
+            // Trigger hit reactor VFX/SFX
+            var reactor = GetComponent<CombatHitReactor>();
+            if (reactor != null)
+            {
+                reactor.OnHit(transform.position, Vector3.up);
+            }
+
             if (_currentHealth <= 0)
             {
                 _currentHealth = 0;

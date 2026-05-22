@@ -4,6 +4,7 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
 using Tartaria.Save;
+using Tartaria.AI;
 
 namespace Tartaria.Integration
 {
@@ -107,6 +108,9 @@ namespace Tartaria.Integration
 
             // Spawn dissonance crystals
             SpawnDissonanceCrystals();
+
+            // Spawn ambient NPCs (Echo civilians wandering the caverns)
+            SpawnAmbientNPCs(3);
 
             // Activate dissonance ambient audio (looping crystal hum)
             var crystalAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("CrystalDissonance", bellTowerCenter, 0.4f);
@@ -303,6 +307,47 @@ namespace Tartaria.Integration
 
             // Lirael whisper
             DialogueManager.Instance?.PlayContextDialogue("lirael_moon2_complete");
+        }
+
+        /// <summary>
+        /// Spawns ambient Echo NPCs wandering the caverns.
+        /// </summary>
+        void SpawnAmbientNPCs(int count)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 spawnPos = cassianSpawnPoint + new Vector3(
+                    Random.Range(-15f, 15f),
+                    0f,
+                    Random.Range(-15f, 15f)
+                );
+
+                var npc = new GameObject($"EchoNPC_Moon2_{i}");
+                npc.transform.position = spawnPos;
+
+                // Mesh (capsule for beta)
+                var filter = npc.AddComponent<MeshFilter>();
+                filter.mesh = Resources.GetBuiltinResource<Mesh>("Capsule.fbx");
+
+                var renderer = npc.AddComponent<MeshRenderer>();
+                renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                renderer.material.color = new Color(0.7f, 0.7f, 0.75f);  // Gray Echo civilian
+
+                // Collider
+                var collider = npc.AddComponent<CapsuleCollider>();
+                collider.height = 2f;
+                collider.radius = 0.4f;
+
+                // AI behavior - wandering patrol
+                var aiNav = npc.AddComponent<UnityEngine.AI.NavMeshAgent>();
+                aiNav.speed = 1.5f;
+                aiNav.angularSpeed = 120f;
+
+                var aiPatrol = npc.AddComponent<NPCAIBehavior>();
+                aiPatrol.SetHomePosition(spawnPos);
+
+                Debug.Log($"[Moon 2] Spawned ambient NPC {i} at {spawnPos}");
+            }
         }
 
         /// <summary>
