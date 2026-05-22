@@ -40,6 +40,11 @@ namespace Tartaria.AI
         [SerializeField] GameObject mudGolemPrefab;
         [SerializeField] GameObject dissonantCrystalPrefab;
         [SerializeField] GameObject giantGolemPrefab;
+        [SerializeField] GameObject shadowStalkerPrefab;
+        [SerializeField] GameObject crystalSentryPrefab;
+        [SerializeField] GameObject voidPhantomPrefab;
+        [SerializeField] GameObject resonanceDronePrefab;
+        [SerializeField] GameObject temporalWraithPrefab;
 
         [Header("Wave Configuration")]
         [SerializeField] WaveConfig[] waves;
@@ -152,7 +157,7 @@ namespace Tartaria.AI
             GameObject prefab = GetPrefabForType(type);
             if (prefab == null)
             {
-                Debug.LogWarning($"[EnemySpawner] No prefab defined for {type}");
+                Debug.LogWarning($"[EnemySpawner] Failed to get prefab or build procedural for {type}");
                 return;
             }
 
@@ -164,18 +169,23 @@ namespace Tartaria.AI
 
                 _activeEnemies.Add(enemy);
 
-                // P1 AUDIT FIX: Wire enemy death event to spawner
+                // Wire enemy death events for all enemy types
                 var mudGolemHealth = enemy.GetComponent<MudGolemHealth>();
                 if (mudGolemHealth != null)
                 {
                     mudGolemHealth.OnDeath += () => OnEnemyDied(enemy);
-                    Debug.Log($"[EnemySpawner] Wired MudGolemHealth.OnDeath for {enemy.name}");
                 }
-                else
-                {
-                    // Future: Add support for other enemy health components (DissonantCrystal, GiantGolem, etc.)
-                    Debug.LogWarning($"[EnemySpawner] {enemy.name} has no health component - death tracking will rely on null polling");
-                }
+
+                // Wire up health component death events for new enemy types
+                var shadowStalker = enemy.GetComponent<ShadowStalkerAI>();
+                var crystalSentry = enemy.GetComponent<CrystalSentryAI>();
+                var voidPhantom = enemy.GetComponent<VoidPhantomAI>();
+                var resonanceDrone = enemy.GetComponent<ResonanceDroneAI>();
+                var temporalWraith = enemy.GetComponent<TemporalWraithAI>();
+
+                // Note: These enemy types handle their own death/destruction
+                // They automatically remove themselves via Destroy(gameObject)
+                // The _activeEnemies.RemoveAll(e => e == null) in WaitForWaveClear handles cleanup
 
                 Debug.Log($"[EnemySpawner] Spawned {type} at {spawnPos}");
             }
@@ -195,11 +205,42 @@ namespace Tartaria.AI
 
         GameObject GetPrefabForType(EnemyType type)
         {
-            return type switch
+            GameObject prefab = type switch
             {
                 EnemyType.MudGolem => mudGolemPrefab,
                 EnemyType.DissonantCrystal => dissonantCrystalPrefab,
                 EnemyType.GiantGolem => giantGolemPrefab,
+                EnemyType.ShadowStalker => shadowStalkerPrefab,
+                EnemyType.CrystalSentry => crystalSentryPrefab,
+                EnemyType.VoidPhantom => voidPhantomPrefab,
+                EnemyType.ResonanceDrone => resonanceDronePrefab,
+                EnemyType.TemporalWraith => temporalWraithPrefab,
+                _ => null
+            };
+
+            // Fallback: If no prefab assigned, build procedurally
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[EnemySpawner] No prefab for {type}, building procedurally");
+                return BuildProceduralEnemy(type);
+            }
+
+            return prefab;
+        }
+
+        GameObject BuildProceduralEnemy(EnemyType type)
+        {
+            Vector3 tempPos = Vector3.zero;
+            Quaternion tempRot = Quaternion.identity;
+
+            return type switch
+            {
+                EnemyType.MudGolem => MudGolemAI.BuildProcedural(tempPos, tempRot),
+                EnemyType.ShadowStalker => ShadowStalkerAI.BuildProcedural(tempPos, tempRot),
+                EnemyType.CrystalSentry => CrystalSentryAI.BuildProcedural(tempPos, tempRot),
+                EnemyType.VoidPhantom => VoidPhantomAI.BuildProcedural(tempPos, tempRot),
+                EnemyType.ResonanceDrone => ResonanceDroneAI.BuildProcedural(tempPos, tempRot),
+                EnemyType.TemporalWraith => TemporalWraithAI.BuildProcedural(tempPos, tempRot),
                 _ => null
             };
         }
@@ -272,7 +313,12 @@ namespace Tartaria.AI
         {
             MudGolem = 0,
             DissonantCrystal = 1,
-            GiantGolem = 2
+            GiantGolem = 2,
+            ShadowStalker = 3,
+            CrystalSentry = 4,
+            VoidPhantom = 5,
+            ResonanceDrone = 6,
+            TemporalWraith = 7
         }
     }
 }
