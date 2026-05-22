@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
@@ -53,6 +54,9 @@ namespace Tartaria.Save
         // R6: Active slot (default 0; SwitchToSlot updates all paths)
         int _currentSlot = 0;
 
+        // v17: ISaveDataProvider extensibility layer
+        readonly List<ISaveDataProvider> _registeredProviders = new();
+
         public SaveData CurrentSave => _currentSave;
 
         void Awake()
@@ -78,6 +82,9 @@ namespace Tartaria.Save
 
         void Start()
         {
+            // v17: Auto-discover all ISaveDataProvider implementations
+            DiscoverProviders();
+            
             LoadOrCreate();
             // Phase 3 R4: background cloud check for newer save + conflict resolution (offline safe)
             _cloudService?.CheckForNewerCloudSaveAndResolve();
@@ -905,11 +912,128 @@ namespace Tartaria.Save
         void FireBeforeSave()
         {
             OnBeforeSave?.Invoke(_currentSave);
+            
+            // v17: Serialize all registered providers
+            SerializeProviders();
         }
 
         void FireAfterLoad()
         {
             OnAfterLoad?.Invoke(_currentSave);
+            
+            // v17: Deserialize all registered providers
+            DeserializeProviders();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // v17: ISaveDataProvider Extensibility Layer
+        // Enables modular save/load without modifying SaveData core.
+        // Provider pattern adheres to Open/Closed principle.
+        // ═══════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Register a save data provider (called by providers in Awake).
+        /// </summary>
+        public void RegisterProvider(ISaveDataProvider provider)
+        {
+            if (provider == null) return;
+            if (_registeredProviders.Contains(provider)) return;
+            
+            _registeredProviders.Add(provider);
+            Debug.Log($"[SaveManager] Registered provider: {provider.GetProviderKey()}");
+        }
+
+        /// <summary>
+        /// Unregister a provider (called in OnDestroy).
+        /// </summary>
+        public void UnregisterProvider(ISaveDataProvider provider)
+        {
+            if (provider == null) return;
+            _registeredProviders.Remove(provider);
+        }
+
+        /// <summary>
+        /// Auto-discover all ISaveDataProvider implementations in scene.
+        /// Called once in Start after all Awake() calls complete.
+        /// </summary>
+        void DiscoverProviders()
+        {
+            var providers = FindObjectsOfType<MonoBehaviour>().OfType<ISaveDataProvider>();
+            foreach (var provider in providers)
+            {
+                RegisterProvider(provider);
+            }
+            
+            Debug.Log($"[SaveManager] Discovered {_registeredProviders.Count} save data providers");
+        }
+
+        /// <summary>
+        /// Serialize all registered providers to SaveData.providerData.
+        /// Called before writing to disk.
+        /// </summary>
+        void SerializeProviders()
+        {
+            if (_currentSave?.providerData == null) return;
+
+            foreach (var provider in _registeredProviders)
+            {
+                try
+                {
+                    string key = provider.GetProviderKey();
+                    object data = provider.GetSaveData();
+                    
+                    if (data == null)
+                    {
+                        Debug.LogWarning($"[SaveManager] Provider {key} returned null data");
+                        continue;
+                    }
+
+                    // Serialize to JSON string (JsonUtility requires serializable types)
+                    string json = JsonUtility.ToJson(data);
+                    _currentSave.providerData.SetProvider(key, json);
+                    
+                    Debug.Log($"[SaveManager] Serialized provider: {key} ({json.Length} bytes)");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[SaveManager] Failed to serialize provider {provider.GetProviderKey()}: {e.Message}");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Deserialize all registered providers from SaveData.providerData.
+        /// Called after loading from disk.
+        /// </summary>
+        void DeserializeProviders()
+        {
+            if (_currentSave?.providerData == null) return;
+
+            foreach (var provider in _registeredProviders)
+            {
+                try
+                {
+                    string key = provider.GetProviderKey();
+                    string json = _currentSave.providerData.GetProvider(key);
+                    
+                    if (string.IsNullOrEmpty(json))
+                    {
+                        Debug.LogWarning($"[SaveManager] No saved data for provider: {key}");
+                        provider.RestoreSaveData(null);
+                        continue;
+                    }
+
+                    // Provider must handle deserialization (knows its own type)
+                    // We pass the JSON string and let provider deserialize
+                    provider.RestoreSaveData(json);
+                    
+                    Debug.Log($"[SaveManager] Deserialized provider: {key} ({json.Length} bytes)");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[SaveManager] Failed to deserialize provider {provider.GetProviderKey()}: {e.Message}");
+                }
+            }
         }
 
         // ═══════════════════════════════════════════════════════════════
