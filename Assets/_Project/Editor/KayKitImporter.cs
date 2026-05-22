@@ -269,7 +269,7 @@ namespace Tartaria.Editor
             report.AppendLine("=======================================================");
 
             // Collect all renderers in scene for stats
-            var allRenderers = Object.FindObjectsOfType<MeshRenderer>(true);
+            var allRenderers = Object.FindObjectsByType<MeshRenderer>(FindObjectsSortMode.None);
             int totalRenderers = allRenderers.Length;
             int totalTris = 0;
             int uniqueMeshCount = 0;

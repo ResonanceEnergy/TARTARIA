@@ -58,7 +58,7 @@ namespace Tartaria.Editor
 
         static int SetupWhiteCityAmplificationController()
         {
-            var existing = Object.FindObjectOfType<WhiteCityAmplificationController>();
+            var existing = Object.FindFirstObjectByType<WhiteCityAmplificationController>();
             if (existing != null) return 0;
 
             var go = new GameObject("Moon5_WhiteCityAmplificationController");

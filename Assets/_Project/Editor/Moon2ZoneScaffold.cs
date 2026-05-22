@@ -999,7 +999,7 @@ namespace Tartaria.Editor
         {
             if (_cam == null) return;
             // Frustum + distance cull on tagged Moon2 content (props via LOD already, dynamic enemies/secrets here)
-            foreach (var t in FindObjectsOfType<Transform>())
+            foreach (var t in FindObjectsByType<Transform>(FindObjectsSortMode.None))
             {
                 if (t == null) continue;
                 if (t.name.Contains("Wraith") || t.GetComponent<Moon2PooledEnemyTag>() != null)
