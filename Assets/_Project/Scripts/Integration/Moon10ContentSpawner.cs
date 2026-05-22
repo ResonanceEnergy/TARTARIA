@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
@@ -96,8 +96,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.ActivateQuest("moon10_rail_network_discovery");
 
             // Dialogue: children NPCs (from Moon 3) now junior engineers
-            // TODO: HUDController not implemented
-            // HUDController.Instance?.ShowObjective("The rails sing again. Connect the continent.");
+            HUDController.Instance?.ShowObjective("The rails sing again. Connect the continent.");
         }
 
         void SpawnCentralStation()

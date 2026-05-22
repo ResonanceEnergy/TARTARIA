@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
 using Tartaria.Core;
@@ -271,7 +271,7 @@ namespace Tartaria.Integration
             // Quest completion + Moon 6 unlock
             if (QuestManager.Instance != null)
             {
-                // TODO: QuestManager.Instance.CompleteQuest("moon5_white_city_restoration");
+                QuestManager.Instance?.CompleteQuest("moon5_white_city_restoration");
             }
 
             if (SaveManager.Instance != null)
@@ -288,10 +288,6 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            // TODO: SaveManager.Instance.SetMoonData(5, "pavilionsRestored", _pavilionsRestored);
-            // TODO: SaveManager.Instance.SetMoonData(5, "thorneIntroduced", _thorneIntroduced ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(5, "auroraHologramTriggered", _auroraHologramTriggered ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(5, "centralSpireComplete", _centralSpireComplete ? 1 : 0);
         }
 
         void LoadState()
@@ -401,3 +397,4 @@ namespace Tartaria.Integration
         }
     }
 }
+

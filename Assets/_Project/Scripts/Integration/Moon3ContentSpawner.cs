@@ -99,9 +99,7 @@ namespace Tartaria.Integration
             SpawnMoon3Content();
 
             // Tutorial hint
-            // TODO: TutorialSystem not implemented
-            // TODO: HUDController not implemented
-        }
+                    }
 
         /// <summary>
         /// Spawns all Moon 3 content: spectral train, cymatic gardens, rail segments.
@@ -330,8 +328,7 @@ namespace Tartaria.Integration
             // Quest objective: protect children + repair track
             QuestManager.Instance?.ActivateQuest("moon3_derailment_defense");
 
-            // TODO: HUDController not implemented
-        }
+                    }
 
         /// <summary>
         /// Triggers climax event: children sing 432 Hz lullaby → train solidifies (Days 19-24).
@@ -382,8 +379,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.CompleteQuest("quest_complete");
 
             // Unlock Moon 4
-            // TODO: HUDController not implemented
-            SaveManager.Instance?.SetMoonProgress(3, 100f);
+                        SaveManager.Instance?.SetMoonProgress(3, 100f);
 
             // Lirael revelation dialogue
             DialogueManager.Instance?.PlayContextDialogue("lirael_moon3_revelation");

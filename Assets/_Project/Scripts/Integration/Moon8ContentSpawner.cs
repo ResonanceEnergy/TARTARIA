@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Save;
@@ -322,7 +322,7 @@ namespace Tartaria.Integration
             // Quest completion + Moon 9 unlock
             if (QuestManager.Instance != null)
             {
-                // TODO: QuestManager.Instance.CompleteQuest("moon8_airship_armada");
+                QuestManager.Instance?.CompleteQuest("moon8_airship_armada");
             }
 
             if (SaveManager.Instance != null)
@@ -339,11 +339,6 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            // TODO: SaveManager.Instance.SetMoonData(8, "airshipsRepaired", _airshipsRepaired);
-            // TODO: SaveManager.Instance.SetMoonData(8, "thorneLanded", _thorneLanded ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(8, "aerialCombatTriggered", _aerialCombatTriggered ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(8, "nightFlightTriggered", _nightFlightTriggered ? 1 : 0);
-            // TODO: SaveManager.Instance.SetMoonData(8, "revelationUnlocked", _revelationUnlocked ? 1 : 0);
         }
 
         void LoadState()
@@ -466,3 +461,4 @@ namespace Tartaria.Integration
         }
     }
 }
+

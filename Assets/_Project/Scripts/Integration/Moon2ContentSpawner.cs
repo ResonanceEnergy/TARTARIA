@@ -89,9 +89,7 @@ namespace Tartaria.Integration
             SpawnMoon2Content();
 
             // Tutorial hint
-            // TODO: TutorialSystem not implemented
-            // TODO: HUDController not implemented
-        }
+                    }
 
         /// <summary>
         /// Spawns all Moon 2 content: Cassian, dissonance crystals, Mud Golems.

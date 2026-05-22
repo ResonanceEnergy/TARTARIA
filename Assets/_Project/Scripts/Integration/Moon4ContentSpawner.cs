@@ -104,9 +104,7 @@ namespace Tartaria.Integration
             SpawnMoon4Content();
 
             // Tutorial hint
-            // TODO: TutorialSystem not implemented
-            // TODO: HUDController not implemented
-        }
+                    }
 
         /// <summary>
         /// Spawns all Moon 4 content: star fort, Echo NPCs, moat puzzles, guardian golem.
@@ -357,9 +355,8 @@ namespace Tartaria.Integration
 
             // Add health + combat
             var health = _guardianGolem.AddComponent<MudGolemHealth>();
-            // TODO: Re-enable once Unity asset database recognizes MudGolemHealth type
-            // health.SetMaxHealth(500f);  // Boss-tier health
-            // health.OnDeath += OnGolemDefeated;
+            health.SetMaxHealth(500f);  // Boss-tier health
+            health.OnDeath += OnGolemDefeated;
 
             // Collider
             var collider = _guardianGolem.AddComponent<CapsuleCollider>();
@@ -375,8 +372,7 @@ namespace Tartaria.Integration
             // Quest objective: defeat corrupted guardian
             QuestManager.Instance?.ActivateQuest("moon4_guardian_battle");
 
-            // TODO: HUDController not implemented
-        }
+                    }
 
         void OnGolemDefeated()
         {
@@ -447,8 +443,7 @@ namespace Tartaria.Integration
             GrantClockFragment();
 
             // Unlock Moon 5
-            // TODO: HUDController not implemented
-            SaveManager.Instance?.SetMoonProgress(4, 100f);
+                        SaveManager.Instance?.SetMoonProgress(4, 100f);
         }
 
         void SpawnMemoryCrystal(Vector3 position)
@@ -655,8 +650,7 @@ namespace Tartaria.Integration
             _read = true;
 
             Debug.Log($"[Moon 4 Inscription] {inscriptionText}");
-            // TODO: HUDController not implemented
-
+            
             // Achievement: discovered Zereth connection
             AchievementSystem.Instance?.Unlock("zereths_truth_partial");
         }
