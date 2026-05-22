@@ -26,6 +26,8 @@ namespace Tartaria.Integration
     [DisallowMultipleComponent]
     public class Moon2AtmosphereAudioManager : MonoBehaviour
     {
+        public static Moon2AtmosphereAudioManager Instance { get; private set; }
+
         // Area roots (5 buildings) discovered for per-area audio
         readonly Dictionary<string, GameObject> _areaRoots = new Dictionary<string, GameObject>();
         readonly Dictionary<string, AudioSource> _baseAmbiences = new Dictionary<string, AudioSource>();
@@ -46,6 +48,9 @@ namespace Tartaria.Integration
 
         void Awake()
         {
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
+            
             _audioMgr = AudioManager.Instance;
             _adaptiveMusic = FindObjectOfType<AdaptiveMusicController>();
             SubscribeToEvents();
