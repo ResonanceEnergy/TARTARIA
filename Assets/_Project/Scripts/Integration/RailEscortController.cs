@@ -802,14 +802,34 @@ namespace Tartaria.Integration
                 _trainRenderers.Add(wr);
             }
 
-            // Golden rail undercarriage + R6 resonance glow rings
-            var glow = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            glow.transform.SetParent(_trainProxy.transform);
-            glow.transform.localPosition = Vector3.down * 1.25f;
-            glow.transform.localScale = new Vector3(0.55f, 7.8f, 0.38f);
-            glow.GetComponent<Renderer>().material.color = new Color(0.96f, 0.87f, 0.28f, 0.72f);
-            glow.isStatic = true;
-            _trainRenderers.Add(glow.GetComponent<Renderer>());
+            // Golden rail undercarriage + R6 resonance glow rings (VFX replacement)
+            GameObject glowVFX = new GameObject("RailGlow_VFX");
+            glowVFX.transform.SetParent(_trainProxy.transform);
+            glowVFX.transform.localPosition = Vector3.down * 1.25f;
+            
+            ParticleSystem ps = glowVFX.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startLifetime = 2.0f;
+            main.startSpeed = 0.3f;
+            main.startSize = 0.5f;
+            main.startColor = new Color(0.96f, 0.87f, 0.28f, 0.8f);
+            main.maxParticles = 200;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            main.loop = true;
+            
+            var emission = ps.emission;
+            emission.rateOverTime = 80f;
+            
+            var shape = ps.shape;
+            shape.shapeType = ParticleSystemShapeType.Box;
+            shape.scale = new Vector3(0.55f, 7.8f, 0.38f);
+            
+            var renderer = glowVFX.GetComponent<ParticleSystemRenderer>();
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            renderer.material.SetColor("_BaseColor", new Color(0.96f, 0.87f, 0.28f, 0.72f));
+            
+            glowVFX.isStatic = true;
+            ps.Play();
 
             // Protection trigger volume
             var col = _trainProxy.AddComponent<SphereCollider>();
@@ -1230,22 +1250,42 @@ namespace Tartaria.Integration
         // R6: Instantiates permanent static objects that survive escort end (world transformation). R7: more markers + wind mgmt
         void CreatePermanentMoon3VictoryMarkers()
         {
-            // Golden resonance rail glow strips along entire path (static) — R7 extended + actual rail tracks
+            // Golden resonance rail glow strips along entire path (static) — R7 extended + actual rail tracks (VFX replacement)
             for (int i = 0; i < 14; i++)
             {
                 float t = i / 13f;
                 Vector3 p = Vector3.Lerp(railStart, railEnd, t) + Vector3.up * 0.4f;
-                var railGlow = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                railGlow.name = "Permanent_RailGlow_Victory_Moon3_R7";
-                railGlow.transform.position = p;
-                railGlow.transform.localScale = new Vector3(0.9f, 1.1f, 0.9f);
-                railGlow.transform.rotation = Quaternion.LookRotation((railEnd - railStart).normalized);
-                var r = railGlow.GetComponent<Renderer>();
-                r.material.color = new Color(0.95f, 0.88f, 0.35f, 0.85f);
-                r.material.EnableKeyword("_EMISSION");
-                if (r.material.HasProperty("_EmissionColor")) r.material.SetColor("_EmissionColor", Color.yellow * 1.4f);
-                railGlow.isStatic = true;
-                Destroy(railGlow.GetComponent<Collider>());
+                
+                GameObject railGlowVFX = new GameObject($"Permanent_RailGlow_Victory_Moon3_R7_{i:D2}");
+                railGlowVFX.transform.position = p;
+                railGlowVFX.transform.rotation = Quaternion.LookRotation((railEnd - railStart).normalized);
+                
+                ParticleSystem psGlow = railGlowVFX.AddComponent<ParticleSystem>();
+                var mainGlow = psGlow.main;
+                mainGlow.startLifetime = 2.5f;
+                mainGlow.startSpeed = 0.2f;
+                mainGlow.startSize = 0.9f;
+                mainGlow.startColor = new Color(0.95f, 0.88f, 0.35f, 0.9f);
+                mainGlow.maxParticles = 120;
+                mainGlow.loop = true;
+                mainGlow.simulationSpace = ParticleSystemSimulationSpace.Local;
+                
+                var emissionGlow = psGlow.emission;
+                emissionGlow.rateOverTime = 50f;
+                
+                var shapeGlow = psGlow.shape;
+                shapeGlow.shapeType = ParticleSystemShapeType.Cylinder;
+                shapeGlow.radius = 0.45f;
+                shapeGlow.length = 1.1f;
+                
+                var rendererGlow = railGlowVFX.GetComponent<ParticleSystemRenderer>();
+                rendererGlow.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                rendererGlow.material.SetColor("_BaseColor", new Color(1f, 1f, 0.5f));
+                rendererGlow.material.EnableKeyword("_EMISSION");
+                rendererGlow.material.SetColor("_EmissionColor", Color.yellow * 1.4f);
+                
+                railGlowVFX.isStatic = true;
+                psGlow.Play();
             }
 
             // Actual beautiful golden rail tracks (LineRenderer for clean look)
