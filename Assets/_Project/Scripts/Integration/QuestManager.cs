@@ -44,12 +44,73 @@ namespace Tartaria.Integration
             DontDestroyOnLoad(gameObject);
             QuestProviderLocator.Current = this;
             ServiceLocator.Quest = this;
+            
+            // Wire save/load events
+            if (Save.SaveManager.Instance != null)
+            {
+                Save.SaveManager.Instance.OnBeforeSave += OnSave;
+                Save.SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
             if (ServiceLocator.Quest == (IQuestService)this) ServiceLocator.Quest = null;
+            
+            // Cleanup save/load event handlers
+            if (Save.SaveManager.Instance != null)
+            {
+                Save.SaveManager.Instance.OnBeforeSave -= OnSave;
+                Save.SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+        
+        void OnSave(Save.SaveData sd)
+        {
+            // Persist quest states to SaveData.quests
+            if (sd.quests != null)
+            {
+                var entries = new List<Save.QuestSaveEntry>();
+                
+                foreach (var kvp in _questStates)
+                {
+                    entries.Add(new Save.QuestSaveEntry
+                    {
+                        questId = kvp.Key,
+                        status = (int)kvp.Value.status,
+                        objectiveProgress = kvp.Value.objectiveProgress ?? System.Array.Empty<int>()
+                    });
+                }
+                
+                sd.quests.entries = entries.ToArray();
+                Debug.Log($"[QuestManager] Saved {entries.Count} quest states");
+            }
+        }
+        
+        void OnLoad(Save.SaveData sd)
+        {
+            // Restore quest states from SaveData.quests
+            if (sd.quests?.entries != null)
+            {
+                foreach (var entry in sd.quests.entries)
+                {
+                    if (string.IsNullOrEmpty(entry.questId)) continue;
+                    
+                    // Only restore if quest exists in database
+                    if (_questStates.ContainsKey(entry.questId))
+                    {
+                        _questStates[entry.questId] = new QuestState
+                        {
+                            status = (QuestStatus)entry.status,
+                            objectiveProgress = entry.objectiveProgress ?? System.Array.Empty<int>()
+                        };
+                    }
+                }
+                
+                _questListsDirty = true;
+                Debug.Log($"[QuestManager] Loaded {sd.quests.entries.Length} quest states");
+            }
         }
 
         void Start()
