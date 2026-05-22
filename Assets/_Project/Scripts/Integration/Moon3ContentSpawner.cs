@@ -118,8 +118,12 @@ namespace Tartaria.Integration
             // Spawn cymatic gardens (8 garden orbs to tune)
             SpawnCymaticGardens();
 
-            // Activate sad train ambient audio
-            // TODO: AudioManager.PlayLoopingSFX not implemented;
+            // Activate sad train ambient audio (spectral train whistle + distant crying)
+            var trainAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("SpectralTrainWhistle", trainSpawnPoint, 0.35f);
+            if (trainAmbience != null)
+            {
+                Debug.Log("[Moon 3] Spectral train ambience active");
+            }
 
             Debug.Log($"[Moon 3] Spawned spectral Orphan Train + {totalOrphans} cymatic gardens");
         }
@@ -364,7 +368,7 @@ namespace Tartaria.Integration
             GrantLullabyBuff();
 
             // Quest complete
-            // TODO: QuestManager.CompleteQuest is private
+            QuestManager.Instance?.CompleteQuest("quest_complete");
 
             // Unlock Moon 4
             // TODO: HUDController not implemented
@@ -381,7 +385,7 @@ namespace Tartaria.Integration
 
             // TODO: Create persistent buff component on player
             // For beta: add achievement
-            // TODO: AchievementSystem.UnlockAchievement not implemented  // Hidden: "Orphan Train" memory
+            AchievementSystem.Instance?.Unlock("orphan_train_memory");
         }
 
         /// <summary>
@@ -496,3 +500,5 @@ namespace Tartaria.Integration
         }
     }
 }
+
+
