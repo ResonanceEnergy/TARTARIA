@@ -26,25 +26,20 @@ namespace Tartaria.Camera
         float _segmentProgress;
         bool _isPlaying;
 
-        // Runtime waypoints loaded from CinematicWaypointSequences
-        List<Vector3> _runtimePositions;
-        List<Vector3> _runtimeLookAts;
-        List<float> _runtimeDurations;
+// Runtime waypoints loaded externally (from Integration tier via PlaySequence)
+    List<Vector3> _runtimePositions;
+    List<Vector3> _runtimeLookAts;
+    List<float> _runtimeDurations;
 
-        /// <summary>
-        /// Play named cinematic sequence from CinematicWaypointSequences.
-        /// </summary>
-        public void PlaySequence(string sequenceName)
+    /// <summary>
+    /// Play cinematic sequence with provided waypoint data.
+    /// Called by Integration tier with CinematicWaypointSequences data.
+    /// </summary>
+    public void PlaySequence(CinematicWaypoint[] waypoints)
+    {
+        if (waypoints == null || waypoints.Length < 2)
         {
-            if (!Tartaria.Integration.CinematicWaypointSequences.Sequences.TryGetValue(sequenceName, out var waypoints))
-            {
-                Debug.LogError($"[CinematicCamera] Sequence '{sequenceName}' not found");
-                return;
-            }
-
-            if (waypoints == null || waypoints.Length < 2)
-            {
-                Debug.LogWarning($"[CinematicCamera] Sequence '{sequenceName}' has <2 waypoints");
+            Debug.LogWarning($"[CinematicCamera] Provided sequence has <2 waypoints");
                 return;
             }
 
@@ -64,7 +59,7 @@ namespace Tartaria.Camera
             _segmentProgress = 0f;
             _isPlaying = true;
 
-            Debug.Log($"[CinematicCamera] Playing '{sequenceName}' ({waypoints.Length} waypoints)");
+            Debug.Log($"[CinematicCamera] Playing sequence ({waypoints.Length} waypoints)");
         }
 
         /// <summary>
@@ -202,6 +197,23 @@ namespace Tartaria.Camera
             {
                 Gizmos.DrawWireSphere(waypoints[waypoints.Length - 1].position, 0.5f);
             }
+        }
+    }
+
+    /// <summary>
+    /// Cinematic waypoint data structure (passed from Integration tier).
+    /// </summary>
+    public struct CinematicWaypoint
+    {
+        public Vector3 position;
+        public Vector3 lookAt;
+        public float duration;
+
+        public CinematicWaypoint(Vector3 pos, Vector3 look, float dur)
+        {
+            position = pos;
+            lookAt = look;
+            duration = dur;
         }
     }
 }

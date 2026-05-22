@@ -1,0 +1,273 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Tartaria.AI
+{
+    /// <summary>
+    /// EnemySpawnerManager — handles wave-based enemy spawning for combat encounters.
+    /// Supports: timed waves, triggered spawns, boss encounters, reinforcements.
+    /// Tracks active enemies, notifies when wave cleared → triggers rewards/progression.
+    /// 
+    /// Wave Config:
+    /// - Wave 1: 3x Mud Golem, 30s interval
+    /// - Wave 2: 5x Dissonant Crystal, 60s interval
+    /// - Wave 3: 1x Boss (Giant Mud Golem), instant
+    /// 
+    /// Features:
+    /// - Spawn points (random selection from pool)
+    /// - Enemy pools (prefabs)
+    /// - Wave progression (auto or manual trigger)
+    /// - Cleared notifications → QuestManager integration
+    /// - Enemy death tracking
+    /// 
+    /// Usage:
+    /// - Attach to scene root GameObject
+    /// - Define spawn points (array of Transforms)
+    /// - Define wave configs in inspector
+    /// - Call StartWaves() to begin encounter
+    /// 
+    /// GDD refs: §09 (Combat Encounters), §03 (Moon Boss Fights)
+    /// </summary>
+    public class EnemySpawnerManager : MonoBehaviour
+    {
+        public static EnemySpawnerManager Instance { get; private set; }
+
+        [Header("Spawn Points")]
+        [SerializeField] Transform[] spawnPoints;
+
+        [Header("Enemy Prefabs")]
+        [SerializeField] GameObject mudGolemPrefab;
+        [SerializeField] GameObject dissonantCrystalPrefab;
+        [SerializeField] GameObject giantGolemPrefab;
+
+        [Header("Wave Configuration")]
+        [SerializeField] WaveConfig[] waves;
+        [SerializeField] bool autoStartWaves = false;
+        [SerializeField] float timeBetweenWaves = 10f;
+
+        public event System.Action<int> OnWaveStarted;  // Wave index
+        public event System.Action<int> OnWaveCleared;  // Wave index
+        public event System.Action OnAllWavesCleared;
+
+        readonly List<GameObject> _activeEnemies = new();
+        int _currentWaveIndex = -1;
+        bool _isSpawning;
+        bool _allWavesComplete;
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+
+        void Start()
+        {
+            if (autoStartWaves)
+            {
+                StartWaves();
+            }
+        }
+
+        /// <summary>
+        /// Start wave spawning sequence.
+        /// </summary>
+        public void StartWaves()
+        {
+            if (_isSpawning)
+            {
+                Debug.LogWarning("[EnemySpawner] Waves already in progress");
+                return;
+            }
+
+            _currentWaveIndex = -1;
+            _allWavesComplete = false;
+
+            StartCoroutine(WaveSequence());
+
+            Debug.Log("[EnemySpawner] Starting wave sequence");
+        }
+
+        IEnumerator WaveSequence()
+        {
+            _isSpawning = true;
+
+            while (_currentWaveIndex < waves.Length - 1)
+            {
+                _currentWaveIndex++;
+                yield return StartCoroutine(SpawnWave(_currentWaveIndex));
+
+                // Wait for wave clear
+                yield return StartCoroutine(WaitForWaveClear());
+
+                OnWaveCleared?.Invoke(_currentWaveIndex);
+
+                Debug.Log($"[EnemySpawner] Wave {_currentWaveIndex + 1} cleared");
+
+                // Wait before next wave
+                if (_currentWaveIndex < waves.Length - 1)
+                {
+                    yield return new WaitForSeconds(timeBetweenWaves);
+                }
+            }
+
+            _allWavesComplete = true;
+            _isSpawning = false;
+
+            OnAllWavesCleared?.Invoke();
+
+            Debug.Log("[EnemySpawner] All waves cleared!");
+        }
+
+        IEnumerator SpawnWave(int waveIndex)
+        {
+            if (waveIndex < 0 || waveIndex >= waves.Length)
+            {
+                yield break;
+            }
+
+            var wave = waves[waveIndex];
+
+            OnWaveStarted?.Invoke(waveIndex);
+
+            Debug.Log($"[EnemySpawner] Starting Wave {waveIndex + 1}: {wave.spawns.Length} spawns");
+
+            foreach (var spawn in wave.spawns)
+            {
+                SpawnEnemy(spawn.enemyType, spawn.count);
+
+                if (spawn.spawnDelay > 0f)
+                {
+                    yield return new WaitForSeconds(spawn.spawnDelay);
+                }
+            }
+        }
+
+        void SpawnEnemy(EnemyType type, int count)
+        {
+            GameObject prefab = GetPrefabForType(type);
+            if (prefab == null)
+            {
+                Debug.LogWarning($"[EnemySpawner] No prefab defined for {type}");
+                return;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                Vector3 spawnPos = GetRandomSpawnPoint();
+                GameObject enemy = Instantiate(prefab, spawnPos, Quaternion.identity, transform);
+                enemy.name = $"{type}_{_activeEnemies.Count}";
+
+                _activeEnemies.Add(enemy);
+
+                // Subscribe to death event
+                // TODO: Hook into enemy health component death event
+                // var health = enemy.GetComponent<EnemyHealth>();
+                // if (health != null)
+                // {
+                //     health.OnDeath += () => OnEnemyDied(enemy);
+                // }
+
+                Debug.Log($"[EnemySpawner] Spawned {type} at {spawnPos}");
+            }
+        }
+
+        Vector3 GetRandomSpawnPoint()
+        {
+            if (spawnPoints == null || spawnPoints.Length == 0)
+            {
+                Debug.LogWarning("[EnemySpawner] No spawn points defined, using origin");
+                return Vector3.zero;
+            }
+
+            Transform point = spawnPoints[Random.Range(0, spawnPoints.Length)];
+            return point != null ? point.position : Vector3.zero;
+        }
+
+        GameObject GetPrefabForType(EnemyType type)
+        {
+            return type switch
+            {
+                EnemyType.MudGolem => mudGolemPrefab,
+                EnemyType.DissonantCrystal => dissonantCrystalPrefab,
+                EnemyType.GiantGolem => giantGolemPrefab,
+                _ => null
+            };
+        }
+
+        IEnumerator WaitForWaveClear()
+        {
+            while (_activeEnemies.Count > 0)
+            {
+                // Remove dead/destroyed enemies
+                _activeEnemies.RemoveAll(e => e == null);
+
+                yield return new WaitForSeconds(0.5f);
+            }
+        }
+
+        /// <summary>
+        /// Called when an enemy dies (hook this to enemy health component).
+        /// </summary>
+        public void OnEnemyDied(GameObject enemy)
+        {
+            _activeEnemies.Remove(enemy);
+
+            Debug.Log($"[EnemySpawner] Enemy died: {enemy.name}, {_activeEnemies.Count} remaining");
+        }
+
+        /// <summary>
+        /// Force-clear all active enemies (debug/cheat).
+        /// </summary>
+        public void ClearAllEnemies()
+        {
+            foreach (var enemy in _activeEnemies)
+            {
+                if (enemy != null)
+                {
+                    Destroy(enemy);
+                }
+            }
+
+            _activeEnemies.Clear();
+
+            Debug.Log("[EnemySpawner] All enemies cleared");
+        }
+
+        /// <summary>
+        /// Get active enemy count.
+        /// </summary>
+        public int GetActiveEnemyCount() => _activeEnemies.Count;
+
+        /// <summary>
+        /// Check if all waves complete.
+        /// </summary>
+        public bool AreAllWavesComplete() => _allWavesComplete;
+
+        [System.Serializable]
+        public class WaveConfig
+        {
+            public string waveName = "Wave 1";
+            public SpawnEntry[] spawns;
+        }
+
+        [System.Serializable]
+        public struct SpawnEntry
+        {
+            public EnemyType enemyType;
+            public int count;
+            public float spawnDelay;  // Seconds before next spawn in wave
+        }
+
+        public enum EnemyType : byte
+        {
+            MudGolem = 0,
+            DissonantCrystal = 1,
+            GiantGolem = 2
+        }
+    }
+}
