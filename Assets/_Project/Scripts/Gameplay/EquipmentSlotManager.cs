@@ -1,5 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Tartaria.Data;
+using Tartaria.Save;
 
 namespace Tartaria.Gameplay
 {
@@ -20,6 +22,11 @@ namespace Tartaria.Gameplay
     /// - Display equipped items in Character UI
     /// - Visual updates (change player mesh/materials)
     /// 
+    /// Save Integration:
+    /// - Implements ISaveDataProvider (v17 modular extensibility)
+    /// - Equipment state persists via itemID references
+    /// - Auto-loads assets from Resources/Equipment/ on restore
+    /// 
     /// Usage:
     /// - EquipmentSlotManager.Instance.EquipItem(EquipSlot.Weapon, itemData)
     /// - EquipmentSlotManager.Instance.UnequipSlot(EquipSlot.Weapon)
@@ -27,21 +34,21 @@ namespace Tartaria.Gameplay
     /// 
     /// GDD refs: §07 (Equipment System), §06 (Character Stats)
     /// </summary>
-    public class EquipmentSlotManager : MonoBehaviour
+    public class EquipmentSlotManager : MonoBehaviour, ISaveDataProvider
     {
         public static EquipmentSlotManager Instance { get; private set; }
 
         [Header("Equipment Slots")]
-        [SerializeField] EquipmentItem weaponSlot;
-        [SerializeField] EquipmentItem armorSlot;
-        [SerializeField] EquipmentItem helmetSlot;
-        [SerializeField] EquipmentItem glovesSlot;
-        [SerializeField] EquipmentItem bootsSlot;
-        [SerializeField] EquipmentItem accessorySlot;
+        [SerializeField] EquipmentItemData weaponSlot;
+        [SerializeField] EquipmentItemData armorSlot;
+        [SerializeField] EquipmentItemData helmetSlot;
+        [SerializeField] EquipmentItemData glovesSlot;
+        [SerializeField] EquipmentItemData bootsSlot;
+        [SerializeField] EquipmentItemData accessorySlot;
 
         public event System.Action<EquipSlot> OnEquipmentChanged;
 
-        Dictionary<EquipSlot, EquipmentItem> _equippedItems = new();
+        Dictionary<EquipSlot, EquipmentItemData> _equippedItems = new();
 
         // Cached total stats
         int _totalStrength = 0;
@@ -77,12 +84,21 @@ namespace Tartaria.Gameplay
             _equippedItems[EquipSlot.Accessory] = accessorySlot;
 
             RecalculateStats();
+
+            // Register with SaveManager (ISaveDataProvider pattern)
+            SaveManager.Instance?.RegisterProvider(this);
+        }
+
+        void OnDestroy()
+        {
+            SaveManager.Instance?.UnregisterProvider(this);
+            if (Instance == this) Instance = null;
         }
 
         /// <summary>
         /// Equip item in slot.
         /// </summary>
-        public bool EquipItem(EquipSlot slot, EquipmentItem item)
+        public bool EquipItem(EquipSlot slot, EquipmentItemData item)
         {
             if (item == null)
             {
@@ -146,7 +162,7 @@ namespace Tartaria.Gameplay
         /// <summary>
         /// Get equipped item in slot.
         /// </summary>
-        public EquipmentItem GetEquippedItem(EquipSlot slot)
+        public EquipmentItemData GetEquippedItem(EquipSlot slot)
         {
             return _equippedItems.GetValueOrDefault(slot, null);
         }
@@ -191,37 +207,103 @@ namespace Tartaria.Gameplay
             Debug.Log("[EquipmentSlot] Unequipped all items");
         }
 
-        public enum EquipSlot : byte
+        // ═══════════════════════════════════════════════════════════════
+        // ISaveDataProvider Implementation (v17 modular save pattern)
+        // ═══════════════════════════════════════════════════════════════
+
+        public string GetProviderKey() => "EquipmentSlotManager";
+
+        public object GetSaveData()
         {
-            Weapon = 0,
-            Armor = 1,
-            Helmet = 2,
-            Gloves = 3,
-            Boots = 4,
-            Accessory = 5
+            return new EquipmentSaveData
+            {
+                weaponSlotItemID = _equippedItems[EquipSlot.Weapon]?.itemID,
+                armorSlotItemID = _equippedItems[EquipSlot.Armor]?.itemID,
+                helmetSlotItemID = _equippedItems[EquipSlot.Helmet]?.itemID,
+                glovesSlotItemID = _equippedItems[EquipSlot.Gloves]?.itemID,
+                bootsSlotItemID = _equippedItems[EquipSlot.Boots]?.itemID,
+                accessorySlotItemID = _equippedItems[EquipSlot.Accessory]?.itemID
+            };
         }
-    }
 
-    /// <summary>
-    /// Equipment item data (ScriptableObject or class).
-    /// </summary>
-    [System.Serializable]
-    public class EquipmentItem
-    {
-        public string itemID;
-        public string itemName;
-        public EquipmentSlotManager.EquipSlot slot;
+        public void RestoreSaveData(object data)
+        {
+            if (data is not EquipmentSaveData equipData)
+            {
+                Debug.LogWarning("[EquipmentSlot] Invalid save data type — expected EquipmentSaveData");
+                return;
+            }
 
-        [Header("Stats")]
-        public int strengthBonus;
-        public int agilityBonus;
-        public int vitalityBonus;
-        public int resonanceBonus;
-        public int attunementBonus;
-        public int armorValue;
+            // Clear current equipment
+            _equippedItems[EquipSlot.Weapon] = null;
+            _equippedItems[EquipSlot.Armor] = null;
+            _equippedItems[EquipSlot.Helmet] = null;
+            _equippedItems[EquipSlot.Gloves] = null;
+            _equippedItems[EquipSlot.Boots] = null;
+            _equippedItems[EquipSlot.Accessory] = null;
 
-        [Header("Visual")]
-        public GameObject meshPrefab;  // Visual representation
-        public Sprite icon;
+            // Load equipment by itemID
+            if (!string.IsNullOrEmpty(equipData.weaponSlotItemID))
+                _equippedItems[EquipSlot.Weapon] = LoadEquipmentByID(equipData.weaponSlotItemID);
+
+            if (!string.IsNullOrEmpty(equipData.armorSlotItemID))
+                _equippedItems[EquipSlot.Armor] = LoadEquipmentByID(equipData.armorSlotItemID);
+
+            if (!string.IsNullOrEmpty(equipData.helmetSlotItemID))
+                _equippedItems[EquipSlot.Helmet] = LoadEquipmentByID(equipData.helmetSlotItemID);
+
+            if (!string.IsNullOrEmpty(equipData.glovesSlotItemID))
+                _equippedItems[EquipSlot.Gloves] = LoadEquipmentByID(equipData.glovesSlotItemID);
+
+            if (!string.IsNullOrEmpty(equipData.bootsSlotItemID))
+                _equippedItems[EquipSlot.Boots] = LoadEquipmentByID(equipData.bootsSlotItemID);
+
+            if (!string.IsNullOrEmpty(equipData.accessorySlotItemID))
+                _equippedItems[EquipSlot.Accessory] = LoadEquipmentByID(equipData.accessorySlotItemID);
+
+            RecalculateStats();
+            Debug.Log("[EquipmentSlot] Equipment state restored from save");
+        }
+
+        /// <summary>
+        /// Load EquipmentItemData asset by itemID.
+        /// Searches Resources/Equipment/ for matching asset.
+        /// Falls back to Resources root if not found in Equipment folder.
+        /// </summary>
+        EquipmentItemData LoadEquipmentByID(string itemID)
+        {
+            if (string.IsNullOrEmpty(itemID))
+                return null;
+
+            // Try loading from Resources/Equipment/ first
+            var item = Resources.Load<EquipmentItemData>($"Equipment/{itemID}");
+
+            if (item == null)
+            {
+                // Fallback: search root Resources
+                item = Resources.Load<EquipmentItemData>(itemID);
+            }
+
+            if (item == null)
+            {
+                Debug.LogWarning($"[EquipmentSlot] Failed to load equipment '{itemID}' from Resources");
+            }
+
+            return item;
+        }
+
+        /// <summary>
+        /// Serializable equipment save data (ISaveDataProvider pattern).
+        /// </summary>
+        [System.Serializable]
+        class EquipmentSaveData
+        {
+            public string weaponSlotItemID;
+            public string armorSlotItemID;
+            public string helmetSlotItemID;
+            public string glovesSlotItemID;
+            public string bootsSlotItemID;
+            public string accessorySlotItemID;
+        }
     }
 }
