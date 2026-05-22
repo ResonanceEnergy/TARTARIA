@@ -125,8 +125,12 @@ namespace Tartaria.Integration
             // Spawn moat pipe puzzle segments (6 locations)
             SpawnMoatPuzzles();
 
-            // Activate dissonant ambient audio
-            // TODO: AudioManager.PlayLoopingSFX not implemented;
+            // Activate dissonant ambient audio (deep rumble + metallic groans)
+            var fortAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("FortDissonance", fortCenter, 0.45f);
+            if (fortAmbience != null)
+            {
+                Debug.Log("[Moon 4] Star fort dissonance ambience active");
+            }
 
             Debug.Log($"[Moon 4] Spawned star fort ({totalBastions} bastions, {totalMoatSegments} moat segments)");
         }

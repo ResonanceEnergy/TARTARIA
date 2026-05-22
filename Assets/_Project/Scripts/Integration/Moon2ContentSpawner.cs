@@ -110,8 +110,12 @@ namespace Tartaria.Integration
             // Spawn dissonance crystals
             SpawnDissonanceCrystals();
 
-            // Activate dissonance ambient audio
-            // TODO: AudioManager.PlayLoopingSFX not implemented;
+            // Activate dissonance ambient audio (looping crystal hum)
+            var crystalAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("CrystalDissonance", bellTowerCenter, 0.4f);
+            if (crystalAmbience != null)
+            {
+                Debug.Log("[Moon 2] Crystal dissonance ambience active");
+            }
 
             Debug.Log($"[Moon 2] Spawned {totalCrystals} dissonance crystals + Cassian NPC");
         }
