@@ -323,7 +323,7 @@ namespace Tartaria.Integration
 
             Vector3 center = new Vector3(20f, 0f, 10f);
             if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
-            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
+            var player = _cachedPlayer;
             if (player != null) center = player.transform.position + new Vector3(12f, 0f, 10f);
 
             for (int i = 0; i < needed; i++)
@@ -342,8 +342,8 @@ namespace Tartaria.Integration
                 return;
             }
 
-            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
-            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
+            var player = _cachedPlayer;
             if (player == null) return;
             var a = AnastasiaController.Instance.transform;
             if (Vector3.Distance(a.position, player.transform.position) > 60f)
@@ -352,8 +352,8 @@ namespace Tartaria.Integration
 
         void EnsurePlayerAnimatorPresent()
         {
-            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
-            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
+            var player = _cachedPlayer;
             if (player == null) return;
             if (player.GetComponent<PlayerAnimator>() == null)
                 player.AddComponent<PlayerAnimator>();
@@ -694,7 +694,7 @@ namespace Tartaria.Integration
             if (milo == null) yield break;
             // Simple visual cue: face player + short forward step (no nav required)
             if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
-            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
+            var player = _cachedPlayer;
             if (player != null)
             {
                 Vector3 toPlayer = (player.transform.position - milo.transform.position).normalized;
@@ -1628,6 +1628,7 @@ namespace Tartaria.Integration
             if (_firstExcavationSite == null) _firstExcavationSite = GameObject.Find("Moon1_FirstExcavationSite");
             if (_firstExcavationSite != null)
             {
+                GameObject firstSiteGO = _firstExcavationSite;  // Local alias for nameplate logic
                 Vector3 firstPos = _firstExcavationSite.transform.position;
                 exc.RegisterSite("echohaven_first_ruin", firstPos, 2, false, "first_dome");
                 // Also register as scanner POI so resonance scan immediately reveals the obvious first target
