@@ -101,6 +101,19 @@ namespace Tartaria.Save
         // v15: Helper accessors for arc scripts (int)
         public int GetMoonFlag(int moonNum, string key, int defaultValue) => moonFlagsInt.Get($"m{moonNum}_{key}", defaultValue);
         public void SetMoonFlag(int moonNum, string key, int value) => moonFlagsInt.Set($"m{moonNum}_{key}", value);
+        
+        // v18+: PlayerHealthController accessors
+        public float PlayerCurrentHealth
+        {
+            get => player.PlayerCurrentHealth;
+            set => player.PlayerCurrentHealth = value;
+        }
+        
+        public Vector3 PlayerCheckpointPosition
+        {
+            get => player.PlayerCheckpointPosition;
+            set => player.PlayerCheckpointPosition = value;
+        }
     }
 
     /// <summary>
@@ -246,6 +259,10 @@ namespace Tartaria.Save
         public string glovesSlotItemID = null;
         public string bootsSlotItemID = null;
         public string accessorySlotItemID = null;
+        
+        // PlayerHealthController fields (v18+)
+        public float PlayerCurrentHealth = 100f;
+        public SerializableVector3 PlayerCheckpointPosition = new SerializableVector3(0, 0, 0);
     }
 
     [Serializable]
