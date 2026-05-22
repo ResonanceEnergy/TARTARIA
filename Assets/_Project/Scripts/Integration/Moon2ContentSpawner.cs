@@ -134,14 +134,14 @@ namespace Tartaria.Integration
             collider.height = 2f;
             collider.radius = 0.4f;
 
-            // Cassian dialogue trigger
-            // TODO: var dialogue = _cassianNPC.AddComponent<DialogueTrigger>();
-            // dialogue.dialogueId = "cassian_intro";  // Wired if DialogueTrigger exists
+            // Cassian dialogue trigger (repeatable interaction)
+            var dialogue = _cassianNPC.AddComponent<DialogueTrigger>();
+            dialogue.SetDialogueContext("cassian_moon2_repeatable");  // Repeatable NPC dialogue
 
             cassianIntroduced = true;
             Debug.Log("[Moon 2] Cassian spawned at cathedral entrance");
 
-            // Cassian intro dialogue
+            // Cassian intro dialogue (one-time on spawn)
             DialogueManager.Instance?.PlayContextDialogue("cassian_intro");
         }
 
@@ -294,10 +294,9 @@ namespace Tartaria.Integration
             Audio.AudioManager.Instance?.PlaySFX2D("Moon2_RestoreHarmonic");
 
             // Quest complete
-            // TODO: QuestManager.CompleteQuest is private
+            QuestManager.Instance?.CompleteQuest("moon2_purge_complete");
 
             // Unlock Moon 3
-            // TODO: HUDController not implemented
             SaveManager.Instance?.SetMoonProgress(2, 100f);
 
             // Lirael whisper
