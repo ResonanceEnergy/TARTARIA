@@ -61,7 +61,7 @@ namespace Tartaria.Editor
 
         static int SetupEchohavenCoreController()
         {
-            var existing = Object.FindObjectOfType<EchohavenContentSpawner>();
+            var existing = Object.FindFirstObjectByType<EchohavenContentSpawner>();
             if (existing != null) return 0;
 
             var go = new GameObject("Moon1_EchohavenCore");
@@ -624,7 +624,7 @@ namespace Tartaria.Editor
             if (_fired || !other.CompareTag("Player")) return;
             _fired = true;
 
-            var spawner = FindObjectOfType<EchohavenContentSpawner>();
+            var spawner = FindFirstObjectByType<EchohavenContentSpawner>();
             if (spawner != null)
             {
                 // The spawner already handles Milo intro + first content on Awake/Start in most flows.
@@ -676,7 +676,7 @@ namespace Tartaria.Editor
             string fullPrompt = $"{localized}  |  {gamepadPrompt}   — {f310Callout}";
 
             // Magical, guided on-screen objective for first 5-10 min
-            var hud = FindObjectOfType<HUDController>();
+            var hud = FindFirstObjectByType<HUDController>();
             if (hud != null)
             {
                 hud.ShowObjective("SCAN HERE — First Buried Ruin. " + fullPrompt + "\nThe Star Dome calls. Follow the light.");
@@ -752,7 +752,7 @@ namespace Tartaria.Editor
             }
 
             // === COMPANION TIE-IN + FIRST TUNE SUCCESS BANNER (magical + emotionally rewarding) ===
-            var milo = FindObjectOfType<MiloController>();
+            var milo = FindFirstObjectByType<MiloController>();
             if (milo != null)
             {
                 Debug.Log("[Moon 1 FTUE] Milo: 'You... you actually made it hum! The first chord... I feel it too. Thank you.' (trust beat + emotional anchor)");
@@ -778,7 +778,7 @@ namespace Tartaria.Editor
             Tartaria.Integration.MoonProgressTracker.Instance?.MarkBeatCleared(1, 1);  // Moon 01, Restoration (beat 1 after Discovery 0)
             Debug.Log("[Moon 1 FTUE] 5-beat flow advanced: Restoration complete. Objective now flows into Conflict (first golem) + Revelation.");
 
-            var hud = FindObjectOfType<HUDController>();
+            var hud = FindFirstObjectByType<HUDController>();
             if (hud != null)
             {
                 // Emotional, guided next objective for seamless 5-10 min experience
@@ -792,7 +792,7 @@ namespace Tartaria.Editor
             QuestManager.Instance?.ProgressByType(Tartaria.Core.QuestObjectiveType.ExcavateRuin, "first_dome");
 
             // Optional spawner hook
-            var spawner = FindObjectOfType<EchohavenContentSpawner>();
+            var spawner = FindFirstObjectByType<EchohavenContentSpawner>();
             if (spawner != null)
             {
                 // FTUE boost already applied; spawner handles full 5-beat + Milo beckon continuity
@@ -851,7 +851,7 @@ namespace Tartaria.Editor
             }
 
             // First companion trust moment + early Conflict teaser (first Mud Golem as hook)
-            milo = FindObjectOfType<MiloController>();
+            milo = FindFirstObjectByType<MiloController>();
             if (milo != null)
             {
                 // Safe trust gain (first real companion moment)

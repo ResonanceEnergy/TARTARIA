@@ -482,7 +482,7 @@ namespace Tartaria.Editor
         static int ApplyR7StaticBatchingToNewRailContent()
         {
             int n = 0;
-            foreach (var go in GameObject.FindObjectsOfType<GameObject>())
+            foreach (var go in GameObject.FindObjectsByType<GameObject>(FindObjectsSortMode.None))
             {
                 if (go.name.Contains("R7_RailStation") || go.name.Contains("R7_RailBranch") || go.name.Contains("R7_RailTerminal"))
                 {
@@ -531,7 +531,7 @@ namespace Tartaria.Editor
         static int SetupFullMoon3RailEscortExperience()
         {
             int n = 0;
-            var existing = GameObject.FindObjectOfType<RailEscortController>();
+            var existing = GameObject.FindFirstObjectByType<RailEscortController>();
             if (existing == null)
             {
                 var escortGO = new GameObject("Moon3_RailEscortController");
