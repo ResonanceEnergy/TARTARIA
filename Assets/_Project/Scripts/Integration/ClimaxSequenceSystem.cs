@@ -5,7 +5,6 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Audio;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -268,7 +267,7 @@ namespace Tartaria.Integration
         IEnumerator RunRSRewardBeat(ClimaxBeat beat)
         {
             GameLoopController.Instance?.QueueRSReward(beat.floatParam, $"climax_moon{_activeMoonIndex + 1}");
-            HUDController.Instance?.FlashRSGain(beat.floatParam);
+            GameEvents.RaiseHUDFlashRSGain(beat.floatParam);
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             AudioManager.Instance?.PlaySFX2D("RSGain");
             yield return new WaitForSeconds(beat.duration > 0 ? beat.duration : 1.5f);
@@ -281,7 +280,7 @@ namespace Tartaria.Integration
             _activeMoonIndex = -1;
 
             // Announce completion
-            HUDController.Instance?.ShowInteractionPrompt($"Moon {moonIdx + 1} Complete!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Moon {moonIdx + 1} Complete!");
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
             AdaptiveMusicController.Instance?.ExitCombat();
 

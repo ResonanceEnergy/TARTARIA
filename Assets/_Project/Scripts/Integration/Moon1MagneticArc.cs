@@ -18,7 +18,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Gameplay;
@@ -146,7 +145,7 @@ namespace Tartaria.Integration
             // Full clear → mark Moon 1 cleared (unlocks Moon 2 portal via MoonProgressTracker).
             MoonProgressTracker.Instance?.MarkCleared(1);
             GameEvents.FireCriticalSaveTrigger("moon1_arc_complete");
-            HUDController.Instance?.ShowBanner("MOON 1 COMPLETE", "The Magnetic Moon awakens. Moon 2 — Lunar — beckons. [F2] to travel.", 8f);
+            GameEvents.RaiseHUDShowBanner("MOON 1 COMPLETE", "The Magnetic Moon awakens. Moon 2 — Lunar — beckons. [F2] to travel.", 8f);
             Debug.Log("[Moon1Arc] Magnetic Moon arc COMPLETE — Moon 2 unlocked.");
 
             _running = false;
@@ -161,14 +160,14 @@ namespace Tartaria.Integration
             _current = Beat.Discovery;
             Debug.Log("[Moon1Arc] Beat 1 — Discovery");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MOON 1 — DISCOVERY",
                 "The Magnetic Moon stirs. Follow Milo. Use your Resonance Scanner.",
                 6f);
 
             // Tutorial prompt: scanner
             yield return new WaitForSeconds(3f);
-            HUDController.Instance?.ShowObjective($"Hold {InputPromptHelper.Scan} to scan for buried Aether structures.");
+            GameEvents.RaiseHUDShowObjective($"Hold {InputPromptHelper.Scan} to scan for buried Aether structures.");
 
             // Spawn the first dig site (north of player spawn) — tagged tutorial
             Vector3 playerPos = SafePlayerPos();
@@ -180,7 +179,7 @@ namespace Tartaria.Integration
             float t0 = Time.time;
             yield return new WaitForSeconds(8f);
 
-            HUDController.Instance?.ShowObjective($"Approach the glowing dig site. Press {InputPromptHelper.Interact} to excavate.");
+            GameEvents.RaiseHUDShowObjective($"Approach the glowing dig site. Press {InputPromptHelper.Interact} to excavate.");
             AudioManager.Instance?.PlaySFX2D("Discovery");
 
             // Hold here a few seconds so the player has time to read + walk
@@ -196,7 +195,7 @@ namespace Tartaria.Integration
             _current = Beat.Restoration;
             Debug.Log("[Moon1Arc] Beat 2 — Restoration");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESTORATION",
                 "Tune the dome. Wake the fountain. Plant the spire. Three blessings await.",
                 6f);
@@ -212,7 +211,7 @@ namespace Tartaria.Integration
                 "Carved Stone — Golden Spiral",
                 "The φ-ratio etched in pre-Flood granite. Cassian dismisses it as decorative. Milo whispers: 'This stone hums when I lick it.'"));
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 $"Restore the 3 hub buildings (Fountain, Dome, Spire). Use {InputPromptHelper.Interact} on each.");
 
             // Wait until EchohavenProgressionSystem reports full hub OR cap at 60s for solo testing
@@ -222,7 +221,7 @@ namespace Tartaria.Integration
                 var prog = EchohavenProgressionSystem.Instance;
                 if (prog != null && prog.IsHubFullyRestored())
                 {
-                    HUDController.Instance?.ShowBanner(
+                    GameEvents.RaiseHUDShowBanner(
                         "HUB AWAKENED",
                         "Blue-white sparks climb the spire. The first ley-line vein lights up — a golden thread points somewhere vast.",
                         5f);
@@ -244,7 +243,7 @@ namespace Tartaria.Integration
             _current = Beat.Conflict;
             Debug.Log("[Moon1Arc] Beat 3 — Conflict");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESET SCOUTS INBOUND",
                 $"Victorian-costumed goons with jackhammers. Defend the hub. {InputPromptHelper.Strike} to strike.",
                 6f);
@@ -263,7 +262,7 @@ namespace Tartaria.Integration
             }
 
             // Watch — when ~half down, prompt giant-mode burst
-            HUDController.Instance?.ShowObjective($"Defeat the Reset Scouts (0 / {scoutCount}).");
+            GameEvents.RaiseHUDShowObjective($"Defeat the Reset Scouts (0 / {scoutCount}).");
             int lastReported = -1;
             while (true)
             {
@@ -273,10 +272,10 @@ namespace Tartaria.Integration
                 if (dead != lastReported)
                 {
                     lastReported = dead;
-                    HUDController.Instance?.ShowObjective($"Defeat the Reset Scouts ({dead} / {scoutCount}).");
+                    GameEvents.RaiseHUDShowObjective($"Defeat the Reset Scouts ({dead} / {scoutCount}).");
                     if (dead == scoutCount / 2)
                     {
-                        HUDController.Instance?.ShowBanner(
+                        GameEvents.RaiseHUDShowBanner(
                             "GIANT MODE — READY",
                             "Your bloodline pulses. Activate Giant Mode and toss them into the mud pit.",
                             5f);
@@ -287,7 +286,7 @@ namespace Tartaria.Integration
                 yield return new WaitForSeconds(0.5f);
             }
 
-            HUDController.Instance?.ShowBanner("WAVE CLEARED", "The mud accepts them. Their clipboards float away.", 4f);
+            GameEvents.RaiseHUDShowBanner("WAVE CLEARED", "The mud accepts them. Their clipboards float away.", 4f);
             AudioManager.Instance?.PlaySFX2D("BuildingRestore");
             yield return new WaitForSeconds(Mathf.Max(minBeatTime - 2f, 2f));
         }
@@ -302,7 +301,7 @@ namespace Tartaria.Integration
             _current = Beat.Climax;
             Debug.Log("[Moon1Arc] Beat 4 — Climax");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "THE BURIED BEACON",
                 "A giant's skeletal hand clutches a mercury-ball spire. Approach and tune it during the 17th-hour alignment.",
                 7f);
@@ -312,7 +311,7 @@ namespace Tartaria.Integration
             var beacon = BuriedBeaconSpire.Spawn(pos);
             _spawnedThisRun.Add(beacon.gameObject);
 
-            HUDController.Instance?.ShowObjective($"Find the Buried Beacon. {InputPromptHelper.Interact} to tune the mercury spire.");
+            GameEvents.RaiseHUDShowObjective($"Find the Buried Beacon. {InputPromptHelper.Interact} to tune the mercury spire.");
 
             // Wait for the beacon to be tuned (TuneCompleted) or 90s cap
             float t0 = Time.time;
@@ -324,7 +323,7 @@ namespace Tartaria.Integration
                 beacon.ForceTune();
 
             // Spectacle
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "CATHEDRAL ERUPTS",
                 "Light spreads outward. Distant spires you cannot yet reach flicker awake on the horizon.",
                 6f);
@@ -347,7 +346,7 @@ namespace Tartaria.Integration
             var encounter = LiraelLullabyEncounter.Spawn(pos);
             _spawnedThisRun.Add(encounter.gameObject);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "LIRAEL APPEARS",
                 "Translucent. Humming. 432 Hz. She doesn't remember her name — only the song.",
                 7f);
@@ -362,7 +361,7 @@ namespace Tartaria.Integration
             _spawnedThisRun.Add(Moon1Collectible.Spawn(dropBase + new Vector3( 0f,   0f,  1.2f), SEED_AIRSHIP_FRAG,    "Airship Component Fragment", "Blooms in the Airship Armada (Moon 8)."));
             _spawnedThisRun.Add(Moon1Collectible.Spawn(dropBase + new Vector3( 0f,   0f, -1.2f), SEED_LIRAEL_LULLABY,  "Lirael's Lullaby",  "Key to Moon 3 and Moon 6."));
 
-            HUDController.Instance?.ShowObjective($"Collect the 4 crossover seeds Lirael left behind. {InputPromptHelper.Interact} on each.");
+            GameEvents.RaiseHUDShowObjective($"Collect the 4 crossover seeds Lirael left behind. {InputPromptHelper.Interact} on each.");
 
             yield return new WaitForSeconds(Mathf.Max(minBeatTime, 5f));
         }
@@ -690,7 +689,7 @@ namespace Tartaria.Integration
 
         IEnumerator TuneSequence()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "17TH HOUR ALIGNMENT",
                 "The spire begins to sing. Hold position. Let the resonance climb.",
                 4f);
@@ -711,7 +710,7 @@ namespace Tartaria.Integration
             IsTuned = true;
             if (_glow != null) { _glow.range = 24f; _glow.intensity = 6f; _glow.color = new Color(1f, 0.95f, 0.6f); }
             GameEvents.FireBuildingRestored("buried_beacon");
-            HUDController.Instance?.ShowBanner("BEACON ALIGNED", "The ley lines spread outward. Distant moons flicker.", 5f);
+            GameEvents.RaiseHUDShowBanner("BEACON ALIGNED", "The ley lines spread outward. Distant moons flicker.", 5f);
         }
 
         public void ForceTune()
@@ -764,7 +763,7 @@ namespace Tartaria.Integration
         public void Interact(GameObject player)
         {
             _read = true;
-            HUDController.Instance?.ShowBanner(title, body, 7f);
+            GameEvents.RaiseHUDShowBanner(title, body, 7f);
             AetherFieldManager.Instance?.AddResonanceScore(2f);
             AudioManager.Instance?.PlaySFX2D("Discovery");
         }
@@ -819,7 +818,7 @@ namespace Tartaria.Integration
         {
             PlayerPrefs.SetInt("moon1_seed_" + seedTag, 1);
             PlayerPrefs.Save();
-            HUDController.Instance?.ShowBanner(displayName + " — Collected", flavor, 5f);
+            GameEvents.RaiseHUDShowBanner(displayName + " — Collected", flavor, 5f);
             AudioManager.Instance?.PlaySFX2D("BuildingRestore");
             AetherFieldManager.Instance?.AddResonanceScore(5f);
             GameEvents.FireCriticalSaveTrigger("moon1_seed_" + seedTag);
@@ -893,9 +892,9 @@ namespace Tartaria.Integration
             // Slow rise + lullaby tones (we don't have a real 432Hz synth — play a SFX hint instead)
             AudioManager.Instance?.PlaySFX2D("HarmonicChoir");
             yield return new WaitForSeconds(2f);
-            HUDController.Instance?.ShowBanner("Lirael (humming)", "...la la la la... 432 Hz... do you remember?", 5f);
+            GameEvents.RaiseHUDShowBanner("Lirael (humming)", "...la la la la... 432 Hz... do you remember?", 5f);
             yield return new WaitForSeconds(5f);
-            HUDController.Instance?.ShowBanner("Lirael", "Why do grown-ups build houses then live in the attic?", 5f);
+            GameEvents.RaiseHUDShowBanner("Lirael", "Why do grown-ups build houses then live in the attic?", 5f);
             yield return new WaitForSeconds(5f);
             // Pulse aura
             float t = 0f;
@@ -906,7 +905,7 @@ namespace Tartaria.Integration
                 if (_body != null) _body.transform.localPosition = new Vector3(0f, 1f + Mathf.Sin(t * 2f) * 0.15f, 0f);
                 yield return null;
             }
-            HUDController.Instance?.ShowBanner("Deep Lore", "A figure in shadow stands atop a star fort. The Dissonant One reaches for something in the sky.", 6f);
+            GameEvents.RaiseHUDShowBanner("Deep Lore", "A figure in shadow stands atop a star fort. The Dissonant One reaches for something in the sky.", 6f);
             yield return new WaitForSeconds(4f);
             // Lirael fades — we leave the GO in place as a quiet ambient memorial
         }

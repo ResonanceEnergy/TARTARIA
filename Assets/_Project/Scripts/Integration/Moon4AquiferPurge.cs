@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Gameplay;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -138,7 +137,7 @@ namespace Tartaria.Integration
         {
             Debug.Log("[AquiferPurge] ALL FOUNTAINS PURGED! Aquifer restored, conductive water flows!");
 
-            HUDController.Instance?.ShowObjective("Aquifer Restored! Pure water flows to star fort moats.");
+            GameEvents.RaiseHUDShowObjective("Aquifer Restored! Pure water flows to star fort moats.");
 
             // Climax VFX: golden water burst from center
             GameObject vfx = new GameObject("AquiferPurgeComplete_VFX");

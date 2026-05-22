@@ -1,6 +1,5 @@
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Input;
 
 namespace Tartaria.Integration
@@ -180,7 +179,7 @@ namespace Tartaria.Integration
         public void WitnessFirstOrphan(string orphanName)
         {
             AddTrust(3f);
-            HUDController.Instance?.ShowBanner("Milo protects", $"Kid named {orphanName}? ...Nobody messes with our family now. I've got the rear.", 5f);
+            GameEvents.RaiseHUDShowBanner("Milo protects", $"Kid named {orphanName}? ...Nobody messes with our family now. I've got the rear.", 5f);
             DialogueManager.Instance?.PlayContextDialogue("milo_first_orphan_" + orphanName.ToLower());
             Debug.Log($"[Milo Moon3] Protective: {orphanName} is under my watch. Found family secured.");
             Save.SaveManager.Instance?.MarkDirty();
@@ -260,7 +259,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayLineById("milo_heart_opens");
 
             // HUD banner for emotional payoff
-            HUDController.Instance?.ShowBanner("Milo (moved)", $"...I didn't think anything was left worth saving. You... you actually brought it back. Maybe there's hope after all.", 7f);
+            GameEvents.RaiseHUDShowBanner("Milo (moved)", $"...I didn't think anything was left worth saving. You... you actually brought it back. Maybe there's hope after all.", 7f);
 
             OnSincereMoment?.Invoke();
             TriggerSincereMoment();

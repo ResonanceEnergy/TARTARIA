@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.AI;
-using Tartaria.UI;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
@@ -50,14 +49,14 @@ namespace Tartaria.Integration
             if (Time.time - _thorneLastUse < thorneCooldown)
             {
                 float remaining = thorneCooldown - (Time.time - _thorneLastUse);
-                HUDController.Instance?.ShowObjective($"Thorne airstrike on cooldown ({remaining:F0}s)");
+                GameEvents.RaiseHUDShowObjective($"Thorne airstrike on cooldown ({remaining:F0}s)");
                 return;
             }
 
             // Check trust level
             if (ThorneController.Instance == null || ThorneController.Instance.TrustLevel < ThorneTrustLevel.Ally)
             {
-                HUDController.Instance?.ShowObjective("Thorne trust too low for combat support");
+                GameEvents.RaiseHUDShowObjective("Thorne trust too low for combat support");
                 return;
             }
 
@@ -69,7 +68,7 @@ namespace Tartaria.Integration
 
         IEnumerator ExecuteThorneAirstrike(Vector3 targetPosition)
         {
-            HUDController.Instance?.ShowObjective("⚡ THORNE AIRSTRIKE INCOMING! ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ THORNE AIRSTRIKE INCOMING! ⚡");
             
             // Thorne radio crackle
             DialogueManager.Instance?.PlayLineById("thorne_airstrike_call");
@@ -167,7 +166,7 @@ namespace Tartaria.Integration
             if (Time.time - _korathLastUse < korathCooldown)
             {
                 float remaining = korathCooldown - (Time.time - _korathLastUse);
-                HUDController.Instance?.ShowObjective($"Korath frost hammer on cooldown ({remaining:F0}s)");
+                GameEvents.RaiseHUDShowObjective($"Korath frost hammer on cooldown ({remaining:F0}s)");
                 return;
             }
 
@@ -175,7 +174,7 @@ namespace Tartaria.Integration
             if (KorathCompanionController.Instance == null || 
                 KorathCompanionController.Instance.CurrentStage != KorathCompanionController.KorathStage.Awakened)
             {
-                HUDController.Instance?.ShowObjective("Korath not yet awakened");
+                GameEvents.RaiseHUDShowObjective("Korath not yet awakened");
                 return;
             }
 
@@ -187,7 +186,7 @@ namespace Tartaria.Integration
 
         IEnumerator ExecuteKorathFrostHammer(Vector3 targetPosition)
         {
-            HUDController.Instance?.ShowObjective("⚡ KORATH FROST HAMMER! ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ KORATH FROST HAMMER! ⚡");
             
             // Korath voice
             DialogueManager.Instance?.PlayLineById("korath_frost_hammer");

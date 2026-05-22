@@ -25,7 +25,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Gameplay;
@@ -128,7 +127,7 @@ namespace Tartaria.Integration
 
             MoonProgressTracker.Instance?.MarkCleared(4);
             GameEvents.FireCriticalSaveTrigger("moon4_arc_complete");
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MOON 4 COMPLETE",
                 "The Star Fort holds. The grid extends. Three brothers — one cleansed, one ally, one hunter.",
                 8f);
@@ -146,7 +145,7 @@ namespace Tartaria.Integration
             _current = Beat.Discovery;
             Debug.Log("[Moon4Arc] Beat 1 — Discovery");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MOON 4 — DISCOVERY",
                 "The Self-Existing Moon. Geometric bastions cracked from the mud. Something below resists your tuning.",
                 7f);
@@ -162,7 +161,7 @@ namespace Tartaria.Integration
             }
 
             yield return new WaitForSeconds(3f);
-            HUDController.Instance?.ShowObjective($"Approach the garrison echoes. Use {InputPromptHelper.Scan} to scan their resonance trail.");
+            GameEvents.RaiseHUDShowObjective($"Approach the garrison echoes. Use {InputPromptHelper.Scan} to scan their resonance trail.");
             AudioManager.Instance?.PlaySFX2D("Discovery");
 
             yield return new WaitForSeconds(Mathf.Max(minBeatTime, 6f));
@@ -177,7 +176,7 @@ namespace Tartaria.Integration
             _current = Beat.Restoration;
             Debug.Log("[Moon4Arc] Beat 2 — Restoration");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESTORATION — STAR FORT",
                 "Place 5 bastions. Snap each to the golden ratio. The geometry will sing.",
                 6f);
@@ -195,7 +194,7 @@ namespace Tartaria.Integration
                 _spawnedThisRun.Add(conduitGO);
             }
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 $"Place 5 bastions on φ-snap nodes. {InputPromptHelper.Interact} to begin the conduit puzzle.");
 
             // Track completion via the puzzle's event
@@ -218,7 +217,7 @@ namespace Tartaria.Integration
 
             if (completed)
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "GEOMETRY SINGS",
                     $"The five bastions resonate. φ-accuracy: {(bestAccuracy * 100f):F0}%. Routing node armed.",
                     5f);
@@ -227,7 +226,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "GEOMETRY HOLDS",
                     "The fort accepts a partial alignment. The commander still slumbers.",
                     4f);
@@ -246,7 +245,7 @@ namespace Tartaria.Integration
             _current = Beat.Conflict;
             Debug.Log("[Moon4Arc] Beat 3 — Conflict");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "CORRUPTED GOLEM — MAELIX",
                 $"Thirty feet of mud, stone, and broken song. Activate Giant Mode. {InputPromptHelper.Strike} to grapple.",
                 7f);
@@ -260,7 +259,7 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(4f);
             TryActivateGiantMode();
 
-            HUDController.Instance?.ShowObjective("Wrestle Maelix to submission. Strike harmonic blows — do not destroy him.");
+            GameEvents.RaiseHUDShowObjective("Wrestle Maelix to submission. Strike harmonic blows — do not destroy him.");
 
             // Watch HP: peaceful cleanse at 30% HP (no kill). 90s cap.
             float t0 = Time.time;
@@ -291,7 +290,7 @@ namespace Tartaria.Integration
             _current = Beat.Climax;
             Debug.Log("[Moon4Arc] Beat 4 — Climax");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MOATS FLOOD — TOWER WAKES",
                 "Conductive pure-water rushes in. The bell tower hums. Distant spires answer.",
                 7f);
@@ -310,7 +309,7 @@ namespace Tartaria.Integration
             var crystal = MaelixMemoryCrystal.Spawn(center + SafePlayerForward() * 6f + Vector3.up * 0.6f);
             _spawnedThisRun.Add(crystal.gameObject);
 
-            HUDController.Instance?.ShowObjective($"Activate the bell tower. {InputPromptHelper.Interact} the resonating cylinder.");
+            GameEvents.RaiseHUDShowObjective($"Activate the bell tower. {InputPromptHelper.Interact} the resonating cylinder.");
 
             // Wait for tower activation OR 60s cap
             float t0 = Time.time;
@@ -321,7 +320,7 @@ namespace Tartaria.Integration
                 bellTower.ForceActivate();
 
             // Spectacle reward
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "SCALAR PING — GRID EXTENDS",
                 "Across the horizon, distant towers flicker awake. The Continental Rail (Moon 3) glows brighter.",
                 7f);
@@ -344,7 +343,7 @@ namespace Tartaria.Integration
             var reveal = MaelixRevelationEncounter.Spawn(pos);
             _spawnedThisRun.Add(reveal.gameObject);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "REVELATION — THREE BROTHERS",
                 "The golem was Maelix. The inscription 'Z' was Zereth — the Dissonant One. Korath has two brothers.",
                 8f);
@@ -362,7 +361,7 @@ namespace Tartaria.Integration
             _spawnedThisRun.Add(Moon4Collectible.Spawn(dropBase + new Vector3( 0f,   0f, -1.2f), SEED_ROUTING_NODE,
                 "Star Fort Routing Node", "Boosts Continental Rail power on revisit (Moon 3).").gameObject);
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 $"Collect the 4 crossover seeds. {InputPromptHelper.Interact} on each.");
 
             yield return new WaitForSeconds(Mathf.Max(minBeatTime, 5f));
@@ -472,7 +471,7 @@ namespace Tartaria.Integration
                 _nextMutter = Time.time + Random.Range(8f, 16f);
                 var line = _lines[_lineIdx % _lines.Length];
                 _lineIdx++;
-                HUDController.Instance?.ShowBanner("Garrison Echo", line, 3f);
+                GameEvents.RaiseHUDShowBanner("Garrison Echo", line, 3f);
             }
         }
     }
@@ -509,7 +508,7 @@ namespace Tartaria.Integration
         {
             if (_read) return;
             _read = true;
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "INSCRIPTION — OLD TARTARIAN",
                 "\"For my brother, the Builder. Hold the line. — Z.\"",
                 7f);
@@ -643,7 +642,7 @@ namespace Tartaria.Integration
             _rends = GetComponentsInChildren<Renderer>();
             _target = GameObject.FindWithTag("Player")?.transform;
             // Distorted voice line on spawn
-            HUDController.Instance?.ShowBanner("Maelix (distorted)", "The song… the song was… WRONG…", 5f);
+            GameEvents.RaiseHUDShowBanner("Maelix (distorted)", "The song… the song was… WRONG…", 5f);
             AudioManager.Instance?.PlaySFX2D("GolemAwaken");
         }
 
@@ -695,7 +694,7 @@ namespace Tartaria.Integration
 
         IEnumerator CleansingSequence()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "GOLEM CLEANSED",
                 "The dissonance leaves him. He kneels. The mud falls away in silver flakes.",
                 6f);
@@ -881,7 +880,7 @@ namespace Tartaria.Integration
 
         IEnumerator ActivationSequence()
         {
-            HUDController.Instance?.ShowBanner("THE BELL TOLLS", "Scalar waves climb the tower. The grid widens.", 5f);
+            GameEvents.RaiseHUDShowBanner("THE BELL TOLLS", "Scalar waves climb the tower. The grid widens.", 5f);
             AudioManager.Instance?.PlaySFX2D("BellTower");
             GameEvents.FireBuildingRestored("star_fort_bell_tower");
 
@@ -946,7 +945,7 @@ namespace Tartaria.Integration
         {
             if (_played) return;
             _played = true;
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MAELIX'S FINAL MEMORY",
                 "A giant kneels before a starlit fort. A voice he loves whispers a song he cannot quite hold. Then static.",
                 8f);
@@ -993,11 +992,11 @@ namespace Tartaria.Integration
 
         public IEnumerator PlayCoroutine()
         {
-            HUDController.Instance?.ShowBanner("Korath (memory)", "\"Maelix. Brother. They made you wrong. I am so sorry.\"", 5f);
+            GameEvents.RaiseHUDShowBanner("Korath (memory)", "\"Maelix. Brother. They made you wrong. I am so sorry.\"", 5f);
             yield return new WaitForSeconds(5f);
-            HUDController.Instance?.ShowBanner("Korath (memory)", "\"The 'Z' on the stone… that was Zereth. Our youngest. He survived.\"", 5f);
+            GameEvents.RaiseHUDShowBanner("Korath (memory)", "\"The 'Z' on the stone… that was Zereth. Our youngest. He survived.\"", 5f);
             yield return new WaitForSeconds(5f);
-            HUDController.Instance?.ShowBanner("Korath (memory)", "\"The Dissonant One is family. The hunt is family. May the song forgive us all.\"", 6f);
+            GameEvents.RaiseHUDShowBanner("Korath (memory)", "\"The Dissonant One is family. The hunt is family. May the song forgive us all.\"", 6f);
             yield return new WaitForSeconds(2f);
         }
     }
@@ -1063,7 +1062,7 @@ namespace Tartaria.Integration
             _collected = true;
             PlayerPrefs.SetInt("moon4_seed_" + seedTag, 1);
             PlayerPrefs.Save();
-            HUDController.Instance?.ShowBanner(title, body, 5f);
+            GameEvents.RaiseHUDShowBanner(title, body, 5f);
             AudioManager.Instance?.PlaySFX2D("Discovery");
             // Float up and dissolve
             StartCoroutine(CollectAnim());

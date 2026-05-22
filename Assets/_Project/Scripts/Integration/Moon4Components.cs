@@ -2,7 +2,6 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -29,7 +28,7 @@ namespace Tartaria.Integration
             string line = _dialogueLines[_lineIndex % _dialogueLines.Length];
             Debug.Log($"[EchoGarrison] {line}");
             
-            HUDController.Instance?.ShowDialogue("Echo Garrison", line);
+            GameEvents.RaiseHUDShowDialogue("Echo Garrison", line);
             Audio.AudioManager.Instance?.PlaySFX2D("Echo_Voice");
             
             _lineIndex++;
@@ -52,7 +51,7 @@ namespace Tartaria.Integration
             if (string.IsNullOrEmpty(inscriptionText)) return;
 
             Debug.Log($"[Inscription] {inscriptionText}");
-            HUDController.Instance?.ShowDialogue("Ancient Inscription", inscriptionText);
+            GameEvents.RaiseHUDShowDialogue("Ancient Inscription", inscriptionText);
             Audio.AudioManager.Instance?.PlaySFX2D("InscriptionRead");
 
             if (!_hasRead)
@@ -162,7 +161,7 @@ namespace Tartaria.Integration
             else
             {
                 Debug.Log($"[BastionAlignment] MISS! Outside φ-window (timing: {timeSincePulse:F3}s)");
-                HUDController.Instance?.ShowObjective("Too early/late! Wait for golden pulse...");
+                GameEvents.RaiseHUDShowObjective("Too early/late! Wait for golden pulse...");
                 Audio.AudioManager.Instance?.PlaySFX2D("AlignmentFail");
             }
         }
@@ -212,7 +211,7 @@ namespace Tartaria.Integration
         System.Collections.IEnumerator FloodMoat()
         {
             Debug.Log("[MoatPipe] Flooding moat segment...");
-            HUDController.Instance?.ShowObjective("Channeling pure water...");
+            GameEvents.RaiseHUDShowObjective("Channeling pure water...");
 
             float elapsed = 0f;
             while (elapsed < FLOOD_DURATION)
@@ -265,7 +264,7 @@ namespace Tartaria.Integration
             _collected = true;
 
             Debug.Log("[ClockFragment] 17-Hour Clock Fragment recovered! First hint of Tartarian time system.");
-            HUDController.Instance?.ShowObjective("17-Hour Clock Fragment discovered!");
+            GameEvents.RaiseHUDShowObjective("17-Hour Clock Fragment discovered!");
             
             // Add to inventory/quest items
             QuestManager.Instance?.CompleteQuest("moon4_clock_fragment");

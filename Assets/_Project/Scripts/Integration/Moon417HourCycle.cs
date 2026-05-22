@@ -1,7 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -86,7 +85,7 @@ namespace Tartaria.Integration
             {
                 On17thHourStart?.Invoke();
                 Debug.Log("[17HourCycle] THE 17TH HOUR BEGINS! All architecture at peak resonance!");
-                HUDController.Instance?.ShowObjective("⚡ 17TH HOUR ACTIVE ⚡");
+                GameEvents.RaiseHUDShowObjective("⚡ 17TH HOUR ACTIVE ⚡");
             }
             else if (currHourInt == 0 && prevHourInt == 16)
             {

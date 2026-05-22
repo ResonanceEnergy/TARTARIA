@@ -28,7 +28,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Gameplay;
@@ -121,7 +120,7 @@ namespace Tartaria.Integration
 
             MoonProgressTracker.Instance?.MarkCleared(6);
             GameEvents.FireCriticalSaveTrigger("moon6_arc_complete");
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MOON 6 COMPLETE",
                 "The organ sings. Lirael conducts. And Zereth's name — once a curse — now sounds like a question.",
                 9f);
@@ -140,7 +139,7 @@ namespace Tartaria.Integration
             _current = Beat.Discovery;
             Debug.Log("[Moon6Arc] Beat 1 — Discovery");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MOON 6 — DISCOVERY",
                 "The Rhythmic Moon. Deep beneath the White City — a sunken cathedral of impossible scale. Its organ cries.",
                 8f);
@@ -160,7 +159,7 @@ namespace Tartaria.Integration
 
             // Lirael discovery dialogue
             yield return new WaitForSeconds(3f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Lirael: \"The pipes are crying. Can you hear it? They're trying to sing but the words come out backwards.\"");
 
             // Broken organ ambient: dissonant reversed chord played via AudioManager
@@ -196,7 +195,7 @@ namespace Tartaria.Integration
             _current = Beat.Restoration;
             Debug.Log("[Moon6Arc] Beat 2 — Restoration");
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Restoration: Repair the crystal pipes and restore the hydraulic fountain bellows.");
 
             AudioManager.Instance?.PlaySFX2D("Restoration_Begin");
@@ -218,7 +217,7 @@ namespace Tartaria.Integration
             }
 
             // Wait until all 6 pipes repaired (poll progress tracker)
-            HUDController.Instance?.ShowObjective("Repair 6 crystal pipes (0 / 6)");
+            GameEvents.RaiseHUDShowObjective("Repair 6 crystal pipes (0 / 6)");
             float timeout = 120f;
             float elapsed = 0f;
             while (elapsed < timeout)
@@ -226,12 +225,12 @@ namespace Tartaria.Integration
                 int repaired = 0;
                 foreach (var n in pipeNodes) if (n.IsRepaired) repaired++;
                 if (repaired >= 6) break;
-                HUDController.Instance?.ShowObjective($"Repair 6 crystal pipes ({repaired} / 6)");
+                GameEvents.RaiseHUDShowObjective($"Repair 6 crystal pipes ({repaired} / 6)");
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
-            HUDController.Instance?.ShowObjective("Pipes repaired! Restore the hydraulic fountain bellows.");
+            GameEvents.RaiseHUDShowObjective("Pipes repaired! Restore the hydraulic fountain bellows.");
             AudioManager.Instance?.PlaySFX2D("PipeRepaired_All");
 
             yield return new WaitForSeconds(1.5f);
@@ -248,20 +247,20 @@ namespace Tartaria.Integration
                 node.Activate();
             }
 
-            HUDController.Instance?.ShowObjective("Restore 3 hydraulic fountain bellows (0 / 3)");
+            GameEvents.RaiseHUDShowObjective("Restore 3 hydraulic fountain bellows (0 / 3)");
             timeout = 90f; elapsed = 0f;
             while (elapsed < timeout)
             {
                 int restored = 0;
                 foreach (var n in bellowsNodes) if (n.IsRestored) restored++;
                 if (restored >= 3) break;
-                HUDController.Instance?.ShowObjective($"Restore 3 hydraulic fountain bellows ({restored} / 3)");
+                GameEvents.RaiseHUDShowObjective($"Restore 3 hydraulic fountain bellows ({restored} / 3)");
                 elapsed += Time.deltaTime;
                 yield return null;
             }
 
             // Organ Conductor mini-game: 3-6-9 escalating sequence
-            HUDController.Instance?.ShowObjective("Conduct the 3-6-9 harmony sequence to prove mastery.");
+            GameEvents.RaiseHUDShowObjective("Conduct the 3-6-9 harmony sequence to prove mastery.");
             yield return new WaitForSeconds(1f);
 
             var conductor = new OrganConductorMiniGame(playerPos + Vector3.forward * 5f);
@@ -278,7 +277,7 @@ namespace Tartaria.Integration
 
             // Cymatic mandala bloom effect on success
             AudioManager.Instance?.PlaySFX2D("OrganRestoredSymphony");
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "PIPES TUNED",
                 "Rose windows project kaleidoscopic cymatic mandalas. The water forms sacred-geometry patterns. The cathedral breathes.",
                 7f);
@@ -302,14 +301,14 @@ namespace Tartaria.Integration
             _current = Beat.Conflict;
             Debug.Log("[Moon6Arc] Beat 3 — Conflict");
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "The Dissonance strikes! Maintain harmony or golems erupt from the pipes!");
 
             AudioManager.Instance?.PlaySFX2D("DissonanceStrike_Begin");
 
             // Milo dialogue — he's hiding
             yield return new WaitForSeconds(1.5f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Milo: \"I signed up for treasure hunting, not a haunted concert hall!\"");
             yield return new WaitForSeconds(2.5f);
 
@@ -320,7 +319,7 @@ namespace Tartaria.Integration
 
             for (int wave = 0; wave < 3; wave++)
             {
-                HUDController.Instance?.ShowObjective($"Hold the harmony! (Wave {wave + 1} / 3)");
+                GameEvents.RaiseHUDShowObjective($"Hold the harmony! (Wave {wave + 1} / 3)");
                 AudioManager.Instance?.PlaySFX2D("Dissonance_Crack");
 
                 // Spawn DissonanceInterruptNode at a random pipe offset
@@ -370,7 +369,7 @@ namespace Tartaria.Integration
                 yield return null;
             }
 
-            HUDController.Instance?.ShowObjective("The Dissonance retreats. The organ holds.");
+            GameEvents.RaiseHUDShowObjective("The Dissonance retreats. The organ holds.");
             AudioManager.Instance?.PlaySFX2D("ConflictResolved_Cathedral");
             yield return new WaitForSeconds(minBeatTime);
         }
@@ -387,7 +386,7 @@ namespace Tartaria.Integration
             _current = Beat.Climax;
             Debug.Log("[Moon6Arc] Beat 4 — Climax");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MOON 6 — CLIMAX",
                 "The Cymatic Requiem. All pipes. All fountains. All bells. A moment of perfect resonance.",
                 8f);
@@ -404,7 +403,7 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(3f);
 
             // Lirael at the microphone
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Lirael steps to the crystal microphone and begins to sing a solo line from her lullaby.");
             AudioManager.Instance?.PlaySFX2D("Lirael_Lullaby_Solo");
 
@@ -420,7 +419,7 @@ namespace Tartaria.Integration
                 child.Activate();
             }
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "The children's choir from Moon 3 appears — their voices joining Lirael's.");
             AudioManager.Instance?.PlaySFX2D("ChildrenChoir_Join");
 
@@ -436,7 +435,7 @@ namespace Tartaria.Integration
             _spawnedThisRun.Add(giantHarvest.Root);
             giantHarvest.Activate();
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "CYMATIC REQUIEM COMPLETE",
                 "City-wide ionized mist rain falls. Cymatic gardens swell to 10x. The cathedral heals itself.",
                 9f);
@@ -456,7 +455,7 @@ namespace Tartaria.Integration
             _current = Beat.Revelation;
             Debug.Log("[Moon6Arc] Beat 5 — Revelation");
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "The organ's tuning records reveal a name: Z. — Zereth. His calibration was flawless.");
 
             Vector3 playerPos = SafePlayerPos();
@@ -469,13 +468,13 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(2f);
 
             // Revelation text
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "\"This organ was silenced mid-performance during the Mud Flood. The organist's final note still " +
                 "hangs in the pipe — a 9-band purity no accident can create.\"");
 
             yield return new WaitForSeconds(3f);
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "\"The tuning is marked: Z. If Zereth was the villain — why does his work ring with such perfect harmony?\"");
 
             yield return new WaitForSeconds(3f);
@@ -499,7 +498,7 @@ namespace Tartaria.Integration
                 col.Activate();
             }
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "REVELATION",
                 "The organ speaks. Zereth calibrated it. Lirael will carry the song. And the Mud Flood silenced the most important note in history.",
                 10f);
@@ -667,7 +666,7 @@ namespace Tartaria.Integration
             if (_collected) return;
             _collected = true;
             AudioManager.Instance?.PlaySFX2D("CrystalPipe_Collect");
-            HUDController.Instance?.ShowObjective("Crystal Pipe Fragment collected — the organ's voice grows clearer.");
+            GameEvents.RaiseHUDShowObjective("Crystal Pipe Fragment collected — the organ's voice grows clearer.");
             gameObject.SetActive(false);
         }
 
@@ -733,7 +732,7 @@ namespace Tartaria.Integration
             if (IsRepaired) return;
             IsRepaired = true;
             AudioManager.Instance?.PlaySFX2D("PipeRepaired_Single");
-            HUDController.Instance?.ShowObjective($"Crystal pipe {_index + 1} repaired — resonance restored.");
+            GameEvents.RaiseHUDShowObjective($"Crystal pipe {_index + 1} repaired — resonance restored.");
             // Glow green on repair
             var mr = GetComponentInChildren<MeshRenderer>();
             if (mr != null)
@@ -810,7 +809,7 @@ namespace Tartaria.Integration
             if (IsRestored) return;
             IsRestored = true;
             AudioManager.Instance?.PlaySFX2D("FountainBellows_Restore");
-            HUDController.Instance?.ShowObjective($"Fountain bellows {_index + 1} restored — hydraulic pressure rising.");
+            GameEvents.RaiseHUDShowObjective($"Fountain bellows {_index + 1} restored — hydraulic pressure rising.");
             Debug.Log($"[Moon6Arc] FountainBellowsNode {_index} restored.");
         }
 
@@ -872,7 +871,7 @@ namespace Tartaria.Integration
         {
             if (IsActive || IsComplete) return;
             IsActive = true;
-            HUDController.Instance?.ShowObjective("Conduct the 3-band sequence — [E] / [A Button]");
+            GameEvents.RaiseHUDShowObjective("Conduct the 3-band sequence — [E] / [A Button]");
             StartCoroutine(RunSequence());
         }
 
@@ -886,7 +885,7 @@ namespace Tartaria.Integration
             for (int i = 0; i < 3; i++)
             {
                 _stage = i + 1;
-                HUDController.Instance?.ShowObjective(prompts[i]);
+                GameEvents.RaiseHUDShowObjective(prompts[i]);
                 float wait = 0f;
                 while (wait < 15f)
                 {
@@ -894,7 +893,7 @@ namespace Tartaria.Integration
                         UnityEngine.Input.GetButtonDown("Jump"))
                     {
                         AudioManager.Instance?.PlaySFX2D(sfx[i]);
-                        HUDController.Instance?.ShowObjective($"Band {(i + 1) * 3} — HARMONY HELD!");
+                        GameEvents.RaiseHUDShowObjective($"Band {(i + 1) * 3} — HARMONY HELD!");
                         yield return new WaitForSeconds(1.5f);
                         break;
                     }
@@ -906,7 +905,7 @@ namespace Tartaria.Integration
             IsComplete = true;
             _stage = 4;
             AudioManager.Instance?.PlaySFX2D("OrganSequence_Complete");
-            HUDController.Instance?.ShowObjective("3-6-9 sequence complete — the organ remembers its voice.");
+            GameEvents.RaiseHUDShowObjective("3-6-9 sequence complete — the organ remembers its voice.");
             Debug.Log("[Moon6Arc] OrganConductorMiniGame complete.");
         }
 
@@ -1017,7 +1016,7 @@ namespace Tartaria.Integration
             if (IsResolved) return;
             IsResolved = true;
             AudioManager.Instance?.PlaySFX2D("Dissonance_Sealed");
-            HUDController.Instance?.ShowObjective($"Dissonance wave {_wave + 1} sealed — harmony holds!");
+            GameEvents.RaiseHUDShowObjective($"Dissonance wave {_wave + 1} sealed — harmony holds!");
             Debug.Log($"[Moon6Arc] DissonanceInterruptNode wave {_wave} resolved.");
             gameObject.SetActive(false);
         }
@@ -1163,7 +1162,7 @@ namespace Tartaria.Integration
         {
             if (_activated) return;
             _activated = true;
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "The crystal microphone hums. Lirael's voice will carry from here across every restored zone.");
             AudioManager.Instance?.PlaySFX2D("CrystalMic_Activate");
         }
@@ -1320,7 +1319,7 @@ namespace Tartaria.Integration
         {
             if (_inspected) return;
             _inspected = true;
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Giant Harvest Pulse: cymatic resonance has swelled crop yields to 10x. " +
                 "Moon 7's massive construction will have all the material it needs.");
         }
@@ -1387,7 +1386,7 @@ namespace Tartaria.Integration
             if (_read) return;
             _read = true;
             AudioManager.Instance?.PlaySFX2D("ScrollRead");
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "ZERETH'S CALIBRATION LOG",
                 "\"Final pipe tuning — 9-band chromatic resonance achieved. All harmonics align to the φ spiral. " +
                 "The cathedral is ready. — Z.\" \n\n" +
@@ -1466,7 +1465,7 @@ namespace Tartaria.Integration
             if (_collected) return;
             _collected = true;
             AudioManager.Instance?.PlaySFX2D("Collectible_Moon");
-            HUDController.Instance?.ShowObjective($"Moon 6 Relic collected: {_itemName}");
+            GameEvents.RaiseHUDShowObjective($"Moon 6 Relic collected: {_itemName}");
             GameEvents.FireCriticalSaveTrigger($"moon6_collected_{_itemName}");
             gameObject.SetActive(false);
         }

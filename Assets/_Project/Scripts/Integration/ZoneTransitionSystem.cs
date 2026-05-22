@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Save;
 
 namespace Tartaria.Integration
@@ -78,7 +77,7 @@ namespace Tartaria.Integration
                     ? AetherFieldManager.Instance.ResonanceScore : 0f;
                 if (currentRS < nextZone.rsRequirementToUnlock)
                 {
-                    HUDController.Instance?.ShowInteractionPrompt(
+                    GameEvents.RaiseHUDShowInteractionPrompt(
                         $"Zone locked. Requires RS {nextZone.rsRequirementToUnlock:F0}. Current: {currentRS:F0}");
                     Debug.Log($"[ZoneTransition] RS gate failed: need {nextZone.rsRequirementToUnlock}, have {currentRS}");
                     return;
@@ -91,7 +90,7 @@ namespace Tartaria.Integration
                 bool questDone = QuestManager.Instance?.IsQuestComplete(nextZone.prerequisiteQuestId) ?? true;
                 if (!questDone)
                 {
-                    HUDController.Instance?.ShowInteractionPrompt(
+                    GameEvents.RaiseHUDShowInteractionPrompt(
                         $"Zone locked. Complete: {nextZone.prerequisiteQuestId}");
                     Debug.Log($"[ZoneTransition] Quest gate failed: {nextZone.prerequisiteQuestId} not completed");
                     return;

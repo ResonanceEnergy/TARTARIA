@@ -3,7 +3,6 @@ using System.Collections;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -120,7 +119,7 @@ namespace Tartaria.Integration
         {
             Debug.Log("[FloatingPlatforms] ALL PLATFORMS ACTIVE! Bridge to central spire complete.");
             
-            HUDController.Instance?.ShowObjective("Floating platform bridge complete! Central spire accessible.");
+            GameEvents.RaiseHUDShowObjective("Floating platform bridge complete! Central spire accessible.");
 
             // Quest progress
             QuestManager.Instance?.CompleteQuest("moon5_floating_platforms");
@@ -157,7 +156,7 @@ namespace Tartaria.Integration
             _isRestoring = true;
 
             Debug.Log($"[FloatingPlatform {platformIndex}] Restoring platform...");
-            HUDController.Instance?.ShowObjective($"Restoring platform {platformIndex + 1}...");
+            GameEvents.RaiseHUDShowObjective($"Restoring platform {platformIndex + 1}...");
 
             // Restoration VFX: golden energy fills platform
             yield return new WaitForSeconds(2f);
@@ -207,7 +206,7 @@ namespace Tartaria.Integration
             string line = _dialogueLines[dialogueIndex % _dialogueLines.Length];
             
             Debug.Log($"[Thorne] {line}");
-            HUDController.Instance?.ShowDialogue("Captain Thorne", line);
+            GameEvents.RaiseHUDShowDialogue("Captain Thorne", line);
             
             DialogueManager.Instance?.PlayContextDialogue($"thorne_line_{dialogueIndex}");
             Audio.AudioManager.Instance?.PlaySFX2D("Thorne_Voice");
@@ -227,7 +226,7 @@ namespace Tartaria.Integration
         public void OfferTransport(Vector3 destination)
         {
             Debug.Log($"[Thorne] Airship transport to {destination} (feature pending full implementation)");
-            HUDController.Instance?.ShowObjective("Thorne's airship ready for transport.");
+            GameEvents.RaiseHUDShowObjective("Thorne's airship ready for transport.");
         }
     }
 }

@@ -3,7 +3,6 @@ using System.Collections;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
-using Tartaria.UI;
 using Tartaria.Save;
 
 namespace Tartaria.Integration
@@ -85,7 +84,7 @@ namespace Tartaria.Integration
             _sessionProgress = 0f;
 
             Debug.Log($"[KorathThaw] Session {completedSessions + 1} started — channeling RS into ice...");
-            HUDController.Instance?.ShowObjective($"Channeling RS into Aether ice... ({completedSessions + 1}/{totalSessions})");
+            GameEvents.RaiseHUDShowObjective($"Channeling RS into Aether ice... ({completedSessions + 1}/{totalSessions})");
 
             // VFX: RS energy flows from player to ice
             GameObject energyFlow = CreateRSFlowVFX();
@@ -98,7 +97,7 @@ namespace Tartaria.Integration
                 {
                     // Player out of RS — abort session
                     Debug.Log("[KorathThaw] RS depleted! Session failed.");
-                    HUDController.Instance?.ShowObjective("Insufficient RS! Wait for regeneration and try again.");
+                    GameEvents.RaiseHUDShowObjective("Insufficient RS! Wait for regeneration and try again.");
                     Audio.AudioManager.Instance?.PlaySFX2D("ThawFail");
                     
                     Destroy(energyFlow);
@@ -124,7 +123,7 @@ namespace Tartaria.Integration
 
             // Show memory fragment
             string memory = _memoryFragments[completedSessions - 1];
-            HUDController.Instance?.ShowDialogue("Korath", memory);
+            GameEvents.RaiseHUDShowDialogue("Korath", memory);
             DialogueManager.Instance?.PlayContextDialogue($"korath_thaw_{completedSessions}");
 
             Audio.AudioManager.Instance?.PlaySFX2D("ThawSuccess");
@@ -138,7 +137,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                HUDController.Instance?.ShowObjective($"Ice partially thawed. Return when ready for session {completedSessions + 1}.");
+                GameEvents.RaiseHUDShowObjective($"Ice partially thawed. Return when ready for session {completedSessions + 1}.");
                 
                 // Save progress
                 SaveManager.Instance?.SetGameFlag($"korath_thaw_session_{completedSessions}", true);
@@ -150,7 +149,7 @@ namespace Tartaria.Integration
             isFullyThawed = true;
 
             Debug.Log("[KorathThaw] KORATH FULLY AWAKENED!");
-            HUDController.Instance?.ShowObjective("⚡⚡⚡ KORATH AWAKENS! ⚡⚡⚡");
+            GameEvents.RaiseHUDShowObjective("⚡⚡⚡ KORATH AWAKENS! ⚡⚡⚡");
 
             // Destroy ice block
             if (_iceBlock != null)

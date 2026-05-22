@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -96,7 +95,7 @@ namespace Tartaria.Integration
         {
             // Show banner
             if (beat.showBanner)
-                HUDController.Instance?.ShowBanner($"{moonName} — {beatType}", beat.beatTitle);
+                GameEvents.RaiseHUDShowBanner($"{moonName} — {beatType}", beat.beatTitle);
 
             // Show narrative text
             if (!string.IsNullOrEmpty(beat.narrativeText))

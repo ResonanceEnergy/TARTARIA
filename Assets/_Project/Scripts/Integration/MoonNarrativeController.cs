@@ -77,7 +77,7 @@ namespace Tartaria.Integration
 
                 case "moon10_zereth_revelation":
                     DialogueManager.Instance?.PlayContextDialogue("narrator_zereth_victim");
-                    UI.HUDController.Instance?.ShowBanner("REVELATION", "Zereth was not the villain...");
+                    GameEvents.RaiseHUDShowBanner("REVELATION", "Zereth was not the villain...");
                     break;
 
                 case "moon13_final_choice":
@@ -111,7 +111,7 @@ namespace Tartaria.Integration
             Debug.Log($"[MoonNarrative] Unlocked Moon {currentMoonNumber}");
 
             // Show Moon unlock banner
-            UI.HUDController.Instance?.ShowBanner($"MOON {currentMoonNumber} UNLOCKED", GetMoonTitle(currentMoonNumber));
+            GameEvents.RaiseHUDShowBanner($"MOON {currentMoonNumber} UNLOCKED", GetMoonTitle(currentMoonNumber));
 
             // Save progress
             SaveNarrativeState();

@@ -6,7 +6,6 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -402,7 +401,7 @@ namespace Tartaria.Integration
             OnWaveStarted?.Invoke(_currentWaveIndex);
 
             // HUD notification
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"Wave {_currentWaveIndex + 1}/{_waves.Count} — {_enemiesRemaining} enemies incoming!");
 
             _spawnCoroutine = StartCoroutine(SpawnWaveEnemies(wave));
@@ -460,12 +459,12 @@ namespace Tartaria.Integration
 
         IEnumerator DelayedNextWave()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"Wave {_currentWaveIndex + 1} cleared! Next wave in {timeBetweenWaves:F0}s...");
 
             yield return new WaitForSeconds(timeBetweenWaves);
 
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
             StartNextWave();
         }
 
@@ -474,7 +473,7 @@ namespace Tartaria.Integration
             _encounterActive = false;
             OnAllWavesCleared?.Invoke();
 
-            HUDController.Instance?.ShowInteractionPrompt("All waves cleared! Victory!");
+            GameEvents.RaiseHUDShowInteractionPrompt("All waves cleared! Victory!");
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
             // Haptics + VFX

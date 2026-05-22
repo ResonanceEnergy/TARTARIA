@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
@@ -836,11 +836,11 @@ namespace Tartaria.Integration
             // Populate the HUD objective panel with the active quest title
             var def = qm.GetQuestDefinition("echohaven_awakening");
             if (def != null)
-                UI.HUDController.Instance?.ShowObjective($"QUEST: {def.displayName}");
+                GameEvents.RaiseHUDShowObjective($"QUEST: {def.displayName}");
 
             // === 5-BEAT OBJECTIVE FLOW KICKOFF (UI FTUE) — guided magical start for first 5-10 min ===
             // Explicitly surface Discovery beat immediately so player feels the lunar structure from second 1.
-            UI.HUDController.Instance?.ShowObjective("MOON 01 — DISCOVERY: The valley hums. Follow the glow to the first buried chord.");
+            GameEvents.RaiseHUDShowObjective("MOON 01 — DISCOVERY: The valley hums. Follow the glow to the first buried chord.");
             Tartaria.UI.MoonHUDBanner.Show("MOON 01 — DISCOVERY", "Echohaven remembers. The first light calls you home.", new Color(0.55f, 0.85f, 1f, 1f), 5f);
 
             Debug.Log("[EchohavenContentSpawner] Starting quest + 5-beat Discovery objective activated — awakening flow primed.");
@@ -3033,7 +3033,7 @@ namespace Tartaria.Integration
             HapticFeedbackManager.Instance?.PlayCombatHit();
 
             // HUD notification
-            UI.HUDController.Instance?.ShowObjective($"Excavated: {SiteName}");
+            GameEvents.RaiseHUDShowObjective($"Excavated: {SiteName}");
 
             // Fade out beam visuals
             var beam = transform.Find("Beam");
@@ -3068,7 +3068,7 @@ namespace Tartaria.Integration
             // and SaveData.inventoryItemIds persists the shovel across save/load.
             Tartaria.Gameplay.InventorySystem.Instance?.AddItem("shovel", 1);
 
-            UI.HUDController.Instance?.ShowObjective($"Tool Acquired: {displayName}");
+            GameEvents.RaiseHUDShowObjective($"Tool Acquired: {displayName}");
             RuntimeHUDBuilder.Instance?.ShowDamageNumber(1f, transform.position + Vector3.up * 1.5f);
             AudioManager.Instance?.PlaySFX("Discovery", transform.position, 0.6f);
 

@@ -4,7 +4,6 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Integration;
 using Tartaria.Audio;
-using Tartaria.UI;
 using Tartaria.Input;
 using Tartaria.Save;
 
@@ -95,13 +94,13 @@ namespace Tartaria.Integration
             if (bridgeFormed)
             {
                 // Cleared visit: permanent golden world state already applied (leys, bright orbs, max hum, full dock/platforms)
-                HUDController.Instance?.ShowObjective("<b>WHITE CITY — THE RADIANCE ENDURES</b>\nIntercontinental Aurora Bridge active. Fast travel open. The grid sings forever.");
+                GameEvents.RaiseHUDShowObjective("<b>WHITE CITY — THE RADIANCE ENDURES</b>\nIntercontinental Aurora Bridge active. Fast travel open. The grid sings forever.");
                 Moon5WhiteCityAudioManager.Instance?.SetResonanceLevel(1.0f);
                 StartCoroutine(AmplifiedOrbPulseLoop());
                 return; // no discovery glow or "amplify" flow for already-complete emotional payoff state
             }
 
-            HUDController.Instance?.ShowObjective("<b>OVERTONE MOON — WHITE CITY</b>\nAmplify the pavilions. Let the light rise.");
+            GameEvents.RaiseHUDShowObjective("<b>OVERTONE MOON — WHITE CITY</b>\nAmplify the pavilions. Let the light rise.");
 
             // Ensure Moon 5 radiant HUD is present
             if (Tartaria.UI.Moon5AmplificationHUD.Instance == null)
@@ -217,12 +216,12 @@ namespace Tartaria.Integration
             // Make all lit central status orbs also breathe with overall resonance (consistent with amplified orbs)
             UpdateStatusOrbsWithResonance();
 
-            HUDController.Instance?.ShowObjective($"Pavilion {index + 1} amplified — {pavilionsAmplified}/5  |  Light at {Mathf.RoundToInt(currentResonancePercent * 100)}%");
+            GameEvents.RaiseHUDShowObjective($"Pavilion {index + 1} amplified — {pavilionsAmplified}/5  |  Light at {Mathf.RoundToInt(currentResonancePercent * 100)}%");
 
             // Extra objective banners for emotional flow (if thin spots)
             if (pavilionsAmplified == 3)
             {
-                HUDController.Instance?.ShowObjective("<b>THREE PAVILIONS SING</b>\nThe 6-band healing aura spreads. The overtone strengthens across the district.");
+                GameEvents.RaiseHUDShowObjective("<b>THREE PAVILIONS SING</b>\nThe 6-band healing aura spreads. The overtone strengthens across the district.");
                 OnRadioLogEntry?.Invoke("Thorne: Three nodes live — the city begins to remember its own voice.");
             }
             else if (pavilionsAmplified == 1)
@@ -501,7 +500,7 @@ namespace Tartaria.Integration
 
             if (dockStage >= 3)
             {
-                HUDController.Instance?.ShowObjective("AIRSHIP DOCK — 80%  |  Thorne's signal is strengthening.");
+                GameEvents.RaiseHUDShowObjective("AIRSHIP DOCK — 80%  |  Thorne's signal is strengthening.");
             }
 
             PersistMoon5State();
@@ -512,7 +511,7 @@ namespace Tartaria.Integration
             if (pavilionsAmplified >= 5 && !spirePlaced && !_climaxFired)
             {
                 _climaxFired = true;
-                HUDController.Instance?.ShowObjective("<b>CLIMAX — THE SPIRE FRAGMENT</b>\nPlace the Moon 1 spire piece at the central anchor. The world will sing.");
+                GameEvents.RaiseHUDShowObjective("<b>CLIMAX — THE SPIRE FRAGMENT</b>\nPlace the Moon 1 spire piece at the central anchor. The world will sing.");
                 OnRadioLogEntry?.Invoke("Thorne: All five! The grid is one voice now. Lock the fragment — birth the bridge!");
             }
         }
@@ -534,7 +533,7 @@ namespace Tartaria.Integration
 
         IEnumerator ExecuteIntercontinentalBridgeClimax()
         {
-            HUDController.Instance?.ShowObjective("THE INTERCONTINENTAL AURORA BRIDGE");
+            GameEvents.RaiseHUDShowObjective("THE INTERCONTINENTAL AURORA BRIDGE");
 
             // 1. Spire base ignition
             VFXController.Instance?.IgniteSpireBridge(spireBasePosition, 6.5f);
@@ -584,11 +583,11 @@ namespace Tartaria.Integration
 
             // Final banner + return portal
             yield return new WaitForSeconds(3.2f);
-            HUDController.Instance?.ShowObjective("<b>MOON 5 COMPLETE — THE RADIANCE ENDURES</b>\nThe White City remembers. The bridge is eternal.");
+            GameEvents.RaiseHUDShowObjective("<b>MOON 5 COMPLETE — THE RADIANCE ENDURES</b>\nThe White City remembers. The bridge is eternal.");
             ReturnPortal.SpawnAt(districtCenter + Vector3.forward * 12f + Vector3.up * 1f);
 
             // Return portal + fast-travel hook polish (Moon 5 bridge victory, mirrors Moon 3 rail emotional closure + permanent link)
-            HUDController.Instance?.ShowObjective("<b>↪ GOLDEN RETURN PORTAL + INTERCONTINENTAL FAST TRAVEL</b>\nThe Aurora Bridge endures. The White City is forever connected.");
+            GameEvents.RaiseHUDShowObjective("<b>↪ GOLDEN RETURN PORTAL + INTERCONTINENTAL FAST TRAVEL</b>\nThe Aurora Bridge endures. The White City is forever connected.");
             VFXController.Instance?.SpawnPlatformStabilizeVFX(districtCenter + Vector3.forward * 12f + Vector3.up * 2f);
             // Hook ready: Moon5IntercontinentalFastTravelUnlocked is now true for map / future triggers
         }
@@ -860,7 +859,7 @@ namespace Tartaria.Integration
                 Moon5WhiteCityAudioManager.Instance?.StartOvertoneDrone(1.0f); // ensure living hum at max for cleared re-entry
                 Moon5WhiteCityAudioManager.Instance?.SetResonanceLevel(1.0f);
 
-                HUDController.Instance?.ShowObjective("<b>THE RADIANCE ENDURES</b>\nWhite City grid permanent. Bridge & fast travel active.");
+                GameEvents.RaiseHUDShowObjective("<b>THE RADIANCE ENDURES</b>\nWhite City grid permanent. Bridge & fast travel active.");
                 return;
             }
 
@@ -1084,7 +1083,7 @@ namespace Tartaria.Integration
                     // Fresh hold start: kick off live tuning audio (rising harmonics for frequency match)
                     Vector3 pos = transform.position;
                     Moon5WhiteCityAudioManager.Instance?.StartPavilionTuning(pavilionIndex, pos);
-                    HUDController.Instance?.ShowObjective($"PAVILION {pavilionIndex + 1} — MATCHING OVERTONE FREQUENCY (HOLD E)");
+                    GameEvents.RaiseHUDShowObjective($"PAVILION {pavilionIndex + 1} — MATCHING OVERTONE FREQUENCY (HOLD E)");
                 }
 
                 _holdTime += Time.deltaTime;
@@ -1249,7 +1248,7 @@ namespace Tartaria.Integration
             if (!_prompted)
             {
                 _prompted = true;
-                HUDController.Instance?.ShowObjective("<b>THE SPIRE FRAGMENT</b>\nPress [E] or [K] to lock the Moon 1 fragment and ignite the Intercontinental Bridge");
+                GameEvents.RaiseHUDShowObjective("<b>THE SPIRE FRAGMENT</b>\nPress [E] or [K] to lock the Moon 1 fragment and ignite the Intercontinental Bridge");
             }
 
             // Auto-place on entry for smooth vertical slice flow (or player can press K)

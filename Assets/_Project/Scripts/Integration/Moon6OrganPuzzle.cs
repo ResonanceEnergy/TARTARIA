@@ -5,7 +5,6 @@ using System.Linq;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
-using Tartaria.UI;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
@@ -80,7 +79,7 @@ namespace Tartaria.Integration
             {
                 // Wrong note — reset sequence
                 Debug.Log("[OrganPuzzle] Wrong note! Sequence reset.");
-                HUDController.Instance?.ShowObjective("Dissonant note! Try again...");
+                GameEvents.RaiseHUDShowObjective("Dissonant note! Try again...");
                 Audio.AudioManager.Instance?.PlaySFX2D("OrganWrongNote");
                 _playerInput.Clear();
                 return;
@@ -105,7 +104,7 @@ namespace Tartaria.Integration
             switch (currentSequence)
             {
                 case 0:
-                    HUDController.Instance?.ShowObjective("⚡ Foundation Sequence Complete! ⚡");
+                    GameEvents.RaiseHUDShowObjective("⚡ Foundation Sequence Complete! ⚡");
                     OnFoundationComplete?.Invoke();
                     Audio.AudioManager.Instance?.PlaySFX2D("OrganFoundationComplete");
                     
@@ -117,7 +116,7 @@ namespace Tartaria.Integration
                     break;
 
                 case 1:
-                    HUDController.Instance?.ShowObjective("⚡ Harmony Sequence Complete! ⚡");
+                    GameEvents.RaiseHUDShowObjective("⚡ Harmony Sequence Complete! ⚡");
                     OnHarmonyComplete?.Invoke();
                     Audio.AudioManager.Instance?.PlaySFX2D("OrganHarmonyComplete");
                     
@@ -132,7 +131,7 @@ namespace Tartaria.Integration
                     break;
 
                 case 2:
-                    HUDController.Instance?.ShowObjective("⚡⚡⚡ CYMATIC REQUIEM COMPLETE! ⚡⚡⚡");
+                    GameEvents.RaiseHUDShowObjective("⚡⚡⚡ CYMATIC REQUIEM COMPLETE! ⚡⚡⚡");
                     OnRequiemComplete?.Invoke();
                     Audio.AudioManager.Instance?.PlaySFX2D("OrganRequiemComplete");
                     
@@ -150,7 +149,7 @@ namespace Tartaria.Integration
         IEnumerator ShowHint(string hint)
         {
             yield return new WaitForSeconds(2f);
-            HUDController.Instance?.ShowObjective(hint);
+            GameEvents.RaiseHUDShowObjective(hint);
         }
 
         IEnumerator TriggerCymaticRequiemCinematic()
@@ -168,7 +167,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.CompleteQuest("moon6_organ_puzzle");
 
             // Reveal 9-band purity note
-            HUDController.Instance?.ShowDialogue("Lirael", "Do you hear it? The ninth band... frozen in the pipes. Zereth's perfect calibration.");
+            GameEvents.RaiseHUDShowDialogue("Lirael", "Do you hear it? The ninth band... frozen in the pipes. Zereth's perfect calibration.");
 
             yield return new WaitForSeconds(2f);
 

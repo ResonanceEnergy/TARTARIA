@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -594,7 +593,7 @@ namespace Tartaria.Integration
             // Dialogue: transition to farewells
             DialogueManager.Instance?.PlayContextDialogue("moon13_time_for_farewells");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "A Moment of Peace",
                 "Your companions wish to speak with you before the final choice.",
                 5f
@@ -618,7 +617,7 @@ namespace Tartaria.Integration
             _farewellsComplete = true;
             Debug.Log("[Moon 13] Companion farewells complete — player ready for final choice");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "The Final Node Awaits",
                 "All companions have spoken. The choice is yours."
             );
@@ -804,7 +803,7 @@ namespace Tartaria.Integration
                 if (!spawner._farewellsComplete)
                 {
                     Debug.Log("[FinalNodeConsole] Farewells not complete — wait for companions to speak");
-                    HUDController.Instance?.ShowObjective("Complete farewell conversations first");
+                    GameEvents.RaiseHUDShowObjective("Complete farewell conversations first");
                     return "Complete farewell conversations first";
                 }
 

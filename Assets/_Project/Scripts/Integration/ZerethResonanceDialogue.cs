@@ -1,6 +1,5 @@
 using System.Collections;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 using UnityEngine;
 
@@ -68,7 +67,7 @@ namespace Tartaria.Integration
             // Prologue: Zereth manifests, dissonant and agonized
             Debug.Log("[ZerethResonance] Zereth manifests — corrupted violet echo, frequency spiking");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "Zereth's Echo",
                 "Not a battle. A conversation. Match his pain with understanding.",
                 6f
@@ -99,7 +98,7 @@ namespace Tartaria.Integration
             // Zereth's pain (dissonant)
             DialogueManager.Instance?.PlayContextDialogue($"zereth_pain_{phaseIndex + 1}");
 
-            HUDController.Instance?.ShowDialogue(
+            GameEvents.RaiseHUDShowDialogue(
                 "Zereth (tormented)",
                 _zerethPainLines[phaseIndex]
             );
@@ -115,7 +114,7 @@ namespace Tartaria.Integration
             // Player response choice (always positive resonance in this sequence)
             Debug.Log($"[ZerethResonance] Player aligns resonance: {_playerResponsePrompts[phaseIndex]}");
 
-            HUDController.Instance?.ShowDialogue(
+            GameEvents.RaiseHUDShowDialogue(
                 "You",
                 _playerResponsePrompts[phaseIndex]
             );
@@ -124,7 +123,7 @@ namespace Tartaria.Integration
             if (phaseIndex >= 1)
             {
                 DialogueManager.Instance?.PlayContextDialogue($"lirael_harmonizes_{phaseIndex}");
-                HUDController.Instance?.ShowObjective("Lirael harmonizes — frequency stabilizing");
+                GameEvents.RaiseHUDShowObjective("Lirael harmonizes — frequency stabilizing");
             }
 
             // Play harmonic tone (432 Hz + overtones)
@@ -215,7 +214,7 @@ namespace Tartaria.Integration
             }
 
             // Final dialogue: Zereth's gratitude
-            HUDController.Instance?.ShowDialogue(
+            GameEvents.RaiseHUDShowDialogue(
                 "Zereth (at peace)",
                 "Thank you... for hearing me. For seeing me. I am... at last... free."
             );

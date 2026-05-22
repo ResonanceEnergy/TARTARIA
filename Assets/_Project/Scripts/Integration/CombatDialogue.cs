@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.AI;
 using Tartaria.Audio;
 using Tartaria.Input;
@@ -79,8 +78,8 @@ namespace Tartaria.Integration
             // cinemaCam?.FocusOn(transform, 3f);
 
             // Show boss nameplate + intro line
-            HUDController.Instance?.ShowBossNameplate(bossName, bossTitle);
-            HUDController.Instance?.ShowSubtitle($"<b>{bossName}:</b> {introLine}", 6f);
+            GameEvents.RaiseHUDShowBossNameplate(bossName, bossTitle);
+            GameEvents.RaiseHUDShowSubtitle($"<b>{bossName}:</b> {introLine}", 6f);
             
             AudioManager.Instance?.PlayVoiceLine($"boss_{bossName.ToLower()}_intro");
 
@@ -92,7 +91,7 @@ namespace Tartaria.Integration
 
         void PlayBossTaunt(string tauntLine)
         {
-            HUDController.Instance?.ShowSubtitle($"<b>{bossName}:</b> {tauntLine}", 4f);
+            GameEvents.RaiseHUDShowSubtitle($"<b>{bossName}:</b> {tauntLine}", 4f);
             AudioManager.Instance?.PlayVoiceLine($"boss_{bossName.ToLower()}_taunt");
 
             // Companion mid-fight reactions
@@ -107,7 +106,7 @@ namespace Tartaria.Integration
             _outroPlayed = true;
 
             // Play defeat line
-            HUDController.Instance?.ShowSubtitle($"<b>{bossName}:</b> {defeatLine}", 8f);
+            GameEvents.RaiseHUDShowSubtitle($"<b>{bossName}:</b> {defeatLine}", 8f);
             AudioManager.Instance?.PlayVoiceLine($"boss_{bossName.ToLower()}_defeat");
 
             // Companion victory reactions
@@ -223,7 +222,7 @@ namespace Tartaria.Integration
         void PlayChatter(string line, bool isCombat)
         {
             // Show subtle subtitle (not as prominent as boss dialogue)
-            HUDController.Instance?.ShowEnemyBark(line, 2.5f);
+            GameEvents.RaiseHUDShowEnemyBark(line, 2.5f);
             
             // Play audio
             string clipName = isCombat ? $"enemy_{enemyType.ToString().ToLower()}_combat" : $"enemy_{enemyType.ToString().ToLower()}_idle";
@@ -265,7 +264,7 @@ namespace Tartaria.Integration
             string whisper = corruptionWhispers[Random.Range(0, corruptionWhispers.Length)];
             
             // Subtle, ominous subtitle (different style from normal dialogue)
-            HUDController.Instance?.ShowCorruptionWhisper(whisper, 5f);
+            GameEvents.RaiseHUDShowCorruptionWhisper(whisper, 5f);
             
             // Distorted, reverb-heavy audio
             AudioManager.Instance?.PlaySFX2D("CorruptionWhisper", 0.4f);

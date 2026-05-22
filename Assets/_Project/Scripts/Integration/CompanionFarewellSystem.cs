@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 using UnityEngine;
 
@@ -54,10 +53,9 @@ namespace Tartaria.Integration
             Audio.AudioManager.Instance?.PlayLoopingSFX("FarewellAmbience", farewellLocation, 0.4f);
 
             // Opening narration
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "Before the Final Choice",
-                "Your companions wish to speak with you one last time.",
-                5f
+                "Your companions wish to speak with you one last time."
             );
 
             yield return new WaitForSeconds(5f);
@@ -88,10 +86,9 @@ namespace Tartaria.Integration
 
             Debug.Log("[CompanionFarewell] All farewells complete — ready for final choice");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "Companions Stand Ready",
-                "Whatever you choose, they will honor it.",
-                4f
+                "Whatever you choose, they will honor it."
             );
 
             // Quest progression
@@ -119,7 +116,7 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(5f);
 
             // Final Milo line
-            HUDController.Instance?.ShowDialogue(
+            GameEvents.RaiseHUDShowDialogue(
                 "Milo",
                 "No matter what happens... I won't forget you. The mud remembers. I remember."
             );
@@ -127,7 +124,7 @@ namespace Tartaria.Integration
 
             // Milo gift: Lucky Compass (symbolic item)
             Debug.Log("[CompanionFarewell] Milo gives you his father's compass — 'So you never lose your way'");
-            HUDController.Instance?.ShowObjective("Milo's Compass received — It always points to hope");
+            GameEvents.RaiseHUDShowObjective("Milo's Compass received — It always points to hope");
 
             yield return new WaitForSeconds(3f);
 
@@ -155,7 +152,7 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(5f);
 
             // Final Thorne line
-            HUDController.Instance?.ShowDialogue(
+            GameEvents.RaiseHUDShowDialogue(
                 "Thorne",
                 "Whatever choice you make... I'll build the world it needs. That's what engineers do."
             );
@@ -163,7 +160,7 @@ namespace Tartaria.Integration
 
             // Thorne gift: Master's Wrench (symbolic)
             Debug.Log("[CompanionFarewell] Thorne gives you his master's wrench — 'Built every ship with this. Now it's yours.'");
-            HUDController.Instance?.ShowObjective("Thorne's Wrench received — The tools to rebuild anything");
+            GameEvents.RaiseHUDShowObjective("Thorne's Wrench received — The tools to rebuild anything");
 
             yield return new WaitForSeconds(3f);
 
@@ -193,7 +190,7 @@ namespace Tartaria.Integration
             Debug.Log("[CompanionFarewell] Lirael sings the complete Silver Passage lullaby — first time in 200 years");
             Audio.AudioManager.Instance?.PlaySFX2D("LiraelLullabyComplete", 1f);
 
-            HUDController.Instance?.ShowDialogue(
+            GameEvents.RaiseHUDShowDialogue(
                 "Lirael",
                 "The song was always for you. Thank you for hearing it."
             );
@@ -201,7 +198,7 @@ namespace Tartaria.Integration
 
             // Lirael gift: Silver Thread (symbolic)
             Debug.Log("[CompanionFarewell] Lirael gives you a silver thread from her dress — 'So we're always connected'");
-            HUDController.Instance?.ShowObjective("Lirael's Thread received — Binds across all timelines");
+            GameEvents.RaiseHUDShowObjective("Lirael's Thread received — Binds across all timelines");
 
             yield return new WaitForSeconds(3f);
 
@@ -228,7 +225,7 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(5f);
 
             // Final Korath wisdom
-            HUDController.Instance?.ShowDialogue(
+            GameEvents.RaiseHUDShowDialogue(
                 "Korath",
                 "The bells ring. The fountains flow. The planet remembers its song. You did this. We are... grateful."
             );
@@ -236,7 +233,7 @@ namespace Tartaria.Integration
 
             // Korath gift: Resonance Stone (symbolic)
             Debug.Log("[CompanionFarewell] Korath places his hand on your shoulder — resonance imprint remains");
-            HUDController.Instance?.ShowObjective("Korath's Blessing received — Carry the giants' song forever");
+            GameEvents.RaiseHUDShowObjective("Korath's Blessing received — Carry the giants' song forever");
 
             yield return new WaitForSeconds(3f);
 

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Audio;
 using Tartaria.Input;
-using Tartaria.UI;
 using Tartaria.Save;
 
 namespace Tartaria.Integration

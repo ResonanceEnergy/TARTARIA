@@ -8,7 +8,6 @@
         "Tartaria.Audio",
         "Tartaria.Camera",
         "Tartaria.Input",
-        "Tartaria.UI",
         "Tartaria.Save",
         "Unity.InputSystem",
         "Unity.Entities",

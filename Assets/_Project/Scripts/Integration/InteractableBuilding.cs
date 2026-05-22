@@ -2,7 +2,6 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Gameplay;
-using Tartaria.UI;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
@@ -223,7 +222,7 @@ namespace Tartaria.Integration
             if (_state == BuildingRestorationState.Buried && IsExcavationComplete())
                 RevealBuriedStructure();
             else if (_state == BuildingRestorationState.Buried)
-                HUDController.Instance?.ShowInteractionPrompt($"{GetDisplayName()} site identified. Press [E] to dig.");
+                GameEvents.RaiseHUDShowInteractionPrompt($"{GetDisplayName()} site identified. Press [E] to dig.");
 
             GameLoopController.Instance?.OnBuildingDiscovered(
                 GetDisplayName(), transform.position);
@@ -249,12 +248,12 @@ namespace Tartaria.Integration
 
             if (excavation.IsDigging)
             {
-                HUDController.Instance?.ShowInteractionPrompt("Already excavating another site.");
+                GameEvents.RaiseHUDShowInteractionPrompt("Already excavating another site.");
                 return true;
             }
 
             excavation.BeginDig(buildingId);
-            HUDController.Instance?.ShowInteractionPrompt($"Digging {GetDisplayName()}...");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Digging {GetDisplayName()}...");
             return true;
         }
 
@@ -283,7 +282,7 @@ namespace Tartaria.Integration
 
             _state = BuildingRestorationState.Revealed;
             AudioManager.Instance?.PlaySFX("BuildingReveal", transform.position);
-            HUDController.Instance?.ShowInteractionPrompt($"The mud crumbles! {GetDisplayName()} is revealed!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"The mud crumbles! {GetDisplayName()} is revealed!");
             UpdateVisuals();
                     if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
             Save.SaveManager.Instance?.MarkDirty();
@@ -296,19 +295,19 @@ namespace Tartaria.Integration
             {
                 case "dome":
                     EnsureMiniGameComponent<ChoirHarmonicsMiniGame>().StartPerformance();
-                    HUDController.Instance?.ShowInteractionPrompt("Choir Harmonics challenge started.");
+                    GameEvents.RaiseHUDShowInteractionPrompt("Choir Harmonics challenge started.");
                     return true;
                 case "fountain":
                     EnsureMiniGameComponent<PipeOrganMiniGame>().StartOrgan();
-                    HUDController.Instance?.ShowInteractionPrompt("Pipe Organ challenge started.");
+                    GameEvents.RaiseHUDShowInteractionPrompt("Pipe Organ challenge started.");
                     return true;
                 case "spire":
                     EnsureMiniGameComponent<AetherConduitMiniGame>().StartPuzzle();
-                    HUDController.Instance?.ShowInteractionPrompt("Aether Conduit challenge started.");
+                    GameEvents.RaiseHUDShowInteractionPrompt("Aether Conduit challenge started.");
                     return true;
                 default:
                     EnsureMiniGameComponent<RailAlignmentMiniGame>().StartAlignment();
-                    HUDController.Instance?.ShowInteractionPrompt("Rail Alignment challenge started.");
+                    GameEvents.RaiseHUDShowInteractionPrompt("Rail Alignment challenge started.");
                     return true;
             }
         }

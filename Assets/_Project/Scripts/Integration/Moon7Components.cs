@@ -5,7 +5,6 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.AI;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -80,7 +79,7 @@ namespace Tartaria.Integration
             currentStage = KorathStage.Awakened;
 
             Debug.Log("[Korath] Giant awakened! 25-foot ancient teacher stands.");
-            HUDController.Instance?.ShowObjective("⚡ KORATH AWAKENS ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ KORATH AWAKENS ⚡");
         }
 
         public void TeachNineBandEnergy()
@@ -100,7 +99,7 @@ namespace Tartaria.Integration
                 }
             }
 
-            HUDController.Instance?.ShowObjective("9-Band Energy Unlocked! Anti-gravity + consciousness buffs available.");
+            GameEvents.RaiseHUDShowObjective("9-Band Energy Unlocked! Anti-gravity + consciousness buffs available.");
             
             DialogueManager.Instance?.PlayContextDialogue("korath_teach_9band");
             Audio.AudioManager.Instance?.PlaySFX2D("NineBandUnlock");
@@ -126,7 +125,7 @@ namespace Tartaria.Integration
                 }
             }
 
-            HUDController.Instance?.ShowObjective("Harmonic Rock Cutting Unlocked! Shape stone with resonance.");
+            GameEvents.RaiseHUDShowObjective("Harmonic Rock Cutting Unlocked! Shape stone with resonance.");
             
             DialogueManager.Instance?.PlayContextDialogue("korath_teach_rockcutting");
 
@@ -146,11 +145,11 @@ namespace Tartaria.Integration
 
         IEnumerator SacrificeSequence()
         {
-            HUDController.Instance?.ShowObjective("⚡ KORATH'S SACRIFICE ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ KORATH'S SACRIFICE ⚡");
             yield return new WaitForSeconds(2f);
 
             // Dialogue
-            HUDController.Instance?.ShowDialogue("Korath", "The grid must wake. Take my resonance, old friends...");
+            GameEvents.RaiseHUDShowDialogue("Korath", "The grid must wake. Take my resonance, old friends...");
             yield return new WaitForSeconds(3f);
 
             // VFX: Golden light pours from Korath into sky
@@ -187,7 +186,7 @@ namespace Tartaria.Integration
                 Destroy(_korathGiant.GetComponent<MeshRenderer>());
             }
 
-            HUDController.Instance?.ShowDialogue("Korath (echo)", "I remain. Voice without form. The old way.");
+            GameEvents.RaiseHUDShowDialogue("Korath (echo)", "I remain. Voice without form. The old way.");
             yield return new WaitForSeconds(2f);
 
             Debug.Log("[Korath] Sacrifice complete. Half the planetary grid lights up.");
@@ -250,7 +249,7 @@ namespace Tartaria.Integration
             string line = lines[_dialogueIndex % lines.Length];
 
             Debug.Log($"[Korath] {line}");
-            HUDController.Instance?.ShowDialogue("Korath", line);
+            GameEvents.RaiseHUDShowDialogue("Korath", line);
 
             DialogueManager.Instance?.PlayContextDialogue($"korath_dialogue_{stageIndex}_{_dialogueIndex}");
             Audio.AudioManager.Instance?.PlaySFX2D("Korath_Voice");
@@ -300,7 +299,7 @@ namespace Tartaria.Integration
         {
             Debug.Log("[GolemSiege] CLIMAX: Massive golem siege begins! Korath fights beside player!");
             
-            HUDController.Instance?.ShowObjective("⚡ GOLEM SIEGE! Defend the star fort! ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ GOLEM SIEGE! Defend the star fort! ⚡");
             
             Audio.AudioManager.Instance?.PlaySFX2D("GolemSiegeStart");
 
@@ -313,7 +312,7 @@ namespace Tartaria.Integration
             {
                 Debug.Log($"[GolemSiege] Wave {_currentWave + 1}/{totalGolemWaves}!");
                 
-                HUDController.Instance?.ShowObjective($"Wave {_currentWave + 1}/{totalGolemWaves}");
+                GameEvents.RaiseHUDShowObjective($"Wave {_currentWave + 1}/{totalGolemWaves}");
 
                 SpawnWave();
 
@@ -330,7 +329,7 @@ namespace Tartaria.Integration
             OnSiegeComplete?.Invoke();
             
             Debug.Log("[GolemSiege] SIEGE COMPLETE! All waves defeated!");
-            HUDController.Instance?.ShowObjective("⚡ SIEGE VICTORIOUS! ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ SIEGE VICTORIOUS! ⚡");
 
             QuestManager.Instance?.CompleteQuest("moon7_golem_siege");
         }
@@ -471,7 +470,7 @@ namespace Tartaria.Integration
         {
             Debug.Log($"[KorathIce] Thaw session {_sessionsCompleted + 1}/{SESSIONS_REQUIRED} starting...");
             
-            HUDController.Instance?.ShowObjective("Channeling resonance into Aether ice...");
+            GameEvents.RaiseHUDShowObjective("Channeling resonance into Aether ice...");
 
             yield return new WaitForSeconds(3f);
 

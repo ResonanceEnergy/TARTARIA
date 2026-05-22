@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Tartaria.UI;
+using Tartaria.Core;
 
 namespace Tartaria.Integration
 {
@@ -69,7 +69,7 @@ namespace Tartaria.Integration
             trigger.center = new Vector3(0f, 1.5f, 0f);
 
             var portal = go.AddComponent<ReturnPortal>();
-            HUDController.Instance?.ShowObjective("<b>↪ Return Portal active</b>  Walk into the cyan beam to leave.");
+            GameEvents.RaiseHUDShowObjective("<b>↪ Return Portal active</b>  Walk into the cyan beam to leave.");
             return portal;
         }
 
@@ -77,7 +77,7 @@ namespace Tartaria.Integration
         {
             if (!other.CompareTag("Player")) return;
             Debug.Log("[ReturnPortal] Player entered — warping to Echohaven.");
-            HUDController.Instance?.ShowObjective("<b>↪ Returning to Echohaven...</b>");
+            GameEvents.RaiseHUDShowObjective("<b>↪ Returning to Echohaven...</b>");
             try { SceneManager.LoadScene(EchohavenScene); }
             catch (System.Exception e) { Debug.LogWarning($"[ReturnPortal] Load failed: {e.Message}"); }
         }

@@ -5,7 +5,6 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
-using Tartaria.UI;
 using Tartaria.Save;   // For SaveManager.MarkDirty in late carry application + full roundtrip
 
 namespace Tartaria.Integration
@@ -248,7 +247,7 @@ namespace Tartaria.Integration
             {
                 CheckAndGrantTruePurifier();
                 string display = GetSiteDisplayName(siteEnum);
-                HUDController.Instance?.ShowObjective($"<color=#FFD700>PURGE BLESSING: {display.ToUpper()} LVL{level}{(hasCarry ? " +LEY" : "")}</color>");
+                GameEvents.RaiseHUDShowObjective($"<color=#FFD700>PURGE BLESSING: {display.ToUpper()} LVL{level}{(hasCarry ? " +LEY" : "")}</color>");
             }
         }
 
@@ -351,7 +350,7 @@ namespace Tartaria.Integration
                 AwardBonus(600f, "TrueLunarPurifier", 3, _moon1LeylineCarryActive);
                 ApplyPlayerMutationForSite(Moon2PurgeSite.CathedralDome, 3, _moon1LeylineCarryActive, true); // capstone visual on dome as center
 
-                HUDController.Instance?.ShowObjective("<color=#FFD700>TRUE LUNAR PURIFIER — All 5 Cavern Sites Cleansed (Ley Carry Active)</color>");
+                GameEvents.RaiseHUDShowObjective("<color=#FFD700>TRUE LUNAR PURIFIER — All 5 Cavern Sites Cleansed (Ley Carry Active)</color>");
                 Debug.Log("[Moon2Progress] === TRUE LUNAR PURIFIER UNLOCKED (CAPSTONE) ===\n" +
                           "  All 5 purge sites (CathedralDome/BellTower/Fountain/CrystalHall/LeyChamber) fully purged.\n" +
                           "  Moon1 leyline carry was " + (_moon1LeylineCarryActive ? "ACTIVE — mutations deepened across the board" : "inactive") + ".\n" +

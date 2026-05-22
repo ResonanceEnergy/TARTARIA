@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -110,7 +109,7 @@ namespace Tartaria.Integration
             SpawnBellTowers();
 
             // Ambient audio: distant bell echoes
-            HUDController.Instance?.ShowObjective("Synchronize all 12 towers. The planet will sing.");
+            GameEvents.RaiseHUDShowObjective("Synchronize all 12 towers. The planet will sing.");
 
             // Quest activation
             QuestManager.Instance?.ActivateQuest("moon12_bell_synchronization");
@@ -286,7 +285,7 @@ namespace Tartaria.Integration
             // Quest update
             QuestManager.Instance?.ActivateQuest("moon12_defend_bell_network");
 
-            HUDController.Instance?.ShowObjective("Defend bell towers from Reset assault!");
+            GameEvents.RaiseHUDShowObjective("Defend bell towers from Reset assault!");
         }
 
         void SpawnResetSquad(int towerIndex)

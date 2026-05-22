@@ -2,7 +2,6 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -120,7 +119,7 @@ namespace Tartaria.Integration
             Debug.Log($"[PavilionAmplification] Pavilion amplified! Field active (radius: {fieldRadius}m)");
             Audio.AudioManager.Instance?.PlaySFX2D("PavilionAmplify");
 
-            HUDController.Instance?.ShowObjective("Amplification field active! +20% RS, +15% speed, +10% resistance");
+            GameEvents.RaiseHUDShowObjective("Amplification field active! +20% RS, +15% speed, +10% resistance");
         }
 
         void OnPlayerEnterField()
@@ -137,7 +136,7 @@ namespace Tartaria.Integration
                 _playerAbilities.AddResistanceMultiplier("pavilion_amp", resistanceBonus);
             }
 
-            HUDController.Instance?.ShowObjective("⚡ AMPLIFICATION FIELD ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ AMPLIFICATION FIELD ⚡");
             Audio.AudioManager.Instance?.PlaySFX2D("AmplificationEnter");
         }
 
@@ -194,7 +193,7 @@ namespace Tartaria.Integration
         System.Collections.IEnumerator RestorePavilion()
         {
             Debug.Log($"[Pavilion {pavilionIndex}] Restoring pavilion with golden-ratio template...");
-            HUDController.Instance?.ShowObjective($"Restoring pavilion {pavilionIndex + 1}...");
+            GameEvents.RaiseHUDShowObjective($"Restoring pavilion {pavilionIndex + 1}...");
 
             // Restoration progress
             while (restorationProgress < RESTORATION_DURATION)
@@ -214,7 +213,7 @@ namespace Tartaria.Integration
             OnRestored?.Invoke(this);
 
             // Update HUD
-            HUDController.Instance?.ShowObjective($"⚡ Pavilion {pavilionIndex + 1} Restored! Amplification field active ⚡");
+            GameEvents.RaiseHUDShowObjective($"⚡ Pavilion {pavilionIndex + 1} Restored! Amplification field active ⚡");
 
             // Quest progress
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, $"restore_pavilion_{pavilionIndex}");
