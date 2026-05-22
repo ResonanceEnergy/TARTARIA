@@ -2,6 +2,10 @@ using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.UI;
+using Tartaria.AI;
+using Tartaria.Audio;
+using Tartaria.Input;
+using Tartaria.Camera;
 
 namespace Tartaria.Integration
 {
