@@ -191,30 +191,60 @@ namespace Tartaria.Integration
             string markerName = $"Marker_{id}";
             if (building.transform.Find(markerName) != null) return;
 
-            var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            marker.name = markerName;
-            marker.transform.SetParent(building.transform);
-
-            // Position above building top
-            var rend = building.GetComponentInChildren<Renderer>();
-            float topY = rend != null ? rend.bounds.max.y - building.transform.position.y + 3f : 8f;
-            marker.transform.localPosition = new Vector3(0f, topY, 0f);
-            marker.transform.localScale = new Vector3(0.6f, 0.8f, 0.6f);
-
-            // Remove collider so it doesn't interfere with raycasts
-            var col = marker.GetComponent<Collider>();
-            if (col != null) Object.Destroy(col);
-
-            // Bright golden glow material
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            if (shader != null)
+            // Try loading RestoreSparkle prefab first
+            GameObject markerPrefab = Resources.Load<GameObject>("Prefabs/VFX/RestoreSparkle");
+            GameObject marker;
+            
+            if (markerPrefab != null)
             {
-                var mat = new Material(shader);
-                mat.SetColor("_BaseColor", new Color(1f, 0.85f, 0.3f));
-                mat.SetFloat("_Smoothness", 0.8f);
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", new Color(1f, 0.8f, 0.2f) * 2f);
-                marker.GetComponent<MeshRenderer>().material = mat;
+                // Use prefab if available
+                marker = Instantiate(markerPrefab);
+                marker.name = markerName;
+                marker.transform.SetParent(building.transform);
+                
+                // Position above building top
+                var rend = building.GetComponentInChildren<Renderer>();
+                float topY = rend != null ? rend.bounds.max.y - building.transform.position.y + 3f : 8f;
+                marker.transform.localPosition = new Vector3(0f, topY, 0f);
+                
+                // Play particle effect
+                ParticleSystem ps = marker.GetComponent<ParticleSystem>();
+                if (ps != null) ps.Play();
+            }
+            else
+            {
+                // Fallback: create runtime particle system
+                marker = new GameObject(markerName);
+                marker.transform.SetParent(building.transform);
+                
+                // Position above building top
+                var rend = building.GetComponentInChildren<Renderer>();
+                float topY = rend != null ? rend.bounds.max.y - building.transform.position.y + 3f : 8f;
+                marker.transform.localPosition = new Vector3(0f, topY, 0f);
+                
+                ParticleSystem ps = marker.AddComponent<ParticleSystem>();
+                var main = ps.main;
+                main.startLifetime = 1.5f;
+                main.startSpeed = 0.5f;
+                main.startSize = 0.3f;
+                main.startColor = new Color(1f, 0.85f, 0.3f, 0.8f);
+                main.maxParticles = 50;
+                main.loop = true;
+                
+                var emission = ps.emission;
+                emission.rateOverTime = 20f;
+                
+                var shape = ps.shape;
+                shape.shapeType = ParticleSystemShapeType.Sphere;
+                shape.radius = 0.3f;
+                
+                var renderer = marker.GetComponent<ParticleSystemRenderer>();
+                renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                renderer.material.SetColor("_BaseColor", new Color(1f, 0.8f, 0.2f));
+                
+                ps.Play();
+                
+                Debug.LogWarning("[BuildingSpawner] RestoreSparkle prefab missing - using runtime ParticleSystem");
             }
 
             // Add a point light so the marker glows visibly

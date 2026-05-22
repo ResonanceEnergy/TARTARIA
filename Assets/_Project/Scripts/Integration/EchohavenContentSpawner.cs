@@ -803,15 +803,22 @@ namespace Tartaria.Integration
             }
             else
             {
-                // Fallback: primitive robed figure
-                cassianGO = new GameObject("Cassian");
-                cassianGO.transform.position = cassianPosition;
-
-                var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            body.name = "Body";
-            body.transform.SetParent(cassianGO.transform);
-            body.transform.localPosition = new Vector3(0f, 1f, 0f);
-            body.transform.localScale = new Vector3(0.8f, 1.2f, 0.8f);
+                // KayKit prefab: Hooded Rogue for mysterious Cassian
+                GameObject cassianPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Rogue_Hooded");
+                if (cassianPrefab != null)
+                {
+                    cassianGO = Instantiate(cassianPrefab, cassianPosition, Quaternion.identity);
+                    cassianGO.name = "Cassian";
+                    cassianGO.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                }
+                else
+                {
+                    Debug.LogError("[EchohavenContentSpawner] CRITICAL: Char_Rogue_Hooded prefab missing");
+                    cassianGO = new GameObject("Cassian_MISSING_PREFAB");
+                    cassianGO.transform.position = cassianPosition;
+                }
+                var body = cassianGO.transform.Find("Body");
+                if (body == null) body = cassianGO.transform;
 
             var r = body.GetComponent<MeshRenderer>();
             if (r != null)
@@ -1830,28 +1837,33 @@ namespace Tartaria.Integration
             marker.transform.SetParent(parent);
             marker.transform.position = pos + new Vector3(0f, 0.1f, 0f);
 
-            // Glowing cylinder beam pointing upward
-            var beam = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            beam.name = "Beam";
-            beam.transform.SetParent(marker.transform);
-            beam.transform.localPosition = new Vector3(0f, 3f, 0f);
-            beam.transform.localScale = new Vector3(0.4f, 3f, 0.4f);
-            Object.Destroy(beam.GetComponent<Collider>()); // no collision — visual only
-
-            var br = beam.GetComponent<MeshRenderer>();
-            var beamShader = Shader.Find("Universal Render Pipeline/Lit");
-            if (beamShader != null)
-            {
-                var mat = new Material(beamShader);
-                mat.SetColor("_BaseColor", new Color(0.3f, 0.7f, 0.3f, 0.5f));
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", new Color(0.1f, 0.8f, 0.2f) * 2f);
-                mat.SetFloat("_Surface", 1f);
-                mat.SetOverrideTag("RenderType", "Transparent");
-                mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-                mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                br.material = mat;
-            }
+            // Glowing particle beam pointing upward (VFX replacement)
+            GameObject beamVFX = new GameObject("Beam_VFX");
+            beamVFX.transform.SetParent(marker.transform);
+            beamVFX.transform.localPosition = new Vector3(0f, 3f, 0f);
+            
+            ParticleSystem ps = beamVFX.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startLifetime = 2.5f;
+            main.startSpeed = 0.5f;
+            main.startSize = 0.4f;
+            main.startColor = new Color(0.3f, 0.7f, 0.3f, 0.6f);
+            main.maxParticles = 100;
+            main.simulationSpace = ParticleSystemSimulationSpace.Local;
+            
+            var emission = ps.emission;
+            emission.rateOverTime = 50f;
+            
+            var shape = ps.shape;
+            shape.shapeType = ParticleSystemShapeType.Cone;
+            shape.angle = 5f;
+            shape.radius = 0.2f;
+            
+            var renderer = beamVFX.GetComponent<ParticleSystemRenderer>();
+            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            renderer.material.SetColor("_BaseColor", new Color(0.1f, 0.8f, 0.2f));
+            
+            ps.Play();
 
             // Point light for visibility at range
             var lightGO = new GameObject("DigLight");
@@ -1956,9 +1968,23 @@ namespace Tartaria.Integration
 
         GameObject CreateAnastasiaPrimitiveFallback()
         {
-            var root = new GameObject("Anastasia");
+            // Load KayKit Anastasia prefab
+            GameObject anastasiaPrefab = Resources.Load<GameObject>("Prefabs/Characters/Anastasia");
+            if (anastasiaPrefab != null)
+            {
+                var root = Instantiate(anastasiaPrefab, Vector3.zero, Quaternion.identity);
+                root.name = "Anastasia";
+                root.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+                return root;
+            }
+            else
+            {
+                Debug.LogError("[EchohavenContentSpawner] CRITICAL: Anastasia prefab missing at Prefabs/Characters/Anastasia");
+                var root = new GameObject("Anastasia_MISSING_PREFAB");
+                return root;
+            }
 
-            // Tall slender capsule — ghost-like figure
+            // OLD PRIMITIVE CODE (unreachable)
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             body.name = "GhostBody";
             body.transform.SetParent(root.transform);

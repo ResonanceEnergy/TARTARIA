@@ -216,16 +216,33 @@ namespace Tartaria.Integration
 
             Destroy(frostVFX, 3f);
 
-            // Frost ring expands
-            GameObject frostRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            // Frost ring expands (VFX replacement)
+            GameObject frostRing = new GameObject("FrostRing_VFX");
             frostRing.transform.position = targetPosition + Vector3.up * 0.1f;
-            frostRing.transform.localScale = new Vector3(korathFrostRadius * 2f, 0.1f, korathFrostRadius * 2f);
-
-            Renderer ringRend = frostRing.GetComponent<Renderer>();
-            Material frostMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            frostMat.color = new Color(0.5f, 0.7f, 1f, 0.5f);
-            ringRend.material = frostMat;
-
+            
+            ParticleSystem psFrost = frostRing.AddComponent<ParticleSystem>();
+            var mainFrost = psFrost.main;
+            mainFrost.startLifetime = 2.5f;
+            mainFrost.startSpeed = korathFrostRadius * 0.8f;
+            mainFrost.startSize = 0.3f;
+            mainFrost.startColor = new Color(0.5f, 0.7f, 1f, 0.6f);
+            mainFrost.maxParticles = 150;
+            mainFrost.loop = false;
+            mainFrost.duration = 2.5f;
+            
+            var emissionFrost = psFrost.emission;
+            emissionFrost.rateOverTime = 0;
+            emissionFrost.SetBursts(new ParticleSystem.Burst[] { new ParticleSystem.Burst(0f, 100) });
+            
+            var shapeFrost = psFrost.shape;
+            shapeFrost.shapeType = ParticleSystemShapeType.Circle;
+            shapeFrost.radius = 0.5f;
+            
+            var rendererFrost = frostRing.GetComponent<ParticleSystemRenderer>();
+            rendererFrost.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+            rendererFrost.material.SetColor("_BaseColor", new Color(0.5f, 0.7f, 1f));
+            
+            psFrost.Play();
             Destroy(frostRing, 3f);
 
             // Damage and freeze enemies

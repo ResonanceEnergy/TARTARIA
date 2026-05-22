@@ -1130,21 +1130,51 @@ namespace Tartaria.Integration
 
             if (_cachedPavilion == null) _cachedPavilion = GameObject.Find($"Moon5_Pavilion_{pavilionIndex + 1:00}");
             var parent = _cachedPavilion ?? gameObject;
-            _pulseOrb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            _pulseOrb.name = "TuningPulse_Preview";
-            _pulseOrb.transform.SetParent(parent.transform);
-            _pulseOrb.transform.localPosition = Vector3.up * 5.2f;
-            _pulseOrb.transform.localScale = Vector3.one * 0.7f;
-
-            var mr = _pulseOrb.GetComponent<MeshRenderer>();
-            if (mr != null)
+            
+            // Try loading ScanPulse prefab first
+            GameObject pulsePrefab = Resources.Load<GameObject>("Prefabs/VFX/ScanPulse");
+            
+            if (pulsePrefab != null)
             {
-                mr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                mr.material.color = new Color(0.8f, 0.9f, 1f, 0.8f);
-                mr.material.EnableKeyword("_EMISSION");
-                mr.material.SetColor("_EmissionColor", new Color(0.5f, 0.7f, 1f) * 0.9f);
+                _pulseOrb = Instantiate(pulsePrefab);
+                _pulseOrb.name = "TuningPulse_Preview";
+                _pulseOrb.transform.SetParent(parent.transform);
+                _pulseOrb.transform.localPosition = Vector3.up * 5.2f;
+                
+                ParticleSystem ps = _pulseOrb.GetComponent<ParticleSystem>();
+                if (ps != null) ps.Play();
             }
-            Destroy(_pulseOrb.GetComponent<Collider>());
+            else
+            {
+                // Fallback: create runtime pulse particle system
+                _pulseOrb = new GameObject("TuningPulse_Preview_VFX");
+                _pulseOrb.transform.SetParent(parent.transform);
+                _pulseOrb.transform.localPosition = Vector3.up * 5.2f;
+                
+                ParticleSystem ps = _pulseOrb.AddComponent<ParticleSystem>();
+                var main = ps.main;
+                main.startLifetime = 2.0f;
+                main.startSpeed = 1.0f;
+                main.startSize = 0.7f;
+                main.startColor = new Color(0.8f, 0.9f, 1f, 0.8f);
+                main.maxParticles = 100;
+                main.loop = true;
+                
+                var emission = ps.emission;
+                emission.rateOverTime = 30f;
+                
+                var shape = ps.shape;
+                shape.shapeType = ParticleSystemShapeType.Sphere;
+                shape.radius = 0.35f;
+                
+                var renderer = _pulseOrb.GetComponent<ParticleSystemRenderer>();
+                renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                renderer.material.SetColor("_BaseColor", new Color(0.5f, 0.7f, 1f));
+                
+                ps.Play();
+                
+                Debug.LogWarning("[WhiteCityAmplification] ScanPulse prefab missing - using runtime ParticleSystem");
+            }
 
             var light = _pulseOrb.AddComponent<Light>();
             light.color = new Color(0.7f, 0.85f, 1f);
