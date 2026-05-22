@@ -338,10 +338,37 @@ namespace Tartaria.Integration
                 return ComposeKayKitBuilding(id, position, scale);
             }
 
-            // Fallback: primitives
-            var go = GameObject.CreatePrimitive(shape);
+            // Fallback: build from components (no primitives)
+            var go = new GameObject("Building_" + id);
             go.transform.position = position + Vector3.up * (scale.y * 0.5f);
             go.transform.localScale = scale;
+            
+            // Add mesh components
+            var mf = go.AddComponent<MeshFilter>();
+            go.AddComponent<MeshRenderer>();
+            
+            // Set mesh based on shape
+            if (shape == PrimitiveType.Cube)
+            {
+                mf.mesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+                go.AddComponent<BoxCollider>();
+            }
+            else if (shape == PrimitiveType.Sphere)
+            {
+                mf.mesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+                go.AddComponent<SphereCollider>();
+            }
+            else if (shape == PrimitiveType.Cylinder)
+            {
+                mf.mesh = Resources.GetBuiltinResource<Mesh>("Cylinder.fbx");
+                go.AddComponent<CapsuleCollider>();
+            }
+            else
+            {
+                // Fallback to cube for other shapes
+                mf.mesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+                go.AddComponent<BoxCollider>();
+            }
 
             // Mud-colored material
             var renderer = go.GetComponent<MeshRenderer>();

@@ -151,40 +151,44 @@ namespace Tartaria.Integration
             iceOuter.transform.SetParent(_korathIceBlock.transform);
             iceOuter.transform.localScale = new Vector3(7f, 13f, 7f);
             iceOuter.transform.localPosition = Vector3.zero;
-            // Add mesh/renderer for visualization (ice cube geometry)
+            // Add mesh/renderer/collider for ice cube geometry
             MeshFilter mf1 = iceOuter.AddComponent<MeshFilter>();
             mf1.mesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
             iceOuter.AddComponent<MeshRenderer>();
+            iceOuter.AddComponent<BoxCollider>(); // Physical collision
 
             // Mid-layer ice
             GameObject iceMid = new GameObject("IceShellMid");
             iceMid.transform.SetParent(_korathIceBlock.transform);
             iceMid.transform.localScale = new Vector3(5.5f, 11.5f, 5.5f);
             iceMid.transform.localPosition = Vector3.zero;
-            // Add mesh/renderer for visualization
+            // Add mesh/renderer/collider
             MeshFilter mf2 = iceMid.AddComponent<MeshFilter>();
             mf2.mesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
             iceMid.AddComponent<MeshRenderer>();
+            iceMid.AddComponent<BoxCollider>(); // Physical collision
 
             // Inner core chamber
             GameObject iceInner = new GameObject("IceShellInner");
             iceInner.transform.SetParent(_korathIceBlock.transform);
             iceInner.transform.localScale = new Vector3(4.5f, 10.5f, 4.5f);
             iceInner.transform.localPosition = Vector3.zero;
-            // Add mesh/renderer for visualization
+            // Add mesh/renderer/collider
             MeshFilter mf3 = iceInner.AddComponent<MeshFilter>();
             mf3.mesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
             iceInner.AddComponent<MeshRenderer>();
+            iceInner.AddComponent<BoxCollider>(); // Physical collision
 
             // Stasis crystal core (pulsing energy)
             GameObject stasisCore = new GameObject("StasisCore");
             stasisCore.transform.SetParent(_korathIceBlock.transform);
             stasisCore.transform.localScale = Vector3.one * 2f;
             stasisCore.transform.localPosition = Vector3.zero;
-            // Add mesh/renderer for visualization (sphere core)
+            // Add mesh/renderer/collider (sphere core)
             MeshFilter mf4 = stasisCore.AddComponent<MeshFilter>();
             mf4.mesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
             stasisCore.AddComponent<MeshRenderer>();
+            stasisCore.AddComponent<SphereCollider>(); // Physical collision (sphere)
 
             // Placeholder visual: violet-tinted translucent ice (9-band energy)
             Renderer[] renderers = _korathIceBlock.GetComponentsInChildren<Renderer>();
