@@ -1,0 +1,260 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using Tartaria.Core;
+using Tartaria.Gameplay;
+using Tartaria.AI;
+
+namespace Tartaria.Integration
+{
+    /// <summary>
+    /// Companion combat abilities — Thorne (airship support) and Korath (frost hammer).
+    /// Activated when companion trust reaches threshold and player is in combat.
+    /// </summary>
+    public class CompanionCombatAbilities : MonoBehaviour
+    {
+        public static CompanionCombatAbilities Instance { get; private set; }
+
+        [Header("Configuration")]
+        [SerializeField] float thorne AirstrikeRadius = 10f;
+        [SerializeField] float thorneAirstrikeDamage = 100f;
+        [SerializeField] float thorneCooldown = 30f;
+
+        [SerializeField] float korathFrostDamage = 150f;
+        [SerializeField] float korathFrostRadius = 15f;
+        [SerializeField] float korathCooldown = 20f;
+
+        float _thorneLastUse = -999f;
+        float _korathLastUse = -999f;
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+
+        /// <summary>
+        /// Thorne airship airstrike support.
+        /// Drops explosive barrels from above on target location.
+        /// Available when Thorne trust >= 50 (Ally level).
+        /// </summary>
+        public void ThorneAirstrike(Vector3 targetPosition)
+        {
+            // Check cooldown
+            if (Time.time - _thorneLastUse < thorneCooldown)
+            {
+                float remaining = thorneCooldown - (Time.time - _thorneLastUse);
+                HUDController.Instance?.ShowObjective($"Thorne airstrike on cooldown ({remaining:F0}s)");
+                return;
+            }
+
+            // Check trust level
+            if (ThorneController.Instance == null || ThorneController.Instance.TrustLevel < ThorneTrustLevel.Ally)
+            {
+                HUDController.Instance?.ShowObjective("Thorne trust too low for combat support");
+                return;
+            }
+
+            _thorneLastUse = Time.time;
+
+            Debug.Log($"[CompanionCombat] Thorne airstrike called at {targetPosition}");
+            StartCoroutine(ExecuteThorneAirstrike(targetPosition));
+        }
+
+        IEnumerator ExecuteThorneAirstrike(Vector3 targetPosition)
+        {
+            HUDController.Instance?.ShowObjective("⚡ THORNE AIRSTRIKE INCOMING! ⚡");
+            
+            // Thorne radio crackle
+            DialogueManager.Instance?.PlayLineById("thorne_airstrike_call");
+            Audio.AudioManager.Instance?.PlaySFX2D("Thorne_RadioCrackle");
+
+            yield return new WaitForSeconds(1f);
+
+            // Airship sound overhead
+            Audio.AudioManager.Instance?.PlaySFX3D("Airship_Flyby", targetPosition);
+
+            yield return new WaitForSeconds(1.5f);
+
+            // Drop explosive barrels
+            for (int i = 0; i < 3; i++)
+            {
+                Vector3 dropPos = targetPosition + new Vector3(
+                    Random.Range(-thorneAirstrikeRadius, thorneAirstrikeRadius),
+                    30f,
+                    Random.Range(-thorneAirstrikeRadius, thorneAirstrikeRadius)
+                );
+
+                GameObject barrel = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                barrel.transform.position = dropPos;
+                barrel.transform.localScale = new Vector3(1f, 2f, 1f);
+                
+                Renderer rend = barrel.GetComponent<Renderer>();
+                rend.material.color = new Color(0.8f, 0.3f, 0.1f); // Explosive orange
+
+                // Add rigidbody for falling
+                Rigidbody rb = barrel.AddComponent<Rigidbody>();
+
+                // Explosion on impact
+                StartCoroutine(BarrelExplosion(barrel, rb));
+
+                yield return new WaitForSeconds(0.3f);
+            }
+        }
+
+        IEnumerator BarrelExplosion(GameObject barrel, Rigidbody rb)
+        {
+            // Wait for impact
+            while (rb.velocity.y < -0.5f || barrel.transform.position.y > 1f)
+            {
+                yield return null;
+            }
+
+            Vector3 explosionPos = barrel.transform.position;
+            Destroy(barrel);
+
+            // Explosion VFX
+            GameObject explosion = new GameObject("Barrel_Explosion");
+            explosion.transform.position = explosionPos;
+
+            ParticleSystem ps = explosion.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startLifetime = 1f;
+            main.startSpeed = 10f;
+            main.startSize = 2f;
+            main.startColor = new Color(1f, 0.5f, 0.1f);
+            main.loop = false;
+            main.maxParticles = 100;
+
+            var emission = ps.emission;
+            emission.SetBursts(new ParticleSystem.Burst[] { new ParticleSystem.Burst(0f, 100) });
+
+            Destroy(explosion, 2f);
+
+            // Audio
+            Audio.AudioManager.Instance?.PlaySFX3D("Barrel_Explosion", explosionPos);
+
+            // Damage enemies in radius
+            Collider[] hits = Physics.OverlapSphere(explosionPos, thorneAirstrikeRadius);
+            foreach (Collider hit in hits)
+            {
+                if (hit.CompareTag("Enemy"))
+                {
+                    var health = hit.GetComponent<EnemyHealth>();
+                    if (health != null)
+                    {
+                        health.TakeDamage(thorneAirstrikeDamage);
+                        Debug.Log($"[ThorneAirstrike] {hit.name} hit for {thorneAirstrikeDamage} damage");
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Korath frost hammer strike.
+        /// Slams ground with frost energy, freezing and damaging enemies.
+        /// Available when Korath is awakened (Moon 7).
+        /// </summary>
+        public void KorathFrostHammer(Vector3 targetPosition)
+        {
+            // Check cooldown
+            if (Time.time - _korathLastUse < korathCooldown)
+            {
+                float remaining = korathCooldown - (Time.time - _korathLastUse);
+                HUDController.Instance?.ShowObjective($"Korath frost hammer on cooldown ({remaining:F0}s)");
+                return;
+            }
+
+            // Check if Korath awakened
+            if (KorathCompanionController.Instance == null || 
+                KorathCompanionController.Instance.CurrentStage != KorathCompanionController.KorathStage.Awakened)
+            {
+                HUDController.Instance?.ShowObjective("Korath not yet awakened");
+                return;
+            }
+
+            _korathLastUse = Time.time;
+
+            Debug.Log($"[CompanionCombat] Korath frost hammer at {targetPosition}");
+            StartCoroutine(ExecuteKorathFrostHammer(targetPosition));
+        }
+
+        IEnumerator ExecuteKorathFrostHammer(Vector3 targetPosition)
+        {
+            HUDController.Instance?.ShowObjective("⚡ KORATH FROST HAMMER! ⚡");
+            
+            // Korath voice
+            DialogueManager.Instance?.PlayLineById("korath_frost_hammer");
+            Audio.AudioManager.Instance?.PlaySFX2D("Korath_Voice");
+
+            yield return new WaitForSeconds(0.5f);
+
+            // Korath slams ground
+            Audio.AudioManager.Instance?.PlaySFX3D("FrostHammer_Impact", targetPosition);
+
+            // Frost explosion VFX
+            GameObject frostVFX = new GameObject("Frost_Hammer_VFX");
+            frostVFX.transform.position = targetPosition;
+
+            ParticleSystem ps = frostVFX.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startLifetime = 2f;
+            main.startSpeed = 8f;
+            main.startSize = 1.5f;
+            main.startColor = new Color(0.6f, 0.8f, 1f, 0.8f); // Icy blue
+            main.loop = false;
+            main.maxParticles = 200;
+
+            var emission = ps.emission;
+            emission.SetBursts(new ParticleSystem.Burst[] { new ParticleSystem.Burst(0f, 200) });
+
+            Destroy(frostVFX, 3f);
+
+            // Frost ring expands
+            GameObject frostRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            frostRing.transform.position = targetPosition + Vector3.up * 0.1f;
+            frostRing.transform.localScale = new Vector3(korathFrostRadius * 2f, 0.1f, korathFrostRadius * 2f);
+
+            Renderer ringRend = frostRing.GetComponent<Renderer>();
+            Material frostMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+            frostMat.color = new Color(0.5f, 0.7f, 1f, 0.5f);
+            ringRend.material = frostMat;
+
+            Destroy(frostRing, 3f);
+
+            // Damage and freeze enemies
+            Collider[] hits = Physics.OverlapSphere(targetPosition, korathFrostRadius);
+            foreach (Collider hit in hits)
+            {
+                if (hit.CompareTag("Enemy"))
+                {
+                    var health = hit.GetComponent<EnemyHealth>();
+                    if (health != null)
+                    {
+                        health.TakeDamage(korathFrostDamage);
+                        Debug.Log($"[KorathFrost] {hit.name} hit for {korathFrostDamage} damage");
+                    }
+
+                    // Apply freeze debuff
+                    var enemy = hit.GetComponent<EnemyAIController>();
+                    if (enemy != null)
+                    {
+                        enemy.ApplyFreeze(3f); // 3 second freeze
+                    }
+                }
+            }
+
+            yield return null;
+        }
+
+        public float ThorneAirstrikeCooldown => Mathf.Max(0f, thorneCooldown - (Time.time - _thorneLastUse));
+        public float KorathFrostCooldown => Mathf.Max(0f, korathCooldown - (Time.time - _korathLastUse));
+
+        public bool ThorneAirstrikeReady => ThorneAirstrikeCooldown <= 0f;
+        public bool KorathFrostReady => KorathFrostCooldown <= 0f;
+    }
+}

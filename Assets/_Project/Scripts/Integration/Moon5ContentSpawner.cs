@@ -106,6 +106,9 @@ namespace Tartaria.Integration
             var platforms = gameObject.AddComponent<FloatingPlatformProgression>();
             platforms.InitializePlatforms();
 
+            // Initialize companion combat abilities (Thorne airship support)
+            var companionCombat = gameObject.AddComponent<CompanionCombatAbilities>();
+
             // Spawn Captain Thorne NPC (after radio introduction)
             SpawnThorneNPC();
 
@@ -189,6 +192,9 @@ namespace Tartaria.Integration
                 WhiteCityPavilion pavilion = pavilionObj.AddComponent<WhiteCityPavilion>();
                 pavilion.pavilionIndex = i;
                 pavilion.OnRestored += OnPavilionRestored;
+
+                // Add amplification field component (buffs player in radius)
+                var amplificationField = pavilionObj.AddComponent<PavilionAmplificationField>();
 
                 _activePavilions.Add(pavilion);
             }

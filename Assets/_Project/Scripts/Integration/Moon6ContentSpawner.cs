@@ -129,7 +129,29 @@ namespace Tartaria.Integration
             var cinematics = gameObject.AddComponent<Moon6RhythmicArcCinematics>();
             cinematics.PlayDiscoveryCinematic();
 
-            Debug.Log($"[Moon6ContentSpawner] Living Library pipe organ spawned: 12 pipes, 6 fountains, Lirael (spectral).");
+            // Initialize organ puzzle controller (12-pipe harmonic sequences)
+            var organPuzzle = gameObject.AddComponent<Moon6OrganPuzzle>();
+            organPuzzle.OnRequiemComplete += HandleRequiemComplete;
+
+            Debug.Log($"[Moon6ContentSpawner] Living Library pipe organ spawned: 12 pipes, 6 fountains, Lirael (spectral), organ puzzle active.");
+        }
+
+        void HandleRequiemComplete()
+        {
+            _revelationUnlocked = true;
+            Debug.Log("[Moon6ContentSpawner] Cymatic Requiem complete! Revelation unlocked: 9-band purity frozen in pipes.");
+            
+            // Update Moon progress
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.SetMoonProgress(6, 100f);
+            }
+        }
+
+        public void MarkRevelationUnlocked()
+        {
+            _revelationUnlocked = true;
+            SaveState();
         }
 
         void SpawnPipeOrgan()
@@ -180,7 +202,6 @@ namespace Tartaria.Integration
                 // CrystalPipe component: IInteractable repair mechanic
                 CrystalPipe pipe = pipeObj.AddComponent<CrystalPipe>();
                 pipe.pipeIndex = i;
-                pipe.OnRepaired += OnPipeRepaired;
 
                 _activePipes.Add(pipe);
             }
@@ -212,7 +233,6 @@ namespace Tartaria.Integration
                 // HydraulicFountain component: IInteractable restoration
                 HydraulicFountain fountain = fountainObj.AddComponent<HydraulicFountain>();
                 fountain.fountainIndex = i;
-                fountain.OnRestored += OnFountainRestored;
 
                 _activeFountains.Add(fountain);
             }
