@@ -192,5 +192,14 @@ namespace Tartaria.AI
             Gizmos.color = new Color(1f, 0.5f, 0f, 0.5f);
             Gizmos.DrawWireSphere(transform.position, attackRange);
         }
+
+        /// <summary>
+        /// Apply freeze debuff (stub - full status effect system pending).
+        /// </summary>
+        public void ApplyFreeze(float duration)
+        {
+            Debug.Log($"[EnemyAI] {name} frozen for {duration}s (stub)");
+            // TODO: Implement freeze status effect (stop NavMeshAgent, visual VFX)
+        }
     }
 }

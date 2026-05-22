@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Gameplay;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -124,7 +125,7 @@ namespace Tartaria.Integration
             CreateFountainVisual(fountain.gameObject, true);
 
             // Quest progress
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.FindLocation, $"aquifer_fountain_{fountain.fountainIndex}");
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.HiddenDiscovery, $"aquifer_fountain_{fountain.fountainIndex}");
 
             // Check completion
             if (_fountainsPurged >= totalFountains)

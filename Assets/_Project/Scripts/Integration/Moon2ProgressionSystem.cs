@@ -861,5 +861,47 @@ namespace Tartaria.Integration
         {
             Moon2LunarContentSpawner.Instance?.OnFirstDissonanceVeinPurged();
         }
+
+        // --- Building-specific purge callbacks (called by Moon2BuildingRestorationSequencer) ---
+
+        public void OnCathedralDomePurged()
+        {
+            Debug.Log("[Moon2Progress] Cathedral Dome purged");
+            RegisterSitePurge("moon2_cathedral_dome");
+        }
+
+        public void OnBellTowerPurged()
+        {
+            Debug.Log("[Moon2Progress] Bell Tower purged");
+            RegisterSitePurge("moon2_bell_tower");
+        }
+
+        public void OnFountainPurged()
+        {
+            Debug.Log("[Moon2Progress] Fountain purged");
+            RegisterSitePurge("moon2_fountain");
+        }
+
+        public void OnCrystalHallPurged()
+        {
+            Debug.Log("[Moon2Progress] Crystal Hall purged");
+            RegisterSitePurge("moon2_crystal_hall");
+        }
+
+        public void OnLeyChamberPurged()
+        {
+            Debug.Log("[Moon2Progress] Ley Chamber purged");
+            RegisterSitePurge("moon2_ley_chamber");
+        }
+
+        public void GrantCapstoneIfAllPurged()
+        {
+            if (_purgedSites.Count >= 5 && !_truePurifier)
+            {
+                _truePurifier = true;
+                Debug.Log("[Moon2Progress] ★ CAPSTONE: True Lunar Purifier unlocked! ★");
+                // TODO: Grant actual capstone benefits
+            }
+        }
     }
 }

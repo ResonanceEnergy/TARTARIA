@@ -219,6 +219,21 @@ namespace Tartaria.Save
             MarkDirty();
         }
 
+        /// <summary>Set moon-specific data (Moon 4 17-hour cycle state).</summary>
+        public void SetMoonData(int moonNum, string key, int value)
+        {
+            if (_currentSave == null) return;
+            _currentSave.SetMoonFlag(moonNum, key, value);
+            MarkDirty();
+        }
+
+        /// <summary>Get moon-specific data (Moon 4 17-hour cycle state).</summary>
+        public int GetMoonData(int moonNum, string key, int defaultValue = 0)
+        {
+            if (_currentSave == null) return defaultValue;
+            return _currentSave.GetMoonFlag(moonNum, key, defaultValue);
+        }
+
         /// <summary>Global game flag (not Moon-specific). Used for endings, unlocks, etc.</summary>
         public void SetGameFlag(string key, bool value)
         {

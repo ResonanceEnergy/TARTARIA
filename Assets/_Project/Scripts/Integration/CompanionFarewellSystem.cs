@@ -121,8 +121,7 @@ namespace Tartaria.Integration
             // Final Milo line
             HUDController.Instance?.ShowDialogue(
                 "Milo",
-                "No matter what happens... I won't forget you. The mud remembers. I remember.",
-                4f
+                "No matter what happens... I won't forget you. The mud remembers. I remember."
             );
             yield return new WaitForSeconds(4f);
 
@@ -158,8 +157,7 @@ namespace Tartaria.Integration
             // Final Thorne line
             HUDController.Instance?.ShowDialogue(
                 "Thorne",
-                "Whatever choice you make... I'll build the world it needs. That's what engineers do.",
-                4f
+                "Whatever choice you make... I'll build the world it needs. That's what engineers do."
             );
             yield return new WaitForSeconds(4f);
 
@@ -197,8 +195,7 @@ namespace Tartaria.Integration
 
             HUDController.Instance?.ShowDialogue(
                 "Lirael",
-                "The song was always for you. Thank you for hearing it.",
-                6f
+                "The song was always for you. Thank you for hearing it."
             );
             yield return new WaitForSeconds(10f); // Lullaby duration
 
@@ -233,8 +230,7 @@ namespace Tartaria.Integration
             // Final Korath wisdom
             HUDController.Instance?.ShowDialogue(
                 "Korath",
-                "The bells ring. The fountains flow. The planet remembers its song. You did this. We are... grateful.",
-                6f
+                "The bells ring. The fountains flow. The planet remembers its song. You did this. We are... grateful."
             );
             yield return new WaitForSeconds(6f);
 

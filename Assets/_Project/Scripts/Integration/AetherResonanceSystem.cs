@@ -50,5 +50,12 @@ namespace Tartaria.Integration
             // TODO: Calculate actual field strength based on purged buildings
             return 0f;
         }
+
+        /// <summary>Add resonance score with description (Moon 2 restoration rewards).</summary>
+        public void AddResonance(float amount, string description)
+        {
+            Debug.Log($"[AetherResonanceSystem] AddResonance: +{amount} RS - {description}");
+            // TODO: Integrate with ResonanceScoreSystem
+        }
     }
 }

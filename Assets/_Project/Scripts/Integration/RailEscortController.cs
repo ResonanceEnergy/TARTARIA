@@ -1510,6 +1510,13 @@ namespace Tartaria.Integration
             }
         }
 
+        /// <summary>Called when a rail segment is reactivated (Moon 3 puzzle progression).</summary>
+        public void OnRailSegmentReactivated(int segmentIndex)
+        {
+            Debug.Log($"[RailEscort] Rail segment {segmentIndex} reactivated");
+            // TODO: Update rail network state, spawn effects
+        }
+
         // Helper proxy (R5 preserved, R6 health tweaks)
         public class RailWraithHealthProxy : MonoBehaviour
         {

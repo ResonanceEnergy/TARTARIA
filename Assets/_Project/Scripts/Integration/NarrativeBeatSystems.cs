@@ -112,11 +112,11 @@ namespace Tartaria.Integration
                 }
             }
 
-            // Play cinematic sequence
+            // Play cinematic sequence (pending waypoint data integration)
             if (!string.IsNullOrEmpty(beat.cinematicSequence))
             {
-                var cinemaCam = FindObjectOfType<UI.CinematicCameraController>();
-                cinemaCam?.PlaySequence(beat.cinematicSequence);
+                // var cinemaCam = FindObjectOfType<Camera.CinematicCameraController>();
+                // cinemaCam?.PlaySequence(waypointData);  // TODO: Load from CinematicWaypointSequences
             }
 
             // Trigger quest
@@ -164,11 +164,11 @@ namespace Tartaria.Integration
 
         void Start()
         {
-            // Subscribe to player action events
-            PlayerCharacter.OnJump += OnPlayerJump;
-            RestorableBuilding.OnAnyBuildingRestored += OnBuildingRestored;
-            PlayerCharacter.OnDamageTaken += OnPlayerHurt;
-            PlayerCharacter.OnResonanceGained += OnResonanceGained;
+            // Subscribe to player action events (pending PlayerCharacter implementation)
+            // PlayerCharacter.OnJump += OnPlayerJump;
+            // RestorableBuilding.OnAnyBuildingRestored += OnBuildingRestored;
+            // PlayerCharacter.OnDamageTaken += OnPlayerHurt;
+            // PlayerCharacter.OnResonanceGained += OnResonanceGained;
         }
 
         void OnPlayerJump()
@@ -192,10 +192,10 @@ namespace Tartaria.Integration
             var milo = MiloController.Instance;
             var lirael = LiraelController.Instance;
 
-            if (milo != null && CompanionManager.Instance.IsCompanionActive("milo"))
+            if (milo != null && CompanionManager.Instance?.IsCompanionActive("milo") == true)
                 milo.OnBuildingRestored(buildingId);
 
-            if (lirael != null && CompanionManager.Instance.IsCompanionActive("lirael"))
+            if (lirael != null && CompanionManager.Instance?.IsCompanionActive("lirael") == true)
                 lirael.OnBuildingRestored(buildingId);
 
             _lastReactionTime = Time.time;
@@ -273,8 +273,8 @@ namespace Tartaria.Integration
         {
             string ending = choiceIndex == 0 ? "Harmony" : choiceIndex == 1 ? "Echo" : "Reset";
 
-            // Save choice
-            Save.SaveManager.Instance?.SaveEndingChoice(ending);
+            // Save choice (SaveManager.SaveEndingChoice pending implementation)
+            Save.SaveManager.Instance?.MarkDirty();
 
             // Show ending description
             string description = choiceIndex == 0 ? harmonyDescription : choiceIndex == 1 ? echoDescription : resetDescription;
@@ -288,12 +288,12 @@ namespace Tartaria.Integration
                     DialogueManager.Instance?.PlayLineById(reactionLine);
             }
 
-            // Play ending cinematic
-            var cinemaCam = FindObjectOfType<UI.CinematicCameraController>();
-            cinemaCam?.PlaySequence($"Ending_{ending}");
+            // Play ending cinematic (pending waypoint data integration)
+            // var cinemaCam = FindObjectOfType<Camera.CinematicCameraController>();
+            // cinemaCam?.PlaySequence(waypointData);  // TODO: Load from CinematicWaypointSequences
 
-            // Achievement unlock
-            UI.AchievementToastUI.Instance?.ShowAchievement($"Ending: {ending}");
+            // Achievement unlock (AchievementToastUI pending implementation)
+            Debug.Log($"[EndingChoiceDialogue] Achievement: Ending {ending}");
 
             Debug.Log($"[EndingChoiceDialogue] Player chose: {ending}");
         }

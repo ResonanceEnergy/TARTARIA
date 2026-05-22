@@ -75,13 +75,13 @@ namespace Tartaria.Integration
                 var questDef = questMgr.GetQuestDefinition(questId);
                 var questState = questMgr.GetQuestState(questId);
 
-                if (questDef != null && questState != null && objectiveIndex < questDef.objectives.Count)
+                if (questDef != null && questState.objectiveProgress != null && objectiveIndex < questDef.objectives.Length)
                 {
                     var objective = questDef.objectives[objectiveIndex];
                     var progress = questState.objectiveProgress[objectiveIndex];
                     float progressPercent = (float)progress / objective.targetCount;
 
-                    string objectiveText = $"{questDef.title}: {objective.description} ({progress}/{objective.targetCount})";
+                    string objectiveText = $"{questDef.displayName}: {objective.description} ({progress}/{objective.targetCount})";
                     SetObjective($"{questId}_{objectiveIndex}", objectiveText, progressPercent, progress >= objective.targetCount);
                     return;
                 }

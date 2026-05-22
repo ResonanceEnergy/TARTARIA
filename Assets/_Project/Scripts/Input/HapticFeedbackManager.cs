@@ -113,6 +113,12 @@ namespace Tartaria.Input
             PlayPulse(0.6f, 0.15f);
         }
 
+        /// <summary>Medium impact haptic (Moon 2 dissonance vein interactions).</summary>
+        public void PlayMediumImpact()
+        {
+            PlayPulse(0.55f, 0.2f);
+        }
+
         // ─── Moon 2 Lunar AVH Haptics: tuning/giant, crystal resonance, fountain storm, lullaby, boss vein phases, giant synergy ───
         public void PlayClimaxRumble() { PlayCascade(0.45f, 0.95f, 0.15f, 2.8f); }
         public void PlayCrystalResonanceTuning() { PlayCascade(0.32f, 0.88f, 0.12f, 1.15f); }
@@ -122,6 +128,8 @@ namespace Tartaria.Input
         public void PlayFountainStormRumble() { PlayCascade(0.28f, 0.91f, 0.0f, 3.2f); }
         public void PlayLullabyPulse() { PlayPulse(0.22f, 0.95f); } // gentle 432Hz companion support
         public void PlayDissonanceCorruptionHit() { PlayRamp(0.75f, 0.18f, 0.7f); }
+        public void PlayThreat() { PlayPulse(0.6f, 0.3f, lowFrequency: true); }  // Threat/danger rumble
+        public void PlayContextual() { PlayPulse(0.4f, 0.15f); }  // Generic contextual feedback
 
         /// <summary>
         /// Direct F310-style rumble: low + high motor intensities held for a duration, then released.

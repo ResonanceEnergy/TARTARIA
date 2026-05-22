@@ -180,7 +180,7 @@ namespace Tartaria.Integration
             // VFX: rail turns golden, electric sparks
             if (VFXController.Instance != null)
             {
-                VFXController.Instance.PlayAetherPulse(segment.transform.position, 1.2f);
+                VFXController.Instance.PlayAetherPulse(segment.transform.position, 1.2f, Color.blue);
             }
 
             // Audio: rail activation chime (432 Hz harmonic)
@@ -196,7 +196,7 @@ namespace Tartaria.Integration
             // Notify rail escort controller
             if (RailEscortController.Instance != null)
             {
-                RailEscortController.Instance.OnRailSegmentReactivated();
+                RailEscortController.Instance.OnRailSegmentReactivated(_segmentsReactivated);
             }
 
             // Check completion
@@ -260,7 +260,7 @@ namespace Tartaria.Integration
             // VFX: golden wave travels entire rail length
             if (VFXController.Instance != null)
             {
-                VFXController.Instance.PlayAetherPulse(transform.position, 8f);
+                VFXController.Instance.PlayAetherPulse(transform.position, 8f, Color.green);
             }
 
             // Haptic celebration
