@@ -52,6 +52,10 @@ namespace Tartaria.Core
         public static event System.Action OnMoon3FastTravelUnlocked;
         public static void FireMoon3FastTravelUnlocked() => OnMoon3FastTravelUnlocked?.Invoke();
 
+        // Moon progress — fired by MoonProgressTracker (Integration) to notify UI/HUD without direct dep
+        public static event System.Action<int>  OnMoonCleared;           // moonNum 1-13
+        public static void FireMoonCleared(int moonNum) => OnMoonCleared?.Invoke(moonNum);
+
         // HUD toast / cloud toast — fired by Save assembly so UI can display without a direct Save→UI dep
         public static event System.Action<string>               OnHUDAchievementToast;
         public static event System.Action<string>               OnHUDCloudQueueToast;

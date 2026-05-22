@@ -169,6 +169,10 @@ namespace Tartaria.Audio
             Register("Moon5_ThorneRadioStatic", GenMoon5ThorneRadioStatic());
             Register("Moon5_TuningRise", GenMoon5TuningRise());
 
+            // ═══ Global — Moon Clear + End Game fanfares ═══
+            Register("moon_clear",                  GenMoonClearFanfare());
+            Register("game_complete_credits_theme", GenGameCompleteCreditsTheme());
+
             _initialized = true;
             Debug.Log($"[ProceduralSFX] Generated {_clips.Count} SFX clips.");
         }
@@ -1794,6 +1798,88 @@ namespace Tartaria.Audio
             var clip = AudioClip.Create(name, data.Length, 1, _sampleRate, false);
             clip.SetData(data, 0);
             return clip;
+        }
+
+        // ═══════════════════════════════════════════════
+        // Global Fanfares — Moon Clear + Game Complete
+        // ═══════════════════════════════════════════════
+
+        /// <summary>
+        /// Moon-clear triumphant stinger — 3-second rising 432Hz chord bloom + shimmer tail.
+        /// Plays once on each moon completion to give the player a memorable payoff moment.
+        /// </summary>
+        static AudioClip GenMoonClearFanfare()
+        {
+            int len = Samples(3.0f);
+            var data = new float[len];
+            // Root 432, PHI fifth, healing 528, octave 864 — golden chord
+            float[] freqs = { F_HARMONIC, F_HARMONIC * PHI, F_HEALING, F_HARMONIC * 2f, 648f };
+            float[] amps  = { 0.38f, 0.29f, 0.24f, 0.18f, 0.14f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                // Attack 0-0.1, sustain 0.1-0.6, decay 0.6-1.0
+                float env = t < 0.1f  ? t / 0.1f :
+                            t < 0.6f  ? 1f :
+                            Mathf.Pow(1f - (t - 0.6f) / 0.4f, 0.6f);
+                float v = 0f;
+                for (int k = 0; k < freqs.Length; k++)
+                {
+                    // Stagger entry: each harmonic blooms in 60ms later
+                    float tShifted = t - k * 0.06f;
+                    if (tShifted < 0f) continue;
+                    float kEnv = tShifted < 0.08f ? tShifted / 0.08f : env;
+                    v += Sine(i, freqs[k]) * amps[k] * kEnv;
+                }
+                // Sparkle shimmer
+                float shimmer = FilteredNoise(i, 3200f) * 0.04f * env * Mathf.Sin(t * 44f);
+                // Bell-like body bob (8 Hz tremolo on tail)
+                float vib = t > 0.3f ? 0.92f + 0.08f * Mathf.Sin(2f * Mathf.PI * 8f * t) : 1f;
+                data[i] = (v + shimmer) * vib * 0.72f;
+            }
+            return MakeClip("SFX_MoonClear", data);
+        }
+
+        /// <summary>
+        /// Game-complete credits theme — 12-second layered orchestral swell.
+        /// Full golden-ratio harmonic stack: 432 root, PHI harmonics, healing 528, celestial 1296.
+        /// Gentle pulse, warm choir pads, rising sparkle, never harsh.
+        /// </summary>
+        static AudioClip GenGameCompleteCreditsTheme()
+        {
+            int len = Samples(12.0f);
+            var data = new float[len];
+            float bRoot  = F_HARMONIC;          // 432
+            float bPHI   = bRoot * PHI;         // ~699
+            float bHeal  = F_HEALING;            // 528
+            float bCel   = F_CELESTIAL * 0.5f;  // 648
+            float bOct   = bRoot * 2f;          // 864
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                // Gentle fade-in (0-2s), full body (2-10s), fade-out (10-12s)
+                float masterEnv = t < (2f/12f)  ? t / (2f/12f) :
+                                  t < (10f/12f) ? 1f :
+                                  Mathf.Pow(1f - (t - (10f/12f)) / (2f/12f), 1.4f);
+                // Slow harmonic breathing (0.07 Hz pulse)
+                float breath = 0.88f + 0.12f * Mathf.Sin(2f * Mathf.PI * 0.07f * t);
+                // Root pad — warm sine
+                float vRoot  = Sine(i, bRoot)  * 0.34f * breath;
+                // PHI fifth — slightly detuned for warmth
+                float detune = 1f + 0.0008f * Mathf.Sin(t * 1.3f);
+                float vPHI   = Sine(i, bPHI * detune) * 0.26f * (0.8f + 0.2f * Mathf.Sin(t * 2.1f));
+                // Healing harmonic — choir-like
+                float choirMod = 0.6f + 0.4f * Mathf.Sin(t * 3.7f);
+                float vHeal  = Sine(i, bHeal) * 0.22f * choirMod;
+                // Celestial — bright shimmer, enters at t=0.2
+                float vCel   = t > 0.2f ? Sine(i, bCel) * 0.16f * (t < 0.3f ? (t-0.2f)/0.1f : 1f) : 0f;
+                // Octave bell — enters at t=0.35, slow tremolo
+                float vOct   = t > 0.35f ? Sine(i, bOct) * 0.11f * (0.7f + 0.3f * Mathf.Sin(t * 9.3f)) : 0f;
+                // Texture: filtered noise sparkle
+                float sparkle = FilteredNoise(i, 4000f) * 0.018f * masterEnv * (0.5f + 0.5f * Mathf.Sin(t * 17f));
+                data[i] = (vRoot + vPHI + vHeal + vCel + vOct + sparkle) * masterEnv * 0.68f;
+            }
+            return MakeClip("SFX_GameCompleteCredits", data);
         }
     }
 }
