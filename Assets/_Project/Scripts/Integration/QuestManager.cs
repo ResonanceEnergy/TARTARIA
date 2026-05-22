@@ -4,6 +4,7 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.UI;
 using Tartaria.Audio;
+using Tartaria.Data;
 
 namespace Tartaria.Integration
 {
@@ -16,6 +17,8 @@ namespace Tartaria.Integration
     ///   - Main: "Echoes of the Buried City" (discover + restore 3 buildings)
     ///   - Side: "Milo's Frequency" (optional companion quest)
     ///   - Side: "Golem Graveyard" (defeat all wave enemies)
+    ///
+    /// Now supports QuestDatabase integration with prerequisite validation.
     /// </summary>
     [DisallowMultipleComponent]
     public class QuestManager : MonoBehaviour, IQuestProvider, IQuestService
@@ -23,7 +26,11 @@ namespace Tartaria.Integration
         public static QuestManager Instance { get; private set; }
 
         [Header("Quest Database")]
+        [Tooltip("Legacy: individual quest definitions (deprecated - use questDatabaseAsset instead)")]
         [SerializeField] QuestDefinition[] questDatabase;
+
+        [Tooltip("New: centralized quest database with validation and prerequisite chains")]
+        [SerializeField] QuestDatabase questDatabaseAsset;
 
         readonly Dictionary<string, QuestState> _questStates = new();
         readonly Dictionary<string, QuestDefinition> _questLookup = new();
@@ -115,7 +122,63 @@ namespace Tartaria.Integration
 
         void Start()
         {
-            // Index quest database
+            // Load from new QuestDatabase asset (preferred)
+            if (questDatabaseAsset != null)
+            {
+                LoadFromQuestDatabase();
+            }
+            // Fallback to legacy quest array
+            else if (questDatabase != null)
+            {
+                LoadFromLegacyArray();
+            }
+            // Last resort: auto-populate from builder
+            else
+            {
+                LoadFromBuilder();
+            }
+
+            Debug.Log($"[QuestManager] Loaded {_questLookup.Count} quests.");
+        }
+
+        void LoadFromQuestDatabase()
+        {
+            var allQuestIds = questDatabaseAsset.GetAllQuestIds();
+            foreach (var questId in allQuestIds)
+            {
+                var quest = questDatabaseAsset.GetQuest(questId);
+                if (quest == null) continue;
+
+                _questLookup[quest.questId] = quest;
+                _questStates[quest.questId] = new QuestState
+                {
+                    status = quest.autoActivate ? QuestStatus.Active : QuestStatus.Locked,
+                    objectiveProgress = new int[quest.GetRuntimeObjectives().Length]
+                };
+            }
+
+            Debug.Log($"[QuestManager] Loaded from QuestDatabase asset: {_questLookup.Count} quests");
+        }
+
+        void LoadFromLegacyArray()
+        {
+            foreach (var quest in questDatabase)
+            {
+                if (quest == null) continue;
+                _questLookup[quest.questId] = quest;
+                _questStates[quest.questId] = new QuestState
+                {
+                    status = quest.autoActivate ? QuestStatus.Active : QuestStatus.Locked,
+                    objectiveProgress = new int[quest.objectives != null ? quest.objectives.Length : 0]
+                };
+            }
+
+            Debug.Log($"[QuestManager] Loaded from legacy array: {_questLookup.Count} quests");
+        }
+
+        void LoadFromBuilder()
+        {
+            questDatabase = QuestDatabaseBuilder.BuildAll();
             if (questDatabase != null)
             {
                 foreach (var quest in questDatabase)
@@ -128,35 +191,15 @@ namespace Tartaria.Integration
                         objectiveProgress = new int[quest.objectives != null ? quest.objectives.Length : 0]
                     };
                 }
+                Debug.Log($"[QuestManager] Auto-populated {_questLookup.Count} quests from QuestDatabaseBuilder.");
             }
-
-            // Auto-populate from QuestDatabaseBuilder if no quests loaded (Gap 5)
-            if (_questLookup.Count == 0)
-            {
-                questDatabase = QuestDatabaseBuilder.BuildAll();
-                if (questDatabase != null)
-                {
-                    foreach (var quest in questDatabase)
-                    {
-                        if (quest == null) continue;
-                        _questLookup[quest.questId] = quest;
-                        _questStates[quest.questId] = new QuestState
-                        {
-                            status = quest.autoActivate ? QuestStatus.Active : QuestStatus.Locked,
-                            objectiveProgress = new int[quest.objectives != null ? quest.objectives.Length : 0]
-                        };
-                    }
-                    Debug.Log($"[QuestManager] Auto-populated {_questLookup.Count} quests from QuestDatabaseBuilder.");
-                }
-            }
-
-            Debug.Log($"[QuestManager] Loaded {_questLookup.Count} quests.");
         }
 
         // ─── Public API ──────────────────────────────
 
         /// <summary>
         /// Activate a locked quest (e.g., when RS threshold or trigger condition met).
+        /// Now validates prerequisites if using QuestData.
         /// </summary>
         public void ActivateQuest(string questId)
         {
@@ -165,15 +208,33 @@ namespace Tartaria.Integration
             if (!_questStates.TryGetValue(questId, out var state)) return;
             if (state.status != QuestStatus.Locked) return;
 
+            // Validate prerequisites if QuestData
+            if (_questLookup.TryGetValue(questId, out var def) && def is QuestData questData)
+            {
+                if (!ValidatePrerequisites(questData))
+                {
+                    Debug.LogWarning($"[QuestManager] Cannot activate '{questId}' - prerequisites not met");
+                    return;
+                }
+            }
+
             state.status = QuestStatus.Active;
             _questStates[questId] = state;
             _questListsDirty = true;
+            
+            // Fire both legacy event and GameEvents
             OnQuestStatusChanged?.Invoke(questId, QuestStatus.Active);
+            Core.GameEvents.RaiseQuestStatusChanged(new Core.QuestStatusChangedEventArgs
+            {
+                questId = questId,
+                newStatus = QuestStatus.Active,
+                oldStatus = QuestStatus.Locked
+            });
 
-            if (_questLookup.TryGetValue(questId, out var def))
+            if (_questLookup.TryGetValue(questId, out var questDef))
             {
                 DialogueManager.Instance?.PlayContextDialogue("quest_start");
-                HUDController.Instance?.ShowInteractionPrompt($"New Quest: {def.displayName}");
+                HUDController.Instance?.ShowInteractionPrompt($"New Quest: {questDef.displayName}");
                 AudioManager.Instance?.PlaySFX2D("QuestAccept");
                 Input.HapticFeedbackManager.Instance?.PlayDiscovery();
             }
@@ -205,7 +266,16 @@ namespace Tartaria.Integration
                 def.objectives[objectiveIndex].targetCount);
 
             _questStates[questId] = state;
+            
+            // Fire both legacy event and GameEvents
             OnObjectiveProgressed?.Invoke(questId, objectiveIndex);
+            Core.GameEvents.RaiseQuestObjectiveProgressed(new Core.QuestObjectiveProgressedEventArgs
+            {
+                questId = questId,
+                objectiveIndex = objectiveIndex,
+                current = state.objectiveProgress[objectiveIndex],
+                target = def.objectives[objectiveIndex].targetCount
+            });
 
             // Check if all objectives complete
             if (AreAllObjectivesComplete(questId))
@@ -337,21 +407,37 @@ namespace Tartaria.Integration
 
         /// <summary>
         /// Marks a quest as completed and grants rewards. Can be called by Moon spawners for quest completion.
+        /// Now handles QuestData rewards (XP, items, unlocks) and auto-activates prerequisite-unlocked quests.
         /// </summary>
         public void CompleteQuest(string questId)
         {
             if (!_questStates.TryGetValue(questId, out var state)) return;
+            
+            QuestStatus oldStatus = state.status;
             state.status = QuestStatus.Completed;
             _questStates[questId] = state;
             _questListsDirty = true;
 
+            // Fire both legacy event and GameEvents
             OnQuestStatusChanged?.Invoke(questId, QuestStatus.Completed);
+            Core.GameEvents.RaiseQuestStatusChanged(new Core.QuestStatusChangedEventArgs
+            {
+                questId = questId,
+                newStatus = QuestStatus.Completed,
+                oldStatus = oldStatus
+            });
 
             if (_questLookup.TryGetValue(questId, out var def))
             {
                 // Grant RS reward
                 if (def.rsReward > 0f)
                     GameLoopController.Instance?.QueueRSReward(def.rsReward, "quest_complete");
+
+                // Grant enhanced rewards if QuestData
+                if (def is QuestData questData)
+                {
+                    GrantQuestDataRewards(questData);
+                }
 
                 DialogueManager.Instance?.PlayContextDialogue("quest_complete");
                 HUDController.Instance?.ShowInteractionPrompt($"Quest Complete: {def.displayName}");
@@ -366,6 +452,19 @@ namespace Tartaria.Integration
                     foreach (var followUp in def.followUpQuestIds)
                         ActivateQuest(followUp);
                 }
+
+                // Check for quests unlocked by this completion (prerequisite chains)
+                if (questDatabaseAsset != null)
+                {
+                    var unlockedQuests = questDatabaseAsset.GetFollowUpQuests(questId);
+                    foreach (var unlockedQuest in unlockedQuests)
+                    {
+                        if (unlockedQuest.autoActivateOnPrerequisites)
+                        {
+                            TryAutoActivateQuest(unlockedQuest);
+                        }
+                    }
+                }
             }
         }
 
@@ -373,14 +472,99 @@ namespace Tartaria.Integration
         {
             if (!_questStates.TryGetValue(questId, out var state)) return false;
             if (!_questLookup.TryGetValue(questId, out var def)) return false;
-            if (def.objectives == null) return true;
+            
+            // Use enhanced objectives if QuestData
+            var objectives = (def is QuestData qd) ? qd.GetRuntimeObjectives() : def.objectives;
+            if (objectives == null) return true;
 
-            for (int i = 0; i < def.objectives.Length; i++)
+            for (int i = 0; i < objectives.Length; i++)
             {
-                if (state.objectiveProgress[i] < def.objectives[i].targetCount)
+                if (state.objectiveProgress[i] < objectives[i].targetCount)
                     return false;
             }
             return true;
+        }
+
+        // ─── Prerequisite Validation ─────────────────
+
+        /// <summary>
+        /// Validate if prerequisites are met for a QuestData.
+        /// </summary>
+        bool ValidatePrerequisites(QuestData questData)
+        {
+            if (questData == null) return true;
+
+            float currentRS = GameLoopController.Instance?.GetCurrentRS() ?? 0f;
+            int currentLevel = PlayerProgression.Instance?.GetCurrentLevel() ?? 1;
+
+            return questData.ArePrerequisitesMet(currentRS, currentLevel, IsQuestComplete);
+        }
+
+        /// <summary>
+        /// Check if a quest is completed.
+        /// </summary>
+        bool IsQuestComplete(string questId)
+        {
+            if (!_questStates.TryGetValue(questId, out var state))
+                return false;
+            return state.status == QuestStatus.Completed;
+        }
+
+        /// <summary>
+        /// Try to auto-activate a quest if all prerequisites are met.
+        /// </summary>
+        void TryAutoActivateQuest(QuestData questData)
+        {
+            if (questData == null) return;
+
+            if (!_questStates.TryGetValue(questData.questId, out var state))
+                return;
+
+            if (state.status != QuestStatus.Locked)
+                return;
+
+            if (ValidatePrerequisites(questData))
+            {
+                ActivateQuest(questData.questId);
+            }
+        }
+
+        /// <summary>
+        /// Grant enhanced rewards from QuestData (XP, items, unlocks).
+        /// </summary>
+        void GrantQuestDataRewards(QuestData questData)
+        {
+            if (questData == null) return;
+
+            // Grant XP
+            if (questData.xpReward > 0)
+            {
+                PlayerProgression.Instance?.AddExperience(questData.xpReward);
+                Debug.Log($"[QuestManager] Granted {questData.xpReward} XP");
+            }
+
+            // Grant items
+            if (questData.itemRewards != null)
+            {
+                foreach (var itemId in questData.itemRewards)
+                {
+                    if (string.IsNullOrEmpty(itemId)) continue;
+                    InventorySystem.Instance?.AddItem(itemId, 1);
+                    Debug.Log($"[QuestManager] Granted item: {itemId}");
+                }
+            }
+
+            // Trigger unlocks
+            if (questData.unlockRewards != null)
+            {
+                foreach (var unlockId in questData.unlockRewards)
+                {
+                    if (string.IsNullOrEmpty(unlockId)) continue;
+                    // Hook to progression/unlock system
+                    PlayerProgression.Instance?.UnlockFeature(unlockId);
+                    Debug.Log($"[QuestManager] Unlocked: {unlockId}");
+                }
+            }
         }
 
         // ─── Save/Load ──────────────────────────────
