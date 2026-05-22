@@ -274,6 +274,15 @@ namespace Tartaria.Audio
         }
 
         /// <summary>
+        /// Stops a looping SFX by name. (Stub for compilation - full implementation TODO)
+        /// </summary>
+        public void StopLoopingSFX(string sfxName)
+        {
+            // TODO: Track and stop looping SFX sources
+            Debug.Log($"[AudioManager] StopLoopingSFX called for: {sfxName} (stub)");
+        }
+
+        /// <summary>
         /// Plays a named voice line at the given volume. Clips loaded from Resources/VoiceLines.
         /// </summary>
         readonly System.Collections.Generic.Dictionary<string, AudioClip> _voiceCache

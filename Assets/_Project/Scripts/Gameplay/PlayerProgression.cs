@@ -1,6 +1,6 @@
 using UnityEngine;
 using System;
-// using Tartaria.Save;  // B1 cycle-break: removed assembly dependency
+using Tartaria.Save;
 
 namespace Tartaria.Gameplay
 {
