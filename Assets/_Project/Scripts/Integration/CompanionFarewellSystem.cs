@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.UI;
+using Tartaria.Audio;
 using UnityEngine;
 
 namespace Tartaria.Integration

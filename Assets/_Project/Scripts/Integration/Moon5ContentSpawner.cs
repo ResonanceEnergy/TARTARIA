@@ -368,68 +368,6 @@ namespace Tartaria.Integration
     }
 
     /// <summary>
-    /// White City pavilion restoration mechanics.
-    /// IInteractable: player tunes pavilion → 6-band healing aura activates.
-    /// </summary>
-    public class WhiteCityPavilion : MonoBehaviour, IInteractable
-    {
-        public int pavilionIndex;
-        public event System.Action<WhiteCityPavilion> OnRestored;
-
-        bool _isRestored;
-
-        public string GetInteractPrompt() => _isRestored ? "Pavilion Restored" : "Restore Pavilion (Hold E)";
-
-        public void Interact(GameObject player)
-        {
-            if (_isRestored) return;
-
-            Debug.Log($"[WhiteCityPavilion] Pavilion {pavilionIndex} restoration begun (instant for beta).");
-            StartRestoration();
-        }
-
-        void StartRestoration()
-        {
-            _isRestored = true;
-
-            // Restoration VFX: golden shimmer particles
-            GameObject vfxObj = new GameObject("PavilionRestore_VFX");
-            vfxObj.transform.position = transform.position + Vector3.up * 3f;
-
-            ParticleSystem ps = vfxObj.AddComponent<ParticleSystem>();
-            var main = ps.main;
-            main.startLifetime = 2f;
-            main.startSpeed = 1.5f;
-            main.startSize = 0.4f;
-            main.loop = false;
-            main.maxParticles = 300;
-
-            var emission = ps.emission;
-            emission.rateOverTime = 0f;
-            emission.SetBursts(new ParticleSystem.Burst[] {
-                new ParticleSystem.Burst(0f, 300)
-            });
-
-            var shape = ps.shape;
-            shape.shapeType = ParticleSystemShapeType.Box;
-            shape.scale = new Vector3(8f, 6f, 8f);
-
-            Renderer rend = ps.GetComponent<Renderer>();
-            if (rend != null && rend.material != null)
-            {
-                rend.material.color = new Color(1f, 0.9f, 0.4f); // Golden shimmer
-            }
-
-            Destroy(vfxObj, 3f);
-
-            // Notify spawner
-            OnRestored?.Invoke(this);
-
-            Debug.Log($"[WhiteCityPavilion] Pavilion {pavilionIndex} restored. 6-band healing aura active.");
-        }
-    }
-
-    /// <summary>
     /// Thorne radio communicator interaction.
     /// First approach: plays Thorne's crackling radio introduction dialogue.
     /// </summary>
