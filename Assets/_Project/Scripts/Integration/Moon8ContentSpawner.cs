@@ -125,6 +125,9 @@ namespace Tartaria.Integration
             // Restoration: 2 additional airships in graveyard (3 total with flagship)
             SpawnAirshipGraveyard();
 
+            // Quest: repair airship armada
+            QuestManager.Instance?.ActivateQuest("moon8_airship_repair");
+
             Debug.Log($"[Moon8ContentSpawner] Thorne flagship landed. Airship graveyard: 2 ships awaiting repair.");
         }
 
@@ -218,9 +221,16 @@ namespace Tartaria.Integration
             // Audio: airship restoration hum (mercury-orb engines ignite)
             AudioManager.Instance?.PlaySFX3D(airshipRepairAudio, airship.transform.position);
 
+            // Quest progress
+            QuestManager.Instance?.ProgressObjective("moon8_airship_repair", 0);
+
+            // HUD: Show progress
+            UI.HUDController.Instance?.ShowObjective($"Airships Repaired: {_airshipsRepaired}/{totalAirships}");
+
             // Check if armada complete
             if (_airshipsRepaired >= totalAirships)
             {
+                QuestManager.Instance?.CompleteQuest("moon8_airship_repair");
                 TriggerAerialCombat();
             }
 
@@ -277,9 +287,12 @@ namespace Tartaria.Integration
             // Quest: destroy generators to save armada
             QuestManager.Instance?.ActivateQuest("moon8_aerial_combat");
 
+            // HUD: Show objective
+            UI.HUDController.Instance?.ShowObjective("Destroy 2 Dissonance Generators to stop drone attacks!");
+
             // Thorne combat dialogue
             DialogueManager.Instance?.PlayContextDialogue("moon8_thorne_combat");
-            // "All hands! Gun ports open! We didn't circle for two centuries to die in our own graveyard!"
+            Debug.Log("[Thorne] All hands! Gun ports open! We didn't circle for two centuries to die in our own graveyard!");
 
             SaveState();
         }
@@ -445,6 +458,18 @@ namespace Tartaria.Integration
                 // Note: Moon unlock via SaveManager (SaveManager.Instance?.UnlockMoon(9))
                 Debug.Log("[Moon8ContentSpawner] Moon 8 complete. Moon 9 (Prophecy Stones) unlocked.");
             }
+
+            // RS Reward for Moon completion
+            GameLoopController.Instance?.QueueRSReward(500f, "Moon 8 Complete: Airship Armada");
+
+            // HUD: Moon trophy
+            UI.HUDController.Instance?.ShowMoonTrophy("MOON 8 COMPLETE", "The Integrity of Harmonizing");
+
+            // Audio: completion fanfare
+            AudioManager.Instance?.PlaySFX2D("MoonCompleteFanfare");
+
+            // Unlock airship travel globally
+            // SaveManager global flag would go here
 
             SaveState();
         }
@@ -647,12 +672,13 @@ namespace Tartaria.Integration
     /// Dissonance generator — destructible ground target.
     /// Player must destroy both to stop drone attacks.
     /// </summary>
-    public class DissonanceGenerator : MonoBehaviour
+    public class DissonanceGenerator : MonoBehaviour, IInteractable
     {
         public int generatorIndex;
         public Moon8ContentSpawner spawner;
 
         float _health = 500f;
+        float _maxHealth = 500f;
         bool _isDestroyed;
 
         void Update()
@@ -663,6 +689,14 @@ namespace Tartaria.Integration
             {
                 light.intensity = 3f + Mathf.Sin(Time.time * 2f) * 1.5f;
             }
+        }
+
+        public string GetInteractPrompt() => _isDestroyed ? "" : $"Attack Generator [{Mathf.RoundToInt(_health / _maxHealth * 100f)}%]";
+
+        public void Interact(GameObject player)
+        {
+            // Player attacks with resonance weapon
+            TakeDamage(50f);
         }
 
         public void TakeDamage(float damage)

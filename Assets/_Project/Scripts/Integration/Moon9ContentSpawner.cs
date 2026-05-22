@@ -148,6 +148,9 @@ namespace Tartaria.Integration
             // Golden Codex at ancient library ruin
             SpawnGoldenCodex();
 
+            // Quest: collect all 6 prophecy stones
+            QuestManager.Instance?.ActivateQuest("moon9_collect_prophecy_stones");
+
             Debug.Log($"[Moon9ContentSpawner] 6 prophecy stones spawned across continent. Golden Codex awaits restoration.");
         }
 
@@ -260,12 +263,19 @@ namespace Tartaria.Integration
             // Audio: stone collection harmonic
             AudioManager.Instance?.PlaySFX3D(stoneCollectAudio, stone.transform.position);
 
+            // Quest progress
+            QuestManager.Instance?.ProgressObjective("moon9_collect_prophecy_stones", 0);
+
+            // HUD: Show progress
+            UI.HUDController.Instance?.ShowObjective($"Prophecy Stones: {_stonesCollected}/{totalStones}");
+
             // Trigger Prophecy Vision (Golden Age moment replay)
             TriggerProphecyVision(stone.stoneIndex);
 
             // Check if all stones collected
             if (_stonesCollected >= totalStones)
             {
+                QuestManager.Instance?.CompleteQuest("moon9_collect_prophecy_stones");
                 TriggerAuroraCity();
             }
 
@@ -554,6 +564,18 @@ namespace Tartaria.Integration
                 Debug.Log("[Moon9ContentSpawner] Moon 9 complete. Moon 10 (Continental Rails) unlocked.");
             }
 
+            // RS Reward for Moon completion
+            GameLoopController.Instance?.QueueRSReward(600f, "Moon 9 Complete: Solar Prophecy");
+
+            // HUD: Moon trophy
+            UI.HUDController.Instance?.ShowMoonTrophy("MOON 9 COMPLETE", "The Intention of Intention");
+
+            // Audio: completion fanfare
+            AudioManager.Instance?.PlaySFX2D("MoonCompleteFanfare");
+
+            // Unlock time-bend ability globally
+            // SaveManager global flag would go here
+
             SaveState();
         }
 
@@ -735,14 +757,19 @@ namespace Tartaria.Integration
         public Moon9ContentSpawner spawner;
 
         float _health = 2000f;
+        float _maxHealth = 2000f;
         float _attackCooldown;
         float _timeBendCooldown;
         Vector3 _spawnPos;
+        int _currentPhase = 1;
 
         void Start()
         {
             _spawnPos = transform.position;
             Debug.Log("[TemporalGuardian] Boss engaged! HP: 2000");
+
+            // Show boss health bar on HUD
+            UI.HUDController.Instance?.ShowBossHealth("Temporal Guardian", 1f);
         }
 
         void Update()
@@ -755,6 +782,16 @@ namespace Tartaria.Integration
             if (light != null)
             {
                 light.intensity = 3f + Mathf.Sin(Time.time * 3f) * 1f;
+            }
+
+            // Phase transitions
+            if (_health < 1200f && _currentPhase == 1)
+            {
+                EnterPhase2();
+            }
+            else if (_health < 600f && _currentPhase == 2)
+            {
+                EnterPhase3();
             }
 
             // Simple attack pattern (placeholder for beta)
@@ -774,22 +811,66 @@ namespace Tartaria.Integration
             }
         }
 
+        void EnterPhase2()
+        {
+            _currentPhase = 2;
+            Debug.Log("[TemporalGuardian] PHASE 2: Time fractures — temporal rifts open!");
+
+            // VFX: rifts appear
+            // Audio phase transition
+            Audio.AudioManager.Instance?.PlaySFX3D("BossPhase2", transform.position);
+
+            // Spawn temporal rifts around boss
+            for (int i = 0; i < 4; i++)
+            {
+                float angle = i * 90f * Mathf.Deg2Rad;
+                Vector3 riftPos = transform.position + new Vector3(Mathf.Cos(angle) * 15f, 0f, Mathf.Sin(angle) * 15f);
+
+                GameObject rift = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                rift.name = $"TemporalRift_{i}";
+                rift.transform.position = riftPos;
+                rift.transform.localScale = Vector3.one * 3f;
+                
+                Renderer rend = rift.GetComponent<Renderer>();
+                rend.material.color = new Color(0.7f, 0.9f, 1f, 0.6f);
+            }
+        }
+
+        void EnterPhase3()
+        {
+            _currentPhase = 3;
+            Debug.Log("[TemporalGuardian] PHASE 3: Timeline collapse imminent!");
+
+            // VFX: boss form distorts
+            // Audio phase transition
+            Audio.AudioManager.Instance?.PlaySFX3D("BossPhase3", transform.position);
+
+            // Speed up attacks
+            _attackCooldown = 2f;
+            _timeBendCooldown = 4f;
+        }
+
         void TemporalBlast()
         {
             Debug.Log("[TemporalGuardian] Temporal blast!");
             // Spawn projectiles toward player (simplified for beta)
+            Audio.AudioManager.Instance?.PlaySFX3D("TemporalBlast", transform.position);
         }
 
         void TimeBendAttack()
         {
             Debug.Log("[TemporalGuardian] Time-bend field! Player slowed!");
             // Apply slow debuff to player within radius
+            Audio.AudioManager.Instance?.PlaySFX3D("TimeBend", transform.position);
         }
 
         public void TakeDamage(float damage)
         {
             _health -= damage;
             Debug.Log($"[TemporalGuardian] Took {damage} damage, {_health} HP remaining");
+
+            // Update HUD boss health
+            UI.HUDController.Instance?.UpdateBossHealth(_health / _maxHealth);
 
             if (_health <= 0f)
             {
@@ -800,6 +881,9 @@ namespace Tartaria.Integration
         void DefeatBoss()
         {
             Debug.Log("[TemporalGuardian] DEFEATED! Clock tower blueprint obtained!");
+
+            // Hide boss health bar
+            UI.HUDController.Instance?.HideBossHealth();
 
             // Death VFX
             GameObject vfxObj = new GameObject("BossDefeat_VFX");
@@ -817,6 +901,12 @@ namespace Tartaria.Integration
             emission.SetBursts(new ParticleSystem.Burst[] { new ParticleSystem.Burst(0f, 1000) });
 
             Destroy(vfxObj, 4f);
+
+            // Audio: boss defeat
+            Audio.AudioManager.Instance?.PlaySFX3D("BossDefeat", transform.position);
+
+            // RS Reward for boss kill
+            GameLoopController.Instance?.QueueRSReward(200f, "Temporal Guardian Defeated");
 
             // Notify spawner
             spawner?.OnBossDefeated();
