@@ -169,7 +169,7 @@ namespace Tartaria.Integration
             // Create train puzzle system
             var puzzleGO = new GameObject("Moon3_TrainPuzzle");
             puzzleGO.transform.position = trainSpawnPoint;
-            _trainPuzzle = puzzleGO.AddComponent<Gameplay.Moon3OrphanTrainPuzzle>();
+            _trainPuzzle = puzzleGO.AddComponent<Moon3OrphanTrainPuzzle>();
             _trainPuzzle.InitializePuzzle(trainSpawnPoint);
 
             // Subscribe to completion
