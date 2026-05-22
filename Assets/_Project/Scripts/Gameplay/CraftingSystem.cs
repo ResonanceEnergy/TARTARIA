@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Audio;
 using Tartaria.Core;
+using Tartaria.Data;
 using Tartaria.Input;
 
 namespace Tartaria.Gameplay
@@ -50,7 +51,7 @@ namespace Tartaria.Gameplay
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
-            RegisterDefaultRecipes();
+            LoadRecipesFromDatabase();
         }
 
         void OnDestroy()
@@ -252,124 +253,48 @@ namespace Tartaria.Gameplay
             return applied;
         }
 
-        // ─── Default Recipes ───
+        // ─── Recipe Database Loading ───
 
-        void RegisterDefaultRecipes()
+        /// <summary>
+        /// Load all recipes from the external CraftingRecipeDatabase ScriptableObject.
+        /// Replaces the old RegisterDefaultRecipes() hardcoded method.
+        /// </summary>
+        void LoadRecipesFromDatabase()
         {
-            // Common tier (Moon 1)
-            RegisterRecipe(new CraftingRecipe
+            var database = Resources.Load<CraftingRecipeDatabase>("CraftingRecipeDatabase");
+            if (database == null)
             {
-                recipeId = "repair_kit",
-                displayName = "Repair Kit",
-                requiredTier = MaterialTier.Common,
-                outputItemId = "repair_kit",
-                outputCount = 1,
-                costs = new[] { new CraftingCost(CurrencyType.AetherShards, 30) }
-            });
-            RegisterRecipe(new CraftingRecipe
-            {
-                recipeId = "aether_potion",
-                displayName = "Aether Potion",
-                requiredTier = MaterialTier.Common,
-                outputItemId = "aether_potion",
-                outputCount = 1,
-                costs = new[] { new CraftingCost(CurrencyType.AetherShards, 50) }
-            });
+                Debug.LogWarning("[CraftingSystem] CraftingRecipeDatabase not found in Resources folder. No recipes loaded.");
+                return;
+            }
 
-            // Uncommon tier (Moon 2-3)
-            RegisterRecipe(new CraftingRecipe
+            int loaded = 0;
+            foreach (var recipeData in database.recipes)
             {
-                recipeId = "resonance_amplifier",
-                displayName = "Resonance Amplifier",
-                requiredTier = MaterialTier.Uncommon,
-                outputItemId = "resonance_amplifier",
-                outputCount = 1,
-                costs = new[]
-                {
-                    new CraftingCost(CurrencyType.AetherShards, 100),
-                    new CraftingCost(CurrencyType.HarmonicFragments, 5)
-                }
-            });
+                if (recipeData == null) continue;
 
-            // Rare tier (Moon 4-6)
-            RegisterRecipe(new CraftingRecipe
-            {
-                recipeId = "echo_lens",
-                displayName = "Echo Lens",
-                requiredTier = MaterialTier.Rare,
-                outputItemId = "echo_lens",
-                outputCount = 1,
-                costs = new[]
+                // Convert CraftingRecipeData to runtime CraftingRecipe
+                var runtimeCosts = new CraftingCost[recipeData.costs.Length];
+                for (int i = 0; i < recipeData.costs.Length; i++)
                 {
-                    new CraftingCost(CurrencyType.ResonanceCrystals, 10),
-                    new CraftingCost(CurrencyType.EchoMemories, 3)
+                    runtimeCosts[i] = new CraftingCost(recipeData.costs[i].currency, recipeData.costs[i].amount);
                 }
-            });
 
-            // Epic tier (Moon 7-9)
-            RegisterRecipe(new CraftingRecipe
-            {
-                recipeId = "harmonic_blade",
-                displayName = "Harmonic Blade",
-                requiredTier = MaterialTier.Epic,
-                outputItemId = "harmonic_blade",
-                outputCount = 1,
-                costs = new[]
+                var runtimeRecipe = new CraftingRecipe
                 {
-                    new CraftingCost(CurrencyType.ResonanceCrystals, 25),
-                    new CraftingCost(CurrencyType.CrystallineDust, 10),
-                    new CraftingCost(CurrencyType.ForgeTokens, 5)
-                }
-            });
+                    recipeId = recipeData.recipeId,
+                    displayName = recipeData.displayName,
+                    requiredTier = recipeData.requiredTier,
+                    outputItemId = recipeData.outputItemId,
+                    outputCount = recipeData.outputCount,
+                    costs = runtimeCosts
+                };
 
-            // Legendary tier (Moon 10-12)
-            RegisterRecipe(new CraftingRecipe
-            {
-                recipeId = "void_anchor",
-                displayName = "Void Anchor",
-                requiredTier = MaterialTier.Legendary,
-                outputItemId = "void_anchor",
-                outputCount = 1,
-                costs = new[]
-                {
-                    new CraftingCost(CurrencyType.StarFragments, 5),
-                    new CraftingCost(CurrencyType.CrystallineDust, 20),
-                    new CraftingCost(CurrencyType.ForgeTokens, 15)
-                }
-            });
+                RegisterRecipe(runtimeRecipe);
+                loaded++;
+            }
 
-            // Ascendant tier (Moon 13)
-            RegisterRecipe(new CraftingRecipe
-            {
-                recipeId = "truth_resonator",
-                displayName = "Truth Resonator",
-                requiredTier = MaterialTier.Ascendant,
-                outputItemId = "truth_resonator",
-                outputCount = 1,
-                costs = new[]
-                {
-                    new CraftingCost(CurrencyType.StarFragments, 15),
-                    new CraftingCost(CurrencyType.HarmonicFragments, 50),
-                    new CraftingCost(CurrencyType.ForgeTokens, 25)
-                }
-            });
-
-            // Mythic tier (Day Out of Time)
-            RegisterRecipe(new CraftingRecipe
-            {
-                recipeId = "eternal_frequency_key",
-                displayName = "Eternal Frequency Key",
-                requiredTier = MaterialTier.Mythic,
-                outputItemId = "eternal_frequency_key",
-                outputCount = 1,
-                costs = new[]
-                {
-                    new CraftingCost(CurrencyType.StarFragments, 50),
-                    new CraftingCost(CurrencyType.EchoMemories, 30),
-                    new CraftingCost(CurrencyType.CrystallineDust, 40),
-                    new CraftingCost(CurrencyType.ForgeTokens, 30)
-                }
-            });
+            Debug.Log($"[CraftingSystem] Loaded {loaded} recipes from database (Total in DB: {database.GetRecipeCount()})");
         }
 
         // ─── Save / Load ───
