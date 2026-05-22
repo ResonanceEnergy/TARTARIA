@@ -17,21 +17,37 @@ namespace Tartaria.Gameplay
     /// <summary>Combat balance constants — single source of truth for tuning values.</summary>
     public static class CombatBalance
     {
+        // Core Loop Tuning — Agent 10 Balance Pass
+        public const float PlayerBaseMeleeDamage = 20f;  // 15 hits to kill golem
+        public const float GolemAttackDamage = 15f;      // ~7 hits to kill player (100 HP)
+        
         // Resonance Pulse — AOE frequency-matched attack
         public const float PulseFreqTolerance = 20f;
         public const float PulseFreqMatchBonus = 1.5f;
 
         // Harmonic Strike — directed frequency-matched attack
-        public const float StrikeBaseMultiplier = 1.25f;
+        public const float StrikeBaseMultiplier = 5f;  // 100 damage (3 strikes = golem kill)
         public const float StrikeFreqTolerance = 10f;
         public const float StrikeTightMatchBonus = 1.6f;
 
         // Enemy defaults
-        public const float DefaultEnemyHP = 100f;
+        public const float DefaultEnemyHP = 300f;  // Golem HP (tuned for 15 melees OR 3 harmonics)
         public const float DefaultDissonantFreq = 174f;
         public const float DefaultMoveSpeed = 4f;
         public const float DefaultAttackRange = 3f;
         public const float BossAttackRange = 8f;
+        
+        // Tuning Mini-Game Balance
+        public const float TuningToleranceEasy = 10f;   // ±10 Hz (easy mode)
+        public const float TuningToleranceHard = 5f;    // ±5 Hz (hard mode)
+        
+        // Rewards — Agent 10 Economy Tuning
+        public const int RSPerBuilding = 50;
+        public const int RSPerEnemy = 10;
+        public const int XPPerBuilding = 25;
+        public const int XPPerEnemy = 10;
+        public const int XPPerQuest = 100;
+        public const int Level2Requirement = 150;  // 1.5 buildings + 2 enemies
     }
 
     [UpdateInGroup(typeof(SimulationSystemGroup))]
