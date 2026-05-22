@@ -2,8 +2,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
+using Tartaria.Core;
+using Tartaria.Integration;
 
-namespace Tartaria.UI
+namespace Tartaria.Integration
 {
     /// <summary>
     /// ObjectiveTrackerUI — persistent on-screen quest/checkpoint tracker.
@@ -42,7 +44,7 @@ namespace Tartaria.UI
         void Start()
         {
             // Subscribe to QuestManager events
-            var questMgr = Integration.QuestManager.Instance;
+            var questMgr = Tartaria.Integration.QuestManager.Instance;
             if (questMgr != null)
             {
                 questMgr.OnObjectiveProgressed += OnObjectiveProgressed;
@@ -66,14 +68,33 @@ namespace Tartaria.UI
 
         void OnObjectiveProgressed(string questId, int objectiveIndex)
         {
-            // TODO: Get objective text from QuestManager
+            // Fetch objective text from QuestManager
+            var questMgr = Integration.QuestManager.Instance;
+            if (questMgr != null)
+            {
+                var questDef = questMgr.GetQuestDefinition(questId);
+                var questState = questMgr.GetQuestState(questId);
+
+                if (questDef != null && questState != null && objectiveIndex < questDef.objectives.Count)
+                {
+                    var objective = questDef.objectives[objectiveIndex];
+                    var progress = questState.objectiveProgress[objectiveIndex];
+                    float progressPercent = (float)progress / objective.targetCount;
+
+                    string objectiveText = $"{questDef.title}: {objective.description} ({progress}/{objective.targetCount})";
+                    SetObjective($"{questId}_{objectiveIndex}", objectiveText, progressPercent, progress >= objective.targetCount);
+                    return;
+                }
+            }
+
+            // Fallback if QuestManager unavailable
             string objectiveId = $"{questId}_{objectiveIndex}";
             SetObjective(objectiveId, $"Quest {questId} - Objective {objectiveIndex}", 0.5f);
         }
 
-        void OnMoonCleared(int moonIndex, string moonName)
+        void OnMoonCleared(int moonIndex)
         {
-            SetObjective($"moon_{moonIndex}_complete", $"Moon {moonIndex}: {moonName} Cleared!", 1f, true);
+            SetObjective($"moon_{moonIndex}_complete", $"Moon {moonIndex} Cleared!", 1f, true);
         }
 
         /// <summary>
@@ -196,8 +217,7 @@ namespace Tartaria.UI
             // Fade in
             if (canvasGroup != null)
             {
-                canvasGroup.alpha = 0f;
-                LeanTween.alphaCanvas(canvasGroup, 1f, 0.5f).setEase(LeanTweenType.easeOutQuad);
+                StartCoroutine(FadeInCoroutine(canvasGroup, 0.5f));
             }
         }
 
@@ -215,8 +235,8 @@ namespace Tartaria.UI
             if (checkmarkIcon != null && isComplete)
             {
                 checkmarkIcon.SetActive(true);
-                // Pulse animation
-                LeanTween.scale(checkmarkIcon, Vector3.one * 1.2f, 0.2f).setEase(LeanTweenType.easeOutBack);
+                // Pulse animation (simple scale bounce)
+                StartCoroutine(PulseScaleCoroutine(checkmarkIcon.transform, 1.2f, 0.2f));
             }
 
             if (isComplete && objectiveText != null)
@@ -230,17 +250,72 @@ namespace Tartaria.UI
         {
             if (canvasGroup != null)
             {
-                LeanTween.alphaCanvas(canvasGroup, 0f, duration).setOnComplete(() =>
+                StartCoroutine(FadeOutCoroutine(canvasGroup, duration, () =>
                 {
                     onComplete?.Invoke();
                     onRemove?.Invoke();
-                });
+                }));
             }
             else
             {
                 onComplete?.Invoke();
                 onRemove?.Invoke();
             }
+        }
+
+        System.Collections.IEnumerator FadeInCoroutine(CanvasGroup cg, float duration)
+        {
+            cg.alpha = 0f;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                cg.alpha = Mathf.Lerp(0f, 1f, elapsed / duration);
+                yield return null;
+            }
+            cg.alpha = 1f;
+        }
+
+        System.Collections.IEnumerator FadeOutCoroutine(CanvasGroup cg, float duration, System.Action onComplete)
+        {
+            float startAlpha = cg.alpha;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                cg.alpha = Mathf.Lerp(startAlpha, 0f, elapsed / duration);
+                yield return null;
+            }
+            cg.alpha = 0f;
+            onComplete?.Invoke();
+        }
+
+        System.Collections.IEnumerator PulseScaleCoroutine(Transform target, float targetScale, float duration)
+        {
+            Vector3 originalScale = target.localScale;
+            Vector3 pulseScale = Vector3.one * targetScale;
+            float elapsed = 0f;
+            
+            // Scale up
+            while (elapsed < duration / 2f)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / (duration / 2f);
+                target.localScale = Vector3.Lerp(originalScale, pulseScale, t);
+                yield return null;
+            }
+            
+            // Scale back down
+            elapsed = 0f;
+            while (elapsed < duration / 2f)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / (duration / 2f);
+                target.localScale = Vector3.Lerp(pulseScale, originalScale, t);
+                yield return null;
+            }
+            
+            target.localScale = originalScale;
         }
     }
 }

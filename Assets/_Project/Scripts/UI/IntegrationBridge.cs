@@ -33,7 +33,7 @@ namespace Tartaria.UI
         public static float GetPlayerCurrentFrequency()
         {
             Resolve();
-            if (_combatBridge == null) return 0f;
+            if (_combatBridge == null) return -1f; // Sentinel: CombatBridge not loaded
             try
             {
                 var m = _combatBridge.GetMethod("GetPlayerCurrentFrequency", BindingFlags.Public | BindingFlags.Static);
@@ -41,7 +41,7 @@ namespace Tartaria.UI
                     return (float)m.Invoke(null, null);
             }
             catch (Exception e) { Debug.LogWarning($"[IntegrationBridge] GetPlayerCurrentFrequency: {e.Message}"); }
-            return 0f;
+            return -1f; // Sentinel: error during reflection call
         }
 
         // --- BossEncounterSystem -------------------------------------------

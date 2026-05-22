@@ -48,6 +48,9 @@ namespace Tartaria.Input
         bool _firstMove = true;
         float _externalMoveMultiplier = 1f;
 
+        /// <summary>Debug: External speed multiplier (set via DebugConsole /speed command).</summary>
+        public float SpeedMultiplier { get => _externalMoveMultiplier; set => _externalMoveMultiplier = Mathf.Clamp(value, 0.1f, 10f); }
+
         // Input actions (bound from InputActionAsset)
         InputAction _moveAction;
         InputAction _sprintAction;

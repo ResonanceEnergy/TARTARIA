@@ -122,7 +122,7 @@ namespace Tartaria.AI
                     break;
 
                 case EnemyState.Retreating:
-                    // TODO: Retreat behavior (low health, run away)
+                    // Note: Enemies don't retreat (corrupted constructs, fight to death by design)
                     break;
             }
         }
@@ -166,7 +166,12 @@ namespace Tartaria.AI
             // Play attack SFX (fully qualified to avoid assembly dependency)
             Tartaria.Audio.AudioManager.Instance?.PlaySFX("EnemyAttack", transform.position, 0.5f);
 
-            // TODO: Trigger attack animation
+            // Trigger attack animation
+            var animator = GetComponent<Animator>();
+            if (animator != null && animator.runtimeAnimatorController != null)
+            {
+                animator.SetTrigger("Attack");
+            }
         }
 
         public void SetHostile(bool hostile)

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 using Tartaria.Core;  // QuestStatus enum
 
 namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integration assembly (wires QuestManager→UI)
@@ -72,22 +73,44 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
         {
             ClearEntries();
 
-            // TODO: Fetch quests from QuestManager
-            // For now, display placeholder entries
+            // Fetch active and completed quests from QuestManager
+            var questMgr = Integration.QuestManager.Instance;
+            if (questMgr == null)
+            {
+                Debug.LogWarning("[QuestLogUI] QuestManager not available, showing placeholder");
+                AddPlaceholderEntries();
+                return;
+            }
+
+            var activeQuests = questMgr.GetActiveQuestIds();
+            var completedQuests = questMgr.GetCompletedQuestIds();
 
             if (groupByMoon)
             {
-                for (int moon = 2; moon <= 13; moon++)
+                // Group quests by Moon number
+                for (int moon = 1; moon <= 13; moon++)
                 {
-                    AddMoonSection(moon);
+                    var moonQuests = activeQuests.Where(qid => qid.StartsWith($"moon{moon}")).ToList();
+                    if (moonQuests.Count > 0)
+                    {
+                        AddMoonSectionWithQuests(moon, moonQuests);
+                    }
                 }
             }
             else
             {
-                AddPlaceholderEntries();
+                // Flat list of all quests
+                foreach (var qid in activeQuests)
+                {
+                    AddQuestEntry(qid, QuestStatus.Active);
+                }
+                foreach (var qid in completedQuests)
+                {
+                    AddQuestEntry(qid, QuestStatus.Completed);
+                }
             }
 
-            Debug.Log("[QuestLogUI] Refreshed quest log");
+            Debug.Log($"[QuestLogUI] Refreshed with {activeQuests.Count} active, {completedQuests.Count} completed");
         }
 
         void AddMoonSection(int moonNumber)
@@ -101,9 +124,24 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
                 _entries.Add(header);
             }
 
-            // Add quests for this Moon (placeholder)
-            // TODO: Query QuestManager for moon-specific quests
-            AddPlaceholderQuest($"moon{moonNumber}_primary", $"Moon {moonNumber} Primary Quest", 0.75f);
+            // Add quests for this Moon
+            var questMgr = Integration.QuestManager.Instance;
+            if (questMgr != null)
+            {
+                var moonQuests = questMgr.GetActiveQuestIds()
+                    .Where(qid => qid.StartsWith($"moon{moonNumber}"))
+                    .ToList();
+
+                foreach (var qid in moonQuests)
+                {
+                    AddQuestEntry(qid, QuestStatus.Active);
+                }
+            }
+            else
+            {
+                // Fallback placeholder
+                AddPlaceholderQuest($"moon{moonNumber}_primary", $"Moon {moonNumber} Primary Quest", 0.75f);
+            }
         }
 
         void AddPlaceholderEntries()
@@ -186,7 +224,12 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
             if (!_isHeader && !string.IsNullOrEmpty(_questId))
             {
                 Debug.Log($"[QuestLogUI] Clicked quest {_questId}");
-                // TODO: Show detailed quest panel
+                // Show detailed quest panel (QuestDetailPanel UI integration pending)
+                var detailPanel = FindFirstObjectByType<QuestDetailPanel>();
+                if (detailPanel != null)
+                {
+                    detailPanel.ShowQuest(_questId);
+                }
             }
         }
     }

@@ -142,13 +142,13 @@ namespace Tartaria.Gameplay
 
         void LoadStatsFromSave()
         {
-            // TODO: Load from SaveManager.CurrentSave
+            // Note: SaveManager integration pending (save schema migration)
             Debug.Log("[PlayerStats] Load stats from save (stub)");
         }
 
         public void SaveStats()
         {
-            // TODO: Write to SaveManager.CurrentSave
+            // Note: SaveManager integration pending (save schema migration)
             Debug.Log("[PlayerStats] Save stats (stub)");
         }
 

@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tartaria.Core
+namespace Tartaria.UI
 {
     /// <summary>
     /// DebugConsole — in-game command terminal for testing + cheats.
@@ -71,7 +71,7 @@ namespace Tartaria.Core
         void Update()
         {
             // Toggle console
-            if (Input.GetKeyDown(toggleKey) || Input.GetKeyDown(toggleKeyAlt))
+            if (UnityEngine.Input.GetKeyDown(toggleKey) || UnityEngine.Input.GetKeyDown(toggleKeyAlt))
             {
                 ToggleConsole();
             }
@@ -79,17 +79,17 @@ namespace Tartaria.Core
             if (!_isVisible) return;
 
             // Command history navigation
-            if (Input.GetKeyDown(KeyCode.UpArrow))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.UpArrow))
             {
                 NavigateHistory(-1);
             }
-            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            else if (UnityEngine.Input.GetKeyDown(KeyCode.DownArrow))
             {
                 NavigateHistory(1);
             }
 
             // Submit command
-            if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Return) || UnityEngine.Input.GetKeyDown(KeyCode.KeypadEnter))
             {
                 if (inputField != null && !string.IsNullOrWhiteSpace(inputField.text))
                 {
@@ -100,7 +100,7 @@ namespace Tartaria.Core
             }
 
             // Auto-complete with Tab
-            if (Input.GetKeyDown(KeyCode.Tab))
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Tab))
             {
                 AutoComplete();
             }
@@ -149,8 +149,26 @@ namespace Tartaria.Core
                 if (args.Length < 1) { LogError("Usage: /rs <amount>"); return; }
                 if (float.TryParse(args[0], out float amount))
                 {
-                    // TODO: Access ResonanceScoreTracker and set RS
-                    Log($"RS set to {amount} (TODO: wire to ResonanceScoreTracker)");
+                    var trackerType = System.Type.GetType("Tartaria.Integration.RunProgressTracker, Tartaria.Integration");
+                    var tracker = trackerType != null ? FindObjectOfType(trackerType) : null;
+                    if (tracker != null)
+                    {
+                        // Set RS via reflection or direct access
+                        var field = tracker.GetType().GetField("_totalRS", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                        if (field != null)
+                        {
+                            field.SetValue(tracker, amount);
+                            Log($"RS set to {amount}");
+                        }
+                        else
+                        {
+                            LogError("RS field not found (reflection failed)");
+                        }
+                    }
+                    else
+                    {
+                        LogError("RunProgressTracker not found");
+                    }
                 }
                 else
                 {
@@ -190,8 +208,8 @@ namespace Tartaria.Core
                     var health = player.GetComponent<Gameplay.PlayerHealth>();
                     if (health != null)
                     {
-                        // TODO: Add godmode flag to PlayerHealth
-                        Log("Godmode toggled (TODO: implement in PlayerHealth)");
+                        health.GodMode = !health.GodMode;
+                        Log($"Godmode {(health.GodMode ? "ON" : "OFF")}");
                     }
                     else
                     {
@@ -209,8 +227,24 @@ namespace Tartaria.Core
                 if (args.Length < 1) { LogError("Usage: /speed <N>"); return; }
                 if (float.TryParse(args[0], out float speed))
                 {
-                    // TODO: Access PlayerMovement and set speed multiplier
-                    Log($"Speed multiplier set to {speed} (TODO: wire to PlayerMovement)");
+                    var player = GameObject.FindGameObjectWithTag("Player");
+                    if (player != null)
+                    {
+                        var inputHandler = player.GetComponent<Input.PlayerInputHandler>();
+                        if (inputHandler != null)
+                        {
+                            inputHandler.SpeedMultiplier = speed;
+                            Log($"Speed multiplier set to {speed}");
+                        }
+                        else
+                        {
+                            LogError("Player has no PlayerInputHandler");
+                        }
+                    }
+                    else
+                    {
+                        LogError("Player not found");
+                    }
                 }
                 else
                 {

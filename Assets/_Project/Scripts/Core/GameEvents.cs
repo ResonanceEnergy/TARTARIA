@@ -63,6 +63,18 @@ namespace Tartaria.Core
         public static void FireHUDAchievementToast(string msg)                                             => OnHUDAchievementToast?.Invoke(msg);
         public static void FireHUDCloudQueueToast(string msg)                                              => OnHUDCloudQueueToast?.Invoke(msg);
         public static void FireHUDSaveConflictPrompt(string localSummary, string cloudSummary, string act) => OnHUDSaveConflictPrompt?.Invoke(localSummary, cloudSummary, act);
+
+        // Weather hazards — fired by WeatherHazardSystem
+        public static event System.Action<int, float> OnWeatherHazardStarted;  // (hazardType, duration)
+        public static event System.Action<int>        OnWeatherHazardEnded;     // (hazardType)
+        public static void FireWeatherHazardStarted(int hazardType, float duration) => OnWeatherHazardStarted?.Invoke(hazardType, duration);
+        public static void FireWeatherHazardEnded(int hazardType)                  => OnWeatherHazardEnded?.Invoke(hazardType);
+
+        // New Game Plus — fired by NewGamePlusSystem
+        public static event System.Action<int> OnNewGamePlusStarted;      // ngPlusCycle
+        public static event System.Action<int> OnPermanentUnlockEarned;   // rewardId
+        public static void FireNewGamePlusStarted(int ngPlusCycle)      => OnNewGamePlusStarted?.Invoke(ngPlusCycle);
+        public static void FirePermanentUnlockEarned(int rewardId)     => OnPermanentUnlockEarned?.Invoke(rewardId);
     }
 
     /// <summary>

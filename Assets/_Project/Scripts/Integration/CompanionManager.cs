@@ -208,7 +208,7 @@ namespace Tartaria.Integration
             var em = world.EntityManager;
 
             var query = em.CreateEntityQuery(typeof(CompanionTag), typeof(CompanionBehavior));
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {
                 var tag = em.GetComponentData<CompanionTag>(entities[i]);
@@ -230,7 +230,6 @@ namespace Tartaria.Integration
                     break;
                 }
             }
-            entities.Dispose();
             query.Dispose();
 
             Debug.Log($"[CompanionManager R7 MOON2] PhysicalTellForBeat triggered for {companionId} beat={beatType} (cathedral/corruption/crystal reactivity + DOTS tell + mutation)");
@@ -246,7 +245,7 @@ namespace Tartaria.Integration
             var em = world.EntityManager;
 
             var query = em.CreateEntityQuery(typeof(CompanionTag), typeof(CompanionBehavior));
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {
                 var tag = em.GetComponentData<CompanionTag>(entities[i]);
@@ -270,7 +269,6 @@ namespace Tartaria.Integration
                     break;
                 }
             }
-            entities.Dispose();
             query.Dispose();
         }
 
@@ -281,19 +279,17 @@ namespace Tartaria.Integration
             var em = world.EntityManager;
 
             var query = em.CreateEntityQuery(typeof(CompanionTag), typeof(CompanionBehavior));
-            var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using var entities = query.ToEntityArray(Unity.Collections.Allocator.Temp);
             for (int i = 0; i < entities.Length; i++)
             {
                 var tag = em.GetComponentData<CompanionTag>(entities[i]);
                 if (tag.CompanionId == companionId)
                 {
                     var b = em.GetComponentData<CompanionBehavior>(entities[i]);
-                    entities.Dispose();
                     query.Dispose();
                     return (b.RedemptionLevel, b.CompanionBondLevel, b.IsEscorting, b.SolidificationActive, b.RedemptionChoiceMade, b.In17thHourMode, b.WorldMutationTier, b.GiantSynergyActive, b.CalendarEchoActive);
                 }
             }
-            entities.Dispose();
             query.Dispose();
             return (0, 0, false, false, false, false, 0, false, false);
         }

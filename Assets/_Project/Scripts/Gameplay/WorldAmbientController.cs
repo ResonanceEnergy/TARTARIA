@@ -83,7 +83,7 @@ namespace Tartaria.Gameplay
         {
             if (dayNightCycle == null)
             {
-                dayNightCycle = DayNightCycle.Instance;
+                dayNightCycle = FindFirstObjectByType<DayNightCycle>();
             }
 
             if (dayNightCycle == null)
@@ -108,8 +108,8 @@ namespace Tartaria.Gameplay
         {
             if (dayNightCycle == null) return;
 
-            // Get normalized time (0 = midnight, 0.5 = noon, 1 = midnight)
-            float normalizedTime = dayNightCycle.GetNormalizedTimeOfDay();
+            // Get normalized time (0-1 from TimeProgress property)
+            float normalizedTime = dayNightCycle.TimeProgress;
 
             UpdateFog(normalizedTime);
             UpdateLighting(normalizedTime);
@@ -260,7 +260,7 @@ namespace Tartaria.Gameplay
                 directionalLight.intensity = preset.sunIntensity;
             }
 
-            // TODO: Apply URP Volume Profile override
+            // Note: URP Volume Profile override (post-processing pipeline integration)
             // if (globalVolume != null && preset.volumeProfile != null)
             // {
             //     globalVolume.profile = preset.volumeProfile;

@@ -27,53 +27,55 @@ namespace Tartaria.Camera
         bool _isActive;
         float _nextSwitchTime;
         bool _onSpeaker = true; // true = shoulder-cam, false = reaction-cam
+    Transform _cachedPlayer;
 
-        object _dialogueManagerInstance;
-        PropertyInfo _isActiveProp;
-        System.Type _dmType;
-        PropertyInfo _dmInstanceProp;
-        float _nextResolveAttempt;
-        bool _resolveWarned;
+    object _dialogueManagerInstance;
+    PropertyInfo _isActiveProp;
+    System.Type _dmType;
+    PropertyInfo _dmInstanceProp;
+    float _nextResolveAttempt;
+    bool _resolveWarned;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Bootstrap()
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+    static void Bootstrap()
+    {
+        var go = new GameObject("DialogueCameraRig");
+        DontDestroyOnLoad(go);
+        go.AddComponent<DialogueCameraRig>();
+    }
+
+    void Awake()
+    {
+        // Resolve DialogueManager type + Instance prop once; instance lookup is lazy.
+        _dmType = System.Type.GetType("Tartaria.Integration.DialogueManager, Tartaria.Integration");
+        if (_dmType != null)
         {
-            var go = new GameObject("DialogueCameraRig");
-            DontDestroyOnLoad(go);
-            go.AddComponent<DialogueCameraRig>();
+            _dmInstanceProp = _dmType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
+            _isActiveProp = _dmType.GetProperty("IsPlaying", BindingFlags.Public | BindingFlags.Instance);
         }
+    }
 
-        void Awake()
+    void Update()
+    {
+        bool shouldBeActive = GetDialogueActive();
+        if (shouldBeActive && !_isActive)
+            ActivateDialogueCam();
+        else if (!shouldBeActive && _isActive)
+            DeactivateDialogueCam();
+
+        if (_isActive)
+            UpdateDialogueCam();
+    }
+
+    void TryResolveDialogueManager()
+    {
+        if (_dmInstanceProp != null)
         {
-            // Resolve DialogueManager type + Instance prop once; instance lookup is lazy.
-            _dmType = System.Type.GetType("Tartaria.Integration.DialogueManager, Tartaria.Integration");
-            if (_dmType != null)
-            {
-                _dmInstanceProp = _dmType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-                _isActiveProp = _dmType.GetProperty("IsPlaying", BindingFlags.Public | BindingFlags.Instance);
-            }
+            _dialogueManagerInstance = _dmInstanceProp.GetValue(null);
         }
+    }
 
-        void TryResolveDialogueManager()
-        {
-            if (_dialogueManagerInstance != null || _dmInstanceProp == null) return;
-            try { _dialogueManagerInstance = _dmInstanceProp.GetValue(null); } catch (System.Exception ex) { Debug.LogWarning($"[DialogueCameraRig] DialogueManager resolution failed: {ex.Message}"); }
-        }
-
-        void LateUpdate()
-        {
-            bool shouldBeActive = GetDialogueActive();
-
-            if (shouldBeActive && !_isActive)
-                ActivateDialogueCam();
-            else if (!shouldBeActive && _isActive)
-                DeactivateDialogueCam();
-
-            if (_isActive)
-                UpdateDialogueCam();
-        }
-
-        bool GetDialogueActive()
+    bool GetDialogueActive()
         {
             if (_dialogueManagerInstance == null && Time.time >= _nextResolveAttempt)
             {
@@ -147,17 +149,22 @@ namespace Tartaria.Camera
                 _nextSwitchTime = Time.time + switchInterval;
             }
 
-            // Find player (speaker in most cases)
-            var player = GameObject.FindGameObjectWithTag("Player");
-            if (player == null)
+            // Cache player transform (only lookup if null)
+            if (_cachedPlayer == null)
+            {
+                var playerGO = GameObject.FindGameObjectWithTag("Player");
+                if (playerGO != null) _cachedPlayer = playerGO.transform;
+            }
+
+            if (_cachedPlayer == null)
             {
                 Debug.LogWarning("[DialogueCameraRig] No Player found, camera idle.");
                 return;
             }
 
             // Target position + rotation
-            Vector3 targetPos = player.transform.position + (_onSpeaker ? shoulderOffset : reactionOffset);
-            Quaternion targetRot = Quaternion.LookRotation(player.transform.forward);
+            Vector3 targetPos = _cachedPlayer.position + (_onSpeaker ? shoulderOffset : reactionOffset);
+            Quaternion targetRot = Quaternion.LookRotation(_cachedPlayer.forward);
             float targetFOV = _onSpeaker ? minFOV : maxFOV;
 
             // Smooth lerp
@@ -167,3 +174,4 @@ namespace Tartaria.Camera
         }
     }
 }
+

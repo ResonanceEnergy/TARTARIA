@@ -834,9 +834,10 @@ namespace Tartaria.Integration
                 }
 
                 RefreshAllAmplifiedOrbs();
-                Rais_permanentLeyNetwork == null) _permanentLeyNetwork = GameObject.Find("Moon5_PermanentLeyNetwork");
-                if (_permanentLeyNetwork
-                ApplyDockVisualOnly();
+                
+                if (_permanentLeyNetwork == null) _permanentLeyNetwork = GameObject.Find("Moon5_PermanentLeyNetwork");
+                if (_permanentLeyNetwork != null)
+                    ApplyDockVisualOnly();
 
                 if (GameObject.Find("Moon5_PermanentLeyNetwork") == null)
                     CreatePermanentLeyNetwork();
@@ -1022,14 +1023,14 @@ namespace Tartaria.Integration
 
     /// <summary>Playtest helper: click a pavilion proxy to fire amplification (demo until real tuning nodes wired).</summary>
     public class Moon5PavilionClickAmplifier : MonoBehaviour
-    {WhiteCityAmplificationController _cachedCtrl;
+    {
+        public int pavilionIndex;
+        WhiteCityAmplificationController _cachedCtrl;
 
         void OnMouseDown()
         {
             if (_cachedCtrl == null) _cachedCtrl = FindObjectOfType<WhiteCityAmplificationController>();
-            _cachedC
-            var ctrl = FindObjectOfType<WhiteCityAmplificationController>();
-            ctrl?.AmplifyPavilion(pavilionIndex);
+            _cachedCtrl?.AmplifyPavilion(pavilionIndex);
         }
     }
 
@@ -1049,13 +1050,10 @@ namespace Tartaria.Integration
 
         void Update()
         {
-            if (!_nearPlayer) 
-            {
             if (_cachedCtrl == null) _cachedCtrl = FindObjectOfType<WhiteCityAmplificationController>();
-            if (_cachedCtrl != null && _cachedC
-            }
-
-            var ctrl = FindObjectOfType<WhiteCityAmplificationController>();
+            if (!_nearPlayer) return;
+            
+            var ctrl = _cachedCtrl;
             if (ctrl != null && ctrl.IsPavilionDone(pavilionIndex))
             {
                 CleanupPulseOrb();
@@ -1106,10 +1104,10 @@ namespace Tartaria.Integration
                 float resonanceProxy = 0.55f + norm * 0.42f;
                 Moon5WhiteCityAudioManager.Instance?.UpdateTuningProgress(pavilionIndex, norm, resonanceProxy);
 
-                if (_hol_cachedCtrl != null)
-                        _cachedC
-                    if (ctrl != null)
-                        ctrl.AmplifyPavilion(pavilionIndex);
+                if (_holdTime >= HOLD_REQUIRED)
+                {
+                    if (_cachedCtrl != null)
+                        _cachedCtrl.AmplifyPavilion(pavilionIndex);
                     else
                         Moon5WhiteCityAudioManager.Instance?.PlayAmplificationStinger(pavilionIndex, 0.95f);
 

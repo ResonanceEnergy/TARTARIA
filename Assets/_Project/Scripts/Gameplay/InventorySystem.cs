@@ -117,6 +117,11 @@ namespace Tartaria.Gameplay
         }
 
         /// <summary>
+        /// Returns all items in inventory (id→count dictionary).
+        /// </summary>
+        public IReadOnlyDictionary<string, int> GetAllItems() => _items;
+
+        /// <summary>
         /// Returns count of an item in inventory (0 if not present).
         /// </summary>
         public int GetItemCount(string itemId)
@@ -132,14 +137,6 @@ namespace Tartaria.Gameplay
         public bool HasItem(string itemId, int minCount = 1)
         {
             return GetItemCount(itemId) >= minCount;
-        }
-
-        /// <summary>
-        /// Returns a snapshot of all items (for UI display).
-        /// </summary>
-        public Dictionary<string, int> GetAllItems()
-        {
-            return new Dictionary<string, int>(_items);
         }
 
         /// <summary>

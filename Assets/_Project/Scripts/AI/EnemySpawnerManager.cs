@@ -164,13 +164,18 @@ namespace Tartaria.AI
 
                 _activeEnemies.Add(enemy);
 
-                // Subscribe to death event
-                // TODO: Hook into enemy health component death event
-                // var health = enemy.GetComponent<EnemyHealth>();
-                // if (health != null)
-                // {
-                //     health.OnDeath += () => OnEnemyDied(enemy);
-                // }
+                // P1 AUDIT FIX: Wire enemy death event to spawner
+                var mudGolemHealth = enemy.GetComponent<MudGolemHealth>();
+                if (mudGolemHealth != null)
+                {
+                    mudGolemHealth.OnDeath += () => OnEnemyDied(enemy);
+                    Debug.Log($"[EnemySpawner] Wired MudGolemHealth.OnDeath for {enemy.name}");
+                }
+                else
+                {
+                    // Future: Add support for other enemy health components (DissonantCrystal, GiantGolem, etc.)
+                    Debug.LogWarning($"[EnemySpawner] {enemy.name} has no health component - death tracking will rely on null polling");
+                }
 
                 Debug.Log($"[EnemySpawner] Spawned {type} at {spawnPos}");
             }

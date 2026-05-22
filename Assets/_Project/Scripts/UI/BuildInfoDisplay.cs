@@ -48,7 +48,7 @@ namespace Tartaria.UI
 
         void Update()
         {
-            if (Input.GetKeyDown(toggleKey))
+            if (UnityEngine.Input.GetKeyDown(toggleKey))
             {
                 ToggleVisibility();
             }
@@ -86,32 +86,19 @@ namespace Tartaria.UI
         }
 
         /// <summary>
-        /// Get commit hash from BuildInfo or fallback.
+        /// Get commit hash from static BuildInfo.
         /// </summary>
         string GetCommitHash()
         {
-            // Try to load from BuildInfo ScriptableObject
-            var buildInfo = Resources.Load<Core.BuildInfo>("BuildInfo");
-            if (buildInfo != null && !string.IsNullOrEmpty(buildInfo.CommitHash))
-            {
-                return buildInfo.CommitHash.Substring(0, Mathf.Min(7, buildInfo.CommitHash.Length));
-            }
-
-            return "dev";
+            return Core.BuildInfo.Hash;
         }
 
         /// <summary>
-        /// Get build date from BuildInfo or fallback.
+        /// Get build date from static BuildInfo.
         /// </summary>
         string GetBuildDate()
         {
-            var buildInfo = Resources.Load<Core.BuildInfo>("BuildInfo");
-            if (buildInfo != null && !string.IsNullOrEmpty(buildInfo.BuildDate))
-            {
-                return buildInfo.BuildDate;
-            }
-
-            return System.DateTime.Now.ToString("yyyy-MM-dd");
+            return Core.BuildInfo.BuildTime;
         }
     }
 }

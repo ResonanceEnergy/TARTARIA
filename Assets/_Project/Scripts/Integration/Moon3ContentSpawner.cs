@@ -47,7 +47,7 @@ namespace Tartaria.Integration
         [SerializeField] GameObject mudGolemPrefab;  // Mud Golem enemy prefab (assign in editor)
 
         [Header("Puzzle Systems")]
-        Gameplay.Moon3OrphanTrainPuzzle _trainPuzzle;
+        Integration.Moon3OrphanTrainPuzzle _trainPuzzle;
 
         GameObject _spectralTrain;
         readonly List<GameObject> _cymaticGardens = new();
@@ -160,7 +160,8 @@ namespace Tartaria.Integration
             var trainAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("SpectralTrainWhistle", trainSpawnPoint, 0.35f);
             if (trainAmbience != null)
             {
-                Debug.Log("[Moon 3] Spectral train ambience active"); + 13 rail segments");
+                Debug.Log("[Moon 3] Spectral train ambience active + 13 rail segments");
+            }
         }
 
         void InitializeTrainPuzzle()
@@ -180,8 +181,7 @@ namespace Tartaria.Integration
                 {
                     TriggerLullabyClimax();
                 }
-            }
-            }
+            };
 
             Debug.Log($"[Moon 3] Spawned spectral Orphan Train + {totalOrphans} cymatic gardens");
         }
@@ -446,7 +446,10 @@ namespace Tartaria.Integration
         void GrantLullabyBuff()
         {
             // Orphan Train Lullaby Crystal: passive 432 Hz healing zone
-            Debug.Log("[Moon 3] Orphan Train Lullaby Crystal granted — passive healing aura");, System.Collections.Generic.HashSet<string> trainPuzzleState = null)
+            Debug.Log("[Moon 3] Orphan Train Lullaby Crystal granted — passive healing aura");
+        }
+
+        void RestoreState(bool unlocked, int orphansFreed, int railSegments, bool climaxComplete, System.Collections.Generic.HashSet<string> trainPuzzleState = null)
         {
             moon3Unlocked = unlocked;
             _orphansFreed = orphansFreed;
@@ -480,6 +483,8 @@ namespace Tartaria.Integration
         public System.Collections.Generic.HashSet<string> GetTrainPuzzleState()
         {
             return _trainPuzzle != null ? _trainPuzzle.SaveState() : new System.Collections.Generic.HashSet<string>();
+        }
+
         /// <summary>
         /// Called by save system to restore Moon 3 state.
         /// </summary>

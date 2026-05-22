@@ -63,7 +63,18 @@ namespace Tartaria.Integration
 
         public string GetInteractPrompt()
         {
-            if (string.IsNullOrEmpty(questId) || QuestManager.Instance == null) return null;
+            // P1 AUDIT FIX: Show "Quest system offline" instead of silent null return
+            if (string.IsNullOrEmpty(questId))
+            {
+                Debug.LogWarning($"[QuestGiver] {giverName} has no questId assigned.");
+                return "[E] Quest system offline (no quest ID)";
+            }
+            
+            if (QuestManager.Instance == null)
+            {
+                Debug.LogError("[QuestGiver] QuestManager.Instance is null. Quest system offline.");
+                return "[E] Quest system offline";
+            }
 
             var state = QuestManager.Instance.GetQuestState(questId);
             switch (state.status)
@@ -82,7 +93,20 @@ namespace Tartaria.Integration
 
         public void Interact(GameObject player)
         {
-            if (string.IsNullOrEmpty(questId) || QuestManager.Instance == null) return;
+            // P1 AUDIT FIX: Show toast message instead of silent fail
+            if (string.IsNullOrEmpty(questId))
+            {
+                Debug.LogWarning($"[QuestGiver] {giverName}: Cannot interact - no questId assigned.");
+                GameEvents.FireHUDAchievementToast($"{giverName}: Quest system offline (no quest ID)");
+                return;
+            }
+            
+            if (QuestManager.Instance == null)
+            {
+                Debug.LogError("[QuestGiver] Cannot interact - QuestManager.Instance is null.");
+                GameEvents.FireHUDAchievementToast("Quest system offline - please report this bug");
+                return;
+            }
 
             var state = QuestManager.Instance.GetQuestState(questId);
 

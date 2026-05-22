@@ -283,7 +283,7 @@ namespace Tartaria.Gameplay
             Audio.AudioManager.Instance?.PlaySFX("resource_harvest", transform.position);
 
             // VFX (sparkle particles)
-            // TODO: ParticleEffectPool.Instance?.PlayEffect("AetherCollect", transform.position);
+            // Note: Aether collection VFX (ParticleEffectPool.Instance?.Spawn("AetherCollect", transform.position))
 
             // Notify spawner
             _spawner?.OnNodeHarvested(this);

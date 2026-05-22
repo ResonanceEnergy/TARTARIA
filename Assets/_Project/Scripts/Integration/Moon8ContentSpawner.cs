@@ -351,45 +351,6 @@ namespace Tartaria.Integration
         void TriggerNightFlight()
         {
             if (_nightFlightTriggered) return;
-                    Mathf.Cos(angle) * 60f,
-                    15f,
-                    Mathf.Sin(angle) * 60f
-                );
-
-                GameObject droneObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                droneObj.name = $"ResetDrone_{i}";
-                droneObj.transform.position = spawnPos;
-                droneObj.transform.localScale = Vector3.one * 2f; // Small drone
-
-                // Placeholder visual: black sphere (dissonance generator)
-                Renderer droneRend = droneObj.GetComponent<Renderer>();
-                droneRend.material.color = new Color(0.1f, 0.1f, 0.15f); // Near-black
-
-                // Red warning light (dissonance active)
-                Light droneLight = droneObj.AddComponent<Light>();
-                droneLight.type = LightType.Point;
-                droneLight.color = Color.red;
-                droneLight.range = 8f;
-                droneLight.intensity = 2f;
-
-                // Enemy AI component (simplified for beta)
-                // Would have proper drone AI attacking airships
-
-                Debug.Log($"[Moon8ContentSpawner] Reset drone {i} spawned. Target dissonance generators!");
-            }
-
-            // Audio: aerial combat music
-            AudioManager.Instance?.PlaySFX2D(aerialCombatAudio);
-
-            // Trigger night flight after 8s (or when combat ends)
-            Invoke(nameof(TriggerNightFlight), 8f);
-
-            SaveState();
-        }
-
-        void TriggerNightFlight()
-        {
-            if (_nightFlightTriggered) return;
             _nightFlightTriggered = true;
 
             Debug.Log("[Moon8ContentSpawner] CLIMAX: Night flight! All 3 ships in formation under full moon!");
