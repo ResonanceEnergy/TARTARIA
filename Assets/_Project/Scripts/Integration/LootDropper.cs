@@ -24,10 +24,15 @@ namespace Tartaria.Integration
         {
             var pick = Table[_dropCount++ % Table.Length];
 
-            var go = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            go.name = $"Loot_{pick.id}";
+            // Build loot cube from components (no CreatePrimitive per primitive elimination mandate).
+            var go = new GameObject($"Loot_{pick.id}");
             go.transform.position = position;
             go.transform.localScale = Vector3.one * 0.35f;
+            
+            var mf = go.AddComponent<MeshFilter>();
+            mf.mesh = Resources.GetBuiltinResource<Mesh>("Cube.fbx");
+            go.AddComponent<MeshRenderer>();
+            go.AddComponent<BoxCollider>();
             // Make collider a trigger so the player can walk through; PickupInteractable uses E.
             var col = go.GetComponent<Collider>();
             if (col != null) col.isTrigger = true;
