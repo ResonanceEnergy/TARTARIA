@@ -504,13 +504,16 @@ namespace Tartaria.Integration
             MoonProgressTracker.Instance?.MarkBeatCleared(MOON_NUM, BEAT_TRUE_TIMELINE);
             MoonProgressTracker.Instance?.MarkCleared(MOON_NUM);
             GameEvents.FireCriticalSaveTrigger("moon13_complete");
-            GameEvents.FireCriticalSaveTrigger("game_complete");
+            GameEvents.FireCriticalSaveTrigger("game_complete");   // GameCompleteOverlay subscribes here
 
             HUDController.Instance?.ShowBanner(
                 "TARTARIA — COMPLETE",
                 "All 13 moons. All 13 bells. The golden age begins again.",
                 12f);
             AudioManager.Instance?.PlaySFX2D("game_complete_credits_theme");
+
+            // Explicit Show() call as belt-and-suspenders in case event was missed
+            Tartaria.UI.GameCompleteOverlay.Instance?.Show();
 
             ApplyPersistentWorldState();
         }

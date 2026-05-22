@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
@@ -130,7 +130,7 @@ namespace Tartaria.Save
             // R5: player-facing via HUD prompt (real dialog hook ready)
             string localS = $"{info?.localMoon ?? 0} moons, {info?.localBuildingsRestored} restored, {info?.localPlayTime:F0}s";
             string cloudS = $"{info?.cloudMoon ?? 0} moons, {info?.cloudBuildingsRestored} restored, {info?.cloudPlayTime:F0}s";
-            Tartaria.UI.HUDController.Instance?.ShowSaveConflictPrompt(localS, cloudS, info?.recommendedAction ?? "merge");
+            GameEvents.FireHUDSaveConflictPrompt(localS, cloudS, info?.recommendedAction ?? "merge");
             Debug.LogWarning($"[SaveManager] Cloud conflict surfaced to player UI: {info?.details}");
         }
 
@@ -165,14 +165,14 @@ namespace Tartaria.Save
         {
             MarkDirty();
             Save();
-            Tartaria.UI.HUDController.Instance?.ShowAchievementToast("Quicksave");
+            GameEvents.FireHUDAchievementToast("Quicksave");
         }
 
         /// <summary>F9 — re-read save from disk and broadcast OnAfterLoad to all subsystems.</summary>
         public void QuickLoad()
         {
             LoadOrCreate();
-            Tartaria.UI.HUDController.Instance?.ShowAchievementToast("Quickload");
+            GameEvents.FireHUDAchievementToast("Quickload");
         }
 
         void OnApplicationFocus(bool hasFocus)
@@ -312,7 +312,7 @@ namespace Tartaria.Save
                     MarkDirty();
                     Save();
                     _cloudService?.QueueUploadAfterSave(JsonUtility.ToJson(_currentSave, true), _currentSave.header.modifiedUtc);
-                    Tartaria.UI.HUDController.Instance?.ShowCloudQueueToast("Kept local save — synced to cloud");
+                    GameEvents.FireHUDCloudQueueToast("Kept local save — synced to cloud");
                     break;
 
                 case ConflictResolutionChoice.KeepCloud:
@@ -320,7 +320,7 @@ namespace Tartaria.Save
                     // In full: we would have kept a pristine cloud copy; here we re-apply the last cloud snapshot via service sim
                     _cloudService?.ForceApplyCloudSnapshotToLocal(); // R6: new hook for KeepCloud
                     LoadOrCreate(); // re-fire after load to push to subsystems
-                    Tartaria.UI.HUDController.Instance?.ShowCloudQueueToast("Kept cloud save — local updated");
+                    GameEvents.FireHUDCloudQueueToast("Kept cloud save — local updated");
                     break;
 
                 case ConflictResolutionChoice.Merge:
@@ -329,7 +329,7 @@ namespace Tartaria.Save
                     MarkDirty();
                     Save();
                     _cloudService?.QueueUploadAfterSave(JsonUtility.ToJson(_currentSave, true), _currentSave.header.modifiedUtc);
-                    Tartaria.UI.HUDController.Instance?.ShowCloudQueueToast("Merged saves — cloud updated");
+                    GameEvents.FireHUDCloudQueueToast("Merged saves — cloud updated");
                     break;
             }
 
@@ -394,7 +394,7 @@ namespace Tartaria.Save
 
             LoadOrCreate();
             Debug.Log($"[SaveManager] R6: Switched to save slot {slot}");
-            Tartaria.UI.HUDController.Instance?.ShowCloudQueueToast($"Slot {slot} loaded");
+            GameEvents.FireHUDCloudQueueToast($"Slot {slot} loaded");
         }
 
         /// <summary>R6: Returns currently active slot index.</summary>
@@ -547,7 +547,7 @@ namespace Tartaria.Save
             Save();
             // CloudService will pick up compression path in next Queue
             _cloudService?.QueueUploadAfterSave(JsonUtility.ToJson(_currentSave, true), _currentSave.header.modifiedUtc);
-            Tartaria.UI.HUDController.Instance?.ShowCloudQueueToast("Large save flushed (compressed)");
+            GameEvents.FireHUDCloudQueueToast("Large save flushed (compressed)");
         }
 
         // ─── Internal ────────────────────────────────
@@ -1080,7 +1080,7 @@ namespace Tartaria.Save
                 SavePendingQueue();
                 Debug.Log($"[CloudSaveService] Queued cloud upload (pending: {_pending.Count}, checksum: {uploadChecksum.Substring(0,8)}...). Offline safe. Compressed={compressed}");
 
-                Tartaria.UI.HUDController.Instance?.ShowAchievementToast("Save queued for cloud sync");
+                GameEvents.FireHUDAchievementToast("Save queued for cloud sync");
 
                 // Immediate attempt if "online"
                 TryProcessQueue();
@@ -1092,7 +1092,7 @@ namespace Tartaria.Save
             /// </summary>
             public void ShowQueueToast(string message)
             {
-                Tartaria.UI.HUDController.Instance?.ShowCloudQueueToast(message);
+                GameEvents.FireHUDCloudQueueToast(message);
             }
 
             static string ComputePayloadChecksum(string content)
@@ -1162,7 +1162,7 @@ namespace Tartaria.Save
                             if (!string.IsNullOrEmpty(p.checksum))
                                 Debug.Log($"[CloudSaveService] Cloud upload verified (checksum match path) for {p.timestampUtc}");
                             _pending.RemoveAt(i);
-                            Tartaria.UI.HUDController.Instance?.ShowAchievementToast("Cloud sync complete");
+                            GameEvents.FireHUDAchievementToast("Cloud sync complete");
                         }
                         else
                         {

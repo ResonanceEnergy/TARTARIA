@@ -3,7 +3,6 @@
     "rootNamespace": "Tartaria.Save",
     "references": [
         "Tartaria.Core",
-        "Tartaria.UI",
         "Unity.InputSystem"
     ],
     "includePlatforms": [],
