@@ -88,6 +88,9 @@ namespace Tartaria.Save
         public MoonFlagsSaveBlock moonFlags = new();
         public MoonFlagsIntSaveBlock moonFlagsInt = new();
 
+        // v16: Global game flags (not Moon-specific) for endings, unlocks, etc.
+        public System.Collections.Generic.List<string> globalFlags = new();
+
         // v15: Helper accessors for arc scripts (bool)
         public bool GetMoonFlag(int moonNum, string key) => moonFlags.Get($"m{moonNum}_{key}");
         public void SetMoonFlag(int moonNum, string key, bool value) => moonFlags.Set($"m{moonNum}_{key}", value);
