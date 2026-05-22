@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Tartaria.Core;
+using Tartaria.Audio;
 // using Tartaria.Integration;  // B1 cycle-break: replaced by IntegrationBridge reflection facade
 
 namespace Tartaria.UI
@@ -113,6 +114,9 @@ namespace Tartaria.UI
             GameEvents.OnHUDAchievementToast   += OnAchievementToastFromEvent;
             GameEvents.OnHUDCloudQueueToast    += ShowCloudQueueToast;
             GameEvents.OnHUDSaveConflictPrompt += OnSaveConflictFromEvent;
+            GameEvents.OnMoonCleared           += OnMoonClearedHandler;
+            // Seed count from persistent tracker (survive reloads)
+            _clearedMoonCount = ServiceLocator.MoonProgress?.ClearedCount ?? 0;
         }
 
         void OnDestroy()
@@ -128,6 +132,7 @@ namespace Tartaria.UI
             GameEvents.OnHUDAchievementToast   -= OnAchievementToastFromEvent;
             GameEvents.OnHUDCloudQueueToast    -= ShowCloudQueueToast;
             GameEvents.OnHUDSaveConflictPrompt -= OnSaveConflictFromEvent;
+            GameEvents.OnMoonCleared           -= OnMoonClearedHandler;
         }
 
         void Update()
@@ -489,7 +494,46 @@ namespace Tartaria.UI
 
         void UpdateMoonTrophy()
         {
-            // Moon trophy widget updates are driven externally by Moon framework; no-op slot for now.
+            // Draws a persistent Moons: X/13 counter in the top-left corner.
+            // Refreshed via _clearedMoonCount which is updated by OnMoonClearedHandler.
+        }
+
+        // ─── Moon counter (OnGUI driven) ───
+        int _clearedMoonCount = 0;
+
+        void OnGUI()
+        {
+            DrawMoonCounter();
+            DrawPurgeHoldBar();
+        }
+
+        void DrawMoonCounter()
+        {
+            if (_clearedMoonCount <= 0) return;
+            const int W = 120, H = 22;
+            int x = 12, y = 12;
+            var style = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 13,
+                fontStyle = _clearedMoonCount >= 13 ? FontStyle.Bold : FontStyle.Normal
+            };
+            style.normal.textColor = _clearedMoonCount >= 13
+                ? new Color(1f, 0.85f, 0.1f)   // gold on completion
+                : new Color(0.85f, 0.95f, 1f);  // pale cyan normally
+            string label = _clearedMoonCount >= 13
+                ? "TARTARIA RESTORED"
+                : $"Moons: {_clearedMoonCount}/13";
+            GUI.Label(new Rect(x, y, W + 60, H), label, style);
+        }
+
+        void OnMoonClearedHandler(int moonNum)
+        {
+            _clearedMoonCount = ServiceLocator.MoonProgress?.ClearedCount ?? (_clearedMoonCount + 1);
+            string title = moonNum < 13
+                ? $"Moon {moonNum:D2} Cleared! ({_clearedMoonCount}/13)"
+                : "All 13 Moons Restored!";
+            ShowAchievementToast(title);
+            AudioManager.Instance?.PlaySFX2D(moonNum < 13 ? "moon_clear" : "game_complete_credits_theme");
         }
 
         // ─── R6 Extreme Testing Pass (call from debug console or Settings) ───
@@ -692,7 +736,7 @@ namespace Tartaria.UI
         }
 
         // Reduced-motion safe IMGUI hold visualizer (center lower screen). Emotional catharsis for first vein without motion risk.
-        void OnGUI()
+        void DrawPurgeHoldBar()
         {
             if (!_purgeHoldVisible) return;
 

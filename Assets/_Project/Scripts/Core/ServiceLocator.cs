@@ -172,6 +172,7 @@ namespace Tartaria.Core
     {
         void MarkBeatCleared(int moonNum, int beatIndex);
         void MarkCleared(int moonNum);
+        int ClearedCount { get; }
     }
 
     /// <summary>Moon 2 progression persistence — registered by Moon2ProgressionSystem.</summary>
