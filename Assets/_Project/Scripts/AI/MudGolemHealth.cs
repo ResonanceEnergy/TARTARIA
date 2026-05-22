@@ -136,12 +136,25 @@ namespace Tartaria.AI
             OnDeath?.Invoke();
 
             // Drop loot (random aether shards or moon-specific materials)
+            int lootCount = 0;
+            string lootItem = "aether_shard";
             if (_dropLootOnDeath)
             {
-                int lootCount = UnityEngine.Random.Range(1, 4); // 1-3 shards
-                Tartaria.Gameplay.InventorySystem.Instance?.AddItem("aether_shard", lootCount);
-                Debug.Log($"[MudGolemHealth] {gameObject.name} dropped {lootCount}x aether_shard");
+                lootCount = UnityEngine.Random.Range(1, 4); // 1-3 shards
+                Tartaria.Gameplay.InventorySystem.Instance?.AddItem(lootItem, lootCount);
+                Debug.Log($"[MudGolemHealth] {gameObject.name} dropped {lootCount}x {lootItem}");
             }
+            
+            // Fire GameEvents for enemy killed (decoupled pub/sub)
+            Core.GameEvents.RaiseEnemyKilled(new Core.EnemyKilledEventArgs
+            {
+                enemyType = "mud_golem",
+                xpReward = 25,  // Base XP for golem
+                lootItemId = lootItem,
+                lootCount = lootCount,
+                position = transform.position,
+                killedBy = killer
+            });
 
             // Disable AI/movement components
             var aiController = GetComponent<MonoBehaviour>(); // Generic AI controller check

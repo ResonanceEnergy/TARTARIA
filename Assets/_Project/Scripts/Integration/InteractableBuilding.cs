@@ -509,11 +509,25 @@ namespace Tartaria.Integration
                 buildingId, definition != null ? definition.baseIncome : 10);
 
             bool allPerfect = true;
+            float avgAccuracy = 0f;
             for (int i = 0; i < 3; i++)
             {
-                if (_nodeAccuracies[i] < 0.95f) { allPerfect = false; break; }
+                avgAccuracy += _nodeAccuracies[i];
+                if (_nodeAccuracies[i] < 0.95f) { allPerfect = false; }
             }
+            avgAccuracy /= 3f;
 
+            // Raise typed GameEvents (decoupled pub/sub)
+            int rsReward = definition != null ? definition.rsReward : 150;
+            Core.GameEvents.RaiseBuildingRestored(new Core.BuildingRestoredEventArgs
+            {
+                buildingId = buildingId,
+                rsReward = rsReward,
+                position = transform.position,
+                tuningAccuracy = avgAccuracy
+            });
+
+            // Legacy GameLoopController call (backward compat)
             GameLoopController.Instance?.OnBuildingRestored(
                 GetDisplayName(), transform.position, allPerfect);
 
