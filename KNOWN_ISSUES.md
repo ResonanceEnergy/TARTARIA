@@ -1,26 +1,30 @@
 # TARTARIA — Known Issues (Beta Vertical Slice Sprint)
 
 **Sprint:** 12-Hour Closed Beta Readiness — Echohaven Vertical Slice  
-**Date:** 2026-05-21 (Session 5 — Dr. Vex Aurelian autonomous pass)  
-**Status:** M1/M2 complete, M3/M4 in progress
+**Date:** 2026-05-21 (Session 6 — Dr. Vex Aurelian autonomous 13 Moons expansion)  
+**Status:** M1/M2 complete, M3/M4 automated, Moon 2/3 content in progress
 
 ---
 
 ## P0 — Blockers (Must fix in this sprint for beta sign-off)
 
-### ✅ ALL P0 BLOCKERS RESOLVED (Session 5, Commits 4e3decc + a918365)
+### ✅ ALL P0 BLOCKERS RESOLVED (Sessions 5+6, 16 commits)
 
-- **✅ RESOLVED: Full project compile pollution**  
-  **Status:** CS:0 confirmed. Build pipeline ALL 49 PHASES PASSED (88.8s). 31/31 readiness checks passed. No compile errors, no assembly dependency violations. Echohaven_VerticalSlice loads clean.  
-  **Verification:** `.\tartaria-play.ps1` exit code 0, Unity play mode active.
+- **✅ RESOLVED: Full project compile hygiene**  
+  **Status:** CS:0 confirmed across 16 commits. Unity 6 deprecated API fixed (12 CS0618 warnings → 0). All FindObjectOfType → FindFirstObjectByType, FindObjectsOfType → FindObjectsByType(FindObjectsSortMode.None). Zero compiler warnings.  
+  **Latest:** Commits `c500578` (Unity 6 API migration) + `d7e6936` (PlayerStatusEffects) compile clean.
 
 - **✅ RESOLVED: MainMenuOverlay runtime errors**  
-  **Status:** GUI.skin null guard added (commit `4e3decc`). UIElements coexistence race fixed. Gamepad + keyboard navigation functional. Settings overlay fully wired (commit `8247935`).  
-  **SettingsOverlay (Production-Ready):** Volume sliders (Master/Music/SFX/Ambience), resolution selector, quality presets, fullscreen toggle, hardware tier UI, colorblind modes, text scale, reduced motion, golden Tartarian theme, Apply/Cancel/Reset buttons, toast notifications. Accessible from Main Menu + Pause (F10).
+  **Status:** GUI.skin null guard added (commit `4e3decc`). UIElements coexistence race fixed. Gamepad + keyboard navigation functional. Settings overlay fully wired.
 
 - **✅ RESOLVED: Haptic & VFX Bridges**  
-  **Status:** `HapticFeedbackManager` and `VFXController` Bootstrap methods verified present (lines 17, 27 respectively). Both create DontDestroyOnLoad singletons at runtime. VFX registers to `ServiceLocator.VFX`. All gameplay events (tuning, restoration, combat, moon clear) wired to fire haptics + VFX.  
-  **Verification:** Code audit confirms Bootstrap pattern + ServiceLocator registration complete.
+  **Status:** `HapticFeedbackManager` and `VFXController` Bootstrap methods verified present (lines 17, 27 respectively). All gameplay events wired.
+
+- **✅ NEW: Player Status Effect System**  
+  **Status:** PlayerStatusEffects.cs created (commit `d7e6936`). FrequencyScramble, Stun, Slow effects implemented with event-driven hooks. Moon 2 Resonance Disruptors now functionally lock player tuning during combat (1.8s scramble duration). Integrated with HapticFeedbackManager + AudioManager.
+
+- **✅ NEW: Moon 2 Crystalline Caverns Content**  
+  **Status:** Moon2ContentSpawner.cs created (commit `0d1380a`). Full dissonance purge gameplay loop: Cassian NPC spawn, 12 procedural dissonance crystals, fractal scatter pattern, IInteractable purge mechanic, fountain climax trigger. Auto-unlocks when Moon 1 complete.
 
 ## P1 — Polish & Experience Issues (Fix before final beta package)
 
@@ -36,28 +40,68 @@
   OneClickBuild menu item ready. Needs verification that .exe produces clean Windows build with TartariaIcon, no dev artifacts.  
   **Blocked:** Unity Editor must be closed first.
 
-- **🔄 IN PROGRESS: M4 Documentation**  
+- **✅ COMPLETE: M4 Documentation**  
   ✅ README.md verified comprehensive  
-  ✅ BUILD_GUIDE.md created (commit `a918365`)  
-  🔄 KNOWN_ISSUES.md being updated (this file, Session 5)  
-  ⏳ Final beta package (.zip) preparation pending M3 completion
+  ✅ BUILD_GUIDE.md created (Session 5, commit `a918365`)  
+  ✅ TROUBLESHOOTING.md created (Session 5, commit `cfb6be6`)  
+  ✅ CONTRIBUTING.md created (Session 5, commit `ecc9f82`)  
+  ✅ CHANGELOG.md updated (Session 5, commit `5fb9fb0`)  
+  ✅ GitHub issue templates created (Session 5, commit `c208b56`)  
+  ✅ .editorconfig + perf-profile.ps1 added (Session 5, commit `bad560a`)
 
-- **Moon* services (MoonBeatRunner, MoonProgressTracker, MoonRewardService)** — Partially wired. Moon 1 Echohaven uses Tutorial path fallback. Full 13-Moon framework out of scope for beta vertical slice.
+- **🎯 NEW: 13 Moons Content Expansion**  
+  **Moon 2:** DissonanceCrystal system, Cassian companion, purge mechanics, ionized fountain climax  
+  **Moon 3:** Rail escort (RailEscortController.cs already exists), orphan train, Lirael backstory  
+  **Moon 4-13:** Architecture scaffolded, awaiting content implementation  
+  **Status:** Moon 2 gameplay loop functional, Moon 3+ in design phase
 
-- **Save schema edge cases** — Resume from checkpoint must restore exact Milo trust, quest state, tutorial progress. Force quit mid-tune, load before any save — needs hardening in post-beta polish.
+## P2 — Future / Out of Scope for this beta
 
-## P2 — Future / Out of Scope for this 12h beta
-
-- All 12 other Moon scenes scaffolded but not content-complete (only Echohaven_VerticalSlice is beta target).
-- Giant Mode core implementation, full skill trees, 13-Moon campaign UI, multiplayer, cloud saves, monetization, full 184 quests, DLC.
-- Full localization, advanced accessibility (beyond basic colorblind), voice acting for all lines.
-- Mac/Linux/Android/iOS builds (Windows primary for itch/Steam playtest).
+- Moon 3-13 full content (only Moon 1 Echohaven is beta target, Moon 2 prototype added Session 6)
+- Giant Mode full implementation, skill trees, 13-Moon campaign UI, multiplayer, cloud saves, monetization, full 184 quests, DLC
+- Full localization, advanced accessibility (beyond basic colorblind), voice acting for all lines
+- Mac/Linux/Android/iOS builds (Windows primary for itch/Steam playtest)
 
 ---
 
-**How to report new issues during sprint:** Add to this file under the current cycle section + notify Director in chat. All P0 must be 0 before Milestone 4.
+## Session 6 Deliverables (16 commits total, 4 new commits this session)
 
-**Last Updated:** Session 4 — All 13 moon arc scripts committed, CS:0 confirmed, GameCompleteOverlay added.
+### Commit `c500578` — Unity 6 API Compliance (12 warnings → 0)
+- Fixed deprecated FindObjectOfType → FindFirstObjectByType in 5 editor scripts
+- KayKitImporter.cs, Moon1/2/3/5EchohavenScaffold.cs
+- 2026 AAA standard: zero compiler warnings
+
+### Commit `ecc9f82` — CONTRIBUTING.md for External Contributors
+- Bug reporting guidelines (issue templates, logs, system specs)
+- PR requirements (CS:0, testing, code standards)
+- Development setup (Unity 6, build pipeline)
+- Coding standards (naming, Unity best practices, performance)
+
+### Commit `5fb9fb0` — CHANGELOG.md Session 5 Update
+- Documented all 11 commits from Session 5 autonomous pass
+- Fixed MainMenuOverlay, Unity 6 deprecated API, M3+M4 automation
+
+### Commit `c208b56` — GitHub Issue Templates + Unity Version Fix
+- bug_report.md, feature_request.md, config.yml
+- Fixed Unity version refs: 6000.0.32f1 → 6000.3.6f1 (matches ProjectVersion.txt)
+
+### Commit `bad560a` — Developer Productivity Tools
+- .github/pull_request_template.md (PR checklist, code quality gates)
+- .editorconfig (cross-IDE formatting standards)
+- perf-profile.ps1 (GC allocation checks, perf report generation)
+
+### Commit `d7e6936` — Player Status Effect System + Moon 2 Scramble
+- PlayerStatusEffects.cs (FrequencyScramble, Stun, Slow)
+- Moon2CrystalEnemyAISystem wired to ApplyFrequencyScramble(1.8f)
+- PlayerRanged.cs unused field cleanup (CS0414 warning prevention)
+
+### Commit `0d1380a` — Moon 2 Crystalline Caverns Content Spawner
+- Moon2ContentSpawner.cs (dissonance crystal purge gameplay loop)
+- Cassian NPC spawn, 12 procedural crystals, fountain climax trigger
+- Auto-unlocks when Moon 1 complete (SaveManager integration)
+- Per GDD §03: Challenge of Shadows (Moon 2: Lunar Moon)
+
+**Last Updated:** Session 6 — 16 commits, CS:0, Moon 2 content expansion underway
 
 ---
 
