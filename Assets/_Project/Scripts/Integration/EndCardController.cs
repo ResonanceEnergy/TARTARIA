@@ -29,12 +29,15 @@ namespace Tartaria.Integration
         [SerializeField] float fadeInDuration = 2.0f;
         [SerializeField] float holdDuration = 8.0f;
         [SerializeField] float fadeOutDuration = 2.0f;
+        [SerializeField] float creditsDuration = 30.0f; // Credits scroll duration
+        [SerializeField] float postCreditsDuration = 10.0f; // Post-credits scene
 
         Canvas _canvas;
         CanvasGroup _group;
         TMP_Text _title;
         TMP_Text _subtitle;
         TMP_Text _bodyText;
+        TMP_Text _creditsText;
         Image _backgroundImage;
         bool _triggered;
         bool _isPlayingEnding;
@@ -172,6 +175,12 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(holdDuration * 1.5f);
             yield return Fade(1f, 0f, fadeOutDuration);
 
+            // Play credits
+            yield return PlayCreditsSequence();
+
+            // Post-credits hook: Harmony ending teaser
+            yield return PlayHarmonyPostCredits();
+
             // Save ending achieved
             SaveManager.Instance?.SetGameFlag("harmony_ending_achieved", true);
 
@@ -193,6 +202,12 @@ namespace Tartaria.Integration
             yield return Fade(0f, 1f, fadeInDuration);
             yield return new WaitForSeconds(holdDuration * 1.5f);
             yield return Fade(1f, 0f, fadeOutDuration);
+
+            // Play credits
+            yield return PlayCreditsSequence();
+
+            // Post-credits hook: Echo ending teaser
+            yield return PlayEchoPostCredits();
 
             // Save ending achieved
             SaveManager.Instance?.SetGameFlag("echo_ending_achieved", true);
@@ -216,11 +231,138 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(holdDuration * 1.5f);
             yield return Fade(1f, 0f, fadeOutDuration);
 
+            // Play credits
+            yield return PlayCreditsSequence();
+
+            // Post-credits hook: Reset ending teaser
+            yield return PlayResetPostCredits();
+
             // Save ending achieved
             SaveManager.Instance?.SetGameFlag("reset_ending_achieved", true);
 
             Debug.Log("[EndCard] Reset ending complete - Thank you for playing TARTARIA");
             _isPlayingEnding = false;
+        }
+
+        IEnumerator PlayCreditsSequence()
+        {
+            Debug.Log("[EndCard] Rolling credits...");
+
+            // Reset UI for credits
+            _backgroundImage.color = Color.black;
+            _title.text = "";
+            _subtitle.text = "";
+            _bodyText.text = "";
+
+            // Show credits text
+            _creditsText.gameObject.SetActive(true);
+            _creditsText.text = GenerateCreditsText();
+            _creditsText.color = new Color(1f, 0.9f, 0.5f); // Aether gold
+
+            // Fade in
+            yield return Fade(0f, 1f, fadeInDuration);
+
+            // Scroll credits (simple hold for now, could animate scroll)
+            yield return new WaitForSeconds(creditsDuration);
+
+            // Fade out
+            yield return Fade(1f, 0f, fadeOutDuration);
+
+            _creditsText.gameObject.SetActive(false);
+
+            Debug.Log("[EndCard] Credits complete");
+        }
+
+        string GenerateCreditsText()
+        {
+            return @"TARTARIA
+The Frequency of Forgotten Cities
+
+A 13-Moon Journey Through Mud and Memory
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+COMPANIONS
+Milo, the Orphan
+Thorne, the Engineer  
+Lirael, the Echo-Girl
+Korath, the Last Giant
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+THE MOONS
+1. Solar — The Lighting
+2. Lunar — The Feeling  
+3. Electric — The Activating
+4. Self-Existing — The Defining
+5. Overtone — The Commanding
+6. Rhythmic — The Organizing
+7. Resonant — The Channeling
+8. Galactic — The Harmonizing
+9. Solar — The Intending
+10. Planetary — The Manifesting
+11. Spectral — The Releasing
+12. Crystal — The Cooperating
+13. Cosmic — The Enduring
+
+━━━━━━━━━━━━━━━━━━━━━━
+
+Thank you for listening.
+
+The Aether remembers.
+
+━━━━━━━━━━━━━━━━━━━━━━";
+        }
+
+        IEnumerator PlayHarmonyPostCredits()
+        {
+            Debug.Log("[EndCard] Post-Credits: Harmony hook — Golden Age DLC tease");
+
+            _backgroundImage.color = new Color(1f, 0.9f, 0.4f, 1f); // Golden
+            _title.text = "";
+            _subtitle.text = "";
+            _bodyText.text = "One Year Later...\n\nThe first airship to Mars departs next moon.\n\nZereth pilots.";
+            _bodyText.color = new Color(0.1f, 0.1f, 0.1f, 1f);
+
+            yield return Fade(0f, 1f, fadeInDuration);
+            yield return new WaitForSeconds(postCreditsDuration);
+            yield return Fade(1f, 0f, fadeOutDuration);
+
+            Debug.Log("[EndCard] HARMONY post-credits complete — DLC: 'Mars Awakening' teased");
+        }
+
+        IEnumerator PlayEchoPostCredits()
+        {
+            Debug.Log("[EndCard] Post-Credits: Echo hook — Threshold DLC tease");
+
+            _backgroundImage.color = new Color(0.3f, 0.5f, 0.8f, 1f); // Aurora blue
+            _title.text = "";
+            _subtitle.text = "";
+            _bodyText.text = "Between Timelines...\n\nZereth guards the gate.\n\nSomeone else is knocking.";
+            _bodyText.color = Color.white;
+
+            yield return Fade(0f, 1f, fadeInDuration);
+            yield return new WaitForSeconds(postCreditsDuration);
+            yield return Fade(1f, 0f, fadeOutDuration);
+
+            Debug.Log("[EndCard] ECHO post-credits complete — DLC: 'The Threshold Keeper' teased");
+        }
+
+        IEnumerator PlayResetPostCredits()
+        {
+            Debug.Log("[EndCard] Post-Credits: Reset hook — Resistance DLC tease");
+
+            _backgroundImage.color = new Color(0.4f, 0.4f, 0.4f, 1f); // Muted gray
+            _title.text = "";
+            _subtitle.text = "";
+            _bodyText.text = "Underneath the Control...\n\nMilo starts a resistance.\n\n'They took the song. We'll take it back.'";
+            _bodyText.color = new Color(0.9f, 0.9f, 0.9f, 1f);
+
+            yield return Fade(0f, 1f, fadeInDuration);
+            yield return new WaitForSeconds(postCreditsDuration);
+            yield return Fade(1f, 0f, fadeOutDuration);
+
+            Debug.Log("[EndCard] RESET post-credits complete — DLC: 'The Resonance Underground' teased");
         }
 
         IEnumerator Fade(float from, float to, float dur)
@@ -263,6 +405,11 @@ namespace Tartaria.Integration
             _bodyText = CreateText(canvasGo.transform, "BodyText", "", 28, new Vector2(0.5f, 0.35f));
             _bodyText.alignment = TextAlignmentOptions.Center;
             _bodyText.rectTransform.sizeDelta = new Vector2(1400, 400);
+
+            _creditsText = CreateText(canvasGo.transform, "CreditsText", "", 32, new Vector2(0.5f, 0.5f));
+            _creditsText.alignment = TextAlignmentOptions.Center;
+            _creditsText.rectTransform.sizeDelta = new Vector2(1600, 900);
+            _creditsText.gameObject.SetActive(false);
         }
 
         static TMP_Text CreateText(Transform parent, string name, string content, float size, Vector2 anchor)

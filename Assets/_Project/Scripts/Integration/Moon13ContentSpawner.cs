@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
@@ -33,6 +33,11 @@ namespace Tartaria.Integration
         [Header("Zereth Confrontation")]
         [SerializeField] GameObject zerethEchoPrefab;
         bool _zerethConfrontationComplete;
+        ZerethResonanceDialogue _zerethResonanceSystem;
+
+        [Header("Companion Farewells")]
+        CompanionFarewellSystem _farewellSystem;
+        bool _farewellsComplete;
 
         readonly List<GameObject> _echoRealms = new();
         GameObject _finalNode;
@@ -81,6 +86,23 @@ namespace Tartaria.Integration
             sd.SetMoonFlag(13, "dissonantRealmVisited", _dissonantRealmVisited);
             sd.SetMoonFlag(13, "floodMomentRealmVisited", _floodMomentRealmVisited);
             sd.SetMoonFlag(13, "zerethConfrontationComplete", _zerethConfrontationComplete);
+            sd.SetMoonFlag(13, "farewellsComplete", _farewellsComplete);
+
+            // Save Zereth resonance phase
+            if (_zerethResonanceSystem != null)
+            {
+                sd.SetMoonFlag(13, "zerethResonancePhase", _zerethResonanceSystem.GetCurrentPhase());
+            }
+
+            // Save farewell state
+            if (_farewellSystem != null)
+            {
+                var farewellState = _farewellSystem.GetFarewellState();
+                for (int i = 0; i < farewellState.Length; i++)
+                {
+                    sd.SetMoonFlag(13, $"farewell_{i}", farewellState[i]);
+                }
+            }
         }
 
         void OnLoad(SaveData sd)
@@ -92,8 +114,27 @@ namespace Tartaria.Integration
             _dissonantRealmVisited = sd.GetMoonFlag(13, "dissonantRealmVisited");
             _floodMomentRealmVisited = sd.GetMoonFlag(13, "floodMomentRealmVisited");
             _zerethConfrontationComplete = sd.GetMoonFlag(13, "zerethConfrontationComplete");
+            _farewellsComplete = sd.GetMoonFlag(13, "farewellsComplete");
 
-            Debug.Log($"[Moon 13] State loaded: choice={chosenPath}, realms={AllRealmsVisited}, finalNode={finalNodeActivated}");
+            // Restore Zereth resonance phase
+            if (_zerethResonanceSystem != null)
+            {
+                int resonancePhase = sd.GetMoonFlag(13, "zerethResonancePhase", 0);
+                _zerethResonanceSystem.SetCurrentPhase(resonancePhase);
+            }
+
+            // Restore farewell state
+            if (_farewellSystem != null)
+            {
+                var farewellState = new bool[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    farewellState[i] = sd.GetMoonFlag(13, $"farewell_{i}");
+                }
+                _farewellSystem.RestoreFarewellState(farewellState);
+            }
+
+            Debug.Log($"[Moon 13] State loaded: choice={chosenPath}, realms={AllRealmsVisited}, finalNode={finalNodeActivated}, farewells={_farewellsComplete}");
         }
 
         void Start()
@@ -126,6 +167,9 @@ namespace Tartaria.Integration
 
             // 3 Echo realm portals
             SpawnEchoRealmGates();
+
+            // Companion farewell system (activated after Zereth confrontation)
+            SpawnCompanionFarewellSystem();
 
             // Ambient audio: Aether tremor
             var aetherAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("AetherTremor", finalNodePoint, 0.5f);
@@ -239,6 +283,17 @@ namespace Tartaria.Integration
             return gate;
         }
 
+        void SpawnCompanionFarewellSystem()
+        {
+            var farewellObj = new GameObject("CompanionFarewellSystem");
+            farewellObj.transform.position = finalNodePoint + Vector3.up * 100f; // Viewing platform
+            farewellObj.transform.SetParent(transform);
+
+            _farewellSystem = farewellObj.AddComponent<CompanionFarewellSystem>();
+
+            Debug.Log("[Moon 13] Companion farewell system ready — will activate after Zereth confrontation");
+        }
+
         public void VisitEchoRealm(EchoRealmGate.RealmType realm)
         {
             switch (realm)
@@ -343,6 +398,49 @@ namespace Tartaria.Integration
                 {
                     var renderer = body.GetComponent<Renderer>();
                     if (renderer != null)
+
+            // Trigger companion farewells before final choice
+            TriggerCompanionFarewells();
+        }
+
+        void TriggerCompanionFarewells()
+        {
+            if (_farewellsComplete || _farewellSystem == null) return;
+
+            Debug.Log("[Moon 13] Triggering companion farewell sequence — emotional payoff before final choice");
+
+            // Dialogue: transition to farewells
+            DialogueManager.Instance?.PlayContextDialogue("moon13_time_for_farewells");
+
+            HUDController.Instance?.ShowBanner(
+                "A Moment of Peace",
+                "Your companions wish to speak with you before the final choice.",
+                5f
+            );
+
+            // Start farewell sequence
+            _farewellSystem.BeginFarewells();
+
+            // Wait for farewells to complete before allowing final node activation
+            StartCoroutine(WaitForFarewells());
+        }
+
+        System.Collections.IEnumerator WaitForFarewells()
+        {
+            // Poll until farewells complete (~2 minutes)
+            while (_farewellSystem != null && !_farewellSystem.AllFarewellsComplete)
+            {
+                yield return new UnityEngine.WaitForSeconds(1f);
+            }
+
+            _farewellsComplete = true;
+            Debug.Log("[Moon 13] Companion farewells complete — player ready for final choice");
+
+            HUDController.Instance?.ShowBanner(
+                "The Final Node Awaits",
+                "All companions have spoken. The choice is yours.",
+                5f
+            );
                     {
                         renderer.material.color = new Color(1f, 0.9f, 0.5f, 0.8f);  // Golden peace
                     }
@@ -520,6 +618,14 @@ namespace Tartaria.Integration
 
             public string GetInteractPrompt()
             {
+                // Check if farewells are complete before allowing final choice
+                if (!spawner._farewellsComplete)
+                {
+                    Debug.Log("[FinalNodeConsole] Farewells not complete — wait for companions to speak");
+                    HUDController.Instance?.ShowObjective("Complete farewell conversations first");
+                    return;
+                }
+
                 if (spawner == null) return "";
                 if (spawner.finalNodeActivated) return "";
                 if (!spawner._zerethConfrontationComplete)

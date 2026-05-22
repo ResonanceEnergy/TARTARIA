@@ -268,16 +268,19 @@ namespace Tartaria.Integration
                 _memoryEchoSystem = echoSystemObj.AddComponent<MemoryEchoSystem>();
             }
 
-            // Configure echo locations (7 memory points around aquifer)
-            var echoPoints = new Vector3[7];
-            var echoDialogues = new string[7];
-            for (int i = 0; i < 7; i++)
+            // Configure echo locations (13 memory points - complete aquifer history)
+            // 13 echoes represent 13 moons of the calendar, full temporal cycle
+            var echoPoints = new Vector3[13];
+            var echoDialogues = new string[13];
+            for (int i = 0; i < 13; i++)
             {
-                float angle = i * (360f / 7f) * Mathf.Deg2Rad;
-                float radius = 30f;
+                float angle = i * (360f / 13f) * Mathf.Deg2Rad;
+                // Two rings: inner (7) + outer (6) for spatial variety
+                float radius = (i < 7) ? 25f : 40f;
+                float heightOffset = Random.Range(-15f, 15f);
                 echoPoints[i] = aquiferCenterPoint + new Vector3(
                     Mathf.Cos(angle) * radius,
-                    Random.Range(-10f, 10f),
+                    heightOffset,
                     Mathf.Sin(angle) * radius
                 );
                 echoDialogues[i] = $"echo_aquifer_{i + 1}";
@@ -298,7 +301,8 @@ namespace Tartaria.Integration
                 _memoryEchoSystem?.ActivateSystem();
             }
 
-            Debug.Log("[Moon 11] Memory echo system spawned — 7 temporal visions available after purification");
+            Debug.Log("[Moon 11] Memory echo system spawned — 13 temporal visions (complete aquifer history) available after purification");
+            Debug.Log("[Moon 11] 13 Echoes represent: Giant water rituals, pre-Flood golden age, corruption moment, 200 years of mud sleep");
         }
 
         public void PurifyAquiferNode(int nodeIndex)
