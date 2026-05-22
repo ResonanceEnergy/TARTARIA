@@ -44,10 +44,12 @@ namespace Tartaria.Integration
         [SerializeField] Vector3 trainSpawnPoint = new(50f, 2f, 30f);  // Windswept Highlands rail junction
         [SerializeField] Vector3[] cymaticGardenPoints;  // Set via editor or runtime
         [SerializeField] Vector3[] railSegmentStarts;  // 5 rail tie positions
+        [SerializeField] GameObject mudGolemPrefab;  // Mud Golem enemy prefab (assign in editor)
 
         GameObject _spectralTrain;
         readonly List<GameObject> _cymaticGardens = new();
         readonly List<GameObject> _adoptedOrphans = new();
+        readonly List<GameObject> _spawnedGolems = new();
         bool _contentSpawned;
         bool _derailmentTriggered;
 
@@ -305,12 +307,21 @@ namespace Tartaria.Integration
 
             Debug.Log("[Moon 3] Derailment ambush triggered — Reset agents planted dissonance!");
 
-            // Spawn Mud Golems along tracks
-            for (int i = 0; i < 3; i++)
+            // Spawn Mud Golems along tracks (3 enemies)
+            if (mudGolemPrefab != null)
             {
-                var spawnPos = trainSpawnPoint + Vector3.forward * (i * 10f);
-                // TODO: Spawn MudGolem enemy prefab at spawnPos
-                Debug.Log($"[Moon 3] Spawning Mud Golem at {spawnPos}");
+                for (int i = 0; i < 3; i++)
+                {
+                    var spawnPos = trainSpawnPoint + Vector3.forward * (i * 10f);
+                    var golem = Instantiate(mudGolemPrefab, spawnPos, Quaternion.identity);
+                    golem.name = $"MudGolem_Derailment_{i}";
+                    _spawnedGolems.Add(golem);
+                    Debug.Log($"[Moon 3] Spawned Mud Golem at {spawnPos}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[Moon 3] MudGolem prefab not assigned, skipping enemy spawn");
             }
 
             // Children scream in spectral echoes
