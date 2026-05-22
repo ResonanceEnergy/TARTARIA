@@ -768,7 +768,7 @@ namespace Tartaria.Integration
             Debug.Log($"[ChildNPC {childIndex}] {_childDialogue[childIndex]}");
 
             // Show dialogue in UI
-            UI.HUDController.Instance?.ShowDialogue($"Child: {_childDialogue[childIndex]}");
+            UI.HUDController.Instance?.ShowDialogue("moon8_child", $"child_{childIndex}");
         }
     }
 }

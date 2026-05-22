@@ -5,6 +5,7 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.AI;
 using Tartaria.Input;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -441,7 +442,7 @@ namespace Tartaria.Integration
             if (player != null && Vector3.Distance(transform.position, player.transform.position) <= attackRange)
             {
                 var health = player.GetComponent<Tartaria.Gameplay.PlayerHealth>();
-                health?.TakeDamage(20f); // 20 damage per hit
+                health?.TakeDamage(20); // 20 damage per hit
             }
         }
     }

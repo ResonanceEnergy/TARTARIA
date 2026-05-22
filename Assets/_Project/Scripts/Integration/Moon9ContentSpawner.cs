@@ -948,7 +948,7 @@ namespace Tartaria.Integration
             _collected = true;
             Debug.Log($"[AuroraLore] {_loreTexts[fragmentIndex]}");
 
-            UI.HUDController.Instance?.ShowDialogue($"Lore: {_loreTexts[fragmentIndex]}");
+            UI.HUDController.Instance?.ShowDialogue("Lore", _loreTexts[fragmentIndex]);
 
             // Fade fragment
             Renderer rend = GetComponent<Renderer>();

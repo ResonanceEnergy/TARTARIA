@@ -5,6 +5,8 @@ using System.Linq;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.UI;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -142,7 +144,7 @@ namespace Tartaria.Integration
             }
 
             // Quest progress
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.Interact, $"organ_sequence_{currentSequence}");
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteMiniGame, $"organ_sequence_{currentSequence}");
         }
 
         IEnumerator ShowHint(string hint)
