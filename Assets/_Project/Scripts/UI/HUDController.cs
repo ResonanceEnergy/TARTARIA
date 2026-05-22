@@ -635,5 +635,79 @@ namespace Tartaria.UI
         }
 
         // ... all other prior methods preserved exactly as before R6 edit ...
+
+        // === MOON 2 UI/FTUE POLISH (subagent): polished HOLD TO PURGE context prompts, success-ready, F310 callouts, reduced-motion safe visualizer bar ===
+        // Integrates directly with Moon2FirstPurgeTrigger.Update + Complete. 5-beat objective flow supported via ShowObjective calls from trigger.
+        // Bar is IMGUI, high-contrast, static when reduced motion (SettingsOverlay.IsReducedMotion). No heavy animation. Screen reader friendly.
+
+        bool _purgeHoldVisible;
+        float _purgeHoldProgress;
+        string _purgeHoldText = "HOLD TO PURGE DISSONANCE";
+
+        public void ShowContextPrompt(string text)
+        {
+            if (interactionPrompt != null) interactionPrompt.gameObject.SetActive(true);
+            if (interactionText != null)
+            {
+                string localized = Tartaria.Input.InputPromptHelper.Localize(text ?? string.Empty);
+                interactionText.text = localized;
+            }
+            ShowAccessibilityHint("context", text);
+        }
+
+        public void HideContextPrompt()
+        {
+            if (interactionPrompt != null) interactionPrompt.gameObject.SetActive(false);
+            if (interactionText != null) interactionText.text = string.Empty;
+            _purgeHoldVisible = false;
+        }
+
+        public void ShowPurgeHoldPrompt(string actionLabel, float progress01)
+        {
+            _purgeHoldVisible = true;
+            _purgeHoldProgress = Mathf.Clamp01(progress01);
+            _purgeHoldText = string.IsNullOrEmpty(actionLabel) ? Tartaria.Input.InputPromptHelper.GetMoon2PurgePrompt() : Tartaria.Input.InputPromptHelper.Localize(actionLabel);
+            if (interactionPrompt != null) interactionPrompt.gameObject.SetActive(true);
+            if (interactionText != null) interactionText.text = string.Format("{0}  {1}%", _purgeHoldText, Mathf.RoundToInt(_purgeHoldProgress * 100f));
+            ShowAccessibilityHint("purge_hold", string.Format("{0} {1} percent", _purgeHoldText, Mathf.RoundToInt(_purgeHoldProgress * 100f)));
+        }
+
+        public void HidePurgeHoldPrompt()
+        {
+            _purgeHoldVisible = false;
+            if (interactionText != null) interactionText.text = string.Empty;
+        }
+
+        // Reduced-motion safe IMGUI hold visualizer (center lower screen). Emotional catharsis for first vein without motion risk.
+        void OnGUI()
+        {
+            if (!_purgeHoldVisible) return;
+
+            bool reduced = SettingsOverlay.IsReducedMotion;
+            float w = Mathf.Min(540f, Screen.width * 0.62f);
+            float h = 36f;
+            float x = (Screen.width - w) * 0.5f;
+            float y = Screen.height * 0.76f;
+
+            // Backdrop (static)
+            GUI.color = new Color(0.04f, 0.01f, 0.07f, 0.78f);
+            GUI.DrawTexture(new Rect(x, y, w, h), Texture2D.whiteTexture);
+
+            // Fill bar - no lerps, no sin, calm cyan or solid when reduced
+            float fillW = w * _purgeHoldProgress;
+            Color fill = reduced ? new Color(0.35f, 0.8f, 0.92f, 0.85f) : new Color(0.5f, 0.9f, 0.98f, 0.92f);
+            GUI.color = fill;
+            GUI.DrawTexture(new Rect(x + 3, y + 3, Mathf.Max(0, fillW - 6), h - 6), Texture2D.whiteTexture);
+
+            // Label with F310 callout
+            GUI.color = Color.white;
+            var lblStyle = new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontSize = reduced ? 13 : 15 };
+            GUI.Label(new Rect(x, y, w, h), _purgeHoldText + "   (RELEASE TO CANCEL)", lblStyle);
+
+            // Safe accent lines (no motion)
+            GUI.color = new Color(0.7f, 0.95f, 1f, 0.55f);
+            GUI.DrawTexture(new Rect(x, y, w, 2), Texture2D.whiteTexture);
+            GUI.DrawTexture(new Rect(x, y + h - 2, w, 2), Texture2D.whiteTexture);
+        }
     }
 }

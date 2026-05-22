@@ -82,6 +82,17 @@ namespace Tartaria.Save
 
         // R6: Boss arena state (Moon3 17th Hour)
         public BossSaveBlock boss = new();
+
+        // v15: Generic moon-flag bag (Moon7-13 arc progression)
+        public MoonFlagsSaveBlock moonFlags = new();
+        public MoonFlagsIntSaveBlock moonFlagsInt = new();
+
+        // v15: Helper accessors for arc scripts (bool)
+        public bool GetMoonFlag(int moonNum, string key) => moonFlags.Get($"m{moonNum}_{key}");
+        public void SetMoonFlag(int moonNum, string key, bool value) => moonFlags.Set($"m{moonNum}_{key}", value);
+        // v15: Helper accessors for arc scripts (int)
+        public int GetMoonFlag(int moonNum, string key, int defaultValue) => moonFlagsInt.Get($"m{moonNum}_{key}", defaultValue);
+        public void SetMoonFlag(int moonNum, string key, int value) => moonFlagsInt.Set($"m{moonNum}_{key}", value);
     }
 
     [Serializable]
@@ -707,6 +718,86 @@ namespace Tartaria.Save
     }
 
     /// <summary>
+    // v15: Generic moon-flag bag — used by Moon7-13 arc progression
+    [Serializable]
+    public class MoonFlagEntry
+    {
+        public string key;
+        public bool value;
+    }
+
+    [Serializable]
+    public class MoonFlagsSaveBlock
+    {
+        public System.Collections.Generic.List<MoonFlagEntry> flags = new();
+
+        [NonSerialized] private System.Collections.Generic.Dictionary<string, bool> _cache;
+
+        public bool Get(string key)
+        {
+            EnsureCache();
+            return _cache.TryGetValue(key, out bool v) && v;
+        }
+
+        public void Set(string key, bool value)
+        {
+            EnsureCache();
+            _cache[key] = value;
+            flags.Clear();
+            foreach (var kv in _cache)
+                flags.Add(new MoonFlagEntry { key = kv.Key, value = kv.Value });
+        }
+
+        void EnsureCache()
+        {
+            if (_cache != null) return;
+            _cache = new System.Collections.Generic.Dictionary<string, bool>();
+            foreach (var e in flags)
+                if (e != null && e.key != null)
+                    _cache[e.key] = e.value;
+        }
+    }
+
+    // v15: Generic int moon-flag bag — used by Moon7-13 arc progression (counters)
+    [Serializable]
+    public class MoonFlagIntEntry
+    {
+        public string key;
+        public int value;
+    }
+
+    [Serializable]
+    public class MoonFlagsIntSaveBlock
+    {
+        public System.Collections.Generic.List<MoonFlagIntEntry> flags = new();
+
+        [NonSerialized] private System.Collections.Generic.Dictionary<string, int> _cache;
+
+        public int Get(string key, int defaultValue = 0)
+        {
+            EnsureCache();
+            return _cache.TryGetValue(key, out int v) ? v : defaultValue;
+        }
+
+        public void Set(string key, int value)
+        {
+            EnsureCache();
+            _cache[key] = value;
+            flags.Clear();
+            foreach (var kv in _cache)
+                flags.Add(new MoonFlagIntEntry { key = kv.Key, value = kv.Value });
+        }
+
+        void EnsureCache()
+        {
+            if (_cache != null) return;
+            _cache = new System.Collections.Generic.Dictionary<string, int>();
+            foreach (var e in flags)
+                if (e != null && e.key != null)
+                    _cache[e.key] = e.value;
+        }
+    }
+
     /// M2 UX: Lightweight non-persistent info struct returned by SaveManager.GetSaveInfo(slot)
     /// for menu rendering (slot list, timestamps, playtime, existence). Not serialized into saves.
     /// </summary>

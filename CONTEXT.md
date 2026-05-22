@@ -63,6 +63,40 @@ Moon 1 now compiles clean. Echohaven ready for playtest/finishing.
 - Updated `Tools/campaign_builder.py` goal line (via prior cycles' pattern).
 - Updated `docs/STATUS/MOON_PROGRESS.md` (Last Updated + narrative) to record the third Moon 3 data host.
 
+---
+
+## Moons 7-13 Full Vertical Slice Arc Files + CS:0 Build — 2026-05-21
+
+**Work**: Wrote all remaining Campaign arc files (Moons 7–13), fixed all CS errors, achieved green build.
+
+**Arc Files Created** (`Assets/_Project/Scripts/Integration/`):
+- `Moon7ResonantArc.cs` — Korath in Aether ice, 3-session thaw, Cassian fate choice, golem siege, Maelix reveal, Zereth seeded. Seeds: `moon7_seed_korath_rock_cutting_airships`, `moon7_seed_cassian_fate_moon9`, `moon7_seed_grid_half_lit`, `moon7_seed_zereth_brothers_lore`.
+- `Moon8GalacticArc.cs` — Thorne flagship descent, 3-ship repair (`Moon8ShipRepairPoint`), Reset drone squadron, 180s night formation flight, civilization's sky/rail severed. Seeds: `moon8_seed_children_airship_crew`, `moon8_seed_airship_train_network`, `moon8_seed_korath_echo_megalith`, `moon8_seed_fast_travel_backbone`.
+- `Moon9SolarArc.cs` — 6 prophecy stones (`Moon9ProphecyStone`), aurora city, Zereth first contact (`zereth_first_contact`), Reset prophecy assault, 17hr clock install (`Moon9ClockInstallPoint`). Seeds: `moon9_seed_stones_7_to_12_seeded`, `mud_flood_timeline_questioned`, `seventeen_hour_clock_unlocked`.
+- `Moon10PlanetaryArc.cs` — continental rail (`Moon10RailLayPoint`), trigger room w/ 3 fingerprint sets (Zereth giant + 2 Parasite Cabal), ley-golem elites, full continental journey, prophecy stones 7-9 appear.
+- `Moon11SpectralArc.cs` — ancient aquifer, 8 fountains (`Moon11FountainActivatePoint`), sludge tendril swarm, planetary aurora, Lirael semi-solid, Stone of Warning (3 figures). Seeds: `moon11_seed_lirael_semi_solid`, `moon11_seed_purification_prereq_moon12`.
+- `Moon12CrystalArc.cs` — 12 bell towers on 12 continents (`Moon12BellTowerPoint`), Reset global assault, all-companions deployed, 60s Planetary Ring, Stone of Promise (two shadows holding hands), grid 95%. Fires: `reset_permanently_shattered`, `planetary_ring_complete`, `grid_at_95_percent`.
+- `Moon13CosmicArc.cs` — 3 Echo Realms (Golden Age / Dissonant Timeline / Flood moment), Zereth NOT combat — resonance dialogue only, Lirael fully solid, 17th Hour final node, grid 100%, True Timeline, `game_complete`. Seeds: `moon13_seed_true_timeline_unlocked`, `moon13_seed_zereth_healed`, `moon13_seed_grid_complete`.
+
+**Build Fixes**:
+- `Moon2FirstPurgeTrigger.cs` (Gameplay asm): Removed illegal `using Tartaria.Integration` + `using Tartaria.UI`. Replaced 3x `Tartaria.UI.SettingsOverlay.IsReducedMotion` with `PlayerPrefs.GetInt("TARTARIA_ReducedMotion", 0) == 1`. Replaced `FindAnyObjectByType<LiraelController>()` + direct call with `ServiceLocator.Lirael?.ReactToFirstPurge()`.
+- `ServiceLocator.cs` (Core asm): Added `void ReactToFirstPurge()` to `ILiraelService` interface so the Gameplay → Core → Integration call chain compiles without asmdef cycles.
+
+**Asmdef invariant preserved**: Core → {Input, Audio, Camera} → Gameplay → AI; UI refs Core/Gameplay/Input/Audio/Camera; Integration refs everything. Gameplay CANNOT reference UI or Integration.
+
+**Result**: CS:0 green build. All 13 Moon arc files on disk. Commit: `git add --ignore-errors -A`.
+
+**Files edited**:
+- `Assets/_Project/Scripts/Core/ServiceLocator.cs` (added ReactToFirstPurge to ILiraelService)
+- `Assets/_Project/Scripts/Gameplay/Moon2FirstPurgeTrigger.cs` (removed cross-asm violations)
+- `Assets/_Project/Scripts/Integration/Moon7ResonantArc.cs` (new)
+- `Assets/_Project/Scripts/Integration/Moon8GalacticArc.cs` (new)
+- `Assets/_Project/Scripts/Integration/Moon9SolarArc.cs` (new)
+- `Assets/_Project/Scripts/Integration/Moon10PlanetaryArc.cs` (new)
+- `Assets/_Project/Scripts/Integration/Moon11SpectralArc.cs` (new)
+- `Assets/_Project/Scripts/Integration/Moon12CrystalArc.cs` (new)
+- `Assets/_Project/Scripts/Integration/Moon13CosmicArc.cs` (new)
+
 **Files changed (git-detectable)**:
 - Assets/_Project/Scripts/Integration/CampaignFlowController.cs (real Moon03 data load + log in Awake)
 - Tools/campaign_builder.py (report goal updated in previous similar step)

@@ -282,8 +282,41 @@ namespace Tartaria.Integration
             AddTrust(-2f); // stress from corruption echo
             UpdateSolidity(Mathf.Max(0.05f, _solidity - 0.12f));
             CompanionManager.Instance?.TriggerPhysicalTellForBeat("lirael", 0); // fracture tell
-            Debug.Log("[LiraelController OnMoon2LiraelFracture] FTUE Discovery: memory fracture + physical tell. (beat 1)");
         }
+
+        /// <summary>
+        /// Called by Moon2FirstPurgeTrigger on successful first dissonance vein purge.
+        /// The emotional anchor reaction for the vertical slice: relief, memory fragment, trust, physical tell, banner/dialogue.
+        /// </summary>
+        public void ReactToFirstPurge()
+        {
+            DialogueManager.Instance?.PlayContextDialogue("lirael_first_purge_relief");
+            AddTrust(12f);
+            UpdateSolidity(Mathf.Min(0.55f, _solidity + 0.18f));
+            CompanionManager.Instance?.TriggerPhysicalTellForBeat("lirael", 0); // relief/solidify
+
+            // Warm 432 relief AVH specific to first purge catharsis
+            AudioManager.Instance?.PlaySFX2D("Moon2_LiraelFirstPurgeReaction", 0.72f);
+            AudioManager.Instance?.PlaySFX2D("Moon2_432LullabyLayer", 0.48f);
+            Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+
+            HUDController.Instance?.ShowBanner("LIRAEL", "The song returns... the shadow lifts. Thank you. I feel the caverns remembering.", 6f);
+
+            Debug.Log("[LiraelController] ReactToFirstPurge � emotional anchor relief for Moon 2 vertical slice (first vein). Trust + memory fragment + physical tell.");
+        }
+
+        /// <summary>
+        /// Called by Moon2LiraelIntroTrigger (and spawner first purge wiring) when player reaches the initial purge site volume.
+        /// Introduces Lirael at the first playable dissonance vein � sets up the emotional FTUE anchor.
+        /// </summary>
+        public void IntroduceMoon2FirstPurgeSite()
+        {
+            OnMoon2LiraelFracture(); // reuse fracture + tell for discovery entry
+            DialogueManager.Instance?.PlayContextDialogue("lirael_moon2_vein_beckon");
+            HUDController.Instance?.ShowContextPrompt("LIRAEL: Listen... the vein is breaking. Purge it with me.");
+            Debug.Log("[LiraelController] IntroduceMoon2FirstPurgeSite � beckon at emotional anchor vein.");
+        }
+
 
         /// <summary>Climax/Relief beat: After ionized fountain storm purify — memory solidifies, song relief, trust surge.</summary>
         public void OnMoon2FountainRelief(bool fullPurgeSuccess)
@@ -408,3 +441,4 @@ namespace Tartaria.Integration
         public bool fullyManifested;
     }
 }
+

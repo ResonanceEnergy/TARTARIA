@@ -124,6 +124,17 @@ namespace Tartaria.Audio
             Register("Moon2_432LullabyLayer", GenMoon2LullabyLayer());
             Register("Moon2_TuningResonance", GenMoon2TuningResonance());
 
+            // ═══ Moon 2 First Purge FTUE (Lunar Moon: Shadow & Purge) — immediate vertical slice audio (modeled on fresh Moon1 rich block) ═══
+            // Dissonance vein hum at start site, cathartic purge stinger, Lirael first reaction chime, F310-synced success tone,
+            // wraith teaser whisper. 324 Hz keynote + tritone corruption → pure 432/PHI crystal bloom on success.
+            // Used by Moon2ZoneScaffold Populate + Moon2FirstPurgeTrigger.
+            Register("Moon2_FirstVeinDissonanceHum", GenMoon2FirstVeinDissonanceHum());
+            Register("Moon2_FirstPurgeStinger", GenMoon2FirstPurgeStinger());
+            Register("Moon2_LiraelFirstPurgeReaction", GenMoon2LiraelFirstPurgeReaction());
+            Register("Moon2_PurgeSuccessF310Tone", GenMoon2PurgeSuccessF310Tone());
+            Register("Moon2_DissonanceWraithWhisper", GenMoon2DissonanceWraithWhisper());
+            Register("Moon2_PurifiedCrystalHum", GenMoon2PurifiedCrystalHum());
+
             // ═══ Moon 3 (Compassion & Rails — Windswept Highlands / Orphan Train Escort / Leviathan) — EXCLUSIVE ═══
             // 432Hz base lullaby rhythm system, dynamic train (wheel clack / whistle / stress), reactive Highlands wind,
             // layered Leviathan roars/attacks, emotional "The Aether Remembers" motif, tension/warmth/triumph layers.
@@ -1045,6 +1056,109 @@ namespace Tartaria.Audio
                 data[i] = (core + ring) * env * 0.55f;
             }
             return MakeClip("SFX_Moon2_TuningResonance", data);
+        }
+
+        // ═══ Moon 2 First Purge FTUE Generators (Shadow & Purge vertical slice) ═══
+        // Directly modeled on the rich Moon1 block just delivered. Dissonance (fractured 324 + tritone) → cathartic pure 432/PHI crystal bloom on successful first vein purge.
+        // Used by Moon2FirstPurgeTrigger + Moon2ZoneScaffold Populate.
+
+        /// <summary>Initial dissonance vein hum at the first playable site — low fractured 324 Hz + tritone corruption, slow pulse, crystalline crackle. The caverns are sick.</summary>
+        static AudioClip GenMoon2FirstVeinDissonanceHum()
+        {
+            int len = Samples(5.5f);
+            var data = new float[len];
+            float fBase = 324f * 0.333f; // deep sub
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = 0.75f + Mathf.Sin(t * 6.28f) * 0.12f;
+                float core = Sine(i, fBase) * 0.55f + Sine(i, 324f) * 0.38f + Sine(i, 324f * 1.5f) * 0.22f; // tritone lean
+                float crackle = FilteredNoise(i, 1850f) * 0.09f * env;
+                float pulse = Mathf.Sin(t * 1.8f) * 0.08f;
+                data[i] = (core + crackle + pulse) * env * 0.32f;
+            }
+            return MakeClip("SFX_Moon2_FirstVeinDissonanceHum", data);
+        }
+
+        /// <summary>Cathartic first purge success stinger — shadow fractures into pure 432 + PHI crystal bloom. Emotional release for the vertical slice.</summary>
+        static AudioClip GenMoon2FirstPurgeStinger()
+        {
+            int len = Samples(2.1f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI) * (1f - t * 0.35f);
+                // Start fractured, bloom pure
+                float diss = Sine(i, 324f) * 0.6f + Sine(i, 486f) * 0.4f;
+                float pure = Sine(i, 432f) * 0.7f + Sine(i, 432f * 1.618f) * 0.55f + Sine(i, 528f) * 0.35f + Sine(i, 699f) * 0.28f;
+                float blend = Mathf.Lerp(diss, pure, Mathf.SmoothStep(0.2f, 0.85f, t));
+                float sparkle = FilteredNoise(i, 2100f) * 0.11f * env;
+                data[i] = (blend + sparkle) * env * 0.48f;
+            }
+            return MakeClip("SFX_Moon2_FirstPurgeStinger", data);
+        }
+
+        /// <summary>Lirael first purge reaction chime — warm shadow-to-light shift, 432 core with soft PHI breath. Companion emotional payoff.</summary>
+        static AudioClip GenMoon2LiraelFirstPurgeReaction()
+        {
+            int len = Samples(2.6f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t * 0.6f) * (0.6f + Mathf.Sin(t * 4.2f) * 0.25f);
+                float core = Sine(i, 432f) * 0.48f + Sine(i, 432f * 1.25f) * 0.32f + Sine(i, 528f) * 0.27f;
+                float breath = Sine(i, 864f) * 0.18f * env;
+                data[i] = (core + breath) * env * 0.41f;
+            }
+            return MakeClip("SFX_Moon2_LiraelFirstPurgeReaction", data);
+        }
+
+        /// <summary>Tight bright F310-synced success tone for the exact moment the first vein purges. Pairs with rumble.</summary>
+        static AudioClip GenMoon2PurgeSuccessF310Tone()
+        {
+            int len = Samples(0.72f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI);
+                float tone = Sine(i, 699f) * 0.65f + Sine(i, 432f * 1.618f) * 0.48f + Sine(i, 1080f) * 0.22f;
+                data[i] = tone * env * 0.62f;
+            }
+            return MakeClip("SFX_Moon2_PurgeSuccessF310Tone", data);
+        }
+
+        /// <summary>Subtle wraith whisper / fractal threat layer for the Conflict teaser spawn after first purge. Distant, unsettling, low volume.</summary>
+        static AudioClip GenMoon2DissonanceWraithWhisper()
+        {
+            int len = Samples(3.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (0.4f + Mathf.Sin(t * 2.1f) * 0.3f) * (1f - t * 0.7f);
+                float whisper = FilteredNoise(i, 920f) * 0.7f + Sine(i, 162f) * 0.55f + Sine(i, 243f) * 0.4f; // tritone cluster
+                data[i] = whisper * env * 0.18f;
+            }
+            return MakeClip("SFX_Moon2_DissonanceWraithWhisper", data);
+        }
+
+        /// <summary>Soft pure singing hum from the newly purified crystal after successful first purge. Permanent world change audio.</summary>
+        static AudioClip GenMoon2PurifiedCrystalHum()
+        {
+            int len = Samples(7.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = 0.82f + Mathf.Sin(t * 1.4f) * 0.11f;
+                float pure = Sine(i, 432f) * 0.52f + Sine(i, 432f * 1.618f) * 0.38f + Sine(i, 648f) * 0.25f;
+                float shimmer = FilteredNoise(i, 1650f) * 0.07f * env;
+                data[i] = (pure + shimmer) * env * 0.29f;
+            }
+            return MakeClip("SFX_Moon2_PurifiedCrystalHum", data);
         }
 
         // ═══════════════════════════════════════════════

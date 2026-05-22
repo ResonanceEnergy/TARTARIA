@@ -11,7 +11,7 @@ namespace Tartaria.Integration
     /// Singleton, DontDestroyOnLoad, self-bootstraps before scene load.
     /// </summary>
     [DisallowMultipleComponent]
-    public class MoonProgressTracker : MonoBehaviour
+    public class MoonProgressTracker : MonoBehaviour, Tartaria.Core.IMoonProgressService
     {
         const string PrefKeyPrefix = "TARTARIA_MoonCleared_";
         public const int MoonCount = 13;
@@ -29,6 +29,7 @@ namespace Tartaria.Integration
             var go = new GameObject("MoonProgressTracker");
             DontDestroyOnLoad(go);
             Instance = go.AddComponent<MoonProgressTracker>();
+            Tartaria.Core.ServiceLocator.MoonProgress = Instance;
             Instance.LoadFromPrefs();
         }
 

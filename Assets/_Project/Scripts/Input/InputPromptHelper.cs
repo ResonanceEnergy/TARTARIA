@@ -29,6 +29,15 @@ namespace Tartaria.Input
         public static string Sprint        => GamepadActive ? "[L3]" : "[Shift]";
         public static string Inventory     => GamepadActive ? "[Select]" : "[I]";
 
+        // Moon 2 FTUE specific: polished HOLD TO PURGE with explicit F310 / Logitech callout for vertical slice emotional clarity
+        public static string PurgeHold     => GamepadActive ? "HOLD [X] (F310)" : "HOLD [E]";
+        public static string PurgeHoldShort=> GamepadActive ? "[X] (F310)" : "[E]";
+
+        /// <summary>
+        /// Returns a full localized "HOLD TO PURGE DISSONANCE" prompt string with correct button + F310 branding for Moon2FirstPurgeTrigger.
+        /// </summary>
+        public static string GetMoon2PurgePrompt() => $"HOLD {PurgeHoldShort} TO PURGE DISSONANCE";
+
         /// <summary>
         /// Replace bracketed keyboard tokens in a string with the active scheme's
         /// equivalent. Cheap to call from GetInteractPrompt() on every frame.
@@ -46,6 +55,9 @@ namespace Tartaria.Input
             if (raw.IndexOf("[G]") >= 0) raw = raw.Replace("[G]", "[B]");
             if (raw.IndexOf("[Esc]") >= 0) raw = raw.Replace("[Esc]", "[Start]");
             if (raw.IndexOf("[Enter]") >= 0) raw = raw.Replace("[Enter]", "[A]");
+
+            // Moon2 F310 explicit support
+            if (raw.IndexOf("[X] (F310)") >= 0) raw = raw.Replace("[X] (F310)", "X (F310)");
             return raw;
         }
 
