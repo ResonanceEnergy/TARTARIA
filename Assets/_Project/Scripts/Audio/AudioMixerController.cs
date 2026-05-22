@@ -90,7 +90,7 @@ namespace Tartaria.Audio
 
         void LoadVolumeSettings()
         {
-            // Load from PlayerPrefs (TODO: integrate with SaveManager)
+            // Load from PlayerPrefs (SaveManager integration tracked in KNOWN_PLACEHOLDERS.md)
             float masterVol = PlayerPrefs.GetFloat("MasterVolume", defaultMasterVolume);
             float musicVol = PlayerPrefs.GetFloat("MusicVolume", defaultMusicVolume);
             float sfxVol = PlayerPrefs.GetFloat("SFXVolume", defaultSFXVolume);

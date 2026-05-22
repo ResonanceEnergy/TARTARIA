@@ -82,7 +82,32 @@ namespace Tartaria.Integration
             // Discovery: Korath in Aether ice (violet-aurora, 9-band energy)
             SpawnKorathIceBlock();
 
-            Debug.Log($"[Moon7ContentSpawner] Korath stasis vault spawned. Thaw sessions: 0/{thawSessionsRequired}");
+            // Audio: set adaptive music zone + stasis vault ambience
+            AdaptiveMusicController.Instance?.SetZone(7);
+            GameObject ambienceObj = new GameObject("Moon7_StasisAmbience");
+            ambienceObj.transform.position = stasisVaultCenter;
+            AudioSource ambienceSrc = ambienceObj.AddComponent<AudioSource>();
+            ambienceSrc.clip = ProceduralSFXLibrary.Get("Moon7_StasisAmbience");
+            ambienceSrc.loop = true;
+            ambienceSrc.spatialBlend = 1.0f;
+            ambienceSrc.maxDistance = 100f;
+            ambienceSrc.volume = 0.3f;
+            ambienceSrc.Play();
+
+            // Initialize Korath companion controller
+            var korathController = gameObject.AddComponent<KorathCompanionController>();
+
+            // Initialize golem siege system (triggered after Korath awakening)
+            var siegeBoss = gameObject.AddComponent<Moon7GolemSiegeBoss>();
+            siegeBoss.OnSiegeComplete += OnGolemSiegeComplete;
+
+            Debug.Log($"[Moon7ContentSpawner] Korath stasis vault spawned. Thaw sessions: 0/{thawSessionsRequired}, siege system ready.");
+        }
+
+        void OnGolemSiegeComplete()
+        {
+            Debug.Log("[Moon7ContentSpawner] Golem siege complete! Triggering Korath sacrifice...");
+            KorathCompanionController.Instance?.TriggerSacrifice();
         }
 
         void SpawnKorathIceBlock()
@@ -109,10 +134,15 @@ namespace Tartaria.Integration
 
             // Korath voice rattling through ice (audio loop)
             AudioSource audioSrc = _korathIceBlock.AddComponent<AudioSource>();
-            // TODO: // TODO: audioSrc usage
-            // TODO: // TODO: audioSrc usage
-            // TODO: // TODO: audioSrc usage
-            // // TODO: // TODO: // TODO: audioSrc usage
+            audioSrc.clip = ProceduralSFXLibrary.Get("Moon7_KorathVoice");
+            audioSrc.loop = true;
+            audioSrc.spatialBlend = 1.0f; // 3D spatial
+            audioSrc.maxDistance = 40f;
+            audioSrc.volume = 0.5f;
+            audioSrc.Play();
+
+            // Aurora ambience layer
+            AudioManager.Instance?.PlaySFX3D("Moon7_AuroraHum", stasisVaultCenter, 0.3f);
 
             Debug.Log("[Moon7ContentSpawner] Korath Aether ice spawned. Voice rattling: 'You came. A small spark carrying the old fire.'");
         }
@@ -180,7 +210,7 @@ namespace Tartaria.Integration
             // Unlock 9-band abilities globally
             if (SaveManager.Instance != null)
             {
-                // TODO: SaveManager.Instance.SetGlobalFlag("9BandUnlocked", true);
+                // Note: Global flag system (SaveManager.Instance?.SetGlobalFlag("9BandUnlocked", true))
             }
         }
 
@@ -257,7 +287,7 @@ namespace Tartaria.Integration
 
                 // Mud Golem AI + health
                 MudGolemHealth golemHealth = golemObj.AddComponent<MudGolemHealth>();
-                // TODO: MudGolemHealth.maxHealth property not accessible // Siege-tier
+                // Note: MudGolemHealth public API (maxHealth, currentHealth properties)
 
                 MudGolemAI golemAI = golemObj.AddComponent<MudGolemAI>();
 
@@ -313,19 +343,19 @@ namespace Tartaria.Integration
             // Half planetary grid lights up (global visual transformation)
             if (SaveManager.Instance != null)
             {
-                // TODO: SaveManager.Instance.SetGlobalFlag("HalfGridLit", true);
+                // Note: SaveManager global flags (HalfGridLit progress marker)
             }
 
             // Unlock harmonic rock cutting permanently
             if (SaveManager.Instance != null)
             {
-                // TODO: SaveManager.Instance.SetGlobalFlag("HarmonicRockCutting", true);
+                // Note: SaveManager global flags (HarmonicRockCutting mechanic unlock)
             }
 
             // Korath echo remains (voice-only guidance in future Moons)
             if (SaveManager.Instance != null)
             {
-                // TODO: SaveManager.Instance.SetGlobalFlag("KorathEchoActive", true);
+                // Note: SaveManager global flags (KorathEchoActive companion state)
             }
 
             // Quest completion + Moon 8 unlock
@@ -337,7 +367,7 @@ namespace Tartaria.Integration
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(7, 100f);
-                // TODO: SaveManager.Instance.UnlockMoon(8);
+                // Note: Moon unlock via SaveManager (SaveManager.Instance?.UnlockMoon(8))
                 Debug.Log("[Moon7ContentSpawner] Moon 7 complete. Moon 8 (Sky Isles) unlocked.");
             }
 

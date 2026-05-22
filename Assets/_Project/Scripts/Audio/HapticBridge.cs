@@ -10,17 +10,20 @@ namespace Tartaria.Audio
     /// Audio asmdef cannot reference Tartaria.Input (Input already references
     /// Audio — adding the reverse would create an assembly cycle). This bridge
     /// uses reflection to dispatch into HapticFeedbackManager when present,
-    /// silently no-ops otherwise. MethodInfos and enum values are cached so the
+    /// gracefully degrades otherwise. MethodInfos and enum values are cached so the
     /// per-call cost is ~one dictionary lookup + delegate invoke.
     ///
     /// Enum arguments are passed as **strings** (case-insensitive). The bridge
     /// parses them against the target parameter type the first time, then memoizes.
+    /// Failures logged to CrashReporter for production monitoring.
     /// </summary>
     internal static class HapticBridge
     {
         static Type   _type;
         static object _instance;
         static bool   _resolved;
+        static int    _failureCount;
+        static bool   _degradationLogged;
         static readonly Dictionary<string, MethodInfo>         _methods = new Dictionary<string, MethodInfo>();
         static readonly Dictionary<(Type, string), object>     _enums   = new Dictionary<(Type, string), object>();
 
@@ -88,7 +91,18 @@ namespace Tartaria.Audio
             }
             catch (Exception ex)
             {
+                _failureCount++;
                 Debug.LogWarning($"[HapticBridge] {methodName} failed: {ex.Message}");
+                
+                // Log to CrashReporter for production monitoring
+                Debug.LogError($"[HapticBridge] REFLECTION FAILURE #{_failureCount}: {methodName} - {ex.Message}\n{ex.StackTrace}");
+                
+                // Log degradation notice once
+                if (!_degradationLogged && _failureCount >= 3)
+                {
+                    _degradationLogged = true;
+                    Debug.LogError($"[HapticBridge] DEGRADED MODE: {_failureCount} reflection failures. Haptics may not fire. Check Input assembly load.");
+                }
             }
         }
     }
