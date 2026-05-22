@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Tartaria.Camera;  // For CinematicWaypoint struct
 
 namespace Tartaria.Integration
 {
@@ -8,8 +9,8 @@ namespace Tartaria.Integration
     /// Used by CinematicCameraController to play scripted camera movements.
     /// 
     /// Usage:
-    /// 1. Call DefineSequence() with sequence name and waypoints array
-    /// 2. Pass to CinematicCameraController.PlaySequence(name)
+    /// 1. Get sequence from Sequences dictionary
+    /// 2. Pass to CinematicCameraController.PlaySequence(waypoints)
     /// 3. Camera interpolates through waypoints with configurable speed/easing
     /// 
     /// Example sequences:
@@ -88,15 +89,26 @@ namespace Tartaria.Integration
             Sequences["moon13_ending"] = waypoints;
             Debug.Log("[Cinematics] Defined Moon13 ending sequence (5 waypoints, 18s total)");
         }
-    }
 
-    /// <summary>
-    /// Single cinematic waypoint — position, look target, duration to reach.
-    /// </summary>
-    public struct CinematicWaypoint
-    {
-        public Vector3 position;
-        public Vector3 lookAt;
-        public float duration;  // Time to interpolate from previous waypoint (seconds)
+        /// <summary>
+        /// Helper to play sequence on a cinematic camera.
+        /// </summary>
+        public static void PlaySequence(string sequenceName, CinematicCameraController camera)
+        {
+            if (camera == null)
+            {
+                Debug.LogError("[Cinematics] Cannot play sequence, camera is null");
+                return;
+            }
+
+            if (!Sequences.TryGetValue(sequenceName, out var waypoints))
+            {
+                Debug.LogError($"[Cinematics] Sequence '{sequenceName}' not found");
+                return;
+            }
+
+            camera.PlaySequence(waypoints);
+            Debug.Log($"[Cinematics] Playing sequence '{sequenceName}'");
+        }
     }
 }
