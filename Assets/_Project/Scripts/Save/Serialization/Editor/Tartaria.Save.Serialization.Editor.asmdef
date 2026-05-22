@@ -1,0 +1,19 @@
+{
+    "name": "Tartaria.Save.Serialization.Editor",
+    "rootNamespace": "Tartaria.Editor.Save",
+    "references": [
+        "Tartaria.Save",
+        "Tartaria.Save.Serialization"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

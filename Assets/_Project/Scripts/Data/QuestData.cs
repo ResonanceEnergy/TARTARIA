@@ -9,8 +9,11 @@ namespace Tartaria.Data
     /// Supports branching quest chains and prerequisite validation.
     /// </summary>
     [CreateAssetMenu(menuName = "Tartaria/Data/Quest Data", order = 99)]
-    public class QuestData : QuestDefinition
+    public class QuestData : QuestDefinition, UnityEngine.ISerializationCallbackReceiver
     {
+        [Header("Schema Version")]
+        [SerializeField] int schemaVersion = Tartaria.Save.SchemaVersion.CURRENT_QUEST;
+
         [Header("Campaign Integration")]
         [Tooltip("Moon number (1-13, 0 for meta/hub quests)")]
         [Range(0, 13)]
@@ -100,6 +103,34 @@ namespace Tartaria.Data
             // Fallback to base objectives array
             return objectives ?? System.Array.Empty<QuestObjective>();
         }
+
+        #region Schema Migration (ISerializationCallbackReceiver)
+
+        /// <summary>
+        /// Called before Unity serializes this object.
+        /// </summary>
+        public void OnBeforeSerialize()
+        {
+            // No action needed
+        }
+
+        /// <summary>
+        /// Called after Unity deserializes this object.
+        /// Auto-migrates to latest schema version if needed.
+        /// </summary>
+        public void OnAfterDeserialize()
+        {
+            int currentVersion = Tartaria.Save.SchemaVersion.CURRENT_QUEST;
+            
+            if (schemaVersion < currentVersion)
+            {
+                Debug.Log($"[QuestData] {questId}: Auto-migrating from v{schemaVersion} to v{currentVersion}");
+                // Future: Apply migration logic here when v2 is released
+                schemaVersion = currentVersion;
+            }
+        }
+
+        #endregion
     }
 
     /// <summary>

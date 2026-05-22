@@ -1,0 +1,17 @@
+// Assembly definition for Serialization namespace
+{
+    "name": "Tartaria.Save.Serialization",
+    "rootNamespace": "Tartaria.Save.Serialization",
+    "references": [
+        "Tartaria.Save"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
