@@ -862,6 +862,20 @@ namespace Tartaria.Integration
             Moon2LunarContentSpawner.Instance?.OnFirstDissonanceVeinPurged();
         }
 
+        /// <summary>Register a site purge for the main 5 Moon 2 buildings.</summary>
+        void RegisterSitePurge(string siteId)
+        {
+            if (string.IsNullOrEmpty(siteId) || _purgedSites.Contains(siteId))
+                return;
+
+            _purgedSites.Add(siteId);
+            _purgeCount++;
+
+            SaveManager.Instance?.MarkDirty();
+
+            Debug.Log($"[Moon2Progress] Site purged: {siteId} | Total: {_purgeCount}");
+        }
+
         // --- Building-specific purge callbacks (called by Moon2BuildingRestorationSequencer) ---
 
         public void OnCathedralDomePurged()

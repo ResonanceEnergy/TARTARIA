@@ -196,7 +196,7 @@ namespace Tartaria.Integration
             // Notify rail escort controller
             if (RailEscortController.Instance != null)
             {
-                RailEscortController.Instance.OnRailSegmentReactivated(_segmentsReactivated);
+                RailEscortController.Instance.OnRailSegmentReactivated(_segmentsActivated);
             }
 
             // Check completion
@@ -285,7 +285,7 @@ namespace Tartaria.Integration
             // Notify escort controller
             if (RailEscortController.Instance != null)
             {
-                RailEscortController.Instance.OnRailSegmentReactivated();  // Final call
+                RailEscortController.Instance.OnRailSegmentReactivated(totalSegments);  // Final call
             }
         }
 

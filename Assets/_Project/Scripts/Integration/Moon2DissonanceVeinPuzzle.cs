@@ -331,9 +331,6 @@ namespace Tartaria.Integration
             if (Integration.MicroGiantController.Instance == null ||
                 !Integration.MicroGiantController.Instance.IsPlayerShrunkForMicroGiantMode())
             {
-            if (Integration.MicroGiantController.Instance == null ||
-                !Integration.MicroGiantController.Instance.IsPlayerShrunkForMicroGiantMode)
-            {
                 AudioManager.Instance?.PlaySFX2D("UI_Error");
                 if (UI.HUDController.Instance != null)
                 {
