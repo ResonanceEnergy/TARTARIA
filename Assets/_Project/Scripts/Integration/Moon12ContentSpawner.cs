@@ -25,6 +25,9 @@ namespace Tartaria.Integration
         bool _resetAssaultActive;
         bool _planetaryRingTriggered;
 
+        [Header("Cymatic Tuning")]
+        readonly List<CymaticTuningPuzzle> _tuningPuzzles = new();
+
         [Header("Spawning")]
         [SerializeField] Vector3[] bellTowerPoints;  // 12 tower locations across zones
         [SerializeField] GameObject bellTowerPrefab;  // Bell tower structure
@@ -126,6 +129,10 @@ namespace Tartaria.Integration
                     var interactable = console.AddComponent<BellTowerConsole>();
                     interactable.spawner = this;
                     interactable.towerIndex = i;
+
+                    // Add cymatic tuning puzzle to each tower
+                    var tuningPuzzle = tower.AddComponent<CymaticTuningPuzzle>();
+                    _tuningPuzzles.Add(tuningPuzzle);
                 }
 
                 _bellTowers.Add(tower);
@@ -140,6 +147,18 @@ namespace Tartaria.Integration
             {
                 Debug.LogWarning($"[Moon 12] Invalid tower index {towerIndex}");
                 return;
+            }
+
+            // Check if cymatic puzzle is solved for this tower
+            if (towerIndex < _tuningPuzzles.Count)
+            {
+                var puzzle = _tuningPuzzles[towerIndex];
+                if (puzzle != null && !puzzle.IsSolved)
+                {
+                    Debug.Log($"[Moon 12] Tower {towerIndex + 1} requires cymatic tuning first");
+                    puzzle.ActivatePuzzle();
+                    return;
+                }
             }
 
             _towersSynchronized++;
