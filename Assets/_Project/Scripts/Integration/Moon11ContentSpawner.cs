@@ -140,46 +140,148 @@ namespace Tartaria.Integration
             _aquiferCore = new GameObject("AquiferCore_Ancient");
             _aquiferCore.transform.position = aquiferCenterPoint;
 
-            // Multi-part aquifer chamber structure
-            // Outer containment shell
-            var chamberOuter = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            chamberOuter.name = "ChamberOuter";
+            // Multi-part aquifer chamber structure - EACH LAYER IS 3-PART ASSEMBLY
+            
+            // OUTER CONTAINMENT SHELL (3 parts)
+            var chamberOuter = new GameObject("ChamberOuter");
             chamberOuter.transform.SetParent(_aquiferCore.transform);
-            chamberOuter.transform.localScale = Vector3.one * 22f;
             chamberOuter.transform.localPosition = Vector3.zero;
+            
+            var outerShell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            outerShell.name = "Shell";
+            outerShell.transform.SetParent(chamberOuter.transform);
+            outerShell.transform.localScale = Vector3.one * 22f;
+            outerShell.transform.localPosition = Vector3.zero;
+            
+            var outerBandTop = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            outerBandTop.name = "BandTop";
+            outerBandTop.transform.SetParent(chamberOuter.transform);
+            outerBandTop.transform.localScale = new Vector3(22.5f, 0.8f, 22.5f);
+            outerBandTop.transform.localPosition = Vector3.up * 8f;
+            outerBandTop.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            
+            var outerBandBot = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            outerBandBot.name = "BandBottom";
+            outerBandBot.transform.SetParent(chamberOuter.transform);
+            outerBandBot.transform.localScale = new Vector3(22.5f, 0.8f, 22.5f);
+            outerBandBot.transform.localPosition = Vector3.down * 8f;
+            outerBandBot.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
 
-            // Mid-layer filtration ring
-            var chamberMid = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            chamberMid.name = "ChamberMid";
+            // MID-LAYER FILTRATION RING (3 parts)
+            var chamberMid = new GameObject("ChamberMid");
             chamberMid.transform.SetParent(_aquiferCore.transform);
-            chamberMid.transform.localScale = Vector3.one * 16f;
             chamberMid.transform.localPosition = Vector3.zero;
+            
+            var midShell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            midShell.name = "Shell";
+            midShell.transform.SetParent(chamberMid.transform);
+            midShell.transform.localScale = Vector3.one * 16f;
+            midShell.transform.localPosition = Vector3.zero;
+            
+            var midRingA = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            midRingA.name = "FilterRing1";
+            midRingA.transform.SetParent(chamberMid.transform);
+            midRingA.transform.localScale = new Vector3(16.5f, 0.5f, 16.5f);
+            midRingA.transform.localPosition = Vector3.up * 5f;
+            midRingA.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+            
+            var midRingB = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            midRingB.name = "FilterRing2";
+            midRingB.transform.SetParent(chamberMid.transform);
+            midRingB.transform.localScale = new Vector3(16.5f, 0.5f, 16.5f);
+            midRingB.transform.localPosition = Vector3.down * 5f;
+            midRingB.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
 
-            // Inner reservoir
-            var chamberInner = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            chamberInner.name = "ChamberInner";
+            // INNER RESERVOIR (3 parts)
+            var chamberInner = new GameObject("ChamberInner");
             chamberInner.transform.SetParent(_aquiferCore.transform);
-            chamberInner.transform.localScale = Vector3.one * 12f;
             chamberInner.transform.localPosition = Vector3.zero;
+            
+            var innerShell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            innerShell.name = "Shell";
+            innerShell.transform.SetParent(chamberInner.transform);
+            innerShell.transform.localScale = Vector3.one * 12f;
+            innerShell.transform.localPosition = Vector3.zero;
+            
+            var innerCap1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            innerCap1.name = "CapTop";
+            innerCap1.transform.SetParent(chamberInner.transform);
+            innerCap1.transform.localScale = new Vector3(4f, 6f, 4f);
+            innerCap1.transform.localPosition = Vector3.up * 4f;
+            
+            var innerCap2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            innerCap2.name = "CapBottom";
+            innerCap2.transform.SetParent(chamberInner.transform);
+            innerCap2.transform.localScale = new Vector3(4f, 6f, 4f);
+            innerCap2.transform.localPosition = Vector3.down * 4f;
 
-            // Water source core (corrupted)
-            var waterSource = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            waterSource.name = "WaterSource";
+            // WATER SOURCE CORE - corrupted (3 parts)
+            var waterSource = new GameObject("WaterSource");
             waterSource.transform.SetParent(_aquiferCore.transform);
-            waterSource.transform.localScale = Vector3.one * 6f;
             waterSource.transform.localPosition = Vector3.zero;
-            var renderer = waterSource.GetComponent<Renderer>();
-            if (renderer != null)
+            
+            var sourceCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sourceCore.name = "Core";
+            sourceCore.transform.SetParent(waterSource.transform);
+            sourceCore.transform.localScale = Vector3.one * 6f;
+            sourceCore.transform.localPosition = Vector3.zero;
+            var coreRend = sourceCore.GetComponent<Renderer>();
+            if (coreRend != null)
             {
-                renderer.material.color = new Color(0.1f, 0.1f, 0.1f, 0.8f);  // Dark corrupted water
+                coreRend.material.color = new Color(0.1f, 0.1f, 0.1f, 0.8f);  // Dark corrupted water
+            }
+            
+            var sourcePulse1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sourcePulse1.name = "Pulse1";
+            sourcePulse1.transform.SetParent(waterSource.transform);
+            sourcePulse1.transform.localScale = Vector3.one * 5f;
+            sourcePulse1.transform.localPosition = Vector3.zero;
+            var pulse1Rend = sourcePulse1.GetComponent<Renderer>();
+            if (pulse1Rend != null)
+            {
+                pulse1Rend.material.color = new Color(0.15f, 0.05f, 0.05f, 0.5f);
+            }
+            
+            var sourcePulse2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            sourcePulse2.name = "Pulse2";
+            sourcePulse2.transform.SetParent(waterSource.transform);
+            sourcePulse2.transform.localScale = Vector3.one * 4f;
+            sourcePulse2.transform.localPosition = Vector3.zero;
+            var pulse2Rend = sourcePulse2.GetComponent<Renderer>();
+            if (pulse2Rend != null)
+            {
+                pulse2Rend.material.color = new Color(0.2f, 0.08f, 0.08f, 0.3f);
             }
 
-            // Interactable: purification console
-            var console = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            console.name = "PurificationConsole";
+            // Interactable: purification console (4-part control station)
+            var console = new GameObject("PurificationConsole");
             console.transform.SetParent(_aquiferCore.transform);
             console.transform.localPosition = new Vector3(0f, -8f, 0f);
-            console.transform.localScale = new Vector3(3f, 1.5f, 3f);
+            
+            var consoleBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            consoleBase.name = "Base";
+            consoleBase.transform.SetParent(console.transform);
+            consoleBase.transform.localScale = new Vector3(3.5f, 0.3f, 3.5f);
+            consoleBase.transform.localPosition = Vector3.zero;
+            
+            var consoleMain = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            consoleMain.name = "MainUnit";
+            consoleMain.transform.SetParent(console.transform);
+            consoleMain.transform.localScale = new Vector3(2.5f, 1.2f, 2.5f);
+            consoleMain.transform.localPosition = Vector3.up * 0.8f;
+            
+            var consoleScreen = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            consoleScreen.name = "Screen";
+            consoleScreen.transform.SetParent(console.transform);
+            consoleScreen.transform.localScale = new Vector3(1.8f, 1f, 0.2f);
+            consoleScreen.transform.localPosition = new Vector3(0f, 1.5f, 1.3f);
+            consoleScreen.transform.rotation = Quaternion.Euler(-15f, 0f, 0f);
+            
+            var consoleAntenna = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            consoleAntenna.name = "Antenna";
+            consoleAntenna.transform.SetParent(console.transform);
+            consoleAntenna.transform.localScale = new Vector3(0.2f, 1.5f, 0.2f);
+            consoleAntenna.transform.localPosition = Vector3.up * 3f;
 
             var interactable = console.AddComponent<AquiferConsole>();
             interactable.spawner = this;
@@ -200,20 +302,51 @@ namespace Tartaria.Integration
                 var node = new GameObject($"AquiferNode_{i + 1}");
                 node.transform.position = aquiferNodePoints[i];
 
-                // Node crystal (corrupted)
-                var crystal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                crystal.name = "NodeCrystal";
+                // Node crystal cluster (3-part formation - corrupted)
+                var crystal = new GameObject("NodeCrystal");
                 crystal.transform.SetParent(node.transform);
-                crystal.transform.localScale = Vector3.one * 3f;
                 crystal.transform.localPosition = Vector3.zero;
-                var renderer = crystal.GetComponent<Renderer>();
-                if (renderer != null)
+                
+                // Main crystal
+                var mainCrystal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                mainCrystal.name = "MainCrystal";
+                mainCrystal.transform.SetParent(crystal.transform);
+                mainCrystal.transform.localScale = new Vector3(2f, 3.5f, 2f);
+                mainCrystal.transform.localPosition = Vector3.zero;
+                var mainRend = mainCrystal.GetComponent<Renderer>();
+                if (mainRend != null)
                 {
-                    renderer.material.color = new Color(0.2f, 0.1f, 0.1f, 1f);  // Dark red corruption
+                    mainRend.material.color = new Color(0.2f, 0.1f, 0.1f, 1f);  // Dark red corruption
+                }
+                
+                // Side crystal 1
+                var sideCrystal1 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sideCrystal1.name = "SideCrystal1";
+                sideCrystal1.transform.SetParent(crystal.transform);
+                sideCrystal1.transform.localScale = new Vector3(1.2f, 2.2f, 1.2f);
+                sideCrystal1.transform.localPosition = new Vector3(-1.5f, -0.5f, 0f);
+                sideCrystal1.transform.rotation = Quaternion.Euler(0f, 0f, -25f);
+                var side1Rend = sideCrystal1.GetComponent<Renderer>();
+                if (side1Rend != null)
+                {
+                    side1Rend.material.color = new Color(0.18f, 0.09f, 0.09f, 1f);
+                }
+                
+                // Side crystal 2
+                var sideCrystal2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                sideCrystal2.name = "SideCrystal2";
+                sideCrystal2.transform.SetParent(crystal.transform);
+                sideCrystal2.transform.localScale = new Vector3(1f, 1.8f, 1f);
+                sideCrystal2.transform.localPosition = new Vector3(1.2f, -0.8f, 0.5f);
+                sideCrystal2.transform.rotation = Quaternion.Euler(0f, 0f, 20f);
+                var side2Rend = sideCrystal2.GetComponent<Renderer>();
+                if (side2Rend != null)
+                {
+                    side2Rend.material.color = new Color(0.22f, 0.11f, 0.11f, 1f);
                 }
 
-                // Interactable
-                var interactable = crystal.AddComponent<AquiferNode>();
+                // Interactable (on main crystal)
+                var interactable = mainCrystal.AddComponent<AquiferNode>();
                 interactable.spawner = this;
                 interactable.nodeIndex = i;
 
@@ -241,44 +374,124 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    // Multi-part fountain structure
+                    // Multi-part fountain structure - EACH COMPONENT IS 3-PART ASSEMBLY (15 total)
                     fountain = new GameObject($"PureFountain_{i + 1}");
                     fountain.transform.position = fountainPoints[i];
 
-                    // Base platform
-                    var basePlatform = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    basePlatform.name = "Base";
+                    // BASE PLATFORM (3 parts)
+                    var basePlatform = new GameObject("Base");
                     basePlatform.transform.SetParent(fountain.transform);
-                    basePlatform.transform.localScale = new Vector3(6f, 0.5f, 6f);
                     basePlatform.transform.localPosition = Vector3.up * 0.25f;
+                    
+                    var baseRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    baseRing.name = "Ring";
+                    baseRing.transform.SetParent(basePlatform.transform);
+                    baseRing.transform.localScale = new Vector3(6.5f, 0.3f, 6.5f);
+                    baseRing.transform.localPosition = Vector3.zero;
+                    
+                    var basePlat = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    basePlat.name = "Platform";
+                    basePlat.transform.SetParent(basePlatform.transform);
+                    basePlat.transform.localScale = new Vector3(6f, 0.4f, 6f);
+                    basePlat.transform.localPosition = Vector3.up * 0.35f;
+                    
+                    var baseEdge = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    baseEdge.name = "Edge";
+                    baseEdge.transform.SetParent(basePlatform.transform);
+                    baseEdge.transform.localScale = new Vector3(5.5f, 0.2f, 5.5f);
+                    baseEdge.transform.localPosition = Vector3.up * 0.6f;
 
-                    // Basin
-                    var basin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    basin.name = "Basin";
+                    // BASIN (3 parts)
+                    var basin = new GameObject("Basin");
                     basin.transform.SetParent(fountain.transform);
-                    basin.transform.localScale = new Vector3(4.5f, 1f, 4.5f);
                     basin.transform.localPosition = Vector3.up * 1f;
+                    
+                    var basinBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    basinBase.name = "Base";
+                    basinBase.transform.SetParent(basin.transform);
+                    basinBase.transform.localScale = new Vector3(4.5f, 0.8f, 4.5f);
+                    basinBase.transform.localPosition = Vector3.zero;
+                    
+                    var basinRim = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    basinRim.name = "Rim";
+                    basinRim.transform.SetParent(basin.transform);
+                    basinRim.transform.localScale = new Vector3(4.7f, 0.3f, 4.7f);
+                    basinRim.transform.localPosition = Vector3.up * 0.85f;
+                    
+                    var basinLip = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    basinLip.name = "Lip";
+                    basinLip.transform.SetParent(basin.transform);
+                    basinLip.transform.localScale = new Vector3(4.3f, 0.2f, 4.3f);
+                    basinLip.transform.localPosition = Vector3.up * 1.1f;
 
-                    // Central pillar
-                    var pillar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    pillar.name = "Pillar";
+                    // CENTRAL PILLAR (3 parts)
+                    var pillar = new GameObject("Pillar");
                     pillar.transform.SetParent(fountain.transform);
-                    pillar.transform.localScale = new Vector3(0.8f, 2f, 0.8f);
                     pillar.transform.localPosition = Vector3.up * 2f;
+                    
+                    var pillarBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    pillarBase.name = "Base";
+                    pillarBase.transform.SetParent(pillar.transform);
+                    pillarBase.transform.localScale = new Vector3(1f, 0.5f, 1f);
+                    pillarBase.transform.localPosition = Vector3.down * 0.3f;
+                    
+                    var pillarShaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    pillarShaft.name = "Shaft";
+                    pillarShaft.transform.SetParent(pillar.transform);
+                    pillarShaft.transform.localScale = new Vector3(0.8f, 1.8f, 0.8f);
+                    pillarShaft.transform.localPosition = Vector3.zero;
+                    
+                    var pillarCapital = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    pillarCapital.name = "Capital";
+                    pillarCapital.transform.SetParent(pillar.transform);
+                    pillarCapital.transform.localScale = new Vector3(0.95f, 0.4f, 0.95f);
+                    pillarCapital.transform.localPosition = Vector3.up * 1.5f;
 
-                    // Spout
-                    var spout = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    spout.name = "Spout";
+                    // SPOUT (3 parts)
+                    var spout = new GameObject("Spout");
                     spout.transform.SetParent(fountain.transform);
-                    spout.transform.localScale = new Vector3(0.5f, 1.5f, 0.5f);
                     spout.transform.localPosition = Vector3.up * 3.5f;
+                    
+                    var spoutBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    spoutBase.name = "NozzleBase";
+                    spoutBase.transform.SetParent(spout.transform);
+                    spoutBase.transform.localScale = new Vector3(0.6f, 0.5f, 0.6f);
+                    spoutBase.transform.localPosition = Vector3.down * 0.5f;
+                    
+                    var spoutTube = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    spoutTube.name = "Tube";
+                    spoutTube.transform.SetParent(spout.transform);
+                    spoutTube.transform.localScale = new Vector3(0.5f, 1.2f, 0.5f);
+                    spoutTube.transform.localPosition = Vector3.zero;
+                    
+                    var spoutTip = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    spoutTip.name = "Tip";
+                    spoutTip.transform.SetParent(spout.transform);
+                    spoutTip.transform.localScale = new Vector3(0.4f, 0.6f, 0.4f);
+                    spoutTip.transform.localPosition = Vector3.up * 1f;
 
-                    // Water orb (at top)
-                    var orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    orb.name = "WaterOrb";
+                    // WATER ORB (3 parts - core + shells)
+                    var orb = new GameObject("WaterOrb");
                     orb.transform.SetParent(fountain.transform);
-                    orb.transform.localScale = Vector3.one * 0.8f;
                     orb.transform.localPosition = Vector3.up * 4.5f;
+                    
+                    var orbCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    orbCore.name = "Core";
+                    orbCore.transform.SetParent(orb.transform);
+                    orbCore.transform.localScale = Vector3.one * 0.6f;
+                    orbCore.transform.localPosition = Vector3.zero;
+                    
+                    var orbMid = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    orbMid.name = "MidShell";
+                    orbMid.transform.SetParent(orb.transform);
+                    orbMid.transform.localScale = Vector3.one * 0.75f;
+                    orbMid.transform.localPosition = Vector3.zero;
+                    
+                    var orbOuter = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    orbOuter.name = "Mist";
+                    orbOuter.transform.SetParent(orb.transform);
+                    orbOuter.transform.localScale = Vector3.one * 0.9f;
+                    orbOuter.transform.localPosition = Vector3.zero;
                 }
 
                 // Initially inactive
