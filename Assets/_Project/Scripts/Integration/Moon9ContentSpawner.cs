@@ -160,14 +160,39 @@ namespace Tartaria.Integration
 
             for (int i = 0; i < totalStones; i++)
             {
-                GameObject stoneObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                stoneObj.name = $"ProphecyStone_{stoneNames[i]}";
+                // Multi-part prophecy stone obelisk (base + shaft + capstone)
+                GameObject stoneObj = new GameObject($"ProphecyStone_{stoneNames[i]}");
                 stoneObj.transform.position = stoneLocations[i];
-                stoneObj.transform.localScale = Vector3.one * 1.2f;
 
-                // Placeholder visual: golden glowing sphere (inscribed with golden-ratio patterns)
-                Renderer rend = stoneObj.GetComponent<Renderer>();
-                rend.material.color = new Color(1f, 0.85f, 0.3f); // Golden glow
+                // Base pedestal
+                GameObject baseObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                baseObj.name = "Base";
+                baseObj.transform.SetParent(stoneObj.transform);
+                baseObj.transform.localPosition = Vector3.zero;
+                baseObj.transform.localScale = new Vector3(1.5f, 0.3f, 1.5f);
+                Renderer baseRend = baseObj.GetComponent<Renderer>();
+                baseRend.material.color = new Color(0.8f, 0.7f, 0.3f); // Dark golden
+
+                // Shaft
+                GameObject shaftObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                shaftObj.name = "Shaft";
+                shaftObj.transform.SetParent(stoneObj.transform);
+                shaftObj.transform.localPosition = new Vector3(0f, 1f, 0f);
+                shaftObj.transform.localScale = new Vector3(0.3f, 1f, 0.3f);
+                Renderer shaftRend = shaftObj.GetComponent<Renderer>();
+                shaftRend.material.color = new Color(1f, 0.85f, 0.3f); // Golden
+
+                // Capstone
+                GameObject capObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                capObj.name = "Capstone";
+                capObj.transform.SetParent(stoneObj.transform);
+                capObj.transform.localPosition = new Vector3(0f, 2.2f, 0f);
+                capObj.transform.localScale = Vector3.one * 0.6f;
+                Renderer capRend = capObj.GetComponent<Renderer>();
+                capRend.material.color = new Color(1f, 0.9f, 0.4f); // Bright golden
+
+                // Use capstone for primary rendering reference
+                Renderer rend = capRend;
 
                 // Golden light (floating marker)
                 Light stoneLight = stoneObj.AddComponent<Light>();
@@ -190,14 +215,40 @@ namespace Tartaria.Integration
 
         void SpawnGoldenCodex()
         {
-            GameObject codexObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            codexObj.name = "GoldenCodex";
+            // Multi-part golden book (cover + pages + binding)
+            GameObject codexObj = new GameObject("GoldenCodex");
             codexObj.transform.position = codexLocation;
-            codexObj.transform.localScale = new Vector3(1.5f, 2f, 0.3f);
 
-            // Placeholder visual: golden book with PHI ratio proportions
-            Renderer rend = codexObj.GetComponent<Renderer>();
-            rend.material.color = new Color(1f, 0.85f, 0.3f); // Golden
+            // Cover
+            GameObject coverObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            coverObj.name = "Cover";
+            coverObj.transform.SetParent(codexObj.transform);
+            coverObj.transform.localPosition = Vector3.zero;
+            coverObj.transform.localScale = new Vector3(1.5f, 2f, 0.3f);
+            Renderer coverRend = coverObj.GetComponent<Renderer>();
+            coverRend.material.color = new Color(1f, 0.85f, 0.3f); // Golden cover
+
+            // Pages (slightly smaller, offset)
+            GameObject pagesObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            pagesObj.name = "Pages";
+            pagesObj.transform.SetParent(codexObj.transform);
+            pagesObj.transform.localPosition = new Vector3(0f, 0f, 0.15f);
+            pagesObj.transform.localScale = new Vector3(1.4f, 1.9f, 0.25f);
+            Renderer pagesRend = pagesObj.GetComponent<Renderer>();
+            pagesRend.material.color = new Color(1f, 0.95f, 0.8f); // Parchment
+
+            // Binding spine
+            GameObject bindingObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            bindingObj.name = "Binding";
+            bindingObj.transform.SetParent(codexObj.transform);
+            bindingObj.transform.localPosition = new Vector3(-0.75f, 0f, 0f);
+            bindingObj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            bindingObj.transform.localScale = new Vector3(0.2f, 1f, 0.2f);
+            Renderer bindingRend = bindingObj.GetComponent<Renderer>();
+            bindingRend.material.color = new Color(0.7f, 0.6f, 0.2f); // Dark bronze
+
+            // Use cover for primary rendering reference
+            Renderer rend = coverRend;
 
             // Golden light emanation
             Light codexLight = codexObj.AddComponent<Light>();
@@ -354,15 +405,44 @@ namespace Tartaria.Integration
                     Mathf.Sin(angle) * radius
                 );
 
-                GameObject platform = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                platform.name = $"AuroraPlatform_{i}";
+                // Multi-part platform (foundation + surface + supports)
+                GameObject platform = new GameObject($"AuroraPlatform_{i}");
                 platform.transform.SetParent(_auroraCityZone.transform);
                 platform.transform.localPosition = platformPos;
-                platform.transform.localScale = new Vector3(12f, 1f, 12f);
 
-                // Golden platform material
-                Renderer pRend = platform.GetComponent<Renderer>();
-                pRend.material.color = new Color(1f, 0.9f, 0.6f, 0.9f);
+                // Foundation
+                GameObject foundationObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                foundationObj.name = "Foundation";
+                foundationObj.transform.SetParent(platform.transform);
+                foundationObj.transform.localPosition = new Vector3(0f, -0.5f, 0f);
+                foundationObj.transform.localScale = new Vector3(12f, 0.5f, 12f);
+                Renderer foundRend = foundationObj.GetComponent<Renderer>();
+                foundRend.material.color = new Color(0.9f, 0.8f, 0.5f, 0.9f);
+
+                // Surface
+                GameObject surfaceObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                surfaceObj.name = "Surface";
+                surfaceObj.transform.SetParent(platform.transform);
+                surfaceObj.transform.localPosition = Vector3.zero;
+                surfaceObj.transform.localScale = new Vector3(12f, 0.3f, 12f);
+                Renderer surfRend = surfaceObj.GetComponent<Renderer>();
+                surfRend.material.color = new Color(1f, 0.9f, 0.6f, 0.9f);
+
+                // 4 corner supports
+                for (int s = 0; s < 4; s++)
+                {
+                    GameObject supportObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    supportObj.name = $"Support_{s}";
+                    supportObj.transform.SetParent(platform.transform);
+                    float sAngle = s * 90f * Mathf.Deg2Rad;
+                    supportObj.transform.localPosition = new Vector3(Mathf.Cos(sAngle) * 5f, -1.5f, Mathf.Sin(sAngle) * 5f);
+                    supportObj.transform.localScale = new Vector3(0.4f, 1.5f, 0.4f);
+                    Renderer supRend = supportObj.GetComponent<Renderer>();
+                    supRend.material.color = new Color(0.8f, 0.7f, 0.4f);
+                }
+
+                // Use surface for primary rendering reference
+                Renderer pRend = surfRend;
 
                 // Platform light
                 Light pLight = platform.AddComponent<Light>();
@@ -374,25 +454,88 @@ namespace Tartaria.Integration
                 // Add lore fragments on platforms
                 if (i % 3 == 0)
                 {
-                    GameObject loreObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    loreObj.name = $"AuroraLoreFragment_{i}";
+                    // Multi-part lore orb (core + 2 rotating rings)
+                    GameObject loreObj = new GameObject($"AuroraLoreFragment_{i}");
                     loreObj.transform.SetParent(platform.transform);
                     loreObj.transform.localPosition = Vector3.up * 2f;
-                    loreObj.transform.localScale = Vector3.one * 0.8f;
+
+                    // Core sphere
+                    GameObject coreObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    coreObj.name = "Core";
+                    coreObj.transform.SetParent(loreObj.transform);
+                    coreObj.transform.localPosition = Vector3.zero;
+                    coreObj.transform.localScale = Vector3.one * 0.8f;
+                    Renderer coreRend = coreObj.GetComponent<Renderer>();
+                    coreRend.material.color = new Color(1f, 0.95f, 0.7f);
+
+                    // Ring 1 (horizontal)
+                    GameObject ring1Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    ring1Obj.name = "Ring1";
+                    ring1Obj.transform.SetParent(loreObj.transform);
+                    ring1Obj.transform.localPosition = Vector3.zero;
+                    ring1Obj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                    ring1Obj.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
+                    Renderer r1Rend = ring1Obj.GetComponent<Renderer>();
+                    r1Rend.material.color = new Color(1f, 0.9f, 0.5f, 0.7f);
+
+                    // Ring 2 (vertical)
+                    GameObject ring2Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    ring2Obj.name = "Ring2";
+                    ring2Obj.transform.SetParent(loreObj.transform);
+                    ring2Obj.transform.localPosition = Vector3.zero;
+                    ring2Obj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+                    ring2Obj.transform.localScale = new Vector3(1.2f, 0.05f, 1.2f);
+                    Renderer r2Rend = ring2Obj.GetComponent<Renderer>();
+                    r2Rend.material.color = new Color(1f, 0.85f, 0.4f, 0.7f);
 
                     AuroraLoreFragment lore = loreObj.AddComponent<AuroraLoreFragment>();
                     lore.fragmentIndex = i / 3;
                 }
             }
 
-            // Central spire (boss encounter zone)
-            GameObject spire = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spire.name = "AuroraSpire_Boss";
+            // Central spire (boss encounter zone) - multi-segment tower
+            GameObject spire = new GameObject("AuroraSpire_Boss");
             spire.transform.SetParent(_auroraCityZone.transform);
             spire.transform.localPosition = new Vector3(0f, 30f, 0f);
-            spire.transform.localScale = new Vector3(4f, 40f, 4f);
 
-            // Spire material
+            // Base
+            GameObject spireBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            spireBase.name = "Base";
+            spireBase.transform.SetParent(spire.transform);
+            spireBase.transform.localPosition = new Vector3(0f, -10f, 0f);
+            spireBase.transform.localScale = new Vector3(5f, 10f, 5f);
+            Renderer baseRend = spireBase.GetComponent<Renderer>();
+            baseRend.material.color = new Color(0.9f, 0.8f, 0.5f);
+
+            // Mid shaft
+            GameObject spireMid = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            spireMid.name = "MidShaft";
+            spireMid.transform.SetParent(spire.transform);
+            spireMid.transform.localPosition = new Vector3(0f, 10f, 0f);
+            spireMid.transform.localScale = new Vector3(3f, 20f, 3f);
+            Renderer midRend = spireMid.GetComponent<Renderer>();
+            midRend.material.color = new Color(1f, 0.9f, 0.6f);
+
+            // Top spire
+            GameObject spireTop = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            spireTop.name = "TopSpire";
+            spireTop.transform.SetParent(spire.transform);
+            spireTop.transform.localPosition = new Vector3(0f, 35f, 0f);
+            spireTop.transform.localScale = new Vector3(1.5f, 15f, 1.5f);
+            Renderer topRend = spireTop.GetComponent<Renderer>();
+            topRend.material.color = new Color(1f, 0.95f, 0.7f);
+
+            // Capstone
+            GameObject spireCap = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            spireCap.name = "Capstone";
+            spireCap.transform.SetParent(spire.transform);
+            spireCap.transform.localPosition = new Vector3(0f, 52f, 0f);
+            spireCap.transform.localScale = Vector3.one * 3f;
+            Renderer capRend = spireCap.GetComponent<Renderer>();
+            capRend.material.color = new Color(1f, 1f, 0.9f);
+
+            // Use mid shaft as reference
+            Renderer spireRend = midRend;
             Renderer sRend = spire.GetComponent<Renderer>();
             sRend.material.color = new Color(1f, 0.85f, 0.4f, 0.95f);
 
@@ -447,14 +590,69 @@ namespace Tartaria.Integration
 
         void SpawnTemporalGuardian(Vector3 position)
         {
-            GameObject bossObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            bossObj.name = "TemporalGuardian_Boss";
+            // *** CRITICAL BOSS: 6-part Temporal Guardian assembly ***
+            GameObject bossObj = new GameObject("TemporalGuardian_Boss");
             bossObj.transform.position = position;
-            bossObj.transform.localScale = Vector3.one * 6f;
 
-            // Placeholder visual: shimmering golden-blue entity
-            Renderer rend = bossObj.GetComponent<Renderer>();
-            rend.material.color = new Color(0.7f, 0.8f, 1f, 0.9f);
+            // Core sphere (central eye)
+            GameObject coreObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            coreObj.name = "Core";
+            coreObj.transform.SetParent(bossObj.transform);
+            coreObj.transform.localPosition = Vector3.zero;
+            coreObj.transform.localScale = Vector3.one * 3f;
+            Renderer coreRend = coreObj.GetComponent<Renderer>();
+            coreRend.material.color = new Color(0.7f, 0.8f, 1f, 0.95f); // Blue-white core
+
+            // Ring 1 (horizontal equator)
+            GameObject ring1Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            ring1Obj.name = "Ring_Equator";
+            ring1Obj.transform.SetParent(bossObj.transform);
+            ring1Obj.transform.localPosition = Vector3.zero;
+            ring1Obj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            ring1Obj.transform.localScale = new Vector3(5f, 0.3f, 5f);
+            Renderer r1Rend = ring1Obj.GetComponent<Renderer>();
+            r1Rend.material.color = new Color(0.8f, 0.9f, 1f, 0.8f);
+
+            // Ring 2 (vertical meridian 1)
+            GameObject ring2Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            ring2Obj.name = "Ring_Meridian1";
+            ring2Obj.transform.SetParent(bossObj.transform);
+            ring2Obj.transform.localPosition = Vector3.zero;
+            ring2Obj.transform.localRotation = Quaternion.Euler(0f, 0f, 0f);
+            ring2Obj.transform.localScale = new Vector3(5f, 0.3f, 5f);
+            Renderer r2Rend = ring2Obj.GetComponent<Renderer>();
+            r2Rend.material.color = new Color(0.75f, 0.85f, 1f, 0.75f);
+
+            // Ring 3 (vertical meridian 2 - perpendicular)
+            GameObject ring3Obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            ring3Obj.name = "Ring_Meridian2";
+            ring3Obj.transform.SetParent(bossObj.transform);
+            ring3Obj.transform.localPosition = Vector3.zero;
+            ring3Obj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            ring3Obj.transform.localScale = new Vector3(5f, 0.3f, 5f);
+            Renderer r3Rend = ring3Obj.GetComponent<Renderer>();
+            r3Rend.material.color = new Color(0.7f, 0.8f, 1f, 0.7f);
+
+            // Top cap (crown)
+            GameObject topCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            topCapObj.name = "TopCap";
+            topCapObj.transform.SetParent(bossObj.transform);
+            topCapObj.transform.localPosition = new Vector3(0f, 4f, 0f);
+            topCapObj.transform.localScale = Vector3.one * 1.5f;
+            Renderer topRend = topCapObj.GetComponent<Renderer>();
+            topRend.material.color = new Color(0.9f, 0.95f, 1f, 0.9f);
+
+            // Bottom cap (anchor)
+            GameObject botCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            botCapObj.name = "BottomCap";
+            botCapObj.transform.SetParent(bossObj.transform);
+            botCapObj.transform.localPosition = new Vector3(0f, -4f, 0f);
+            botCapObj.transform.localScale = Vector3.one * 1.5f;
+            Renderer botRend = botCapObj.GetComponent<Renderer>();
+            botRend.material.color = new Color(0.9f, 0.95f, 1f, 0.9f);
+
+            // Use core as primary reference
+            Renderer rend = coreRend;
 
             // Boss light
             Light bossLight = bossObj.AddComponent<Light>();
@@ -583,14 +781,58 @@ namespace Tartaria.Integration
         {
             Vector3 clockTowerPos = new Vector3(200f, 20f, 300f); // White City bell tower
 
-            GameObject clockObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            clockObj.name = "17Hour_ClockTower";
+            // Multi-part clock tower (base + shaft + face + bell housing)
+            GameObject clockObj = new GameObject("17Hour_ClockTower");
             clockObj.transform.position = clockTowerPos;
-            clockObj.transform.localScale = new Vector3(2f, 20f, 2f); // Tall clock tower
 
-            // Placeholder visual: golden brass clock mechanism
-            Renderer rend = clockObj.GetComponent<Renderer>();
-            rend.material.color = new Color(0.85f, 0.7f, 0.3f); // Brass
+            // Base platform
+            GameObject baseObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            baseObj.name = "Base";
+            baseObj.transform.SetParent(clockObj.transform);
+            baseObj.transform.localPosition = new Vector3(0f, -10f, 0f);
+            baseObj.transform.localScale = new Vector3(4f, 1f, 4f);
+            Renderer baseRend = baseObj.GetComponent<Renderer>();
+            baseRend.material.color = new Color(0.6f, 0.5f, 0.3f);
+
+            // Tower shaft
+            GameObject shaftObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            shaftObj.name = "Shaft";
+            shaftObj.transform.SetParent(clockObj.transform);
+            shaftObj.transform.localPosition = Vector3.zero;
+            shaftObj.transform.localScale = new Vector3(2f, 20f, 2f);
+            Renderer shaftRend = shaftObj.GetComponent<Renderer>();
+            shaftRend.material.color = new Color(0.85f, 0.7f, 0.3f); // Brass
+
+            // Clock face
+            GameObject faceObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            faceObj.name = "ClockFace";
+            faceObj.transform.SetParent(clockObj.transform);
+            faceObj.transform.localPosition = new Vector3(0f, 15f, 2.2f);
+            faceObj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            faceObj.transform.localScale = new Vector3(2.5f, 0.2f, 2.5f);
+            Renderer faceRend = faceObj.GetComponent<Renderer>();
+            faceRend.material.color = new Color(1f, 0.95f, 0.8f); // White face
+
+            // Bell housing (top)
+            GameObject bellObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            bellObj.name = "BellHousing";
+            bellObj.transform.SetParent(clockObj.transform);
+            bellObj.transform.localPosition = new Vector3(0f, 22f, 0f);
+            bellObj.transform.localScale = new Vector3(2.5f, 2f, 2.5f);
+            Renderer bellRend = bellObj.GetComponent<Renderer>();
+            bellRend.material.color = new Color(0.7f, 0.6f, 0.3f);
+
+            // Spire cap
+            GameObject spireObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            spireObj.name = "Spire";
+            spireObj.transform.SetParent(clockObj.transform);
+            spireObj.transform.localPosition = new Vector3(0f, 25f, 0f);
+            spireObj.transform.localScale = new Vector3(0.5f, 3f, 0.5f);
+            Renderer spireRend = spireObj.GetComponent<Renderer>();
+            spireRend.material.color = new Color(0.9f, 0.8f, 0.4f);
+
+            // Use shaft as primary reference
+            Renderer rend = shaftRend;
 
             // Clock face (17 markers visible)
             // Full implementation would show 17-segment clock dial
@@ -820,19 +1062,46 @@ namespace Tartaria.Integration
             // Audio phase transition
             Audio.AudioManager.Instance?.PlaySFX3D("BossPhase2", transform.position);
 
-            // Spawn temporal rifts around boss
+            // Spawn temporal rifts around boss (multi-part vortex)
             for (int i = 0; i < 4; i++)
             {
                 float angle = i * 90f * Mathf.Deg2Rad;
                 Vector3 riftPos = transform.position + new Vector3(Mathf.Cos(angle) * 15f, 0f, Mathf.Sin(angle) * 15f);
 
-                GameObject rift = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                rift.name = $"TemporalRift_{i}";
+                GameObject rift = new GameObject($"TemporalRift_{i}");
                 rift.transform.position = riftPos;
-                rift.transform.localScale = Vector3.one * 3f;
-                
-                Renderer rend = rift.GetComponent<Renderer>();
-                rend.material.color = new Color(0.7f, 0.9f, 1f, 0.6f);
+
+                // Core vortex
+                GameObject coreObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                coreObj.name = "Core";
+                coreObj.transform.SetParent(rift.transform);
+                coreObj.transform.localPosition = Vector3.zero;
+                coreObj.transform.localScale = Vector3.one * 2f;
+                Renderer coreRend = coreObj.GetComponent<Renderer>();
+                coreRend.material.color = new Color(0.6f, 0.8f, 1f, 0.7f);
+
+                // Outer swirl ring
+                GameObject swirlObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                swirlObj.name = "Swirl";
+                swirlObj.transform.SetParent(rift.transform);
+                swirlObj.transform.localPosition = Vector3.zero;
+                swirlObj.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                swirlObj.transform.localScale = new Vector3(3.5f, 0.1f, 3.5f);
+                Renderer swirlRend = swirlObj.GetComponent<Renderer>();
+                swirlRend.material.color = new Color(0.7f, 0.9f, 1f, 0.5f);
+
+                // Energy tendrils (4 small spheres orbiting)
+                for (int t = 0; t < 4; t++)
+                {
+                    float tAngle = t * 90f * Mathf.Deg2Rad;
+                    GameObject tendrilObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    tendrilObj.name = $"Tendril_{t}";
+                    tendrilObj.transform.SetParent(rift.transform);
+                    tendrilObj.transform.localPosition = new Vector3(Mathf.Cos(tAngle) * 2f, 0f, Mathf.Sin(tAngle) * 2f);
+                    tendrilObj.transform.localScale = Vector3.one * 0.5f;
+                    Renderer tRend = tendrilObj.GetComponent<Renderer>();
+                    tRend.material.color = new Color(0.8f, 0.95f, 1f, 0.8f);
+                }
             }
         }
 
@@ -911,14 +1180,49 @@ namespace Tartaria.Integration
             // Notify spawner
             spawner?.OnBossDefeated();
 
-            // Drop clock tower blueprint
-            GameObject blueprint = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            blueprint.name = "ClockTowerBlueprint";
+            // Drop clock tower blueprint (multi-part scroll)
+            GameObject blueprint = new GameObject("ClockTowerBlueprint");
             blueprint.transform.position = transform.position;
-            blueprint.transform.localScale = Vector3.one * 1.5f;
 
-            Renderer rend = blueprint.GetComponent<Renderer>();
-            rend.material.color = new Color(1f, 0.9f, 0.6f);
+            // Scroll cylinder (rolled)
+            GameObject scrollObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            scrollObj.name = "Scroll";
+            scrollObj.transform.SetParent(blueprint.transform);
+            scrollObj.transform.localPosition = Vector3.zero;
+            scrollObj.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            scrollObj.transform.localScale = new Vector3(0.3f, 1f, 0.3f);
+            Renderer scrollRend = scrollObj.GetComponent<Renderer>();
+            scrollRend.material.color = new Color(1f, 0.95f, 0.85f);
+
+            // Left endcap
+            GameObject leftCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            leftCapObj.name = "LeftCap";
+            leftCapObj.transform.SetParent(blueprint.transform);
+            leftCapObj.transform.localPosition = new Vector3(-1f, 0f, 0f);
+            leftCapObj.transform.localScale = Vector3.one * 0.4f;
+            Renderer leftRend = leftCapObj.GetComponent<Renderer>();
+            leftRend.material.color = new Color(0.7f, 0.6f, 0.3f);
+
+            // Right endcap
+            GameObject rightCapObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            rightCapObj.name = "RightCap";
+            rightCapObj.transform.SetParent(blueprint.transform);
+            rightCapObj.transform.localPosition = new Vector3(1f, 0f, 0f);
+            rightCapObj.transform.localScale = Vector3.one * 0.4f;
+            Renderer rightRend = rightCapObj.GetComponent<Renderer>();
+            rightRend.material.color = new Color(0.7f, 0.6f, 0.3f);
+
+            // Glow orb (blueprint marker)
+            GameObject glowObj = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            glowObj.name = "Glow";
+            glowObj.transform.SetParent(blueprint.transform);
+            glowObj.transform.localPosition = new Vector3(0f, 1f, 0f);
+            glowObj.transform.localScale = Vector3.one * 0.6f;
+            Renderer glowRend = glowObj.GetComponent<Renderer>();
+            glowRend.material.color = new Color(1f, 0.9f, 0.6f);
+
+            // Use glow as primary reference
+            Renderer rend = glowRend;
 
             // Destroy boss
             Destroy(gameObject, 0.5f);
