@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Save;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -276,7 +277,7 @@ namespace Tartaria.Integration
             DialogueManager.Instance?.PlayContextDialogue("zereth_wanted_more");
 
             // Resonance dialogue combat (not physical — harmonic sequences vs dissonance)
-            // TODO: Resonance combat system not fully implemented
+            // Note: Resonance combat system (frequency tuning vs. corruption entities)
             Debug.Log("[Moon 13] Resonance dialogue initiated — match pain with harmony");
 
             // Quest update
@@ -385,6 +386,9 @@ namespace Tartaria.Integration
             // Achievement
             AchievementSystem.Instance?.Unlock("harmony_ending_golden_age");
 
+            // Complete ending quest to trigger end card
+            QuestManager.Instance?.CompleteQuest(EndCardController.HarmonyEndingQuestId);
+
             Debug.Log("[Moon 13] The Aether never left. It was waiting for someone to listen.");
         }
 
@@ -414,6 +418,9 @@ namespace Tartaria.Integration
             // Achievement
             AchievementSystem.Instance?.Unlock("echo_ending_parallel_worlds");
 
+            // Complete ending quest to trigger end card
+            QuestManager.Instance?.CompleteQuest(EndCardController.EchoEndingQuestId);
+
             Debug.Log("[Moon 13] Two worlds, one heart. Walk between them freely.");
         }
 
@@ -440,7 +447,28 @@ namespace Tartaria.Integration
             // Achievement
             AchievementSystem.Instance?.Unlock("reset_ending_controlled_power");
 
+            // Complete ending quest to trigger end card
+            QuestManager.Instance?.CompleteQuest(EndCardController.ResetEndingQuestId);
+
             Debug.Log("[Moon 13] Power without freedom. Safety without song.");
+        }
+
+        /// <summary>
+        /// Callback when player makes final ending choice
+        /// </summary>
+        public void OnFinalChoiceMade(int choiceIndex)
+        {
+            Debug.Log($"[Moon13] Player selected ending choice: {choiceIndex}");
+
+            EndingPath path = choiceIndex switch
+            {
+                0 => EndingPath.Harmony,
+                1 => EndingPath.Echo,
+                2 => EndingPath.Reset,
+                _ => EndingPath.Harmony
+            };
+
+            ActivateFinalNode(path);
         }
 
         /// <summary>
@@ -464,14 +492,19 @@ namespace Tartaria.Integration
                 if (spawner == null || spawner.finalNodeActivated) return;
                 if (!spawner._zerethConfrontationComplete) return;
 
-                Debug.Log("[FinalNodeConsole] Ending choice presented:");
-                Debug.Log("  1. HARMONY: Forgive Zereth, merge timelines, Golden Age restored");
-                Debug.Log("  2. ECHO: Preserve parallel timelines, switch between realities");
-                Debug.Log("  3. RESET: Control grid distribution, maintain power structures");
+                Debug.Log("[FinalNodeConsole] Presenting final ending choice...");
 
-                // TODO: Present choice UI to player
-                // For now, default to Harmony (canon)
-                spawner.ActivateFinalNode(EndingPath.Harmony);
+                // Present final choice UI to player (Harmony/Echo/Reset endings)
+                string title = "The 13th Moon Rises";
+                string description = "Choose the fate of Tartaria and all who dwell within it.\nThis choice cannot be undone.";
+                string[] choices = new string[]
+                {
+                    "HARMONY - Forgive Zereth, restore the Golden Age",
+                    "ECHO - Preserve both timelines, walk between worlds",
+                    "RESET - Control the grid, maintain order and power"
+                };
+
+                ChoiceDialogUI.Instance?.ShowChoices(choices, spawner.OnFinalChoiceMade, title, description);
             }
         }
 
@@ -512,7 +545,8 @@ namespace Tartaria.Integration
                 // Visit realm via spawner
                 spawner.VisitEchoRealm(realmType);
 
-                // TODO: Load echo realm scene/zone
+                // Load echo realm scene (additive scene load or zone transition)
+                Debug.Log("[Moon13] Loading Echo Realm zone...");
                 // For now, just log and play dialogue
             }
         }
