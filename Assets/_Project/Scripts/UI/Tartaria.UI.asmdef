@@ -8,6 +8,7 @@
         "Tartaria.Audio",
         "Tartaria.Camera",
         "Tartaria.Save",
+        "Tartaria.Localization",
         "Unity.TextMeshPro",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",

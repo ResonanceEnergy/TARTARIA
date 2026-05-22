@@ -12,6 +12,7 @@
         "Tartaria.UI",
         "Tartaria.Save",
         "Tartaria.Integration",
+        "Tartaria.Localization",
         "Unity.Entities",
         "Unity.Mathematics",
         "Unity.Collections",
