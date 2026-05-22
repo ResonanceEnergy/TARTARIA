@@ -383,21 +383,32 @@ namespace Tartaria.Integration
 
             Debug.Log("[Moon 4] Golem encounter triggered — corrupted guardian emerges!");
 
-            // Spawn guardian golem
+            // Spawn guardian golem using KayKit Skeleton Warrior
             golemSpawnPoint = fortCenter + Vector3.forward * 5f;
-            _guardianGolem = new GameObject("GuardianGolem_Maelix");
-            _guardianGolem.transform.position = golemSpawnPoint;
-            _guardianGolem.transform.localScale = Vector3.one * 3f;  // 30-foot scale (10m)
+            
+            GameObject skeletonPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Warrior");
+            if (skeletonPrefab != null)
+            {
+                _guardianGolem = Instantiate(skeletonPrefab, golemSpawnPoint, Quaternion.identity);
+                _guardianGolem.name = "GuardianGolem_Maelix";
+                _guardianGolem.transform.localScale = Vector3.one * 3f;  // 30-foot scale (10m)
 
-            // Visual: large capsule (placeholder for 30-foot mud golem)
-            var filter = _guardianGolem.AddComponent<MeshFilter>();
-            filter.mesh = Resources.GetBuiltinResource<Mesh>("Capsule.fbx");
-            var renderer = _guardianGolem.AddComponent<MeshRenderer>();
-            renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            renderer.material.color = new Color(0.25f, 0.2f, 0.15f);  // Living mud + shattered stone
+                // Add health + combat
+                if (_guardianGolem.GetComponent<MudGolemHealth>() == null)
+                    _guardianGolem.AddComponent<MudGolemHealth>();
+                if (_guardianGolem.GetComponent<MudGolemAI>() == null)
+                    _guardianGolem.AddComponent<MudGolemAI>();
 
-            // Add health + combat (Unity asset database reimport fix complete)
-            // var health = _guardianGolem.AddComponent<MudGolemHealth>();
+                Debug.Log("[Moon4ContentSpawner] Guardian Golem spawned with KayKit skeleton");
+            }
+            else
+            {
+                Debug.LogError("[Moon4ContentSpawner] Failed to load KayKit skeleton for guardian golem");
+                _guardianGolem = null;
+                return;
+            }
+
+            // Old primitive code removed - now using KayKit prefab
             // health.SetMaxHealth(500f);  // Boss-tier health
             // health.OnDeath += OnGolemDefeated;
             Debug.Log("[Moon4] Guardian golem health wiring deferred pending Unity asset refresh");

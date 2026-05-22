@@ -137,23 +137,44 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    // Fallback: create simple tower visual
+                    // Multi-part bell tower (no single primitives)
                     tower = new GameObject($"BellTower_{i + 1}");
                     tower.transform.position = bellTowerPoints[i];
 
-                    // Tower structure (tall cylinder)
-                    var structure = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    structure.name = "TowerStructure";
-                    structure.transform.SetParent(tower.transform);
-                    structure.transform.localScale = new Vector3(5f, 30f, 5f);
-                    structure.transform.localPosition = Vector3.up * 30f;
+                    // Tower base (stone foundation)
+                    var towerBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    towerBase.name = "TowerBase";
+                    towerBase.transform.SetParent(tower.transform);
+                    towerBase.transform.localScale = new Vector3(6f, 5f, 6f);
+                    towerBase.transform.localPosition = Vector3.up * 5f;
+
+                    // Tower mid-section
+                    var towerMid = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    towerMid.name = "TowerMid";
+                    towerMid.transform.SetParent(tower.transform);
+                    towerMid.transform.localScale = new Vector3(5f, 20f, 5f);
+                    towerMid.transform.localPosition = Vector3.up * 30f;
+
+                    // Bell chamber (platform)
+                    var bellChamber = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    bellChamber.name = "BellChamber";
+                    bellChamber.transform.SetParent(tower.transform);
+                    bellChamber.transform.localScale = new Vector3(6f, 3f, 6f);
+                    bellChamber.transform.localPosition = Vector3.up * 52f;
 
                     // Bell (sphere at top)
                     var bell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     bell.name = "Bell";
                     bell.transform.SetParent(tower.transform);
-                    bell.transform.localScale = Vector3.one * 6f;
-                    bell.transform.localPosition = Vector3.up * 60f;
+                    bell.transform.localScale = Vector3.one * 4f;
+                    bell.transform.localPosition = Vector3.up * 56f;
+
+                    // Spire
+                    var spire = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    spire.name = "Spire";
+                    spire.transform.SetParent(tower.transform);
+                    spire.transform.localScale = new Vector3(1f, 8f, 1f);
+                    spire.transform.localPosition = Vector3.up * 64f;
 
                     // Tuning console
                     var console = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -263,19 +284,22 @@ namespace Tartaria.Integration
 
             var spawnPoint = _bellTowers[towerIndex].transform.position + Vector3.right * 20f;
 
-            // Spawn 3 Reset agents (placeholder)
+            // Spawn 3 Reset agents — KayKit Skeleton Warriors
             for (int i = 0; i < 3; i++)
             {
-                var agent = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                agent.name = $"ResetAgent_Tower{towerIndex}_{i}";
-                agent.transform.position = spawnPoint + Vector3.forward * (i * 3f);
-                agent.transform.localScale = new Vector3(1f, 2f, 1f);
-
-                // Red color to indicate enemy
-                var renderer = agent.GetComponent<Renderer>();
-                if (renderer != null)
+                GameObject agentPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Warrior");
+                GameObject agent;
+                if (agentPrefab != null)
                 {
-                    renderer.material.color = Color.red;
+                    agent = Instantiate(agentPrefab, spawnPoint + Vector3.forward * (i * 3f), Quaternion.identity);
+                    agent.name = $"ResetAgent_Tower{towerIndex}_{i}";
+                    agent.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                }
+                else
+                {
+                    Debug.LogError("[Moon12ContentSpawner] CRITICAL: Char_Skeleton_Warrior prefab missing for Reset agents");
+                    agent = new GameObject($"ResetAgent_Tower{towerIndex}_{i}_MISSING_PREFAB");
+                    agent.transform.position = spawnPoint + Vector3.forward * (i * 3f);
                 }
             }
 

@@ -817,31 +817,6 @@ namespace Tartaria.Integration
                     cassianGO = new GameObject("Cassian_MISSING_PREFAB");
                     cassianGO.transform.position = cassianPosition;
                 }
-                var body = cassianGO.transform.Find("Body");
-                if (body == null) body = cassianGO.transform;
-
-            var r = body.GetComponent<MeshRenderer>();
-            if (r != null)
-            {
-                var shader = Shader.Find("Universal Render Pipeline/Lit");
-                if (shader != null)
-                {
-                    var mat = new Material(shader);
-                    mat.SetColor("_BaseColor", new Color(0.2f, 0.15f, 0.3f)); // Dark purple robe
-                    mat.SetFloat("_Smoothness", 0.3f);
-                    r.material = mat;
-                }
-            }
-
-            // Hood (sphere on top)
-            var hood = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            hood.name = "Hood";
-            hood.transform.SetParent(cassianGO.transform);
-            hood.transform.localPosition = new Vector3(0f, 2.3f, 0f);
-            hood.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
-            var hoodR = hood.GetComponent<MeshRenderer>();
-            if (hoodR != null && r != null)
-                hoodR.material = r.material;
 
             // NPC interaction collider
             var col = cassianGO.AddComponent<CapsuleCollider>();
@@ -1907,14 +1882,15 @@ namespace Tartaria.Integration
             mat.EnableKeyword("_EMISSION");
             mat.SetColor("_EmissionColor", new Color(0.05f, 0.4f, 0.1f) * 1.5f);
             mat.SetFloat("_Surface", 1f);
-                mat.SetOverrideTag("RenderType", "Transparent");
-                mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
-                mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                rr.material = mat;
-            }
+            mat.SetOverrideTag("RenderType", "Transparent");
+            mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
+            mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+            rendererRing.material = mat;
+            
+            psRing.Play();
 
             // Floating label
-            string labelText = $"[E] Dig — {siteName}";
+            string labelText = "[E] Dig - " + siteName;
             AddNameplate(marker, Tartaria.Input.InputPromptHelper.Localize(labelText), new Color(0.3f, 1f, 0.4f));
 
             // Pulsing bob animation

@@ -194,28 +194,49 @@ namespace Tartaria.Integration
             }
             else
             {
-                // Fallback: create final node visual
+                // Multi-part citadel final node (no single primitives)
                 _finalNode = new GameObject("FinalNode_13thMoon");
                 _finalNode.transform.position = finalNodePoint;
 
-                // Node chamber (massive sphere)
-                var chamber = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                chamber.name = "NodeChamber";
-                chamber.transform.SetParent(_finalNode.transform);
-                chamber.transform.localScale = Vector3.one * 40f;
-                chamber.transform.localPosition = Vector3.zero;
+                // Outer dome shell
+                var domeOuter = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                domeOuter.name = "DomeOuter";
+                domeOuter.transform.SetParent(_finalNode.transform);
+                domeOuter.transform.localScale = Vector3.one * 42f;
+                domeOuter.transform.localPosition = Vector3.zero;
+
+                // Mid-layer chamber
+                var chamberMid = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                chamberMid.name = "ChamberMid";
+                chamberMid.transform.SetParent(_finalNode.transform);
+                chamberMid.transform.localScale = Vector3.one * 28f;
+                chamberMid.transform.localPosition = Vector3.zero;
+
+                // Inner sanctum
+                var chamberInner = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                chamberInner.name = "ChamberInner";
+                chamberInner.transform.SetParent(_finalNode.transform);
+                chamberInner.transform.localScale = Vector3.one * 18f;
+                chamberInner.transform.localPosition = Vector3.zero;
 
                 // Core crystal (pulsing)
                 var crystal = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 crystal.name = "CoreCrystal";
                 crystal.transform.SetParent(_finalNode.transform);
-                crystal.transform.localScale = Vector3.one * 15f;
+                crystal.transform.localScale = Vector3.one * 8f;
                 crystal.transform.localPosition = Vector3.zero;
-                var renderer = crystal.GetComponent<Renderer>();
-                if (renderer != null)
+                var crystalRenderer = crystal.GetComponent<Renderer>();
+                if (crystalRenderer != null)
                 {
-                    renderer.material.color = new Color(0.9f, 0.7f, 1f, 1f);  // Violet cosmic energy
+                    crystalRenderer.material.color = new Color(0.9f, 0.7f, 1f, 1f);  // Violet cosmic energy
                 }
+
+                // Crystal spire (vertical pillar)
+                var spire = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                spire.name = "CrystalSpire";
+                spire.transform.SetParent(_finalNode.transform);
+                spire.transform.localScale = new Vector3(2f, 20f, 2f);
+                spire.transform.localPosition = Vector3.zero;
 
                 // Activation console
                 var console = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -268,16 +289,39 @@ namespace Tartaria.Integration
             var gate = new GameObject(name);
             gate.transform.position = position;
 
-            // Portal visual (glowing ring)
+            // Multi-part portal structure
+            // Outer ring (frame)
+            var outerRing = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            outerRing.name = "OuterRing";
+            outerRing.transform.SetParent(gate.transform);
+            outerRing.transform.localScale = new Vector3(6f, 0.3f, 6f);
+            outerRing.transform.localPosition = Vector3.zero;
+
+            // Inner portal disc
             var portal = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             portal.name = "Portal";
             portal.transform.SetParent(gate.transform);
-            portal.transform.localScale = new Vector3(5f, 0.5f, 5f);
+            portal.transform.localScale = new Vector3(4.5f, 0.2f, 4.5f);
             portal.transform.localPosition = Vector3.zero;
             var renderer = portal.GetComponent<Renderer>();
             if (renderer != null)
             {
                 renderer.material.color = color;
+            }
+
+            // Support pillars (4 cardinal points)
+            for (int p = 0; p < 4; p++)
+            {
+                float angle = p * 90f * Mathf.Deg2Rad;
+                var pillar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                pillar.name = $"Pillar_{p}";
+                pillar.transform.SetParent(gate.transform);
+                pillar.transform.localPosition = new Vector3(
+                    Mathf.Cos(angle) * 5f,
+                    -4f,
+                    Mathf.Sin(angle) * 5f
+                );
+                pillar.transform.localScale = new Vector3(0.5f, 4f, 0.5f);
             }
 
             return gate;
@@ -352,19 +396,19 @@ namespace Tartaria.Integration
             }
             else
             {
-                // Fallback: giant humanoid shape
-                _zerethEcho = new GameObject("ZerethEcho_Tormented");
-                _zerethEcho.transform.position = spawnPos;
-
-                var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                body.name = "Body";
-                body.transform.SetParent(_zerethEcho.transform);
-                body.transform.localScale = new Vector3(5f, 10f, 5f);  // Giant scale
-                body.transform.localPosition = Vector3.zero;
-                var renderer = body.GetComponent<Renderer>();
-                if (renderer != null)
+                // Fallback: KayKit Barbarian scaled to giant size for final boss
+                GameObject zerethPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Barbarian");
+                if (zerethPrefab != null)
                 {
-                    renderer.material.color = new Color(0.3f, 0.1f, 0.4f, 0.8f);  // Dark purple torment
+                    _zerethEcho = Instantiate(zerethPrefab, spawnPos, Quaternion.identity);
+                    _zerethEcho.name = "ZerethEcho_Tormented";
+                    _zerethEcho.transform.localScale = new Vector3(8f, 8f, 8f); // Giant final boss scale
+                }
+                else
+                {
+                    Debug.LogError("[Moon13ContentSpawner] CRITICAL: Char_Barbarian prefab missing for Zereth Echo");
+                    _zerethEcho = new GameObject("ZerethEcho_Tormented_MISSING_PREFAB");
+                    _zerethEcho.transform.position = spawnPos;
                 }
             }
 

@@ -172,14 +172,63 @@ namespace Tartaria.Integration
                     Mathf.Sin(angle) * pavilionRadius
                 );
 
-                GameObject pavilionObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                pavilionObj.name = $"WhiteCity_Pavilion_{i}";
+                // Multi-part pavilion structure (Beaux-Arts architecture)
+                GameObject pavilionObj = new GameObject($"WhiteCity_Pavilion_{i}");
                 pavilionObj.transform.position = pos;
-                pavilionObj.transform.localScale = new Vector3(8f, 6f, 8f); // Large Beaux-Arts pavilion
+
+                // Foundation platform
+                GameObject foundation = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                foundation.name = "Foundation";
+                foundation.transform.SetParent(pavilionObj.transform);
+                foundation.transform.localScale = new Vector3(9f, 0.5f, 9f);
+                foundation.transform.localPosition = Vector3.up * 0.25f;
+
+                // Main pavilion body
+                GameObject pavilionBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                pavilionBody.name = "PavilionBody";
+                pavilionBody.transform.SetParent(pavilionObj.transform);
+                pavilionBody.transform.localScale = new Vector3(7f, 4f, 7f);
+                pavilionBody.transform.localPosition = Vector3.up * 2.5f;
+
+                // Dome (sphere on top)
+                GameObject dome = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                dome.name = "Dome";
+                dome.transform.SetParent(pavilionObj.transform);
+                dome.transform.localScale = new Vector3(7.5f, 3f, 7.5f);
+                dome.transform.localPosition = Vector3.up * 6f;
+
+                // 4 columns (corner pillars)
+                for (int col = 0; col < 4; col++)
+                {
+                    float colAngle = col * 90f * Mathf.Deg2Rad;
+                    GameObject column = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    column.name = $"Column_{col}";
+                    column.transform.SetParent(pavilionObj.transform);
+                    column.transform.localPosition = new Vector3(
+                        Mathf.Cos(colAngle) * 3.5f,
+                        2.5f,
+                        Mathf.Sin(colAngle) * 3.5f
+                    );
+                    column.transform.localScale = new Vector3(0.5f, 4f, 0.5f);
+
+                    // Capital (cube on top)
+                    GameObject capital = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    capital.name = $"Capital_{col}";
+                    capital.transform.SetParent(pavilionObj.transform);
+                    capital.transform.localPosition = new Vector3(
+                        Mathf.Cos(colAngle) * 3.5f,
+                        4.7f,
+                        Mathf.Sin(colAngle) * 3.5f
+                    );
+                    capital.transform.localScale = new Vector3(0.8f, 0.4f, 0.8f);
+                }
 
                 // Placeholder visual: white marble (Beaux-Arts style)
-                Renderer rend = pavilionObj.GetComponent<Renderer>();
-                rend.material.color = new Color(0.95f, 0.95f, 0.98f); // White marble
+                Renderer[] renderers = pavilionObj.GetComponentsInChildren<Renderer>();
+                foreach (Renderer rend in renderers)
+                {
+                    rend.material.color = new Color(0.95f, 0.95f, 0.98f); // White marble
+                }
 
                 // Warm light inside (healing aura placeholder)
                 Light healingLight = pavilionObj.AddComponent<Light>();
@@ -294,15 +343,44 @@ namespace Tartaria.Integration
 
             Debug.Log("[Moon5ContentSpawner] REVELATION: Spire fragment from Moon 1 completes White City central spire!");
 
-            // Spawn central spire at White City center (bridges zones)
-            GameObject spireObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireObj.name = "WhiteCity_CentralSpire";
-            spireObj.transform.position = whiteCityCenter + new Vector3(0f, 12f, 0f);
-            spireObj.transform.localScale = new Vector3(1.5f, 12f, 1.5f); // Tall spire
+            // Multi-part central spire at White City center (bridges zones)
+            GameObject spireObj = new GameObject("WhiteCity_CentralSpire");
+            spireObj.transform.position = whiteCityCenter;
+
+            // Spire base (foundation)
+            GameObject spireBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            spireBase.name = "SpireBase";
+            spireBase.transform.SetParent(spireObj.transform);
+            spireBase.transform.localScale = new Vector3(3f, 1f, 3f);
+            spireBase.transform.localPosition = Vector3.up * 0.5f;
+
+            // Lower spire column
+            GameObject spireLower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            spireLower.name = "SpireLower";
+            spireLower.transform.SetParent(spireObj.transform);
+            spireLower.transform.localScale = new Vector3(2f, 8f, 2f);
+            spireLower.transform.localPosition = Vector3.up * 9f;
+
+            // Upper spire column (tapered)
+            GameObject spireUpper = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            spireUpper.name = "SpireUpper";
+            spireUpper.transform.SetParent(spireObj.transform);
+            spireUpper.transform.localScale = new Vector3(1.5f, 6f, 1.5f);
+            spireUpper.transform.localPosition = Vector3.up * 19f;
+
+            // Spire apex crystal
+            GameObject spireApex = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            spireApex.name = "SpireApex";
+            spireApex.transform.SetParent(spireObj.transform);
+            spireApex.transform.localScale = Vector3.one * 1.2f;
+            spireApex.transform.localPosition = Vector3.up * 25f;
 
             // Golden material (ley-line bridge active)
-            Renderer spireRend = spireObj.GetComponent<Renderer>();
-            spireRend.material.color = new Color(1f, 0.9f, 0.4f); // Golden glow
+            Renderer[] spireRenderers = spireObj.GetComponentsInChildren<Renderer>();
+            foreach (Renderer spireRend in spireRenderers)
+            {
+                spireRend.material.color = new Color(1f, 0.9f, 0.4f); // Golden glow
+            }
 
             // Spire light (multi-zone ley-line corridor)
             Light spireLight = spireObj.AddComponent<Light>();

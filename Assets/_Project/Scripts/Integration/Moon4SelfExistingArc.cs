@@ -787,21 +787,49 @@ namespace Tartaria.Integration
             var stone = new Material(sh);
             stone.color = new Color(0.78f, 0.74f, 0.68f);
 
-            // Tower shaft (cylinder)
-            var shaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            shaft.name = "Shaft";
-            shaft.transform.SetParent(root.transform, false);
-            shaft.transform.localPosition = new Vector3(0f, 4f, 0f);
-            shaft.transform.localScale = new Vector3(1.6f, 4f, 1.6f);
-            shaft.GetComponent<MeshRenderer>().material = stone;
-            Object.Destroy(shaft.GetComponent<Collider>());
+            // Multi-part bell tower structure
+            // Foundation base
+            var towerBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            towerBase.name = "Base";
+            towerBase.transform.SetParent(root.transform, false);
+            towerBase.transform.localPosition = new Vector3(0f, 1f, 0f);
+            towerBase.transform.localScale = new Vector3(2.2f, 2f, 2.2f);
+            towerBase.GetComponent<MeshRenderer>().material = stone;
+            Object.Destroy(towerBase.GetComponent<Collider>());
+
+            // Lower shaft segment
+            var shaftLower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            shaftLower.name = "ShaftLower";
+            shaftLower.transform.SetParent(root.transform, false);
+            shaftLower.transform.localPosition = new Vector3(0f, 3.5f, 0f);
+            shaftLower.transform.localScale = new Vector3(1.8f, 3f, 1.8f);
+            shaftLower.GetComponent<MeshRenderer>().material = stone;
+            Object.Destroy(shaftLower.GetComponent<Collider>());
+
+            // Upper shaft segment
+            var shaftUpper = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            shaftUpper.name = "ShaftUpper";
+            shaftUpper.transform.SetParent(root.transform, false);
+            shaftUpper.transform.localPosition = new Vector3(0f, 6.5f, 0f);
+            shaftUpper.transform.localScale = new Vector3(1.6f, 3f, 1.6f);
+            shaftUpper.GetComponent<MeshRenderer>().material = stone;
+            Object.Destroy(shaftUpper.GetComponent<Collider>());
+
+            // Bell chamber platform
+            var bellChamber = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            bellChamber.name = "BellChamber";
+            bellChamber.transform.SetParent(root.transform, false);
+            bellChamber.transform.localPosition = new Vector3(0f, 9.2f, 0f);
+            bellChamber.transform.localScale = new Vector3(2f, 0.4f, 2f);
+            bellChamber.GetComponent<MeshRenderer>().material = stone;
+            Object.Destroy(bellChamber.GetComponent<Collider>());
 
             // Bell (sphere on top)
             var bell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             bell.name = "Bell";
             bell.transform.SetParent(root.transform, false);
-            bell.transform.localPosition = new Vector3(0f, 8.6f, 0f);
-            bell.transform.localScale = Vector3.one * 1.6f;
+            bell.transform.localPosition = new Vector3(0f, 10f, 0f);
+            bell.transform.localScale = Vector3.one * 1.3f;
             var bronze = new Material(sh);
             bronze.color = new Color(0.65f, 0.45f, 0.18f);
             bronze.SetFloat("_Metallic", 0.85f);
