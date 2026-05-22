@@ -1,16 +1,17 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Tartaria.Camera
 {
     /// <summary>
     /// Cinematic Camera Controller — smooth camera paths for cutscenes.
-    /// Attach to cinematic camera GameObject, define waypoints in editor.
+    /// Attach to cinematic camera GameObject, define waypoints in editor OR load from CinematicWaypointSequences.
     /// Integrates with Moon content spawners for story moments.
     /// </summary>
     public class CinematicCameraController : MonoBehaviour
     {
-        [Header("Waypoints")]
+        [Header("Waypoints (Editor or Programmatic)")]
         [SerializeField] Transform[] waypoints;
         [SerializeField] float[] waypointDurations;  // Seconds per segment
 
@@ -25,22 +26,45 @@ namespace Tartaria.Camera
         float _segmentProgress;
         bool _isPlaying;
 
+        // Runtime waypoints loaded from CinematicWaypointSequences
+        List<Vector3> _runtimePositions;
+        List<Vector3> _runtimeLookAts;
+        List<float> _runtimeDurations;
+
         /// <summary>
-        /// Play cinematic sequence from start to end.
+        /// Play named cinematic sequence from CinematicWaypointSequences.
         /// </summary>
-        public void PlayCinematic()
+        public void PlaySequence(string sequenceName)
         {
+            if (!Tartaria.Integration.CinematicWaypointSequences.Sequences.TryGetValue(sequenceName, out var waypoints))
+            {
+                Debug.LogError($"[CinematicCamera] Sequence '{sequenceName}' not found");
+                return;
+            }
+
             if (waypoints == null || waypoints.Length < 2)
             {
-                Debug.LogWarning("[CinematicCamera] Need at least 2 waypoints");
+                Debug.LogWarning($"[CinematicCamera] Sequence '{sequenceName}' has <2 waypoints");
                 return;
+            }
+
+            // Load runtime waypoints
+            _runtimePositions = new List<Vector3>(waypoints.Length);
+            _runtimeLookAts = new List<Vector3>(waypoints.Length);
+            _runtimeDurations = new List<float>(waypoints.Length);
+
+            foreach (var wp in waypoints)
+            {
+                _runtimePositions.Add(wp.position);
+                _runtimeLookAts.Add(wp.lookAt);
+                _runtimeDurations.Add(wp.duration);
             }
 
             _currentWaypoint = 0;
             _segmentProgress = 0f;
             _isPlaying = true;
 
-            Debug.Log($"[CinematicCamera] Playing {waypoints.Length} waypoint sequence");
+            Debug.Log($"[CinematicCamera] Playing '{sequenceName}' ({waypoints.Length} waypoints)");
         }
 
         /// <summary>
@@ -54,21 +78,37 @@ namespace Tartaria.Camera
 
         void Update()
         {
-            if (!_isPlaying || waypoints == null || waypoints.Length < 2) return;
+            if (!_isPlaying) return;
+
+            // Determine source: runtime waypoints or editor Transform waypoints
+            int waypointCount = (_runtimePositions != null && _runtimePositions.Count > 0)
+                ? _runtimePositions.Count
+                : (waypoints != null ? waypoints.Length : 0);
+
+            if (waypointCount < 2) return;
 
             int nextWaypoint = _currentWaypoint + 1;
-            if (nextWaypoint >= waypoints.Length)
+            if (nextWaypoint >= waypointCount)
             {
                 // Sequence complete
                 _isPlaying = false;
+                _runtimePositions = null;  // Clear runtime data
+                _runtimeLookAts = null;
+                _runtimeDurations = null;
                 Debug.Log("[CinematicCamera] Sequence complete");
                 return;
             }
 
             // Get current segment duration
-            float duration = (waypointDurations != null && _currentWaypoint < waypointDurations.Length)
-                ? waypointDurations[_currentWaypoint]
-                : 3f;  // Default 3 seconds per segment
+            float duration = 3f;  // Default
+            if (_runtimeDurations != null && _currentWaypoint < _runtimeDurations.Count)
+            {
+                duration = _runtimeDurations[_currentWaypoint];
+            }
+            else if (waypointDurations != null && _currentWaypoint < waypointDurations.Length)
+            {
+                duration = waypointDurations[_currentWaypoint];
+            }
 
             _segmentProgress += Time.deltaTime / duration;
 
@@ -82,20 +122,50 @@ namespace Tartaria.Camera
             {
                 // Interpolate position
                 float t = moveCurve.Evaluate(_segmentProgress);
-                Vector3 targetPos = Vector3.Lerp(waypoints[_currentWaypoint].position, waypoints[nextWaypoint].position, t);
-                transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref _velocity, smoothTime);
 
-                // Interpolate rotation
-                Quaternion targetRot;
-                if (lookAtTarget && lookAtTransform != null)
+                Vector3 startPos, endPos, lookTarget;
+
+                if (_runtimePositions != null && _runtimePositions.Count > 0)
                 {
-                    targetRot = Quaternion.LookRotation(lookAtTransform.position - transform.position);
+                    // Runtime waypoints
+                    startPos = _runtimePositions[_currentWaypoint];
+                    endPos = _runtimePositions[nextWaypoint];
+                    lookTarget = Vector3.Lerp(_runtimeLookAts[_currentWaypoint], _runtimeLookAts[nextWaypoint], t);
                 }
                 else
                 {
-                    targetRot = Quaternion.Slerp(waypoints[_currentWaypoint].rotation, waypoints[nextWaypoint].rotation, t);
+                    // Editor Transform waypoints
+                    startPos = waypoints[_currentWaypoint].position;
+                    endPos = waypoints[nextWaypoint].position;
+
+                    if (lookAtTarget && lookAtTransform != null)
+                    {
+                        lookTarget = lookAtTransform.position;
+                    }
+                    else
+                    {
+                        // Interpolate rotation from Transforms
+                        Quaternion targetRot = Quaternion.Slerp(
+                            waypoints[_currentWaypoint].rotation,
+                            waypoints[nextWaypoint].rotation,
+                            t
+                        );
+                        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, smoothTime);
+                        transform.position = Vector3.SmoothDamp(transform.position, Vector3.Lerp(startPos, endPos, t), ref _velocity, smoothTime);
+                        return;  // Skip lookAt handling below
+                    }
                 }
-                transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, smoothTime);
+
+                Vector3 targetPos = Vector3.Lerp(startPos, endPos, t);
+                transform.position = Vector3.SmoothDamp(transform.position, targetPos, ref _velocity, smoothTime);
+
+                // Look at target
+                Vector3 lookDirection = lookTarget - transform.position;
+                if (lookDirection.sqrMagnitude > 0.001f)
+                {
+                    Quaternion targetRot = Quaternion.LookRotation(lookDirection);
+                    transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, smoothTime);
+                }
             }
         }
 
