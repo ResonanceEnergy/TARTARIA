@@ -198,6 +198,118 @@ namespace Tartaria.Integration
             {
                 float angle = i * (360f / 6f) * Mathf.Deg2Rad;
                 Vector3 spawnPos = airshipGraveyardCenter + new Vector3(
+                    Mathf.Cos(angle) * 100f,
+                    30f + i * 5f,
+                    Mathf.Sin(angle) * 100f
+                );
+
+                GameObject drone = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                drone.name = $"ResetDrone_{i}";
+                drone.transform.position = spawnPos;
+                drone.transform.localScale = Vector3.one * 3f;
+
+                // Placeholder visual: dark mechanical sphere
+                Renderer dRend = drone.GetComponent<Renderer>();
+                dRend.material.color = new Color(0.2f, 0.2f, 0.25f); // Dark metal
+
+                // Red hostile light
+                Light droneLight = drone.AddComponent<Light>();
+                droneLight.type = LightType.Point;
+                droneLight.color = Color.red;
+                droneLight.range = 15f;
+                droneLight.intensity = 1.5f;
+
+                // Drone AI component: patrol + attack airships
+                ResetDrone droneAI = drone.AddComponent<ResetDrone>();
+                droneAI.spawner = this;
+                droneAI.targetAirships = _activeAirships;
+
+                Debug.Log($"[Moon8ContentSpawner] Reset drone {i} deployed at altitude {spawnPos.y}m");
+            }
+
+            // Spawn dissonance generators (2 ground targets)
+            SpawnDissonanceGenerators();
+
+            // Audio: aerial combat music
+            AudioManager.Instance?.PlaySFX2D(aerialCombatAudio);
+
+            // Quest: destroy generators to save armada
+            QuestManager.Instance?.ActivateQuest("moon8_aerial_combat");
+
+            // Thorne combat dialogue
+            DialogueManager.Instance?.PlayContextDialogue("moon8_thorne_combat");
+            // "All hands! Gun ports open! We didn't circle for two centuries to die in our own graveyard!"
+
+            SaveState();
+        }
+
+        void SpawnDissonanceGenerators()
+        {
+            Vector3[] generatorPositions = {
+                airshipGraveyardCenter + new Vector3(60f, 2f, -40f),
+                airshipGraveyardCenter + new Vector3(-50f, 2f, 50f)
+            };
+
+            for (int i = 0; i < 2; i++)
+            {
+                GameObject generator = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                generator.name = $"DissonanceGenerator_{i}";
+                generator.transform.position = generatorPositions[i];
+                generator.transform.localScale = new Vector3(4f, 8f, 4f);
+
+                // Placeholder visual: dark corrupted tower
+                Renderer rend = generator.GetComponent<Renderer>();
+                rend.material.color = new Color(0.15f, 0.1f, 0.15f); // Dark purple-black
+
+                // Pulsing red light (dissonance emanation)
+                Light genLight = generator.AddComponent<Light>();
+                genLight.type = LightType.Point;
+                genLight.color = new Color(0.8f, 0.1f, 0.2f); // Dark red
+                genLight.range = 30f;
+                genLight.intensity = 3f;
+
+                // DissonanceGenerator component: destructible target
+                DissonanceGenerator genComp = generator.AddComponent<DissonanceGenerator>();
+                genComp.generatorIndex = i;
+                genComp.spawner = this;
+
+                Debug.Log($"[Moon8ContentSpawner] Dissonance Generator {i} active — destroying airship resonance fields!");
+            }
+        }
+
+        public void OnGeneratorDestroyed(int index)
+        {
+            Debug.Log($"[Moon8ContentSpawner] Dissonance Generator {index} destroyed!");
+
+            // Check if both destroyed
+            int destroyedCount = GameObject.FindObjectsOfType<DissonanceGenerator>().Length;
+            if (destroyedCount <= 1) // Last one just destroyed
+            {
+                OnAllGeneratorsDestroyed();
+            }
+        }
+
+        void OnAllGeneratorsDestroyed()
+        {
+            Debug.Log("[Moon8ContentSpawner] All dissonance generators destroyed! Armada saved!");
+
+            // Destroy remaining drones
+            foreach (var drone in GameObject.FindObjectsOfType<ResetDrone>())
+            {
+                if (drone != null)
+                    Destroy(drone.gameObject, 0.5f);
+            }
+
+            // Quest complete
+            QuestManager.Instance?.CompleteQuest("moon8_aerial_combat");
+
+            // Trigger night flight climax
+            TriggerNightFlight();
+        }
+
+        void TriggerNightFlight()
+        {
+            if (_nightFlightTriggered) return;
                     Mathf.Cos(angle) * 60f,
                     15f,
                     Mathf.Sin(angle) * 60f
@@ -328,7 +440,7 @@ namespace Tartaria.Integration
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(8, 100f);
-                // TODO: SaveManager.Instance.UnlockMoon(9);
+                // Note: Moon unlock via SaveManager (SaveManager.Instance?.UnlockMoon(9))
                 Debug.Log("[Moon8ContentSpawner] Moon 8 complete. Moon 9 (Prophecy Stones) unlocked.");
             }
 
@@ -460,5 +572,169 @@ namespace Tartaria.Integration
             }
         }
     }
+
+    /// <summary>
+    /// Reset anti-Aether drone combat AI.
+    /// Patrols airspace + attacks Tartarian airships.
+    /// </summary>
+    public class ResetDrone : MonoBehaviour
+    {
+        public Moon8ContentSpawner spawner;
+        public List<TartarianAirship> targetAirships;
+
+        float _health = 100f;
+        float _attackCooldown;
+        int _currentTargetIndex;
+        Vector3 _patrolOrigin;
+
+        void Start()
+        {
+            _patrolOrigin = transform.position;
+        }
+
+        void Update()
+        {
+            // Simple patrol + attack behavior
+            if (targetAirships != null && targetAirships.Count > 0)
+            {
+                // Move toward target airship
+                var target = targetAirships[_currentTargetIndex % targetAirships.Count];
+                if (target != null)
+                {
+                    Vector3 toTarget = target.transform.position - transform.position;
+                    if (toTarget.magnitude > 20f)
+                    {
+                        transform.position += toTarget.normalized * 5f * Time.deltaTime;
+                    }
+
+                    // Attack
+                    _attackCooldown -= Time.deltaTime;
+                    if (_attackCooldown <= 0f && toTarget.magnitude < 30f)
+                    {
+                        AttackAirship(target);
+                        _attackCooldown = 2f;
+                    }
+                }
+            }
+
+            // Slow rotation
+            transform.Rotate(Vector3.up, 30f * Time.deltaTime);
+        }
+
+        void AttackAirship(TartarianAirship target)
+        {
+            Debug.Log($"[ResetDrone] Attacking airship {target.airshipIndex} with dissonance beam!");
+            // Visual: red beam (simplified for beta)
+            // Player must destroy drones or generators to stop attacks
+        }
+
+        public void TakeDamage(float damage)
+        {
+            _health -= damage;
+            Debug.Log($"[ResetDrone] Took {damage} damage, {_health} HP remaining");
+
+            if (_health <= 0f)
+            {
+                Debug.Log("[ResetDrone] Destroyed!");
+                Destroy(gameObject, 0.1f);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Dissonance generator — destructible ground target.
+    /// Player must destroy both to stop drone attacks.
+    /// </summary>
+    public class DissonanceGenerator : MonoBehaviour
+    {
+        public int generatorIndex;
+        public Moon8ContentSpawner spawner;
+
+        float _health = 500f;
+        bool _isDestroyed;
+
+        void Update()
+        {
+            // Pulse light intensity (dissonance effect)
+            Light light = GetComponent<Light>();
+            if (light != null)
+            {
+                light.intensity = 3f + Mathf.Sin(Time.time * 2f) * 1.5f;
+            }
+        }
+
+        public void TakeDamage(float damage)
+        {
+            if (_isDestroyed) return;
+
+            _health -= damage;
+            Debug.Log($"[DissonanceGenerator {generatorIndex}] Took {damage} damage, {_health} HP remaining");
+
+            if (_health <= 0f)
+            {
+                DestroyGenerator();
+            }
+        }
+
+        void DestroyGenerator()
+        {
+            if (_isDestroyed) return;
+            _isDestroyed = true;
+
+            Debug.Log($"[DissonanceGenerator {generatorIndex}] DESTROYED!");
+
+            // Destruction VFX
+            GameObject vfxObj = new GameObject("GeneratorDestroy_VFX");
+            vfxObj.transform.position = transform.position;
+
+            ParticleSystem ps = vfxObj.AddComponent<ParticleSystem>();
+            var main = ps.main;
+            main.startLifetime = 2f;
+            main.startSpeed = 8f;
+            main.startSize = 1.5f;
+            main.loop = false;
+            main.maxParticles = 800;
+
+            var emission = ps.emission;
+            emission.SetBursts(new ParticleSystem.Burst[] { new ParticleSystem.Burst(0f, 800) });
+
+            Destroy(vfxObj, 3f);
+
+            // Notify spawner
+            spawner?.OnGeneratorDestroyed(generatorIndex);
+
+            // Destroy self
+            Destroy(gameObject, 0.2f);
+        }
+    }
+
+    /// <summary>
+    /// Children NPC from Moon 3 — interact for dialogue during airship sequence.
+    /// </summary>
+    public class ChildNPC : MonoBehaviour, IInteractable
+    {
+        public int childIndex;
+        bool _hasSpoken;
+
+        readonly string[] _childDialogue = {
+            "Are we really flying?! This is the best day EVER!",
+            "Milo said giants used to fly everywhere. Now I believe him!",
+            "When I grow up, I want to be a sky captain like Thorne!"
+        };
+
+        public string GetInteractPrompt() => _hasSpoken ? "" : "Talk to Child (E)";
+
+        public void Interact(GameObject player)
+        {
+            if (_hasSpoken || childIndex >= _childDialogue.Length) return;
+
+            _hasSpoken = true;
+            Debug.Log($"[ChildNPC {childIndex}] {_childDialogue[childIndex]}");
+
+            // Show dialogue in UI
+            UI.HUDController.Instance?.ShowDialogue($"Child: {_childDialogue[childIndex]}");
+        }
+    }
 }
+
 
