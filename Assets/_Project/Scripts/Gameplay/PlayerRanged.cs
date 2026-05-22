@@ -16,9 +16,8 @@ namespace Tartaria.Gameplay
         [SerializeField] Transform firePoint;
         [SerializeField] int poolSize = 16;
         [SerializeField] float aimFOVMultiplier = 0.7f;
-        // TODO: aimSensitivityMultiplier should live in CameraController (Tartaria.Camera)
-        // to avoid cross-assembly reference. PlayerRanged has no look input handling.
-        [SerializeField] float aimSensitivityMultiplier = 0.5f;
+        // Note: Aim sensitivity adjustment should be implemented in CameraController (Tartaria.Camera)
+        // via ICameraShakeService.SetSensitivityMultiplier() — PlayerRanged handles bow mechanics only.
 
         GameObject[] _arrowPool;
         int _nextArrowIndex;

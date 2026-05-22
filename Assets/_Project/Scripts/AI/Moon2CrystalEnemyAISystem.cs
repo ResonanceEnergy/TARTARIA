@@ -133,12 +133,12 @@ namespace Tartaria.AI
                 if (disrupt.ValueRO.PulseTimer <= 0f && dist < 18f)
                 {
                     disrupt.ValueRW.PulseTimer = disrupt.ValueRO.PulseCooldown;
-                    // Scramble effect: in real game would call a player freq scramble API.
-                    // Here we log + minor direct damage as proxy. Real integration via PlayerCombatState or event.
+                    // Scramble effect: lock player tuning input to random frequency for 1.8s
                     if (!disrupt.ValueRO.IsSilenced)
                     {
                         combatant.ValueRW.Health -= disrupt.ValueRO.AttackDamage;
-                        // TODO Moon2: broadcast scramble event (1.8s random freq lock)
+                        // Broadcast scramble event to player
+                        Gameplay.PlayerStatusEffects.Instance?.ApplyFrequencyScramble(1.8f);
                     }
                 }
 
