@@ -31,7 +31,7 @@ namespace Tartaria.Gameplay
 
         [Header("References")]
         [SerializeField] Light directionalLight;
-        [SerializeField] Volume globalVolume;
+        [SerializeField] UnityEngine.Rendering.Volume globalVolume;
         [SerializeField] DayNightCycle dayNightCycle;
 
         [Header("Fog Settings")]
