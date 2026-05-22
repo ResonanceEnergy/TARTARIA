@@ -7,6 +7,7 @@ namespace Tartaria.AI
     /// <summary>
     /// Health component for Mud Golem enemies (Moon 3 derailment ambush, Moon 4 guardian boss).
     /// Provides max health, damage handling, death events, and visual feedback integration.
+    /// Public API: TakeDamage, Heal, SetMaxHealth, Kill, ResetHealth.
     /// </summary>
     public class MudGolemHealth : MonoBehaviour
     {
