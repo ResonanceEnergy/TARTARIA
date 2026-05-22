@@ -23,6 +23,8 @@ namespace Tartaria.UI
         string _waypointLabel;
         Texture2D _ringTex;
         Texture2D _pixel;
+        Transform _cachedPlayer;
+        float _playerRetryTimer;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
@@ -51,15 +53,25 @@ namespace Tartaria.UI
             _pixel.SetPixel(0, 0, Color.white); _pixel.Apply();
         }
 
-        Transform FindPlayer()
+        Transform GetOrFindPlayer()
         {
-            var p = GameObject.FindGameObjectWithTag("Player");
-            return p != null ? p.transform : null;
+            // Cache player transform, only re-lookup if null + retry timer elapsed
+            if (_cachedPlayer == null)
+            {
+                _playerRetryTimer += Time.unscaledDeltaTime;
+                if (_playerRetryTimer >= 1f) // Retry every 1 second if player not found
+                {
+                    var p = GameObject.FindGameObjectWithTag("Player");
+                    if (p != null) _cachedPlayer = p.transform;
+                    _playerRetryTimer = 0f;
+                }
+            }
+            return _cachedPlayer;
         }
 
         void OnGUI()
         {
-            var player = FindPlayer();
+            var player = GetOrFindPlayer();
             if (player == null) return;
 
             int x = Screen.width - Size - 24;

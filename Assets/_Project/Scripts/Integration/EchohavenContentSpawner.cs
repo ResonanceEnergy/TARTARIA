@@ -157,7 +157,8 @@ namespace Tartaria.Integration
         /// </summary>
         void EnsureMoon1LunarFramework()
         {
-            if (GameObject.Find("MoonFramework") != null) return;
+            if (_moonFramework == null) _moonFramework = GameObject.Find("MoonFramework");
+            if (_moonFramework != null) return;
 
             var root = new GameObject("MoonFramework (Moon1 Runtime)");
             var runner = root.AddComponent<MoonBeatRunner>();
@@ -185,10 +186,10 @@ namespace Tartaria.Integration
         void EnsureTraversalFreedom()
         {
             // Remove hard world blockers so the player can roam freely.
-            var worldBoundary = GameObject.Find("WorldBoundary");
-            if (worldBoundary != null)
+            if (_worldBoundary == null) _worldBoundary = GameObject.Find("WorldBoundary");
+            if (_worldBoundary != null)
             {
-                var cols = worldBoundary.GetComponentsInChildren<Collider>(true);
+                var cols = _worldBoundary.GetComponentsInChildren<Collider>(true);
                 for (int i = 0; i < cols.Length; i++)
                     cols[i].enabled = false;
             }
@@ -214,7 +215,8 @@ namespace Tartaria.Integration
 
         void EnsureShovelPickup()
         {
-            if (GameObject.Find("ShovelPickup") != null) return;
+            if (_shovelPickup == null) _shovelPickup = GameObject.Find("ShovelPickup");
+            if (_shovelPickup != null) return;
 
             Vector3 spawn = new Vector3(12f, 1f, 7f);
             var playerSpawn = GameObject.Find("PlayerSpawn");
@@ -268,7 +270,8 @@ namespace Tartaria.Integration
 
         void EnsureMudDigVisuals()
         {
-            if (GameObject.Find("--- DIG MOUNDS ---") != null) return;
+            if (_digMoundsRoot == null) _digMoundsRoot = GameObject.Find("--- DIG MOUNDS ---");
+            if (_digMoundsRoot != null) return;
 
             var parent = new GameObject("--- DIG MOUNDS ---");
             Vector3[] centers =
@@ -307,7 +310,8 @@ namespace Tartaria.Integration
             if (needed <= 0) return;
 
             Vector3 center = new Vector3(20f, 0f, 10f);
-            var player = GameObject.FindWithTag("Player");
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
             if (player != null) center = player.transform.position + new Vector3(12f, 0f, 10f);
 
             for (int i = 0; i < needed; i++)
@@ -326,7 +330,8 @@ namespace Tartaria.Integration
                 return;
             }
 
-            var player = GameObject.FindWithTag("Player");
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
             if (player == null) return;
             var a = AnastasiaController.Instance.transform;
             if (Vector3.Distance(a.position, player.transform.position) > 60f)
@@ -334,7 +339,8 @@ namespace Tartaria.Integration
         }
 
         void EnsurePlayerAnimatorPresent()
-        {
+        {if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null
             var player = GameObject.FindWithTag("Player");
             if (player == null) return;
             if (player.GetComponent<PlayerAnimator>() == null)
@@ -343,7 +349,8 @@ namespace Tartaria.Integration
 
         void EnsureAmbientMotes()
         {
-            if (GameObject.Find("AmbientAetherMotes") != null) return;
+            if (_ambientMotes == null) _ambientMotes = GameObject.Find("AmbientAetherMotes");
+            if (_ambientMotes != null) return;
 
             var go = new GameObject("AmbientAetherMotes");
             go.transform.position = new Vector3(0f, 8f, 0f);
@@ -373,7 +380,8 @@ namespace Tartaria.Integration
 
         void EnsureRuntimeFoliage()
         {
-            if (GameObject.Find("FoliageRoot") != null) return;
+            if (_foliageRoot == null) _foliageRoot = GameObject.Find("FoliageRoot");
+            if (_foliageRoot != null) return;
 
             var root = new GameObject("FoliageRoot");
             var grassParent = new GameObject("Grass");
@@ -673,7 +681,8 @@ namespace Tartaria.Integration
             var milo = MiloController.Instance;
             if (milo == null) yield break;
             // Simple visual cue: face player + short forward step (no nav required)
-            var player = GameObject.FindWithTag("Player");
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
             if (player != null)
             {
                 Vector3 toPlayer = (player.transform.position - milo.transform.position).normalized;
@@ -1115,13 +1124,14 @@ namespace Tartaria.Integration
         void SpawnAuroraPermanent()
         {
             // Idempotent: don't spawn if already exists
-            if (GameObject.Find("Sky_Aurora") != null) return;
+            if (_skyAurora == null) _skyAurora = GameObject.Find("Sky_Aurora");
+            if (_skyAurora != null) return;
 
             // Ensure VFX parent exists
-            var vfxRoot = GameObject.Find("VFX");
-            if (vfxRoot == null)
+            if (_vfxRoot == null) _vfxRoot = GameObject.Find("VFX");
+            if (_vfxRoot == null)
             {
-                vfxRoot = new GameObject("VFX");
+                _vfxRoot = new GameObject("VFX");
             }
 
             // Load Aurora prefab from Resources
@@ -1135,7 +1145,8 @@ namespace Tartaria.Integration
             // Spawn at high altitude (y=200)
             var aurora = Instantiate(auroraPrefab, new Vector3(0, 200, 0), Quaternion.identity);
             aurora.name = "Sky_Aurora";
-            aurora.transform.SetParent(vfxRoot.transform, true);
+            aurora.transform.SetParent(_vfxRoot.transform, true);
+            _skyAurora = aurora;
 
             _environmentalVFX.AddRange(aurora.GetComponentsInChildren<ParticleSystem>());
             Debug.Log("[EchohavenContentSpawner] Aurora VFX spawned in sky at (0, 200, 0).");
@@ -1162,7 +1173,8 @@ namespace Tartaria.Integration
 
         void TriggerAmbientScanPulse()
         {
-            var player = GameObject.FindWithTag("Player");
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
             if (player == null) return;
 
             #if UNITY_EDITOR
@@ -1281,8 +1293,8 @@ namespace Tartaria.Integration
 
             // ─── Rich Moon 1 Echohaven zone audio additions (gentle buried resonance hum, corruption drone, ambient wind/motes) ───
             // Immediate magical feel on first populate + start volume (lightweight, existing ProceduralSFX + fallback gen with 432Hz family tie-in)
-            var firstSite = GameObject.Find("Moon1_FirstExcavationSite");
-            Vector3 buriedPos = firstSite != null ? firstSite.transform.position + new Vector3(0, 1.1f, 0) : new Vector3(8f, 1.1f, 5f);
+            if (_firstExcavationSite == null) _firstExcavationSite = GameObject.Find("Moon1_FirstExcavationSite");
+            Vector3 buriedPos = _firstExcavationSite != null ? _firstExcavationSite.transform.position + new Vector3(0, 1.1f, 0) : new Vector3(8f, 1.1f, 5f);
             CreateAmbientSource("BuriedResonanceHum", buriedPos, "Moon1_BuriedResonanceHum", 0.12f, 32f);  // rich dedicated 432+PHI buried hum at obvious ruin
 
             // Corruption drones (dissonant low layers near patches/zones for unsettling contrast) — use dedicated Moon1 drone
@@ -1601,10 +1613,10 @@ namespace Tartaria.Integration
 
             // ─── INTEGRATION: New scaffold's first obvious excavation site (Moon1EchohavenScaffold PlaceFirstExcavationSite) ───
             // Makes the core loop immediately playable: obvious ruin near start for first 10 min magic after population.
-            var firstSiteGO = GameObject.Find("Moon1_FirstExcavationSite");
-            if (firstSiteGO != null)
+            if (_firstExcavationSite == null) _firstExcavationSite = GameObject.Find("Moon1_FirstExcavationSite");
+            if (_firstExcavationSite != null)
             {
-                Vector3 firstPos = firstSiteGO.transform.position;
+                Vector3 firstPos = _firstExcavationSite.transform.position;
                 exc.RegisterSite("echohaven_first_ruin", firstPos, 2, false, "first_dome");
                 // Also register as scanner POI so resonance scan immediately reveals the obvious first target
                 var scanner = Gameplay.ResonanceScannerSystem.Instance;
@@ -1790,10 +1802,10 @@ namespace Tartaria.Integration
             CreateDigSiteMarker(digParent.transform, new Vector3(0f, 0f, -30f),  "Spire Ruins");
 
             // Scaffold first excavation site marker (integrated obvious ruin)
-            var first = GameObject.Find("Moon1_FirstExcavationSite");
-            if (first != null)
+            if (_firstExcavationSite == null) _firstExcavationSite = GameObject.Find("Moon1_FirstExcavationSite");
+            if (_firstExcavationSite != null)
             {
-                CreateDigSiteMarker(digParent.transform, first.transform.position, "First Ruin (Tutorial)");
+                CreateDigSiteMarker(digParent.transform, _firstExcavationSite.transform.position, "First Ruin (Tutorial)");
             }
 
             Debug.Log("[EchohavenContentSpawner] Dig site markers placed (incl. scaffold first if present).");

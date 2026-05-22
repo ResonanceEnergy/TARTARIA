@@ -67,6 +67,11 @@ namespace Tartaria.Integration
         // Pre-allocated buffer for Physics.OverlapSphereNonAlloc
         static readonly Collider[] _overlapBuffer = new Collider[32];
 
+        // ─── PERF: Cached references for Moon2 Cathedral + structures ───
+        GameObject _moon2Cathedral;
+        Dictionary<string, GameObject> _moon2Structures = new Dictionary<string, GameObject>();
+        float _sceneObjectRetryTimer;
+
         public bool IsGiant => _isGiant;
         public GiantAbility ActiveAbility => _activeAbility;
 
@@ -474,17 +479,26 @@ namespace Tartaria.Integration
         {
             Debug.Log("[GiantMode Moon2] ═══ THE CATHEDRAL SHAKES — GIANT MODE POWER FANTASY ═══");
 
-            // Locate the 5 signature structures
-            var cathedral = GameObject.Find("moon2_cathedral_dome") ?? GameObject.Find("Fractured Cathedral Dome");
+            // Locate the 5 signature structures (cache for performance)
+            if (_moon2Cathedral == null)
+            {
+                _moon2Cathedral = GameObject.Find("moon2_cathedral_dome") ?? GameObject.Find("Fractured Cathedral Dome");
+            }
+            
             var structures = new List<GameObject>();
             string[] ids = { "moon2_cathedral_dome", "moon2_bell_tower", "moon2_fountain", "moon2_crystal_hall", "moon2_ley_chamber" };
             foreach (string id in ids)
             {
-                var go = GameObject.Find(id);
+                GameObject go;
+                if (!_moon2Structures.TryGetValue(id, out go) || go == null)
+                {
+                    go = GameObject.Find(id);
+                    if (go != null) _moon2Structures[id] = go;
+                }
                 if (go != null) structures.Add(go);
-            }
-
-            // PHASE 1: The Impact Stomp (0-1.8s)
+            }_moon2Cathedral != null)
+            {
+                StartCoroutine(ApplyCathedralShake(_moon2C
             Audio.AudioManager.Instance?.PlaySFX2D("CathedralQuakeRumble");
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             if (playerTransform != null)
