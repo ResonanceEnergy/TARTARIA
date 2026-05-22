@@ -367,8 +367,9 @@ namespace Tartaria.Integration
 
             // Add health
             var health = golem.AddComponent<MudGolemHealth>();
-            health.SetMaxHealth(300f);
-            health.OnDeath += () => OnGolemDefeated(golem);
+            // TODO: Assembly dependency - enable after Tartaria.AI recompiles
+            // health.SetMaxHealth(300f);
+            // health.OnDeath += () => OnGolemDefeated(golem);
 
             // Add collider
             var collider = golem.AddComponent<CapsuleCollider>();

@@ -45,7 +45,7 @@ namespace Tartaria.Integration
                 // Grant rewards
                 if (resonanceReward > 0f)
                 {
-                    PlayerCharacter.Instance?.AddRS(resonanceReward);
+                    AetherResonanceSystem.Instance?.AddResonance(resonanceReward, "Lore Discovery");
                     HUDController.Instance?.ShowAchievementToast($"+{resonanceReward:F0} RS — Lore Discovery");
                 }
 
@@ -147,7 +147,7 @@ namespace Tartaria.Integration
 
                 // Grant rewards
                 if (resonanceReward > 0f)
-                    PlayerCharacter.Instance?.AddRS(resonanceReward);
+                    AetherResonanceSystem.Instance?.AddResonance(resonanceReward, "Echo Memory");
 
                 if (!string.IsNullOrEmpty(codexUnlockId))
                     UI.CodexSystem.Instance?.UnlockEntry(codexUnlockId);

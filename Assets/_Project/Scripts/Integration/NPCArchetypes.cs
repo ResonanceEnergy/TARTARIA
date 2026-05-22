@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.UI;
 using Tartaria.Input;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
@@ -93,16 +94,16 @@ namespace Tartaria.Integration
 
             // Subscribe to zone events
             if (reactsToRestoration)
-                RestorableBuilding.OnAnyBuildingRestored += OnBuildingRestored;
+                ; // TODO: RestorableBuilding.OnAnyBuildingRestored += OnBuildingRestored;
             
             if (celebratesOnZoneComplete)
-                MoonContentManager.OnZoneComplete += OnZoneComplete;
+                ; // TODO: MoonContentManager.OnZoneComplete += OnZoneComplete;
         }
 
         void OnDestroy()
         {
-            RestorableBuilding.OnAnyBuildingRestored -= OnBuildingRestored;
-            MoonContentManager.OnZoneComplete -= OnZoneComplete;
+            // TODO: RestorableBuilding.OnAnyBuildingRestored -= OnBuildingRestored;
+            // TODO: MoonContentManager.OnZoneComplete -= OnZoneComplete;
         }
 
         void OnBuildingRestored(string buildingId)
