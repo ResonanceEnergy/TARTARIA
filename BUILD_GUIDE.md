@@ -8,8 +8,8 @@
 
 ### Required Software
 
-- **Unity 6000.0.32f1** (exact version, URP 17.3.0 included)
-  - Install via Unity Hub: `unityhub://6000.0.32f1/0822185ae2e4`
+- **Unity 6000.3.6f1** (exact version, URP 17.3.0 included)
+  - Install via Unity Hub: `unityhub://6000.3.6f1/bbb010bdb8a3`
   - Modules: Windows Build Support (IL2CPP)
 - **Git** (for cloning + version control)
 - **PowerShell 7+** (for build automation scripts)
@@ -39,7 +39,7 @@ cd TARTARIA
 - Launch Unity Hub
 - Click **Add → Add project from disk**
 - Select the `TARTARIA` folder
-- Unity 6000.0.32f1 will open and import assets (~5 min first launch)
+- Unity 6000.3.6f1 will open and import assets (~5 min first launch)
 
 ### 3. One-Click Build + Play
 
@@ -133,7 +133,7 @@ Performance gates validate 60 fps target on GTX 1070 baseline (Medium tier):
 cd C:\dev\TARTARIA_new
 
 # Run CI perf gates
-"C:\Program Files\Unity\Hub\Editor\6000.0.32f1\Editor\Unity.exe" `
+"C:\Program Files\Unity\Hub\Editor\6000.3.6f1\Editor\Unity.exe" `
   -projectPath . `
   -executeMethod Tartaria.Editor.Perf.PerformanceGateRunner.RunCIGates `
   -batchmode -quit `
