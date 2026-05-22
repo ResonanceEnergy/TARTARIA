@@ -2,12 +2,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Linq;
+using Tartaria.Data;
 
 namespace Tartaria.UI
 {
     /// <summary>
     /// Inventory UI Panel — displays player inventory grid, item tooltips.
     /// Attach to Canvas panel, wire to InventorySystem events.
+    /// Integrated with ItemDatabase for icons and metadata.
     /// </summary>
     public class InventoryUIPanel : MonoBehaviour
     {
@@ -118,8 +120,38 @@ namespace Tartaria.UI
                 if (slotIndex < allItems.Count)
                 {
                     var item = allItems.ElementAt(slotIndex);
-                    if (itemNameText != null) itemNameText.text = item.Key;
-                    if (itemDescriptionText != null) itemDescriptionText.text = $"Quantity: {item.Value}";
+                    string itemId = item.Key;
+                    int count = item.Value;
+
+                    // Get ItemData from database for rich tooltip
+                    var itemData = inventory.GetItemData(itemId);
+                    if (itemData != null)
+                    {
+                        if (itemNameText != null)
+                            itemNameText.text = $"{itemData.displayName} x{count}";
+                        
+                        if (itemDescriptionText != null)
+                        {
+                            string rarity = itemData.rarity.ToString();
+                            string category = itemData.category.ToString();
+                            itemDescriptionText.text = $"{itemData.description}\n\n" +
+                                                      $"<color=yellow>{rarity}</color> | {category}\n" +
+                                                      $"Value: {itemData.value} RS | Weight: {itemData.weight:F1} kg";
+                        }
+                        
+                        if (itemIconImage != null)
+                            itemIconImage.sprite = itemData.icon;
+                        
+                        return;
+                    }
+
+                    // Fallback if no ItemData found
+                    if (itemNameText != null)
+                        itemNameText.text = $"{itemId} x{count}";
+                    
+                    if (itemDescriptionText != null)
+                        itemDescriptionText.text = "No description available";
+                    
                     return;
                 }
             }
@@ -127,6 +159,7 @@ namespace Tartaria.UI
             // Fallback if slot empty
             if (itemNameText != null) itemNameText.text = "Empty";
             if (itemDescriptionText != null) itemDescriptionText.text = "";
+            if (itemIconImage != null) itemIconImage.sprite = null;
         }
 
         void HideTooltip()
@@ -181,7 +214,19 @@ namespace Tartaria.UI
             if (_itemIcons.TryGetValue(itemId, out Sprite cached))
                 return cached;
 
-            // Try loading from Resources (convention: Resources/Items/{itemId}.png)
+            // Try getting icon from ItemDatabase first
+            var inventory = Gameplay.InventorySystem.Instance;
+            if (inventory != null)
+            {
+                var itemData = inventory.GetItemData(itemId);
+                if (itemData != null && itemData.icon != null)
+                {
+                    _itemIcons[itemId] = itemData.icon;
+                    return itemData.icon;
+                }
+            }
+
+            // Fallback: try loading from Resources (legacy support)
             Sprite icon = Resources.Load<Sprite>($"Items/{itemId}");
             if (icon != null)
                 _itemIcons[itemId] = icon;
