@@ -5,6 +5,7 @@ using Tartaria.Core;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.UI;
+using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
@@ -245,7 +246,7 @@ namespace Tartaria.Integration
             // Celebration VFX (golden dome over entire cathedral zone)
             if (VFXController.Instance != null)
             {
-                VFXController.Instance.PlayAetherPulse(transform.position, 15f);
+                VFXController.Instance.PlayAetherPulse(transform.position, 15f, Color.yellow);
             }
 
             // Celebration audio

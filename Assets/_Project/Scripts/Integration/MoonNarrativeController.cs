@@ -64,18 +64,15 @@ namespace Tartaria.Integration
 
                 case "moon3_orphan_reveal":
                     DialogueManager.Instance?.PlayContextDialogue("helena_orphan_train");
-                    // Trigger cinematic camera sequence (CinematicCameraController integration)
-                    var cinemaCam = FindObjectOfType<UI.CinematicCameraController>();
-                    if (cinemaCam != null)
-                    {
-                        cinemaCam.PlaySequence("MoonIntro");
-                    }
+                    // Trigger cinematic camera sequence (CinematicCameraController integration pending)
+                    // var cinemaCam = FindObjectOfType<Camera.CinematicCameraController>();
+                    // cinemaCam?.PlaySequence(waypointData);  // TODO: Load waypoint data from CinematicWaypointSequences
                     break;
 
                 case "moon4_guardian_awakening":
                     DialogueManager.Instance?.PlayContextDialogue("narrator_guardian_golem");
                     // Play boss intro cinematic (timeline or camera sequence)
-                    Debug.Log($"[MoonNarrative] Playing boss intro for Moon {_currentMoon}");
+                    Debug.Log($"[MoonNarrative] Playing boss intro for Moon {currentMoonNumber}");
                     break;
 
                 case "moon10_zereth_revelation":
@@ -159,6 +156,13 @@ namespace Tartaria.Integration
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+        }
+
+        void OnEndingChosen(int choiceIndex)
+        {
+            string ending = choiceIndex == 0 ? "Harmony" : choiceIndex == 1 ? "Echo" : "Reset";
+            Debug.Log($"[MoonNarrative] Ending chosen: {ending}");
+            // Save choice (SaveManager integration pending)
         }
     }
 }

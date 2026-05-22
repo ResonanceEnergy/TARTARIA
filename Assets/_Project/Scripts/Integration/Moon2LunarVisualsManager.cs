@@ -43,5 +43,12 @@ namespace Tartaria.Integration
             // TODO: Implement phase transition animation
             Debug.Log("[Moon2LunarVisualsManager] PlayPhaseTransition() - STUB");
         }
+
+        /// <summary>Plays lunar shadow purge transformation VFX (golden burn effect).</summary>
+        public void PlayLunarShadowPurgeCathedralTransformation(Vector3 position, float duration)
+        {
+            Debug.Log($"[Moon2LunarVisualsManager] PlayLunarShadowPurgeCathedralTransformation at {position} for {duration}s - STUB");
+            // TODO: Implement golden purge VFX
+        }
     }
 }

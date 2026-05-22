@@ -218,7 +218,7 @@ namespace Tartaria.Integration
             // Weakening corruption field VFX (purple to golden shift)
             if (VFXController.Instance != null)
             {
-                VFXController.Instance.PlayAetherPulse(vein.transform.position, 0.8f);
+                VFXController.Instance.PlayAetherPulse(vein.transform.position, 0.8f, Color.cyan);
             }
 
             // Check completion
@@ -245,7 +245,7 @@ namespace Tartaria.Integration
             // VFX: golden wave radiates from cathedral center
             if (VFXController.Instance != null)
             {
-                VFXController.Instance.PlayAetherPulse(transform.position, 5f);
+                VFXController.Instance.PlayAetherPulse(transform.position, 5f, Color.magenta);
             }
 
             // Haptic celebration
@@ -318,7 +318,7 @@ namespace Tartaria.Integration
         {
             // Micro-giant mode required
             if (Integration.MicroGiantController.Instance != null &&
-                Integration.MicroGiantController.Instance.IsPlayerShrunkForMicroGiantMode)
+                Integration.MicroGiantController.Instance.IsPlayerShrunkForMicroGiantMode())
             {
                 return "[E] Purge Dissonance Vein";
             }
@@ -328,6 +328,9 @@ namespace Tartaria.Integration
         public void Interact(GameObject interactor)
         {
             // Must be in micro-giant mode
+            if (Integration.MicroGiantController.Instance == null ||
+                !Integration.MicroGiantController.Instance.IsPlayerShrunkForMicroGiantMode())
+            {
             if (Integration.MicroGiantController.Instance == null ||
                 !Integration.MicroGiantController.Instance.IsPlayerShrunkForMicroGiantMode)
             {

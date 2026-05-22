@@ -265,6 +265,12 @@ namespace Tartaria.Integration
             ExitMicroMode();
         }
 
+        /// <summary>Check if player is currently shrunk for micro-giant mode.</summary>
+        public bool IsPlayerShrunkForMicroGiantMode()
+        {
+            return _isMicro;
+        }
+
         struct CorruptionNode
         {
             public Vector3 position;

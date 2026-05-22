@@ -2,6 +2,7 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -57,7 +58,7 @@ namespace Tartaria.Integration
             if (!_hasRead)
             {
                 _hasRead = true;
-                QuestManager.Instance?.ProgressByType(QuestObjectiveType.FindLocation, "inscription_zereth");
+                QuestManager.Instance?.ProgressByType(QuestObjectiveType.HiddenDiscovery, "inscription_zereth");
             }
         }
     }

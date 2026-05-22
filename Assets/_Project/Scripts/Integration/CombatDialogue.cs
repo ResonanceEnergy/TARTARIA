@@ -74,9 +74,9 @@ namespace Tartaria.Integration
             if (_introPlayed) return;
             _introPlayed = true;
 
-            // Cinematic camera focus on boss
-            var cinemaCam = FindObjectOfType<UI.CinematicCameraController>();
-            cinemaCam?.FocusOn(transform, 3f);
+            // Cinematic camera focus on boss (FocusOn method pending implementation)
+            // var cinemaCam = FindObjectOfType<Camera.CinematicCameraController>();
+            // cinemaCam?.FocusOn(transform, 3f);
 
             // Show boss nameplate + intro line
             HUDController.Instance?.ShowBossNameplate(bossName, bossTitle);

@@ -101,8 +101,7 @@ namespace Tartaria.Integration
 
             HUDController.Instance?.ShowDialogue(
                 "Zereth (tormented)",
-                _zerethPainLines[phaseIndex],
-                5f
+                _zerethPainLines[phaseIndex]
             );
 
             // Visual: Zereth's body flickers with pain (color shift)
@@ -118,8 +117,7 @@ namespace Tartaria.Integration
 
             HUDController.Instance?.ShowDialogue(
                 "You",
-                _playerResponsePrompts[phaseIndex],
-                4f
+                _playerResponsePrompts[phaseIndex]
             );
 
             // Lirael joins harmonically (phases 2-5)
@@ -219,8 +217,7 @@ namespace Tartaria.Integration
             // Final dialogue: Zereth's gratitude
             HUDController.Instance?.ShowDialogue(
                 "Zereth (at peace)",
-                "Thank you... for hearing me. For seeing me. I am... at last... free.",
-                8f
+                "Thank you... for hearing me. For seeing me. I am... at last... free."
             );
 
             // Play 432 Hz sustained tone (perfect harmony)

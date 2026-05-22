@@ -1,6 +1,7 @@
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Save;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -193,14 +194,14 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            SaveManager.Instance.SetMoonData("moon4_current_hour", Mathf.FloorToInt(_currentHour));
+            SaveManager.Instance.SetMoonData(4, "current_hour", Mathf.FloorToInt(_currentHour));
         }
 
         public void LoadState()
         {
             if (SaveManager.Instance == null) return;
 
-            int savedHour = SaveManager.Instance.GetMoonData("moon4_current_hour");
+            int savedHour = SaveManager.Instance.GetMoonData(4, "current_hour", -1);
             if (savedHour >= 0 && savedHour < 17)
             {
                 _currentHour = savedHour;

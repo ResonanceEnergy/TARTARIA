@@ -499,6 +499,26 @@ namespace Tartaria.Integration
             };
         }
 
+        /// <summary>
+        /// Check if companion is active/present (stub - full implementation pending).
+        /// </summary>
+        public bool IsCompanionActive(string companionId)
+        {
+            if (string.IsNullOrEmpty(companionId)) return false;
+            if (!_states.TryGetValue(companionId, out var state)) return false;
+            return state.unlocked;  // Simple check: unlocked = active for now
+        }
+
+        /// <summary>
+        /// Check if companion is unlocked (stub).
+        /// </summary>
+        public bool IsCompanionUnlocked(string companionId)
+        {
+            if (string.IsNullOrEmpty(companionId)) return false;
+            if (!_states.TryGetValue(companionId, out var state)) return false;
+            return state.unlocked;
+        }
+
         public class CompanionManagerSavePayload
         {
             public string[] companionIds;

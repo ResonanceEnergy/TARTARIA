@@ -1005,8 +1005,7 @@ namespace Tartaria.Integration
             if (_fired || !other.CompareTag("Player")) return;
             _fired = true;
             if (_cachedCtrl == null) _cachedCtrl = FindObjectOfType<WhiteCityAmplificationController>();
-            _cachedCar ctrl = FindObjectOfType<WhiteCityAmplificationController>();
-            ctrl?.BeginAmplificationSequence();
+            _cachedCtrl?.BeginAmplificationSequence();
             ThorneController.Instance?.RadioFirstContact();
         }
     }

@@ -95,6 +95,7 @@ namespace Tartaria.Integration
         bool _climaxComplete;
         bool _revelationComplete;
         bool _isReturningPlayer;
+        bool cassianIntroduced;  // Track Cassian introduction state
         int _currentBeat; // 1-5
         string _crystalMemoryVariant = "neutral"; // trust / doubt / returning
 

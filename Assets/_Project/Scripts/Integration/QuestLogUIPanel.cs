@@ -144,6 +144,62 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
             }
         }
 
+        void AddMoonSectionWithQuests(int moonNumber, List<string> questIds)
+        {
+            // Add Moon header
+            var headerGO = Instantiate(questEntryPrefab, questListContainer);
+            var header = headerGO.GetComponent<QuestEntryUI>();
+            if (header != null)
+            {
+                header.SetHeaderMode($"— MOON {moonNumber} —");
+                _entries.Add(header);
+            }
+
+            // Add quests
+            foreach (var qid in questIds)
+            {
+                AddQuestEntry(qid, QuestStatus.Active);
+            }
+        }
+
+        void AddQuestEntry(string questId, QuestStatus status)
+        {
+            var questMgr = QuestManager.Instance;
+            if (questMgr == null)
+            {
+                AddPlaceholderQuest(questId, questId, 0.5f);
+                return;
+            }
+
+            var questDef = questMgr.GetQuestDefinition(questId);
+            if (questDef == null)
+            {
+                AddPlaceholderQuest(questId, questId, 0.5f);
+                return;
+            }
+
+            var questState = questMgr.GetQuestState(questId);
+            float progress = 0.5f;  // Default progress (QuestState struct has no completionPercent property)
+            if (questState.objectiveProgress != null && questState.objectiveProgress.Length > 0)
+            {
+                // Calculate progress as ratio of completed objectives
+                int completed = 0;
+                foreach (var p in questState.objectiveProgress)
+                {
+                    if (p > 0) completed++;
+                }
+                progress = (float)completed / questState.objectiveProgress.Length;
+            }
+
+            var entryGO = Instantiate(questEntryPrefab, questListContainer);
+            var entry = entryGO.GetComponent<QuestEntryUI>();
+            if (entry != null)
+            {
+                entry.SetQuestData(questId, questDef.displayName, progress);
+                _entries.Add(entry);
+            }
+        }
+
         void AddPlaceholderEntries()
         {
             AddPlaceholderQuest("test_quest_1", "Discover Star Dome", 1.0f);
@@ -231,6 +287,18 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
                     detailPanel.ShowQuest(_questId);
                 }
             }
+        }
+    }
+
+    /// <summary>
+    /// Quest detail panel stub — full implementation pending.
+    /// </summary>
+    public class QuestDetailPanel : MonoBehaviour
+    {
+        public void ShowQuest(string questId)
+        {
+            Debug.Log($"[QuestDetailPanel] Show quest: {questId}");
+            // TODO: Implementation pending
         }
     }
 }

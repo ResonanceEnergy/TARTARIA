@@ -438,11 +438,11 @@ namespace Tartaria.Integration
 
             HUDController.Instance?.ShowBanner(
                 "The Final Node Awaits",
-                "All companions have spoken. The choice is yours.",
-                5f
+                "All companions have spoken. The choice is yours."
             );
                     {
-                        renderer.material.color = new Color(1f, 0.9f, 0.5f, 0.8f);  // Golden peace
+                        var rend = GetComponent<Renderer>();
+                        if (rend != null) rend.material.color = new Color(1f, 0.9f, 0.5f, 0.8f);  // Golden peace
                     }
                 }
             }
@@ -623,11 +623,11 @@ namespace Tartaria.Integration
                 {
                     Debug.Log("[FinalNodeConsole] Farewells not complete — wait for companions to speak");
                     HUDController.Instance?.ShowObjective("Complete farewell conversations first");
-                    return;
+                    return "Complete farewell conversations first";
                 }
 
                 if (spawner == null) return "";
-                if (spawner.finalNodeActivated) return "";
+                if (spawner.finalNodeActivated) return "Final node already activated";
                 if (!spawner._zerethConfrontationComplete)
                     return "Complete Zereth confrontation first";
                 return "Hold [E] to Activate Final Node — Choose Ending Path";

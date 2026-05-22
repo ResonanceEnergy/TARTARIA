@@ -2,6 +2,7 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -65,7 +66,7 @@ namespace Tartaria.Integration
             // Healing while in field
             if (_playerInField && _playerHealth != null)
             {
-                _playerHealth.Heal(healingRate * Time.deltaTime);
+                _playerHealth.Heal((int)(healingRate * Time.deltaTime));
             }
         }
 
@@ -216,7 +217,7 @@ namespace Tartaria.Integration
             HUDController.Instance?.ShowObjective($"⚡ Pavilion {pavilionIndex + 1} Restored! Amplification field active ⚡");
 
             // Quest progress
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.Interact, $"restore_pavilion_{pavilionIndex}");
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, $"restore_pavilion_{pavilionIndex}");
         }
 
         public void MarkRestored()

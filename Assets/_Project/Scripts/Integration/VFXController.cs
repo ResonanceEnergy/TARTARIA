@@ -929,6 +929,16 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
+        /// Cathedral transformation VFX overload — accepts position and duration.
+        /// </summary>
+        public void PlayMudToRestoredCathedralTransformation(Vector3 position, float duration)
+        {
+            Debug.Log($"[VFXController] Cathedral transformation VFX at {position} for {duration}s");
+            SpawnPrimitiveBurst(position + Vector3.up * 2f, new Color(0.95f, 0.88f, 0.55f), duration, 48);
+            SpawnVortex(position + Vector3.up * 3f, new Color(0.9f, 0.85f, 0.55f, 0.9f), duration);
+        }
+
+        /// <summary>
         /// Aether pulse VFX — radial particle burst with color gradient.
         /// Used for ley line activations, tuning success, and restoration ripples.
         /// </summary>

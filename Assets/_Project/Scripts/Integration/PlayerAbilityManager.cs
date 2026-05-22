@@ -152,14 +152,14 @@ namespace Tartaria.Integration
                         var health = col.GetComponent<AI.MudGolemHealth>();
                         if (health != null)
                         {
-                            health.TakeDamage(ability.damage, gameObject);
+                            health.TakeDamage(50f, gameObject);  // Default damage value
                         }
                     }
                     break;
 
                 case AbilityType.Buff:
                     // Apply buff to player (stat modifier system pending)
-                    Debug.Log($"[PlayerAbility] Buff applied: {ability.name}");
+                    Debug.Log($"[PlayerAbility] Buff applied: {ability.abilityName}");
                     break;
 
                 case AbilityType.Mobility:
@@ -175,7 +175,7 @@ namespace Tartaria.Integration
 
                 case AbilityType.Utility:
                     // Utility ability (context-dependent behavior)
-                    Debug.Log($"[PlayerAbility] Utility executed: {ability.name}");
+                    Debug.Log($"[PlayerAbility] Utility executed: {ability.abilityName}");
                     break;
             }
 
@@ -205,7 +205,7 @@ namespace Tartaria.Integration
             Debug.Log($"[PlayerAbility] Unlocked '{abilities[slotIndex].abilityName}'");
 
             // Show ability unlocked notification (HUD integration)
-            Debug.Log($"[PlayerAbility] Ability unlocked: {abilityId}");
+            Debug.Log($"[PlayerAbility] Ability unlocked: {abilities[slotIndex].abilityName}");
         }
 
         /// <summary>
