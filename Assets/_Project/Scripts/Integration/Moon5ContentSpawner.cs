@@ -137,14 +137,32 @@ namespace Tartaria.Integration
 
         void SpawnThorneCommunicator()
         {
-            _thorneCommunicator = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            _thorneCommunicator.name = "Thorne_Radio_Communicator";
-            _thorneCommunicator.transform.position = whiteCityCenter + new Vector3(0f, 2f, 0f);
-            _thorneCommunicator.transform.localScale = new Vector3(0.6f, 0.8f, 0.3f); // Radio box shape
+            // Try to load KayKit lantern as radio beacon
+            GameObject lanternPrefab = Resources.Load<GameObject>("KayKit/RPGToolsBits/lantern");
+            if (lanternPrefab != null)
+            {
+                _thorneCommunicator = Instantiate(lanternPrefab, whiteCityCenter + new Vector3(0f, 2f, 0f), Quaternion.identity);
+                _thorneCommunicator.name = "Thorne_Radio_Communicator";
+                _thorneCommunicator.transform.localScale = Vector3.one * 2f; // Scale up lantern
+            }
+            else
+            {
+                Debug.LogError("[Moon5ContentSpawner] KayKit lantern prefab not found, using empty GameObject fallback");
+                _thorneCommunicator = new GameObject("Thorne_Radio_Communicator_Fallback");
+                _thorneCommunicator.transform.position = whiteCityCenter + new Vector3(0f, 2f, 0f);
+                _thorneCommunicator.transform.localScale = new Vector3(0.6f, 0.8f, 0.3f);
+                
+                _thorneCommunicator.AddComponent<MeshFilter>();
+                MeshRenderer rend = _thorneCommunicator.AddComponent<MeshRenderer>();
+                if (rend != null)
+                {
+                    rend.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                    rend.material.color = new Color(0.2f, 0.2f, 0.25f);
+                }
+                _thorneCommunicator.AddComponent<BoxCollider>();
+            }
 
-            // Placeholder visual: dark gray with pulsing light (radio signal)
-            Renderer rend = _thorneCommunicator.GetComponent<Renderer>();
-            rend.material.color = new Color(0.2f, 0.2f, 0.25f); // Dark gray metal
+            // Pulsing light applies to both prefab and fallback
 
             // Pulsing light (radio signal active)
             Light radioLight = _thorneCommunicator.AddComponent<Light>();
@@ -177,22 +195,28 @@ namespace Tartaria.Integration
                 pavilionObj.transform.position = pos;
 
                 // Foundation platform
-                GameObject foundation = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                foundation.name = "Foundation";
+                GameObject foundation = new GameObject("Foundation");
+                foundation.AddComponent<MeshFilter>();
+                foundation.AddComponent<MeshRenderer>();
+                foundation.AddComponent<CapsuleCollider>();
                 foundation.transform.SetParent(pavilionObj.transform);
                 foundation.transform.localScale = new Vector3(9f, 0.5f, 9f);
                 foundation.transform.localPosition = Vector3.up * 0.25f;
 
                 // Main pavilion body
-                GameObject pavilionBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                pavilionBody.name = "PavilionBody";
+                GameObject pavilionBody = new GameObject("PavilionBody");
+                pavilionBody.AddComponent<MeshFilter>();
+                pavilionBody.AddComponent<MeshRenderer>();
+                pavilionBody.AddComponent<BoxCollider>();
                 pavilionBody.transform.SetParent(pavilionObj.transform);
                 pavilionBody.transform.localScale = new Vector3(7f, 4f, 7f);
                 pavilionBody.transform.localPosition = Vector3.up * 2.5f;
 
                 // Dome (sphere on top)
-                GameObject dome = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                dome.name = "Dome";
+                GameObject dome = new GameObject("Dome");
+                dome.AddComponent<MeshFilter>();
+                dome.AddComponent<MeshRenderer>();
+                dome.AddComponent<SphereCollider>();
                 dome.transform.SetParent(pavilionObj.transform);
                 dome.transform.localScale = new Vector3(7.5f, 3f, 7.5f);
                 dome.transform.localPosition = Vector3.up * 6f;
@@ -201,8 +225,10 @@ namespace Tartaria.Integration
                 for (int col = 0; col < 4; col++)
                 {
                     float colAngle = col * 90f * Mathf.Deg2Rad;
-                    GameObject column = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    column.name = $"Column_{col}";
+                    GameObject column = new GameObject($"Column_{col}");
+                    column.AddComponent<MeshFilter>();
+                    column.AddComponent<MeshRenderer>();
+                    column.AddComponent<CapsuleCollider>();
                     column.transform.SetParent(pavilionObj.transform);
                     column.transform.localPosition = new Vector3(
                         Mathf.Cos(colAngle) * 3.5f,
@@ -212,8 +238,10 @@ namespace Tartaria.Integration
                     column.transform.localScale = new Vector3(0.5f, 4f, 0.5f);
 
                     // Capital (cube on top)
-                    GameObject capital = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    capital.name = $"Capital_{col}";
+                    GameObject capital = new GameObject($"Capital_{col}");
+                    capital.AddComponent<MeshFilter>();
+                    capital.AddComponent<MeshRenderer>();
+                    capital.AddComponent<BoxCollider>();
                     capital.transform.SetParent(pavilionObj.transform);
                     capital.transform.localPosition = new Vector3(
                         Mathf.Cos(colAngle) * 3.5f,
@@ -348,29 +376,37 @@ namespace Tartaria.Integration
             spireObj.transform.position = whiteCityCenter;
 
             // Spire base (foundation)
-            GameObject spireBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireBase.name = "SpireBase";
+            GameObject spireBase = new GameObject("SpireBase");
+            spireBase.AddComponent<MeshFilter>();
+            spireBase.AddComponent<MeshRenderer>();
+            spireBase.AddComponent<CapsuleCollider>();
             spireBase.transform.SetParent(spireObj.transform);
             spireBase.transform.localScale = new Vector3(3f, 1f, 3f);
             spireBase.transform.localPosition = Vector3.up * 0.5f;
 
             // Lower spire column
-            GameObject spireLower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireLower.name = "SpireLower";
+            GameObject spireLower = new GameObject("SpireLower");
+            spireLower.AddComponent<MeshFilter>();
+            spireLower.AddComponent<MeshRenderer>();
+            spireLower.AddComponent<CapsuleCollider>();
             spireLower.transform.SetParent(spireObj.transform);
             spireLower.transform.localScale = new Vector3(2f, 8f, 2f);
             spireLower.transform.localPosition = Vector3.up * 9f;
 
             // Upper spire column (tapered)
-            GameObject spireUpper = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            spireUpper.name = "SpireUpper";
+            GameObject spireUpper = new GameObject("SpireUpper");
+            spireUpper.AddComponent<MeshFilter>();
+            spireUpper.AddComponent<MeshRenderer>();
+            spireUpper.AddComponent<CapsuleCollider>();
             spireUpper.transform.SetParent(spireObj.transform);
             spireUpper.transform.localScale = new Vector3(1.5f, 6f, 1.5f);
             spireUpper.transform.localPosition = Vector3.up * 19f;
 
             // Spire apex crystal
-            GameObject spireApex = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            spireApex.name = "SpireApex";
+            GameObject spireApex = new GameObject("SpireApex");
+            spireApex.AddComponent<MeshFilter>();
+            spireApex.AddComponent<MeshRenderer>();
+            spireApex.AddComponent<SphereCollider>();
             spireApex.transform.SetParent(spireObj.transform);
             spireApex.transform.localScale = Vector3.one * 1.2f;
             spireApex.transform.localPosition = Vector3.up * 25f;
@@ -443,6 +479,8 @@ namespace Tartaria.Integration
         {
             // Legacy method - now handled by OnLoad event
         }
+
+
     }
 
     /// <summary>
