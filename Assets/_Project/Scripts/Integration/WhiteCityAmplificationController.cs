@@ -762,13 +762,13 @@ namespace Tartaria.Integration
             psFrag.Play();
 
             // Add a light for radiance
-            var light = frag.AddComponent<Light>();
+            var light = fragVFX.AddComponent<Light>();
             light.color = new Color(1f, 0.92f, 0.5f);
             light.intensity = 3f;
             light.range = 8f;
 
             // Lerp the fragment up into the spire over 2.5 seconds
-            Vector3 startPos = frag.transform.position;
+            Vector3 startPos = fragVFX.transform.position;
             Vector3 endPos = spireBasePosition + Vector3.up * 7f;
 
             float t = 0f;
@@ -778,8 +778,8 @@ namespace Tartaria.Integration
             {
                 t += Time.deltaTime;
                 float u = Mathf.SmoothStep(0, 1, t / dur);
-                frag.transform.position = Vector3.Lerp(startPos, endPos, u);
-                frag.transform.Rotate(Vector3.up, 180f * Time.deltaTime, Space.World); // spinning as it locks in
+                fragVFX.transform.position = Vector3.Lerp(startPos, endPos, u);
+                fragVFX.transform.Rotate(Vector3.up, 180f * Time.deltaTime, Space.World); // spinning as it locks in
                 yield return null;
             }
 
@@ -787,7 +787,7 @@ namespace Tartaria.Integration
             VFXController.Instance?.SpawnPlatformStabilizeVFX(endPos);
             VFXController.Instance?.IgniteSpireBridge(endPos, 1.5f); // extra ignition flash
 
-            Destroy(frag, 0.8f);
+            Destroy(fragVFX, 0.8f);
         }
 
         void PersistMoon5State()

@@ -115,13 +115,13 @@ namespace Tartaria.Integration
             var rendererMarker = markerVFX.GetComponent<ParticleSystemRenderer>();
             rendererMarker.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
             rendererMarker.material.SetColor("_BaseColor", markerColor);
+            rendererMarker.material.EnableKeyword("_EMISSION");
+            rendererMarker.material.SetColor("_EmissionColor", markerColor * 2.4f);
             
             psMarker.Play();
-                mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", mat.color * 2.4f);
-            }
-            Object.Destroy(marker.GetComponent<Collider>());
-            Object.Destroy(marker, 12f);
+            
+            // Cleanup
+            Destroy(markerVFX, 12f);
         }
 
         public void ApplyMoon2EpicSecretPermanentVisualUpgrade()

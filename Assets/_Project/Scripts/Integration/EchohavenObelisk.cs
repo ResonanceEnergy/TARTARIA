@@ -125,9 +125,9 @@ namespace Tartaria.Integration
             
             psOrb.Play();
 
-            var light = crownOrb.AddComponent<Light>();
+            var light = crownOrbVFX.AddComponent<Light>();
             light.type = LightType.Point;
-            light.color = gold;
+            light.color = new Color(1f, 0.85f, 0.4f);
             light.intensity = 4f;
             light.range = 10f;
 
