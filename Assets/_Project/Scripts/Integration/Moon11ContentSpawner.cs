@@ -24,6 +24,10 @@ namespace Tartaria.Integration
         int _fountainsActivated;
         int _aquiferNodesPurified;
 
+        [Header("Memory Echoes")]
+        [SerializeField] GameObject memoryEchoSystemPrefab;
+        MemoryEchoSystem _memoryEchoSystem;
+
         [Header("Spawning")]
         [SerializeField] Vector3 aquiferCenterPoint = new(0f, -20f, 0f);  // Deep underground
         [SerializeField] Vector3[] fountainPoints;  // 10 surface fountain locations
@@ -79,6 +83,9 @@ namespace Tartaria.Integration
 
             // 10 surface fountains (inactive until aquifer restored)
             SpawnSurfaceFountains();
+
+            // Memory echo system (temporal visions)
+            SpawnMemoryEchoSystem();
 
             // Ambient audio: corrupted water gurgling
             var aquiferAmbience = Audio.AudioManager.Instance?.PlayLoopingSFX("CorruptedAquifer", aquiferCenterPoint, 0.4f);
@@ -211,6 +218,55 @@ namespace Tartaria.Integration
             Debug.Log($"[Moon 11] Spawned {totalFountains} surface fountains (inactive until aquifer purified)");
         }
 
+        void SpawnMemoryEchoSystem()
+        {
+            // Create memory echo system
+            var echoSystemObj = new GameObject("MemoryEchoSystem_Aquifer");
+            echoSystemObj.transform.position = aquiferCenterPoint + Vector3.up * 20f;
+            echoSystemObj.transform.SetParent(transform);
+
+            if (memoryEchoSystemPrefab != null)
+            {
+                _memoryEchoSystem = Instantiate(memoryEchoSystemPrefab, echoSystemObj.transform).GetComponent<MemoryEchoSystem>();
+            }
+            else
+            {
+                _memoryEchoSystem = echoSystemObj.AddComponent<MemoryEchoSystem>();
+            }
+
+            // Configure echo locations (7 memory points around aquifer)
+            var echoPoints = new Vector3[7];
+            var echoDialogues = new string[7];
+            for (int i = 0; i < 7; i++)
+            {
+                float angle = i * (360f / 7f) * Mathf.Deg2Rad;
+                float radius = 30f;
+                echoPoints[i] = aquiferCenterPoint + new Vector3(
+                    Mathf.Cos(angle) * radius,
+                    Random.Range(-10f, 10f),
+                    Mathf.Sin(angle) * radius
+                );
+                echoDialogues[i] = $"echo_aquifer_{i + 1}";
+            }
+
+            // Use reflection to set private fields (or make them public in MemoryEchoSystem)
+            var pointsField = typeof(MemoryEchoSystem).GetField("echoPointLocations", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            var dialoguesField = typeof(MemoryEchoSystem).GetField("echoDialogueIds", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (pointsField != null) pointsField.SetValue(_memoryEchoSystem, echoPoints);
+            if (dialoguesField != null) dialoguesField.SetValue(_memoryEchoSystem, echoDialogues);
+
+            // Activate once aquifer nodes are purified
+            if (_aquiferNodesPurified >= totalAquiferNodes)
+            {
+                _memoryEchoSystem?.ActivateSystem();
+            }
+
+            Debug.Log("[Moon 11] Memory echo system spawned — 7 temporal visions available after purification");
+        }
+
         public void PurifyAquiferNode(int nodeIndex)
         {
             if (nodeIndex < 0 || nodeIndex >= totalAquiferNodes)
@@ -270,6 +326,13 @@ namespace Tartaria.Integration
 
             // Activate all surface fountains
             ActivateAllFountains();
+
+            // Activate memory echo system
+            if (_memoryEchoSystem != null)
+            {
+                _memoryEchoSystem.ActivateSystem();
+                Debug.Log("[Moon 11] Memory echo visions now accessible — witness the aquifer's history");
+            }
 
             // Dialogue
             DialogueManager.Instance?.PlayContextDialogue("lirael_water_remembers");
