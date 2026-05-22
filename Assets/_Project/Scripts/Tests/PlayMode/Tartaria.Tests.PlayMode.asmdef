@@ -1,0 +1,26 @@
+{
+    "name": "Tartaria.Tests.PlayMode",
+    "rootNamespace": "Tartaria.Tests.PlayMode",
+    "references": [
+        "GUID:27619889b8ba8c24980f49ee34dbb44a",
+        "GUID:0acc523941302664db1f4e527237feb3",
+        "GUID:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+        "GUID:b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
+        "GUID:c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8",
+        "GUID:d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9",
+        "GUID:e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": true,
+    "precompiledReferences": [
+        "nunit.framework.dll"
+    ],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
