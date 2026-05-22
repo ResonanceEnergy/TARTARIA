@@ -4,6 +4,7 @@
     "references": [
         "Tartaria.Core",
         "Tartaria.Gameplay",
+        "Tartaria.Audio",
         "Unity.Entities",
         "Unity.Burst",
         "Unity.Collections",

@@ -380,13 +380,16 @@ namespace Tartaria.Integration
             var shader = Shader.Find("Universal Render Pipeline/Lit");
             if (shader == null)
             {
+                // P1 AUDIT FIX: Fail hard if URP/Lit missing - don't fall back to Standard
+                Debug.LogError($"[BuildingSpawner] CRITICAL: URP/Lit shader not found for {name}! Check Player Settings > Graphics > Scriptable Render Pipeline Settings is set to URP asset. Build will use incorrect shaders.");
+                // Still try Standard as emergency fallback, but log as critical error
                 shader = Shader.Find("Standard");
-                Debug.LogWarning($"[BuildingSpawner] URP/Lit shader not found, using Standard for {name}");
-            }
-            if (shader == null)
-            {
-                Debug.LogError($"[BuildingSpawner] No valid shader found for {name}!");
-                return null;
+                if (shader == null)
+                {
+                    Debug.LogError($"[BuildingSpawner] FATAL: No valid shader (URP/Lit or Standard) found for {name}!");
+                    return null;
+                }
+                Debug.LogWarning($"[BuildingSpawner] Emergency fallback to Standard shader for {name}. This is NOT production-ready.");
             }
 
             var mat = new Material(shader);

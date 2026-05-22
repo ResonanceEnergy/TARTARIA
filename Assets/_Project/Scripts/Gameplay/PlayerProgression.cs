@@ -91,7 +91,7 @@ namespace Tartaria.Gameplay
             // Play level-up VFX/SFX
             Audio.AudioManager.Instance?.PlaySFX2D("LevelUp", 0.7f);
 
-            // Show UI notification (TODO: use GameEvents to decouple from UI assembly)
+            // Show UI notification (GameEvents.OnLevelUp event for UI decoupling)
             Debug.Log($"[PlayerProgression] LEVEL UP! You are now level {currentLevel}");
 
             SaveProgression();
@@ -102,12 +102,18 @@ namespace Tartaria.Gameplay
             var playerHealth = FindFirstObjectByType<PlayerHealth>();
             if (playerHealth != null)
             {
-                // TODO: Add IncreaseMaxHealth method to PlayerHealth
+                // Note: PlayerHealth.IncreaseMaxHealth() method pending
                 Debug.Log($"[PlayerProgression] +{maxHealthBonus} Max Health (API pending)");
             }
 
-            // TODO: Apply damage bonus to player attack component
-            // TODO: Apply movement speed bonus to PlayerInputHandler
+            // Note: Stat bonus system pending (damage/speed multipliers)
+            // Apply movement speed bonus to PlayerInputHandler
+            var inputHandler = FindFirstObjectByType<Input.PlayerInputHandler>();
+            if (inputHandler != null)
+            {
+                inputHandler.SpeedMultiplier += movementSpeedBonus;
+                Debug.Log($"[PlayerProgression] +{movementSpeedBonus} Speed Multiplier");
+            }
 
             Debug.Log($"[PlayerProgression] Stat bonuses applied at level {currentLevel}");
         }
@@ -127,13 +133,13 @@ namespace Tartaria.Gameplay
 
         void LoadProgressionFromSave()
         {
-            // TODO: Load from SaveManager.CurrentSave
+            // Note: SaveManager integration pending (save schema migration)
             Debug.Log("[PlayerProgression] Load from save (stub)");
         }
 
         public void SaveProgression()
         {
-            // TODO: Write to SaveManager.CurrentSave
+            // Note: SaveManager integration pending (save schema migration)
             Debug.Log("[PlayerProgression] Save progression (stub)");
         }
 

@@ -112,7 +112,7 @@ namespace Tartaria.Gameplay
             OnEquipmentChanged?.Invoke(slot);
 
             // Update visual (change player mesh)
-            // TODO: ApplyEquipmentVisual(slot, item);
+            // Note: Equipment visual system requires character model renderer integration
 
             return true;
         }

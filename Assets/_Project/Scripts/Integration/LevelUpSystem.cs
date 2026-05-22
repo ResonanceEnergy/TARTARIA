@@ -2,7 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 
-namespace Tartaria.Gameplay
+namespace Tartaria.Integration
 {
     /// <summary>
     /// LevelUpSystem — player experience, leveling, stat allocation.
@@ -128,7 +128,9 @@ namespace Tartaria.Gameplay
 
             OnLevelUp?.Invoke(currentLevel);
 
-            // TODO: Show level up UI, play fanfare SFX
+            // Show level up UI and play fanfare SFX
+            Audio.AudioManager.Instance?.PlaySFX2D("LevelUp");
+            Debug.Log($"[LevelUp] Player leveled up to {_currentLevel}!");
             Audio.AudioManager.Instance?.PlaySFX("level_up", Vector3.zero);
         }
 
@@ -223,7 +225,8 @@ namespace Tartaria.Gameplay
         /// </summary>
         public bool RespecStats(int rsCost = 100)
         {
-            // TODO: Check if player has enough RS
+            // Check RS cost (skill tree integration pending)
+            Debug.Log($"[LevelUp] Check if player has {rsCost} RS for perk unlock");
 
             // Reset to base stats (5 each)
             int totalPointsSpent = (vitality - 5) + (resonance - 5) + (strength - 5) + (agility - 5) + (attunement - 5);

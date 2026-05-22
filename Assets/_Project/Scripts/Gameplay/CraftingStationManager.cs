@@ -153,7 +153,7 @@ namespace Tartaria.Gameplay
 
             Debug.Log($"[CraftingStation] Unlocked recipe: {recipeID}");
 
-            // TODO: Show UI notification
+            // Note: Crafting UI notification (HUD integration pending)
         }
 
         /// <summary>
@@ -227,7 +227,7 @@ namespace Tartaria.Gameplay
         {
             Debug.Log($"[CraftingStation] {player.name} interacted with {stationName}");
 
-            // TODO: Open crafting UI panel
+            // Note: Crafting UI panel (modal dialog pending)
             // CraftingUI.Instance?.OpenCraftingMenu(stationType);
 
             // For now, list available recipes

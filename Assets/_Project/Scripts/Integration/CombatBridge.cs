@@ -220,7 +220,7 @@ namespace Tartaria.Integration
         {
             if (!_enemyQueryCreated || !_world.IsCreated) return;
 
-            var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
             int count = 0;
 
             for (int i = 0; i < entities.Length; i++)
@@ -251,8 +251,6 @@ namespace Tartaria.Integration
                 }
             }
 
-            entities.Dispose();
-
             if (count > 0)
             {
                 _activeEnemyCount = count;
@@ -264,7 +262,7 @@ namespace Tartaria.Integration
         {
             if (!_enemyQueryCreated || !_world.IsCreated) return;
 
-            var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
             int hitCount = 0;
 
             for (int i = 0; i < entities.Length; i++)
@@ -300,8 +298,6 @@ namespace Tartaria.Integration
                 }
             }
 
-            entities.Dispose();
-
             if (hitCount > 0)
             {
                 _activeEnemyCount = hitCount;
@@ -314,7 +310,7 @@ namespace Tartaria.Integration
             // Lightweight count for wave / boss transition logic
             if (!_enemyQueryCreated || !_world.IsCreated) return;
 
-            var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
+            using var entities = _enemyQuery.ToEntityArray(Unity.Collections.Allocator.Temp);
             int alive = 0;
 
             for (int i = 0; i < entities.Length; i++)
@@ -326,7 +322,6 @@ namespace Tartaria.Integration
                 }
             }
 
-            entities.Dispose();
             _activeEnemyCount = alive;
 
             if (alive == 0 && _inCombat)

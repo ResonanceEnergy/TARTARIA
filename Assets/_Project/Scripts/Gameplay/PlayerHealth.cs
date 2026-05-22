@@ -19,6 +19,7 @@ namespace Tartaria.Gameplay
         int _currentHealth;
         float _lastDamageTime;
         bool _isDead;
+        bool _godMode; // Debug: invincibility
         Vector3 _spawnPosition;
         Quaternion _spawnRotation;
         bool _spawnRecorded;
@@ -29,6 +30,7 @@ namespace Tartaria.Gameplay
         public int CurrentHealth => _currentHealth;
         public int MaxHealth => maxHealth;
         public bool IsDead => _isDead;
+        public bool GodMode { get => _godMode; set => _godMode = value; }
 
         void Awake()
         {
@@ -66,7 +68,7 @@ namespace Tartaria.Gameplay
 
         public void TakeDamage(int amount)
         {
-            if (_isDead) return;
+            if (_isDead || _godMode) return;
 
             // Sprint: Check for i-frames from dodge
             var dodge = GetComponent<PlayerDodge>();

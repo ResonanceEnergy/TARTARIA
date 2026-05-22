@@ -496,9 +496,8 @@ namespace Tartaria.Integration
                     if (go != null) _moon2Structures[id] = go;
                 }
                 if (go != null) structures.Add(go);
-            }_moon2Cathedral != null)
-            {
-                StartCoroutine(ApplyCathedralShake(_moon2C
+            }
+            
             Audio.AudioManager.Instance?.PlaySFX2D("CathedralQuakeRumble");
             HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             if (playerTransform != null)

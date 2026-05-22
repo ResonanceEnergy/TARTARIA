@@ -339,9 +339,9 @@ namespace Tartaria.Integration
         }
 
         void EnsurePlayerAnimatorPresent()
-        {if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
-            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null
-            var player = GameObject.FindWithTag("Player");
+        {
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
             if (player == null) return;
             if (player.GetComponent<PlayerAnimator>() == null)
                 player.AddComponent<PlayerAnimator>();

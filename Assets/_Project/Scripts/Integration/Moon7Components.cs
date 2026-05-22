@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.AI;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {

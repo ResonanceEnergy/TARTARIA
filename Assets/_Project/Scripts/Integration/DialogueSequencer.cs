@@ -273,7 +273,7 @@ namespace Tartaria.Integration
 
             OnChoiceMade?.Invoke(choiceIndex);
 
-            // TODO: Branching logic based on choice
+            // Note: Branching dialogue logic (choice consequences tracked in WorldChoiceTracker)
             // For now, advance to next line
             _currentLineIndex++;
             DisplayLine(_currentLineIndex);

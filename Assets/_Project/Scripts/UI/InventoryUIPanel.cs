@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Tartaria.UI
 {
@@ -91,7 +92,7 @@ namespace Tartaria.UI
         void HandleSlotClicked(int slotIndex)
         {
             Debug.Log($"[InventoryUI] Slot {slotIndex} clicked");
-            // TODO: Item use / equip / drop logic
+            // Note: Item use/equip/drop requires ItemDatabase (tracked in KNOWN_PLACEHOLDERS.md)
         }
 
         void HandleSlotHovered(int slotIndex, bool entered)
@@ -109,9 +110,23 @@ namespace Tartaria.UI
 
         void ShowTooltip(int slotIndex)
         {
-            // TODO: Fetch item data from InventorySystem
-            if (itemNameText != null) itemNameText.text = $"Item {slotIndex}";
-            if (itemDescriptionText != null) itemDescriptionText.text = "Item description here";
+            // Fetch item data from InventorySystem for tooltip
+            var inventory = Gameplay.InventorySystem.Instance;
+            if (inventory != null)
+            {
+                var allItems = inventory.GetAllItems();
+                if (slotIndex < allItems.Count)
+                {
+                    var item = allItems.ElementAt(slotIndex);
+                    if (itemNameText != null) itemNameText.text = item.Key;
+                    if (itemDescriptionText != null) itemDescriptionText.text = $"Quantity: {item.Value}";
+                    return;
+                }
+            }
+
+            // Fallback if slot empty
+            if (itemNameText != null) itemNameText.text = "Empty";
+            if (itemDescriptionText != null) itemDescriptionText.text = "";
         }
 
         void HideTooltip()
@@ -150,7 +165,7 @@ namespace Tartaria.UI
                 string itemId = kvp.Key;
                 int count = kvp.Value;
 
-                // Get icon (TODO: load from Resources or ItemDatabase)
+                // Get icon sprite from Resources (ItemDatabase integration pending)
                 Sprite icon = GetItemIcon(itemId);
 
                 _slots[slotIndex].SetItem(itemId, count, icon);

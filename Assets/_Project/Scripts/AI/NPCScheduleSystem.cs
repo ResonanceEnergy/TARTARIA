@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
+using Tartaria.Core;
 
 namespace Tartaria.AI
 {
@@ -32,7 +33,7 @@ namespace Tartaria.AI
 
         public event System.Action<int> OnHourChanged;  // Fired when game hour advances
 
-        Gameplay.DayNightCycle _dayNightCycle;
+        DayNightCycle _dayNightCycle;
         int _lastHour = -1;
         float _updateTimer;
 
@@ -48,7 +49,7 @@ namespace Tartaria.AI
 
         void Start()
         {
-            _dayNightCycle = Gameplay.DayNightCycle.Instance;
+            _dayNightCycle = FindFirstObjectByType<DayNightCycle>();
             if (_dayNightCycle == null)
             {
                 Debug.LogWarning("[NPCSchedule] DayNightCycle not found, NPC schedules disabled");
@@ -74,7 +75,7 @@ namespace Tartaria.AI
 
         void CheckTimeUpdate()
         {
-            int currentHour = _dayNightCycle.GetCurrentHour();
+            int currentHour = Mathf.FloorToInt(_dayNightCycle.TimeOfDay);
 
             if (currentHour != _lastHour)
             {
@@ -90,7 +91,7 @@ namespace Tartaria.AI
         /// </summary>
         public int GetCurrentHour()
         {
-            return _dayNightCycle?.GetCurrentHour() ?? 12;
+            return _dayNightCycle != null ? Mathf.FloorToInt(_dayNightCycle.TimeOfDay) : 12;
         }
 
         /// <summary>

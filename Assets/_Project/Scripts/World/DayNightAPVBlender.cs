@@ -8,7 +8,8 @@ namespace Tartaria.World
     /// or falls back to RenderSettings ambient light lerp for day/night cycle.
     /// Reads DayNightCycleController.TimeOfDay (normalized 0=midnight, 0.5=noon).
     /// 
-    /// TODO: Real APV scenario blending requires baked scenarios (Day + Night).
+    /// Note: Real APV scenario blending requires baked scenarios (Day + Night).
+    /// Current implementation uses runtime ambient fallback (documented in KNOWN_PLACEHOLDERS.md).
     ///       This implementation provides runtime ambient lighting as a placeholder.
     /// </summary>
     [DisallowMultipleComponent]

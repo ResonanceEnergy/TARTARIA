@@ -4,7 +4,7 @@ using TMPro;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tartaria.Core
+namespace Tartaria.UI
 {
     /// <summary>
     /// PerformanceMetricsOverlay — real-time FPS, frame time, memory, draw calls display.
@@ -83,7 +83,7 @@ namespace Tartaria.Core
         void Update()
         {
             // Toggle visibility
-            if (Input.GetKeyDown(toggleKey))
+            if (UnityEngine.Input.GetKeyDown(toggleKey))
             {
                 ToggleVisibility();
             }

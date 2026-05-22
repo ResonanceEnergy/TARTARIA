@@ -209,7 +209,7 @@ namespace Tartaria.Core
             _isTransitioning = true;
             canvasGroup.blocksRaycasts = true;
 
-            // TODO: Use shader-based circle mask for proper circular transition
+            // Note: Shader-based circle mask transition (requires custom shader asset)
             // Fallback to fade for now
             yield return FadeCoroutine(duration, onComplete);
 

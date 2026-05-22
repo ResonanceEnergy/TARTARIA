@@ -133,10 +133,12 @@ namespace Tartaria.AI
             // Fire death event (Moon content spawners subscribe to this)
             OnDeath?.Invoke();
 
-            // TODO: Drop loot if configured (InventorySystem.Instance?.AddItem(...))
+            // Drop loot (random aether shards or moon-specific materials)
             if (_dropLootOnDeath)
             {
-                Debug.Log($"[MudGolemHealth] {gameObject.name} would drop loot here (InventorySystem pending)");
+                int lootCount = UnityEngine.Random.Range(1, 4); // 1-3 shards
+                Tartaria.Gameplay.InventorySystem.Instance?.AddItem("aether_shard", lootCount);
+                Debug.Log($"[MudGolemHealth] {gameObject.name} dropped {lootCount}x aether_shard");
             }
 
             // Disable AI/movement components
@@ -146,8 +148,16 @@ namespace Tartaria.AI
                 aiController.enabled = false;
             }
 
-            // TODO: Play death VFX/audio (AudioManager.Instance?.PlayOneShot("golem_death"))
-            // TODO: Play death animation if Animator exists
+            // Play death VFX and audio
+            Tartaria.Audio.AudioManager.Instance?.PlaySFX2D("golem_death");
+            Tartaria.Core.ParticleEffectPool.Instance?.Spawn("GolemDeathExplosion", transform.position, Quaternion.identity, 2f);
+
+            // Play death animation if Animator exists
+            var animator = GetComponent<Animator>();
+            if (animator != null && animator.runtimeAnimatorController != null)
+            {
+                animator.SetTrigger("Death");
+            }
 
             // Destroy after delay
             if (_destroyOnDeath)

@@ -2,6 +2,10 @@
     "name": "Tartaria.Tests.PlayMode",
     "rootNamespace": "Tartaria.Tests.PlayMode",
     "references": [
+        "GUID:babe856c342817147bf5b68e16b505e9",
+        "GUID:f3aa4cb2ca065f8429e39280f85dd82a",
+        "GUID:d0784aa6de2eb68458834ca61df7a48b",
+        "GUID:5327fffd4e556414f837901ad5f7b538",
         "GUID:27619889b8ba8c24980f49ee34dbb44a",
         "GUID:0acc523941302664db1f4e527237feb3",
         "GUID:a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",

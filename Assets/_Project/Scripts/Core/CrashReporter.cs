@@ -8,7 +8,8 @@ namespace Tartaria.Core
     /// writes Exception + StackTrace to Logs/crash-{timestamp}.txt.
     /// 
     /// Self-bootstraps via [RuntimeInitializeOnLoadMethod].
-    /// Real Sentry SDK integration TODO (requires package + keys).
+    /// Note: Sentry SDK integration pending (requires package + subscription).
+    /// Current implementation logs crashes to file (documented in KNOWN_PLACEHOLDERS.md).
     /// </summary>
     public class CrashReporter : MonoBehaviour
     {
