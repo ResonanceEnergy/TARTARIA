@@ -199,6 +199,27 @@ namespace Tartaria.Save
         }
 
         /// <summary>
+        /// Get moon progression percentage (0-100).
+        /// Helper for Moon spawners - wraps CurrentSave.GetMoonFlag pattern.
+        /// </summary>
+        public float GetMoonProgress(int moonNum)
+        {
+            if (_currentSave == null) return 0f;
+            return _currentSave.GetMoonFlag(moonNum, "progress", 0);
+        }
+
+        /// <summary>
+        /// Set moon progression percentage (0-100).
+        /// Helper for Moon spawners - wraps CurrentSave.SetMoonFlag pattern.
+        /// </summary>
+        public void SetMoonProgress(int moonNum, float progress)
+        {
+            if (_currentSave == null) return;
+            _currentSave.SetMoonFlag(moonNum, "progress", Mathf.RoundToInt(progress));
+            MarkDirty();
+        }
+
+        /// <summary>
         /// Immediately writes save to disk (double-write with checksum).
         /// </summary>
         public void Save()

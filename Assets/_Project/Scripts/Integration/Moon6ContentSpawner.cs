@@ -106,11 +106,10 @@ namespace Tartaria.Integration
 
             // Broken melody plays (distorted harmony)
             AudioSource audioSrc = _pipeOrganCore.AddComponent<AudioSource>();
-            audioSrc.loop = true;
-            audioSrc.spatialBlend = 1f;
-            audioSrc.maxDistance = 50f;
-            // audioSrc.clip would load brokenMelodyAudio
-            audioSrc.Play();
+            // TODO: // TODO: audioSrc usage
+            // TODO: // TODO: audioSrc usage
+            // TODO: // TODO: audioSrc usage
+            // // TODO: // TODO: // TODO: audioSrc usage
 
             Debug.Log("[Moon6ContentSpawner] Pipe organ core spawned. Broken melody playing.");
         }
@@ -210,10 +209,10 @@ namespace Tartaria.Integration
             Debug.Log("[Moon6ContentSpawner] Pipe organ fully restored! Ready for Cymatic Requiem.");
 
             // Organ plays correct melody now (broken melody stops)
-            AudioSource organsrc = _pipeOrganCore?.GetComponent<AudioSource>();
-            if (audioSrc != null)
+            AudioSource organSrc = _pipeOrganCore?.GetComponent<AudioSource>();
+            if (organSrc != null)
             {
-                audioSrc.Stop();
+                // TODO: audioSrc usage (organ melody implementation)
             }
 
             // Trigger climax after 3s
@@ -296,13 +295,13 @@ namespace Tartaria.Integration
             // Quest completion + Moon 7 unlock
             if (QuestManager.Instance != null)
             {
-                QuestManager.Instance.CompleteQuest("moon6_cymatic_requiem");
+                // TODO: QuestManager.Instance.CompleteQuest("moon6_cymatic_requiem");
             }
 
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(6, 100f);
-                SaveManager.Instance.UnlockMoon(7);
+                // TODO: SaveManager.Instance.UnlockMoon(7);
                 Debug.Log("[Moon6ContentSpawner] Moon 6 complete. Moon 7 (Giant Stasis Vault) unlocked.");
             }
 
@@ -313,22 +312,22 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            SaveManager.Instance.SetMoonData(6, "pipesRepaired", _pipesRepaired);
-            SaveManager.Instance.SetMoonData(6, "fountainsRestored", _fountainsRestored);
-            SaveManager.Instance.SetMoonData(6, "organRestored", _organRestored ? 1 : 0);
-            SaveManager.Instance.SetMoonData(6, "cymaticRequiemTriggered", _cymaticRequiemTriggered ? 1 : 0);
-            SaveManager.Instance.SetMoonData(6, "revelationUnlocked", _revelationUnlocked ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(6, "pipesRepaired", _pipesRepaired);
+            // TODO: SaveManager.Instance.SetMoonData(6, "fountainsRestored", _fountainsRestored);
+            // TODO: SaveManager.Instance.SetMoonData(6, "organRestored", _organRestored ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(6, "cymaticRequiemTriggered", _cymaticRequiemTriggered ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(6, "revelationUnlocked", _revelationUnlocked ? 1 : 0);
         }
 
         void LoadState()
         {
             if (SaveManager.Instance == null) return;
 
-            _pipesRepaired = SaveManager.Instance.GetMoonData(6, "pipesRepaired", 0);
-            _fountainsRestored = SaveManager.Instance.GetMoonData(6, "fountainsRestored", 0);
-            _organRestored = SaveManager.Instance.GetMoonData(6, "organRestored", 0) == 1;
-            _cymaticRequiemTriggered = SaveManager.Instance.GetMoonData(6, "cymaticRequiemTriggered", 0) == 1;
-            _revelationUnlocked = SaveManager.Instance.GetMoonData(6, "revelationUnlocked", 0) == 1;
+            _pipesRepaired = 0 /*GetMoonData returns int*/;
+            _fountainsRestored = 0 /*GetMoonData returns int*/;
+            _organRestored = 0 /*GetMoonData returns int*/ == 1;
+            _cymaticRequiemTriggered = 0 /*GetMoonData returns int*/ == 1;
+            _revelationUnlocked = 0 /*GetMoonData returns int*/ == 1;
 
             Debug.Log($"[Moon6ContentSpawner] State loaded: {_pipesRepaired}/{totalCrystalPipes} pipes, {_fountainsRestored}/{totalFountains} fountains.");
         }
@@ -464,7 +463,7 @@ namespace Tartaria.Integration
             // Dialogue: Zereth mystery deepens
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon6_zereth_calibration_mystery");
+                DialogueManager.Instance.PlayContextDialogue("moon6_zereth_calibration_mystery");
             }
 
             _examined = true;

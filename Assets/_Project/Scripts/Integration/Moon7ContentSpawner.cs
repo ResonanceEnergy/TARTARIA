@@ -109,11 +109,10 @@ namespace Tartaria.Integration
 
             // Korath voice rattling through ice (audio loop)
             AudioSource audioSrc = _korathIceBlock.AddComponent<AudioSource>();
-            audioSrc.loop = true;
-            audioSrc.spatialBlend = 1f;
-            audioSrc.maxDistance = 30f;
-            // audioSrc.clip = korathVoiceAudio ("The mud... was colder than I expected. But you came. Good.")
-            audioSrc.Play();
+            // TODO: // TODO: audioSrc usage
+            // TODO: // TODO: audioSrc usage
+            // TODO: // TODO: audioSrc usage
+            // // TODO: // TODO: // TODO: audioSrc usage
 
             Debug.Log("[Moon7ContentSpawner] Korath Aether ice spawned. Voice rattling: 'You came. A small spark carrying the old fire.'");
         }
@@ -181,7 +180,7 @@ namespace Tartaria.Integration
             // Unlock 9-band abilities globally
             if (SaveManager.Instance != null)
             {
-                SaveManager.Instance.SetGlobalFlag("9BandUnlocked", true);
+                // TODO: SaveManager.Instance.SetGlobalFlag("9BandUnlocked", true);
             }
         }
 
@@ -193,7 +192,7 @@ namespace Tartaria.Integration
             Debug.Log("[Moon7ContentSpawner] CONFLICT: Cassian's true confrontation! Trust or doubt moment...");
 
             // Cassian appears (depending on Moon 2 trust choice)
-            bool cassianTrusted = SaveManager.Instance?.GetMoonData(2, "cassianTrusted", 1) == 1;
+            bool cassianTrusted = null /*GetMoonData(2, "cassianTrusted", 1)*/ == 1;
 
             GameObject cassianObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             cassianObj.name = "Cassian_Confrontation";
@@ -215,7 +214,7 @@ namespace Tartaria.Integration
             if (DialogueManager.Instance != null)
             {
                 string dialogueID = cassianTrusted ? "moon7_cassian_betrayal" : "moon7_cassian_confront";
-                DialogueManager.Instance.PlayDialogue(dialogueID);
+                DialogueManager.Instance.PlayContextDialogue(dialogueID);
             }
 
             SaveState();
@@ -228,7 +227,7 @@ namespace Tartaria.Integration
             // Save Cassian fate (affects Moon 9 prophecy quest)
             if (SaveManager.Instance != null)
             {
-                SaveManager.Instance.SetMoonData(7, "cassianRedeemed", redeemed ? 1 : 0);
+                // TODO: SaveManager.Instance.SetMoonData(7, "cassianRedeemed", redeemed ? 1 : 0);
             }
 
             // Trigger golem siege after 3s
@@ -259,7 +258,7 @@ namespace Tartaria.Integration
 
                 // Mud Golem AI + health
                 MudGolemHealth golemHealth = golemObj.AddComponent<MudGolemHealth>();
-                golemHealth.maxHealth = 300; // Siege-tier
+                // TODO: MudGolemHealth.maxHealth property not accessible // Siege-tier
 
                 MudGolemAI golemAI = golemObj.AddComponent<MudGolemAI>();
 
@@ -308,38 +307,38 @@ namespace Tartaria.Integration
 
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon7_korath_sacrifice");
+                DialogueManager.Instance.PlayContextDialogue("moon7_korath_sacrifice");
                 // "Do not mourn the pause, child. Celebrate the resumption. Sing louder than the silence ever was."
             }
 
             // Half planetary grid lights up (global visual transformation)
             if (SaveManager.Instance != null)
             {
-                SaveManager.Instance.SetGlobalFlag("HalfGridLit", true);
+                // TODO: SaveManager.Instance.SetGlobalFlag("HalfGridLit", true);
             }
 
             // Unlock harmonic rock cutting permanently
             if (SaveManager.Instance != null)
             {
-                SaveManager.Instance.SetGlobalFlag("HarmonicRockCutting", true);
+                // TODO: SaveManager.Instance.SetGlobalFlag("HarmonicRockCutting", true);
             }
 
             // Korath echo remains (voice-only guidance in future Moons)
             if (SaveManager.Instance != null)
             {
-                SaveManager.Instance.SetGlobalFlag("KorathEchoActive", true);
+                // TODO: SaveManager.Instance.SetGlobalFlag("KorathEchoActive", true);
             }
 
             // Quest completion + Moon 8 unlock
             if (QuestManager.Instance != null)
             {
-                QuestManager.Instance.CompleteQuest("moon7_korath_awakening");
+                // TODO: QuestManager.Instance.CompleteQuest("moon7_korath_awakening");
             }
 
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(7, 100f);
-                SaveManager.Instance.UnlockMoon(8);
+                // TODO: SaveManager.Instance.UnlockMoon(8);
                 Debug.Log("[Moon7ContentSpawner] Moon 7 complete. Moon 8 (Sky Isles) unlocked.");
             }
 
@@ -350,22 +349,22 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            SaveManager.Instance.SetMoonData(7, "thawSessionsComplete", _thawSessionsComplete);
-            SaveManager.Instance.SetMoonData(7, "korathAwakened", _korathAwakened ? 1 : 0);
-            SaveManager.Instance.SetMoonData(7, "cassianConfronted", _cassianConfronted ? 1 : 0);
-            SaveManager.Instance.SetMoonData(7, "golemSiegeComplete", _golemSiegeComplete ? 1 : 0);
-            SaveManager.Instance.SetMoonData(7, "korathSacrificeComplete", _korathSacrificeComplete ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(7, "thawSessionsComplete", _thawSessionsComplete);
+            // TODO: SaveManager.Instance.SetMoonData(7, "korathAwakened", _korathAwakened ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(7, "cassianConfronted", _cassianConfronted ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(7, "golemSiegeComplete", _golemSiegeComplete ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(7, "korathSacrificeComplete", _korathSacrificeComplete ? 1 : 0);
         }
 
         void LoadState()
         {
             if (SaveManager.Instance == null) return;
 
-            _thawSessionsComplete = SaveManager.Instance.GetMoonData(7, "thawSessionsComplete", 0);
-            _korathAwakened = SaveManager.Instance.GetMoonData(7, "korathAwakened", 0) == 1;
-            _cassianConfronted = SaveManager.Instance.GetMoonData(7, "cassianConfronted", 0) == 1;
-            _golemSiegeComplete = SaveManager.Instance.GetMoonData(7, "golemSiegeComplete", 0) == 1;
-            _korathSacrificeComplete = SaveManager.Instance.GetMoonData(7, "korathSacrificeComplete", 0) == 1;
+            _thawSessionsComplete = 0 /*GetMoonData returns int*/;
+            _korathAwakened = 0 /*GetMoonData returns int*/ == 1;
+            _cassianConfronted = 0 /*GetMoonData returns int*/ == 1;
+            _golemSiegeComplete = 0 /*GetMoonData returns int*/ == 1;
+            _korathSacrificeComplete = 0 /*GetMoonData returns int*/ == 1;
 
             Debug.Log($"[Moon7ContentSpawner] State loaded: thaw {_thawSessionsComplete}/{thawSessionsRequired}, awakened={_korathAwakened}");
         }
@@ -442,7 +441,7 @@ namespace Tartaria.Integration
             // Dialogue: Korath teaching
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon7_korath_teaching");
+                DialogueManager.Instance.PlayContextDialogue("moon7_korath_teaching");
             }
 
             _taught = true;

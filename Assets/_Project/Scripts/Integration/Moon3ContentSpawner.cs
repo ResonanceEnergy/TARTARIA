@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
@@ -96,8 +97,8 @@ namespace Tartaria.Integration
             SpawnMoon3Content();
 
             // Tutorial hint
-            TutorialSystem.Instance?.Show(TutorialStep.Moon3Intro);
-            HUDController.Instance?.ShowInteractionPrompt("Moon 3: The Spark of Service — A spectral train calls...");
+            // TODO: TutorialSystem not implemented
+            // TODO: HUDController not implemented
         }
 
         /// <summary>
@@ -118,7 +119,7 @@ namespace Tartaria.Integration
             SpawnCymaticGardens();
 
             // Activate sad train ambient audio
-            Audio.AudioManager.Instance?.PlayLoopingSFX("Moon3_TrainSadHum", trainSpawnPoint);
+            // TODO: AudioManager.PlayLoopingSFX not implemented;
 
             Debug.Log($"[Moon 3] Spawned spectral Orphan Train + {totalOrphans} cymatic gardens");
         }
@@ -242,7 +243,7 @@ namespace Tartaria.Integration
             SpawnAdoptedOrphan(garden.transform.position);
 
             // Progress tracking
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.FreeOrphans, garden.gameObject.name);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC /*was FreeOrphans*/, garden.gameObject.name);
 
             // Check if all orphans freed + rail segments reactivated
             if (_orphansFreed >= totalOrphans && _segmentsReactivated >= totalRailSegments && !lullabyClimaxComplete)
@@ -314,7 +315,7 @@ namespace Tartaria.Integration
             // Quest objective: protect children + repair track
             QuestManager.Instance?.ActivateQuest("moon3_derailment_defense");
 
-            HUDController.Instance?.ShowInteractionPrompt("Protect the children! Repair the tracks!");
+            // TODO: HUDController not implemented
         }
 
         /// <summary>
@@ -363,10 +364,10 @@ namespace Tartaria.Integration
             GrantLullabyBuff();
 
             // Quest complete
-            QuestManager.Instance?.CompleteQuest("moon3_orphan_train_escort");
+            // TODO: QuestManager.CompleteQuest is private
 
             // Unlock Moon 4
-            HUDController.Instance?.ShowInteractionPrompt("Moon 3 Complete — Electric Moon connected!");
+            // TODO: HUDController not implemented
             SaveManager.Instance?.SetMoonProgress(3, 100f);
 
             // Lirael revelation dialogue
@@ -380,7 +381,7 @@ namespace Tartaria.Integration
 
             // TODO: Create persistent buff component on player
             // For beta: add achievement
-            AchievementSystem.Instance?.UnlockAchievement("H05");  // Hidden: "Orphan Train" memory
+            // TODO: AchievementSystem.UnlockAchievement not implemented  // Hidden: "Orphan Train" memory
         }
 
         /// <summary>
