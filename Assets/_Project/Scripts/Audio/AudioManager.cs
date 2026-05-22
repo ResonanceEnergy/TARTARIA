@@ -26,6 +26,8 @@ namespace Tartaria.Audio
         [SerializeField] AudioMixerGroup musicGroup;
         [SerializeField] AudioMixerGroup sfxGroup;
         [SerializeField] AudioMixerGroup uiGroup;
+        [SerializeField] AudioMixerGroup ambienceGroup;
+        [SerializeField] AudioMixerGroup footstepsGroup;
 
         [Header("Mixer Snapshots (optional)")]
         [SerializeField, Tooltip("Default snapshot — applied for Exploration / Tuning / Menu / Cinematic.")]
@@ -401,6 +403,17 @@ namespace Tartaria.Audio
             if (position.HasValue) source.transform.position = position.Value;
             source.Play();
         }
+
+        // ─── Mixer Group Accessors ───────────────────
+
+        /// <summary>Public accessor for Ambience mixer group (used by AmbienceZone, EnvironmentalAudio).</summary>
+        public AudioMixerGroup AmbienceGroup => ambienceGroup;
+
+        /// <summary>Public accessor for Footsteps mixer group (used by FootstepController).</summary>
+        public AudioMixerGroup FootstepsGroup => footstepsGroup;
+
+        /// <summary>Public accessor for SFX mixer group (used by external systems).</summary>
+        public AudioMixerGroup SfxGroup => sfxGroup;
 
         // ─── Mixer Volume API (slider-friendly) ──────
 
