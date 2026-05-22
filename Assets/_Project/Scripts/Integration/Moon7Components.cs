@@ -204,6 +204,8 @@ namespace Tartaria.Integration
     /// </summary>
     public class KorathDialogue : MonoBehaviour, IInteractable
     {
+        public event System.Action OnTeachingComplete;
+
         int _dialogueIndex = 0;
 
         readonly string[][] _dialogueByStage = {
@@ -253,6 +255,12 @@ namespace Tartaria.Integration
             Audio.AudioManager.Instance?.PlaySFX2D("Korath_Voice");
 
             _dialogueIndex++;
+
+            // Trigger teaching complete after the ninth-band teaching line (stage 2, line 1)
+            if (stageIndex == 2 && _dialogueIndex == 2)
+            {
+                OnTeachingComplete?.Invoke();
+            }
         }
     }
 

@@ -70,6 +70,18 @@ namespace Tartaria.Integration
         Mesh _impostorQuadMesh;
         Material _impostorMaterial;
 
+        // Additional cached references
+        GameObject _skyAurora;
+        GameObject _vfxRoot;
+        GameObject _cachedPlayer;
+        GameObject _firstExcavationSite;
+        GameObject _moonFramework;
+        GameObject _worldBoundary;
+        GameObject _shovelPickup;
+        GameObject _digMoundsRoot;
+        GameObject _ambientMotes;
+        GameObject _foliageRoot;
+
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
@@ -310,7 +322,7 @@ namespace Tartaria.Integration
             if (needed <= 0) return;
 
             Vector3 center = new Vector3(20f, 0f, 10f);
-            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
             var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
             if (player != null) center = player.transform.position + new Vector3(12f, 0f, 10f);
 
@@ -681,7 +693,7 @@ namespace Tartaria.Integration
             var milo = MiloController.Instance;
             if (milo == null) yield break;
             // Simple visual cue: face player + short forward step (no nav required)
-            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
             var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
             if (player != null)
             {
@@ -1173,8 +1185,8 @@ namespace Tartaria.Integration
 
         void TriggerAmbientScanPulse()
         {
-            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player")?.transform;
-            var player = _cachedPlayer != null ? _cachedPlayer.gameObject : null;
+            if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
+            var player = _cachedPlayer;
             if (player == null) return;
 
             #if UNITY_EDITOR

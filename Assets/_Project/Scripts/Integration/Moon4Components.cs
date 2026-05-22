@@ -165,6 +165,16 @@ namespace Tartaria.Integration
                 Audio.AudioManager.Instance?.PlaySFX2D("AlignmentFail");
             }
         }
+
+        /// <summary>
+        /// Mark this bastion as aligned (for save/load restoration).
+        /// </summary>
+        public void MarkAligned()
+        {
+            _isAligned = true;
+            if (_material != null)
+                _material.color = _pulseColor;
+        }
     }
 
     /// <summary>
