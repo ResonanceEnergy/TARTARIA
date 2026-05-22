@@ -111,6 +111,31 @@ namespace Tartaria.Core
         public static event Action<XPGainedEventArgs> OnXPGained;
 
         // ═══════════════════════════════════════════════════════════════════
+        // PLAYER HEALTH EVENTS (New — reduces PlayerHealthController coupling)
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Raised when player takes damage.
+        /// Subscribers: HUDController (health bar + damage indicators), AudioController (damage SFX),
+        ///              CameraController (screen shake), QuestManager (damage tracking).
+        /// </summary>
+        public static event Action<PlayerDamagedEventArgs> OnPlayerDamaged;
+
+        /// <summary>
+        /// Raised when player dies.
+        /// Subscribers: HUDController (death screen), PlayerController (disable input),
+        ///              AudioController (death SFX), StatsTracker (death count), QuestManager.
+        /// </summary>
+        public static event Action OnPlayerDeath;
+
+        /// <summary>
+        /// Raised when player respawns after death.
+        /// Subscribers: HUDController (fade-in effect), CameraController (reset),
+        ///              AudioController (respawn SFX), PlayerController (re-enable input).
+        /// </summary>
+        public static event Action OnPlayerRespawned;
+
+        // ═══════════════════════════════════════════════════════════════════
         // INVENTORY EVENTS (New — reduces InventorySystem coupling)
         // ═══════════════════════════════════════════════════════════════════
 
@@ -295,6 +320,32 @@ namespace Tartaria.Core
             catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnItemRemoved: {ex}"); }
         }
 
+        public static void RaisePlayerDamaged(float damageAmount, float remainingHealth)
+        {
+            try
+            {
+                var args = new PlayerDamagedEventArgs
+                {
+                    damageAmount = damageAmount,
+                    remainingHealth = remainingHealth
+                };
+                OnPlayerDamaged?.Invoke(args);
+            }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnPlayerDamaged: {ex}"); }
+        }
+
+        public static void RaisePlayerDeath()
+        {
+            try { OnPlayerDeath?.Invoke(); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnPlayerDeath: {ex}"); }
+        }
+
+        public static void RaisePlayerRespawned()
+        {
+            try { OnPlayerRespawned?.Invoke(); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnPlayerRespawned: {ex}"); }
+        }
+
         public static void RaiseMoonUnlocked(MoonUnlockedEventArgs args)
         {
             try
@@ -340,6 +391,7 @@ namespace Tartaria.Core
         public int rsReward;
         public Vector3 position;
         public float tuningAccuracy;  // 0-1, affects RS bonus
+        public GameObject Building;  // Reference to the restored building (for checkpoint tracking)
     }
 
     public class BuildingDiscoveredEventArgs
@@ -394,6 +446,12 @@ namespace Tartaria.Core
     {
         public float amount;
         public string source;  // "enemy_kill", "quest_complete", "building_restore", etc.
+    }
+
+    public class PlayerDamagedEventArgs
+    {
+        public float damageAmount;
+        public float remainingHealth;
     }
 
     public class ItemPickupEventArgs
