@@ -394,8 +394,21 @@ namespace Tartaria.Integration
             // Orphan Train Lullaby Crystal: passive 432 Hz healing zone
             Debug.Log("[Moon 3] Orphan Train Lullaby Crystal granted — passive healing aura");
 
-            // TODO: Create persistent buff component on player
-            // For beta: add achievement
+            // Add persistent healing buff to player
+            var player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+            {
+                var buff = player.AddComponent<Gameplay.LullabyBuffComponent>();
+                buff.SetHealRate(1f);  // 1 HP/sec
+                buff.SetFrequency(432f);  // 432 Hz Lullaby Crystal resonance
+                Debug.Log("[Moon 3] LullabyBuff applied to player — 1 HP/sec at 432 Hz");
+            }
+            else
+            {
+                Debug.LogWarning("[Moon 3] Player not found, cannot apply LullabyBuff");
+            }
+
+            // Achievement
             AchievementSystem.Instance?.Unlock("orphan_train_memory");
         }
 
