@@ -25,9 +25,37 @@ namespace Tartaria.UI
         void Start()
         {
             // Subscribe to QuestManager events
-            // Integration.QuestManager.Instance.OnQuestStatusChanged += RefreshQuestLog;
+            var questMgr = Integration.QuestManager.Instance;
+            if (questMgr != null)
+            {
+                questMgr.OnQuestStatusChanged += OnQuestStatusChangedHandler;
+                questMgr.OnObjectiveProgressed += OnObjectiveProgressedHandler;
+            }
 
             gameObject.SetActive(false);  // Hidden by default
+        }
+
+        void OnDestroy()
+        {
+            // Unsubscribe
+            var questMgr = Integration.QuestManager.Instance;
+            if (questMgr != null)
+            {
+                questMgr.OnQuestStatusChanged -= OnQuestStatusChangedHandler;
+                questMgr.OnObjectiveProgressed -= OnObjectiveProgressedHandler;
+            }
+        }
+
+        void OnQuestStatusChangedHandler(string questId, Integration.QuestStatus status)
+        {
+            Debug.Log($"[QuestLogUI] Quest {questId} → {status}");
+            RefreshQuestLog();
+        }
+
+        void OnObjectiveProgressedHandler(string questId, int objectiveIndex)
+        {
+            Debug.Log($"[QuestLogUI] Quest {questId} objective {objectiveIndex} progressed");
+            RefreshQuestLog();
         }
 
         public void ToggleQuestLog()
@@ -118,6 +146,41 @@ namespace Tartaria.UI
         bool _isHeader;
 
         public void SetQuestData(string questId, string questName, float progress)
+        {
+            _questId = questId;
+            _isHeader = false;
+
+            if (questNameText != null)
+                questNameText.text = questName;
+
+            if (progressBar != null)
+            {
+                progressBar.value = progress;
+                progressBar.gameObject.SetActive(true);
+            }
+
+            if (completeIcon != null)
+                completeIcon.SetActive(progress >= 0.99f);
+        }
+
+        public void SetHeaderMode(string headerText)
+        {
+            _isHeader = true;
+
+            if (questNameText != null)
+            {
+                questNameText.text = headerText;
+                questNameText.fontStyle = FontStyle.Bold;
+            }
+
+            if (progressBar != null)
+                progressBar.gameObject.SetActive(false);
+
+            if (completeIcon != null)
+                completeIcon.SetActive(false);
+        }
+    }
+}
         {
             _questId = questId;
             _isHeader = false;
