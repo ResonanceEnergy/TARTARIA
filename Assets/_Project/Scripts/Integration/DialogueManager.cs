@@ -730,6 +730,141 @@ namespace Tartaria.Integration
             public bool oneShot;
             public float duration;
         }
+
+        // ─── DIALOGUE TREE SYSTEM ────────────────────────────────
+
+        DialoguePlayer _dialoguePlayer;
+        readonly Dictionary<string, Data.DialogueTreeAsset> _loadedTrees = new();
+        readonly HashSet<string> _playedOneTimeTrees = new();
+
+        /// <summary>True if a dialogue tree is currently playing.</summary>
+        public bool IsPlayingTree => _dialoguePlayer != null && _dialoguePlayer.IsPlaying;
+
+        /// <summary>
+        /// Play a dialogue tree by loading it from Resources/Dialogue/.
+        /// Creates a DialoguePlayer component to manage tree traversal.
+        /// </summary>
+        public void PlayTree(string treeId)
+        {
+            if (string.IsNullOrEmpty(treeId))
+            {
+                Debug.LogError("[DialogueManager] Cannot play tree with null/empty ID!");
+                return;
+            }
+
+            // Check if this is a one-time tree that has already been played
+            if (_playedOneTimeTrees.Contains(treeId))
+            {
+                Debug.Log($"[DialogueManager] Tree '{treeId}' is one-time-only and has already been played.");
+                return;
+            }
+
+            // Load tree from Resources
+            var tree = LoadTree(treeId);
+            if (tree == null)
+            {
+                Debug.LogError($"[DialogueManager] Failed to load dialogue tree: {treeId}");
+                return;
+            }
+
+            // Stop current tree if one is playing
+            if (_dialoguePlayer != null && _dialoguePlayer.IsPlaying)
+            {
+                Debug.Log($"[DialogueManager] Stopping current tree to play: {treeId}");
+                _dialoguePlayer.EndConversation();
+            }
+
+            // Create DialoguePlayer if needed
+            if (_dialoguePlayer == null)
+            {
+                var playerGO = new GameObject("DialoguePlayer");
+                playerGO.transform.SetParent(transform);
+                _dialoguePlayer = playerGO.AddComponent<DialoguePlayer>();
+                _dialoguePlayer.OnConversationEnded += OnTreeEnded;
+            }
+
+            // Start playing the tree
+            _dialoguePlayer.PlayTree(tree);
+
+            // Track one-time trees
+            if (tree.oneTimeOnly)
+            {
+                _playedOneTimeTrees.Add(treeId);
+                Debug.Log($"[DialogueManager] Marked tree '{treeId}' as played (one-time-only)");
+            }
+        }
+
+        /// <summary>
+        /// Loads a dialogue tree from Resources/Dialogue/{treeId}.asset
+        /// </summary>
+        Data.DialogueTreeAsset LoadTree(string treeId)
+        {
+            // Check cache first
+            if (_loadedTrees.TryGetValue(treeId, out var cachedTree))
+                return cachedTree;
+
+            // Load from Resources
+            var tree = Resources.Load<Data.DialogueTreeAsset>($"Dialogue/{treeId}");
+            if (tree == null)
+            {
+                Debug.LogError($"[DialogueManager] Dialogue tree not found: Resources/Dialogue/{treeId}.asset");
+                return null;
+            }
+
+            // Cache for future use
+            _loadedTrees[treeId] = tree;
+            Debug.Log($"[DialogueManager] Loaded dialogue tree: {treeId} ({tree.nodes.Count} nodes)");
+
+            return tree;
+        }
+
+        /// <summary>
+        /// Advances the current dialogue tree by selecting a choice.
+        /// </summary>
+        public void SelectDialogueChoice(int choiceIndex)
+        {
+            if (_dialoguePlayer == null || !_dialoguePlayer.IsPlaying)
+            {
+                Debug.LogWarning("[DialogueManager] No active dialogue tree to select choice from!");
+                return;
+            }
+
+            _dialoguePlayer.SelectChoice(choiceIndex);
+        }
+
+        /// <summary>
+        /// Ends the current dialogue tree playback.
+        /// </summary>
+        public void EndCurrentTree()
+        {
+            if (_dialoguePlayer != null && _dialoguePlayer.IsPlaying)
+            {
+                _dialoguePlayer.EndConversation();
+            }
+        }
+
+        void OnTreeEnded(string treeId)
+        {
+            Debug.Log($"[DialogueManager] Tree ended: {treeId}");
+            // Additional cleanup or events can be handled here
+        }
+
+        /// <summary>
+        /// Returns the current DialoguePlayer (for UI integration).
+        /// </summary>
+        public DialoguePlayer GetDialoguePlayer()
+        {
+            return _dialoguePlayer;
+        }
+
+        /// <summary>
+        /// Resets one-time tree tracking (for testing or new game).
+        /// </summary>
+        public void ResetOneTimeTrees()
+        {
+            _playedOneTimeTrees.Clear();
+            Debug.Log("[DialogueManager] Reset one-time tree tracking");
+        }
     }
 
     // ROUND 4: Full set of Milo/Lirael/Korath + Anastasia/Cassian bond, Moon3 rail vertical, Moons4-6 5-beat diary, permanent world payoff (W7/W8/W9 real-time comments), 17th Hour reactivity, giant resonance harmony narrative lines added in the catalogue init (trust milestone block).
