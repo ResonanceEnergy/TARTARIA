@@ -175,6 +175,14 @@ namespace Tartaria.Save
         public SerializableVector3 position;
         public string currentZone = "echohaven";
         public float aetherCharge;
+        
+        // PlayerProgression fields
+        public int level = 1;
+        public float currentXP = 0f;
+        
+        // Inventory fields (itemId → count)
+        public string[] inventoryItemIds = Array.Empty<string>();
+        public int[] inventoryItemCounts = Array.Empty<int>();
     }
 
     [Serializable]

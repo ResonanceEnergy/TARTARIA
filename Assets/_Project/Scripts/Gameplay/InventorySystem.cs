@@ -4,6 +4,7 @@ using UnityEngine;
 using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
+// using Tartaria.Save;  // B1 cycle-break: removed assembly dependency
 
 namespace Tartaria.Gameplay
 {
@@ -49,11 +50,70 @@ namespace Tartaria.Gameplay
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+            
+            // Wire save/load events
+            if (Tartaria.Save.SaveManager.Instance != null)
+            {
+                Tartaria.Save.SaveManager.Instance.OnBeforeSave += OnSave;
+                Tartaria.Save.SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+            
+            // Cleanup save/load event handlers
+            if (Tartaria.Save.SaveManager.Instance != null)
+            {
+                Tartaria.Save.SaveManager.Instance.OnBeforeSave -= OnSave;
+                Tartaria.Save.SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+        
+        void OnSave(Tartaria.Save.SaveData sd)
+        {
+            // Persist inventory to SaveData.player
+            if (sd.player != null)
+            {
+                var itemIds = new List<string>();
+                var itemCounts = new List<int>();
+                
+                foreach (var kvp in _items)
+                {
+                    itemIds.Add(kvp.Key);
+                    itemCounts.Add(kvp.Value);
+                }
+                
+                sd.player.inventoryItemIds = itemIds.ToArray();
+                sd.player.inventoryItemCounts = itemCounts.ToArray();
+                
+                Debug.Log($"[Inventory] Saved {_items.Count} unique items");
+            }
+        }
+        
+        void OnLoad(Tartaria.Save.SaveData sd)
+        {
+            // Restore inventory from SaveData.player
+            _items.Clear();
+            
+            if (sd.player != null && sd.player.inventoryItemIds != null && sd.player.inventoryItemCounts != null)
+            {
+                int count = Mathf.Min(sd.player.inventoryItemIds.Length, sd.player.inventoryItemCounts.Length);
+                for (int i = 0; i < count; i++)
+                {
+                    string itemId = sd.player.inventoryItemIds[i];
+                    int itemCount = sd.player.inventoryItemCounts[i];
+                    
+                    if (!string.IsNullOrEmpty(itemId) && itemCount > 0)
+                    {
+                        _items[itemId] = itemCount;
+                    }
+                }
+                
+                Debug.Log($"[Inventory] Loaded {_items.Count} unique items");
+                OnInventoryChanged?.Invoke();
+            }
         }
 
         // ─── API ───────────────────────────────────
@@ -85,6 +145,9 @@ namespace Tartaria.Gameplay
 
             AudioManager.Instance?.PlaySFX2D("ItemPickup");
             HapticFeedbackManager.Instance?.PlayDiscovery();
+            
+            // Mark save dirty
+            SaveManager.Instance?.MarkDirty();
 
             return true;
         }
@@ -112,6 +175,9 @@ namespace Tartaria.Gameplay
             Debug.Log($"[Inventory] Removed {count}x {itemId} (remaining {remaining})");
             OnItemRemoved?.Invoke(itemId, remaining);
             OnInventoryChanged?.Invoke();
+            
+            // Mark save dirty
+            SaveManager.Instance?.MarkDirty();
 
             return true;
         }
@@ -147,6 +213,7 @@ namespace Tartaria.Gameplay
             _items.Clear();
             Debug.Log("[Inventory] Cleared");
             OnInventoryChanged?.Invoke();
+            SaveManager.Instance?.MarkDirty();
         }
     }
 }

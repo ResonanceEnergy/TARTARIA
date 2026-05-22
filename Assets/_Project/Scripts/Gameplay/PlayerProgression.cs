@@ -1,5 +1,6 @@
 using UnityEngine;
 using System;
+// using Tartaria.Save;  // B1 cycle-break: removed assembly dependency
 
 namespace Tartaria.Gameplay
 {
@@ -49,11 +50,53 @@ namespace Tartaria.Gameplay
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+            
+            // Wire save/load events
+            if (Tartaria.Save.SaveManager.Instance != null)
+            {
+                Tartaria.Save.SaveManager.Instance.OnBeforeSave += OnSave;
+                Tartaria.Save.SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+        
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+            
+            // Cleanup save/load event handlers
+            if (Tartaria.Save.SaveManager.Instance != null)
+            {
+                Tartaria.Save.SaveManager.Instance.OnBeforeSave -= OnSave;
+                Tartaria.Save.SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+        
+        void OnSave(Tartaria.Save.SaveData sd)
+        {
+            // Persist player level/XP to SaveData.player
+            if (sd.player != null)
+            {
+                sd.player.level = currentLevel;
+                sd.player.currentXP = currentXP;
+                Debug.Log($"[PlayerProgression] Saved: Level {currentLevel}, XP {currentXP}");
+            }
+        }
+        
+        void OnLoad(Tartaria.Save.SaveData sd)
+        {
+            // Restore player level/XP from SaveData.player
+            if (sd.player != null)
+            {
+                currentLevel = Mathf.Max(1, sd.player.level);
+                currentXP = Mathf.Max(0f, sd.player.currentXP);
+                Debug.Log($"[PlayerProgression] Loaded: Level {currentLevel}, XP {currentXP}");
+            }
         }
 
         void Start()
         {
-            LoadProgressionFromSave();
+            // OnLoad already populated currentLevel/currentXP via SaveManager events
+            Debug.Log($"[PlayerProgression] Initialized at Level {currentLevel}, XP {currentXP}/{XPToNextLevel}");
         }
 
         // === Public API ===
@@ -94,7 +137,8 @@ namespace Tartaria.Gameplay
             // Show UI notification (GameEvents.OnLevelUp event for UI decoupling)
             Debug.Log($"[PlayerProgression] LEVEL UP! You are now level {currentLevel}");
 
-            SaveProgression();
+            // Mark save dirty
+            SaveManager.Instance?.MarkDirty();
         }
 
         void ApplyStatBonuses()
@@ -116,6 +160,9 @@ namespace Tartaria.Gameplay
             }
 
             Debug.Log($"[PlayerProgression] Stat bonuses applied at level {currentLevel}");
+            
+            // Mark save dirty after stat changes
+            SaveManager.Instance?.MarkDirty();
         }
 
         float CalculateXPForLevel(int level)
@@ -129,23 +176,7 @@ namespace Tartaria.Gameplay
             currentLevel = Mathf.Clamp(level, 1, maxLevel);
             currentXP = 0f;
             Debug.Log($"[PlayerProgression] Set to level {currentLevel}");
-        }
-
-        void LoadProgressionFromSave()
-        {
-            // Note: SaveManager integration pending (save schema migration)
-            Debug.Log("[PlayerProgression] Load from save (stub)");
-        }
-
-        public void SaveProgression()
-        {
-            // Note: SaveManager integration pending (save schema migration)
-            Debug.Log("[PlayerProgression] Save progression (stub)");
-        }
-
-        void OnDestroy()
-        {
-            if (Instance == this) Instance = null;
+            Tartaria.Save.SaveManager.Instance?.MarkDirty();
         }
     }
 }

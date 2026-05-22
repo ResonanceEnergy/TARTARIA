@@ -141,12 +141,56 @@ namespace Tartaria.Integration
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
             StopAllCoroutines();
+            
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+        
+        void OnSave(SaveData sd)
+        {
+            // Moon 2 Lunar: 5-beat FTUE + Cassian arc + Crystal Remembers state
+            sd.SetMoonFlag(2, "discoveryComplete", _discoveryComplete);
+            sd.SetMoonFlag(2, "restorationComplete", _restorationComplete);
+            sd.SetMoonFlag(2, "conflictComplete", _conflictComplete);
+            sd.SetMoonFlag(2, "climaxComplete", _climaxComplete);
+            sd.SetMoonFlag(2, "revelationComplete", _revelationComplete);
+            sd.SetMoonFlag(2, "currentBeat", _currentBeat);
+            sd.SetMoonFlag(2, "cassianIntroduced", cassianIntroduced);
+            sd.SetMoonFlag(2, "isReturningPlayer", _isReturningPlayer);
+            sd.SetMoonFlag(2, "ftueStarted", _ftueStarted);
+        }
+        
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 2 Lunar state (5-beat progression)
+            _discoveryComplete = sd.GetMoonFlag(2, "discoveryComplete");
+            _restorationComplete = sd.GetMoonFlag(2, "restorationComplete");
+            _conflictComplete = sd.GetMoonFlag(2, "conflictComplete");
+            _climaxComplete = sd.GetMoonFlag(2, "climaxComplete");
+            _revelationComplete = sd.GetMoonFlag(2, "revelationComplete");
+            _currentBeat = sd.GetMoonFlag(2, "currentBeat", 0);
+            cassianIntroduced = sd.GetMoonFlag(2, "cassianIntroduced");
+            _isReturningPlayer = sd.GetMoonFlag(2, "isReturningPlayer");
+            _ftueStarted = sd.GetMoonFlag(2, "ftueStarted");
+            
+            Debug.Log($"[Moon2Lunar] State loaded: beat={_currentBeat}, discovery={_discoveryComplete}, revelation={_revelationComplete}");
         }
 
         void Start()
