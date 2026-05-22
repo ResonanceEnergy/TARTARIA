@@ -2,6 +2,32 @@
 
 > *Tune the World. Light the Ley Lines. Reclaim the Golden Age.*
 
+## 🎮 BETA STATUS — Moon 1 Preview Build
+
+**CURRENT BUILD:** v1.0.0-beta (Echohaven Vertical Slice)  
+**PLAYABLE SCOPE:** Moon 1 only (Echohaven restoration, 3-5 hours gameplay)  
+**STATUS:** Closed beta — shippable for testing, NOT production-ready
+
+**What's Included:**
+- ✅ Echohaven zone (3 buildings, tuning mechanics, combat)
+- ✅ Core loop (tune → restore → save → progress)
+- ✅ Haptic feedback (DualSense controller)
+- ✅ Main menu, settings, save/load system
+- ✅ 60 FPS performance target (GTX 1070+)
+
+**What's NOT Included (Moon 2-13):**
+- ⚠️ Moon 2-13 content is prototype/stub quality (placeholder visuals, incomplete mechanics)
+- ⚠️ Cloud save sync has known issues (local save works)
+- ⚠️ Late-game systems are documented but not fully implemented
+- 📋 See [MOON_COMPLETION_STATUS.md](docs/MOON_COMPLETION_STATUS.md) for detailed breakdown
+
+**System Requirements:**
+- **Minimum:** Windows 10/11, GTX 1070 / RX 580, 8 GB RAM, 4 GB storage
+- **Recommended:** RTX 3060 / RX 6700 XT, 16 GB RAM
+- **Optional:** FSR 2.2, DLSS 3.5, DualSense haptics
+
+---
+
 ## The Vision
 
 **TARTARIA WORLD OF WONDER** is a session-based, open-world restoration RPG / light city-builder / harmonic puzzle-action hybrid for PC (Steam). Players awaken as a Tartarian descendant in a post-Mud Flood world, excavating buried wonders, tuning atmospheric Aether through sacred-geometry architecture, and restoring a globe-spanning free-energy grid — one glowing dome at a time.
