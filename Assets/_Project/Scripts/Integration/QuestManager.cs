@@ -274,7 +274,10 @@ namespace Tartaria.Integration
 
         // ─── Internal ────────────────────────────────
 
-        void CompleteQuest(string questId)
+        /// <summary>
+        /// Marks a quest as completed and grants rewards. Can be called by Moon spawners for quest completion.
+        /// </summary>
+        public void CompleteQuest(string questId)
         {
             if (!_questStates.TryGetValue(questId, out var state)) return;
             state.status = QuestStatus.Completed;
