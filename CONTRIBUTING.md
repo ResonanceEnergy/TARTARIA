@@ -133,8 +133,8 @@ Want to contribute code? Great!
 
 ### Prerequisites
 
-- **Unity 6000.0.32f1** (exact version required)
-  - Install via Unity Hub: `unityhub://6000.0.32f1/0822185ae2e4`
+- **Unity 6000.3.6f1** (exact version required)
+  - Install via Unity Hub: `unityhub://6000.3.6f1/bbb010bdb8a3`
   - Modules: Windows Build Support (IL2CPP)
 - **Git** (for cloning repository)
 - **PowerShell 7+** (for build automation)
@@ -147,7 +147,7 @@ git clone https://github.com/ResonanceEnergy/TARTARIA.git
 cd TARTARIA
 ```
 
-Open project in Unity Hub → Unity 6000.0.32f1 will import assets (~5 min first launch)
+Open project in Unity Hub → Unity 6000.3.6f1 will import assets (~5 min first launch)
 
 ### Build & Play
 
