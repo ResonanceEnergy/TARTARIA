@@ -149,21 +149,38 @@ namespace Tartaria.Integration
             if (line.oneShot)
                 _playedOneShots.Add(line.id);
 
-            UIManager.Instance?.ShowDialogue(line.speaker, line.text);
-
-            // Try to play VO placeholder; fall back to text-only if unavailable
-            bool hasVO = Audio.VOPlaceholderLibrary.PlayLineIfAvailable(line.id);
-            if (!hasVO)
+            // P1 AUDIT FIX: Show [MISSING LINE] placeholder instead of empty text
+            string displayText = line.text;
+            bool isMissing = string.IsNullOrEmpty(displayText);
+            if (isMissing)
             {
-                // Fallback: try AudioManager.PlayVoiceLine if it exists
-                AudioManager.Instance?.PlayVoiceLine(line.id, volume);
+                displayText = $"[MISSING LINE: {line.id}]";
+                Debug.LogError($"[Dialogue] Line load failure: {line.id} has no text. Showing placeholder. (Auto-logged to CrashReporter)");
+            }
+
+            UIManager.Instance?.ShowDialogue(line.speaker, displayText);
+
+            // P1 AUDIT FIX: Skip VO playback when line text is missing to avoid audio/text desync
+            if (!isMissing)
+            {
+                // Try to play VO placeholder; fall back to text-only if unavailable
+                bool hasVO = Audio.VOPlaceholderLibrary.PlayLineIfAvailable(line.id);
+                if (!hasVO)
+                {
+                    // Fallback: try AudioManager.PlayVoiceLine if it exists
+                    AudioManager.Instance?.PlayVoiceLine(line.id, volume);
+                }
+            }
+            else
+            {
+                Debug.Log($"[Dialogue] Skipped VO playback for missing line: {line.id}");
             }
 
             // Auto-close after delay
             CancelInvoke(nameof(HideLine));
             Invoke(nameof(HideLine), _currentLineDuration);
 
-            Debug.Log($"[Dialogue] {line.speaker}: {line.text}");
+            Debug.Log($"[Dialogue] {line.speaker}: {displayText}");
         }
 
         void HideLine()

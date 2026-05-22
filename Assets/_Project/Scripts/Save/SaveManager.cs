@@ -557,7 +557,13 @@ namespace Tartaria.Save
                     return compressed;
                 }
             }
-            catch (Exception ex) { Debug.LogWarning("[SaveManager] Compression failed (falling back): " + ex.Message); }
+            catch (Exception ex)
+            {
+                Debug.LogWarning("[SaveManager] Compression failed (falling back): " + ex.Message);
+                
+                // P1 AUDIT FIX: Use GameEvents instead of direct UI reference (assembly dependency issue)
+                GameEvents.FireHUDAchievementToast("⚠️ Save file not compressed (low disk space?)");
+            }
             return Encoding.UTF8.GetBytes(json);
         }
 
@@ -938,6 +944,10 @@ namespace Tartaria.Save
                     catch (Exception ex)
                     {
                         UnityEngine.Debug.LogWarning("[SteamCloudBackend] Upload error: " + ex.Message);
+                        
+                        // P1 AUDIT FIX: Show UI notification for Steam cloud failures
+                        GameEvents.FireHUDCloudQueueToast("Steam cloud sync error - will retry");
+                        
                         return false;
                     }
                 }
@@ -975,6 +985,10 @@ namespace Tartaria.Save
                     catch (Exception ex)
                     {
                         UnityEngine.Debug.LogWarning("[FirebaseCloudBackend] Upload failed (will retry via queue): " + ex.Message);
+                        
+                        // P1 AUDIT FIX: Show UI notification for Firebase cloud failures  
+                        GameEvents.FireHUDCloudQueueToast("Cloud backup error - will retry");
+                        
                         return false;
                     }
                 }
@@ -1046,7 +1060,13 @@ namespace Tartaria.Save
 
                     Debug.Log("[CloudSaveService] R6: Force-applied cloud snapshot (KeepCloud choice executed).");
                 }
-                catch (Exception e) { Debug.LogWarning("[CloudSaveService] ForceApply failed: " + e.Message); }
+                catch (Exception e)
+                {
+                    Debug.LogWarning("[CloudSaveService] ForceApply failed: " + e.Message);
+                    
+                    // P1 AUDIT FIX: Show UI notification when cloud merge fails
+                    GameEvents.FireHUDAchievementToast("⚠️ Cloud save merge failed - check connection");
+                }
             }
 
             void LoadPendingQueue()
@@ -1164,7 +1184,14 @@ namespace Tartaria.Save
                             bool steamOk = _steamBackend.Upload("tartaria_slot0.sav", p.payloadJson, p.checksum ?? "");
                             if (steamOk) ok = true;
                         }
-                        catch (Exception ex) { Debug.LogWarning("[Cloud] Steam backend failed: " + ex.Message); }
+                        catch (Exception ex)
+                        {
+                            Debug.LogWarning("[Cloud] Steam backend failed: " + ex.Message);
+                            
+                            // P1 AUDIT FIX: Immediate feedback on upload exception
+                            if (p.retryCount == 0)
+                                GameEvents.FireHUDCloudQueueToast("Cloud sync error detected...");
+                        }
 
                         // R5: Use dedicated Firebase backend (production-ready)
                         try
@@ -1173,7 +1200,15 @@ namespace Tartaria.Save
                             bool fbOk = _firebaseBackend.UploadSave(uid, 0, p.payloadJson, p.timestampUtc, p.checksum ?? "");
                             if (fbOk) ok = true;
                         }
-                        catch { }
+                        catch (Exception ex)
+                        {
+                            // P1 AUDIT FIX: Log Firebase failures for debugging + show immediate UI feedback
+                            Debug.LogWarning($"[Cloud] Firebase backend failed (retry {p.retryCount}): " + ex.Message);
+                            
+                            // Show immediate feedback on first failure
+                            if (p.retryCount == 0)
+                                GameEvents.FireHUDCloudQueueToast("Cloud backup error - retrying...");
+                        }
 
                         if (ok)
                         {
@@ -1184,13 +1219,28 @@ namespace Tartaria.Save
                                 Debug.Log($"[CloudSaveService] Cloud upload verified (checksum match path) for {p.timestampUtc}");
                             _pending.RemoveAt(i);
                             GameEvents.FireHUDAchievementToast("Cloud sync complete");
+                            
+                            // P1 AUDIT FIX: Clear persistent sync indicator when successful
+                            if (_pending.Count == 0)
+                                GameEvents.FireHUDCloudQueueToast(""); // Clear indicator
                         }
                         else
                         {
                             p.retryCount++;
+                            
+                            // P1 AUDIT FIX: Show persistent UI indicator for pending/failing syncs
+                            if (p.retryCount >= 3)
+                            {
+                                // After 3 failures, show persistent warning
+                                GameEvents.FireHUDCloudQueueToast($"Cloud sync retrying ({p.retryCount}/5)...");
+                            }
+                            
                             if (p.retryCount > 5)
                             {
-                                Debug.LogWarning("[CloudSaveService] Dropped persistent pending after max retries (player notified via queue toast in UI).");
+                                // P1 AUDIT FIX: Alert user when save is dropped after max retries
+                                Debug.LogError($"[CloudSaveService] CRITICAL: Dropped save after 5 failed retries. Timestamp: {p.timestampUtc}");
+                                GameEvents.FireHUDAchievementToast("⚠️ Cloud sync failed - save not backed up!");
+                                GameEvents.FireHUDCloudQueueToast($"⚠️ {_pending.Count - 1} saves waiting for cloud sync");
                                 _pending.RemoveAt(i);
                             }
                         }
@@ -1199,6 +1249,12 @@ namespace Tartaria.Save
                     {
                         // R6: In deep sim offline, still allow forced flush path but increment retries visibly
                         p.retryCount++;
+                        
+                        // P1 AUDIT FIX: Show offline indicator
+                        if (p.retryCount == 1)
+                        {
+                            GameEvents.FireHUDCloudQueueToast($"Offline - {_pending.Count} saves queued");
+                        }
                     }
                 }
                 SavePendingQueue();
@@ -1257,6 +1313,9 @@ namespace Tartaria.Save
                 catch (Exception e)
                 {
                     Debug.LogWarning("[CloudSaveService] Cloud check failed (offline safe): " + e.Message);
+                    
+                    // P1 AUDIT FIX: Show UI notification for cloud conflict resolution failures
+                    GameEvents.FireHUDAchievementToast("Cloud save check failed (offline mode)");
                 }
             }
 
