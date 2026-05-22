@@ -142,43 +142,55 @@ namespace Tartaria.Integration
                     tower.transform.position = bellTowerPoints[i];
 
                     // Tower base (stone foundation)
-                    var towerBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    towerBase.name = "TowerBase";
+                    var towerBase = new GameObject("TowerBase");
+                    towerBase.AddComponent<MeshFilter>();
+                    towerBase.AddComponent<MeshRenderer>();
+                    towerBase.AddComponent<CapsuleCollider>();
                     towerBase.transform.SetParent(tower.transform);
                     towerBase.transform.localScale = new Vector3(6f, 5f, 6f);
                     towerBase.transform.localPosition = Vector3.up * 5f;
 
                     // Tower mid-section
-                    var towerMid = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    towerMid.name = "TowerMid";
+                    var towerMid = new GameObject("TowerMid");
+                    towerMid.AddComponent<MeshFilter>();
+                    towerMid.AddComponent<MeshRenderer>();
+                    towerMid.AddComponent<CapsuleCollider>();
                     towerMid.transform.SetParent(tower.transform);
                     towerMid.transform.localScale = new Vector3(5f, 20f, 5f);
                     towerMid.transform.localPosition = Vector3.up * 30f;
 
                     // Bell chamber (platform)
-                    var bellChamber = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    bellChamber.name = "BellChamber";
+                    var bellChamber = new GameObject("BellChamber");
+                    bellChamber.AddComponent<MeshFilter>();
+                    bellChamber.AddComponent<MeshRenderer>();
+                    bellChamber.AddComponent<BoxCollider>();
                     bellChamber.transform.SetParent(tower.transform);
                     bellChamber.transform.localScale = new Vector3(6f, 3f, 6f);
                     bellChamber.transform.localPosition = Vector3.up * 52f;
 
                     // Bell (sphere at top)
-                    var bell = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    bell.name = "Bell";
+                    var bell = new GameObject("Bell");
+                    bell.AddComponent<MeshFilter>();
+                    bell.AddComponent<MeshRenderer>();
+                    bell.AddComponent<SphereCollider>();
                     bell.transform.SetParent(tower.transform);
                     bell.transform.localScale = Vector3.one * 4f;
                     bell.transform.localPosition = Vector3.up * 56f;
 
                     // Spire
-                    var spire = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    spire.name = "Spire";
+                    var spire = new GameObject("Spire");
+                    spire.AddComponent<MeshFilter>();
+                    spire.AddComponent<MeshRenderer>();
+                    spire.AddComponent<CapsuleCollider>();
                     spire.transform.SetParent(tower.transform);
                     spire.transform.localScale = new Vector3(1f, 8f, 1f);
                     spire.transform.localPosition = Vector3.up * 64f;
 
                     // Tuning console
-                    var console = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    console.name = "TuningConsole";
+                    var console = new GameObject("TuningConsole");
+                    console.AddComponent<MeshFilter>();
+                    console.AddComponent<MeshRenderer>();
+                    console.AddComponent<BoxCollider>();
                     console.transform.SetParent(tower.transform);
                     console.transform.localScale = new Vector3(2f, 1f, 2f);
                     console.transform.localPosition = Vector3.up * 2f;
