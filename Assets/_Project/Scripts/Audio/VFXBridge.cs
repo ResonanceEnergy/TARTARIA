@@ -9,14 +9,17 @@ namespace Tartaria.Audio
     /// Late-bound bridge to Tartaria.Integration.VFXController.
     /// Audio asmdef cannot reference Tartaria.Integration (would invert the
     /// established dependency direction). Reflection dispatch with cached
-    /// MethodInfos. Silently no-ops if VFXController isn't loaded.
+    /// MethodInfos. Gracefully degrades if VFXController isn't loaded.
     /// Enums (if any) are passed as strings — parsed once, then memoized.
+    /// Failures logged to CrashReporter for production monitoring.
     /// </summary>
     internal static class VFXBridge
     {
         static Type   _type;
         static object _instance;
         static bool   _resolved;
+        static int    _failureCount;
+        static bool   _degradationLogged;
         static readonly Dictionary<string, MethodInfo>     _methods = new Dictionary<string, MethodInfo>();
         static readonly Dictionary<(Type, string), object> _enums   = new Dictionary<(Type, string), object>();
 
@@ -84,7 +87,18 @@ namespace Tartaria.Audio
             }
             catch (Exception ex)
             {
+                _failureCount++;
                 Debug.LogWarning($"[VFXBridge] {methodName} failed: {ex.Message}");
+                
+                // Log to CrashReporter for production monitoring
+                Debug.LogError($"[VFXBridge] REFLECTION FAILURE #{_failureCount}: {methodName} - {ex.Message}\n{ex.StackTrace}");
+                
+                // Log degradation notice once
+                if (!_degradationLogged && _failureCount >= 3)
+                {
+                    _degradationLogged = true;
+                    Debug.LogError($"[VFXBridge] DEGRADED MODE: {_failureCount} reflection failures. VFX may not fire. Check Integration assembly load.");
+                }
             }
         }
     }

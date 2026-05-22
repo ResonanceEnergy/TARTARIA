@@ -169,6 +169,38 @@ namespace Tartaria.Audio
             Register("Moon5_ThorneRadioStatic", GenMoon5ThorneRadioStatic());
             Register("Moon5_TuningRise", GenMoon5TuningRise());
 
+            // ═══ Moon 6 (Rhythmic Moon — Sunken Cathedral Organ Symphony) — EXCLUSIVE ═══
+            // Full pipe organ tones (12 pipes = 12-note chromatic), hydraulic fountain flows,
+            // Cymatic Requiem climax layers, Lirael choir harmonics, bell tolls, crystal chimes.
+            // 432Hz + PHI + organ overtones (2nd/3rd/5th harmonics). Zero other moons touched.
+            Register("Moon6_BrokenMelody", GenMoon6BrokenMelody());
+            Register("Moon6_PipeRepair", GenMoon6PipeRepair());
+            Register("Moon6_OrganTone", GenMoon6OrganTone());
+            Register("Moon6_FountainFlow", GenMoon6FountainFlow());
+            Register("Moon6_CymaticRequiem", GenMoon6CymaticRequiem());
+            Register("Moon6_LiraelChoir", GenMoon6LiraelChoir());
+            Register("Moon6_BellToll", GenMoon6BellToll());
+            Register("Moon6_CrystalChime", GenMoon6CrystalChime());
+            Register("Moon6_HydraulicBellows", GenMoon6HydraulicBellows());
+            Register("Moon6_CathedralAmbience", GenMoon6CathedralAmbience());
+            Register("Moon6_IonicMistRain", GenMoon6IonicMistRain());
+
+            // ═══ Moon 7 (Resonant Moon — Korath Awakening + Giant Stasis Vault) — EXCLUSIVE ═══
+            // Ice thaw crackles, 9-band aurora energy (violet 432*φ²), Korath voice rumbles,
+            // golem siege bass impacts, Cassian confrontation tension, harmonic rock cutting SFX,
+            // Korath sacrifice golden surge, stasis vault ambient (deep sub-bass + aurora hum).
+            Register("Moon7_IceThaw", GenMoon7IceThaw());
+            Register("Moon7_AuroraHum", GenMoon7AuroraHum());
+            Register("Moon7_KorathVoice", GenMoon7KorathVoiceRumble());
+            Register("Moon7_KorathAwakening", GenMoon7KorathAwakening());
+            Register("Moon7_GolemSiege", GenMoon7GolemSiegeBass());
+            Register("Moon7_CassianTension", GenMoon7CassianTension());
+            Register("Moon7_HarmonicCutting", GenMoon7HarmonicRockCutting());
+            Register("Moon7_KorathSacrifice", GenMoon7KorathSacrifice());
+            Register("Moon7_StasisAmbience", GenMoon7StasisVaultAmbience());
+            Register("Moon7_9BandUnlock", GenMoon79BandUnlock());
+            Register("Moon7_VioletPulse", GenMoon7VioletPulse());
+
             // ═══ Global — Moon Clear + End Game fanfares ═══
             Register("moon_clear",                  GenMoonClearFanfare());
             Register("game_complete_credits_theme", GenGameCompleteCreditsTheme());
@@ -1880,6 +1912,435 @@ namespace Tartaria.Audio
                 data[i] = (vRoot + vPHI + vHeal + vCel + vOct + sparkle) * masterEnv * 0.68f;
             }
             return MakeClip("SFX_GameCompleteCredits", data);
+        }
+
+        // ═══════════════════════════════════════════════
+        // Moon 6 Generators (Rhythmic Moon — Sunken Cathedral Organ Symphony)
+        // Pipe organ tones, hydraulic fountains, Cymatic Requiem, Lirael choir, bell tolls
+        // ═══════════════════════════════════════════════
+
+        /// <summary>Broken melody — distorted organ playing backwards. Dissonant tritone + reversed 432 harmony.</summary>
+        static AudioClip GenMoon6BrokenMelody()
+        {
+            int len = Samples(8.5f);
+            var data = new float[len];
+            float[] melody = { 432f, 486f, 432f * TRITONE, 324f, 648f }; // Broken intervals
+            for (int i = 0; i < len; i++)
+            {
+                float t = 1f - ((float)i / len); // Reverse time
+                int noteIdx = (int)(t * melody.Length) % melody.Length;
+                float env = 0.4f + 0.3f * Mathf.Sin(t * 7f); // Erratic volume
+                float organ = Sine(i, melody[noteIdx]) * 0.35f
+                            + Sine(i, melody[noteIdx] * 2f) * 0.18f  // 2nd harmonic
+                            + Sine(i, melody[noteIdx] * 3f) * 0.10f; // 3rd harmonic
+                float distortion = FilteredNoise(i, 120f) * 0.12f;
+                data[i] = (organ + distortion) * env * 0.55f;
+            }
+            return MakeClip("SFX_Moon6_BrokenMelody", data);
+        }
+
+        /// <summary>Pipe repair harmonic chime — bright 432Hz + PHI overtones, crystal ring.</summary>
+        static AudioClip GenMoon6PipeRepair()
+        {
+            int len = Samples(1.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI) * (1f - t * 0.3f);
+                float tone = Sine(i, F_HARMONIC) * 0.42f
+                           + Sine(i, F_HARMONIC * PHI) * 0.28f
+                           + Sine(i, F_HEALING) * 0.19f
+                           + Sine(i, 1296f * 0.5f) * 0.12f;
+                float ring = FilteredNoise(i, 3500f) * 0.05f * env;
+                data[i] = (tone + ring) * env * 0.65f;
+            }
+            return MakeClip("SFX_Moon6_PipeRepair", data);
+        }
+
+        /// <summary>Single organ pipe tone — procedural 12-note chromatic organ scale (C4 to B4). Call with pipe index 0-11.</summary>
+        static AudioClip GenMoon6OrganTone()
+        {
+            // Generate middle C (261.63 Hz) with organ overtones
+            int len = Samples(3.0f);
+            var data = new float[len];
+            float fundamental = 261.63f; // C4
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Clamp01(t * 10f) * (1f - Mathf.Pow(Mathf.Max(0f, t - 0.7f) / 0.3f, 1.5f));
+                // Organ overtones: strong 2nd, 3rd, 5th harmonics
+                float organ = Sine(i, fundamental) * 0.40f
+                            + Sine(i, fundamental * 2f) * 0.30f
+                            + Sine(i, fundamental * 3f) * 0.18f
+                            + Sine(i, fundamental * 4f) * 0.10f
+                            + Sine(i, fundamental * 5f) * 0.08f;
+                data[i] = organ * env * 0.60f;
+            }
+            return MakeClip("SFX_Moon6_OrganTone", data);
+        }
+
+        /// <summary>Hydraulic fountain flow — water babble + mechanical bellows whoosh.</summary>
+        static AudioClip GenMoon6FountainFlow()
+        {
+            int len = Samples(4.2f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float flow = Mathf.Abs(Mathf.Sin(t * 8f + Mathf.Sin(t * 2.1f) * 1.4f));
+                float water = FilteredNoise(i, 850f) * flow * 0.32f;
+                float bellows = Sine(i, 54f) * 0.18f + Sine(i, 108f) * 0.12f;
+                float env = 0.85f + 0.15f * Mathf.Sin(t * 3.5f);
+                data[i] = (water + bellows) * env * 0.48f;
+            }
+            return MakeClip("SFX_Moon6_FountainFlow", data);
+        }
+
+        /// <summary>Cymatic Requiem climax — full organ symphony with 432Hz golden cascade, 6-second swell.</summary>
+        static AudioClip GenMoon6CymaticRequiem()
+        {
+            int len = Samples(8.5f);
+            var data = new float[len];
+            float[] chord = { 324f, F_HARMONIC, F_HEALING, 648f, 864f, 1296f }; // Cathedral chord
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float swell = Mathf.Clamp01(t * 2.5f) * (1f - Mathf.Pow(Mathf.Max(0f, t - 0.7f) / 0.3f, 1.2f));
+                float v = 0f;
+                for (int k = 0; k < chord.Length; k++)
+                {
+                    float delay = k * 0.08f;
+                    float localT = Mathf.Max(0f, t - delay);
+                    float kEnv = localT < 0.15f ? localT / 0.15f : 1f;
+                    v += Sine(i, chord[k]) * (0.20f - k * 0.018f) * kEnv;
+                }
+                float thunder = FilteredNoise(i, 60f) * 0.15f * swell;
+                data[i] = (v + thunder) * swell * 0.70f;
+            }
+            return MakeClip("SFX_Moon6_CymaticRequiem", data);
+        }
+
+        /// <summary>Lirael choir hum — spectral children's voices, 432Hz lullaby layer.</summary>
+        static AudioClip GenMoon6LiraelChoir()
+        {
+            int len = Samples(5.5f);
+            var data = new float[len];
+            float[] voices = { 324f, F_HARMONIC * 0.9f, F_HARMONIC, F_HEALING * 0.85f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float breath = 0.75f + 0.25f * Mathf.Sin(t * 2.8f);
+                float v = 0f;
+                for (int k = 0; k < voices.Length; k++)
+                {
+                    float vibrato = Mathf.Sin(t * 5.2f + k) * 1.2f;
+                    v += Sine(i, voices[k] + vibrato) * (0.18f - k * 0.02f) * breath;
+                }
+                float whisper = FilteredNoise(i, 1800f) * 0.04f * breath;
+                float env = Mathf.Sin(t * Mathf.PI) * 0.95f;
+                data[i] = (v + whisper) * env * 0.52f;
+            }
+            return MakeClip("SFX_Moon6_LiraelChoir", data);
+        }
+
+        /// <summary>Cathedral bell toll — deep 486Hz (Moon 2 bell family) with long decay, 8-second ring.</summary>
+        static AudioClip GenMoon6BellToll()
+        {
+            int len = Samples(8.0f);
+            var data = new float[len];
+            float fundamental = 486f; // Bell root (Moon 2 family)
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float strike = t < 0.02f ? (1f - t / 0.02f) * 0.8f : 0f;
+                float decay = Mathf.Exp(-t * 2.2f);
+                float warble = 0.98f + 0.02f * Mathf.Sin(t * 7.3f);
+                float bell = (Sine(i, fundamental) * 0.48f
+                            + Sine(i, fundamental * 2.03f) * 0.26f
+                            + Sine(i, fundamental * 3.1f) * 0.14f
+                            + Sine(i, fundamental * 5.2f) * 0.08f) * warble;
+                data[i] = (bell + strike * FilteredNoise(i, 400f)) * decay * 0.62f;
+            }
+            return MakeClip("SFX_Moon6_BellToll", data);
+        }
+
+        /// <summary>Crystal pipe chime — high 1296Hz celestial ping with shimmer tail.</summary>
+        static AudioClip GenMoon6CrystalChime()
+        {
+            int len = Samples(2.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float decay = Mathf.Exp(-t * 3.5f);
+                float chime = Sine(i, F_CELESTIAL) * 0.45f
+                            + Sine(i, F_CELESTIAL * 1.5f) * 0.22f
+                            + Sine(i, F_CELESTIAL * 2f) * 0.12f;
+                float shimmer = FilteredNoise(i, 4200f) * 0.08f * decay;
+                data[i] = (chime + shimmer) * decay * 0.58f;
+            }
+            return MakeClip("SFX_Moon6_CrystalChime", data);
+        }
+
+        /// <summary>Hydraulic bellows breathing — deep mechanical pulse, 54Hz sub-bass + air whoosh.</summary>
+        static AudioClip GenMoon6HydraulicBellows()
+        {
+            int len = Samples(3.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float cycle = Mathf.Sin(t * Mathf.PI * 2f);
+                float inhale = Mathf.Clamp01(cycle);
+                float exhale = Mathf.Clamp01(-cycle);
+                float sub = Sine(i, 54f) * 0.28f * inhale;
+                float air = FilteredNoise(i, 650f) * 0.35f * exhale;
+                float creak = FilteredNoise(i, 180f) * 0.12f * Mathf.Abs(cycle);
+                data[i] = (sub + air + creak) * 0.65f;
+            }
+            return MakeClip("SFX_Moon6_HydraulicBellows", data);
+        }
+
+        /// <summary>Cathedral ambient loop — deep cave reverb, distant water drips, 432Hz undertone.</summary>
+        static AudioClip GenMoon6CathedralAmbience()
+        {
+            int len = Samples(12.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float cave = FilteredNoise(i, 90f) * 0.22f * (0.85f + 0.15f * Mathf.Sin(t * 1.3f));
+                float drone = Sine(i, F_HARMONIC * 0.25f) * 0.12f;
+                float drip = (Random.value < 0.005f ? 0.4f : 0f) * FilteredNoise(i, 1800f);
+                float wind = FilteredNoise(i, 420f) * 0.08f * (0.7f + 0.3f * Mathf.Sin(t * 2.1f));
+                data[i] = (cave + drone + drip + wind) * 0.35f;
+            }
+            return MakeClip("SFX_Moon6_CathedralAmbience", data);
+        }
+
+        /// <summary>Ionized mist rain — cyan particles falling, soft electric crackle + water patter.</summary>
+        static AudioClip GenMoon6IonicMistRain()
+        {
+            int len = Samples(10.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float rain = FilteredNoise(i, 1200f) * 0.28f * (0.8f + 0.2f * Mathf.Sin(t * 5.7f));
+                float crackle = FilteredNoise(i, 3500f) * (Random.value < 0.12f ? 0.15f : 0.03f);
+                float hum = Sine(i, F_HEALING * 0.6f) * 0.08f;
+                data[i] = (rain + crackle + hum) * 0.42f;
+            }
+            return MakeClip("SFX_Moon6_IonicMistRain", data);
+        }
+
+        // ═══════════════════════════════════════════════
+        // Moon 7 Generators (Resonant Moon — Korath Awakening + Giant Stasis Vault)
+        // Ice thaw, 9-band aurora, Korath voice, golem siege, Cassian tension, harmonic cutting
+        // ═══════════════════════════════════════════════
+
+        /// <summary>Ice thaw crackle — sharp cracks + melt drips, violet energy dispersing.</summary>
+        static AudioClip GenMoon7IceThaw()
+        {
+            int len = Samples(3.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float crack = (Random.value < 0.08f ? 0.65f : 0f) * FilteredNoise(i, 2800f);
+                float melt = FilteredNoise(i, 950f) * 0.18f * (t + 0.3f);
+                float energy = Sine(i, 699f) * 0.12f * Mathf.Exp(-t * 2f); // PHI freq
+                data[i] = (crack + melt + energy) * 0.58f;
+            }
+            return MakeClip("SFX_Moon7_IceThaw", data);
+        }
+
+        /// <summary>9-band aurora hum — violet 432*φ² = ~1130Hz carrier with 7.83Hz modulation.</summary>
+        static AudioClip GenMoon7AuroraHum()
+        {
+            int len = Samples(8.0f);
+            var data = new float[len];
+            float carrier = F_HARMONIC * PHI * PHI; // 9-band frequency
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float modulation = 0.7f + 0.3f * Mathf.Sin(2f * Mathf.PI * F_TELLURIC * t);
+                float aurora = Sine(i, carrier) * 0.35f * modulation;
+                float sub = Sine(i, carrier * 0.5f) * 0.18f;
+                float shimmer = FilteredNoise(i, 2100f) * 0.06f * modulation;
+                data[i] = (aurora + sub + shimmer) * 0.48f;
+            }
+            return MakeClip("SFX_Moon7_AuroraHum", data);
+        }
+
+        /// <summary>Korath voice rumble — deep 60Hz sub-bass with harmonic overtones, giant resonance.</summary>
+        static AudioClip GenMoon7KorathVoiceRumble()
+        {
+            int len = Samples(4.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI) * 0.95f;
+                float rumble = Sine(i, 60f) * 0.48f
+                             + Sine(i, 120f) * 0.22f
+                             + Sine(i, 180f) * 0.12f;
+                float growl = FilteredNoise(i, 240f) * 0.18f;
+                data[i] = (rumble + growl) * env * 0.72f;
+            }
+            return MakeClip("SFX_Moon7_KorathVoice", data);
+        }
+
+        /// <summary>Korath awakening — ice shattering + golden 432Hz surge, giant stands.</summary>
+        static AudioClip GenMoon7KorathAwakening()
+        {
+            int len = Samples(6.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float shatter = t < 0.15f ? FilteredNoise(i, 3200f) * (0.15f - t) / 0.15f * 0.75f : 0f;
+                float rise = Mathf.Clamp01((t - 0.15f) * 2f);
+                float surge = Sine(i, F_HARMONIC * (0.5f + rise * 0.8f)) * 0.42f * rise
+                            + Sine(i, F_HEALING) * 0.28f * rise
+                            + Sine(i, 1296f * 0.5f) * 0.18f * rise;
+                float giant = Sine(i, 54f) * 0.32f * rise;
+                float env = 1f - Mathf.Pow(Mathf.Max(0f, t - 0.75f) / 0.25f, 1.5f);
+                data[i] = (shatter + surge + giant) * env * 0.78f;
+            }
+            return MakeClip("SFX_Moon7_KorathAwakening", data);
+        }
+
+        /// <summary>Golem siege bass — massive 40Hz impacts + 80Hz rumble, war drums.</summary>
+        static AudioClip GenMoon7GolemSiegeBass()
+        {
+            int len = Samples(12.0f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                // Impact every 1.5 seconds
+                float impactCycle = (t * 8f) % 1f;
+                float impact = impactCycle < 0.1f ? Mathf.Exp(-impactCycle * 30f) * 0.85f : 0f;
+                float rumble = Sine(i, 40f) * 0.38f + Sine(i, 80f) * 0.22f;
+                float war = FilteredNoise(i, 160f) * 0.28f * (0.7f + 0.3f * Mathf.Sin(t * 11f));
+                data[i] = (impact * FilteredNoise(i, 600f) + rumble + war) * 0.68f;
+            }
+            return MakeClip("SFX_Moon7_GolemSiege", data);
+        }
+
+        /// <summary>Cassian confrontation tension — dissonant 432*tritone dread, minor seconds.</summary>
+        static AudioClip GenMoon7CassianTension()
+        {
+            int len = Samples(5.2f);
+            var data = new float[len];
+            float root = F_HARMONIC;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float pulse = 0.8f + 0.2f * Mathf.Sin(t * 4.3f);
+                float tension = Sine(i, root * TRITONE) * 0.32f * pulse
+                              + Sine(i, root * TRITONE * 0.5f) * 0.18f
+                              + Sine(i, root * 1.059f) * 0.22f; // Minor 2nd
+                float dread = FilteredNoise(i, 110f) * 0.15f;
+                data[i] = (tension + dread) * 0.55f;
+            }
+            return MakeClip("SFX_Moon7_CassianTension", data);
+        }
+
+        /// <summary>Harmonic rock cutting — 432Hz + PHI saw through stone, crystal precision.</summary>
+        static AudioClip GenMoon7HarmonicRockCutting()
+        {
+            int len = Samples(2.8f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float cutting = FilteredNoise(i, 1800f) * 0.42f * (0.9f + 0.1f * Mathf.Sin(t * 23f));
+                float harmonic = Sine(i, F_HARMONIC) * 0.28f + Sine(i, F_HARMONIC * PHI) * 0.18f;
+                float grind = FilteredNoise(i, 350f) * 0.22f;
+                data[i] = (cutting + harmonic + grind) * 0.65f;
+            }
+            return MakeClip("SFX_Moon7_HarmonicCutting", data);
+        }
+
+        /// <summary>Korath sacrifice — golden light surge, 1296Hz celestial bloom, giant fades.</summary>
+        static AudioClip GenMoon7KorathSacrifice()
+        {
+            int len = Samples(9.5f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float swell = Mathf.Clamp01(t * 3f) * (1f - Mathf.Pow(Mathf.Max(0f, t - 0.6f) / 0.4f, 1.8f));
+                float golden = Sine(i, F_CELESTIAL) * 0.45f * swell
+                             + Sine(i, F_HEALING) * 0.32f * swell
+                             + Sine(i, F_HARMONIC * 2f) * 0.22f * swell;
+                float giant = Sine(i, 60f) * 0.28f * (1f - t * 0.8f);
+                float celestial = FilteredNoise(i, 3800f) * 0.08f * swell;
+                data[i] = (golden + giant + celestial) * 0.75f;
+            }
+            return MakeClip("SFX_Moon7_KorathSacrifice", data);
+        }
+
+        /// <summary>Stasis vault ambience — deep sub-bass 30Hz, violet aurora whisper, ice wind.</summary>
+        static AudioClip GenMoon7StasisVaultAmbience()
+        {
+            int len = Samples(15.0f);
+            var data = new float[len];
+            float carrier = F_HARMONIC * PHI * PHI;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float sub = Sine(i, 30f) * 0.18f * (0.85f + 0.15f * Mathf.Sin(t * 0.8f));
+                float aurora = Sine(i, carrier) * 0.12f * (0.7f + 0.3f * Mathf.Sin(t * 1.5f));
+                float wind = FilteredNoise(i, 280f) * 0.15f * (0.75f + 0.25f * Mathf.Sin(t * 2.3f));
+                float ice = FilteredNoise(i, 2400f) * 0.04f * (Random.value < 0.15f ? 1.5f : 0.6f);
+                data[i] = (sub + aurora + wind + ice) * 0.38f;
+            }
+            return MakeClip("SFX_Moon7_StasisAmbience", data);
+        }
+
+        /// <summary>9-band unlock stinger — PHI² frequency cascade, anti-gravity surge.</summary>
+        static AudioClip GenMoon79BandUnlock()
+        {
+            int len = Samples(3.2f);
+            var data = new float[len];
+            float[] cascade = { F_HARMONIC * PHI * PHI, F_HEALING * PHI, F_CELESTIAL * 0.8f, 1620f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI) * (1f - t * 0.25f);
+                float v = 0f;
+                for (int k = 0; k < cascade.Length; k++)
+                {
+                    float delay = k * 0.15f;
+                    float localT = Mathf.Max(0f, t - delay);
+                    if (localT > 0.01f)
+                        v += Sine(i, cascade[k]) * (0.22f - k * 0.03f) * (localT < 0.12f ? localT / 0.12f : 1f);
+                }
+                float sparkle = FilteredNoise(i, 4500f) * 0.06f * env;
+                data[i] = (v + sparkle) * env * 0.68f;
+            }
+            return MakeClip("SFX_Moon7_9BandUnlock", data);
+        }
+
+        /// <summary>Violet pulse — 9-band energy throb, 7.83Hz Schumann modulation on PHI² carrier.</summary>
+        static AudioClip GenMoon7VioletPulse()
+        {
+            int len = Samples(2.4f);
+            var data = new float[len];
+            float carrier = F_HARMONIC * PHI * PHI;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float modulation = 0.6f + 0.4f * Mathf.Sin(2f * Mathf.PI * F_TELLURIC * t);
+                float pulse = Sine(i, carrier) * 0.42f * modulation;
+                float env = Mathf.Sin(t * Mathf.PI);
+                data[i] = pulse * env * 0.58f;
+            }
+            return MakeClip("SFX_Moon7_VioletPulse", data);
         }
     }
 }

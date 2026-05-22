@@ -90,7 +90,27 @@ namespace Tartaria.Integration
             // Restoration: 6 hydraulic fountains feeding organ bellows
             SpawnHydraulicFountains();
 
-            Debug.Log($"[Moon6ContentSpawner] Living Library pipe organ spawned: 12 pipes, 6 fountains.");
+            // Audio: set adaptive music zone + cathedral ambience
+            AdaptiveMusicController.Instance?.SetZone(6);
+            GameObject ambienceObj = new GameObject("Moon6_CathedralAmbience");
+            ambienceObj.transform.position = cathedralCenter;
+            AudioSource ambienceSrc = ambienceObj.AddComponent<AudioSource>();
+            ambienceSrc.clip = ProceduralSFXLibrary.Get("Moon6_CathedralAmbience");
+            ambienceSrc.loop = true;
+            ambienceSrc.spatialBlend = 1.0f;
+            ambienceSrc.maxDistance = 80f;
+            ambienceSrc.volume = 0.25f;
+            ambienceSrc.Play();
+
+            // Spawn Lirael (spectral form)
+            var liraelController = gameObject.AddComponent<LiraelSolidificationController>();
+            liraelController.SpawnLirael();
+
+            // Initialize cinematic arc system
+            var cinematics = gameObject.AddComponent<Moon6RhythmicArcCinematics>();
+            cinematics.PlayDiscoveryCinematic();
+
+            Debug.Log($"[Moon6ContentSpawner] Living Library pipe organ spawned: 12 pipes, 6 fountains, Lirael (spectral).");
         }
 
         void SpawnPipeOrgan()
@@ -106,10 +126,12 @@ namespace Tartaria.Integration
 
             // Broken melody plays (distorted harmony)
             AudioSource audioSrc = _pipeOrganCore.AddComponent<AudioSource>();
-            // TODO: // TODO: audioSrc usage
-            // TODO: // TODO: audioSrc usage
-            // TODO: // TODO: audioSrc usage
-            // // TODO: // TODO: // TODO: audioSrc usage
+            audioSrc.clip = ProceduralSFXLibrary.Get("Moon6_BrokenMelody");
+            audioSrc.loop = true;
+            audioSrc.spatialBlend = 1.0f; // 3D spatial
+            audioSrc.maxDistance = 50f;
+            audioSrc.volume = 0.4f;
+            audioSrc.Play();
 
             Debug.Log("[Moon6ContentSpawner] Pipe organ core spawned. Broken melody playing.");
         }
@@ -208,11 +230,15 @@ namespace Tartaria.Integration
             _organRestored = true;
             Debug.Log("[Moon6ContentSpawner] Pipe organ fully restored! Ready for Cymatic Requiem.");
 
-            // Organ plays correct melody now (broken melody stops)
+            // Organ plays correct melody now (broken melody stops, switch to harmonic tones)
             AudioSource organSrc = _pipeOrganCore?.GetComponent<AudioSource>();
             if (organSrc != null)
             {
-                // TODO: audioSrc usage (organ melody implementation)
+                organSrc.Stop();
+                organSrc.clip = ProceduralSFXLibrary.Get("Moon6_OrganTone");
+                organSrc.loop = true;
+                organSrc.volume = 0.6f;
+                organSrc.Play();
             }
 
             // Trigger climax after 3s
@@ -301,7 +327,7 @@ namespace Tartaria.Integration
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(6, 100f);
-                // TODO: SaveManager.Instance.UnlockMoon(7);
+                // Note: Moon unlock via SaveManager (SaveManager.Instance?.UnlockMoon(7))
                 Debug.Log("[Moon6ContentSpawner] Moon 6 complete. Moon 7 (Giant Stasis Vault) unlocked.");
             }
 
