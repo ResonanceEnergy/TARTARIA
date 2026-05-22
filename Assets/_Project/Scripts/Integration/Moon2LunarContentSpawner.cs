@@ -98,6 +98,34 @@ namespace Tartaria.Integration
         int _currentBeat; // 1-5
         string _crystalMemoryVariant = "neutral"; // trust / doubt / returning
 
+        // Called by the first playable Dissonance Vein FTUE (Moon2FirstPurgeTrigger) after successful purge in the vertical slice
+                public void OnFirstDissonanceVeinPurged()
+        {
+            if (_discoveryComplete && _restorationComplete) return;
+            _discoveryComplete = true;
+            _restorationComplete = true;
+            _currentBeat = 2;
+
+            Debug.Log("[Moon2LunarContentSpawner] First Dissonance Vein purged � emotional anchor. Advancing 5-beat (Discovery + Restoration) and wiring to full narrative.");
+
+            // Lirael + Cassian intro continuity
+            if (LiraelController.Instance != null)
+            {
+                LiraelController.Instance.IntroduceMoon2FirstPurgeSite();
+            }
+
+            DialogueManager.Instance?.PlayLineById("lirael_moon2_first_vein_purged");
+            QuestManager.Instance?.ProgressObjective("lunar_challenge", 0);
+
+            // Ensure restoration beat guidance (first purge serves as emotional restoration anchor too)
+            TriggerRestorationBeatHint();
+
+            MoonProgressTracker.Instance?.MarkBeatCleared(2, 0);
+            MoonProgressTracker.Instance?.MarkBeatCleared(2, 1);
+
+            _currentBeat = 3;
+        }
+
         // Pools & caches
         readonly Queue<GameObject> _golemPool = new Queue<GameObject>();
         readonly List<GameObject> _spawnedGuards = new List<GameObject>();
@@ -376,6 +404,7 @@ namespace Tartaria.Integration
 
             // Spawn the first Mud Golem (tight fractal corridor feel)
             SpawnFirstMudGolem();
+            SpawnConflictWraith();
 
             // Cassian "intel" — player may notice he knew the exact location
             bool noticed = Random.value > 0.6f; // or driven by player observation in real
@@ -643,7 +672,37 @@ namespace Tartaria.Integration
         }
 
         // Save / returning helpers
-        public bool IsReturningPlayer => _isReturningPlayer;
+        void SpawnConflictWraith()
+        {
+            Vector3 wraithPos = firstMudGolemSpawn + new Vector3(22f, 1.2f, 12f);
+            var wraith = new GameObject("Conflict_Wraith_Threat");
+            wraith.transform.position = wraithPos;
+            wraith.name = "FractalWraith_ConflictBeat";
+
+            var vis = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            vis.transform.SetParent(wraith.transform);
+            vis.transform.localScale = new Vector3(0.8f, 1.6f, 0.8f);
+            var vr = vis.GetComponent<Renderer>();
+            if (vr != null)
+            {
+                vr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                vr.material.color = new Color(0.18f, 0.12f, 0.32f);
+                vr.material.SetColor("_EmissionColor", new Color(0.4f, 0.15f, 0.6f) * 1.6f);
+            }
+            Destroy(vis.GetComponent<Collider>());
+
+            var ps = wraith.AddComponent<ParticleSystem>();
+            var m = ps.main;
+            m.startColor = new Color(0.25f, 0.18f, 0.42f, 0.85f);
+            m.startSize = 0.55f;
+            m.startLifetime = 2.4f;
+            ps.Play();
+
+            AudioManager.Instance?.PlaySFX("Moon2_DissonanceWraithWhisper", wraithPos, 0.65f);
+            Destroy(wraith, 18f);
+            Debug.Log("[Moon2LunarContentSpawner] WRAITH SPAWNED on Conflict beat.");
+        }
+
         public string CurrentCrystalMemoryVariant => _crystalMemoryVariant;
         public int GetUnlockedMemoryFragmentCount() => _unlockedMemoryFragments.Count;
     }
@@ -714,3 +773,4 @@ namespace Tartaria.Integration
         public string GetInteractPrompt() => GetPrompt();
     }
 }
+

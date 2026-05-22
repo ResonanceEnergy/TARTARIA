@@ -24,6 +24,9 @@ namespace Tartaria.Core
         public static IQuestService Quest { get; set; }
         public static IMoonMechanicService MoonMechanic { get; set; }
         public static ISaveService Save { get; set; }
+        public static ICompanionService Companion { get; set; }
+        public static IMoonProgressService MoonProgress { get; set; }
+        public static IMoon2ProgressionService Moon2Progression { get; set; }
     }
 
     public interface IGameLoopService
@@ -44,6 +47,8 @@ namespace Tartaria.Core
         void PlayResonancePulse(Vector3 position, float radius);
         void PlayLeyLineRestore(Vector3 start, Vector3 end);
         void PlayDiscoveryBurst(Vector3 position);
+        void SpawnAuroraFountain(Vector3 origin, float height);
+        void TriggerOvertoneThread(Vector3 from, Vector3 to, float intensity);
 
         // ─── Moon 3 Rail Escort "Compassion & Rails" VFX (R7 full integration) ───
         // Spectral orphans' lullaby glow + particles when singing (tells the compassion story: children 's voices calm the storm)
@@ -59,6 +64,13 @@ namespace Tartaria.Core
     public interface IHUDService
     {
         void ShowInteractionPrompt(string text);
+        void ShowContextPrompt(string text);
+        void HideContextPrompt();
+        void ShowPurgeHoldPrompt(string actionLabel, float progress01);
+        void HidePurgeHoldPrompt();
+        void ShowObjective(string objective);
+        void ShowBanner(string title, string body, float duration = 4f);
+        void ShowAchievementToast(string title, string subtitle = "");
     }
 
     public interface IMiloService
@@ -81,6 +93,8 @@ namespace Tartaria.Core
         void BoardTrain(Vector3 positionOnTrain);
         // Moon 3 R7 escort variant — board the train at escort start with optional roof position.
         void BoardTrainLiraelEscort(Vector3 positionOnTrain, bool onRoof);
+        // Moon 2 first purge emotional anchor — called from Gameplay without cross-asm ref
+        void ReactToFirstPurge();
     }
 
     /// <summary>
@@ -140,10 +154,32 @@ namespace Tartaria.Core
     public interface ISaveService
     {
         void Save();
+        void MarkDirty();
         int GetCurrentSlot();
         bool HasAnySave();
         /// <summary>Returns a brief "Slot N • MM/dd HH:mm" label for the current slot, or empty if none.</summary>
         string GetCurrentSaveLabel();
+    }
+
+    /// <summary>Companion trust/state service — registered by CompanionManager.</summary>
+    public interface ICompanionService
+    {
+        void AddTrust(string companionId, float amount);
+    }
+
+    /// <summary>Moon beat/clear tracking — registered by MoonProgressTracker.</summary>
+    public interface IMoonProgressService
+    {
+        void MarkBeatCleared(int moonNum, int beatIndex);
+        void MarkCleared(int moonNum);
+    }
+
+    /// <summary>Moon 2 progression persistence — registered by Moon2ProgressionSystem.</summary>
+    public interface IMoon2ProgressionService
+    {
+        bool IsSitePurged(string siteId);
+        void RegisterFirstPurge(string siteId);
+        void OnFirstVeinPurgedEvent();
     }
 
     /// <summary>

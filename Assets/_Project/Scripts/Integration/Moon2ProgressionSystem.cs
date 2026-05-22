@@ -30,7 +30,7 @@ namespace Tartaria.Integration
     /// Absolute path: C:\dev\TARTARIA_new
     /// </summary>
     [DisallowMultipleComponent]
-    public class Moon2ProgressionSystem : MonoBehaviour
+    public class Moon2ProgressionSystem : MonoBehaviour, Tartaria.Core.IMoon2ProgressionService
     {
         public static Moon2ProgressionSystem Instance { get; private set; }
 
@@ -100,6 +100,7 @@ namespace Tartaria.Integration
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
             DontDestroyOnLoad(gameObject);
+            Tartaria.Core.ServiceLocator.Moon2Progression = this;
 
             // Hook events (safe, idempotent)
             GameEvents.OnBuildingRestored += HandleBuildingRestored;
@@ -824,6 +825,41 @@ namespace Tartaria.Integration
                 // Capstone keeps the world alive — occasional extra resonance
                 AetherFieldManager.Instance?.AddResonanceScore(35f);
             }
+        }
+
+        /// <summary>
+        /// Wires the Moon2FirstPurgeTrigger (emotional anchor FTUE) into permanent purgedSites.
+        /// The special first dissonance vein is stored as a plain legacy entry in Moon2SaveBlock.purgedMoon2Sites
+        /// so it survives reloads and contributes to GetPurgeCountSafe / IsSitePurged / returning-player logic.
+        /// Minor RS emotional reward distinguishes the anchor from major 5-site blessings.
+        /// </summary>
+        public void RegisterFirstPurge(string siteId = "moon2_first_dissonance_vein")
+        {
+            if (string.IsNullOrEmpty(siteId))
+                siteId = "moon2_first_dissonance_vein";
+
+            if (!_purgedSites.Contains(siteId))
+            {
+                _purgedSites.Add(siteId);
+            }
+
+            _purgeCount = Mathf.Max(_purgeCount, 1);
+
+            // Emotional anchor reward (distinct from the 5 key site deep mutations)
+            AwardBonus(22f, "FirstVeinEmotionalAnchor", 1, _moon1LeylineCarryActive);
+
+            SaveManager.Instance?.MarkDirty();
+
+            Debug.Log($"[Moon2Progress] FIRST DISSONANCE VEIN REGISTERED as permanent purgedSite: {siteId}. Flows into SaveData.moon2.purgedMoon2Sites for full roundtrip + persistence. Emotional anchor of the vertical slice complete.");
+        }
+
+        /// <summary>
+        /// IMoon2ProgressionService — notifies Moon2LunarContentSpawner that the first vein has been purged.
+        /// Called from Gameplay via ServiceLocator (no asmdef dep on Integration needed in Gameplay).
+        /// </summary>
+        public void OnFirstVeinPurgedEvent()
+        {
+            Moon2LunarContentSpawner.Instance?.OnFirstDissonanceVeinPurged();
         }
     }
 }

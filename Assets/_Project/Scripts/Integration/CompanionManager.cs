@@ -15,7 +15,7 @@ namespace Tartaria.Integration
     /// Moon 2 Companion Stories & Reactivity R7: Cathedral/corruption/crystal specific quests, dialogue, physical tells (ApplyPhysicalTellForBeat), trust + permanent world effects for Lirael/Korath/Cassian/Anastasia.
     /// </summary>
     [DisallowMultipleComponent]
-    public class CompanionManager : MonoBehaviour
+    public class CompanionManager : MonoBehaviour, Tartaria.Core.ICompanionService
     {
         public static CompanionManager Instance { get; private set; }
 
@@ -34,6 +34,7 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
+            Tartaria.Core.ServiceLocator.Companion = this;
 
             if (companions == null || companions.Length == 0)
                 companions = CreateDefaultCompanions();
