@@ -158,17 +158,26 @@ namespace Tartaria.Gameplay
                 {
                     ExcavationSystem.Instance?.SetScanAccuracy(poi.poiId, accuracy);
                     ExcavationSystem.Instance?.DiscoverSite(poi.poiId);
+
+                    // Satisfying F310 rumble on successful buried ruin / excavation site discovery (core loop magic moment)
+                    // Especially juicy for the obvious first scaffold site — player feels the "ping hit" haptically.
+                    HapticFeedbackManager.Instance?.TriggerF310Rumble(0.65f, 0.92f, 0.95f);  // strong satisfying dual-motor rumble on success
+                    HapticFeedbackManager.Instance?.PlayDiscovery(); // layered
                 }
 
                 Debug.Log($"[Scanner] Found: {poi.poiId} ({poi.poiType}) at {distance:F0}m, accuracy {accuracy:P0}");
             }
 
-            // VFX + Haptics
-            ServiceLocator.VFX?.PlayEffect(VFXEffect.AetherVortex, playerPosition);
+            // VFX + Haptics (reduced-motion friendly: skip heavy VFX/ pulse spawn if accessibility reduced motion enabled)
+            bool reducedMotion = UnityEngine.PlayerPrefs.GetInt("TARTARIA_ReducedMotion", 0) == 1;
+            if (!reducedMotion)
+            {
+                ServiceLocator.VFX?.PlayEffect(VFXEffect.AetherVortex, playerPosition);
+            }
             HapticFeedbackManager.Instance?.PlayDiscovery();
 
-            // Feature 3: Spawn ScanPulse VFX
-            if (scanPulseVFX != null)
+            // Feature 3: Spawn ScanPulse VFX only if not reduced-motion (static glow on ruin is enough for accessibility)
+            if (!reducedMotion && scanPulseVFX != null)
                 Instantiate(scanPulseVFX, playerPosition, Quaternion.identity);
 
             // Audio ping (Feature 2: ResonancePulse SFX)

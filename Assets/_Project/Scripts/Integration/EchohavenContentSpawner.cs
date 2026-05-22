@@ -131,6 +131,8 @@ namespace Tartaria.Integration
             SpawnCorruptionZones();
             SpawnParticleEffects();
             SpawnAmbientAudio();
+            // First-populate magical entry stinger (gentle 432Hz family for instant wonder on start volume enter) — slight delay for audio mgr + player presence
+            StartCoroutine(PlayFirstPopulateStinger());
             SpawnInitialEnemies();                                      // Spawn 2 golems at game start
             SpawnAuroraPermanent();                                     // Aurora VFX in sky
             SetupEnemyWaveEncounters();
@@ -594,7 +596,12 @@ namespace Tartaria.Integration
             if (def != null)
                 UI.HUDController.Instance?.ShowObjective($"QUEST: {def.displayName}");
 
-            Debug.Log("[EchohavenContentSpawner] Starting quest activated on HUD.");
+            // === 5-BEAT OBJECTIVE FLOW KICKOFF (UI FTUE) — guided magical start for first 5-10 min ===
+            // Explicitly surface Discovery beat immediately so player feels the lunar structure from second 1.
+            UI.HUDController.Instance?.ShowObjective("MOON 01 — DISCOVERY: The valley hums. Follow the glow to the first buried chord.");
+            Tartaria.UI.MoonHUDBanner.Show("MOON 01 — DISCOVERY", "Echohaven remembers. The first light calls you home.", new Color(0.55f, 0.85f, 1f, 1f), 5f);
+
+            Debug.Log("[EchohavenContentSpawner] Starting quest + 5-beat Discovery objective activated — awakening flow primed.");
         }
 
         // ─── Milo Companion (Gap 6) ─────────────────
@@ -641,6 +648,17 @@ namespace Tartaria.Integration
             MiloController.Instance?.Introduce();
             // Moon 1 Echohaven onboarding: start early trust arc on first meeting (per 27_TUTORIAL + 03_CAMPAIGN)
             CompanionManager.Instance?.AddTrust("milo", 10f);
+
+            // Milo discovery reaction stinger (rich Moon1_MiloDiscovery warm 432+chime for first companion "we're not alone" magical moment on populate flow)
+            if (MiloController.Instance != null)
+            {
+                AudioManager.Instance?.PlaySFX("Moon1_MiloDiscovery", MiloController.Instance.transform.position, 0.45f);
+                AudioManager.Instance?.PlaySFX("Discovery", MiloController.Instance.transform.position, 0.28f);
+                // Soft 432 + PHI tone for companion "awakening" resonance sync
+                AudioManager.Instance?.PlayTone(432f, 0.55f, 0.18f);
+                AudioManager.Instance?.PlayTone(540f, 0.32f, 0.11f);
+            }
+
             // Gentle movement teaching cue (social follow) — non-blocking
             if (MiloController.Instance != null)
             {
@@ -1253,15 +1271,29 @@ namespace Tartaria.Integration
 
         void SpawnAmbientAudio()
         {
-            // Wind ambience — central
-            CreateAmbientSource("Ambient_Wind", Vector3.zero, "Wind", 0.25f, 80f);
+            // Wind ambience — central (gentle start volume)
+            CreateAmbientSource("Ambient_Wind", Vector3.zero, "Wind", 0.18f, 80f);
 
             // Deep hum near buildings — low frequency resonance
-            CreateAmbientSource("Ambient_Hum_Dome", new Vector3(30f, 2f, 20f), "DeepHum", 0.15f, 25f);
-            CreateAmbientSource("Ambient_Hum_Fountain", new Vector3(-20f, 2f, 35f), "WaterAmbient", 0.2f, 20f);
-            CreateAmbientSource("Ambient_Hum_Spire", new Vector3(0f, 5f, -30f), "CrystalHum", 0.15f, 25f);
+            CreateAmbientSource("Ambient_Hum_Dome", new Vector3(30f, 2f, 20f), "DeepHum", 0.12f, 25f);
+            CreateAmbientSource("Ambient_Hum_Fountain", new Vector3(-20f, 2f, 35f), "WaterAmbient", 0.14f, 20f);
+            CreateAmbientSource("Ambient_Hum_Spire", new Vector3(0f, 5f, -30f), "CrystalHum", 0.12f, 25f);
 
-            Debug.Log("[EchohavenContentSpawner] Ambient audio sources placed.");
+            // ─── Rich Moon 1 Echohaven zone audio additions (gentle buried resonance hum, corruption drone, ambient wind/motes) ───
+            // Immediate magical feel on first populate + start volume (lightweight, existing ProceduralSFX + fallback gen with 432Hz family tie-in)
+            var firstSite = GameObject.Find("Moon1_FirstExcavationSite");
+            Vector3 buriedPos = firstSite != null ? firstSite.transform.position + new Vector3(0, 1.1f, 0) : new Vector3(8f, 1.1f, 5f);
+            CreateAmbientSource("BuriedResonanceHum", buriedPos, "Moon1_BuriedResonanceHum", 0.12f, 32f);  // rich dedicated 432+PHI buried hum at obvious ruin
+
+            // Corruption drones (dissonant low layers near patches/zones for unsettling contrast) — use dedicated Moon1 drone
+            CreateAmbientSource("CorruptionDrone1", new Vector3(-8f, 0.6f, 22f), "Moon1_CorruptionDrone", 0.075f, 20f);
+            CreateAmbientSource("CorruptionDrone2", new Vector3(12f, 0.6f, 21f), "Moon1_CorruptionDrone", 0.07f, 20f);
+            CreateAmbientSource("CorruptionDrone3", new Vector3(2f, 0.6f, 28f), "Moon1_CorruptionDrone", 0.065f, 18f);
+
+            // Ambient wind/motes ethereal layer (high soft harmonics for floating motes feel) — use dedicated Moon1 motes
+            CreateAmbientSource("MotesWindAmbience", new Vector3(1f, 5.5f, -1f), "Moon1_EtherealMotes", 0.065f, 42f);
+
+            Debug.Log("[EchohavenContentSpawner] Ambient audio sources placed (rich Echohaven zone layers: buried hum + corruption drones + motes wind, all gentle start volumes 0.07-0.18).");
         }
 
         void CreateAmbientSource(string name, Vector3 pos, string sfxName, float volume, float range)
@@ -1295,33 +1327,75 @@ namespace Tartaria.Integration
         AudioClip GenerateAmbientTone(string name)
         {
             int sampleRate = 44100;
-            int duration = 5; // seconds
+            int duration = 6; // seconds, longer seamless loop
             int sampleCount = sampleRate * duration;
             var samples = new float[sampleCount];
 
             float freq = name switch
             {
-                "Wind" => 120f,
-                "DeepHum" => 60f,
-                "WaterAmbient" => 200f,
+                "Wind" => 95f,
+                "DeepHum" => 52f,
+                "WaterAmbient" => 175f,
                 "CrystalHum" => 432f,
+                "BuriedResonanceHum" => 108f,
+                _ when name.Contains("Corruption") || name.Contains("Drone") => 47f,
+                _ when name.Contains("Mote") => 648f,
                 _ => 100f
             };
+
+            bool isCorrupt = name.Contains("Corruption") || name.Contains("Drone") || freq < 60f;
+            bool isHigh = name.Contains("Mote") || freq > 400f;
 
             for (int i = 0; i < sampleCount; i++)
             {
                 float t = (float)i / sampleRate;
-                // Low drone with slight variation
-                samples[i] = Mathf.Sin(2f * Mathf.PI * freq * t) * 0.1f
-                    + Mathf.Sin(2f * Mathf.PI * freq * 1.5f * t) * 0.05f;
-                // Fade in/out for seamless loop
-                float env = Mathf.Min(t, duration - t, 0.5f) / 0.5f;
-                samples[i] *= env;
+                float f = freq;
+
+                // Core drone + rich 432Hz family overtones (magical Tartaria signature, lightweight)
+                float s = Mathf.Sin(2f * Mathf.PI * f * t) * 0.11f
+                        + Mathf.Sin(2f * Mathf.PI * f * 1.5f * t) * 0.055f
+                        + Mathf.Sin(2f * Mathf.PI * 432f * t) * 0.035f;   // tie every zone ambient to 432 family
+
+                if (isCorrupt)
+                {
+                    // Dissonant tritone corruption drone (unsettling but gentle)
+                    s += Mathf.Sin(2f * Mathf.PI * f * 1.414f * t) * 0.065f;
+                    s *= (0.65f + 0.35f * Mathf.Sin(t * 0.35f)); // slow organic pulse
+                }
+                else if (isHigh)
+                {
+                    // Ethereal mote/wind high layer — soft celestial partials
+                    s += Mathf.Sin(2f * Mathf.PI * 1296f * t) * 0.022f;
+                    s *= (0.8f + 0.2f * Mathf.Sin(t * 1.2f + 1.7f));
+                }
+                else
+                {
+                    // Buried / resonance gentle — warm PHI harmonic bloom
+                    s += Mathf.Sin(2f * Mathf.PI * 432f * 0.5f * t) * 0.04f;
+                    s += Mathf.Sin(2f * Mathf.PI * f * 1.618f * t) * 0.03f;
+                }
+
+                // Soft fade for loop seamlessness + start volume friendly
+                float env = Mathf.Min(t, duration - t, 0.8f) / 0.8f;
+                samples[i] = s * env * 0.85f;
             }
 
             var clip = AudioClip.Create($"Ambient_{name}", sampleCount, 1, sampleRate, false);
             clip.SetData(samples, 0);
             return clip;
+        }
+
+        System.Collections.IEnumerator PlayFirstPopulateStinger()
+        {
+            yield return new WaitForSeconds(1.2f);
+            var am = AudioManager.Instance;
+            if (am != null)
+            {
+                am.PlaySFX2D("Moon1_ScanStinger", 0.24f);  // rich 432+PHI magical entry stinger for first populate wonder
+                am.PlaySFX2D("TuneLock", 0.15f);
+                am.PlayTone(432f, 0.65f, 0.10f);
+                am.PlayTone(432f * 1.618f, 0.38f, 0.07f); // PHI family layer
+            }
         }
 
         // ─── Enemy Wave Encounters (Gap 1) ───────────
@@ -1525,7 +1599,33 @@ namespace Tartaria.Integration
             // Spire — 5-layer site, giant-mode required for deepest layers
             exc.RegisterSite("echohaven_spire",    new Vector3(0f,   0f, -30f), 5, true,  "spire");
 
-            Debug.Log("[EchohavenContentSpawner] 3 Moon 1 excavation sites registered.");
+            // ─── INTEGRATION: New scaffold's first obvious excavation site (Moon1EchohavenScaffold PlaceFirstExcavationSite) ───
+            // Makes the core loop immediately playable: obvious ruin near start for first 10 min magic after population.
+            var firstSiteGO = GameObject.Find("Moon1_FirstExcavationSite");
+            if (firstSiteGO != null)
+            {
+                Vector3 firstPos = firstSiteGO.transform.position;
+                exc.RegisterSite("echohaven_first_ruin", firstPos, 2, false, "first_dome");
+                // Also register as scanner POI so resonance scan immediately reveals the obvious first target
+                var scanner = Gameplay.ResonanceScannerSystem.Instance;
+                if (scanner != null)
+                {
+                    scanner.RegisterPOI(new Gameplay.ScanPOI
+                    {
+                        poiId = "echohaven_first_ruin",
+                        poiType = Gameplay.ScanPOIType.ExcavationSite,
+                        position = firstPos,
+                        isRevealed = false
+                    });
+                }
+                Debug.Log($"[EchohavenContentSpawner] Scaffold first excavation site integrated at {firstPos} (echohaven_first_ruin, 2 layers) — scan target ready.");
+
+                // UI FTUE polish: clear "SCAN HERE" nameplate + F310/gamepad-aware prompt on the obvious first ruin (magical guided entry for 5-10 min post-populate)
+                AddNameplate(firstSiteGO, Tartaria.Input.InputPromptHelper.Localize("SCAN HERE — [G] Resonance / [E] Tune (F310: B/A)"), new Color(0.4f, 0.85f, 1f));
+                // If reduced motion, the nameplate is static billboard (already friendly); no extra pulse added here.
+            }
+
+            Debug.Log("[EchohavenContentSpawner] 3 Moon 1 excavation sites registered (+ scaffold first if present).");
         }
 
         // ─── VFX Event Handlers (Gap 17) ─────────────
@@ -1689,7 +1789,14 @@ namespace Tartaria.Integration
             CreateDigSiteMarker(digParent.transform, new Vector3(-20f, 0f, 35f), "Fountain Ruins");
             CreateDigSiteMarker(digParent.transform, new Vector3(0f, 0f, -30f),  "Spire Ruins");
 
-            Debug.Log("[EchohavenContentSpawner] 3 dig site markers placed.");
+            // Scaffold first excavation site marker (integrated obvious ruin)
+            var first = GameObject.Find("Moon1_FirstExcavationSite");
+            if (first != null)
+            {
+                CreateDigSiteMarker(digParent.transform, first.transform.position, "First Ruin (Tutorial)");
+            }
+
+            Debug.Log("[EchohavenContentSpawner] Dig site markers placed (incl. scaffold first if present).");
         }
 
         void CreateDigSiteMarker(Transform parent, Vector3 pos, string siteName)

@@ -81,6 +81,19 @@ namespace Tartaria.Audio
             Register("AetherVisionOn",  GenAetherVisionOn());
             Register("AetherVisionOff", GenAetherVisionOff());
 
+            // ═══ Moon 1 Echohaven (Magnetic Moon — The Awakening) — rich magical zone audio for scaffold + first 5-10 min FTUE ═══
+            // Buried resonance hum (432 + PHI family overtones), first scan/tune stingers, Milo discovery reactions,
+            // corruption drones (gentle dissonance), F310-synced success tones, ethereal motes wind layer.
+            // All procedural, 432Hz core + golden ratio harmonics (PHI) for wondrous alive feel the moment Populate runs.
+            // Used by Moon1EchohavenScaffold placements + Moon1FirstTuningTrigger + EchohavenContentSpawner ambient.
+            Register("Moon1_BuriedResonanceHum", GenMoon1BuriedResonanceHum());
+            Register("Moon1_ScanStinger", GenMoon1ScanStinger());
+            Register("Moon1_TuneSuccessStinger", GenMoon1TuneSuccessStinger());
+            Register("Moon1_CorruptionDrone", GenMoon1CorruptionDrone());
+            Register("Moon1_MiloDiscovery", GenMoon1MiloDiscoveryReaction());
+            Register("Moon1_F310SyncedTone", GenMoon1F310SyncedTone());
+            Register("Moon1_EtherealMotes", GenMoon1EtherealMotes());
+
             // ═══ Moon 2 Atmosphere, Audio & Environmental Polish (Crystal Cathedral) ═══
             // Unique per-area ambiences, reactive restore/purge, crystal resonance, wind, corruption, subtle shifts
             // Keynote 324 Hz + tritone corruption per C_AUDIO_DESIGN + 12_VIVID_VISUALS fractal purge
@@ -132,6 +145,18 @@ namespace Tartaria.Audio
             Register("Moon3_RailTuning", GenMoon3RailTuning());
             Register("Moon3_WraithShriek", GenMoon3WraithShriek());
             Register("Moon3_TrainRestored", GenMoon3TrainRestored());
+
+            // ═══ Moon 5 (Overtone Moon — White City Echo District Amplification) — EXCLUSIVE ═══
+            // 432Hz + PHI harmonic overtones for tuning stingers, 6-band healing auras (528 family),
+            // aurora fountain whooshes, bridge ignition motif (rising golden chord), Thorne radio crackle/static.
+            // TuningRise for live hold-E frequency match feedback (rising pitch + partial bloom).
+            // All procedural, 60fps friendly, pairs with Moon5WhiteCityAudioManager + hold interaction.
+            Register("Moon5_AmplificationStinger", GenMoon5AmplificationStinger());
+            Register("Moon5_HealingAuraTone", GenMoon5HealingAuraTone());
+            Register("Moon5_FountainWhoosh", GenMoon5FountainWhoosh());
+            Register("Moon5_BridgeIgnition", GenMoon5BridgeIgnition());
+            Register("Moon5_ThorneRadioStatic", GenMoon5ThorneRadioStatic());
+            Register("Moon5_TuningRise", GenMoon5TuningRise());
 
             _initialized = true;
             Debug.Log($"[ProceduralSFX] Generated {_clips.Count} SFX clips.");
@@ -1327,6 +1352,289 @@ namespace Tartaria.Audio
                 data[i] = (chord + resolve) * env * 0.7f;
             }
             return MakeClip("SFX_Moon3_TrainRestored", data);
+        }
+
+        // ═══════════════════════════════════════════════
+        // Moon 5 Overtone Generators (procedural, 432Hz family + PHI harmonics)
+        // Lightweight sine + filtered noise, no assets. Used by audio manager for alive tuning feel.
+        // ═══════════════════════════════════════════════
+
+        static AudioClip GenMoon5AmplificationStinger()
+        {
+            int len = Samples(1.35f);
+            var data = new float[len];
+            float b = F_HARMONIC; // 432
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 0.92f) * (1f - t * 0.28f);
+                float vib = Mathf.Sin(t * 11f) * 2.2f;
+                float v = Sine(i, b) * 0.52f
+                        + Sine(i, b * 1.5f + vib) * 0.31f
+                        + Sine(i, b * 2.02f) * 0.19f
+                        + Sine(i, F_HEALING) * 0.24f
+                        + Sine(i, b * PHI * 0.5f) * 0.13f;
+                float air = FilteredNoise(i, 1950f) * 0.07f * env;
+                data[i] = (v + air) * env * 0.68f;
+            }
+            return MakeClip("SFX_Moon5_AmplificationStinger", data);
+        }
+
+        static AudioClip GenMoon5HealingAuraTone()
+        {
+            int len = Samples(3.8f); // soft looping-friendly aura
+            var data = new float[len];
+            float[] tones = { F_HEALING, F_HARMONIC * 1.22f, 648f, F_HEALING * 0.75f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float pulse = 0.82f + 0.18f * Mathf.Sin(2f * Mathf.PI * 0.19f * t);
+                float v = 0f;
+                for (int k = 0; k < tones.Length; k++)
+                {
+                    float f = tones[k] + Mathf.Sin(t * 0.8f + k) * 0.6f;
+                    v += Sine(i, f) * (0.19f - k * 0.022f) * pulse;
+                }
+                float shimmer = FilteredNoise(i, 1420f) * 0.025f * pulse;
+                data[i] = (v + shimmer) * 0.38f;
+            }
+            return MakeClip("SFX_Moon5_HealingAuraTone", data);
+        }
+
+        static AudioClip GenMoon5FountainWhoosh()
+        {
+            int len = Samples(2.1f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float gust = Mathf.Pow(Mathf.Abs(Mathf.Sin(t * 2.7f + Mathf.Sin(t * 1.1f) * 1.6f)), 1.4f);
+                float whoosh = FilteredNoise(i, 1250f) * gust * 0.38f;
+                float water = Sine(i, 216f) * 0.21f + Sine(i, 324f) * 0.14f;
+                float sparkle = FilteredNoise(i, 2650f) * 0.09f * gust * (0.6f + Mathf.Sin(t * 19f) * 0.4f);
+                float env = Mathf.Sin(t * Mathf.PI * 0.85f) * (0.9f + 0.1f * gust);
+                data[i] = (whoosh + water + sparkle) * env * 0.52f;
+            }
+            return MakeClip("SFX_Moon5_FountainWhoosh", data);
+        }
+
+        static AudioClip GenMoon5BridgeIgnition()
+        {
+            int len = Samples(4.2f);
+            var data = new float[len];
+            float b = F_HARMONIC;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Clamp01(t * 1.8f) * (1f - Mathf.Pow(Mathf.Max(0f, t - 0.65f) / 0.35f, 1.3f));
+                float rise = Mathf.Clamp01((t - 0.1f) * 1.6f);
+                float chord = Sine(i, b * 0.5f) * 0.42f * rise
+                            + Sine(i, b) * 0.38f
+                            + Sine(i, b * 1.5f + Mathf.Sin(t * 4f) * 3f) * 0.25f * rise
+                            + Sine(i, 528f) * 0.19f;
+                float surge = FilteredNoise(i, 820f) * 0.14f * env * rise;
+                float high = FilteredNoise(i, 2100f) * 0.06f * env;
+                data[i] = (chord + surge + high) * env * 0.74f;
+            }
+            return MakeClip("SFX_Moon5_BridgeIgnition", data);
+        }
+
+        static AudioClip GenMoon5ThorneRadioStatic()
+        {
+            int len = Samples(1.9f);
+            var data = new float[len];
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = (1f - t * 0.6f);
+                float crackle = FilteredNoise(i, 1350f) * (0.55f + Mathf.Sin(t * 47f) * 0.35f) * env;
+                float carrier = Sine(i, 180f) * 0.12f + Sine(i, 390f) * 0.08f; // voice carrier hint
+                float hiss = FilteredNoise(i, 4200f) * 0.04f * env;
+                float pop = (Random.value < 0.018f ? 0.85f : 0f) * env;
+                data[i] = (crackle + carrier + hiss + pop) * 0.48f;
+            }
+            return MakeClip("SFX_Moon5_ThorneRadioStatic", data);
+        }
+
+        static AudioClip GenMoon5TuningRise()
+        {
+            int len = Samples(0.9f);
+            var data = new float[len];
+            float b = F_HARMONIC;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI);
+                float progress = t;
+                float vib = Mathf.Sin(t * 9f) * (1.5f - progress);
+                float v = Sine(i, b * (0.7f + progress * 1.1f) + vib) * 0.48f
+                        + Sine(i, b * 1.5f * (0.85f + progress * 0.6f)) * 0.29f
+                        + Sine(i, 528f + progress * 40f) * 0.18f;
+                float bloom = FilteredNoise(i, 1650f) * 0.07f * (0.4f + progress);
+                data[i] = (v + bloom) * env * 0.6f;
+            }
+            return MakeClip("SFX_Moon5_TuningRise", data);
+        }
+
+        // ═══════════════════════════════════════════════
+        // Moon 1 Echohaven Generators — 432Hz + PHI family for magical first-zone wonder
+        // Buried hums, stingers, Milo reactions, drones, F310 tones. Seamless loops where noted.
+        // ═══════════════════════════════════════════════
+
+        /// <summary>Deep buried resonance hum for first excavation site — low fundamentals + rich 432/PHI overtones, slow alive modulation. 6s loop.</summary>
+        static AudioClip GenMoon1BuriedResonanceHum()
+        {
+            int len = Samples(6.0f);
+            var data = new float[len];
+            float fBase = 108f;
+            float f432 = F_HARMONIC;
+            float fPHI = F_HARMONIC * PHI * 0.5f; // ~349
+            float fHigh = 648f;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float pulse = 0.88f + 0.12f * Mathf.Sin(2f * Mathf.PI * 0.09f * t);
+                float vib = Mathf.Sin(t * 2.7f) * 1.2f;
+                float s = Sine(i, fBase) * 0.32f * pulse
+                        + Sine(i, fBase * 1.5f) * 0.18f * pulse
+                        + Sine(i, f432 + vib) * 0.29f
+                        + Sine(i, fPHI + vib * 0.6f) * 0.17f
+                        + Sine(i, fHigh) * 0.11f * (0.7f + 0.3f * Mathf.Sin(t * 5.1f));
+                float shimmer = FilteredNoise(i, 1850f) * 0.025f * pulse;
+                float env = 0.95f + 0.05f * Mathf.Sin(2f * Mathf.PI * 0.045f * t);
+                data[i] = (s + shimmer) * env * 0.38f;
+            }
+            return MakeClip("SFX_Moon1_BuriedResonanceHum", data);
+        }
+
+        /// <summary>First scan entry stinger — magical 432 + PHI family rising chord for "SCAN HERE" moment on FTUE trigger. Short bloom.</summary>
+        static AudioClip GenMoon1ScanStinger()
+        {
+            int len = Samples(0.95f);
+            var data = new float[len];
+            float[] notes = { 216f, F_HARMONIC, F_HARMONIC * PHI, F_HEALING, 648f };
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 0.96f) * (1f - t * 0.22f);
+                float v = 0f;
+                for (int k = 0; k < notes.Length; k++)
+                {
+                    float phase = t * (2.2f + k * 0.6f);
+                    v += Sine(i, notes[k] + Mathf.Sin(phase) * 1.8f) * (0.28f - k * 0.032f) * (0.6f + 0.4f * (1f - t));
+                }
+                float air = FilteredNoise(i, 2100f) * 0.06f * env;
+                data[i] = (v + air) * env * 0.82f;
+            }
+            return MakeClip("SFX_Moon1_ScanStinger", data);
+        }
+
+        /// <summary>First tune success stinger — celebratory 432/PHI chord bloom + sparkle. F310-synced payoff feel for CompleteFirstTune.</summary>
+        static AudioClip GenMoon1TuneSuccessStinger()
+        {
+            int len = Samples(1.85f);
+            var data = new float[len];
+            float b = F_HARMONIC;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Pow(1f - t * 0.48f, 0.7f) * (t < 0.15f ? t / 0.15f : 1f);
+                float bloom = 0.7f + 0.3f * Mathf.Sin(t * 18f);
+                float v = Sine(i, b) * 0.48f * bloom
+                        + Sine(i, b * PHI) * 0.31f * bloom
+                        + Sine(i, F_HEALING) * 0.26f * (0.85f + 0.15f * Mathf.Sin(t * 11f))
+                        + Sine(i, 699f) * 0.19f
+                        + Sine(i, 864f) * 0.14f * (0.6f + Mathf.Sin(t * 23f) * 0.4f);
+                float sparkle = FilteredNoise(i, 2450f) * 0.09f * env * (0.5f + 0.5f * Mathf.Sin(t * 31f));
+                data[i] = (v + sparkle) * env * 0.74f;
+            }
+            return MakeClip("SFX_Moon1_TuneSuccessStinger", data);
+        }
+
+        /// <summary>Gentle unsettling corruption drone for patches — low tritone + 432 bleed for contrast against pure resonance. 5.5s loop.</summary>
+        static AudioClip GenMoon1CorruptionDrone()
+        {
+            int len = Samples(5.5f);
+            var data = new float[len];
+            float fLow = 47f;
+            float fTrit = fLow * TRITONE;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float slow = 0.82f + 0.18f * Mathf.Sin(2f * Mathf.PI * 0.065f * t);
+                float s = Sine(i, fLow) * 0.35f * slow
+                        + Sine(i, fTrit) * 0.21f * slow
+                        + Sine(i, 108f) * 0.12f
+                        + FilteredNoise(i, 85f) * 0.24f * (0.6f + 0.4f * Mathf.Sin(t * 1.9f));
+                float hiss = FilteredNoise(i, 1450f) * 0.06f * (0.4f + 0.6f * slow);
+                float env = 0.9f + 0.1f * Mathf.Sin(2f * Mathf.PI * 0.03f * t);
+                data[i] = (s + hiss) * env * 0.48f;
+            }
+            return MakeClip("SFX_Moon1_CorruptionDrone", data);
+        }
+
+        /// <summary>Milo discovery / first companion reaction — warm 432-family chime with soft breath and trust glow. Triggered on tune success + IntroduceMilo.</summary>
+        static AudioClip GenMoon1MiloDiscoveryReaction()
+        {
+            int len = Samples(2.4f);
+            var data = new float[len];
+            float f1 = F_HARMONIC;
+            float f2 = F_HARMONIC * 1.25f;
+            float f3 = F_HEALING * 0.92f;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float breath = 0.65f + 0.35f * (Mathf.Sin(t * 2.8f) * 0.5f + 0.5f);
+                float vib = Mathf.Sin(t * 3.6f) * 0.9f;
+                float chime = Sine(i, f1 + vib) * 0.36f * breath
+                            + Sine(i, f2 + vib * 0.5f) * 0.24f * breath
+                            + Sine(i, f3) * 0.19f * breath
+                            + Sine(i, 864f) * 0.11f * (0.5f + 0.5f * Mathf.Sin(t * 7f));
+                float warmth = FilteredNoise(i, 520f) * 0.04f * breath;
+                float env = Mathf.Sin(t * Mathf.PI * 0.92f) * (1f - t * 0.18f);
+                data[i] = (chime + warmth) * env * 0.55f;
+            }
+            return MakeClip("SFX_Moon1_MiloDiscovery", data);
+        }
+
+        /// <summary>F310 haptic-synced pure tone burst — bright clean layer for first tune success rumble confirm. Short, punchy, wondrous.</summary>
+        static AudioClip GenMoon1F310SyncedTone()
+        {
+            int len = Samples(0.65f);
+            var data = new float[len];
+            float fCore = 699f; // 432 * PHI approx
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float env = Mathf.Sin(t * Mathf.PI * 1.05f) * (1f - t * 0.35f);
+                float v = Sine(i, fCore) * 0.72f * env
+                        + Sine(i, fCore * 1.5f) * 0.31f * env
+                        + Sine(i, 432f) * 0.18f * (0.4f + 0.6f * env);
+                float ring = FilteredNoise(i, 3200f) * 0.05f * env;
+                data[i] = (v + ring) * 0.68f;
+            }
+            return MakeClip("SFX_Moon1_F310SyncedTone", data);
+        }
+
+        /// <summary>High ethereal motes / zone wind layer — soft high harmonics + shimmer for floating aether feel over Echohaven. Long loop.</summary>
+        static AudioClip GenMoon1EtherealMotes()
+        {
+            int len = Samples(7.2f);
+            var data = new float[len];
+            float f1 = 648f;
+            float f2 = F_HARMONIC * 1.8f;
+            for (int i = 0; i < len; i++)
+            {
+                float t = (float)i / len;
+                float gust = 0.78f + 0.22f * Mathf.Sin(2f * Mathf.PI * 0.14f * t + Mathf.Sin(t * 2.3f) * 0.6f);
+                float s = Sine(i, f1) * 0.21f * gust
+                        + Sine(i, f2) * 0.14f * gust
+                        + Sine(i, 864f) * 0.09f * (0.5f + 0.5f * Mathf.Sin(t * 4.8f));
+                float air = FilteredNoise(i, 1850f) * 0.07f * gust;
+                float env = 0.92f + 0.08f * Mathf.Sin(2f * Mathf.PI * 0.07f * t);
+                data[i] = (s + air) * env * 0.31f;
+            }
+            return MakeClip("SFX_Moon1_EtherealMotes", data);
         }
 
         // ═══════════════════════════════════════════════

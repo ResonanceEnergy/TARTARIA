@@ -1,6 +1,7 @@
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.UI;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -240,6 +241,35 @@ namespace Tartaria.Integration
             Save.SaveManager.Instance?.MarkDirty();
             if (TrustLevel >= MiloTrustLevel.Invested)
                 DialogueManager.Instance?.PlayContextDialogue("milo_impressed_build");
+        }
+
+        /// <summary>
+        /// STRONG EMOTIONAL PAYOFF for the very first successful restoration (Moon 1 first 10min magic with scaffold first ruin).
+        /// Milo drops cynicism, shows heart — trust spike, special dialogue, haptic, HUD moment.
+        /// </summary>
+        public void TriggerFirstRestorationEmotional(string siteName = "the first dome")
+        {
+            if (_sincereMoments > 0) return; // only once
+            _sincereMoments++;
+
+            AddTrust(28f);  // big leap on the "we did it together" moment
+            Save.SaveManager.Instance?.MarkDirty();
+
+            // Special heart moment dialogue (falls back gracefully if line missing)
+            DialogueManager.Instance?.PlayContextDialogue("milo_first_restoration");
+            DialogueManager.Instance?.PlayLineById("milo_heart_opens");
+
+            // HUD banner for emotional payoff
+            HUDController.Instance?.ShowBanner("Milo (moved)", $"...I didn't think anything was left worth saving. You... you actually brought it back. Maybe there's hope after all.", 7f);
+
+            OnSincereMoment?.Invoke();
+            TriggerSincereMoment();
+
+            // Rich haptic payoff (F310 rumble for emotional weight)
+            HapticFeedbackManager.Instance?.PlayPerfectTune();
+            HapticFeedbackManager.Instance?.TriggerF310Rumble(0.4f, 0.85f, 1.8f);
+
+            Debug.Log($"[Milo] First restoration emotional payoff triggered for {siteName} — trust now {Trust:F0}, heart opened.");
         }
 
         /// <summary>Zone completion boosts trust.</summary>

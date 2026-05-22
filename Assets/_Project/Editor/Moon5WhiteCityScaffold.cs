@@ -41,6 +41,9 @@ namespace Tartaria.Editor
             created += PlaceAirshipDockFoundation();
             created += PlaceFloatingPlatformProxies();
 
+            // Atmosphere polish: 8 cheap glowing resonance lanterns + floating crystals (magical 1893 World's Fair night)
+            created += PlaceResonanceLanternsAndCrystals();
+
             // Start trigger + Thorne radio volume
             created += CreateStartVolumeAndThorneRadio();
 
@@ -153,9 +156,9 @@ namespace Tartaria.Editor
                 }
                 UnityEngine.Object.DestroyImmediate(dome.GetComponent<Collider>());
 
-                // Simple tuning proxy collider (real restoration uses InteractableBuilding later)
+                // Main body collider — keep solid for nice "walk on the pavilion base" proxy feel
                 var col = p.GetComponent<Collider>();
-                col.isTrigger = true;
+                col.isTrigger = false; // solid platform
 
                 // Full interaction: Click OR walk close + E (F310 South button supported)
                 var amp = p.AddComponent<Tartaria.Integration.Moon5PavilionClickAmplifier>();
@@ -164,7 +167,7 @@ namespace Tartaria.Editor
                 var inter = p.AddComponent<Tartaria.Integration.Moon5PavilionInteractor>();
                 inter.pavilionIndex = i;
 
-                // Proximity trigger for E-key / gamepad interaction
+                // Dedicated proximity trigger sphere for clean E/hold interaction (doesn't interfere with walking)
                 var prox = p.AddComponent<SphereCollider>();
                 prox.isTrigger = true;
                 prox.radius = 9f;
@@ -269,6 +272,102 @@ namespace Tartaria.Editor
 
                 n++;
             }
+            return n;
+        }
+
+        static int PlaceResonanceLanternsAndCrystals()
+        {
+            if (GameObject.Find("Moon5_ResonanceLantern_01") != null) return 0;
+
+            int n = 0;
+            var decorRoot = new GameObject("Moon5_AtmosphereDecor");
+            decorRoot.isStatic = true;
+
+            // 8 cheap glowing resonance lantern posts + floating crystals scattered around district,
+            // fountains, dock and spire. Warm gold lanterns (classic 1893 fair) + cool resonance cyan crystals.
+            // Pure primitives + emissive + point lights. Instant magical atmosphere on first Populate. 60fps.
+            Vector3[] positions = {
+                new Vector3(22f, 1.2f, -8f),    // near fountains west
+                new Vector3(35f, 1.2f, -9f),
+                new Vector3(26f, 0.9f, 12f),    // path to pavilion 5
+                new Vector3(48f, 1.1f, 8f),     // near pavilion 3/4
+                new Vector3(28f, 2.5f, -2f),    // spire base west float crystal
+                new Vector3(30f, 1.8f, 8f),     // spire east
+                new Vector3(60f, 1.5f, 18f),    // dock approach
+                new Vector3(75f, 2.2f, 35f)     // dock far edge, floating
+            };
+
+            for (int i = 0; i < positions.Length; i++)
+            {
+                Vector3 basePos = positions[i];
+                bool isLantern = (i % 2 == 0);
+
+                if (isLantern)
+                {
+                    // Bronze post + glowing lantern head
+                    var post = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    post.name = $"Moon5_ResonanceLantern_{i+1:00}_Post";
+                    post.transform.position = basePos;
+                    post.transform.localScale = new Vector3(0.28f, 3.2f, 0.28f);
+                    var pmr = post.GetComponent<MeshRenderer>();
+                    if (pmr)
+                    {
+                        pmr.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                        pmr.sharedMaterial.color = new Color(0.35f, 0.32f, 0.28f);
+                    }
+                    UnityEngine.Object.DestroyImmediate(post.GetComponent<Collider>());
+                    post.transform.SetParent(decorRoot.transform);
+                    n++;
+
+                    var head = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    head.name = $"Moon5_ResonanceLantern_{i+1:00}";
+                    head.transform.position = basePos + Vector3.up * 3.35f;
+                    head.transform.localScale = Vector3.one * 0.65f;
+                    var hmr = head.GetComponent<MeshRenderer>();
+                    if (hmr)
+                    {
+                        hmr.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                        hmr.sharedMaterial.color = new Color(0.98f, 0.92f, 0.65f);
+                        hmr.sharedMaterial.SetColor("_EmissionColor", new Color(1f, 0.85f, 0.4f) * 2.8f);
+                        hmr.sharedMaterial.EnableKeyword("_EMISSION");
+                    }
+                    UnityEngine.Object.DestroyImmediate(head.GetComponent<Collider>());
+                    var lgt = head.AddComponent<Light>();
+                    lgt.type = LightType.Point;
+                    lgt.color = new Color(1f, 0.9f, 0.6f);
+                    lgt.intensity = 2.4f;
+                    lgt.range = 14f;
+                    lgt.shadows = LightShadows.None;
+                    head.transform.SetParent(decorRoot.transform);
+                    n++;
+                }
+                else
+                {
+                    // Floating resonance crystal (hovering, no post)
+                    var cry = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    cry.name = $"Moon5_FloatingCrystal_{i+1:00}";
+                    cry.transform.position = basePos + Vector3.up * 2.8f;
+                    cry.transform.localScale = Vector3.one * 0.55f;
+                    var cmr = cry.GetComponent<MeshRenderer>();
+                    if (cmr)
+                    {
+                        cmr.sharedMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                        cmr.sharedMaterial.color = new Color(0.7f, 0.95f, 0.98f);
+                        cmr.sharedMaterial.SetColor("_EmissionColor", new Color(0.6f, 0.95f, 1f) * 3.2f);
+                        cmr.sharedMaterial.EnableKeyword("_EMISSION");
+                    }
+                    UnityEngine.Object.DestroyImmediate(cry.GetComponent<Collider>());
+                    var clgt = cry.AddComponent<Light>();
+                    clgt.type = LightType.Point;
+                    clgt.color = new Color(0.6f, 0.95f, 1f);
+                    clgt.intensity = 1.9f;
+                    clgt.range = 11f;
+                    clgt.shadows = LightShadows.None;
+                    cry.transform.SetParent(decorRoot.transform);
+                    n++;
+                }
+            }
+
             return n;
         }
 
