@@ -351,10 +351,14 @@ namespace Tartaria.Integration
                     Mathf.Sin(angle) * 100f
                 );
 
-                GameObject drone = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                drone.name = $"ResetDrone_{i}";
+                GameObject drone = new GameObject($"ResetDrone_{i}");
                 drone.transform.position = spawnPos;
                 drone.transform.localScale = Vector3.one * 3f;
+                // Add sphere mesh components
+                var droneMF = drone.AddComponent<MeshFilter>();
+                droneMF.mesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+                drone.AddComponent<MeshRenderer>();
+                drone.AddComponent<SphereCollider>();
 
                 // Placeholder visual: dark mechanical sphere
                 Renderer dRend = drone.GetComponent<Renderer>();
@@ -408,32 +412,44 @@ namespace Tartaria.Integration
                 generator.transform.position = generatorPositions[i];
 
                 // Foundation base
-                GameObject genBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                genBase.name = "GeneratorBase";
+                GameObject genBase = new GameObject("GeneratorBase");
                 genBase.transform.SetParent(generator.transform);
                 genBase.transform.localScale = new Vector3(5f, 2f, 5f);
                 genBase.transform.localPosition = Vector3.up * 1f;
+                var baseMF = genBase.AddComponent<MeshFilter>();
+                baseMF.mesh = Resources.GetBuiltinResource<Mesh>("Cylinder.fbx");
+                genBase.AddComponent<MeshRenderer>();
+                genBase.AddComponent<CapsuleCollider>();
 
                 // Lower tower section
-                GameObject genLower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                genLower.name = "GeneratorLower";
+                GameObject genLower = new GameObject("GeneratorLower");
                 genLower.transform.SetParent(generator.transform);
                 genLower.transform.localScale = new Vector3(4f, 5f, 4f);
                 genLower.transform.localPosition = Vector3.up * 6f;
+                var lowerMF = genLower.AddComponent<MeshFilter>();
+                lowerMF.mesh = Resources.GetBuiltinResource<Mesh>("Cylinder.fbx");
+                genLower.AddComponent<MeshRenderer>();
+                genLower.AddComponent<CapsuleCollider>();
 
                 // Upper tower section
-                GameObject genUpper = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                genUpper.name = "GeneratorUpper";
+                GameObject genUpper = new GameObject("GeneratorUpper");
                 genUpper.transform.SetParent(generator.transform);
                 genUpper.transform.localScale = new Vector3(3.5f, 3f, 3.5f);
                 genUpper.transform.localPosition = Vector3.up * 12f;
+                var upperMF = genUpper.AddComponent<MeshFilter>();
+                upperMF.mesh = Resources.GetBuiltinResource<Mesh>("Cylinder.fbx");
+                genUpper.AddComponent<MeshRenderer>();
+                genUpper.AddComponent<CapsuleCollider>();
 
                 // Dissonance emitter (top sphere)
-                GameObject emitter = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                emitter.name = "DissonanceEmitter";
+                GameObject emitter = new GameObject("DissonanceEmitter");
                 emitter.transform.SetParent(generator.transform);
                 emitter.transform.localScale = Vector3.one * 2.5f;
                 emitter.transform.localPosition = Vector3.up * 15f;
+                var emitterMF = emitter.AddComponent<MeshFilter>();
+                emitterMF.mesh = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+                emitter.AddComponent<MeshRenderer>();
+                emitter.AddComponent<SphereCollider>();
 
                 // Placeholder visual: dark corrupted tower
                 Renderer[] renderers = generator.GetComponentsInChildren<Renderer>();
