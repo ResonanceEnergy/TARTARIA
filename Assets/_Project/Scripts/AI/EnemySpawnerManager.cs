@@ -230,19 +230,35 @@ namespace Tartaria.AI
 
         GameObject BuildProceduralEnemy(EnemyType type)
         {
-            Vector3 tempPos = Vector3.zero;
-            Quaternion tempRot = Quaternion.identity;
-
-            return type switch
+            // Load KayKit Skeleton prefabs from Resources
+            string prefabPath = type switch
             {
-                EnemyType.MudGolem => MudGolemAI.BuildProcedural(tempPos, tempRot),
-                EnemyType.ShadowStalker => ShadowStalkerAI.BuildProcedural(tempPos, tempRot),
-                EnemyType.CrystalSentry => CrystalSentryAI.BuildProcedural(tempPos, tempRot),
-                EnemyType.VoidPhantom => VoidPhantomAI.BuildProcedural(tempPos, tempRot),
-                EnemyType.ResonanceDrone => ResonanceDroneAI.BuildProcedural(tempPos, tempRot),
-                EnemyType.TemporalWraith => TemporalWraithAI.BuildProcedural(tempPos, tempRot),
+                EnemyType.MudGolem => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Warrior",
+                EnemyType.ShadowStalker => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Rogue",
+                EnemyType.CrystalSentry => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Mage",
+                EnemyType.VoidPhantom => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Minion",
+                EnemyType.ResonanceDrone => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Minion",
+                EnemyType.TemporalWraith => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Mage",
+                EnemyType.DissonantCrystal => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Warrior",
+                EnemyType.GiantGolem => "Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Warrior",
                 _ => null
             };
+
+            if (string.IsNullOrEmpty(prefabPath))
+            {
+                Debug.LogWarning($"[EnemySpawner] No KayKit prefab mapping for {type}");
+                return null;
+            }
+
+            GameObject prefab = Resources.Load<GameObject>(prefabPath);
+            if (prefab != null)
+            {
+                Debug.Log($"[EnemySpawner] Loaded KayKit prefab: {prefabPath} for {type}");
+                return prefab;
+            }
+
+            Debug.LogWarning($"[EnemySpawner] Failed to load KayKit prefab: {prefabPath}");
+            return null;
         }
 
         IEnumerator WaitForWaveClear()
