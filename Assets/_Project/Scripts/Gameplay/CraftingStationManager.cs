@@ -63,9 +63,29 @@ namespace Tartaria.Gameplay
 
         /// <summary>
         /// Get all recipes for a specific station type.
+        /// NOTE: Uses high-performance CraftingRecipeRegistry for O(1) lookup after initialization.
         /// </summary>
         public CraftingRecipe[] GetRecipesForStation(StationType stationType)
         {
+            // Try to use high-performance registry first
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Data.Query.CraftingRecipeRegistry.Count > 0)
+            {
+                var recipes = Data.Query.CraftingRecipeRegistry.GetByStation(stationType);
+                return System.Array.ConvertAll(recipes.ToArray(), r => new CraftingRecipe
+                {
+                    recipeID = r.recipeId,
+                    requiredStation = r.requiredStation,
+                    ingredients = r.ingredients != null 
+                        ? System.Array.ConvertAll(r.ingredients, i => new CraftingIngredient { itemID = i.itemId, quantity = i.quantity })
+                        : System.Array.Empty<CraftingIngredient>(),
+                    outputItemID = r.outputItemId,
+                    outputQuantity = r.outputQuantity
+                });
+            }
+            #endif
+            
+            // Fallback to O(n) search
             return _recipesByID.Values
                 .Where(r => r.requiredStation == stationType)
                 .ToArray();
@@ -73,9 +93,30 @@ namespace Tartaria.Gameplay
 
         /// <summary>
         /// Get unlocked recipes for a station.
+        /// NOTE: Uses high-performance CraftingRecipeRegistry for O(1) lookup after initialization.
         /// </summary>
         public CraftingRecipe[] GetUnlockedRecipesForStation(StationType stationType)
         {
+            // Try to use high-performance registry first
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Data.Query.CraftingRecipeRegistry.Count > 0)
+            {
+                var recipes = Data.Query.CraftingRecipeRegistry.GetByStation(stationType);
+                var unlocked = recipes.Where(r => IsRecipeUnlocked(r.recipeId)).ToArray();
+                return System.Array.ConvertAll(unlocked, r => new CraftingRecipe
+                {
+                    recipeID = r.recipeId,
+                    requiredStation = r.requiredStation,
+                    ingredients = r.ingredients != null 
+                        ? System.Array.ConvertAll(r.ingredients, i => new CraftingIngredient { itemID = i.itemId, quantity = i.quantity })
+                        : System.Array.Empty<CraftingIngredient>(),
+                    outputItemID = r.outputItemId,
+                    outputQuantity = r.outputQuantity
+                });
+            }
+            #endif
+            
+            // Fallback to O(n) search
             return _recipesByID.Values
                 .Where(r => r.requiredStation == stationType && IsRecipeUnlocked(r.recipeID))
                 .ToArray();

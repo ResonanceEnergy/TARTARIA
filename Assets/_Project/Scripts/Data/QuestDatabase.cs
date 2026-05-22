@@ -39,18 +39,40 @@ namespace Tartaria.Data
 
         /// <summary>
         /// Get all quests for a specific moon.
+        /// NOTE: For better performance, use QuestRegistry.GetByMoon() after initialization.
+        /// This method falls back to O(n) search if registry is not initialized.
         /// </summary>
         public QuestData[] GetQuestsByMoon(int moonId)
         {
+            // Try to use high-performance registry first
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Query.QuestRegistry.Count > 0)
+            {
+                return Query.QuestRegistry.GetByMoon(moonId).ToArray();
+            }
+            #endif
+            
+            // Fallback to O(n) search (pre-initialization or build-time)
             EnsureIndexed();
             return allQuests.Where(q => q != null && q.moonId == moonId).ToArray();
         }
 
         /// <summary>
         /// Get all quests of a specific category.
+        /// NOTE: For better performance, use QuestRegistry.GetByCategory() after initialization.
+        /// This method falls back to O(n) search if registry is not initialized.
         /// </summary>
         public QuestData[] GetQuestsByCategory(QuestCategory category)
         {
+            // Try to use high-performance registry first
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Query.QuestRegistry.Count > 0)
+            {
+                return Query.QuestRegistry.GetByCategory(category).ToArray();
+            }
+            #endif
+            
+            // Fallback to O(n) search (pre-initialization or build-time)
             EnsureIndexed();
             return allQuests.Where(q => q != null && q.category == category).ToArray();
         }

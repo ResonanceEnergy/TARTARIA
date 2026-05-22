@@ -87,17 +87,39 @@ namespace Tartaria.Data
 
         /// <summary>
         /// Returns all items matching a category.
+        /// NOTE: For better performance, use ItemRegistry.GetByCategory() after initialization.
+        /// This method falls back to O(n) search if registry is not initialized.
         /// </summary>
         public List<ItemData> GetItemsByCategory(ItemCategory category)
         {
+            // Try to use high-performance registry first
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Query.ItemRegistry.Count > 0)
+            {
+                return Query.ItemRegistry.GetByCategory(category).ToList();
+            }
+            #endif
+            
+            // Fallback to O(n) search (pre-initialization or build-time)
             return items.Where(item => item.category == category).ToList();
         }
 
         /// <summary>
         /// Returns all items matching a rarity.
+        /// NOTE: For better performance, use ItemRegistry.GetByRarity() after initialization.
+        /// This method falls back to O(n) search if registry is not initialized.
         /// </summary>
         public List<ItemData> GetItemsByRarity(ItemRarity rarity)
         {
+            // Try to use high-performance registry first
+            #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            if (Query.ItemRegistry.Count > 0)
+            {
+                return Query.ItemRegistry.GetByRarity(rarity).ToList();
+            }
+            #endif
+            
+            // Fallback to O(n) search (pre-initialization or build-time)
             return items.Where(item => item.rarity == rarity).ToList();
         }
 

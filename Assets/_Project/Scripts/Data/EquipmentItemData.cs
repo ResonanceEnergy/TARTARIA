@@ -1,4 +1,7 @@
 using UnityEngine;
+using System.Collections.Generic;
+using Tartaria.Data.Validation;
+using Tartaria.Localization;
 
 namespace Tartaria.Data
 {
@@ -20,13 +23,21 @@ namespace Tartaria.Data
     /// GDD refs: §07 (Equipment System), §06 (Character Stats)
     /// </summary>
     [CreateAssetMenu(fileName = "New Equipment", menuName = "Tartaria/Equipment Item", order = 200)]
-    public class EquipmentItemData : ScriptableObject
+    public class EquipmentItemData : ScriptableObject, IValidatable, ILocalizable
     {
         [Header("Identity")]
         [Tooltip("Unique identifier for save/load and inventory tracking")]
         public string itemID;
 
-        [Tooltip("Display name shown in UI")]
+        [Header("Localization")]
+        [Tooltip("Localization key for equipment name (equipment.name.{itemID})")]
+        public LocalizationKey nameKey;
+
+        [Tooltip("Localization key for equipment description (equipment.desc.{itemID})")]
+        public LocalizationKey descKey;
+
+        [Header("Legacy Display (Fallback)")]
+        [Tooltip("Display name shown in UI (used if nameKey is empty)")]
         public string itemName;
 
         [Tooltip("Which equipment slot this item occupies")]
@@ -64,8 +75,64 @@ namespace Tartaria.Data
 
         [Header("Description")]
         [TextArea(2, 4)]
-        [Tooltip("Lore text or item description")]
+        [Tooltip("Lore text or item description (used if descKey is empty)")]
         public string description;
+
+        private void OnValidate()
+        {
+            // Auto-generate localization keys from itemID
+            if (!string.IsNullOrWhiteSpace(itemID))
+            {
+                if (!nameKey.IsValid)
+                {
+                    nameKey = new LocalizationKey("equipment.name", itemID);
+                }
+                if (!descKey.IsValid)
+                {
+                    descKey = new LocalizationKey("equipment.desc", itemID);
+                }
+            }
+        }
+
+        #region ILocalizable Implementation
+
+        public LocalizationKey[] GetLocalizationKeys()
+        {
+            return new[] { nameKey, descKey };
+        }
+
+        public string GetFallbackText(LocalizationKey key)
+        {
+            if (key == nameKey)
+                return itemName;
+            if (key == descKey)
+                return description;
+            return string.Empty;
+        }
+
+        public string GetLocalizedName()
+        {
+            if (nameKey.IsValid && LocalizationManager.Instance != null)
+            {
+                string localized = LocalizationManager.Instance.GetText(nameKey);
+                if (!localized.StartsWith("[MISSING:"))
+                    return localized;
+            }
+            return itemName;
+        }
+
+        public string GetLocalizedDescription()
+        {
+            if (descKey.IsValid && LocalizationManager.Instance != null)
+            {
+                string localized = LocalizationManager.Instance.GetText(descKey);
+                if (!localized.StartsWith("[MISSING:"))
+                    return localized;
+            }
+            return description;
+        }
+
+        #endregion
 
         /// <summary>
         /// Get formatted tooltip for UI display.
@@ -98,6 +165,82 @@ namespace Tartaria.Data
             }
 
             return tooltip;
+        }
+
+        /// <summary>
+        /// Comprehensive validation for equipment data integrity.
+        /// </summary>
+        public List<ValidationResult> Validate()
+        {
+            var results = new List<ValidationResult>();
+
+            // ID validation
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateID(itemID, "itemID"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateIDFormat(itemID, "itemID"));
+
+            // Name validation
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(itemName, "itemName"));
+
+            // Icon validation
+            if (icon == null)
+            {
+                results.Add(ValidationResult.Error(
+                    "icon is null",
+                    "Equipment must have icons for inventory display",
+                    "Assign a Sprite to the icon field"
+                ));
+            }
+
+            // Slot validation
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateEnum(slot, "slot"));
+
+            // Stat validation (all should be non-negative)
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(strengthBonus, "strengthBonus"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(agilityBonus, "agilityBonus"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(vitalityBonus, "vitalityBonus"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(resonanceBonus, "resonanceBonus"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(attunementBonus, "attunementBonus"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(armorValue, "armorValue"));
+
+            // Check if equipment has any stats
+            bool hasAnyStats = strengthBonus > 0 || agilityBonus > 0 || vitalityBonus > 0 ||
+                              resonanceBonus > 0 || attunementBonus > 0 || armorValue > 0;
+
+            if (!hasAnyStats && (specialEffects == null || specialEffects.Length == 0))
+            {
+                results.Add(ValidationResult.Warning(
+                    "Equipment has no stats or special effects",
+                    "Equipment with no bonuses serves no gameplay purpose",
+                    "Add stat bonuses or special effects"
+                ));
+            }
+
+            // Mesh prefab validation (optional)
+            if (meshPrefab == null)
+            {
+                results.Add(ValidationResult.Info(
+                    "meshPrefab is not assigned",
+                    "Equipment without mesh prefabs won't be visible when equipped"
+                ));
+            }
+
+            // Special effects validation
+            if (specialEffects != null)
+            {
+                for (int i = 0; i < specialEffects.Length; i++)
+                {
+                    if (string.IsNullOrWhiteSpace(specialEffects[i]))
+                    {
+                        results.Add(ValidationResult.Warning(
+                            $"specialEffects[{i}] is empty",
+                            "Empty special effect entries clutter the inspector",
+                            "Remove empty entries from specialEffects array"
+                        ));
+                    }
+                }
+            }
+
+            return results;
         }
     }
 
