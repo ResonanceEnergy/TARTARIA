@@ -205,20 +205,20 @@ namespace Tartaria.Integration
 
         static void UpdateMoon7ContentSpawner()
         {
-            string path = ""Assets/_Project/Scripts/Integration/Moon7ContentSpawner.cs"";
+            string path = "Assets/_Project/Scripts/Integration/Moon7ContentSpawner.cs";
             if (!File.Exists(path))
             {
-                Debug.LogWarning($""[PrefabWireupGenerator] File not found: {path}"");
+                Debug.LogWarning($"[PrefabWireupGenerator] File not found: {path}");
                 return;
             }
 
             string content = File.ReadAllText(path);
 
             // Add using directive if not present
-            if (!content.Contains(""using Tartaria.Integration;""))
+            if (!content.Contains("using Tartaria.Integration;"))
             {
-                content = content.Replace(""using Tartaria.World;"", 
-                    ""using Tartaria.World;\nusing Tartaria.Integration;"");
+                content = content.Replace("using Tartaria.World;", 
+                    "using Tartaria.World;\nusing Tartaria.Integration;");
             }
 
             // Replace Korath giant spawn
@@ -239,25 +239,25 @@ namespace Tartaria.Integration
                 @"GameObject golemObj = PrefabLibrary.LoadMudGolem();");
 
             File.WriteAllText(path, content);
-            Debug.Log($""[PrefabWireupGenerator] ✓ Updated: {path}"");
+            Debug.Log($"[PrefabWireupGenerator] ✓ Updated: {path}");
         }
 
         static void UpdateMoon10ContentSpawner()
         {
-            string path = ""Assets/_Project/Scripts/Integration/Moon10ContentSpawner.cs"";
+            string path = "Assets/_Project/Scripts/Integration/Moon10ContentSpawner.cs";
             if (!File.Exists(path))
             {
-                Debug.LogWarning($""[PrefabWireupGenerator] File not found: {path}"");
+                Debug.LogWarning($"[PrefabWireupGenerator] File not found: {path}");
                 return;
             }
 
             string content = File.ReadAllText(path);
 
             // Add using directive
-            if (!content.Contains(""using Tartaria.Integration;""))
+            if (!content.Contains("using Tartaria.Integration;"))
             {
-                content = content.Replace(""using Tartaria.World;"", 
-                    ""using Tartaria.World;\nusing Tartaria.Integration;"");
+                content = content.Replace("using Tartaria.World;", 
+                    "using Tartaria.World;\nusing Tartaria.Integration;");
             }
 
             // Replace station building spawn
@@ -268,25 +268,25 @@ namespace Tartaria.Integration
             building.transform.SetParent(station.transform);");
 
             File.WriteAllText(path, content);
-            Debug.Log($""[PrefabWireupGenerator] ✓ Updated: {path}"");
+            Debug.Log($"[PrefabWireupGenerator] ✓ Updated: {path}");
         }
 
         static void UpdateBuildingSpawner()
         {
-            string path = ""Assets/_Project/Scripts/Integration/BuildingSpawner.cs"";
+            string path = "Assets/_Project/Scripts/Integration/BuildingSpawner.cs";
             if (!File.Exists(path))
             {
-                Debug.LogWarning($""[PrefabWireupGenerator] File not found: {path}"");
+                Debug.LogWarning($"[PrefabWireupGenerator] File not found: {path}");
                 return;
             }
 
             string content = File.ReadAllText(path);
 
             // Add using directive
-            if (!content.Contains(""using Tartaria.Integration;""))
+            if (!content.Contains("using Tartaria.Integration;"))
             {
-                content = content.Replace(""using Tartaria.World;"", 
-                    ""using Tartaria.World;\nusing Tartaria.Integration;"");
+                content = content.Replace("using Tartaria.World;", 
+                    "using Tartaria.World;\nusing Tartaria.Integration;");
             }
 
             // Add helper method to map building type to prefab
@@ -303,11 +303,11 @@ namespace Tartaria.Integration
         }";
 
             // Insert helper method before LoadFallbackBuilding method
-            if (!content.Contains(""LoadBuildingPrefab""))
+            if (!content.Contains("LoadBuildingPrefab"))
             {
                 content = content.Replace(
-                    ""static GameObject LoadFallbackBuilding("",
-                    helperMethod + ""\n\n        static GameObject LoadFallbackBuilding("");
+                    "static GameObject LoadFallbackBuilding(",
+                    helperMethod + "\n\n        static GameObject LoadFallbackBuilding(");
             }
 
             // Replace primitive creation in LoadFallbackBuilding
@@ -317,7 +317,7 @@ namespace Tartaria.Integration
             var go = LoadBuildingPrefab(category);");
 
             File.WriteAllText(path, content);
-            Debug.Log($""[PrefabWireupGenerator] ✓ Updated: {path}"");
+            Debug.Log($"[PrefabWireupGenerator] ✓ Updated: {path}");
         }
     }
 }

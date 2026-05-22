@@ -9,6 +9,7 @@ namespace Tartaria.AI
     /// Provides max health, damage handling, death events, and visual feedback integration.
     /// Public API: TakeDamage, Heal, SetMaxHealth, Kill, ResetHealth.
     /// Updated: Added SetMaxHealth method for Moon 7 siege golem spawning.
+    /// Force recompile: 2026-05-22 (assembly dependency fix)
     /// </summary>
     public class MudGolemHealth : MonoBehaviour
     {
