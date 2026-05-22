@@ -1,0 +1,68 @@
+# EditorConfig for TARTARIA Unity project
+# https://editorconfig.org
+
+root = true
+
+# All files
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C# files
+[*.cs]
+indent_style = space
+indent_size = 4
+max_line_length = 120
+
+# Naming conventions
+dotnet_naming_rule.private_fields_rule.severity = warning
+dotnet_naming_rule.private_fields_rule.symbols = private_fields
+dotnet_naming_rule.private_fields_rule.style = underscore_prefix
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+
+dotnet_naming_style.underscore_prefix.capitalization = camel_case
+dotnet_naming_style.underscore_prefix.required_prefix = _
+
+# Code style
+csharp_prefer_braces = true:warning
+csharp_prefer_simple_using_statement = true:suggestion
+csharp_style_namespace_declarations = file_scoped:suggestion
+
+# Unity-specific
+# No warnings on Unity message methods (Update, Awake, etc.) being unused
+dotnet_diagnostic.IDE0051.severity = none
+
+# JSON (Unity meta files, manifests)
+[*.json]
+indent_style = space
+indent_size = 2
+
+# YAML (GitHub workflows)
+[*.yml]
+indent_style = space
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = 120
+
+# PowerShell
+[*.ps1]
+indent_style = space
+indent_size = 4
+charset = utf-8-bom
+
+# Shader files
+[*.{shader,cginc,hlsl,compute}]
+indent_style = space
+indent_size = 4
+
+# Unity asset files (use tabs for compatibility)
+[*.{prefab,unity,mat,asset}]
+indent_style = tab
+indent_size = 4
