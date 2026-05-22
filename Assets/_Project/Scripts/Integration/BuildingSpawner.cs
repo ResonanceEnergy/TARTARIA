@@ -31,6 +31,10 @@ namespace Tartaria.Integration
         [SerializeField, Tooltip("KayKit bushes for ambient scatter")]
         GameObject[] kayKitBushPrefabs;
 
+        [Header("VFX Prefabs")]
+        [SerializeField, Tooltip("RestoreSparkle VFX for building discovery markers")]
+        GameObject restoreSparkleVFX;
+
         // Scene object names from EchohavenScenePopulator
         static readonly string[] DomeNames = { "StarDome_Placeholder", "Echohaven_StarDome" };
         static readonly string[] FountainNames = { "HarmonicFountain_Placeholder", "Echohaven_HarmonicFountain" };
@@ -191,14 +195,12 @@ namespace Tartaria.Integration
             string markerName = $"Marker_{id}";
             if (building.transform.Find(markerName) != null) return;
 
-            // Try loading RestoreSparkle prefab first
-            GameObject markerPrefab = Resources.Load<GameObject>("Prefabs/VFX/RestoreSparkle");
             GameObject marker;
             
-            if (markerPrefab != null)
+            if (restoreSparkleVFX != null)
             {
-                // Use prefab if available
-                marker = Instantiate(markerPrefab);
+                // Use assigned prefab
+                marker = Instantiate(restoreSparkleVFX);
                 marker.name = markerName;
                 marker.transform.SetParent(building.transform);
                 

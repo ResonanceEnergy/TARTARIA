@@ -44,6 +44,9 @@ namespace Tartaria.Integration
         public bool bridgeFormed;
         public float currentResonancePercent = 0.55f; // starts near unlock
 
+        [Header("VFX Prefabs")]
+        [SerializeField] GameObject scanPulseVFXPrefab;
+
         // Central visualizer orbs near spire (5 small glowing indicators that light as pavilions are amplified — strong "UI visualizer" without Canvas/asmdef issues)
         private GameObject[] _pavilionStatusOrbs = new GameObject[5];
 
@@ -1143,12 +1146,9 @@ namespace Tartaria.Integration
             if (_cachedPavilion == null) _cachedPavilion = GameObject.Find($"Moon5_Pavilion_{pavilionIndex + 1:00}");
             var parent = _cachedPavilion ?? gameObject;
             
-            // Try loading ScanPulse prefab first
-            GameObject pulsePrefab = Resources.Load<GameObject>("Prefabs/VFX/ScanPulse");
-            
-            if (pulsePrefab != null)
+            if (scanPulseVFXPrefab != null)
             {
-                _pulseOrb = Instantiate(pulsePrefab);
+                _pulseOrb = Instantiate(scanPulseVFXPrefab);
                 _pulseOrb.name = "TuningPulse_Preview";
                 _pulseOrb.transform.SetParent(parent.transform);
                 _pulseOrb.transform.localPosition = Vector3.up * 5.2f;
@@ -1185,7 +1185,7 @@ namespace Tartaria.Integration
                 
                 ps.Play();
                 
-                Debug.LogWarning("[WhiteCityAmplification] ScanPulse prefab missing - using runtime ParticleSystem");
+                Debug.LogWarning("[WhiteCityAmplification] ScanPulse prefab not assigned - using runtime ParticleSystem fallback");
             }
 
             var light = _pulseOrb.AddComponent<Light>();

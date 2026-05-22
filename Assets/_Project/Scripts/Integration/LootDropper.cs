@@ -7,10 +7,17 @@ namespace Tartaria.Integration
     /// Day-11: spawns runtime loot pickups when enemies die.
     /// No prefab required — builds a glowing cube + PickupInteractable on the fly.
     /// Items rotate through a small drop table by deterministic count.
+    /// Optional VFX: Set ShardCollectVFX prefab for vacuum effect on spawn.
     /// </summary>
     public static class LootDropper
     {
         static int _dropCount;
+
+        /// <summary>
+        /// Optional ShardCollect VFX prefab for loot spawn effect.
+        /// Assign via LootDropper.ShardCollectVFX = yourPrefab in scene setup.
+        /// </summary>
+        public static GameObject ShardCollectVFX { get; set; }
 
         struct Drop { public string id; public string display; public Color color; }
         static readonly Drop[] Table =
@@ -64,6 +71,22 @@ namespace Tartaria.Integration
             t.GetField("itemId",      bf)?.SetValue(p, pick.id);
             t.GetField("displayName", bf)?.SetValue(p, pick.display);
             t.GetField("quantity",    bf)?.SetValue(p, 1);
+
+            // Spawn ShardCollect VFX if assigned (vacuum effect toward position)
+            if (ShardCollectVFX != null)
+            {
+                GameObject vfx = Object.Instantiate(ShardCollectVFX, position, Quaternion.identity);
+                
+                // Match VFX color to loot rarity
+                ParticleSystem ps = vfx.GetComponent<ParticleSystem>();
+                if (ps != null)
+                {
+                    var main = ps.main;
+                    main.startColor = pick.color;
+                }
+                
+                Object.Destroy(vfx, 2f);
+            }
 
             // Auto-cleanup if never picked up.
             Object.Destroy(go, 60f);
