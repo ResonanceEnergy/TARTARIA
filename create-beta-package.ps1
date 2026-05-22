@@ -45,6 +45,7 @@ $docs = @(
     "README.md",
     "BUILD_GUIDE.md",
     "KNOWN_ISSUES.md",
+    "TROUBLESHOOTING.md",
     "CHANGELOG.md"
 )
 
