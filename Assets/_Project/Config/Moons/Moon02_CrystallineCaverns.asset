@@ -27,11 +27,11 @@ MonoBehaviour:
   rsRequirement: 10
   questId: Moon02_Awaken
   beatHeadlines:
-  - "Discovery \u2014 Crystalline Caverns stirs."
-  - "Restoration \u2014 tune the architecture."
-  - "Conflict \u2014 face the DissonancePurge."
-  - "Climax \u2014 hold the resonance."
-  - "Revelation \u2014 the Crystalline Caverns reveals its secret."
+  - "Discovery \u2014 The Crystalline Caverns stir with dissonance."
+  - "Restoration \u2014 First crystal vein purge and tuning."
+  - "Conflict \u2014 Dissonance wraiths and fractal golems rise."
+  - "Climax \u2014 The Fractal Heart Purge Core ignites."
+  - "Revelation \u2014 Lirael manifests. The song returns from shadow."
   beatDurations:
   - 4
   - 6

@@ -27,11 +27,11 @@ MonoBehaviour:
   rsRequirement: 0
   questId: AwakenStarDome
   beatHeadlines:
-  - "Discovery \u2014 Echohaven stirs."
-  - "Restoration \u2014 tune the architecture."
-  - "Conflict \u2014 face the Excavation."
-  - "Climax \u2014 hold the resonance."
-  - "Revelation \u2014 the Echohaven reveals its secret."
+  - "Discovery \u2014 The buried Star Dome calls from the mud."
+  - "Restoration \u2014 First resonance scan and dome tuning."
+  - "Conflict \u2014 Mud Golems rise. Defend the dig site."
+  - "Climax \u2014 The full harmonic chorus ignites the spire."
+  - "Revelation \u2014 Milo awakens. The song was always inside you."
   beatDurations:
   - 4
   - 6

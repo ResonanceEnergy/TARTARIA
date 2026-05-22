@@ -172,6 +172,22 @@ namespace Tartaria.Gameplay
 
             OnFrequencyChanged?.Invoke(_currentFrequency);
 
+            // Hold-to-tune polish for first 10min magic: when close, holding confirm (mouse/South) locks in with stinger + strong payoff feel
+            bool confirmHeld = false;
+            var mouseHeld = Mouse.current != null && Mouse.current.leftButton.isPressed;
+            var gamepadHeld = Gamepad.current != null && Gamepad.current.buttonSouth.isPressed;
+            confirmHeld = mouseHeld || gamepadHeld;
+            if (confirmHeld && _accuracy >= 0.82f)
+            {
+                // Accelerate completion for satisfying "hold when orb is bright" agency
+                _timeRemaining = Mathf.Max(0f, _timeRemaining - Time.deltaTime * 3.5f);
+                if (_accuracy >= 0.9f)
+                {
+                    AudioManager.Instance?.PlaySFX2D("TuningComplete");  // stinger-like on strong hold
+                    HapticFeedbackManager.Instance?.PlayPerfectTune();
+                }
+            }
+
             // Real-time audio feedback: play tone at current frequency
             AudioManager.Instance?.PlayTone(_currentFrequency, 0.5f);
 

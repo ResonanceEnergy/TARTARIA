@@ -1022,6 +1022,18 @@ namespace Tartaria.Integration
             freqRT.offsetMin = Vector2.zero;
             freqRT.offsetMax = Vector2.zero;
 
+            // Pulsing resonance orb at dial center — hold-to-tune visual payoff (clear + fun). Pulses brighter/faster on high accuracy.
+            // Reduced-motion friendly: static soft glow when SettingsOverlay.IsReducedMotion (no scale/alpha lerp).
+            var orbGO = CreateChild(dialRT, "ResonanceOrb");
+            var orbImg = orbGO.AddComponent<Image>();
+            orbImg.color = new Color(1f, 0.92f, 0.6f, 0.35f);  // warm golden aether
+            orbImg.raycastTarget = false;
+            var orbRT = orbGO.GetComponent<RectTransform>();
+            orbRT.anchorMin = new Vector2(0.42f, 0.42f);
+            orbRT.anchorMax = new Vector2(0.58f, 0.58f);
+            orbRT.offsetMin = Vector2.zero;
+            orbRT.offsetMax = Vector2.zero;
+
             // Target Hz label (static, smaller)
             var targetLabelGO = CreateChild(dialRT, "TargetLabel");
             var targetLabel = targetLabelGO.AddComponent<TextMeshProUGUI>();
@@ -1090,9 +1102,9 @@ namespace Tartaria.Integration
                 SetField(tuning, "accuracyText", accText);
             }
 
-            // Add dial updater component — drives the needle fill & frequency text
+            // Add dial updater component — drives the needle fill & frequency text + pulsing orb for fun hold-to-tune feedback
             var updater = overlayGO.AddComponent<TuningDialUpdater>();
-            updater.Initialize(needleFill, freqText, accText, fill);
+            updater.Initialize(needleFill, freqText, accText, fill, orbImg);
 
             Debug.Log("[RuntimeHUDBuilder] Tuning overlay built with 432 Hz radial dial.");
         }
@@ -2003,16 +2015,21 @@ namespace Tartaria.Integration
         TextMeshProUGUI _freqText;
         TextMeshProUGUI _accText;
         Image _accFill;
+        Image _resonanceOrb;  // pulsing orb for clear/fun tuning (hold when bright = satisfying commit)
         Tartaria.Gameplay.TuningMiniGameController _tuning;
         const float MaxFrequency = 864f; // targetFreq × 2
+        float _orbBaseAlpha = 0.35f;
+        float _pulsePhase;
 
         public void Initialize(Image needle, TextMeshProUGUI freqText,
-            TextMeshProUGUI accText, Image accFill)
+            TextMeshProUGUI accText, Image accFill, Image resonanceOrb = null)
         {
             _needle   = needle;
             _freqText = freqText;
             _accText  = accText;
             _accFill  = accFill;
+            _resonanceOrb = resonanceOrb;
+            if (_resonanceOrb != null) _orbBaseAlpha = _resonanceOrb.color.a;
         }
 
         void OnEnable()
@@ -2032,10 +2049,25 @@ namespace Tartaria.Integration
         // which may run long after this overlay is built. Retry every frame until found.
         void Update()
         {
-            if (_tuning != null) return;
-            _tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGameController>();
-            if (_tuning != null)
-                _tuning.OnFrequencyChanged += OnFrequencyChanged;
+            if (_tuning == null)
+            {
+                _tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGameController>();
+                if (_tuning != null)
+                    _tuning.OnFrequencyChanged += OnFrequencyChanged;
+            }
+
+            // Keep orb pulsing even if no freq change (for hold phase satisfaction)
+            if (_resonanceOrb != null && !Tartaria.UI.SettingsOverlay.IsReducedMotion && _tuning != null && _tuning.IsActive)
+            {
+                float acc = _tuning.CurrentAccuracy;
+                _pulsePhase += Time.deltaTime * (2.8f + acc * 7f);
+                float pulse = 0.5f + 0.5f * Mathf.Sin(_pulsePhase) * (0.25f + acc * 0.75f);
+                var c = _resonanceOrb.color;
+                c.a = _orbBaseAlpha + pulse * 0.7f * acc;
+                _resonanceOrb.color = c;
+                float s = 1f + (acc * 0.22f * Mathf.Sin(_pulsePhase * 1.4f));
+                _resonanceOrb.rectTransform.localScale = Vector3.one * s;
+            }
         }
 
         void OnFrequencyChanged(float freq)
@@ -2050,7 +2082,20 @@ namespace Tartaria.Integration
             if (_accFill != null)
                 _accFill.fillAmount = acc;
             if (_accText != null)
-                _accText.text = $"Accuracy: {acc:P0}";
+                _accText.text = $"Accuracy: {acc:P0}  {(acc > 0.85f ? "HOLD TO LOCK!" : "")}";
+
+            // Pulsing orb: brighter + faster pulse when accuracy high (makes "hold-to-tune" obvious and fun)
+            // Reduced-motion: static soft glow only (no animation)
+            if (_resonanceOrb != null)
+            {
+                if (Tartaria.UI.SettingsOverlay.IsReducedMotion)
+                {
+                    var c = _resonanceOrb.color;
+                    c.a = _orbBaseAlpha + (acc * 0.45f);  // brighter on good acc, but static
+                    _resonanceOrb.color = c;
+                }
+                // else: pulsing driven by dedicated Update() for stability (avoids event timing jitter)
+            }
         }
     }
 

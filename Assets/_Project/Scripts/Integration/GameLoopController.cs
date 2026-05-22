@@ -9,6 +9,7 @@ using Tartaria.Save;
 using Tartaria.UI;
 using Tartaria.Input;
 using Tartaria.Gameplay;
+using Tartaria.Camera;
 
 namespace Tartaria.Integration
 {
@@ -47,6 +48,7 @@ namespace Tartaria.Integration
         bool _rsQueryCreated;
         bool _playerQueryCreated;
         bool _ecsReady;
+        bool _firstRestorationDone;  // for Milo first restoration emotional payoff on scaffold first site
 
         // Pending RS rewards — buffered until ECS is ready
         readonly System.Collections.Generic.List<(float amount, string source)> _pendingRsRewards = new();
@@ -1161,6 +1163,19 @@ namespace Tartaria.Integration
             MiloController.Instance?.NotifyBuildingRestored();
             LiraelController.Instance?.NotifyBuildingRestored();
             KorathController.Instance?.NotifyBuildingRestored();
+
+            // ─── FIRST RESTORATION EMOTIONAL PAYOFF (scaffold first_ruin integrated) ───
+            // The magic 8-12min moment: obvious ruin -> scan rumble -> dig -> hold-tune orb -> restore -> Milo heart opens.
+            if (!_firstRestorationDone && buildingName != null &&
+                (buildingName.ToLower().Contains("first") || buildingName.ToLower().Contains("echohaven_first") || buildingName == "first_dome"))
+            {
+                _firstRestorationDone = true;
+                MiloController.Instance?.TriggerFirstRestorationEmotional(buildingName);
+                // Extra camera + music lift for strong emotional beat (reduced motion respects camera already)
+                cameraController?.FocusOnPoint(position + Vector3.up * 6f, 2.4f);
+                AdaptiveMusicController.Instance?.PlayRestoration();  // swells again for payoff
+                Debug.Log("[GameLoop] FIRST restoration emotional Milo payoff fired for core loop magic.");
+            }
 
             // Round 4: Wire Mud Colossus as post-fountain climax (Echohaven vertical slice pinnacle)
             // Only on first fountain restore to create the memorable 5-10min boss+restoration experience

@@ -489,7 +489,17 @@ namespace Tartaria.Integration
 
         void Update()
         {
-            // Gentle bob + spin
+            // Reduced-motion friendly: static position + no spin for accessibility (affects Moon 1 first excavation "scan here" hints too)
+            if (Tartaria.UI.SettingsOverlay.IsReducedMotion)
+            {
+                // Keep base height only — no animation
+                var p = transform.localPosition;
+                p.y = _baseY;
+                transform.localPosition = p;
+                return;
+            }
+
+            // Gentle bob + spin (full motion path)
             float bob = Mathf.Sin(Time.time * 1.5f + _phase) * 0.4f;
             var pos = transform.localPosition;
             pos.y = _baseY + bob;
