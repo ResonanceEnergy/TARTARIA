@@ -161,29 +161,37 @@ namespace Tartaria.Integration
             _pipeOrganCore.transform.position = cathedralCenter;
 
             // Console base
-            GameObject consoleBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            consoleBase.name = "ConsoleBase";
+            GameObject consoleBase = new GameObject("ConsoleBase");
+            consoleBase.AddComponent<MeshFilter>();
+            consoleBase.AddComponent<MeshRenderer>();
+            consoleBase.AddComponent<BoxCollider>();
             consoleBase.transform.SetParent(_pipeOrganCore.transform);
             consoleBase.transform.localScale = new Vector3(8f, 2f, 4f);
             consoleBase.transform.localPosition = Vector3.up * 1f;
 
             // Organ body (tall rear panel)
-            GameObject organBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            organBody.name = "OrganBody";
+            GameObject organBody = new GameObject("OrganBody");
+            organBody.AddComponent<MeshFilter>();
+            organBody.AddComponent<MeshRenderer>();
+            organBody.AddComponent<BoxCollider>();
             organBody.transform.SetParent(_pipeOrganCore.transform);
             organBody.transform.localScale = new Vector3(10f, 10f, 1f);
             organBody.transform.localPosition = new Vector3(0f, 6f, -2f);
 
             // Upper decorative crown
-            GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            crown.name = "Crown";
+            GameObject crown = new GameObject("Crown");
+            crown.AddComponent<MeshFilter>();
+            crown.AddComponent<MeshRenderer>();
+            crown.AddComponent<BoxCollider>();
             crown.transform.SetParent(_pipeOrganCore.transform);
             crown.transform.localScale = new Vector3(11f, 2f, 1.5f);
             crown.transform.localPosition = new Vector3(0f, 12f, -2f);
 
             // Keyboard platform
-            GameObject keyboard = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            keyboard.name = "Keyboard";
+            GameObject keyboard = new GameObject("Keyboard");
+            keyboard.AddComponent<MeshFilter>();
+            keyboard.AddComponent<MeshRenderer>();
+            keyboard.AddComponent<BoxCollider>();
             keyboard.transform.SetParent(_pipeOrganCore.transform);
             keyboard.transform.localScale = new Vector3(6f, 0.2f, 1f);
             keyboard.transform.localPosition = new Vector3(0f, 2f, 1f);
@@ -219,8 +227,10 @@ namespace Tartaria.Integration
                     -5f + Mathf.Cos(angle) * 2f
                 );
 
-                GameObject pipeObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                pipeObj.name = $"CrystalPipe_{i}";
+                GameObject pipeObj = new GameObject($"CrystalPipe_{i}");
+                pipeObj.AddComponent<MeshFilter>();
+                pipeObj.AddComponent<MeshRenderer>();
+                pipeObj.AddComponent<CapsuleCollider>();
                 pipeObj.transform.position = pos;
                 pipeObj.transform.localScale = new Vector3(0.4f, 5f, 0.4f); // Tall pipe
                 pipeObj.transform.rotation = Quaternion.Euler(0f, 0f, angle * Mathf.Rad2Deg); // Slight tilt
@@ -256,29 +266,37 @@ namespace Tartaria.Integration
                 fountainObj.transform.position = pos;
 
                 // Foundation
-                GameObject foundation = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                foundation.name = "Foundation";
+                GameObject foundation = new GameObject("Foundation");
+                foundation.AddComponent<MeshFilter>();
+                foundation.AddComponent<MeshRenderer>();
+                foundation.AddComponent<CapsuleCollider>();
                 foundation.transform.SetParent(fountainObj.transform);
                 foundation.transform.localScale = new Vector3(3f, 0.5f, 3f);
                 foundation.transform.localPosition = Vector3.up * 0.25f;
 
                 // Basin
-                GameObject basin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                basin.name = "Basin";
+                GameObject basin = new GameObject("Basin");
+                basin.AddComponent<MeshFilter>();
+                basin.AddComponent<MeshRenderer>();
+                basin.AddComponent<CapsuleCollider>();
                 basin.transform.SetParent(fountainObj.transform);
                 basin.transform.localScale = new Vector3(2f, 1f, 2f);
                 basin.transform.localPosition = Vector3.up * 1f;
 
                 // Water pipe (feeds organ bellows)
-                GameObject pipe = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                pipe.name = "WaterPipe";
+                GameObject pipe = new GameObject("WaterPipe");
+                pipe.AddComponent<MeshFilter>();
+                pipe.AddComponent<MeshRenderer>();
+                pipe.AddComponent<CapsuleCollider>();
                 pipe.transform.SetParent(fountainObj.transform);
                 pipe.transform.localScale = new Vector3(0.3f, 2f, 0.3f);
                 pipe.transform.localPosition = Vector3.up * 2.5f;
 
                 // Valve cap
-                GameObject valve = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                valve.name = "Valve";
+                GameObject valve = new GameObject("Valve");
+                valve.AddComponent<MeshFilter>();
+                valve.AddComponent<MeshRenderer>();
+                valve.AddComponent<SphereCollider>();
                 valve.transform.SetParent(fountainObj.transform);
                 valve.transform.localScale = Vector3.one * 0.5f;
                 valve.transform.localPosition = Vector3.up * 3.5f;
