@@ -63,26 +63,40 @@ namespace Tartaria.Integration
                 trigger.transform.position = echoPointLocations[i];
                 trigger.transform.SetParent(transform);
 
-                // Visual marker (ghostly sphere)
-                var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                marker.name = "EchoMarker";
-                marker.transform.SetParent(trigger.transform);
-                marker.transform.localScale = Vector3.one * 2f;
-                marker.transform.localPosition = Vector3.zero;
+                // Visual marker (ghostly sphere) - VFX replacement
+                GameObject markerVFX = new GameObject("EchoMarker_VFX");
+                markerVFX.transform.SetParent(trigger.transform);
+                markerVFX.transform.localPosition = Vector3.zero;
+                
+                ParticleSystem psEcho = markerVFX.AddComponent<ParticleSystem>();
+                var mainEcho = psEcho.main;
+                mainEcho.startLifetime = 2.5f;
+                mainEcho.startSpeed = 0.2f;
+                mainEcho.startSize = 1.0f;
+                mainEcho.startColor = new Color(echoTint.r, echoTint.g, echoTint.b, 0.7f);
+                mainEcho.maxParticles = 80;
+                mainEcho.loop = true;
+                
+                var emissionEcho = psEcho.emission;
+                emissionEcho.rateOverTime = 30f;
+                
+                var shapeEcho = psEcho.shape;
+                shapeEcho.shapeType = ParticleSystemShapeType.Sphere;
+                shapeEcho.radius = 1.0f;
+                
+                var rendererEcho = markerVFX.GetComponent<ParticleSystemRenderer>();
+                rendererEcho.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
+                rendererEcho.material.SetColor("_BaseColor", echoTint);
+                
+                psEcho.Play();
 
-                var renderer = marker.GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    renderer.material.color = echoTint;
-                }
-
-                // Trigger zone
-                var triggerZone = marker.AddComponent<SphereCollider>();
+                // Trigger zone (use markerVFX instead of marker)
+                var triggerZone = markerVFX.AddComponent<SphereCollider>();
                 triggerZone.isTrigger = true;
                 triggerZone.radius = echoTriggerRadius / 2f;
 
                 // Interactable component
-                var interactable = marker.AddComponent<MemoryEchoInteractable>();
+                var interactable = markerVFX.AddComponent<MemoryEchoInteractable>();
                 interactable.system = this;
                 interactable.echoIndex = i;
 

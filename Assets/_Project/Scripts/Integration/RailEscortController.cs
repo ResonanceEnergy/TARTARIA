@@ -1274,9 +1274,8 @@ namespace Tartaria.Integration
                 emissionGlow.rateOverTime = 50f;
                 
                 var shapeGlow = psGlow.shape;
-                shapeGlow.shapeType = ParticleSystemShapeType.Cylinder;
-                shapeGlow.radius = 0.45f;
-                shapeGlow.length = 1.1f;
+                shapeGlow.shapeType = ParticleSystemShapeType.Box; // Cylinder not available, use Box
+                shapeGlow.scale = new Vector3(0.9f, 1.1f, 0.9f); // Box dimensions to approximate cylinder
                 
                 var rendererGlow = railGlowVFX.GetComponent<ParticleSystemRenderer>();
                 rendererGlow.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));

@@ -175,12 +175,24 @@ namespace Tartaria.Integration
 
         /// <summary>
         /// Creates a minimal playable character when no prefab is assigned.
-        /// Capsule + CharacterController + PlayerInputHandler.
+        /// Uses KayKit Knight prefab as fallback.
         /// </summary>
         GameObject CreateFallbackPlayer()
         {
-            var player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            player.name = "Player";
+            // Load KayKit Knight for default player
+            GameObject playerPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Knight");
+            GameObject player;
+            if (playerPrefab != null)
+            {
+                player = Instantiate(playerPrefab, Vector3.zero, Quaternion.identity);
+                player.name = "Player";
+            }
+            else
+            {
+                Debug.LogError("[PlayerSpawner] CRITICAL: Char_Knight prefab missing for player");
+                player = new GameObject("Player_MISSING_PREFAB");
+            }
+
             player.tag = "Player";
             player.layer = LayerMask.NameToLayer("Player") >= 0
                 ? LayerMask.NameToLayer("Player") : 0;
