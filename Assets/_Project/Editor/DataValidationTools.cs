@@ -1,0 +1,293 @@
+using UnityEngine;
+using UnityEditor;
+using System.Collections.Generic;
+using System.Linq;
+using Tartaria.Data;
+using Tartaria.Data.Validation;
+using Tartaria.Core;
+
+namespace Tartaria.Editor
+{
+    /// <summary>
+    /// Editor validation tools for TARTARIA data assets.
+    /// Provides menu items to validate all ScriptableObject data at once.
+    /// </summary>
+    public static class DataValidationTools
+    {
+        private const string MenuRoot = "Tartaria/Data Validation/";
+
+        // ─── Validate All Data ─────────────────────────────────────────
+
+        [MenuItem(MenuRoot + "Validate All Data Assets", priority = 0)]
+        public static void ValidateAllData()
+        {
+            Debug.Log("[DataValidation] Starting full validation scan...");
+
+            var results = new Dictionary<string, List<ValidationResult>>();
+            int totalAssets = 0;
+            int assetsWithIssues = 0;
+
+            // Find all IValidatable assets
+            var guids = AssetDatabase.FindAssets("t:ScriptableObject");
+
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
+
+                if (asset is IValidatable validatable)
+                {
+                    totalAssets++;
+                    var validationResults = validatable.Validate();
+
+                    if (validationResults.Count > 0)
+                    {
+                        results[path] = validationResults;
+                        assetsWithIssues++;
+                    }
+                }
+            }
+
+            // Display results
+            if (results.Count == 0)
+            {
+                EditorUtility.DisplayDialog(
+                    "Validation Complete",
+                    $"✓ All {totalAssets} data assets validated successfully!\n\nNo issues found.",
+                    "OK"
+                );
+                Debug.Log($"[DataValidation] <color=green>✓ {totalAssets} assets validated, 0 issues</color>");
+            }
+            else
+            {
+                int totalErrors = 0;
+                int totalWarnings = 0;
+
+                foreach (var kvp in results)
+                {
+                    totalErrors += DataValidator.GetErrorCount(kvp.Value);
+                    totalWarnings += DataValidator.GetWarningCount(kvp.Value);
+                }
+
+                EditorUtility.DisplayDialog(
+                    "Validation Issues Found",
+                    $"Validated {totalAssets} assets.\n\n" +
+                    $"Issues found in {assetsWithIssues} assets:\n" +
+                    $"• {totalErrors} Errors\n" +
+                    $"• {totalWarnings} Warnings\n\n" +
+                    $"See Console for details.",
+                    "OK"
+                );
+
+                // Log all issues
+                foreach (var kvp in results)
+                {
+                    Debug.LogError($"[DataValidation] Issues in: {kvp.Key}");
+                    foreach (var result in kvp.Value)
+                    {
+                        var asset = AssetDatabase.LoadAssetAtPath<Object>(kvp.Key);
+                        
+                        switch (result.Level)
+                        {
+                            case ValidationLevel.Error:
+                                Debug.LogError($"  {result}", asset);
+                                break;
+                            case ValidationLevel.Warning:
+                                Debug.LogWarning($"  {result}", asset);
+                                break;
+                            case ValidationLevel.Info:
+                                Debug.Log($"  {result}", asset);
+                                break;
+                        }
+                    }
+                }
+            }
+        }
+
+        // ─── Validate by Type ──────────────────────────────────────────
+
+        [MenuItem(MenuRoot + "Validate Items", priority = 10)]
+        public static void ValidateItems()
+        {
+            ValidateAssetType<ItemData>("Items");
+        }
+
+        [MenuItem(MenuRoot + "Validate Quests", priority = 11)]
+        public static void ValidateQuests()
+        {
+            ValidateAssetType<QuestDefinition>("Quests");
+        }
+
+        [MenuItem(MenuRoot + "Validate Skills", priority = 12)]
+        public static void ValidateSkills()
+        {
+            ValidateAssetType<SkillNodeData>("Skills");
+        }
+
+        [MenuItem(MenuRoot + "Validate Equipment", priority = 13)]
+        public static void ValidateEquipment()
+        {
+            ValidateAssetType<EquipmentItemData>("Equipment");
+        }
+
+        [MenuItem(MenuRoot + "Validate Dialogue", priority = 14)]
+        public static void ValidateDialogue()
+        {
+            ValidateAssetType<DialogueNodeData>("Dialogue");
+        }
+
+        // ─── Helper Methods ────────────────────────────────────────────
+
+        private static void ValidateAssetType<T>(string typeName) where T : ScriptableObject, IValidatable
+        {
+            Debug.Log($"[DataValidation] Validating {typeName}...");
+
+            var assets = GetAllAssetsOfType<T>();
+            var results = new Dictionary<T, List<ValidationResult>>();
+
+            foreach (var asset in assets)
+            {
+                var validationResults = asset.Validate();
+                if (validationResults.Count > 0)
+                {
+                    results[asset] = validationResults;
+                }
+            }
+
+            // Display results
+            if (results.Count == 0)
+            {
+                EditorUtility.DisplayDialog(
+                    $"{typeName} Validation",
+                    $"✓ All {assets.Count} {typeName.ToLower()} validated successfully!",
+                    "OK"
+                );
+                Debug.Log($"[DataValidation] <color=green>✓ {assets.Count} {typeName.ToLower()} validated</color>");
+            }
+            else
+            {
+                int totalErrors = 0;
+                int totalWarnings = 0;
+
+                foreach (var kvp in results)
+                {
+                    totalErrors += DataValidator.GetErrorCount(kvp.Value);
+                    totalWarnings += DataValidator.GetWarningCount(kvp.Value);
+
+                    Debug.LogError($"[DataValidation] Issues in {kvp.Key.name}:", kvp.Key);
+                    foreach (var result in kvp.Value)
+                    {
+                        switch (result.Level)
+                        {
+                            case ValidationLevel.Error:
+                                Debug.LogError($"  {result}", kvp.Key);
+                                break;
+                            case ValidationLevel.Warning:
+                                Debug.LogWarning($"  {result}", kvp.Key);
+                                break;
+                        }
+                    }
+                }
+
+                EditorUtility.DisplayDialog(
+                    $"{typeName} Validation Issues",
+                    $"Issues found in {results.Count} of {assets.Count} {typeName.ToLower()}:\n\n" +
+                    $"• {totalErrors} Errors\n" +
+                    $"• {totalWarnings} Warnings\n\n" +
+                    $"See Console for details.",
+                    "OK"
+                );
+            }
+        }
+
+        private static List<T> GetAllAssetsOfType<T>() where T : ScriptableObject
+        {
+            var assets = new List<T>();
+            var guids = AssetDatabase.FindAssets($"t:{typeof(T).Name}");
+
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<T>(path);
+                if (asset != null)
+                {
+                    assets.Add(asset);
+                }
+            }
+
+            return assets;
+        }
+
+        // ─── Build Validation Hook ────────────────────────────────────
+
+        /// <summary>
+        /// Validates all data before build (can be called from build pipeline).
+        /// Returns true if validation passed, false if errors were found.
+        /// </summary>
+        public static bool ValidateForBuild()
+        {
+            Debug.Log("[DataValidation] Pre-build validation check...");
+
+            var guids = AssetDatabase.FindAssets("t:ScriptableObject");
+            int totalErrors = 0;
+
+            foreach (var guid in guids)
+            {
+                var path = AssetDatabase.GUIDToAssetPath(guid);
+                var asset = AssetDatabase.LoadAssetAtPath<ScriptableObject>(path);
+
+                if (asset is IValidatable validatable)
+                {
+                    var results = validatable.Validate();
+                    int errors = DataValidator.GetErrorCount(results);
+
+                    if (errors > 0)
+                    {
+                        totalErrors += errors;
+                        Debug.LogError($"[Build Validation] {errors} error(s) in {asset.name}", asset);
+
+                        foreach (var result in results)
+                        {
+                            if (result.Level == ValidationLevel.Error)
+                            {
+                                Debug.LogError($"  {result}", asset);
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (totalErrors > 0)
+            {
+                Debug.LogError($"[Build Validation] FAILED: {totalErrors} validation errors found!");
+                return false;
+            }
+
+            Debug.Log("[Build Validation] <color=green>✓ PASSED: No validation errors</color>");
+            return true;
+        }
+
+        [MenuItem(MenuRoot + "Pre-Build Validation Check", priority = 100)]
+        public static void RunPreBuildValidation()
+        {
+            bool passed = ValidateForBuild();
+
+            if (passed)
+            {
+                EditorUtility.DisplayDialog(
+                    "Build Validation Passed",
+                    "✓ All data validated successfully!\n\nProject is ready for build.",
+                    "OK"
+                );
+            }
+            else
+            {
+                EditorUtility.DisplayDialog(
+                    "Build Validation Failed",
+                    "❌ Validation errors found!\n\nFix all errors before building.\n\nSee Console for details.",
+                    "OK"
+                );
+            }
+        }
+    }
+}

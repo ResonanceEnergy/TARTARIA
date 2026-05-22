@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Tartaria.Data.Validation;
 
 namespace Tartaria.Data
 {
@@ -109,18 +110,25 @@ namespace Tartaria.Data
     /// Contains speaker, text, choices, and conditions for branching conversations.
     /// </summary>
     [CreateAssetMenu(fileName = "New Dialogue Node", menuName = "Tartaria/Dialogue/Node", order = 300)]
-    public class DialogueNodeData : ScriptableObject
+    public class DialogueNodeData : ScriptableObject, ILocalizable
     {
         [Header("Node Identity")]
         [Tooltip("Unique identifier for this node within the tree")]
         public string nodeId;
 
-        [Header("Dialogue Content")]
-        [Tooltip("Name of the speaker (e.g., 'Anastasia', 'Cassian', 'Player')")]
+        [Header("Localization")]
+        [Tooltip("Localization key for speaker name (dialogue.speaker.{speakerId})")]
+        public LocalizationKey speakerKey;
+
+        [Tooltip("Localization key for dialogue text (dialogue.node.{nodeId})")]
+        public LocalizationKey textKey;
+
+        [Header("Legacy Dialogue Content (Fallback)")]
+        [Tooltip("Name of the speaker (used if speakerKey is empty)")]
         public string speakerName;
 
         [TextArea(3, 10)]
-        [Tooltip("Dialogue text displayed when this node is reached")]
+        [Tooltip("Dialogue text displayed (used if textKey is empty)")]
         public string dialogueText;
 
         [Header("Choices")]
@@ -148,6 +156,75 @@ namespace Tartaria.Data
         [Header("Events")]
         [Tooltip("Optional quest to activate when this node is displayed")]
         public string activateQuestId;
+
+        private void OnValidate()
+        {
+            // Auto-generate localization keys from nodeId
+            if (!string.IsNullOrWhiteSpace(nodeId))
+            {
+                if (!textKey.IsValid)
+                {
+                    textKey = new LocalizationKey("dialogue.node", nodeId);
+                }
+                if (!speakerKey.IsValid && !string.IsNullOrWhiteSpace(speakerName))
+                {
+                    string speakerId = speakerName.Replace(" ", "_").ToLower();
+                    speakerKey = new LocalizationKey("dialogue.speaker", speakerId);
+                }
+            }
+        }
+
+        #region ILocalizable Implementation
+
+        public LocalizationKey[] GetLocalizationKeys()
+        {
+            var keys = new List<LocalizationKey> { speakerKey, textKey };
+            
+            // Add choice keys
+            if (choices != null)
+            {
+                foreach (var choice in choices)
+                {
+                    if (choice.choiceKey.IsValid)
+                        keys.Add(choice.choiceKey);
+                }
+            }
+            
+            return keys.ToArray();
+        }
+
+        public string GetFallbackText(LocalizationKey key)
+        {
+            if (key == speakerKey)
+                return speakerName;
+            if (key == textKey)
+                return dialogueText;
+            return string.Empty;
+        }
+
+        public string GetLocalizedSpeaker()
+        {
+            if (speakerKey.IsValid && LocalizationManager.Instance != null)
+            {
+                string localized = LocalizationManager.Instance.GetText(speakerKey);
+                if (!localized.StartsWith("[MISSING:"))
+                    return localized;
+            }
+            return speakerName;
+        }
+
+        public string GetLocalizedText()
+        {
+            if (textKey.IsValid && LocalizationManager.Instance != null)
+            {
+                string localized = LocalizationManager.Instance.GetText(textKey);
+                if (!localized.StartsWith("[MISSING:"))
+                    return localized;
+            }
+            return dialogueText;
+        }
+
+        #endregion
 
         [Tooltip("Optional quest to complete when this node is displayed")]
         public string completeQuestId;
@@ -217,6 +294,128 @@ namespace Tartaria.Data
                 Debug.Log($"[DialogueNode] Modified {speakerName} relationship by {relationshipDelta:+0;-0}");
                 // TODO: Wire to NPC relationship system when implemented
             }
+        }
+
+        /// <summary>
+        /// Comprehensive validation for dialogue node data integrity.
+        /// </summary>
+        public List<ValidationResult> Validate()
+        {
+            var results = new List<ValidationResult>();
+
+            // Node ID validation
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateID(nodeId, "nodeId"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateIDFormat(nodeId, "nodeId"));
+
+            // Speaker name validation
+            if (string.IsNullOrWhiteSpace(speakerName))
+            {
+                results.Add(ValidationResult.Warning(
+                    "speakerName is empty",
+                    "Speaker names help identify who is talking",
+                    "Assign a speaker name (e.g., 'Anastasia', 'Player')"
+                ));
+            }
+
+            // Dialogue text validation
+            if (string.IsNullOrWhiteSpace(dialogueText))
+            {
+                results.Add(ValidationResult.Error(
+                    "dialogueText is empty",
+                    "Dialogue nodes must have text to display",
+                    "Add dialogue text content"
+                ));
+            }
+
+            // Flow control validation
+            if (!endsConversation && (choices == null || choices.Length == 0) && string.IsNullOrEmpty(autoAdvanceToNode))
+            {
+                results.Add(ValidationResult.Error(
+                    "Node has no exit path",
+                    "Node must either end conversation, have choices, or auto-advance",
+                    "Set endsConversation=true, add choices, or set autoAdvanceToNode"
+                ));
+            }
+
+            // Choices validation
+            if (choices != null && choices.Length > 0)
+            {
+                for (int i = 0; i < choices.Length; i++)
+                {
+                    var choice = choices[i];
+
+                    if (string.IsNullOrWhiteSpace(choice.choiceText))
+                    {
+                        results.Add(ValidationResult.Error(
+                            $"choices[{i}].choiceText is empty",
+                            "Empty choice text creates blank buttons",
+                            $"Add text for choice {i}"
+                        ));
+                    }
+
+                    if (!choice.endsConversation && string.IsNullOrWhiteSpace(choice.nextNodeId))
+                    {
+                        results.Add(ValidationResult.Error(
+                            $"choices[{i}] has no exit path",
+                            "Choice must either end conversation or link to next node",
+                            $"Set nextNodeId or endsConversation=true for choice {i}"
+                        ));
+                    }
+
+                    // Check for self-reference (infinite loop)
+                    if (choice.nextNodeId == nodeId)
+                    {
+                        results.Add(ValidationResult.Error(
+                            $"choices[{i}].nextNodeId references self",
+                            "Self-referencing choices cause infinite loops",
+                            "Link to a different node or end conversation"
+                        ));
+                    }
+                }
+            }
+
+            // Auto-advance validation
+            if (!string.IsNullOrEmpty(autoAdvanceToNode))
+            {
+                if (autoAdvanceToNode == nodeId)
+                {
+                    results.Add(ValidationResult.Error(
+                        "autoAdvanceToNode references self",
+                        "Self-referencing auto-advance causes infinite loops",
+                        "Set autoAdvanceToNode to a different node ID"
+                    ));
+                }
+
+                if (autoAdvanceDelay < 0)
+                {
+                    results.Add(ValidationResult.Error(
+                        $"autoAdvanceDelay is negative: {autoAdvanceDelay}",
+                        "Negative delays are invalid",
+                        "Set autoAdvanceDelay to 0 or positive value"
+                    ));
+                }
+
+                if (autoAdvanceDelay == 0)
+                {
+                    results.Add(ValidationResult.Warning(
+                        "autoAdvanceDelay is 0 with auto-advance enabled",
+                        "Instant auto-advance may skip text display",
+                        "Consider setting a small delay (e.g., 2 seconds)"
+                    ));
+                }
+            }
+
+            // Relationship value validation
+            if (setRelationshipValue > 100)
+            {
+                results.Add(ValidationResult.Warning(
+                    $"setRelationshipValue is very high: {setRelationshipValue}",
+                    "Relationship values typically range 0-100",
+                    "Verify this value is intentional"
+                ));
+            }
+
+            return results;
         }
     }
 
