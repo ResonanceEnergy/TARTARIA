@@ -55,11 +55,45 @@ namespace Tartaria.Integration
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // Moon 2: 12 dissonance crystals + Cassian intro state
+            sd.SetMoonFlag(2, "crystalsDestroyed", _crystalsDestroyed);
+            sd.SetMoonFlag(2, "cassianIntroduced", cassianIntroduced);
+            sd.SetMoonFlag(2, "bellTowerRestored", bellTowerRestored);
+            sd.SetMoonFlag(2, "fountainPurgeComplete", fountainPurgeComplete);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 2 state (12 dissonance crystals)
+            _crystalsDestroyed = sd.GetMoonFlag(2, "crystalsDestroyed", 0);
+            cassianIntroduced = sd.GetMoonFlag(2, "cassianIntroduced");
+            bellTowerRestored = sd.GetMoonFlag(2, "bellTowerRestored");
+            fountainPurgeComplete = sd.GetMoonFlag(2, "fountainPurgeComplete");
+
+            Debug.Log($"[Moon 2] State loaded: crystals={_crystalsDestroyed}/{totalCrystals}, cassian={cassianIntroduced}, purge={fountainPurgeComplete}");
         }
 
         void Start()

@@ -54,6 +54,46 @@ namespace Tartaria.Integration
         {
             // Check save state
             moon13Unlocked = SaveManager.Instance?.GetMoonProgress(13) > 0f;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // P0 CRITICAL: Ending choice MUST persist
+            sd.SetMoonFlag(13, "finalNodeActivated", finalNodeActivated);
+            sd.SetMoonFlag(13, "chosenPath", (int)chosenPath);
+            sd.SetMoonFlag(13, "goldenAgeRealmVisited", _goldenAgeRealmVisited);
+            sd.SetMoonFlag(13, "dissonantRealmVisited", _dissonantRealmVisited);
+            sd.SetMoonFlag(13, "floodMomentRealmVisited", _floodMomentRealmVisited);
+            sd.SetMoonFlag(13, "zerethConfrontationComplete", _zerethConfrontationComplete);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore critical ending choice state
+            finalNodeActivated = sd.GetMoonFlag(13, "finalNodeActivated");
+            chosenPath = (EndingPath)sd.GetMoonFlag(13, "chosenPath", 0);
+            _goldenAgeRealmVisited = sd.GetMoonFlag(13, "goldenAgeRealmVisited");
+            _dissonantRealmVisited = sd.GetMoonFlag(13, "dissonantRealmVisited");
+            _floodMomentRealmVisited = sd.GetMoonFlag(13, "floodMomentRealmVisited");
+            _zerethConfrontationComplete = sd.GetMoonFlag(13, "zerethConfrontationComplete");
+
+            Debug.Log($"[Moon 13] State loaded: choice={chosenPath}, realms={AllRealmsVisited}, finalNode={finalNodeActivated}");
         }
 
         void Start()

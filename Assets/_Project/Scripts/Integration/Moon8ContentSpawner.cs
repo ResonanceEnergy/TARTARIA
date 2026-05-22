@@ -56,6 +56,47 @@ namespace Tartaria.Integration
                 return;
             }
             Instance = this;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // Moon 8: 3 airships repaired + Thorne landing
+            sd.SetMoonFlag(8, "airshipsRepaired", _airshipsRepaired);
+            sd.SetMoonFlag(8, "thorneLanded", _thorneLanded);
+            sd.SetMoonFlag(8, "aerialCombatTriggered", _aerialCombatTriggered);
+            sd.SetMoonFlag(8, "nightFlightTriggered", _nightFlightTriggered);
+            sd.SetMoonFlag(8, "revelationUnlocked", _revelationUnlocked);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 8 state
+            _airshipsRepaired = sd.GetMoonFlag(8, "airshipsRepaired", 0);
+            _thorneLanded = sd.GetMoonFlag(8, "thorneLanded");
+            _aerialCombatTriggered = sd.GetMoonFlag(8, "aerialCombatTriggered");
+            _nightFlightTriggered = sd.GetMoonFlag(8, "nightFlightTriggered");
+            _revelationUnlocked = sd.GetMoonFlag(8, "revelationUnlocked");
+
+            Debug.Log($"[Moon8ContentSpawner] State loaded: airships={_airshipsRepaired}/{totalAirships}, landed={_thorneLanded}");
         }
 
         void Start()

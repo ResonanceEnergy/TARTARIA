@@ -48,6 +48,40 @@ namespace Tartaria.Integration
         {
             // Check save state
             moon11Unlocked = SaveManager.Instance?.GetMoonProgress(11) > 0f;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // Moon 11: 10 fountains + 5 aquifer purification nodes
+            sd.SetMoonFlag(11, "fountainsActivated", _fountainsActivated);
+            sd.SetMoonFlag(11, "aquiferNodesPurified", _aquiferNodesPurified);
+            sd.SetMoonFlag(11, "aquiferPurified", aquiferPurified);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 11 state
+            _fountainsActivated = sd.GetMoonFlag(11, "fountainsActivated", 0);
+            _aquiferNodesPurified = sd.GetMoonFlag(11, "aquiferNodesPurified", 0);
+            aquiferPurified = sd.GetMoonFlag(11, "aquiferPurified");
+
+            Debug.Log($"[Moon 11] State loaded: fountains={_fountainsActivated}/{totalFountains}, nodes={_aquiferNodesPurified}/{totalAquiferNodes}");
         }
 
         void Start()

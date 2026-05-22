@@ -67,11 +67,43 @@ namespace Tartaria.Integration
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
+        }
+
+        void OnSave(SaveData sd)
+        {
+            // Moon 3: 8 orphans + 5 rail segments
+            sd.SetMoonFlag(3, "orphansFreed", _orphansFreed);
+            sd.SetMoonFlag(3, "segmentsReactivated", _segmentsReactivated);
+            sd.SetMoonFlag(3, "lullabyClimaxComplete", lullabyClimaxComplete);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 3 state (8 orphans rescued + 5 rail segments)
+            _orphansFreed = sd.GetMoonFlag(3, "orphansFreed", 0);
+            _segmentsReactivated = sd.GetMoonFlag(3, "segmentsReactivated", 0);
+            lullabyClimaxComplete = sd.GetMoonFlag(3, "lullabyClimaxComplete");
+
+            Debug.Log($"[Moon 3] State loaded: orphans={_orphansFreed}/{totalOrphans}, rail={_segmentsReactivated}/{totalRailSegments}, lullaby={lullabyClimaxComplete}");
         }
 
         void Start()

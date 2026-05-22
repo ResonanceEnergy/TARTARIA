@@ -57,6 +57,25 @@ namespace Tartaria.Integration
                 return;
             }
             Instance = this;
+
+            // Wire save/load events
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave += OnSave;
+                SaveManager.Instance.OnAfterLoad += OnLoad;
+            }
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this) Instance = null;
+
+            // Cleanup save/load event handlers
+            if (SaveManager.Instance != null)
+            {
+                SaveManager.Instance.OnBeforeSave -= OnSave;
+                SaveManager.Instance.OnAfterLoad -= OnLoad;
+            }
         }
 
         void Start()
@@ -374,23 +393,36 @@ namespace Tartaria.Integration
             SaveState();
         }
 
+        void OnSave(SaveData sd)
+        {
+            // Moon 7: Korath thawing + Cassian confrontation + golem siege
+            sd.SetMoonFlag(7, "thawSessionsComplete", _thawSessionsComplete);
+            sd.SetMoonFlag(7, "korathAwakened", _korathAwakened);
+            sd.SetMoonFlag(7, "cassianConfronted", _cassianConfronted);
+            sd.SetMoonFlag(7, "golemSiegeComplete", _golemSiegeComplete);
+            sd.SetMoonFlag(7, "korathSacrificeComplete", _korathSacrificeComplete);
+        }
+
+        void OnLoad(SaveData sd)
+        {
+            // Restore Moon 7 state
+            _thawSessionsComplete = sd.GetMoonFlag(7, "thawSessionsComplete", 0);
+            _korathAwakened = sd.GetMoonFlag(7, "korathAwakened");
+            _cassianConfronted = sd.GetMoonFlag(7, "cassianConfronted");
+            _golemSiegeComplete = sd.GetMoonFlag(7, "golemSiegeComplete");
+            _korathSacrificeComplete = sd.GetMoonFlag(7, "korathSacrificeComplete");
+
+            Debug.Log($"[Moon7ContentSpawner] State loaded: thaw {_thawSessionsComplete}/{thawSessionsRequired}, awakened={_korathAwakened}");
+        }
+
         void SaveState()
         {
-            if (SaveManager.Instance == null) return;
-
+            // Legacy method - now handled by OnSave event
         }
 
         void LoadState()
         {
-            if (SaveManager.Instance == null) return;
-
-            _thawSessionsComplete = 0 /*GetMoonData returns int*/;
-            _korathAwakened = 0 /*GetMoonData returns int*/ == 1;
-            _cassianConfronted = 0 /*GetMoonData returns int*/ == 1;
-            _golemSiegeComplete = 0 /*GetMoonData returns int*/ == 1;
-            _korathSacrificeComplete = 0 /*GetMoonData returns int*/ == 1;
-
-            Debug.Log($"[Moon7ContentSpawner] State loaded: thaw {_thawSessionsComplete}/{thawSessionsRequired}, awakened={_korathAwakened}");
+            // Legacy method - now handled by OnLoad event
         }
     }
 
