@@ -164,6 +164,17 @@ namespace Tartaria.Core
         public static event Action<DialogueEventArgs> OnDialogueStateChanged;
 
         // ═══════════════════════════════════════════════════════════════════
+        // PLAYER ABILITY EVENTS (New)
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Raised when Aether Vision is toggled on/off.
+        /// Subscribers: BuildingRenderer (highlight interactive objects), CollectibleRenderer (glow),
+        ///              HUDController (visual feedback), AudioController (toggle SFX).
+        /// </summary>
+        public static event Action<AetherVisionToggledEventArgs> OnAetherVisionToggledTyped;
+
+        // ═══════════════════════════════════════════════════════════════════
         // RESONANCE SHARDS (RS) ECONOMY EVENTS (Legacy — preserved)
         // ═══════════════════════════════════════════════════════════════════
 
@@ -306,6 +317,17 @@ namespace Tartaria.Core
             try { OnDialogueStateChanged?.Invoke(args); }
             catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnDialogueStateChanged: {ex}"); }
         }
+
+        public static void RaiseAetherVisionToggled(bool enabled)
+        {
+            try
+            {
+                OnAetherVisionToggledTyped?.Invoke(new AetherVisionToggledEventArgs { enabled = enabled });
+                // Also fire legacy event for backward compat
+                if (enabled) OnToggleAetherVision?.Invoke();
+            }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnAetherVisionToggled: {ex}"); }
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════════
@@ -409,6 +431,11 @@ namespace Tartaria.Core
         public bool isActive;
         public string speakerName;
         public string dialogueId;
+    }
+
+    public class AetherVisionToggledEventArgs
+    {
+        public bool enabled;
     }
 
     /// <summary>
