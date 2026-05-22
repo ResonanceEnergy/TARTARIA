@@ -41,7 +41,8 @@ namespace Tartaria.Integration
             emissionPillar.rateOverTime = 70f;
             
             var shapePillar = psPillar.shape;
-            shapePillar.shapeType = ParticleSystemShapeType.Cylinder;
+            shapePillar.shapeType = ParticleSystemShapeType.Cone;
+            shapePillar.angle = 3f;
             shapePillar.radius = 0.3f;
             shapePillar.length = 4f;
             
@@ -51,9 +52,11 @@ namespace Tartaria.Integration
             mat.SetColor("_BaseColor", cyan);
             mat.EnableKeyword("_EMISSION");
             mat.SetColor("_EmissionColor", cyan * 4f);
-            renderer.sharedMaterial = mat;
+            rendererPillar.material = mat;
+            
+            psPillar.Play();
 
-            var light = pillar.AddComponent<Light>();
+            var light = pillarVFX.AddComponent<Light>();
             light.type = LightType.Point;
             light.color = cyan;
             light.intensity = 6f;

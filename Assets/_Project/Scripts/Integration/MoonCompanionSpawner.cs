@@ -73,10 +73,9 @@ namespace Tartaria.Integration
             rendererHalo.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
             rendererHalo.material.SetColor("_BaseColor", tint);
             rendererHalo.material.EnableKeyword("_EMISSION");
-            hmat.SetColor("_EmissionColor", tint * 4f);
-            halo.GetComponent<MeshRenderer>().sharedMaterial = hmat;
+            rendererHalo.material.SetColor("_EmissionColor", tint * 4f);
 
-            var light = halo.AddComponent<Light>();
+            var light = haloVFX.AddComponent<Light>();
             light.type = LightType.Point;
             light.color = tint;
             light.intensity = 3f;
