@@ -677,6 +677,16 @@ namespace Tartaria.UI
         }
 
         /// <summary>
+        /// Show dialogue line via DialogueManager integration.
+        /// Called from Moon content spawners to trigger NPC/tutorial dialogue.
+        /// Uses IntegrationBridge reflection to avoid circular assembly dependency.
+        /// </summary>
+        public void ShowDialogue(string contextId, string lineId)
+        {
+            IntegrationBridge.PlayDialogueLine(contextId, lineId);
+        }
+
+        /// <summary>
         /// Minimal HUD text scale application for key labels (M2). Full HUD requires per-element base storage + layout.
         /// High-impact: scales main value/prompt/freq texts live when settings change.
         /// </summary>
