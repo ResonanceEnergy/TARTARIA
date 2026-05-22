@@ -3,7 +3,8 @@
   "rootNamespace": "Tartaria.Data",
   "references": [
     "Tartaria.Core",
-    "Tartaria.Gameplay"
+    "Tartaria.Gameplay",
+    "Tartaria.Localization"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

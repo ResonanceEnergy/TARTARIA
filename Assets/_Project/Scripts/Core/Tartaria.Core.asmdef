@@ -10,7 +10,8 @@
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.Addressables",
-        "Unity.ResourceManager"
+        "Unity.ResourceManager",
+        "Tartaria.Localization"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
