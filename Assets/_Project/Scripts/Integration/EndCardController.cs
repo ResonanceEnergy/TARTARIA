@@ -1,33 +1,51 @@
 using System.Collections;
 using TMPro;
 using Tartaria.Core;
+using Tartaria.Save;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace Tartaria.Integration
 {
     /// <summary>
-    /// Slice end-card. Listens for the Awaken Star Dome quest completion,
-    /// fades a black overlay in, shows the title, holds, then unloads.
+    /// End-card controller for both demo slice and full game endings.
+    /// Handles: Demo end (awaken_star_dome), Moon 13 endings (Harmony/Echo/Reset).
     /// Self-builds its Canvas + CanvasGroup + TMP_Text at runtime so it
-    /// has zero scene-wiring cost. Per docs/33_VERTICAL_SLICE_SCRIPT.md.
+    /// has zero scene-wiring cost.
     /// </summary>
     [DisallowMultipleComponent]
     public class EndCardController : MonoBehaviour
     {
+        // Demo slice trigger
         public const string TriggerQuestId = "awaken_star_dome";
-        public const string TitleText = "TARTARIA";
-        public const string SubtitleText = "DEMO BUILD";
+        public const string DemoTitleText = "TARTARIA";
+        public const string DemoSubtitleText = "DEMO BUILD";
 
-        [SerializeField] float fadeInDuration = 1.5f;
-        [SerializeField] float holdDuration = 3.0f;
-        [SerializeField] float fadeOutDuration = 1.5f;
+        // Full game ending quests
+        public const string HarmonyEndingQuestId = "moon13_harmony_ending";
+        public const string EchoEndingQuestId = "moon13_echo_ending";
+        public const string ResetEndingQuestId = "moon13_reset_ending";
+
+        [SerializeField] float fadeInDuration = 2.0f;
+        [SerializeField] float holdDuration = 8.0f;
+        [SerializeField] float fadeOutDuration = 2.0f;
 
         Canvas _canvas;
         CanvasGroup _group;
         TMP_Text _title;
         TMP_Text _subtitle;
+        TMP_Text _bodyText;
+        Image _backgroundImage;
         bool _triggered;
+        bool _isPlayingEnding;
+
+        enum EndingType
+        {
+            Demo,
+            Harmony,
+            Echo,
+            Reset
+        }
 
         void Awake()
         {
@@ -38,13 +56,17 @@ namespace Tartaria.Integration
         void OnEnable()
         {
             if (QuestManager.Instance != null)
+            {
                 QuestManager.Instance.OnQuestStatusChanged += HandleQuestStatusChanged;
+            }
         }
 
         void OnDisable()
         {
             if (QuestManager.Instance != null)
+            {
                 QuestManager.Instance.OnQuestStatusChanged -= HandleQuestStatusChanged;
+            }
         }
 
         void Start()
@@ -59,29 +81,146 @@ namespace Tartaria.Integration
 
         void HandleQuestStatusChanged(string questId, QuestStatus status)
         {
-            if (_triggered) return;
+            if (_isPlayingEnding) return;
             if (status != QuestStatus.Completed) return;
-            if (!string.Equals(questId, TriggerQuestId, System.StringComparison.OrdinalIgnoreCase)) return;
 
-            _triggered = true;
-            StartCoroutine(PlaySequence());
+            // Check for demo end
+            if (string.Equals(questId, TriggerQuestId, System.StringComparison.OrdinalIgnoreCase))
+            {
+                StartCoroutine(PlayDemoEnd());
+                return;
+            }
+
+            // Check for full game endings
+            if (string.Equals(questId, HarmonyEndingQuestId, System.StringComparison.OrdinalIgnoreCase))
+            {
+                StartCoroutine(PlayHarmonyEnding());
+                return;
+            }
+
+            if (string.Equals(questId, EchoEndingQuestId, System.StringComparison.OrdinalIgnoreCase))
+            {
+                StartCoroutine(PlayEchoEnding());
+                return;
+            }
+
+            if (string.Equals(questId, ResetEndingQuestId, System.StringComparison.OrdinalIgnoreCase))
+            {
+                StartCoroutine(PlayResetEnding());
+                return;
+            }
         }
 
         /// <summary>Public hook for manual testing / non-quest triggers.</summary>
         public void TriggerEnd()
         {
-            if (_triggered) return;
-            _triggered = true;
-            StartCoroutine(PlaySequence());
+            if (_isPlayingEnding) return;
+            StartCoroutine(PlayDemoEnd());
         }
 
-        IEnumerator PlaySequence()
+        /// <summary>Trigger specific ending manually</summary>
+        public void TriggerEnding(string endingType)
         {
-            Debug.Log("[EndCard] Slice complete. Rolling end card.");
+            if (_isPlayingEnding) return;
+
+            switch (endingType.ToLower())
+            {
+                case "harmony":
+                    StartCoroutine(PlayHarmonyEnding());
+                    break;
+                case "echo":
+                    StartCoroutine(PlayEchoEnding());
+                    break;
+                case "reset":
+                    StartCoroutine(PlayResetEnding());
+                    break;
+                default:
+                    StartCoroutine(PlayDemoEnd());
+                    break;
+            }
+        }
+
+        IEnumerator PlayDemoEnd()
+        {
+            _isPlayingEnding = true;
+            Debug.Log("[EndCard] Demo slice complete. Rolling end card.");
+
+            _title.text = DemoTitleText;
+            _subtitle.text = DemoSubtitleText;
+            _bodyText.text = "";
+            _backgroundImage.color = Color.black;
+
             yield return Fade(0f, 1f, fadeInDuration);
             yield return new WaitForSeconds(holdDuration);
             yield return Fade(1f, 0f, fadeOutDuration);
-            _triggered = false; // allow re-trigger if quest ever re-fires
+
+            _isPlayingEnding = false;
+        }
+
+        IEnumerator PlayHarmonyEnding()
+        {
+            _isPlayingEnding = true;
+            Debug.Log("[EndCard] HARMONY ENDING - Golden Age Restored");
+
+            _backgroundImage.color = new Color(1f, 0.9f, 0.4f, 1f); // Golden
+            _title.text = "HARMONY";
+            _subtitle.text = "The Golden Age Returns";
+            _bodyText.text = "The mud recedes.\nBuildings rise in full glory.\nGiants walk among humans again.\n\nThe Aether never left.\nIt was waiting for someone to listen.";
+            _bodyText.color = new Color(0.1f, 0.1f, 0.1f, 1f); // Dark text on golden bg
+
+            yield return Fade(0f, 1f, fadeInDuration);
+            yield return new WaitForSeconds(holdDuration * 1.5f);
+            yield return Fade(1f, 0f, fadeOutDuration);
+
+            // Save ending achieved
+            SaveManager.Instance?.SetGameFlag("harmony_ending_achieved", true);
+
+            Debug.Log("[EndCard] Harmony ending complete - Thank you for playing TARTARIA");
+            _isPlayingEnding = false;
+        }
+
+        IEnumerator PlayEchoEnding()
+        {
+            _isPlayingEnding = true;
+            Debug.Log("[EndCard] ECHO ENDING - Parallel Worlds");
+
+            _backgroundImage.color = new Color(0.3f, 0.5f, 0.8f, 1f); // Aurora blue
+            _title.text = "ECHO";
+            _subtitle.text = "Between Two Worlds";
+            _bodyText.text = "Both timelines preserved.\nWalk between Golden Age and Present.\n\nZereth finds peace in the threshold.\n\nTwo worlds, one heart.";
+            _bodyText.color = Color.white;
+
+            yield return Fade(0f, 1f, fadeInDuration);
+            yield return new WaitForSeconds(holdDuration * 1.5f);
+            yield return Fade(1f, 0f, fadeOutDuration);
+
+            // Save ending achieved
+            SaveManager.Instance?.SetGameFlag("echo_ending_achieved", true);
+
+            Debug.Log("[EndCard] Echo ending complete - Thank you for playing TARTARIA");
+            _isPlayingEnding = false;
+        }
+
+        IEnumerator PlayResetEnding()
+        {
+            _isPlayingEnding = true;
+            Debug.Log("[EndCard] RESET ENDING - Controlled Power");
+
+            _backgroundImage.color = new Color(0.4f, 0.4f, 0.4f, 1f); // Muted gray
+            _title.text = "RESET";
+            _subtitle.text = "Power Without Freedom";
+            _bodyText.text = "Immense power achieved.\nBut the wonder dims.\n\nThe sky never fully clears.\n\nSafety without song.";
+            _bodyText.color = new Color(0.9f, 0.9f, 0.9f, 1f);
+
+            yield return Fade(0f, 1f, fadeInDuration);
+            yield return new WaitForSeconds(holdDuration * 1.5f);
+            yield return Fade(1f, 0f, fadeOutDuration);
+
+            // Save ending achieved
+            SaveManager.Instance?.SetGameFlag("reset_ending_achieved", true);
+
+            Debug.Log("[EndCard] Reset ending complete - Thank you for playing TARTARIA");
+            _isPlayingEnding = false;
         }
 
         IEnumerator Fade(float from, float to, float dur)
@@ -111,16 +250,19 @@ namespace Tartaria.Integration
 
             var bgGo = new GameObject("Background");
             bgGo.transform.SetParent(canvasGo.transform, false);
-            var bg = bgGo.AddComponent<Image>();
-            bg.color = Color.black;
-            var bgRt = bg.rectTransform;
+            _backgroundImage = bgGo.AddComponent<Image>();
+            _backgroundImage.color = Color.black;
+            var bgRt = _backgroundImage.rectTransform;
             bgRt.anchorMin = Vector2.zero;
             bgRt.anchorMax = Vector2.one;
             bgRt.offsetMin = Vector2.zero;
             bgRt.offsetMax = Vector2.zero;
 
-            _title = CreateText(canvasGo.transform, "Title", TitleText, 96, new Vector2(0.5f, 0.55f));
-            _subtitle = CreateText(canvasGo.transform, "Subtitle", SubtitleText, 36, new Vector2(0.5f, 0.45f));
+            _title = CreateText(canvasGo.transform, "Title", DemoTitleText, 96, new Vector2(0.5f, 0.65f));
+            _subtitle = CreateText(canvasGo.transform, "Subtitle", DemoSubtitleText, 36, new Vector2(0.5f, 0.55f));
+            _bodyText = CreateText(canvasGo.transform, "BodyText", "", 28, new Vector2(0.5f, 0.35f));
+            _bodyText.alignment = TextAlignmentOptions.Center;
+            _bodyText.rectTransform.sizeDelta = new Vector2(1400, 400);
         }
 
         static TMP_Text CreateText(Transform parent, string name, string content, float size, Vector2 anchor)
