@@ -58,12 +58,23 @@ namespace Tartaria.Integration
             _pool.gameObject.SetActive(false);
 
             ServiceLocator.VFX = this;
+            
+            // Subscribe to cross-assembly VFX event system
+            VFXEventSystem.OnVFXRequested += HandleVFXRequest;
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
             if (ServiceLocator.VFX == (IVFXService)this) ServiceLocator.VFX = null;
+            
+            // Unsubscribe from event system
+            VFXEventSystem.OnVFXRequested -= HandleVFXRequest;
+        }
+        
+        void HandleVFXRequest(VFXEventArgs args)
+        {
+            PlayEffect(args.Effect, args.Position);
         }
 
         /// <summary>

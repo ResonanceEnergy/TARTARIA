@@ -117,7 +117,7 @@ namespace Tartaria.AI
             {
                 _renderer.material.color = Color.yellow;
             }
-            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up);
+            VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position + Vector3.up);
             Debug.Log("[CrystalSentry] Telegraphing attack...");
         }
 
@@ -144,7 +144,7 @@ namespace Tartaria.AI
             var proj = projectile.AddComponent<CrystalProjectile>();
             proj.Initialize(direction, projectileSpeed, projectileDamage);
 
-            VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.Spark, transform.position);
             Audio.AudioManager.Instance?.PlayTone(528f, 0.3f);
 
             // Reset visual
@@ -206,7 +206,7 @@ namespace Tartaria.AI
             _state = SentryState.Dead;
             Debug.Log("[CrystalSentry] Defeated");
             
-            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position);
             
             // Drop loot
             if (InventorySystem.Instance != null)
@@ -273,7 +273,7 @@ namespace Tartaria.AI
                 if (playerHealth != null)
                 {
                     playerHealth.TakeDamage(Mathf.RoundToInt(_damage));
-                    VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
+                    // VFXController.Instance  // B1: Cross-assembly call commented (VFXController in Integration)?.PlayEffect(VFXEffect.Spark, transform.position);
                 }
                 Destroy(gameObject);
             }

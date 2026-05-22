@@ -122,7 +122,7 @@ namespace Tartaria.AI
             if (_player == null) return;
 
             // VFX at current position
-            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.AetherVortex, transform.position);
 
             // Calculate random position around player
             Vector2 randomCircle = Random.insideUnitCircle.normalized * Random.Range(teleportMinDistance, teleportRadius);
@@ -137,7 +137,7 @@ namespace Tartaria.AI
             transform.position = targetPos;
 
             // VFX at new position
-            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.AetherVortex, transform.position);
             Audio.AudioManager.Instance?.PlayTone(256f, 0.4f);
 
             Debug.Log($"[VoidPhantom] Teleported to {targetPos}");
@@ -151,7 +151,7 @@ namespace Tartaria.AI
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(Mathf.RoundToInt(attackDamage));
-                VFXController.Instance?.PlayEffect(VFXEffect.Spark, _player.position);
+                VFXEventSystem.RequestVFX(VFXEffect.Spark, _player.position);
                 Debug.Log($"[VoidPhantom] Attack dealt {attackDamage} damage");
             }
         }
@@ -196,7 +196,7 @@ namespace Tartaria.AI
             _state = PhantomState.Dead;
             Debug.Log("[VoidPhantom] Defeated");
             
-            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.AetherVortex, transform.position);
             
             // Drop loot
             if (InventorySystem.Instance != null)

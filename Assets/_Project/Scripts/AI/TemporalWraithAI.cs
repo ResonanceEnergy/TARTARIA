@@ -127,7 +127,7 @@ namespace Tartaria.AI
                 // Visual effect every 60 frames
                 if (Time.frameCount % 60 == 0)
                 {
-                    VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, transform.position);
+                    VFXEventSystem.RequestVFX(VFXEffect.CorruptionPulse, transform.position);
                 }
 
                 // Note: In full implementation, this would modify Time.timeScale or player movement speed
@@ -147,8 +147,8 @@ namespace Tartaria.AI
             Debug.Log($"[TemporalWraith] TIME REWIND! Health restored to {_currentHealth}/{maxHealth}");
 
             // VFX
-            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position);
-            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 2f);
+            VFXEventSystem.RequestVFX(VFXEffect.AetherVortex, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position + Vector3.up * 2f);
             Audio.AudioManager.Instance?.PlayTone(432f, 0.8f);
 
             // Return to combat after brief delay
@@ -181,7 +181,7 @@ namespace Tartaria.AI
             var cloneAI = _activeClone.AddComponent<TemporalCloneAI>();
             cloneAI.Initialize(_player, attackDamage * 0.5f, 10f);
 
-            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, clonePos);
+            VFXEventSystem.RequestVFX(VFXEffect.AetherVortex, clonePos);
 
             Debug.Log("[TemporalWraith] Spawned temporal clone");
 
@@ -197,7 +197,7 @@ namespace Tartaria.AI
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(Mathf.RoundToInt(attackDamage));
-                VFXController.Instance?.PlayEffect(VFXEffect.Spark, _player.position);
+                VFXEventSystem.RequestVFX(VFXEffect.Spark, _player.position);
                 Debug.Log($"[TemporalWraith] Attack dealt {attackDamage} damage");
             }
         }
@@ -239,8 +239,8 @@ namespace Tartaria.AI
             _agent.isStopped = true;
             Debug.Log("[TemporalWraith] Defeated");
             
-            VFXController.Instance?.PlayEffect(VFXEffect.AetherVortex, transform.position);
-            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.AetherVortex, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position);
             
             // Clean up clone
             if (_activeClone != null)
@@ -318,7 +318,7 @@ namespace Tartaria.AI
                     if (playerHealth != null)
                     {
                         playerHealth.TakeDamage(Mathf.RoundToInt(_damage));
-                        VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
+                        VFXEventSystem.RequestVFX(VFXEffect.Spark, transform.position);
                     }
                     _attackCooldown = 2f;
                 }

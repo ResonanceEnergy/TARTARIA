@@ -140,14 +140,14 @@ namespace Tartaria.AI
             // Ambush deals extra damage
             float ambushDamage = attackDamage * 1.5f;
             DamagePlayer(ambushDamage);
-            VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.Spark, transform.position);
             Debug.Log($"[ShadowStalker] Ambush attack! {ambushDamage} damage");
         }
 
         void PerformAttack()
         {
             DamagePlayer(attackDamage);
-            VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.Spark, transform.position);
         }
 
         void DamagePlayer(float damage)

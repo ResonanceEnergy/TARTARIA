@@ -181,7 +181,7 @@ namespace Tartaria.AI
                 var rend = enemy.GetComponentInChildren<Renderer>();
                 if (rend != null && Time.frameCount % 60 == 0)
                 {
-                    VFXController.Instance?.PlayEffect(VFXEffect.Spark, enemy.transform.position);
+                    VFXEventSystem.RequestVFX(VFXEffect.Spark, enemy.transform.position);
                 }
             }
         }
@@ -221,7 +221,7 @@ namespace Tartaria.AI
             _beamLine.enabled = false;
             Debug.Log("[ResonanceDrone] Defeated");
             
-            VFXController.Instance?.PlayEffect(VFXEffect.HarmonicCascade, transform.position);
+            VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position);
             
             // Drop loot
             if (InventorySystem.Instance != null)
