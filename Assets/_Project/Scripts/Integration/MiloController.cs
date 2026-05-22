@@ -287,6 +287,28 @@ namespace Tartaria.Integration
             Save.SaveManager.Instance?.MarkDirty();
         }
 
+        /// <summary>Boss encounter — Milo reactions.</summary>
+        public void OnBossEncountered(string bossName)
+        {
+            DialogueManager.Instance?.PlayContextDialogue($"milo_boss_{bossName.ToLower()}_intro");
+            AddTrust(2f);
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        /// <summary>Boss defeated — Milo celebrates.</summary>
+        public void OnBossDefeated(string bossName)
+        {
+            DialogueManager.Instance?.PlayContextDialogue($"milo_boss_{bossName.ToLower()}_victory");
+            AddTrust(5f);
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        /// <summary>Building restored — Milo reacts based on trust level.</summary>
+        public void OnBuildingRestored(string buildingId)
+        {
+            NotifyBuildingRestored();
+        }
+
         // ─── Save / Load ────────────────────────────
 
         public MiloSaveData GetSaveData()

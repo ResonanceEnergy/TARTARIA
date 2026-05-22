@@ -687,6 +687,51 @@ namespace Tartaria.UI
         }
 
         /// <summary>
+        /// Show lore popup (plaques, notes, inscriptions) — modal overlay with title + body.
+        /// </summary>
+        public void ShowLorePopup(string title, string bodyText, float duration = 8f)
+        {
+            ShowAccessibilityHint("lore_popup", $"{title}: {bodyText}");
+            ShowBanner(title, bodyText, duration);
+        }
+
+        /// <summary>
+        /// Show enemy bark (combat chatter) — subtle subtitle at bottom.
+        /// </summary>
+        public void ShowEnemyBark(string barkText, float duration = 2.5f)
+        {
+            ShowAccessibilityHint("enemy_bark", barkText);
+            ShowSubtitle(barkText, duration);
+        }
+
+        /// <summary>
+        /// Show corruption whisper — ominous distorted text overlay.
+        /// </summary>
+        public void ShowCorruptionWhisper(string whisper, float duration = 5f)
+        {
+            ShowAccessibilityHint("corruption_whisper", whisper);
+            ShowBanner("...", whisper, duration);
+        }
+
+        /// <summary>
+        /// Show boss nameplate — dramatic intro with name + title.
+        /// </summary>
+        public void ShowBossNameplate(string bossName, string bossTitle)
+        {
+            ShowAccessibilityHint("boss_intro", $"{bossName} — {bossTitle}");
+            ShowBanner(bossName, bossTitle, 6f);
+        }
+
+        /// <summary>
+        /// Show subtitle text (dialogue, narration, dramatic moments).
+        /// </summary>
+        public void ShowSubtitle(string text, float duration)
+        {
+            ShowAccessibilityHint("subtitle", text);
+            // Invoke(nameof(HideSubtitle), duration); // Future: dedicated subtitle UI element
+        }
+
+        /// <summary>
         /// Minimal HUD text scale application for key labels (M2). Full HUD requires per-element base storage + layout.
         /// High-impact: scales main value/prompt/freq texts live when settings change.
         /// </summary>
