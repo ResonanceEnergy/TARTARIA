@@ -724,17 +724,19 @@ namespace Tartaria.Integration
             wraith.transform.position = wraithPos;
             wraith.name = "FractalWraith_ConflictBeat";
 
-            var vis = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            vis.transform.SetParent(wraith.transform);
-            vis.transform.localScale = new Vector3(0.8f, 1.6f, 0.8f);
-            var vr = vis.GetComponent<Renderer>();
-            if (vr != null)
+            // Load KayKit Skeleton Mage for spectral wraith
+            GameObject wraithPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Skeletons/Char_Skeleton_Mage");
+            if (wraithPrefab != null)
             {
-                vr.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                vr.material.color = new Color(0.18f, 0.12f, 0.32f);
-                vr.material.SetColor("_EmissionColor", new Color(0.4f, 0.15f, 0.6f) * 1.6f);
+                var vis = Instantiate(wraithPrefab, Vector3.zero, Quaternion.identity);
+                vis.transform.SetParent(wraith.transform);
+                vis.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                vis.name = "WraithBody";
             }
-            Destroy(vis.GetComponent<Collider>());
+            else
+            {
+                Debug.LogError("[Moon2LunarContentSpawner] CRITICAL: Char_Skeleton_Mage prefab missing");
+            }
 
             var ps = wraith.AddComponent<ParticleSystem>();
             var m = ps.main;

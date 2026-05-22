@@ -140,18 +140,33 @@ namespace Tartaria.Integration
             _aquiferCore = new GameObject("AquiferCore_Ancient");
             _aquiferCore.transform.position = aquiferCenterPoint;
 
-            // Core chamber (large sphere)
-            var chamber = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            chamber.name = "CoreChamber";
-            chamber.transform.SetParent(_aquiferCore.transform);
-            chamber.transform.localScale = Vector3.one * 20f;
-            chamber.transform.localPosition = Vector3.zero;
+            // Multi-part aquifer chamber structure
+            // Outer containment shell
+            var chamberOuter = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            chamberOuter.name = "ChamberOuter";
+            chamberOuter.transform.SetParent(_aquiferCore.transform);
+            chamberOuter.transform.localScale = Vector3.one * 22f;
+            chamberOuter.transform.localPosition = Vector3.zero;
 
-            // Water source (inner sphere, corrupted black)
+            // Mid-layer filtration ring
+            var chamberMid = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            chamberMid.name = "ChamberMid";
+            chamberMid.transform.SetParent(_aquiferCore.transform);
+            chamberMid.transform.localScale = Vector3.one * 16f;
+            chamberMid.transform.localPosition = Vector3.zero;
+
+            // Inner reservoir
+            var chamberInner = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            chamberInner.name = "ChamberInner";
+            chamberInner.transform.SetParent(_aquiferCore.transform);
+            chamberInner.transform.localScale = Vector3.one * 12f;
+            chamberInner.transform.localPosition = Vector3.zero;
+
+            // Water source core (corrupted)
             var waterSource = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             waterSource.name = "WaterSource";
             waterSource.transform.SetParent(_aquiferCore.transform);
-            waterSource.transform.localScale = Vector3.one * 10f;
+            waterSource.transform.localScale = Vector3.one * 6f;
             waterSource.transform.localPosition = Vector3.zero;
             var renderer = waterSource.GetComponent<Renderer>();
             if (renderer != null)
@@ -226,21 +241,44 @@ namespace Tartaria.Integration
                 }
                 else
                 {
-                    // Fallback: create simple fountain visual
+                    // Multi-part fountain structure
                     fountain = new GameObject($"PureFountain_{i + 1}");
                     fountain.transform.position = fountainPoints[i];
 
+                    // Base platform
+                    var basePlatform = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    basePlatform.name = "Base";
+                    basePlatform.transform.SetParent(fountain.transform);
+                    basePlatform.transform.localScale = new Vector3(6f, 0.5f, 6f);
+                    basePlatform.transform.localPosition = Vector3.up * 0.25f;
+
+                    // Basin
                     var basin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                     basin.name = "Basin";
                     basin.transform.SetParent(fountain.transform);
-                    basin.transform.localScale = new Vector3(5f, 1f, 5f);
-                    basin.transform.localPosition = Vector3.zero;
+                    basin.transform.localScale = new Vector3(4.5f, 1f, 4.5f);
+                    basin.transform.localPosition = Vector3.up * 1f;
 
+                    // Central pillar
+                    var pillar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                    pillar.name = "Pillar";
+                    pillar.transform.SetParent(fountain.transform);
+                    pillar.transform.localScale = new Vector3(0.8f, 2f, 0.8f);
+                    pillar.transform.localPosition = Vector3.up * 2f;
+
+                    // Spout
                     var spout = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                     spout.name = "Spout";
                     spout.transform.SetParent(fountain.transform);
-                    spout.transform.localScale = new Vector3(0.5f, 3f, 0.5f);
-                    spout.transform.localPosition = Vector3.up * 2f;
+                    spout.transform.localScale = new Vector3(0.5f, 1.5f, 0.5f);
+                    spout.transform.localPosition = Vector3.up * 3.5f;
+
+                    // Water orb (at top)
+                    var orb = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    orb.name = "WaterOrb";
+                    orb.transform.SetParent(fountain.transform);
+                    orb.transform.localScale = Vector3.one * 0.8f;
+                    orb.transform.localPosition = Vector3.up * 4.5f;
                 }
 
                 // Initially inactive

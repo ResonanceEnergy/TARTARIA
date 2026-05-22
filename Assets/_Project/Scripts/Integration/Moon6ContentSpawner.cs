@@ -156,14 +156,44 @@ namespace Tartaria.Integration
 
         void SpawnPipeOrgan()
         {
-            _pipeOrganCore = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            _pipeOrganCore.name = "PipeOrgan_Core";
+            // Multi-part pipe organ structure
+            _pipeOrganCore = new GameObject("PipeOrgan_Core");
             _pipeOrganCore.transform.position = cathedralCenter;
-            _pipeOrganCore.transform.localScale = new Vector3(10f, 12f, 5f); // Massive organ console
+
+            // Console base
+            GameObject consoleBase = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            consoleBase.name = "ConsoleBase";
+            consoleBase.transform.SetParent(_pipeOrganCore.transform);
+            consoleBase.transform.localScale = new Vector3(8f, 2f, 4f);
+            consoleBase.transform.localPosition = Vector3.up * 1f;
+
+            // Organ body (tall rear panel)
+            GameObject organBody = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            organBody.name = "OrganBody";
+            organBody.transform.SetParent(_pipeOrganCore.transform);
+            organBody.transform.localScale = new Vector3(10f, 10f, 1f);
+            organBody.transform.localPosition = new Vector3(0f, 6f, -2f);
+
+            // Upper decorative crown
+            GameObject crown = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            crown.name = "Crown";
+            crown.transform.SetParent(_pipeOrganCore.transform);
+            crown.transform.localScale = new Vector3(11f, 2f, 1.5f);
+            crown.transform.localPosition = new Vector3(0f, 12f, -2f);
+
+            // Keyboard platform
+            GameObject keyboard = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            keyboard.name = "Keyboard";
+            keyboard.transform.SetParent(_pipeOrganCore.transform);
+            keyboard.transform.localScale = new Vector3(6f, 0.2f, 1f);
+            keyboard.transform.localPosition = new Vector3(0f, 2f, 1f);
 
             // Placeholder visual: dark wood with brass accents
-            Renderer rend = _pipeOrganCore.GetComponent<Renderer>();
-            rend.material.color = new Color(0.25f, 0.18f, 0.12f); // Dark walnut
+            Renderer[] renderers = _pipeOrganCore.GetComponentsInChildren<Renderer>();
+            foreach (Renderer rend in renderers)
+            {
+                rend.material.color = new Color(0.25f, 0.18f, 0.12f); // Dark walnut
+            }
 
             // Broken melody plays (distorted harmony)
             AudioSource audioSrc = _pipeOrganCore.AddComponent<AudioSource>();
@@ -221,14 +251,44 @@ namespace Tartaria.Integration
                     Mathf.Sin(angle) * fountainRadius
                 );
 
-                GameObject fountainObj = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                fountainObj.name = $"HydraulicFountain_{i}";
+                // Multi-part hydraulic fountain
+                GameObject fountainObj = new GameObject($"HydraulicFountain_{i}");
                 fountainObj.transform.position = pos;
-                fountainObj.transform.localScale = new Vector3(2f, 1f, 2f); // Fountain basin
+
+                // Foundation
+                GameObject foundation = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                foundation.name = "Foundation";
+                foundation.transform.SetParent(fountainObj.transform);
+                foundation.transform.localScale = new Vector3(3f, 0.5f, 3f);
+                foundation.transform.localPosition = Vector3.up * 0.25f;
+
+                // Basin
+                GameObject basin = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                basin.name = "Basin";
+                basin.transform.SetParent(fountainObj.transform);
+                basin.transform.localScale = new Vector3(2f, 1f, 2f);
+                basin.transform.localPosition = Vector3.up * 1f;
+
+                // Water pipe (feeds organ bellows)
+                GameObject pipe = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                pipe.name = "WaterPipe";
+                pipe.transform.SetParent(fountainObj.transform);
+                pipe.transform.localScale = new Vector3(0.3f, 2f, 0.3f);
+                pipe.transform.localPosition = Vector3.up * 2.5f;
+
+                // Valve cap
+                GameObject valve = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                valve.name = "Valve";
+                valve.transform.SetParent(fountainObj.transform);
+                valve.transform.localScale = Vector3.one * 0.5f;
+                valve.transform.localPosition = Vector3.up * 3.5f;
 
                 // Placeholder visual: stone basin with dry cracked interior
-                Renderer rend = fountainObj.GetComponent<Renderer>();
-                rend.material.color = new Color(0.5f, 0.5f, 0.52f); // Gray stone
+                Renderer[] renderers = fountainObj.GetComponentsInChildren<Renderer>();
+                foreach (Renderer rend in renderers)
+                {
+                    rend.material.color = new Color(0.5f, 0.5f, 0.52f); // Gray stone
+                }
 
                 // HydraulicFountain component: IInteractable restoration
                 HydraulicFountain fountain = fountainObj.AddComponent<HydraulicFountain>();
@@ -331,15 +391,21 @@ namespace Tartaria.Integration
 
         void SpawnLiraelChoirScene()
         {
-            // Lirael NPC (transparent girl, now more solid from Moon 3 healing)
-            GameObject liraelObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            liraelObj.name = "Lirael_Conducting";
-            liraelObj.transform.position = cathedralCenter + new Vector3(0f, 1f, 8f);
-            liraelObj.transform.localScale = new Vector3(0.4f, 0.8f, 0.4f); // Child-sized
-
-            // Placeholder visual: translucent blue-white (spectral girl, 60% solid now)
-            Renderer liraelRend = liraelObj.GetComponent<Renderer>();
-            liraelRend.material.color = new Color(0.7f, 0.85f, 1f, 0.6f); // More solid than Moon 3
+            // Lirael NPC (spectral girl, more solid from Moon 3 healing) — use KayKit Mage
+            GameObject liraelPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Mage");
+            GameObject liraelObj;
+            if (liraelPrefab != null)
+            {
+                liraelObj = Instantiate(liraelPrefab, cathedralCenter + new Vector3(0f, 0f, 8f), Quaternion.identity);
+                liraelObj.name = "Lirael_Conducting";
+                liraelObj.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f); // Child-sized
+            }
+            else
+            {
+                Debug.LogError("[Moon6ContentSpawner] CRITICAL: Char_Mage prefab missing for Lirael");
+                liraelObj = new GameObject("Lirael_Conducting_MISSING_PREFAB");
+                liraelObj.transform.position = cathedralCenter + new Vector3(0f, 1f, 8f);
+            }
 
             // Lirael sings (audio cue)
             AudioManager.Instance?.PlaySFX3D(liraelChoirAudio, liraelObj.transform.position);

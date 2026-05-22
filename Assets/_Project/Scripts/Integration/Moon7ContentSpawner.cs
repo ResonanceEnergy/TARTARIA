@@ -142,14 +142,44 @@ namespace Tartaria.Integration
 
         void SpawnKorathIceBlock()
         {
-            _korathIceBlock = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            _korathIceBlock.name = "Korath_AetherIce";
+            // Multi-part stasis ice chamber (not a single cube)
+            _korathIceBlock = new GameObject("Korath_AetherIce");
             _korathIceBlock.transform.position = stasisVaultCenter;
-            _korathIceBlock.transform.localScale = new Vector3(6f, 12f, 6f); // Massive ice block (giant inside)
+
+            // Outer ice shell
+            GameObject iceOuter = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            iceOuter.name = "IceShellOuter";
+            iceOuter.transform.SetParent(_korathIceBlock.transform);
+            iceOuter.transform.localScale = new Vector3(7f, 13f, 7f);
+            iceOuter.transform.localPosition = Vector3.zero;
+
+            // Mid-layer ice
+            GameObject iceMid = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            iceMid.name = "IceShellMid";
+            iceMid.transform.SetParent(_korathIceBlock.transform);
+            iceMid.transform.localScale = new Vector3(5.5f, 11.5f, 5.5f);
+            iceMid.transform.localPosition = Vector3.zero;
+
+            // Inner core chamber
+            GameObject iceInner = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            iceInner.name = "IceShellInner";
+            iceInner.transform.SetParent(_korathIceBlock.transform);
+            iceInner.transform.localScale = new Vector3(4.5f, 10.5f, 4.5f);
+            iceInner.transform.localPosition = Vector3.zero;
+
+            // Stasis crystal core (pulsing energy)
+            GameObject stasisCore = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            stasisCore.name = "StasisCore";
+            stasisCore.transform.SetParent(_korathIceBlock.transform);
+            stasisCore.transform.localScale = Vector3.one * 2f;
+            stasisCore.transform.localPosition = Vector3.zero;
 
             // Placeholder visual: violet-tinted translucent ice (9-band energy)
-            Renderer rend = _korathIceBlock.GetComponent<Renderer>();
-            rend.material.color = new Color(0.6f, 0.4f, 0.9f, 0.7f); // Violet aurora ice
+            Renderer[] renderers = _korathIceBlock.GetComponentsInChildren<Renderer>();
+            foreach (Renderer rend in renderers)
+            {
+                rend.material.color = new Color(0.6f, 0.4f, 0.9f, 0.7f); // Violet aurora ice
+            }
 
             // Violet aurora light (9-band energy pulsing)
             Light iceLight = _korathIceBlock.AddComponent<Light>();
@@ -208,15 +238,20 @@ namespace Tartaria.Integration
                 Destroy(_korathIceBlock);
             }
 
-            // Spawn Korath giant NPC
-            _korathGiant = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            _korathGiant.name = "Korath_Giant";
-            _korathGiant.transform.position = stasisVaultCenter + Vector3.up * 5f;
-            _korathGiant.transform.localScale = new Vector3(3f, 12f, 3f); // 25-foot giant (12m × 2 = 24 feet ~= 25)
-
-            // Placeholder visual: ancient scarred giant (warm stone color)
-            Renderer giantRend = _korathGiant.GetComponent<Renderer>();
-            giantRend.material.color = new Color(0.65f, 0.5f, 0.4f); // Warm ancient stone
+            // Spawn Korath giant NPC — KayKit Barbarian scaled up
+            GameObject korathPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Barbarian");
+            if (korathPrefab != null)
+            {
+                _korathGiant = Instantiate(korathPrefab, stasisVaultCenter + Vector3.up * 5f, Quaternion.identity);
+                _korathGiant.name = "Korath_Giant";
+                _korathGiant.transform.localScale = new Vector3(6f, 6f, 6f); // Giant scale (25-foot)
+            }
+            else
+            {
+                Debug.LogError("[Moon7ContentSpawner] CRITICAL: Char_Barbarian prefab missing for Korath");
+                _korathGiant = new GameObject("Korath_Giant_MISSING_PREFAB");
+                _korathGiant.transform.position = stasisVaultCenter + Vector3.up * 5f;
+            }
 
             // Korath dialogue component
             KorathDialogue dialogue = _korathGiant.AddComponent<KorathDialogue>();
@@ -249,17 +284,22 @@ namespace Tartaria.Integration
 
             Debug.Log("[Moon7ContentSpawner] CONFLICT: Cassian's true confrontation! Trust or doubt moment...");
 
-            // Cassian appears (depending on Moon 2 trust choice)
+            // Cassian appears (depending on Moon 2 trust choice) — KayKit Hooded Rogue
             bool cassianTrusted = null /*GetMoonData(2, "cassianTrusted", 1)*/ == 1;
 
-            GameObject cassianObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            cassianObj.name = "Cassian_Confrontation";
-            cassianObj.transform.position = stasisVaultCenter + new Vector3(15f, 1f, 10f);
-            cassianObj.transform.localScale = new Vector3(0.5f, 1f, 0.5f);
-
-            // Placeholder visual: dark cloak (Reset sympathizer reveal)
-            Renderer cassianRend = cassianObj.GetComponent<Renderer>();
-            cassianRend.material.color = new Color(0.3f, 0.25f, 0.25f); // Dark gray cloak
+            GameObject cassianPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Rogue_Hooded");
+            GameObject cassianObj;
+            if (cassianPrefab != null)
+            {
+                cassianObj = Instantiate(cassianPrefab, stasisVaultCenter + new Vector3(15f, 0f, 10f), Quaternion.identity);
+                cassianObj.name = "Cassian_Confrontation";
+            }
+            else
+            {
+                Debug.LogError("[Moon7ContentSpawner] CRITICAL: Char_Rogue_Hooded prefab missing for Cassian");
+                cassianObj = new GameObject("Cassian_Confrontation_MISSING_PREFAB");
+                cassianObj.transform.position = stasisVaultCenter + new Vector3(15f, 1f, 10f);
+            }
 
             // Cassian choice interaction
             CassianChoice choiceInteract = cassianObj.AddComponent<CassianChoice>();
@@ -308,10 +348,21 @@ namespace Tartaria.Integration
                     Mathf.Sin(angle) * 40f
                 );
 
-                GameObject golemObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                golemObj.name = $"SiegeGolem_{i}";
-                golemObj.transform.position = spawnPos;
-                golemObj.transform.localScale = new Vector3(2f, 3f, 2f); // Large golems
+                // Spawn KayKit MudGolem prefab
+                GameObject golemPrefab = Resources.Load<GameObject>("Prefabs/Characters/MudGolem");
+                GameObject golemObj;
+                if (golemPrefab != null)
+                {
+                    golemObj = Instantiate(golemPrefab, spawnPos, Quaternion.identity);
+                    golemObj.name = $"SiegeGolem_{i}";
+                    golemObj.transform.localScale = new Vector3(2f, 2f, 2f); // Large golems
+                }
+                else
+                {
+                    Debug.LogError("[Moon7ContentSpawner] CRITICAL: MudGolem prefab missing");
+                    golemObj = new GameObject($"SiegeGolem_{i}_MISSING_PREFAB");
+                    golemObj.transform.position = spawnPos;
+                }
 
                 // Mud Golem AI + health
                 MudGolemHealth golemHealth = golemObj.AddComponent<MudGolemHealth>();

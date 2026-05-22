@@ -133,14 +133,55 @@ namespace Tartaria.Integration
 
         void SpawnThorneFlagship()
         {
-            _thorneFlagship = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            _thorneFlagship.name = "Thorne_Flagship";
-            _thorneFlagship.transform.position = whiteCityDock + Vector3.up * 8f; // Hovering at dock
-            _thorneFlagship.transform.localScale = new Vector3(12f, 4f, 30f); // Large airship hull
+            // Multi-part Thorne flagship airship
+            _thorneFlagship = new GameObject("Thorne_Flagship");
+            _thorneFlagship.transform.position = whiteCityDock + Vector3.up * 8f;
+
+            // Hull main body
+            GameObject hullMain = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            hullMain.name = "HullMain";
+            hullMain.transform.SetParent(_thorneFlagship.transform);
+            hullMain.transform.localScale = new Vector3(10f, 3f, 25f);
+            hullMain.transform.localPosition = Vector3.zero;
+
+            // Hull bow (front section)
+            GameObject hullBow = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            hullBow.name = "HullBow";
+            hullBow.transform.SetParent(_thorneFlagship.transform);
+            hullBow.transform.localScale = new Vector3(8f, 2.5f, 8f);
+            hullBow.transform.localPosition = new Vector3(0f, 0f, 16.5f);
+
+            // Hull stern (rear section)
+            GameObject hullStern = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            hullStern.name = "HullStern";
+            hullStern.transform.SetParent(_thorneFlagship.transform);
+            hullStern.transform.localScale = new Vector3(9f, 2.8f, 6f);
+            hullStern.transform.localPosition = new Vector3(0f, 0f, -15.5f);
+
+            // Bridge tower
+            GameObject bridge = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            bridge.name = "Bridge";
+            bridge.transform.SetParent(_thorneFlagship.transform);
+            bridge.transform.localScale = new Vector3(6f, 4f, 6f);
+            bridge.transform.localPosition = new Vector3(0f, 3.5f, 0f);
+
+            // Mercury-orb engines (2 nacelles)
+            for (int e = 0; e < 2; e++)
+            {
+                GameObject engine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                engine.name = $"Engine_{e}";
+                engine.transform.SetParent(_thorneFlagship.transform);
+                engine.transform.localScale = new Vector3(2f, 4f, 2f);
+                engine.transform.localPosition = new Vector3((e == 0 ? -6f : 6f), -1f, -10f);
+                engine.transform.rotation = Quaternion.Euler(0f, 0f, 90f);
+            }
 
             // Placeholder visual: battered Tartarian airship (sacred-geometry hull, brass accents)
-            Renderer rend = _thorneFlagship.GetComponent<Renderer>();
-            rend.material.color = new Color(0.6f, 0.5f, 0.4f); // Weathered brass
+            Renderer[] renderers = _thorneFlagship.GetComponentsInChildren<Renderer>();
+            foreach (Renderer rend in renderers)
+            {
+                rend.material.color = new Color(0.6f, 0.5f, 0.4f); // Weathered brass
+            }
 
             // Light: mercury-orb engines (cold, off)
             Light engineLight = _thorneFlagship.AddComponent<Light>();
@@ -165,14 +206,21 @@ namespace Tartaria.Integration
 
         void SpawnThorneNPC()
         {
-            GameObject thorneObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            thorneObj.name = "CaptainThorne";
-            thorneObj.transform.position = whiteCityDock + new Vector3(3f, 2f, 0f); // On dock
-            thorneObj.transform.localScale = new Vector3(0.5f, 1f, 0.5f);
-
-            // Placeholder visual: grizzled captain (dark coat)
-            Renderer thorneRend = thorneObj.GetComponent<Renderer>();
-            thorneRend.material.color = new Color(0.3f, 0.3f, 0.35f); // Dark weathered coat
+            // Captain Thorne — KayKit Ranger (grizzled veteran)
+            GameObject thornePrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Ranger");
+            GameObject thorneObj;
+            if (thornePrefab != null)
+            {
+                thorneObj = Instantiate(thornePrefab, whiteCityDock + new Vector3(3f, 0f, 0f), Quaternion.identity);
+                thorneObj.name = "CaptainThorne";
+                thorneObj.transform.localScale = new Vector3(1.1f, 1.1f, 1.1f);
+            }
+            else
+            {
+                Debug.LogError("[Moon8ContentSpawner] CRITICAL: Char_Ranger prefab missing for Thorne");
+                thorneObj = new GameObject("CaptainThorne_MISSING_PREFAB");
+                thorneObj.transform.position = whiteCityDock + new Vector3(3f, 2f, 0f);
+            }
 
             // Thorne dialogue component
             ThorneDialogue dialogue = thorneObj.AddComponent<ThorneDialogue>();
@@ -192,15 +240,46 @@ namespace Tartaria.Integration
                     Mathf.Sin(angle) * graveyardRadius
                 );
 
-                GameObject airshipObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                airshipObj.name = $"Airship_Graveyard_{i}";
+                // Multi-part crashed airship
+                GameObject airshipObj = new GameObject($"Airship_Graveyard_{i}");
                 airshipObj.transform.position = pos;
-                airshipObj.transform.localScale = new Vector3(10f, 3.5f, 25f); // Slightly smaller than flagship
-                airshipObj.transform.rotation = Quaternion.Euler(0f, i * 45f, 10f + i * 5f); // Tilted (crashed)
+                airshipObj.transform.rotation = Quaternion.Euler(0f, i * 45f, 10f + i * 5f);
+
+                // Hull main section
+                GameObject hullMain = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                hullMain.name = "HullMain";
+                hullMain.transform.SetParent(airshipObj.transform);
+                hullMain.transform.localScale = new Vector3(9f, 2.5f, 20f);
+                hullMain.transform.localPosition = Vector3.zero;
+
+                // Hull fore section
+                GameObject hullFore = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                hullFore.name = "HullFore";
+                hullFore.transform.SetParent(airshipObj.transform);
+                hullFore.transform.localScale = new Vector3(7f, 2f, 6f);
+                hullFore.transform.localPosition = new Vector3(0f, 0f, 13f);
+
+                // Hull aft section
+                GameObject hullAft = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                hullAft.name = "HullAft";
+                hullAft.transform.SetParent(airshipObj.transform);
+                hullAft.transform.localScale = new Vector3(8f, 2.2f, 5f);
+                hullAft.transform.localPosition = new Vector3(0f, 0f, -12.5f);
+
+                // Broken engine (one side)
+                GameObject brokenEngine = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                brokenEngine.name = "BrokenEngine";
+                brokenEngine.transform.SetParent(airshipObj.transform);
+                brokenEngine.transform.localScale = new Vector3(1.5f, 3f, 1.5f);
+                brokenEngine.transform.localPosition = new Vector3(-5f, -1f, -8f);
+                brokenEngine.transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
 
                 // Placeholder visual: rusted hulls, mud-covered
-                Renderer rend = airshipObj.GetComponent<Renderer>();
-                rend.material.color = new Color(0.4f, 0.35f, 0.3f, 0.8f); // Rusted brown
+                Renderer[] renderers = airshipObj.GetComponentsInChildren<Renderer>();
+                foreach (Renderer rend in renderers)
+                {
+                    rend.material.color = new Color(0.4f, 0.35f, 0.3f, 0.8f); // Rusted brown
+                }
 
                 // TartarianAirship component: IInteractable repair mechanic
                 TartarianAirship airship = airshipObj.AddComponent<TartarianAirship>();
@@ -306,14 +385,44 @@ namespace Tartaria.Integration
 
             for (int i = 0; i < 2; i++)
             {
-                GameObject generator = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                generator.name = $"DissonanceGenerator_{i}";
+                // Multi-part dissonance generator tower
+                GameObject generator = new GameObject($"DissonanceGenerator_{i}");
                 generator.transform.position = generatorPositions[i];
-                generator.transform.localScale = new Vector3(4f, 8f, 4f);
+
+                // Foundation base
+                GameObject genBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                genBase.name = "GeneratorBase";
+                genBase.transform.SetParent(generator.transform);
+                genBase.transform.localScale = new Vector3(5f, 2f, 5f);
+                genBase.transform.localPosition = Vector3.up * 1f;
+
+                // Lower tower section
+                GameObject genLower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                genLower.name = "GeneratorLower";
+                genLower.transform.SetParent(generator.transform);
+                genLower.transform.localScale = new Vector3(4f, 5f, 4f);
+                genLower.transform.localPosition = Vector3.up * 6f;
+
+                // Upper tower section
+                GameObject genUpper = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                genUpper.name = "GeneratorUpper";
+                genUpper.transform.SetParent(generator.transform);
+                genUpper.transform.localScale = new Vector3(3.5f, 3f, 3.5f);
+                genUpper.transform.localPosition = Vector3.up * 12f;
+
+                // Dissonance emitter (top sphere)
+                GameObject emitter = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                emitter.name = "DissonanceEmitter";
+                emitter.transform.SetParent(generator.transform);
+                emitter.transform.localScale = Vector3.one * 2.5f;
+                emitter.transform.localPosition = Vector3.up * 15f;
 
                 // Placeholder visual: dark corrupted tower
-                Renderer rend = generator.GetComponent<Renderer>();
-                rend.material.color = new Color(0.15f, 0.1f, 0.15f); // Dark purple-black
+                Renderer[] renderers = generator.GetComponentsInChildren<Renderer>();
+                foreach (Renderer rend in renderers)
+                {
+                    rend.material.color = new Color(0.15f, 0.1f, 0.15f); // Dark purple-black
+                }
 
                 // Pulsing red light (dissonance emanation)
                 Light genLight = generator.AddComponent<Light>();
@@ -407,17 +516,23 @@ namespace Tartaria.Integration
 
         void SpawnChildrenOnDeck()
         {
-            // 3 adopted children from Moon 3 climb aboard flagship
+            // 3 adopted children from Moon 3 climb aboard flagship — KayKit Rogue scaled down
             for (int i = 0; i < 3; i++)
             {
-                GameObject childObj = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-                childObj.name = $"AdoptedChild_OnDeck_{i}";
-                childObj.transform.position = whiteCityDock + new Vector3(i * 2f - 2f, 3f, 2f);
-                childObj.transform.localScale = new Vector3(0.3f, 0.6f, 0.3f); // Child-sized
-
-                // Placeholder visual: warm skin tone (happy children)
-                Renderer childRend = childObj.GetComponent<Renderer>();
-                childRend.material.color = new Color(0.9f, 0.75f, 0.65f);
+                GameObject childPrefab = Resources.Load<GameObject>("Prefabs/Characters/KayKit/Char_Rogue");
+                GameObject childObj;
+                if (childPrefab != null)
+                {
+                    childObj = Instantiate(childPrefab, whiteCityDock + new Vector3(i * 2f - 2f, 0f, 2f), Quaternion.identity);
+                    childObj.name = $"AdoptedChild_OnDeck_{i}";
+                    childObj.transform.localScale = new Vector3(0.6f, 0.6f, 0.6f); // Child-sized
+                }
+                else
+                {
+                    Debug.LogError("[Moon8ContentSpawner] CRITICAL: Char_Rogue prefab missing for adopted children");
+                    childObj = new GameObject($"AdoptedChild_OnDeck_{i}_MISSING_PREFAB");
+                    childObj.transform.position = whiteCityDock + new Vector3(i * 2f - 2f, 3f, 2f);
+                }
 
                 Debug.Log($"[Moon8ContentSpawner] Adopted child {i} climbs aboard flagship: 'We're FLYING!'");
             }

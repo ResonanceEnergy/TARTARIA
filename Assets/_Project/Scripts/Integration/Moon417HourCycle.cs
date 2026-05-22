@@ -100,23 +100,56 @@ namespace Tartaria.Integration
             _clockTower = new GameObject("Moon4_ClockTower");
             _clockTower.transform.position = clockTowerPosition;
 
-            // Visual: tall tower with clock face
-            GameObject tower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            tower.transform.SetParent(_clockTower.transform);
-            tower.transform.localPosition = Vector3.zero;
-            tower.transform.localScale = new Vector3(3f, 20f, 3f);
+            // Multi-part clock tower structure
+            // Base foundation
+            GameObject towerBase = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            towerBase.name = "TowerBase";
+            towerBase.transform.SetParent(_clockTower.transform);
+            towerBase.transform.localPosition = Vector3.up * 2f;
+            towerBase.transform.localScale = new Vector3(4f, 4f, 4f);
 
-            Renderer towerRend = tower.GetComponent<Renderer>();
-            towerRend.material.color = new Color(0.6f, 0.55f, 0.5f); // Stone
+            // Lower tower section
+            GameObject towerLower = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            towerLower.name = "TowerLower";
+            towerLower.transform.SetParent(_clockTower.transform);
+            towerLower.transform.localPosition = Vector3.up * 10f;
+            towerLower.transform.localScale = new Vector3(3.5f, 12f, 3.5f);
+
+            // Upper tower section
+            GameObject towerUpper = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            towerUpper.name = "TowerUpper";
+            towerUpper.transform.SetParent(_clockTower.transform);
+            towerUpper.transform.localPosition = Vector3.up * 26f;
+            towerUpper.transform.localScale = new Vector3(3f, 8f, 3f);
+
+            // Clock chamber platform
+            GameObject clockChamber = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            clockChamber.name = "ClockChamber";
+            clockChamber.transform.SetParent(_clockTower.transform);
+            clockChamber.transform.localPosition = Vector3.up * 35f;
+            clockChamber.transform.localScale = new Vector3(5f, 2f, 5f);
 
             // Clock face (sphere on tower top)
             GameObject clockFace = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            clockFace.name = "ClockFace";
             clockFace.transform.SetParent(_clockTower.transform);
-            clockFace.transform.localPosition = new Vector3(0f, 21f, 0f);
+            clockFace.transform.localPosition = new Vector3(0f, 37f, 0f);
             clockFace.transform.localScale = new Vector3(4f, 4f, 0.5f);
 
-            Renderer clockRend = clockFace.GetComponent<Renderer>();
-            clockRend.material.color = new Color(1f, 0.95f, 0.8f); // Golden face
+            // Tower materials
+            Renderer[] towerRenderers = _clockTower.GetComponentsInChildren<Renderer>();
+            Color stoneColor = new Color(0.6f, 0.55f, 0.5f);
+            foreach (Renderer rend in towerRenderers)
+            {
+                if (rend.gameObject.name == "ClockFace")
+                {
+                    rend.material.color = new Color(1f, 0.95f, 0.8f); // Golden face
+                }
+                else
+                {
+                    rend.material.color = stoneColor; // Stone
+                }
+            }
 
             // Clock light (pulses during 17th hour)
             Light clockLight = _clockTower.AddComponent<Light>();
