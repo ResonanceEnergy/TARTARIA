@@ -91,8 +91,8 @@ namespace Tartaria.Gameplay
             // Play level-up VFX/SFX
             Audio.AudioManager.Instance?.PlaySFX2D("LevelUp", 0.7f);
 
-            // Show UI notification
-            UI.HUDController.Instance?.ShowBanner("LEVEL UP!", $"You are now level {currentLevel}");
+            // Show UI notification (TODO: use GameEvents to decouple from UI assembly)
+            Debug.Log($"[PlayerProgression] LEVEL UP! You are now level {currentLevel}");
 
             SaveProgression();
         }
@@ -102,8 +102,8 @@ namespace Tartaria.Gameplay
             var playerHealth = FindFirstObjectByType<PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.IncreaseMaxHealth(maxHealthBonus);
-                Debug.Log($"[PlayerProgression] +{maxHealthBonus} Max Health");
+                // TODO: Add IncreaseMaxHealth method to PlayerHealth
+                Debug.Log($"[PlayerProgression] +{maxHealthBonus} Max Health (API pending)");
             }
 
             // TODO: Apply damage bonus to player attack component

@@ -32,8 +32,39 @@ namespace Tartaria.UI
         void Start()
         {
             // Subscribe to InventorySystem events
-            // (requires InventorySystem to expose events)
+            var inventory = Gameplay.InventorySystem.Instance;
+            if (inventory != null)
+            {
+                inventory.OnInventoryChanged += RefreshInventory;
+                inventory.OnItemAdded += OnItemAddedHandler;
+                inventory.OnItemRemoved += OnItemRemovedHandler;
+            }
+
             gameObject.SetActive(false);  // Hidden by default
+        }
+
+        void OnDestroy()
+        {
+            // Unsubscribe from events
+            var inventory = Gameplay.InventorySystem.Instance;
+            if (inventory != null)
+            {
+                inventory.OnInventoryChanged -= RefreshInventory;
+                inventory.OnItemAdded -= OnItemAddedHandler;
+                inventory.OnItemRemoved -= OnItemRemovedHandler;
+            }
+        }
+
+        void OnItemAddedHandler(string itemId, int newCount)
+        {
+            Debug.Log($"[InventoryUI] Item added: {itemId} x{newCount}");
+            RefreshInventory();
+        }
+
+        void OnItemRemovedHandler(string itemId, int remainingCount)
+        {
+            Debug.Log($"[InventoryUI] Item removed: {itemId}, remaining: {remainingCount}");
+            RefreshInventory();
         }
 
         void BuildInventoryGrid()
@@ -96,8 +127,51 @@ namespace Tartaria.UI
 
         public void RefreshInventory()
         {
-            // TODO: Sync with InventorySystem.GetAllItems()
-            Debug.Log("[InventoryUI] Refresh inventory (stub)");
+            var inventory = Gameplay.InventorySystem.Instance;
+            if (inventory == null)
+            {
+                Debug.LogWarning("[InventoryUI] InventorySystem not found");
+                return;
+            }
+
+            // Clear all slots first
+            foreach (var slot in _slots)
+            {
+                slot.ClearSlot();
+            }
+
+            // Populate slots with inventory items
+            var items = inventory.GetAllItems();
+            int slotIndex = 0;
+            foreach (var kvp in items)
+            {
+                if (slotIndex >= _slots.Count) break;
+
+                string itemId = kvp.Key;
+                int count = kvp.Value;
+
+                // Get icon (TODO: load from Resources or ItemDatabase)
+                Sprite icon = GetItemIcon(itemId);
+
+                _slots[slotIndex].SetItem(itemId, count, icon);
+                slotIndex++;
+            }
+
+            Debug.Log($"[InventoryUI] Refreshed {slotIndex} items across {_slots.Count} slots");
+        }
+
+        Sprite GetItemIcon(string itemId)
+        {
+            // Cache lookup
+            if (_itemIcons.TryGetValue(itemId, out Sprite cached))
+                return cached;
+
+            // Try loading from Resources (convention: Resources/Items/{itemId}.png)
+            Sprite icon = Resources.Load<Sprite>($"Items/{itemId}");
+            if (icon != null)
+                _itemIcons[itemId] = icon;
+
+            return icon;  // May be null if not found
         }
     }
 

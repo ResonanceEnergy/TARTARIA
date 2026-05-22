@@ -13,6 +13,7 @@ namespace Tartaria.Save
     [Serializable]
     public class SaveData
     {
+        public int version = SaveFileVersion.CURRENT_VERSION;  // Save format version for migrations
         public SaveHeader header = new();
         public PlayerSaveData player = new();
         public WorldSaveData world = new();

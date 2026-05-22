@@ -159,12 +159,12 @@ namespace Tartaria.AI
             var playerHealth = _player.GetComponent<Gameplay.PlayerHealth>();
             if (playerHealth != null)
             {
-                playerHealth.TakeDamage(attackDamage);
+                playerHealth.TakeDamage(Mathf.RoundToInt(attackDamage));
                 Debug.Log($"[EnemyAI] {gameObject.name} attacked player for {attackDamage} damage");
             }
 
-            // Play attack SFX
-            Audio.AudioManager.Instance?.PlaySFX("EnemyAttack", transform.position, 0.5f);
+            // Play attack SFX (fully qualified to avoid assembly dependency)
+            Tartaria.Audio.AudioManager.Instance?.PlaySFX("EnemyAttack", transform.position, 0.5f);
 
             // TODO: Trigger attack animation
         }

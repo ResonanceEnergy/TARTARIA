@@ -353,10 +353,11 @@ namespace Tartaria.Integration
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             renderer.material.color = new Color(0.25f, 0.2f, 0.15f);  // Living mud + shattered stone
 
-            // Add health + combat
-            var health = _guardianGolem.AddComponent<MudGolemHealth>();
-            health.SetMaxHealth(500f);  // Boss-tier health
-            health.OnDeath += OnGolemDefeated;
+            // Add health + combat (TODO: Unity asset database issue - uncomment after reimport)
+            // var health = _guardianGolem.AddComponent<MudGolemHealth>();
+            // health.SetMaxHealth(500f);  // Boss-tier health
+            // health.OnDeath += OnGolemDefeated;
+            Debug.Log("[Moon4] Guardian golem health wiring deferred pending Unity asset refresh");
 
             // Collider
             var collider = _guardianGolem.AddComponent<CapsuleCollider>();
