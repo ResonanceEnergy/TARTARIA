@@ -386,7 +386,7 @@ namespace Tartaria.Integration
 
             // Wire live to HUD wheel (production polish)
             float freq = c.CurrentFrequency;
-            Tartaria.UI.HUDController.Instance?.UpdateFrequencyWheel(freq, 0f);
+            GameEvents.RaiseHUDUpdateFrequencyWheel(freq, 0f);
 
             // Accessibility richer feedback (captions + screen reader)
             Tartaria.UI.AccessibilityManager.Instance?.PostSFXCaption("FrequencyWheel", $"Player frequency adjusted by {deltaHz:+0;-0} Hz → now {freq:F0} Hz.");

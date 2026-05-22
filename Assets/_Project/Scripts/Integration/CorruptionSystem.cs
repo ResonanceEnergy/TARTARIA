@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {

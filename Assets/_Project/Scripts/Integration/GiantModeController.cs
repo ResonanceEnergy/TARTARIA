@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {

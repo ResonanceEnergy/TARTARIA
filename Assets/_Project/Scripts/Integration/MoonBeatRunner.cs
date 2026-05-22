@@ -1,7 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -148,7 +147,7 @@ namespace Tartaria.Integration
             string title = $"MOON {definition.number:D2}  —  {b.ToString().ToUpperInvariant()}";
             MoonHUDBanner.Show(title, subtitle, BeatTint(b));
             // Also push to existing HUDController objective slot for back-compat.
-            HUDController.Instance?.ShowObjective($"<b>{title}</b>\n<size=70%>{subtitle}</size>");
+            GameEvents.RaiseHUDShowObjective($"<b>{title}</b>\n<size=70%>{subtitle}</size>");
         }
 
         string BeatSubtitle(Beat b)

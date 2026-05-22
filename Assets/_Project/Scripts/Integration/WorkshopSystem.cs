@@ -4,7 +4,6 @@ using UnityEngine;
 using Unity.Entities;
 using Tartaria.Core;
 using Tartaria.Gameplay;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -102,7 +101,7 @@ namespace Tartaria.Integration
             // Quest integration
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, buildingId);
 
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"{building?.Definition?.buildingName ?? buildingId} upgraded to Tier {newTier}!");
 
             Debug.Log($"[Workshop] {buildingId} upgraded to Tier {newTier}");

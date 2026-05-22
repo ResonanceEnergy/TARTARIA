@@ -4,7 +4,6 @@ using Tartaria.Gameplay;
 using Tartaria.Save;
 using Tartaria.Audio;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {

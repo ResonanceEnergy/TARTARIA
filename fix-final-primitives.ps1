@@ -1,4 +1,4 @@
-cd C:\dev\TARTARIA_new
+﻿cd C:\dev\TARTARIA_new
 
 $file = "Assets\_Project\Scripts\Integration\EchohavenContentSpawner.cs"
 $content = Get-Content $file -Raw

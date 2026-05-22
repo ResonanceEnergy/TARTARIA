@@ -6,7 +6,6 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Audio;
 using Tartaria.Save;
-using Tartaria.UI;
 using Tartaria.Input;
 using Tartaria.Gameplay;
 using Tartaria.Camera;
@@ -712,7 +711,7 @@ namespace Tartaria.Integration
                 if (_rsBuffTimer <= 0f)
                 {
                     _rsBuffTimer = 0f;
-                    HUDController.Instance?.ShowInteractionPrompt("Resonance Amplifier expired.");
+                    GameEvents.RaiseHUDShowInteractionPrompt("Resonance Amplifier expired.");
                 }
             }
 
@@ -863,7 +862,7 @@ namespace Tartaria.Integration
         {
             Debug.Log("[GameLoop] Tutorial complete — unlocking first quest.");
             QuestManager.Instance?.UnlockQuest("echohaven_awakening");
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "Tutorial complete! Open your Quest Log (J) to begin.");
         }
 
@@ -885,7 +884,7 @@ namespace Tartaria.Integration
             AchievementSystem.Instance?.CheckBossDefeated(result.bossName ?? "boss");
 
             // Hide boss health bar + freq puzzle HUD
-            HUDController.Instance?.HideBossHealth();
+            GameEvents.RaiseHUDHideBossHealth();
 
             // Return to exploration after cinematic
             GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
@@ -894,7 +893,7 @@ namespace Tartaria.Integration
 
         void HandleBossHealthChanged(float normalizedHealth)
         {
-            HUDController.Instance?.UpdateBossHealth(normalizedHealth);
+            GameEvents.RaiseHUDUpdateBossHealth(normalizedHealth);
 
             // Round 4: Keep in-boss CurrentTargetFrequency HUD live + vuln state
             var bossSys = BossEncounterSystem.Instance;
@@ -910,7 +909,7 @@ namespace Tartaria.Integration
 
             // Show moon trophy banner
             string moonName = ZoneTransitionSystem.Instance?.CurrentZone?.zoneName ?? $"Moon {moonIndex + 1}";
-            HUDController.Instance?.ShowMoonTrophy(
+            GameEvents.RaiseHUDShowMoonTrophy(
                 $"{moonName} Restored!",
                 "The resonance deepens. A new path opens.");
 
@@ -922,7 +921,7 @@ namespace Tartaria.Integration
             EconomySystem.Instance?.AddCurrency(CurrencyType.AetherShards, 50 + moonIndex * 10);
 
             // Flash the RS gauge
-            HUDController.Instance?.FlashRSGain(25f);
+            GameEvents.RaiseHUDFlashRSGain(25f);
 
             SaveManager.Instance?.MarkDirty();
         }
@@ -936,7 +935,7 @@ namespace Tartaria.Integration
 
             // Show boss health bar when boss encounters start
             if (BossEncounterSystem.Instance != null && BossEncounterSystem.Instance.IsActive)
-                HUDController.Instance?.ShowBossHealth(
+                GameEvents.RaiseHUDShowBossHealth(
                     BossEncounterSystem.Instance.CurrentBoss?.bossName ?? "Boss", 1f);
         }
 
@@ -951,7 +950,7 @@ namespace Tartaria.Integration
         {
             Debug.Log("[GameLoop] All combat waves cleared.");
             HUDController.Instance?.HideWaveCounter();
-            HUDController.Instance?.HideBossHealth();
+            GameEvents.RaiseHUDHideBossHealth();
             NotificationSystem.Instance?.Show("All waves eliminated! Victory!", NotificationType.Combat);
             AdaptiveMusicController.Instance?.ExitCombat();
             SaveManager.Instance?.MarkDirty();
@@ -1200,7 +1199,7 @@ namespace Tartaria.Integration
             {
                 Debug.Log("[GameLoop] Post-fountain climax: spawning Mud Colossus boss encounter.");
                 VFXController.Instance?.PlayEffect(VFXEffect.CorruptionPulse, fountainPos + Vector3.up * 3f);
-                HUDController.Instance?.ShowObjective("The earth itself awakens — DEFEAT THE MUD COLOSSUS!");
+                GameEvents.RaiseHUDShowObjective("The earth itself awakens — DEFEAT THE MUD COLOSSUS!");
                 BossEncounterSystem.Instance.SpawnBoss("mud_colossus");
                 // Center visual proxy near fountain
                 if (BossEncounterSystem.Instance.CurrentBoss != null && BossEncounterSystem.Instance.CurrentBoss.bossName.Contains("Mud"))
@@ -1315,7 +1314,7 @@ namespace Tartaria.Integration
         public void ActivateRSBuff(float duration = RS_BUFF_DURATION)
         {
             _rsBuffTimer = duration;
-            HUDController.Instance?.ShowInteractionPrompt($"Resonance Amplifier active! +25% RS for {duration:F0}s");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Resonance Amplifier active! +25% RS for {duration:F0}s");
             Debug.Log($"[GameLoop] RS buff activated for {duration}s");
         }
 
@@ -1461,12 +1460,12 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(6f);
 
             // Display zone complete message via HUD
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "ECHOHAVEN RESTORED\nResonance Score: 100 — Zone Complete");
 
             yield return new WaitForSeconds(5f);
 
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
 
             // Return to exploration — in full game this would advance to next zone
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
@@ -2879,14 +2878,14 @@ namespace Tartaria.Integration
 
         void HandleChoirFailed()
         {
-            HUDController.Instance?.ShowInteractionPrompt("The choir's harmony collapsed...");
+            GameEvents.RaiseHUDShowInteractionPrompt("The choir's harmony collapsed...");
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
             Debug.Log("[GameLoop] Choir Harmonics performance failed.");
         }
 
         void HandleConvergenceFailed()
         {
-            HUDController.Instance?.ShowInteractionPrompt("The cosmic alignment slipped away...");
+            GameEvents.RaiseHUDShowInteractionPrompt("The cosmic alignment slipped away...");
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
             Debug.Log("[GameLoop] Cosmic Convergence failed.");
         }
@@ -2898,7 +2897,7 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayLeyLineRestore(
                 UnityEngine.Vector3.zero,
                 UnityEngine.Vector3.one);
-            HUDController.Instance?.ShowInteractionPrompt($"Ley line restored between nodes {nodeA} and {nodeB}!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Ley line restored between nodes {nodeA} and {nodeB}!");
             Debug.Log($"[GameLoop] Ley line restored: {nodeA} ↔ {nodeB}, +{rsReward} RS");
         }
 
@@ -2920,7 +2919,7 @@ namespace Tartaria.Integration
                 "Twilight Garden", "Titan's Breach", "Resonance Peak"
             };
             string zoneName = zoneIndex < zoneNames.Length ? zoneNames[zoneIndex] : $"Zone {zoneIndex}";
-            HUDController.Instance?.ShowInteractionPrompt($"Memory: {zoneName}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Memory: {zoneName}");
             Debug.Log($"[GameLoop] Memory zone changed to: {zoneName} ({zoneIndex})");
         }
 
@@ -2930,7 +2929,7 @@ namespace Tartaria.Integration
         {
             int delta = newAmt - oldAmt;
             string sign = delta > 0 ? "+" : "";
-            HUDController.Instance?.ShowInteractionPrompt($"{type}: {sign}{delta} (now {newAmt})");
+            GameEvents.RaiseHUDShowInteractionPrompt($"{type}: {sign}{delta} (now {newAmt})");
             if (delta > 0)
                 AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
             Debug.Log($"[GameLoop] Currency {type}: {oldAmt} → {newAmt}");
@@ -2954,14 +2953,14 @@ namespace Tartaria.Integration
 
         void HandleRecipeDiscovered(string recipeId)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"New recipe discovered: {recipeId}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"New recipe discovered: {recipeId}");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.Discovery);
             Debug.Log($"[GameLoop] Recipe discovered: {recipeId}");
         }
 
         void HandleCraftFailed(string recipeId, string reason)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Craft failed: {reason}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Craft failed: {reason}");
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
             Debug.Log($"[GameLoop] Craft failed: {recipeId} — {reason}");
         }
@@ -2984,7 +2983,7 @@ namespace Tartaria.Integration
         void HandleCorruptionChanged(string buildingId, float newLevel)
         {
             if (newLevel > 0.7f)
-                HUDController.Instance?.ShowInteractionPrompt($"Warning: {buildingId} corruption critical!");
+                GameEvents.RaiseHUDShowInteractionPrompt($"Warning: {buildingId} corruption critical!");
             Debug.Log($"[GameLoop] Corruption changed: {buildingId} → {newLevel:F2}");
         }
 
@@ -3000,7 +2999,7 @@ namespace Tartaria.Integration
 
         void HandleCorruptionSpread(string from, string to)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Corruption spreading from {from}!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Corruption spreading from {from}!");
             VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 10f);
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
             Debug.Log($"[GameLoop] Corruption spread: {from} → {to}");
@@ -3019,7 +3018,7 @@ namespace Tartaria.Integration
 
         void HandleLayerCleared(ExcavationSite site, int layerIndex)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Layer {layerIndex + 1} cleared at {site.siteId}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Layer {layerIndex + 1} cleared at {site.siteId}");
             HapticFeedbackManager.Instance?.PlayPerfectTune();
             Debug.Log($"[GameLoop] Layer {layerIndex} cleared at {site.siteId}");
         }
@@ -3037,7 +3036,7 @@ namespace Tartaria.Integration
         void HandleExcavationRS(ExcavationSite site, float rsAmount)
         {
             QueueRSReward(rsAmount, $"excavation_{site.siteId}");
-            HUDController.Instance?.FlashRSGain(rsAmount);
+            GameEvents.RaiseHUDFlashRSGain(rsAmount);
             Debug.Log($"[GameLoop] Excavation RS yield: +{rsAmount} from {site.siteId}");
         }
 
@@ -3064,7 +3063,7 @@ namespace Tartaria.Integration
 
         void HandleBossSpawned(BossDefinition boss)
         {
-            HUDController.Instance?.ShowBossHealth(boss.bossName, 1f);
+            GameEvents.RaiseHUDShowBossHealth(boss.bossName, 1f);
             AdaptiveMusicController.Instance?.EnterBossEncounter();
             HapticFeedbackManager.Instance?.PlayGolemSpawn();
             VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 20f);
@@ -3078,7 +3077,7 @@ namespace Tartaria.Integration
 
         void HandleBossPhaseChanged(int phase)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Boss entering phase {phase + 1}!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Boss entering phase {phase + 1}!");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.BossPhase);
             HapticFeedbackManager.Instance?.PlayMoonHaptic(_currentMoonIndex, HapticContext.BossPhaseShift);
             Debug.Log($"[GameLoop] Boss phase changed: {phase}");
@@ -3105,7 +3104,7 @@ namespace Tartaria.Integration
 
         void HandleRockCutFailed()
         {
-            HUDController.Instance?.ShowInteractionPrompt("The rock shattered... resonance lost.");
+            GameEvents.RaiseHUDShowInteractionPrompt("The rock shattered... resonance lost.");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningFail);
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
             Debug.Log("[GameLoop] Rock cutting failed.");
@@ -3123,7 +3122,7 @@ namespace Tartaria.Integration
 
         void HandleOrganFailed()
         {
-            HUDController.Instance?.ShowInteractionPrompt("The organ pipes fell silent...");
+            GameEvents.RaiseHUDShowInteractionPrompt("The organ pipes fell silent...");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningFail);
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
             Debug.Log("[GameLoop] Pipe organ failed.");
@@ -3170,7 +3169,7 @@ namespace Tartaria.Integration
 
         void HandleEndingChosen(CampaignFlowController.EndingPath ending)
         {
-            HUDController.Instance?.ShowMoonTrophy("THE END",
+            GameEvents.RaiseHUDShowMoonTrophy("THE END",
                 $"Path: {ending}");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.ZoneComplete);
             Debug.Log($"[GameLoop] Ending chosen: {ending}");
@@ -3190,7 +3189,7 @@ namespace Tartaria.Integration
 
         void HandleAnastasiaSolidification(SolidificationPhase phase)
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"Anastasia solidification: phase {(int)phase}");
             Debug.Log($"[GameLoop] Anastasia solidification phase: {phase}");
         }
@@ -3199,7 +3198,7 @@ namespace Tartaria.Integration
 
         void HandleCassianIntel(string intel)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Cassian: \"{intel}\"");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Cassian: \"{intel}\"");
             DialogueManager.Instance?.PlayContextDialogue("discovery");
             CompanionManager.Instance?.AddTrust("cassian", 5f);
             Debug.Log($"[GameLoop] Cassian shared intel: {intel}");
@@ -3210,7 +3209,7 @@ namespace Tartaria.Integration
         void HandleNodeActivated(int nodeIndex)
         {
             VFXController.Instance?.PlayResonancePulse(Vector3.zero, 8f);
-            HUDController.Instance?.ShowInteractionPrompt($"Ley node {nodeIndex} activated!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Ley node {nodeIndex} activated!");
             QueueRSReward(10f, $"ley_node_{nodeIndex}");
             Debug.Log($"[GameLoop] Ley node activated: {nodeIndex}");
         }
@@ -3218,7 +3217,7 @@ namespace Tartaria.Integration
         void HandleNodeSevered(int nodeIndex)
         {
             VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 8f);
-            HUDController.Instance?.ShowInteractionPrompt($"Ley node {nodeIndex} severed!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Ley node {nodeIndex} severed!");
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
             Debug.Log($"[GameLoop] Ley node severed: {nodeIndex}");
         }
@@ -3236,7 +3235,7 @@ namespace Tartaria.Integration
 
         void HandleMercuryOrbTuned(int shipIndex, int orbCount)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Mercury orb {orbCount} tuned on airship {shipIndex + 1}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Mercury orb {orbCount} tuned on airship {shipIndex + 1}");
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
             HapticFeedbackManager.Instance?.PlayPerfectTune();
             Debug.Log($"[GameLoop] Mercury orb tuned: ship={shipIndex}, orbs={orbCount}");
@@ -3244,7 +3243,7 @@ namespace Tartaria.Integration
 
         void HandleFormationChanged(AirshipFleetManager.FleetFormation formation)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Fleet formation: {formation}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Fleet formation: {formation}");
             Debug.Log($"[GameLoop] Fleet formation changed: {formation}");
         }
 
@@ -3294,7 +3293,7 @@ namespace Tartaria.Integration
 
         void HandleAquiferLayerPurged(int layer, float accuracy)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Aquifer layer {layer + 1} purged ({accuracy:P0})");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Aquifer layer {layer + 1} purged ({accuracy:P0})");
             VFXController.Instance?.PlayResonancePulse(Vector3.down * layer * 5f, 10f);
             HapticFeedbackManager.Instance?.PlayPerfectTune();
             QueueRSReward(15f * accuracy, $"aquifer_layer_{layer}");
@@ -3303,7 +3302,7 @@ namespace Tartaria.Integration
 
         void HandleAquiferBossSpawned()
         {
-            HUDController.Instance?.ShowBossHealth("Sludge Leviathan", 1f);
+            GameEvents.RaiseHUDShowBossHealth("Sludge Leviathan", 1f);
             AdaptiveMusicController.Instance?.EnterBossEncounter();
             HapticFeedbackManager.Instance?.PlayGolemSpawn();
             Debug.Log("[GameLoop] Aquifer boss spawned: Sludge Leviathan");
@@ -3318,14 +3317,14 @@ namespace Tartaria.Integration
 
         void HandleBuildingIncome(string buildingId, int income)
         {
-            HUDController.Instance?.FlashRSGain(income);
+            GameEvents.RaiseHUDFlashRSGain(income);
             Debug.Log($"[GameLoop] Building income: {buildingId} → +{income}");
         }
 
         void HandleAchievementProgress(string achievementId, float progress)
         {
             if (progress >= 0.5f && progress < 0.51f) // halfway milestone
-                HUDController.Instance?.ShowInteractionPrompt($"Achievement progress: {achievementId} 50%");
+                GameEvents.RaiseHUDShowInteractionPrompt($"Achievement progress: {achievementId} 50%");
             Debug.Log($"[GameLoop] Achievement progress: {achievementId} → {progress:P0}");
         }
 
@@ -3372,7 +3371,7 @@ namespace Tartaria.Integration
             VFXController.Instance?.PlayResonancePulse(Vector3.zero, 20f);
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
             HapticFeedbackManager.Instance?.PlayPerfectTune();
-            HUDController.Instance?.ShowInteractionPrompt("Resonance peak!");
+            GameEvents.RaiseHUDShowInteractionPrompt("Resonance peak!");
             Debug.Log("[GameLoop] Conduit resonance peak");
         }
 
@@ -3389,7 +3388,7 @@ namespace Tartaria.Integration
         void HandleRockComboChanged(int combo)
         {
             if (combo >= 3)
-                HUDController.Instance?.ShowInteractionPrompt($"Combo x{combo}!");
+                GameEvents.RaiseHUDShowInteractionPrompt($"Combo x{combo}!");
             if (combo >= 5)
                 AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
             Debug.Log($"[GameLoop] Rock cutting combo: {combo}");
@@ -3409,7 +3408,7 @@ namespace Tartaria.Integration
         {
             VFXController.Instance?.PlayDissonancePulse(Vector3.zero, 5f);
             HapticFeedbackManager.Instance?.PlayDissonanceAlert();
-            HUDController.Instance?.ShowInteractionPrompt("Chain broken! Re-align segments.");
+            GameEvents.RaiseHUDShowInteractionPrompt("Chain broken! Re-align segments.");
             Debug.Log($"[GameLoop] Train chain broken at segment {segmentIndex}");
         }
 
@@ -3452,7 +3451,7 @@ namespace Tartaria.Integration
         void HandleChordAdvanced(int chordIndex)
         {
             AdaptiveMusicController.Instance?.PlayStinger(StingerType.TuningSuccess);
-            HUDController.Instance?.ShowInteractionPrompt($"Chord {chordIndex + 1} complete!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Chord {chordIndex + 1} complete!");
             QueueRSReward(5f, $"chord_{chordIndex}");
             Debug.Log($"[GameLoop] Chord advanced: {chordIndex}");
         }
@@ -3461,7 +3460,7 @@ namespace Tartaria.Integration
 
         void HandleAnastasiaLine(AnastasiaLine line)
         {
-            HUDController.Instance?.ShowInteractionPrompt(line.text);
+            GameEvents.RaiseHUDShowInteractionPrompt(line.text);
             Debug.Log($"[GameLoop] Anastasia line delivered: #{line.id} [{line.category}]");
         }
 
@@ -3477,10 +3476,10 @@ namespace Tartaria.Integration
 
         void HandleBossFailed()
         {
-            HUDController.Instance?.ShowInteractionPrompt("Boss encounter failed — regroup and retune your frequency. The world remembers.");
+            GameEvents.RaiseHUDShowInteractionPrompt("Boss encounter failed — regroup and retune your frequency. The world remembers.");
             AdaptiveMusicController.Instance?.ExitCombat();
             HapticFeedbackManager.Instance?.PlayCombatHit();
-            HUDController.Instance?.HideBossHealth(); // also hides freq target display
+            GameEvents.RaiseHUDHideBossHealth(); // also hides freq target display
             HUDController.Instance?.HideBossTargetFrequency();
             // Graceful: leave player in exploration with partial RS penalty avoided (no punishment beyond lost opportunity)
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
@@ -3489,7 +3488,7 @@ namespace Tartaria.Integration
 
         void HandleClimaxStarted(int moonIndex)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Climax sequence beginning for Moon {moonIndex + 1}!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Climax sequence beginning for Moon {moonIndex + 1}!");
             AdaptiveMusicController.Instance?.EnterCombat();
             HapticFeedbackManager.Instance?.PlayMoonHaptic(moonIndex, HapticContext.BossPhaseShift);
             Debug.Log($"[GameLoop] Climax started: Moon {moonIndex}");
@@ -3497,7 +3496,7 @@ namespace Tartaria.Integration
 
         void HandleScanStarted()
         {
-            HUDController.Instance?.ShowInteractionPrompt("Resonance scan initiated...");
+            GameEvents.RaiseHUDShowInteractionPrompt("Resonance scan initiated...");
             HapticFeedbackManager.Instance?.PlayDiscovery();
             Debug.Log("[GameLoop] Resonance scan started.");
         }
@@ -3505,7 +3504,7 @@ namespace Tartaria.Integration
         void HandleScanComplete(System.Collections.Generic.List<ScanResult> results)
         {
             int count = results?.Count ?? 0;
-            HUDController.Instance?.ShowInteractionPrompt($"Scan complete — {count} signal(s) detected.");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Scan complete — {count} signal(s) detected.");
             if (count > 0)
                 AdaptiveMusicController.Instance?.PlayDiscovery();
             Debug.Log($"[GameLoop] Scan complete: {count} results.");
@@ -3538,21 +3537,21 @@ namespace Tartaria.Integration
 
         void HandleTrainDeparted(int from, int to)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Train departing: station {from} → {to}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Train departing: station {from} → {to}");
             HapticFeedbackManager.Instance?.PlayMoonHaptic(_currentMoonIndex, HapticContext.ZoneTransition);
             Debug.Log($"[GameLoop] Train departed: {from} → {to}");
         }
 
         void HandleTrainArrived(int stationIndex)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Arrived at station {stationIndex}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Arrived at station {stationIndex}");
             AdaptiveMusicController.Instance?.PlayDiscovery();
             Debug.Log($"[GameLoop] Train arrived: station {stationIndex}");
         }
 
         void HandleRailLeviathan()
         {
-            HUDController.Instance?.ShowInteractionPrompt("Rail Leviathan approaches!");
+            GameEvents.RaiseHUDShowInteractionPrompt("Rail Leviathan approaches!");
             AdaptiveMusicController.Instance?.EnterCombat();
             HapticFeedbackManager.Instance?.PlayCombatHit();
             Debug.Log("[GameLoop] Rail Leviathan encounter triggered.");
@@ -3561,7 +3560,7 @@ namespace Tartaria.Integration
         void HandleTowerTuned(int towerIndex, float accuracy)
         {
             QueueRSReward(5f * accuracy, "tower_tuned");
-            HUDController.Instance?.ShowInteractionPrompt($"Tower {towerIndex} tuned — accuracy {accuracy:P0}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Tower {towerIndex} tuned — accuracy {accuracy:P0}");
             HapticFeedbackManager.Instance?.PlayDiscovery();
             Debug.Log($"[GameLoop] Tower tuned: {towerIndex}, accuracy {accuracy:F2}");
         }
@@ -3580,7 +3579,7 @@ namespace Tartaria.Integration
 
         void HandleTowerDesynced(int towerIndex)
         {
-            HUDController.Instance?.ShowInteractionPrompt($"Tower {towerIndex} lost synchronization!");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Tower {towerIndex} lost synchronization!");
             HapticFeedbackManager.Instance?.PlayCombatHit();
             Debug.Log($"[GameLoop] Tower desynced: {towerIndex}");
         }

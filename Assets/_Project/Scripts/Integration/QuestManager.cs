@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 using Tartaria.Data;
 
@@ -234,7 +233,7 @@ namespace Tartaria.Integration
             if (_questLookup.TryGetValue(questId, out var questDef))
             {
                 DialogueManager.Instance?.PlayContextDialogue("quest_start");
-                HUDController.Instance?.ShowInteractionPrompt($"New Quest: {questDef.displayName}");
+                GameEvents.RaiseHUDShowInteractionPrompt($"New Quest: {questDef.displayName}");
                 AudioManager.Instance?.PlaySFX2D("QuestAccept");
                 Input.HapticFeedbackManager.Instance?.PlayDiscovery();
             }
@@ -440,7 +439,7 @@ namespace Tartaria.Integration
                 }
 
                 DialogueManager.Instance?.PlayContextDialogue("quest_complete");
-                HUDController.Instance?.ShowInteractionPrompt($"Quest Complete: {def.displayName}");
+                GameEvents.RaiseHUDShowInteractionPrompt($"Quest Complete: {def.displayName}");
                 AudioManager.Instance?.PlaySFX2D("QuestComplete");
                 Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
                 Save.SaveManager.Instance?.MarkDirty();

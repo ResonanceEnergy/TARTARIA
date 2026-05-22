@@ -6,7 +6,6 @@ using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -100,7 +99,7 @@ namespace Tartaria.Integration
                 Instantiate(_clockMechanismPrefab, _clockTowerSocket.position, _clockTowerSocket.rotation);
             }
             if (_moonCleared)
-                HUDController.Instance?.ShowObjective(
+                GameEvents.RaiseHUDShowObjective(
                     "<b>SOLAR MOON — THE PROPHECY UNFOLDS</b>\n" +
                     "Six stones aligned. The aurora city spoke. The clock ticks on the 17th Hour.");
         }
@@ -121,11 +120,11 @@ namespace Tartaria.Integration
         // ─── Beat 1: Discovery ─────────────────────────────────────
         private IEnumerator Beat1_Discovery()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "SOLAR MOON — DISCOVERY",
                 "Prophecy stones — ancient crystals inscribed with golden-ratio patterns — appear across the grid as floating golden markers at ley-line intersections.",
                 8f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Locate the first prophecy stone via airship or train.");
 
             AudioManager.Instance?.PlaySFX2D("prophecy_stone_hum_ambient");
@@ -134,7 +133,7 @@ namespace Tartaria.Integration
             bool cassianRedeemed = SaveManager.Instance?.CurrentSave?.GetMoonFlag(0, "cassian_fate_redeemed") ?? false;
             if (cassianRedeemed)
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "CASSIAN (redeemed)",
                     "He provides coded translations from his Reset contact days, speeding prophecy stone discovery.",
                     6f);
@@ -142,7 +141,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "CASSIAN'S GHOST-ECHO",
                     "His ghost-echo haunts stone locations, offering cryptic directions from beyond.",
                     6f);
@@ -165,12 +164,12 @@ namespace Tartaria.Integration
         // ─── Beat 2: Restoration — collect all 6 stones, each triggers vision ───
         private IEnumerator Beat2_Restoration()
         {
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 $"Collect and align all 6 prophecy stones. [{_stonesCollected}/6]");
 
             yield return new WaitUntil(() => _stonesCollected >= 6);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "SIX STONES ALIGNED",
                 "Each stone triggers a Prophecy Vision when held during the 17th Hour. " +
                 "Giants and humans in communal song. Water fountains feeding ionized mist. Sound waves parting granite.",
@@ -199,11 +198,11 @@ namespace Tartaria.Integration
         {
             _stonesCollected = Mathf.Max(_stonesCollected, stoneIndex + 1);
             SaveManager.Instance?.CurrentSave?.SetMoonFlag(MOON_NUM, "stones_collected_int", _stonesCollected);
-            HUDController.Instance?.ShowObjective($"Collect prophecy stones: [{_stonesCollected}/6]");
+            GameEvents.RaiseHUDShowObjective($"Collect prophecy stones: [{_stonesCollected}/6]");
 
             if (stoneIndex < _stoneNames.Length)
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     $"PROPHECY VISION — {_stoneNames[stoneIndex]}",
                     _stoneVisions[stoneIndex],
                     9f);
@@ -218,13 +217,13 @@ namespace Tartaria.Integration
         {
             yield return new WaitForSeconds(1f);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "THE DISSONANT ONE SPEAKS",
                 "Zereth's echo appears as a dark shimmer at the edge of each prophecy vision — and speaks directly to you for the first time.",
                 8f);
             AudioManager.Instance?.PlaySFX2D("zereth_first_direct_vo");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "ZERETH (distorted, agonized)",
                 "\"You see paradise. I saw a cage. They called it harmony. I called it submission. " +
                 "One note — one frequency — forever? I wanted MORE.\"",
@@ -236,7 +235,7 @@ namespace Tartaria.Integration
             GameEvents.FireCriticalSaveTrigger("zereth_first_contact");
 
             // Reset attacks on prophecy sites
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESET AGENTS — INTENSIFIED ASSAULT",
                 "Reset forces are targeting prophecy stone sites specifically. Defend the stones.",
                 7f);
@@ -258,7 +257,7 @@ namespace Tartaria.Integration
         {
             yield return new WaitForSeconds(1f);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "ALL SIX STONES ALIGNED — AURORA CITY",
                 "A temporary floating aurora city appears above you — a complete Golden Age district: " +
                 "domes, spires, fountains, trains, all in perfect operation. For 3 minutes.",
@@ -268,7 +267,7 @@ namespace Tartaria.Integration
             if (_floatingAuroraCityFX != null)
                 _floatingAuroraCityFX.SetActive(true);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MILO (staring up)",
                 "\"That's real, isn't it? Not a sales pitch. Not a postcard. That's what we were supposed to have.\"",
                 9f);
@@ -281,7 +280,7 @@ namespace Tartaria.Integration
             if (_floatingAuroraCityFX != null)
                 _floatingAuroraCityFX.SetActive(false);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "THE CITY FADES",
                 "It's gone. The loss hits harder than any boss fight. But now you know what you're building toward.",
                 9f);
@@ -300,7 +299,7 @@ namespace Tartaria.Integration
         {
             yield return new WaitForSeconds(2f);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "STONE OF STARS — ANOMALY",
                 "The 6th stone shows a timestamp: the vision is dated to the Rhythmic Moon, 17th Hour — " +
                 "the SAME time Zereth allegedly triggered the Flood. But in the vision, the bells ring in PERFECT HARMONY. Nothing is wrong.",
@@ -309,7 +308,7 @@ namespace Tartaria.Integration
 
             yield return new WaitForSeconds(5f);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "THE CENTRAL MYSTERY DEEPENS",
                 "The Mud Flood happened AFTER the vision ends. What happened between the ringing bells and the cataclysm? " +
                 "Three figures at a trigger device. One giant. Two humans.",
@@ -320,7 +319,7 @@ namespace Tartaria.Integration
 
             // Install 17-hour clock
             yield return new WaitForSeconds(3f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Install the 17-hour clock mechanism in the bell tower.");
 
             yield return new WaitUntil(() => FindObjectOfType<Moon9ClockInstallPoint>()?.IsInstalled ?? true);
@@ -328,7 +327,7 @@ namespace Tartaria.Integration
             _clockInstalled = true;
             SaveManager.Instance?.CurrentSave?.SetMoonFlag(MOON_NUM, "clock_installed", true);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "17-HOUR CLOCK INSTALLED",
                 "Permanent time-bend ability unlocked. During the 17th Hour, resonance sensitivity is doubled " +
                 "and Aether yields from all structures increase.",
@@ -349,7 +348,7 @@ namespace Tartaria.Integration
             MoonProgressTracker.Instance?.MarkCleared(MOON_NUM);
             GameEvents.FireCriticalSaveTrigger("moon9_complete");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "SOLAR MOON — COMPLETE",
                 "The prophecy stones remember. Zereth's voice lingers. The truth approaches.",
                 8f);

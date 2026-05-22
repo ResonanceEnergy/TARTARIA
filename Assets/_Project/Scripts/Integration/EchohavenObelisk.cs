@@ -1,7 +1,6 @@
 using System.Text;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {

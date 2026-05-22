@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Save;
@@ -342,7 +342,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.ProgressObjective("moon9_collect_prophecy_stones", 0);
 
             // HUD: Show progress
-            UI.HUDController.Instance?.ShowObjective($"Prophecy Stones: {_stonesCollected}/{totalStones}");
+            GameEvents.RaiseHUDShowObjective($"Prophecy Stones: {_stonesCollected}/{totalStones}");
 
             // Trigger Prophecy Vision (Golden Age moment replay)
             TriggerProphecyVision(stone.stoneIndex);
@@ -740,7 +740,7 @@ namespace Tartaria.Integration
             if (_auroraCityActive)
             {
                 // Player has time to explore before city fades
-                UI.HUDController.Instance?.ShowObjective($"Explore aurora city before it fades! ({(int)_auroraCityTimer}s remaining)");
+                GameEvents.RaiseHUDShowObjective($"Explore aurora city before it fades! ({(int)_auroraCityTimer}s remaining)");
             }
         }
 
@@ -823,7 +823,7 @@ namespace Tartaria.Integration
             GameLoopController.Instance?.QueueRSReward(600f, "Moon 9 Complete: Solar Prophecy");
 
             // HUD: Moon trophy
-            UI.HUDController.Instance?.ShowMoonTrophy("MOON 9 COMPLETE", "The Intention of Intention");
+            UI.GameEvents.RaiseHUDShowMoonTrophy("MOON 9 COMPLETE", "The Intention of Intention");
 
             // Audio: completion fanfare
             AudioManager.Instance?.PlaySFX2D("MoonCompleteFanfare");
@@ -1033,7 +1033,7 @@ namespace Tartaria.Integration
             spawner?.OnCodexPageRestored();
 
             // Show inscription in UI
-            UI.HUDController.Instance?.ShowObjective($"PHI Inscription {_pagesRestored}: {GetPageInscription(_pagesRestored)}");
+            GameEvents.RaiseHUDShowObjective($"PHI Inscription {_pagesRestored}: {GetPageInscription(_pagesRestored)}");
         }
 
         string GetPageInscription(int pageNum)
@@ -1078,7 +1078,7 @@ namespace Tartaria.Integration
             Debug.Log("[TemporalGuardian] Boss engaged! HP: 2000");
 
             // Show boss health bar on HUD
-            UI.HUDController.Instance?.ShowBossHealth("Temporal Guardian", 1f);
+            GameEvents.RaiseHUDShowBossHealth("Temporal Guardian", 1f);
         }
 
         void Update()
@@ -1212,7 +1212,7 @@ namespace Tartaria.Integration
             Debug.Log($"[TemporalGuardian] Took {damage} damage, {_health} HP remaining");
 
             // Update HUD boss health
-            UI.HUDController.Instance?.UpdateBossHealth(_health / _maxHealth);
+            GameEvents.RaiseHUDUpdateBossHealth(_health / _maxHealth);
 
             if (_health <= 0f)
             {
@@ -1225,7 +1225,7 @@ namespace Tartaria.Integration
             Debug.Log("[TemporalGuardian] DEFEATED! Clock tower blueprint obtained!");
 
             // Hide boss health bar
-            UI.HUDController.Instance?.HideBossHealth();
+            GameEvents.RaiseHUDHideBossHealth();
 
             // Death VFX
             GameObject vfxObj = new GameObject("BossDefeat_VFX");
@@ -1333,7 +1333,7 @@ namespace Tartaria.Integration
             _collected = true;
             Debug.Log($"[AuroraLore] {_loreTexts[fragmentIndex]}");
 
-            UI.HUDController.Instance?.ShowDialogue("Lore", _loreTexts[fragmentIndex]);
+            UI.GameEvents.RaiseHUDShowDialogue("Lore", _loreTexts[fragmentIndex]);
 
             // Fade fragment
             Renderer rend = GetComponent<Renderer>();

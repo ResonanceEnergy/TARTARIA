@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Input;
 using Tartaria.Audio;
 
@@ -142,8 +141,8 @@ namespace Tartaria.Integration
         public void SkipTutorial()
         {
             _tutorialFinished = true;
-            HUDController.Instance?.HideInteractionPrompt();
-            HUDController.Instance?.ShowObjective(null);
+            GameEvents.RaiseHUDHideInteractionPrompt();
+            GameEvents.RaiseHUDShowObjective(null);
             AudioManager.Instance?.PlaySFX2D("TutorialDone");
             OnTutorialComplete?.Invoke();
         }
@@ -323,9 +322,9 @@ namespace Tartaria.Integration
             var step = _steps[_currentIndex];
             _shown.Add(step.step);  // Mark as shown — won't be skipped in future BeginStep calls
             _observeTimer = 0f;     // Reset observe timer every time we start watching a step
-            HUDController.Instance?.ShowInteractionPrompt(step.prompt);
+            GameEvents.RaiseHUDShowInteractionPrompt(step.prompt);
             // Also update persistent objective panel
-            HUDController.Instance?.ShowObjective(step.prompt);
+            GameEvents.RaiseHUDShowObjective(step.prompt);
             Debug.Log($"[Tutorial] Step {_currentIndex}: {step.step} — {step.prompt}");
         }
 
@@ -365,7 +364,7 @@ namespace Tartaria.Integration
             _completed.Add(stepDef.step);
 
             // Celebration
-            HUDController.Instance?.ShowInteractionPrompt(stepDef.celebration);
+            GameEvents.RaiseHUDShowInteractionPrompt(stepDef.celebration);
             DialogueManager.Instance?.PlayContextDialogue("tuning_success");
             VFXController.Instance?.PlayDiscoveryBurst(
                 PlayerInputHandler.Instance != null
@@ -383,7 +382,7 @@ namespace Tartaria.Integration
 
         void AdvanceToNext()
         {
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
             BeginStep(_currentIndex + 1);
         }
 

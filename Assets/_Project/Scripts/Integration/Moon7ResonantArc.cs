@@ -6,7 +6,6 @@ using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -121,7 +120,7 @@ namespace Tartaria.Integration
             if (_moonCleared)
             {
                 if (_centralBellTowerGlowFX != null) _centralBellTowerGlowFX.SetActive(true);
-                HUDController.Instance?.ShowObjective(
+                GameEvents.RaiseHUDShowObjective(
                     "<b>RESONANT MOON — THE ATTUNEMENT HOLDS</b>\n" +
                     "Korath's sacrifice lit half the grid. His echo remains in every bell-toll.");
             }
@@ -160,11 +159,11 @@ namespace Tartaria.Integration
         // Deepest mud vault; resonance scan reveals Korath in Aether ice
         private IEnumerator Beat1_Discovery()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESONANT MOON — DISCOVERY",
                 "The deepest mud vault reveals something massive in violet Aether ice. A giant in voluntary stasis.",
                 6f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Perform a resonance scan to identify the entity in the ice.");
 
             AudioManager.Instance?.PlaySFX2D("moon7_vault_ambience");
@@ -183,7 +182,7 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(1.5f);
 
             // Korath speaks through ice
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "KORATH (through the ice)",
                 "\"The mud… was colder than I expected. But you came. A small spark carrying the old fire. Good.\"",
                 8f);
@@ -199,7 +198,7 @@ namespace Tartaria.Integration
 
         private void OnKorathScanned()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESONANCE SCAN — RESULT",
                 "9-Band energy signature. Living giant, frozen in voluntary stasis. Violet-aurora Aether ice. Awaiting thaw protocol.",
                 7f);
@@ -210,7 +209,7 @@ namespace Tartaria.Integration
         // Multi-session thawing: harvest crystals, feed them to ice via precision cuts
         private IEnumerator Beat2_Restoration()
         {
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Thaw Korath: harvest 3× crystal clusters (Giant Mode), feed them to the ice with precision resonance cuts. [0/3]");
 
             AudioManager.Instance?.PlaySFX2D("moon7_thaw_sequence_begin");
@@ -227,7 +226,7 @@ namespace Tartaria.Integration
             yield return StartCoroutine(KorathEmergenceSequence());
 
             // 9-band unlock
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "9-BAND AETHER UNLOCKED",
                 "Anti-gravity. Consciousness buffs. Floating platforms. The world breathes differently now.",
                 7f);
@@ -236,7 +235,7 @@ namespace Tartaria.Integration
 
             // Korath teaches harmonic rock cutting
             yield return new WaitForSeconds(2f);
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "KORATH",
                 "\"Do not force the line. Whisper to it. The golden spiral remembers its own name. Let it draw itself.\"",
                 8f);
@@ -259,13 +258,13 @@ namespace Tartaria.Integration
             string[] reveals = { "a massive hand visible through the ice", "his shoulder and chest emerging", "his ancient, kind, scarred face revealed" };
             if (sessionIndex < reveals.Length)
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     $"KORATH THAW — SESSION {sessionIndex + 1}/3",
                     $"The ice fractures further — {reveals[sessionIndex]}.",
                     5f);
             }
 
-            HUDController.Instance?.ShowObjective($"Thaw Korath: harvest crystal clusters. [{_thawProgress}/3]");
+            GameEvents.RaiseHUDShowObjective($"Thaw Korath: harvest crystal clusters. [{_thawProgress}/3]");
             AudioManager.Instance?.PlaySFX2D($"korath_thaw_creak_{sessionIndex + 1}");
             GameEvents.FireCriticalSaveTrigger($"moon7_thaw_session_{sessionIndex + 1}");
         }
@@ -278,7 +277,7 @@ namespace Tartaria.Integration
             if (_korathThawedFX != null) _korathThawedFX.SetActive(true);
             if (_korathCompanionProxy != null) _korathCompanionProxy.SetActive(true);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "KORATH AWAKENS",
                 "25 feet of gentle thunder. He stretches, looks at your small dome, and smiles: \"You are trying. That is everything.\"",
                 9f);
@@ -298,7 +297,7 @@ namespace Tartaria.Integration
 
             if (trustedCassian)
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "CASSIAN — BETRAYAL",
                     "Cassian is inside your cathedral, planting a massive dissonance crystal. Your trust was his tool.",
                     7f);
@@ -306,7 +305,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "CASSIAN — CONFRONTATION",
                     "\"Free energy sounds noble until you realize it makes kings obsolete.\"",
                     7f);
@@ -320,7 +319,7 @@ namespace Tartaria.Integration
                 _dissonanceCrystalProp.SetActive(true);
             }
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Cassian awaits your decision — Redeem (show him the choir) or Purge (resonance battle).");
 
             // Wait for player choice via CassianChoicePoint
@@ -348,7 +347,7 @@ namespace Tartaria.Integration
 
             if (redeemed)
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "CASSIAN — REDEEMED",
                     "He watches the choir, the children, Korath standing peacefully. He weeps. \"I… didn't know it could still be this.\"",
                     9f);
@@ -357,7 +356,7 @@ namespace Tartaria.Integration
             }
             else
             {
-                HUDController.Instance?.ShowBanner(
+                GameEvents.RaiseHUDShowBanner(
                     "CASSIAN — PURGED",
                     "The resonance battle ends. He dissolves into golden static. His ghost-echo will linger at prophecy stone sites.",
                     7f);
@@ -369,11 +368,11 @@ namespace Tartaria.Integration
         // Golem siege of star-fort cluster; Korath fights beside player; brother reveal
         private IEnumerator Beat4_Climax()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESONANT MOON — CLIMAX",
                 "A massive golem siege descends on the star-fort cluster. Korath stands with you — the first giant ally in combat.",
                 7f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Defend the star-fort cluster. Fight alongside Korath to break the golem siege.");
 
             AudioManager.Instance?.PlaySFX2D("moon7_golem_siege_horns");
@@ -384,7 +383,7 @@ namespace Tartaria.Integration
             if (boss != null)
                 boss.SpawnBoss("moon7_golem_siege_commander");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "KORATH (mid-battle)",
                 "\"They've learned nothing! Stone does not forget its song!\" He lifts a boulder and sings a note that shatters three golems at once.",
                 8f);
@@ -400,7 +399,7 @@ namespace Tartaria.Integration
             _golemBrotherRevealed = true;
             SaveManager.Instance?.CurrentSave?.SetMoonFlag(MOON_NUM, "golem_brother_revealed", true);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "KORATH'S REVELATION",
                 "\"The golem from the old fort was my brother Maelix. And the Dissonant One is my other brother Zereth. " +
                 "He did not want destruction — he wanted transcendence. But the cosmos does not grant wishes to the impatient.\"",
@@ -422,11 +421,11 @@ namespace Tartaria.Integration
         {
             yield return new WaitForSeconds(1f);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESONANT MOON — REVELATION",
                 "Korath approaches the central bell tower. His decision is made. He will give everything.",
                 7f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Accompany Korath to the central bell tower for the final resonance pour.");
 
             AudioManager.Instance?.PlaySFX2D("moon7_sacrifice_prelude");
@@ -439,7 +438,7 @@ namespace Tartaria.Integration
             // Half the grid lights up — global visual event
             GameEvents.FireCriticalSaveTrigger("half_grid_illuminated");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "HALF THE GRID ILLUMINATED",
                 "Golden ley rivers thread from horizon to horizon. The sky itself seems to sing. " +
                 "Korath's harmonic rock-cutting technique is now a permanent player ability.",
@@ -468,7 +467,7 @@ namespace Tartaria.Integration
             MoonProgressTracker.Instance?.MarkCleared(MOON_NUM);
             GameEvents.FireCriticalSaveTrigger("moon7_complete");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "RESONANT MOON — COMPLETE",
                 "\"Do not mourn the pause, child. Celebrate the resumption. Sing louder than the silence ever was.\" — Korath",
                 10f);
@@ -480,7 +479,7 @@ namespace Tartaria.Integration
         private IEnumerator KorathSacrificeSequence()
         {
             AudioManager.Instance?.PlaySFX2D("korath_sacrifice_vo");
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "KORATH",
                 "\"Do not mourn the pause, child. Celebrate the resumption. Sing louder than the silence ever was.\"",
                 9f);
@@ -565,7 +564,7 @@ namespace Tartaria.Integration
         public void Interact(GameObject interactor)
         {
             // Trigger Redeem by default; UI system can override with ChoosePurge
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "CASSIAN — DECISION",
                 "Show him the choir singing, the children playing, Korath standing peacefully… or purge him here.",
                 7f);

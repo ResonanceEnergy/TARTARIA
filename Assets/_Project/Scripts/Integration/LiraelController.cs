@@ -1,6 +1,5 @@
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
@@ -192,7 +191,7 @@ namespace Tartaria.Integration
         public void RememberFirstOrphan(string orphanName)
         {
             AddTrust(4f);
-            HUDController.Instance?.ShowBanner("Lirael remembers", $"That song... {orphanName}... I used to hum it with the others on the rails. You brought her back to us.", 5f);
+            GameEvents.RaiseHUDShowBanner("Lirael remembers", $"That song... {orphanName}... I used to hum it with the others on the rails. You brought her back to us.", 5f);
             DialogueManager.Instance?.PlayContextDialogue("lirael_first_orphan_" + orphanName.ToLower());
             // Full authored line fallback if context missing
             Debug.Log($"[Lirael Moon3] Truth beat: {orphanName} joins the found family. My voice feels stronger.");
@@ -203,7 +202,7 @@ namespace Tartaria.Integration
         public void BeginLullabySupport()
         {
             AddTrust(1.5f);
-            HUDController.Instance?.ShowBanner("Lirael sings", "432... 528... listen to the children. Match their hearts...", 3f);
+            GameEvents.RaiseHUDShowBanner("Lirael sings", "432... 528... listen to the children. Match their hearts...", 3f);
             AudioManager.Instance?.PlaySFX2D("LiraelLullabyHum"); // safe call
             Debug.Log("[Lirael Moon3] Lullaby support singing started for orphan adoption rhythm game.");
         }
@@ -324,7 +323,7 @@ namespace Tartaria.Integration
             AudioManager.Instance?.PlaySFX2D("Moon2_432LullabyLayer", 0.48f);
             Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
 
-            HUDController.Instance?.ShowBanner("LIRAEL", "The song returns... the shadow lifts. Thank you. I feel the caverns remembering.", 6f);
+            GameEvents.RaiseHUDShowBanner("LIRAEL", "The song returns... the shadow lifts. Thank you. I feel the caverns remembering.", 6f);
 
             Debug.Log("[LiraelController] ReactToFirstPurge � emotional anchor relief for Moon 2 vertical slice (first vein). Trust + memory fragment + physical tell.");
         }

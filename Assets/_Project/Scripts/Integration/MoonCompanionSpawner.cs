@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -176,10 +175,10 @@ namespace Tartaria.Integration
 
             if (greeting == null || greeting.Length == 0)
             {
-                HUDController.Instance?.ShowObjective($"<b>{companionName}:</b> ...");
+                GameEvents.RaiseHUDShowObjective($"<b>{companionName}:</b> ...");
                 return;
             }
-            HUDController.Instance?.ShowObjective(greeting[_line % greeting.Length]);
+            GameEvents.RaiseHUDShowObjective(greeting[_line % greeting.Length]);
             _line++;
         }
     }

@@ -3,7 +3,6 @@ using System.Collections;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -74,7 +73,7 @@ namespace Tartaria.Integration
             UpdateVisualForStage(SolidificationStage.SemiSolid);
 
             Debug.Log("[Lirael] Solidification: Spectral → Semi-Solid (pipe restoration complete).");
-            HUDController.Instance?.ShowObjective("Lirael: 'I can feel the ground... almost.'");
+            GameEvents.RaiseHUDShowObjective("Lirael: 'I can feel the ground... almost.'");
 
             DialogueManager.Instance?.PlayContextDialogue("lirael_semisolid");
         }
@@ -87,7 +86,7 @@ namespace Tartaria.Integration
             UpdateVisualForStage(SolidificationStage.Corporeal);
 
             Debug.Log("[Lirael] Solidification COMPLETE: Fully corporeal! (Cymatic Requiem climax)");
-            HUDController.Instance?.ShowObjective("⚡ Lirael Solidified! First echo made flesh!");
+            GameEvents.RaiseHUDShowObjective("⚡ Lirael Solidified! First echo made flesh!");
 
             DialogueManager.Instance?.PlayContextDialogue("lirael_corporeal");
 
@@ -167,7 +166,7 @@ namespace Tartaria.Integration
             string line = lines[_dialogueIndex % lines.Length];
 
             Debug.Log($"[Lirael] {line}");
-            HUDController.Instance?.ShowDialogue("Lirael", line);
+            GameEvents.RaiseHUDShowDialogue("Lirael", line);
 
             DialogueManager.Instance?.PlayContextDialogue($"lirael_dialogue_{stageIndex}_{_dialogueIndex}");
             Audio.AudioManager.Instance?.PlaySFX2D("Lirael_Voice");
@@ -214,13 +213,13 @@ namespace Tartaria.Integration
 
         IEnumerator DiscoverySequence()
         {
-            HUDController.Instance?.ShowObjective("The organ's broken melody echoes through the mud...");
+            GameEvents.RaiseHUDShowObjective("The organ's broken melody echoes through the mud...");
             yield return new WaitForSeconds(3f);
 
             // Camera: pan to organ
             // Audio: distorted backwards melody
             
-            HUDController.Instance?.ShowDialogue("Lirael (faint)", "The pipes... they sing in pain...");
+            GameEvents.RaiseHUDShowDialogue("Lirael (faint)", "The pipes... they sing in pain...");
             yield return new WaitForSeconds(2f);
 
             Debug.Log("[Moon6Arc] Discovery cinematic complete.");
@@ -240,11 +239,11 @@ namespace Tartaria.Integration
 
         IEnumerator RestorationSequence()
         {
-            HUDController.Instance?.ShowObjective("Restoring the cathedral organ...");
+            GameEvents.RaiseHUDShowObjective("Restoring the cathedral organ...");
             yield return new WaitForSeconds(2f);
 
             // Montage: each pipe lights up
-            HUDController.Instance?.ShowDialogue("Lirael", "Yes... YES! The harmonics return!");
+            GameEvents.RaiseHUDShowDialogue("Lirael", "Yes... YES! The harmonics return!");
             yield return new WaitForSeconds(2f);
 
             // Lirael solidifies to semi-solid
@@ -267,13 +266,13 @@ namespace Tartaria.Integration
 
         IEnumerator CymaticRequiemSequence()
         {
-            HUDController.Instance?.ShowObjective("⚡ THE CYMATIC REQUIEM BEGINS ⚡");
+            GameEvents.RaiseHUDShowObjective("⚡ THE CYMATIC REQUIEM BEGINS ⚡");
             yield return new WaitForSeconds(2f);
 
             // Camera: wide shot of cathedral, Lirael conducting
             // Audio: full organ symphony + choir
 
-            HUDController.Instance?.ShowDialogue("Lirael", "For those who could not sing...");
+            GameEvents.RaiseHUDShowDialogue("Lirael", "For those who could not sing...");
             yield return new WaitForSeconds(3f);
 
             // VFX: ionized mist rain falls across White City
@@ -299,13 +298,13 @@ namespace Tartaria.Integration
 
         IEnumerator RevelationSequence()
         {
-            HUDController.Instance?.ShowObjective("A perfect note frozen in crystal...");
+            GameEvents.RaiseHUDShowObjective("A perfect note frozen in crystal...");
             yield return new WaitForSeconds(2f);
 
-            HUDController.Instance?.ShowDialogue("Lirael", "Impossible. This note... it's FLAWLESS. No human could calibrate this.");
+            GameEvents.RaiseHUDShowDialogue("Lirael", "Impossible. This note... it's FLAWLESS. No human could calibrate this.");
             yield return new WaitForSeconds(3f);
 
-            HUDController.Instance?.ShowDialogue("Lirael", "The inscription: 'Z'. The Dissonant One... was once a master tuner?");
+            GameEvents.RaiseHUDShowDialogue("Lirael", "The inscription: 'Z'. The Dissonant One... was once a master tuner?");
             yield return new WaitForSeconds(2f);
 
             Debug.Log("[Moon6Arc] Revelation: Zereth mystery deepens.");

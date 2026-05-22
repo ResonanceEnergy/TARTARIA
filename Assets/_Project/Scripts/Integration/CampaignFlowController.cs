@@ -206,7 +206,7 @@ namespace Tartaria.Integration
 
             // Show intro dialogue
             DialogueManager.Instance?.PlayContextDialogue($"moon_{index + 1}_intro");
-            UI.HUDController.Instance?.ShowInteractionPrompt($"Moon {index + 1}: {moon.moonName}");
+            GameEvents.RaiseHUDShowInteractionPrompt($"Moon {index + 1}: {moon.moonName}");
             Audio.AdaptiveMusicController.Instance?.SetZone(index);
             Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 
@@ -248,7 +248,7 @@ namespace Tartaria.Integration
             // Check if this completion enables Moon advancement
             if (CanAdvance())
             {
-                UI.HUDController.Instance?.ShowInteractionPrompt(
+                GameEvents.RaiseHUDShowInteractionPrompt(
                     "The way forward is open. Seek the Ley Line portal.");
             }
         }

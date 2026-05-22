@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {

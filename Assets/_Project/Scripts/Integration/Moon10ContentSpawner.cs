@@ -1,9 +1,8 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
@@ -150,7 +149,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.ActivateQuest("moon10_restore_12_segments");
 
             // Dialogue: children NPCs (from Moon 3) now junior engineers
-            HUDController.Instance?.ShowObjective("The rails sing again. Connect the continent.");
+            GameEvents.RaiseHUDShowObjective("The rails sing again. Connect the continent.");
         }
 
         void SpawnCentralStation()
@@ -1250,7 +1249,7 @@ namespace Tartaria.Integration
             GameLoopController.Instance?.QueueRSReward(700f, "Moon 10 Complete: Continental Railway");
 
             // HUD: Moon trophy
-            HUDController.Instance?.ShowMoonTrophy("MOON 10 COMPLETE", "The Manifestation of Producing");
+            GameEvents.RaiseHUDShowMoonTrophy("MOON 10 COMPLETE", "The Manifestation of Producing");
 
             // Audio: completion fanfare
             AudioManager.Instance?.PlaySFX2D("MoonCompleteFanfare");
@@ -1379,7 +1378,7 @@ namespace Tartaria.Integration
             _hasSpoken = true;
             Debug.Log($"[OrphanEngineer {engineerIndex}] {_dialogues[engineerIndex]}");
 
-            UI.HUDController.Instance?.ShowDialogue("Engineer", _dialogues[engineerIndex]);
+            UI.GameEvents.RaiseHUDShowDialogue("Engineer", _dialogues[engineerIndex]);
         }
     }
 
@@ -1453,7 +1452,7 @@ namespace Tartaria.Integration
             Debug.Log("[RailLeviathan] Boss engaged! HP: 5000");
 
             // Show boss health bar
-            UI.HUDController.Instance?.ShowBossHealth("Rail Leviathan", 1f);
+            GameEvents.RaiseHUDShowBossHealth("Rail Leviathan", 1f);
         }
 
         void Update()
@@ -1613,7 +1612,7 @@ namespace Tartaria.Integration
             Debug.Log($"[RailLeviathan] Took {damage} damage, {_health} HP remaining");
 
             // Update HUD boss health
-            UI.HUDController.Instance?.UpdateBossHealth(_health / _maxHealth);
+            GameEvents.RaiseHUDUpdateBossHealth(_health / _maxHealth);
 
             if (_health <= 0f)
             {
@@ -1629,7 +1628,7 @@ namespace Tartaria.Integration
             Debug.Log("[RailLeviathan] DEFEATED! Network guardian falls!");
 
             // Hide boss health bar
-            UI.HUDController.Instance?.HideBossHealth();
+            GameEvents.RaiseHUDHideBossHealth();
 
             // Death VFX
             GameObject vfxObj = new GameObject("LeviathanDefeat_VFX");

@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
@@ -43,7 +42,7 @@ namespace Tartaria.Integration
             yield return new WaitForSeconds(startDelay);
 
             string banner = $"<b>MOON {definition.number:D2} — {definition.zoneName.ToUpperInvariant()}</b>";
-            HUDController.Instance?.ShowObjective(banner);
+            GameEvents.RaiseHUDShowObjective(banner);
 
             switch (definition.mechanic)
             {
@@ -81,7 +80,7 @@ namespace Tartaria.Integration
                 default:                             yield return Mechanic_Combat(baseEnemyCount, "Defend the zone — defeat {0} enemies."); break;
             }
 
-            HUDController.Instance?.ShowObjective($"<b>MOON {definition.number:D2} CLEARED</b>  +{Mathf.RoundToInt(15f + definition.number * 2f)} RS");
+            GameEvents.RaiseHUDShowObjective($"<b>MOON {definition.number:D2} CLEARED</b>  +{Mathf.RoundToInt(15f + definition.number * 2f)} RS");
             GameLoopController.Instance?.QueueRSReward(15f + definition.number * 2f, $"moon{definition.number:D2}_clear");
             AudioManager.Instance?.PlaySFX2D("BuildingRestore");
 
@@ -101,7 +100,7 @@ namespace Tartaria.Integration
 
         IEnumerator Mechanic_Boss()
         {
-            HUDController.Instance?.ShowObjective($"<b>BOSS:</b> Convergence—survive the harmonic siege.");
+            GameEvents.RaiseHUDShowObjective($"<b>BOSS:</b> Convergence—survive the harmonic siege.");
             var boss = BossEncounterSystem.Instance;
             if (boss != null) boss.StartBoss(definition.number);
             // Kick the Cosmic Convergence meta-mini-game (Moon 13).
@@ -115,7 +114,7 @@ namespace Tartaria.Integration
 
         IEnumerator Mechanic_Aquifer()
         {
-            HUDController.Instance?.ShowObjective("Pierce the veil — purge the corrupted aquifer.");
+            GameEvents.RaiseHUDShowObjective("Pierce the veil — purge the corrupted aquifer.");
             AquiferPurgeMiniGame.Instance?.StartMiniGame();
             // Run a small combat ring concurrently as the spectral threat.
             yield return Mechanic_Combat(5, "Banish {0} spectral echoes while purging the depths.");
@@ -126,7 +125,7 @@ namespace Tartaria.Integration
 
         IEnumerator Mechanic_Combat(int count, string promptFmt)
         {
-            HUDController.Instance?.ShowObjective(string.Format(promptFmt, count));
+            GameEvents.RaiseHUDShowObjective(string.Format(promptFmt, count));
             SpawnGolemRing(count, RingRadiusForMechanic());
             yield return WaitForAllDead(60f);
         }
@@ -140,7 +139,7 @@ namespace Tartaria.Integration
         /// </summary>
         IEnumerator Mechanic_Moon2CrystalPurge()
         {
-            HUDController.Instance?.ShowObjective("Purge the crystalline corruption — the caverns fight back.");
+            GameEvents.RaiseHUDShowObjective("Purge the crystalline corruption — the caverns fight back.");
 
             if (CombatWaveManager.Instance == null)
             {
@@ -163,7 +162,7 @@ namespace Tartaria.Integration
                 while (CombatWaveManager.Instance.IsEncounterActive)
                     yield return null;
 
-                HUDController.Instance?.ShowObjective($"Crystal node {v} purged. Resonance stabilizing...");
+                GameEvents.RaiseHUDShowObjective($"Crystal node {v} purged. Resonance stabilizing...");
                 yield return new WaitForSeconds(2.2f);
             }
 
@@ -188,7 +187,7 @@ namespace Tartaria.Integration
         IEnumerator Mechanic_Excavation()
         {
             const int siteCount = 4;
-            HUDController.Instance?.ShowObjective($"Excavate {siteCount} buried Aether sites — walk close to a beacon.");
+            GameEvents.RaiseHUDShowObjective($"Excavate {siteCount} buried Aether sites — walk close to a beacon.");
             var beacons = new List<GameObject>();
             for (int i = 0; i < siteCount; i++)
             {
@@ -227,7 +226,7 @@ namespace Tartaria.Integration
         /// <summary>FortifyDefense — stationary core HP drains unless protected by killing escort waves.</summary>
         IEnumerator Mechanic_Defense()
         {
-            HUDController.Instance?.ShowBanner("Defend", "Defend the core! Hold the line for 45 seconds.");
+            GameEvents.RaiseHUDShowBanner("Defend", "Defend the core! Hold the line for 45 seconds.");
             float defenseTimer = 45f;
             float coreHP = 100f;
             var corePos = transform.position;
@@ -250,18 +249,18 @@ namespace Tartaria.Integration
             if (coreHP > 0f)
             {
                 GameLoopController.Instance?.QueueRSReward(35f, "moon_defense_complete");
-                HUDController.Instance?.ShowBanner("Defend", "Core defended!");
+                GameEvents.RaiseHUDShowBanner("Defend", "Core defended!");
             }
             else
             {
-                HUDController.Instance?.ShowBanner("Defend", "Core breached — try again.");
+                GameEvents.RaiseHUDShowBanner("Defend", "Core breached — try again.");
             }
         }
 
         /// <summary>OrphanTrain — escort a moving NPC across a path while fast enemies chase.</summary>
         IEnumerator Mechanic_Escort()
         {
-            HUDController.Instance?.ShowBanner("Escort", "Escort the orphan — defend until they reach safety.");
+            GameEvents.RaiseHUDShowBanner("Escort", "Escort the orphan — defend until they reach safety.");
             var escortee = GameObject.CreatePrimitive(PrimitiveType.Capsule);
             escortee.name = "EscortNPC";
             escortee.transform.position = transform.position + Vector3.forward * -8f;
@@ -280,7 +279,7 @@ namespace Tartaria.Integration
                 if (Vector3.Distance(escortee.transform.position, goal) < 1.2f)
                 {
                     GameLoopController.Instance?.QueueRSReward(40f, "moon_escort_complete");
-                    HUDController.Instance?.ShowBanner("Escort", "Orphan delivered safely!");
+                    GameEvents.RaiseHUDShowBanner("Escort", "Orphan delivered safely!");
                     Destroy(escortee);
                     yield break;
                 }
@@ -292,13 +291,13 @@ namespace Tartaria.Integration
                 yield return null;
             }
             if (escortee != null) Destroy(escortee);
-            HUDController.Instance?.ShowBanner("Escort", "Escort failed.");
+            GameEvents.RaiseHUDShowBanner("Escort", "Escort failed.");
         }
 
         /// <summary>Resonance/Amplification/OrganRequiem/LeyProphecy/LivingGrid/BellTower — tune N beacons via FrequencyManager.</summary>
         IEnumerator Mechanic_Resonance(int beaconCount)
         {
-            HUDController.Instance?.ShowBanner("Resonance", $"Tune {beaconCount} resonance beacons.");
+            GameEvents.RaiseHUDShowBanner("Resonance", $"Tune {beaconCount} resonance beacons.");
             var beacons = new List<GameObject>();
             var targetFreqs = new List<float>();
             for (int i = 0; i < beaconCount; i++)
@@ -338,11 +337,11 @@ namespace Tartaria.Integration
             if (tuned >= beaconCount)
             {
                 GameLoopController.Instance?.QueueRSReward(25f, "moon_resonance_complete");
-                HUDController.Instance?.ShowBanner("Resonance", "All beacons in harmony!");
+                GameEvents.RaiseHUDShowBanner("Resonance", "All beacons in harmony!");
             }
             else
             {
-                HUDController.Instance?.ShowBanner("Resonance", $"Tuned {tuned}/{beaconCount} beacons.");
+                GameEvents.RaiseHUDShowBanner("Resonance", $"Tuned {tuned}/{beaconCount} beacons.");
             }
         }
 

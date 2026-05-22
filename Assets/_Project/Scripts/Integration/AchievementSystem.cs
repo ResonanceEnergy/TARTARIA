@@ -372,7 +372,7 @@ namespace Tartaria.Integration
             GameLoopController.Instance?.QueueRSReward(def.rsReward, $"achievement_{def.id}");
 
             // HUD notification
-            UI.HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"ACHIEVEMENT UNLOCKED\n{def.title}");
             Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
 

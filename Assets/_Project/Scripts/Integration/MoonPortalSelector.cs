@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Tartaria.UI;
 #if ENABLE_INPUT_SYSTEM
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Controls;
@@ -195,7 +194,7 @@ namespace Tartaria.Integration
             if (n < 1 || n > MoonScenes.Length) return;
             string sceneName = MoonScenes[n - 1];
             Debug.Log($"[MoonPortal] Loading Moon {n:D2} — {sceneName}");
-            HUDController.Instance?.ShowObjective($"<b>↪ Loading Moon {n:D2}: {sceneName}</b>");
+            GameEvents.RaiseHUDShowObjective($"<b>↪ Loading Moon {n:D2}: {sceneName}</b>");
             SceneFadeTransition.LoadScene(sceneName);
         }
 

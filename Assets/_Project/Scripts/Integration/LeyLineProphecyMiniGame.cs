@@ -203,7 +203,7 @@ namespace Tartaria.Integration
             {
                 string text = stoneDefinitions[stoneIndex].prophecyText;
                 if (!string.IsNullOrEmpty(text))
-                    UI.HUDController.Instance?.ShowInteractionPrompt(text);
+                    GameEvents.RaiseHUDShowInteractionPrompt(text);
             }
         }
 
@@ -214,7 +214,7 @@ namespace Tartaria.Integration
             {
                 _visionPlaying = false;
                 _currentVisionStone = -1;
-                UI.HUDController.Instance?.HideInteractionPrompt();
+                GameEvents.RaiseHUDHideInteractionPrompt();
                 OnVisionEnded?.Invoke();
             }
         }

@@ -2,7 +2,6 @@ using System.Reflection;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {

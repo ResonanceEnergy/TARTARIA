@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Save;
@@ -322,7 +322,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.ProgressObjective("moon8_airship_repair", 0);
 
             // HUD: Show progress
-            UI.HUDController.Instance?.ShowObjective($"Airships Repaired: {_airshipsRepaired}/{totalAirships}");
+            GameEvents.RaiseHUDShowObjective($"Airships Repaired: {_airshipsRepaired}/{totalAirships}");
 
             // Check if armada complete
             if (_airshipsRepaired >= totalAirships)
@@ -389,7 +389,7 @@ namespace Tartaria.Integration
             QuestManager.Instance?.ActivateQuest("moon8_aerial_combat");
 
             // HUD: Show objective
-            UI.HUDController.Instance?.ShowObjective("Destroy 2 Dissonance Generators to stop drone attacks!");
+            GameEvents.RaiseHUDShowObjective("Destroy 2 Dissonance Generators to stop drone attacks!");
 
             // Thorne combat dialogue
             DialogueManager.Instance?.PlayContextDialogue("moon8_thorne_combat");
@@ -612,7 +612,7 @@ namespace Tartaria.Integration
             GameLoopController.Instance?.QueueRSReward(500f, "Moon 8 Complete: Airship Armada");
 
             // HUD: Moon trophy
-            UI.HUDController.Instance?.ShowMoonTrophy("MOON 8 COMPLETE", "The Integrity of Harmonizing");
+            UI.GameEvents.RaiseHUDShowMoonTrophy("MOON 8 COMPLETE", "The Integrity of Harmonizing");
 
             // Audio: completion fanfare
             AudioManager.Instance?.PlaySFX2D("MoonCompleteFanfare");
@@ -917,7 +917,7 @@ namespace Tartaria.Integration
             Debug.Log($"[ChildNPC {childIndex}] {_childDialogue[childIndex]}");
 
             // Show dialogue in UI
-            UI.HUDController.Instance?.ShowDialogue("moon8_child", $"child_{childIndex}");
+            UI.GameEvents.RaiseHUDShowDialogue("moon8_child", $"child_{childIndex}");
         }
     }
 }

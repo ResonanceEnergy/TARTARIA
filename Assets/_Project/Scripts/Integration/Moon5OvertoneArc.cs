@@ -6,7 +6,6 @@ using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -124,7 +123,7 @@ namespace Tartaria.Integration
 
             if (cleared)
             {
-                HUDController.Instance?.ShowObjective(
+                GameEvents.RaiseHUDShowObjective(
                     "<b>OVERTONE MOON -- THE WHITE CITY SHINES</b>\nThorne circles above. Airship dock ready.");
                 return;
             }
@@ -146,11 +145,11 @@ namespace Tartaria.Integration
         // Grid ~30% reveals buried White City. Thorne's first crackling radio contact.
         private IEnumerator Beat1_Discovery()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "OVERTONE MOON -- DISCOVERY",
                 "Your strengthened grid reveals the buried White City -- 1893 World's Fair pavilions glowing under the Overtone Moon.",
                 7f);
-            HUDController.Instance?.ShowObjective("Explore the White City. Something is circling overhead.");
+            GameEvents.RaiseHUDShowObjective("Explore the White City. Something is circling overhead.");
 
             AudioManager.Instance?.PlaySFX2D("moon5_white_city_emerge_fanfare");
             AudioManager.Instance?.PlaySFX2D("moon5_ambient_aurora_hum");
@@ -169,7 +168,7 @@ namespace Tartaria.Integration
 
             // Thorne's crackling radio signal
             PlayRadioSFX(_thorneRadioClip, "moon5_thorne_first_contact_vo");
-            HUDController.Instance?.ShowObjective("Explore the White City pavilions. Thorne watches from 10,000 ft.");
+            GameEvents.RaiseHUDShowObjective("Explore the White City pavilions. Thorne watches from 10,000 ft.");
 
             yield return WaitForPlayerProximity(_whiteCityCenter, 15f, 60f);
 
@@ -182,7 +181,7 @@ namespace Tartaria.Integration
         // Airship dock blueprints found in pavilion basement.
         private IEnumerator Beat2_Restoration()
         {
-            HUDController.Instance?.ShowObjective($"Restore the 5 White City Pavilions and activate 6-band healing.");
+            GameEvents.RaiseHUDShowObjective($"Restore the 5 White City Pavilions and activate 6-band healing.");
             AudioManager.Instance?.PlaySFX2D("moon5_restoration_music");
 
             // Spawn floating platforms as progress prop
@@ -206,7 +205,7 @@ namespace Tartaria.Integration
                         _pavilionsRestored = Mathf.Min(5, _pavilionsRestored + 1);
                         ActivatePavilionGlow(_pavilionsRestored - 1);
                         SaveManager.Instance?.CurrentSave?.SetMoonFlag(MOON_NUM, "pavilions", _pavilionsRestored);
-                        HUDController.Instance?.ShowObjective($"Pavilions restored: {_pavilionsRestored}/5");
+                        GameEvents.RaiseHUDShowObjective($"Pavilions restored: {_pavilionsRestored}/5");
                     }
                 }
             }
@@ -214,7 +213,7 @@ namespace Tartaria.Integration
             // Reveal airship dock blueprints
             if (_airshipDockBlueprintGO != null) _airshipDockBlueprintGO.SetActive(true);
             AudioManager.Instance?.PlaySFX2D("milo_airship_blueprints_vo");
-            HUDController.Instance?.ShowObjective("Blueprints found! Defend the pavilions from demolition crews.");
+            GameEvents.RaiseHUDShowObjective("Blueprints found! Defend the pavilions from demolition crews.");
             yield return new WaitForSeconds(2f);
             ClearBeat(BEAT_RESTORATION);
         }
@@ -223,11 +222,11 @@ namespace Tartaria.Integration
         // Reset demolition crews attack. Defend with 6-band healing aura keeping buildings alive.
         private IEnumerator Beat3_Conflict()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "OVERTONE MOON -- CONFLICT",
                 "Reset demolition crews attack! 'Pavilion 7-12: dismantled by March 1894. Claim structural insufficiency.'",
                 6f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Defend the pavilions! Use 6-band healing aura to keep them alive while you fight.");
             AudioManager.Instance?.PlaySFX2D("moon5_reset_crew_arrival_sting");
             AudioManager.Instance?.PlaySFX2D("moon5_combat_music");
@@ -268,7 +267,7 @@ namespace Tartaria.Integration
             SaveManager.Instance?.CurrentSave?.SetMoonFlag(MOON_NUM, "dock_built", true);
 
             AudioManager.Instance?.PlaySFX2D("milo_outraged_history_vo");
-            HUDController.Instance?.ShowObjective("Demolition crew repelled! Airship dock under construction.");
+            GameEvents.RaiseHUDShowObjective("Demolition crew repelled! Airship dock under construction.");
             yield return new WaitForSeconds(3f);
             ClearBeat(BEAT_CONFLICT);
         }
@@ -277,7 +276,7 @@ namespace Tartaria.Integration
         // 5 pavilions fully lit -> ionized fountain aurora replays World's Fair festival holograms.
         private IEnumerator Beat4_Climax()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "OVERTONE MOON -- CLIMAX",
                 "Five pavilions restored! Ionized fountain auroras replay pre-flood festivals. Giants and humans celebrating together.",
                 7f);
@@ -304,7 +303,7 @@ namespace Tartaria.Integration
             PlayRadioSFX(_thorneSignalStrongClip, "moon5_thorne_signal_strong_vo");
 
             ServiceLocator.MoonProgress?.MarkBeatCleared(MOON_NUM, BEAT_CLIMAX);
-            HUDController.Instance?.ShowObjective("Thorne is inbound. The airship dock awaits.");
+            GameEvents.RaiseHUDShowObjective("Thorne is inbound. The airship dock awaits.");
             yield return new WaitForSeconds(5f);
             ClearBeat(BEAT_CLIMAX);
         }
@@ -314,7 +313,7 @@ namespace Tartaria.Integration
         // Fair diaries encode Moon 9 coded letters. Forward seeds planted.
         private IEnumerator Beat5_Revelation()
         {
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Revelation: Place the Spire Fragment to bridge the ley-line corridor between two zones.");
             AudioManager.Instance?.PlaySFX2D("moon5_revelation_music");
 
@@ -351,7 +350,7 @@ namespace Tartaria.Integration
             }
             ServiceLocator.MoonProgress?.MarkCleared(MOON_NUM);
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "<b>MOON 5 COMPLETE!</b>\nThe White City shines. Captain Thorne descends.");
             Debug.Log("[Moon5] COMPLETE. Airship dock built. Thorne inbound for Moon 8.");
         }

@@ -1,4 +1,4 @@
-# Open Unity and Wire Characters
+﻿# Open Unity and Wire Characters
 # Opens Unity GUI so you can run the wiring tool via menu
 
 Write-Host "=== OPENING UNITY FOR CHARACTER WIRING ===" -ForegroundColor Cyan

@@ -1,11 +1,10 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
-using Tartaria.UI;
 using Tartaria.Save;
 using Tartaria.AI;
 
@@ -276,7 +275,7 @@ namespace Tartaria.Integration
             if (guard != null)
             {
                 DialogueManager.Instance?.PlayContextDialogue(index == 0 ? "returning_guard_first_memory" : "returning_guard_crystal_remembers");
-                HUDController.Instance?.ShowBanner("The Crystals Remember", "Back again, Architect. The ley still sings the song you left last time.", 6f);
+                GameEvents.RaiseHUDShowBanner("The Crystals Remember", "Back again, Architect. The ley still sings the song you left last time.", 6f);
             }
         }
 
@@ -288,7 +287,7 @@ namespace Tartaria.Integration
             qm.ActivateQuest(LUNAR_CHALLENGE_ID);
             var def = qm.GetQuestDefinition(LUNAR_CHALLENGE_ID);
             if (def != null)
-                HUDController.Instance?.ShowObjective($"QUEST: {def.displayName} — 5 Beats of the Lunar Purge");
+                GameEvents.RaiseHUDShowObjective($"QUEST: {def.displayName} — 5 Beats of the Lunar Purge");
             Debug.Log("[Moon2LunarContentSpawner] lunar_challenge quest activated (5 objectives).");
         }
 
@@ -362,7 +361,7 @@ namespace Tartaria.Integration
             // Rich dialogue hooks
             DialogueManager.Instance?.PlayContextDialogue("lirael_moon2_discovery_fracture");
             DialogueManager.Instance?.PlayContextDialogue("cassian_moon2_discovery_beckon");
-            HUDController.Instance?.ShowBanner("Discovery", "The song's breaking… A new Echo arrives — Cassian, scholar of the corruption.", 7f);
+            GameEvents.RaiseHUDShowBanner("Discovery", "The song's breaking… A new Echo arrives — Cassian, scholar of the corruption.", 7f);
 
             // Quest progress objective 1
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.DiscoverBuilding, "moon2_discovery", 1);
@@ -406,7 +405,7 @@ namespace Tartaria.Integration
             if (_restorationComplete) return;
 
             DialogueManager.Instance?.PlayContextDialogue("moon2_restoration_microgiant_intro");
-            HUDController.Instance?.ShowBanner("Restoration", "Micro-Giant Mode unlocked. Enter the fractal lattice inside the dome. Tune the dissonance crystals.", 6f);
+            GameEvents.RaiseHUDShowBanner("Restoration", "Micro-Giant Mode unlocked. Enter the fractal lattice inside the dome. Tune the dissonance crystals.", 6f);
 
             // In real would unlock MicroGiantController for Moon2
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, "micro_giant_tune", 0); // hint
@@ -459,7 +458,7 @@ namespace Tartaria.Integration
             }
 
             DialogueManager.Instance?.PlayContextDialogue("moon2_conflict_first_golem");
-            HUDController.Instance?.ShowBanner("Conflict", "The first Mud Golem rises from the dissonance. Cassian's intel was… too perfect.", 5f);
+            GameEvents.RaiseHUDShowBanner("Conflict", "The first Mud Golem rises from the dissonance. Cassian's intel was… too perfect.", 5f);
 
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, "mud_golem_first", 1);
             CompanionManager.Instance?.TriggerPhysicalTellForBeat("cassian", 1);
@@ -544,7 +543,7 @@ namespace Tartaria.Integration
 
             DialogueManager.Instance?.PlayContextDialogue("moon2_climax_fountain_storm");
             DialogueManager.Instance?.PlayContextDialogue("milo_fountain_wet_comment"); // from docs
-            HUDController.Instance?.ShowBanner("CLIMAX — The Crystal Cathedral Sings", "Ionized mist purges the dome in a golden wave. The corruption screams and burns.", 8f);
+            GameEvents.RaiseHUDShowBanner("CLIMAX — The Crystal Cathedral Sings", "Ionized mist purges the dome in a golden wave. The corruption screams and burns.", 8f);
 
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.RestoreBuilding, "moon2_fountain", 1);
             CompanionManager.Instance?.TriggerPhysicalTellForBeat("lirael", 0);
@@ -582,7 +581,7 @@ namespace Tartaria.Integration
                 station.Initialize(this, _isReturningPlayer, _crystalMemoryVariant);
             }
 
-            HUDController.Instance?.ShowBanner("The Crystal Remembers", "Cassian's diary lies open. The great crystal pulses with every choice you made. It remembers…", 9f);
+            GameEvents.RaiseHUDShowBanner("The Crystal Remembers", "Cassian's diary lies open. The great crystal pulses with every choice you made. It remembers…", 9f);
         }
 
         // ==================== BEAT 5: REVELATION + THE CRYSTAL REMEMBERS (DEEP + REPLAYABLE) ====================
@@ -610,7 +609,7 @@ namespace Tartaria.Integration
             string banner = choseTrustPath
                 ? "The Crystal Remembers — Hope"
                 : "The Crystal Remembers — Fracture";
-            HUDController.Instance?.ShowBanner(banner, choseTrustPath
+            GameEvents.RaiseHUDShowBanner(banner, choseTrustPath
                 ? "You chose to believe. The crystal glows golden. New ley resonances awaken across the caverns."
                 : "Doubt lingers. The crystal pulses violet. Warnings echo from the Flood.", 10f);
 
@@ -677,11 +676,11 @@ namespace Tartaria.Integration
             if (_isReturningPlayer || _unlockedMemoryFragments.Count > 2)
             {
                 DialogueManager.Instance?.PlayContextDialogue("crystal_remembers_returning_echo");
-                HUDController.Instance?.ShowBanner("The Crystals Still Sing", "You have been here before. Every choice echoes. The Flood remembers your name.", 7f);
+                GameEvents.RaiseHUDShowBanner("The Crystals Still Sing", "You have been here before. Every choice echoes. The Flood remembers your name.", 7f);
             }
 
             // Final banner + replay prompt
-            HUDController.Instance?.ShowBanner("The Crystal Remembers", "Replay any fragment. The memory is yours forever — changed by what you chose.", 12f);
+            GameEvents.RaiseHUDShowBanner("The Crystal Remembers", "Replay any fragment. The memory is yours forever — changed by what you chose.", 12f);
         }
 
         void UnlockCrystalMemoryFragments(bool trustPath)
@@ -813,7 +812,7 @@ namespace Tartaria.Integration
         public void Interact()
         {
             DialogueManager.Instance?.PlayContextDialogue("returning_guard_lore");
-            HUDController.Instance?.ShowBanner("The Ley Remembers", "You restored the first dome. The corruption fears what you became.", 5f);
+            GameEvents.RaiseHUDShowBanner("The Ley Remembers", "You restored the first dome. The corruption fears what you became.", 5f);
         }
         public void Interact(GameObject player) => Interact();
         public string GetPrompt() => "Speak with the returning guard (disarmed, remembers you)";

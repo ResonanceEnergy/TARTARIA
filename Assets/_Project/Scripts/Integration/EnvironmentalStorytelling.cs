@@ -1,6 +1,5 @@
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Input;
 using Tartaria.Audio;
 
@@ -136,7 +135,7 @@ namespace Tartaria.Integration
             AudioManager.Instance?.PlayVoiceLine(audioClipName, 1f);
             
             // Show subtitle overlay (stays on screen for duration)
-            HUDController.Instance?.ShowSubtitle(subtitleText, logDuration);
+            GameEvents.RaiseHUDShowSubtitle(subtitleText, logDuration);
             
             // Atmospheric VFX — crystalline glow, echo ripples
             HapticFeedbackManager.Instance?.PlayContextual();

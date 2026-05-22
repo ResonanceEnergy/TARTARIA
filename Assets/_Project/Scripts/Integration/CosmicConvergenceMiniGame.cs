@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -179,7 +178,7 @@ namespace Tartaria.Integration
                 Save.SaveManager.Instance?.MarkDirty();
                 AchievementSystem.Instance?.Unlock("M06");
 
-                HUDController.Instance?.ShowInteractionPrompt(
+                GameEvents.RaiseHUDShowInteractionPrompt(
                     $"COSMIC CONVERGENCE COMPLETE\nScore: {_convergenceScore:P0}");
                 Audio.AudioManager.Instance?.PlaySFX2D("ConvergenceComplete");
 
@@ -192,7 +191,7 @@ namespace Tartaria.Integration
                 Debug.Log($"[CosmicConvergence] Complete! Score: {_convergenceScore:P0}");
 
                 yield return new WaitForSeconds(5f);
-                HUDController.Instance?.HideInteractionPrompt();
+                GameEvents.RaiseHUDHideInteractionPrompt();
             }
             finally
             {
@@ -211,7 +210,7 @@ namespace Tartaria.Integration
             OnPhaseStarted?.Invoke(phase);
             ActivatePhaseSystem(phase);
 
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"CONVERGENCE PHASE {(int)phase}: {GetPhaseDisplayName(phase)}");
 
             Debug.Log($"[CosmicConvergence] Phase {(int)phase}: {phase}");
@@ -223,7 +222,7 @@ namespace Tartaria.Integration
             if (!_phasesComplete[idx])
                 CompleteCurrentPhase(0.3f); // Timeout penalty
 
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
             yield return new WaitForSeconds(2f); // Brief pause between phases
         }
 
@@ -310,7 +309,7 @@ namespace Tartaria.Integration
 
                 case ConvergencePhase.FinalTuning:
                     // Player must tune the Planetary Nexus to golden-ratio 432 Hz
-                    HUDController.Instance?.ShowInteractionPrompt(
+                    GameEvents.RaiseHUDShowInteractionPrompt(
                         "Tune the Planetary Nexus to 432 Hz.\nAlign all harmonic frequencies to the golden ratio.");
                     _finalTuningAccumulator = 0f;
                     break;

@@ -6,7 +6,6 @@ using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -113,7 +112,7 @@ namespace Tartaria.Integration
 
             if (cleared)
             {
-                HUDController.Instance?.ShowObjective(
+                GameEvents.RaiseHUDShowObjective(
                     "<b>ELECTRIC MOON -- THE ORPHAN RAILS RUN FREE</b>\nThe children remember their song.");
                 return;
             }
@@ -135,11 +134,11 @@ namespace Tartaria.Integration
         // Spectral Orphan Train materializes. Lirael recognition moment.
         private IEnumerator Beat1_Discovery()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "ELECTRIC MOON -- DISCOVERY",
                 "A spectral train materializes on dormant rails. Aboard: ghost children in Victorian clothing.",
                 6f);
-            HUDController.Instance?.ShowObjective("The Orphan Train has appeared. Approach the platform.");
+            GameEvents.RaiseHUDShowObjective("The Orphan Train has appeared. Approach the platform.");
 
             AudioManager.Instance?.PlaySFX2D("moon3_rail_junction_ambience");
             AudioManager.Instance?.PlaySFX2D("spectral_train_approach");
@@ -153,7 +152,7 @@ namespace Tartaria.Integration
 
             if (_liraelTearsFX != null) _liraelTearsFX.SetActive(true);
             AudioManager.Instance?.PlaySFX2D("lirael_recognition_vo");
-            HUDController.Instance?.ShowObjective("Approach the Orphan Train with Lirael.");
+            GameEvents.RaiseHUDShowObjective("Approach the Orphan Train with Lirael.");
 
             yield return WaitForPlayerProximity(_trainDeparturePlatform, 8f, 45f);
 
@@ -166,7 +165,7 @@ namespace Tartaria.Integration
         private IEnumerator Beat2_Restoration()
         {
             int totalTies = _railTiePlacements?.Length ?? 5;
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 $"Restore the Rail: lay {totalTies} rail segments and tune cymatic gardens.");
             AudioManager.Instance?.PlaySFX2D("moon3_rail_restoration_music");
 
@@ -189,7 +188,7 @@ namespace Tartaria.Integration
             SaveManager.Instance?.CurrentSave?.SetMoonFlag(MOON_NUM, "adopted", _adoptedChildCount);
 
             AudioManager.Instance?.PlaySFX2D("orphan_child_greeting_vo");
-            HUDController.Instance?.ShowObjective($"Orphans adopted: {_adoptedChildCount}/3. Now protect the track!");
+            GameEvents.RaiseHUDShowObjective($"Orphans adopted: {_adoptedChildCount}/3. Now protect the track!");
             yield return new WaitForSeconds(2f);
             ClearBeat(BEAT_RESTORATION);
         }
@@ -198,11 +197,11 @@ namespace Tartaria.Integration
         // Train derails into mud golem ambush. Protect children, repair track.
         private IEnumerator Beat3_Conflict()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "ELECTRIC MOON -- CONFLICT",
                 "Reset agents derailed the train. Children scream in spectral echoes. Protect them!",
                 5f);
-            HUDController.Instance?.ShowObjective("AMBUSH! Protect the orphans while repairing the track.");
+            GameEvents.RaiseHUDShowObjective("AMBUSH! Protect the orphans while repairing the track.");
             AudioManager.Instance?.PlaySFX2D("moon3_train_derail_impact");
             AudioManager.Instance?.PlaySFX2D("moon3_combat_music");
 
@@ -230,7 +229,7 @@ namespace Tartaria.Integration
             MudGolemHealth.OnAnyGolemDied -= OnGolemKilled;
 
             AudioManager.Instance?.PlaySFX2D("milo_cynical_vo_moon3");
-            HUDController.Instance?.ShowObjective("Track cleared! Re-align the final rail segment.");
+            GameEvents.RaiseHUDShowObjective("Track cleared! Re-align the final rail segment.");
             yield return new WaitForSeconds(3f);
             ClearBeat(BEAT_CONFLICT);
         }
@@ -239,7 +238,7 @@ namespace Tartaria.Integration
         // Children sing 432 Hz lullaby -- train solidifies golden. Orphan Lullaby Crystal drops.
         private IEnumerator Beat4_Climax()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "ELECTRIC MOON -- CLIMAX",
                 "The children stand together and SING. A 432 Hz lullaby reactivates the entire rail.",
                 6f);
@@ -264,7 +263,7 @@ namespace Tartaria.Integration
             AudioManager.Instance?.PlaySFX2D("lirael_tears_of_light_vo");
             AudioManager.Instance?.PlaySFX2D("milo_sobered_vo_moon3");
 
-            HUDController.Instance?.ShowObjective("The Orphan Train is ALIVE. Ride with the children.");
+            GameEvents.RaiseHUDShowObjective("The Orphan Train is ALIVE. Ride with the children.");
 
             if (_lullabyCrystalItem != null)
             {
@@ -285,7 +284,7 @@ namespace Tartaria.Integration
         // Lore: Reset used orphan trains for cultural genocide. Plant forward seeds.
         private IEnumerator Beat5_Revelation()
         {
-            HUDController.Instance?.ShowObjective("Revelation: Search the train's archive car for the truth.");
+            GameEvents.RaiseHUDShowObjective("Revelation: Search the train's archive car for the truth.");
             AudioManager.Instance?.PlaySFX2D("moon3_revelation_music");
 
             if (_loreScrollPrefab != null && _loreScrollSpawnPoint != null)
@@ -307,7 +306,7 @@ namespace Tartaria.Integration
             }
             ServiceLocator.MoonProgress?.MarkCleared(MOON_NUM);
 
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "<b>MOON 3 COMPLETE!</b>\nThe Orphan Train runs free. Lirael's arc begins.");
             Debug.Log("[Moon3] COMPLETE. Seeds planted. Lirael arc growing.");
         }

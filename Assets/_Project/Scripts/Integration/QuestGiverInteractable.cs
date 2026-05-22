@@ -1,7 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Input;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -155,7 +154,7 @@ namespace Tartaria.Integration
         {
             var def = Definition;
             if (def == null || def.objectives == null || def.objectives.Length == 0) return;
-            HUDController.Instance?.ShowObjective(def.objectives[0].description);
+            GameEvents.RaiseHUDShowObjective(def.objectives[0].description);
         }
 
         static void ShowToast(string msg)

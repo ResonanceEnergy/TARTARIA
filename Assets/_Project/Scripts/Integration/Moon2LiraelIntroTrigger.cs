@@ -1,6 +1,5 @@
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {

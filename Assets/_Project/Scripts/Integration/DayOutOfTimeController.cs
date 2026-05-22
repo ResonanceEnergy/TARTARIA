@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.UI;
 using Tartaria.Save;
 
 namespace Tartaria.Integration
@@ -153,11 +152,11 @@ namespace Tartaria.Integration
                 OnEventCompleted?.Invoke();
                 AchievementSystem.Instance?.CheckDayOutOfTime();
 
-                HUDController.Instance?.ShowInteractionPrompt(
+                GameEvents.RaiseHUDShowInteractionPrompt(
                     "THE DAY OUT OF TIME\nResonance Restored. The world remembers.");
 
                 yield return new WaitForSeconds(10f);
-                HUDController.Instance?.HideInteractionPrompt();
+                GameEvents.RaiseHUDHideInteractionPrompt();
 
                 SaveManager.Instance?.MarkDirty();
 
@@ -202,7 +201,7 @@ namespace Tartaria.Integration
             OnMemoryZoneChanged?.Invoke(zoneIndex);
             Tartaria.Input.HapticFeedbackManager.Instance?.PlayDiscovery();
 
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"Memory {zoneIndex + 1} of 13");
 
             // Scroll corridor — memoryCorridorSpeed controls transition rate
@@ -218,7 +217,7 @@ namespace Tartaria.Integration
                 yield return null;
             }
 
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
         }
 
         // ─── Companion Performances ──────────────────
@@ -254,7 +253,7 @@ namespace Tartaria.Integration
 
         IEnumerator LiraelConcert()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "Lirael sings the Song of Restoration.\nCrystal harmonics ripple through all 13 zones.");
             DialogueManager.Instance?.PlayContextDialogue("dott_lirael_concert");
             LiraelController.Instance?.NotifyZoneComplete(); // triggers celebration state
@@ -262,12 +261,12 @@ namespace Tartaria.Integration
             Tartaria.Audio.AdaptiveMusicController.Instance?.PlayRestoration();
             yield return new WaitForSeconds(12f);
             CompanionManager.Instance?.AddTrust("lirael", 25);
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
         }
 
         IEnumerator ThorneFlyover()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "Thorne leads the militia fleet in a skyward salute.\n\"For those who stood when the world knelt.\"");
             DialogueManager.Instance?.PlayContextDialogue("dott_thorne_flyover");
 
@@ -277,53 +276,53 @@ namespace Tartaria.Integration
 
             yield return new WaitForSeconds(10f);
             CompanionManager.Instance?.AddTrust("thorne", 25);
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
         }
 
         IEnumerator KorathSymphony()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "Korath projects the true star map onto the sky.\nConstellations the old world once navigated by.");
             DialogueManager.Instance?.PlayContextDialogue("dott_korath_symphony");
 
             yield return new WaitForSeconds(10f);
             CompanionManager.Instance?.AddTrust("korath", 25);
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
         }
 
         IEnumerator VeritasOrganFinale()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "Veritas rings all 12 bell towers simultaneously.\n7.83 Hz -- the Earth's heartbeat restored.");
             DialogueManager.Instance?.PlayContextDialogue("dott_veritas_organ");
 
             VFXController.Instance?.SpawnPlanetaryBellRing(Vector3.zero);
             yield return new WaitForSeconds(12f);
             CompanionManager.Instance?.AddTrust("veritas", 25);
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
         }
 
         IEnumerator MiloCommerceFestival()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "Milo darts between stalls, tail blazing gold.\n\"Best deals in a thousand years! Everything must go!\"");
             DialogueManager.Instance?.PlayContextDialogue("dott_milo_festival");
 
             yield return new WaitForSeconds(8f);
             CompanionManager.Instance?.AddTrust("milo", 25);
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
         }
 
         IEnumerator AnastasiaSolidificationCelebration()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "Golden motes spiral inward. Anastasia steps forward, fully solid.\n\"I remember everything now. Every stone. Every name.\"");
             DialogueManager.Instance?.PlayContextDialogue("dott_anastasia_solid");
 
             VFXController.Instance?.SpawnAnastasiaSolidificationEffect(Vector3.zero);
             yield return new WaitForSeconds(15f);
             CompanionManager.Instance?.AddTrust("anastasia", 50);
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
 
             AchievementSystem.Instance?.CheckSolidification();
         }
@@ -352,7 +351,7 @@ namespace Tartaria.Integration
             RenderSettings.fog = false;
             RenderSettings.ambientLight = dottSkyColor;
 
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 "SANDBOX MODE\nExplore the restored world freely. No enemies, no timers.");
 
             Debug.Log("[DotT] Sandbox mode activated.");
@@ -361,7 +360,7 @@ namespace Tartaria.Integration
         public void ExitSandbox()
         {
             _sandboxActive = false;
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
             Debug.Log("[DotT] Sandbox mode deactivated.");
         }
 
@@ -414,10 +413,10 @@ namespace Tartaria.Integration
 
         IEnumerator ChallengeLoop()
         {
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"CHALLENGE: {_activeChallenge}\nTime limit: {(_challengeTimeLimit < float.MaxValue ? $"{_challengeTimeLimit}s" : "None")}");
             yield return new WaitForSeconds(3f);
-            HUDController.Instance?.HideInteractionPrompt();
+            GameEvents.RaiseHUDHideInteractionPrompt();
 
             GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
@@ -450,7 +449,7 @@ namespace Tartaria.Integration
             _activeChallenge = DotTChallengeMode.None;
 
             string result = success ? "COMPLETE" : "FAILED";
-            HUDController.Instance?.ShowInteractionPrompt(
+            GameEvents.RaiseHUDShowInteractionPrompt(
                 $"Challenge {result}: {mode}\nScore: {_challengeScore} | Time: {_challengeTimer:F1}s");
 
             // Award festival currency on success

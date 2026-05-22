@@ -6,7 +6,6 @@ using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
 using Tartaria.Save;
-using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -105,7 +104,7 @@ namespace Tartaria.Integration
                 if (_airship3 != null) _airship3.SetActive(true);
             }
             if (_moonCleared)
-                HUDController.Instance?.ShowObjective(
+                GameEvents.RaiseHUDShowObjective(
                     "<b>GALACTIC MOON — ARMADA FLIES</b>\nAll three ships operational. Sky routes open. " +
                     "Thorne stands permanent watch on the bridge.");
         }
@@ -129,12 +128,12 @@ namespace Tartaria.Integration
         {
             AudioManager.Instance?.PlaySFX2D("airship_descent_engines");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "GALACTIC MOON — THORNE ARRIVES",
                 "A battered Tartarian flagship descends through the clouds to your White City dock. " +
                 "Sacred-geometry hull, mercury-orb engines (cold), a bridge sized for giants.",
                 8f);
-            HUDController.Instance?.ShowObjective("Guide Captain Thorne's flagship to the airship dock.");
+            GameEvents.RaiseHUDShowObjective("Guide Captain Thorne's flagship to the airship dock.");
 
             if (_thorneFlagship != null)
             {
@@ -148,7 +147,7 @@ namespace Tartaria.Integration
             _thorneArrived = true;
             if (_thorneCompanionProxy != null) _thorneCompanionProxy.SetActive(true);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "CAPTAIN THORNE",
                 "\"Two centuries circling, living on stale air and stubbornness. " +
                 "This bucket flies like it's still offended we dug it out of the mud.\"",
@@ -178,7 +177,7 @@ namespace Tartaria.Integration
         // ─── Beat 2: Restoration ───────────────────────────────────
         private IEnumerator Beat2_Restoration()
         {
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Repair the airship armada (3 ships scattered in the graveyard zone). Tune mercury-orb anti-grav engines with 9-band Aether. [0/3]");
 
             AudioManager.Instance?.PlaySFX2D("airship_graveyard_ambience");
@@ -189,14 +188,14 @@ namespace Tartaria.Integration
 
             yield return new WaitUntil(() => _shipsRepaired >= 3);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "ARMADA OPERATIONAL",
                 "All three ships airworthy. Anti-grav mercury-orb engines humming. " +
                 "The children from Moon 3 have already claimed the bridge deck.",
                 7f);
             AudioManager.Instance?.PlaySFX2D("armada_launch_fanfare");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "THORNE",
                 "\"Little ones on my bridge. Wonderful. Now I need child-sized railings. And more patience.\"",
                 6f);
@@ -204,7 +203,7 @@ namespace Tartaria.Integration
 
             // Megalith transport demo
             yield return new WaitForSeconds(2f);
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "MEGALITH TRANSPORT",
                 "Giant-mode rock cutting → airship anti-grav field lifts 300-ton stones → fly them to construction sites. " +
                 "Korath's echo: \"We sang the stones across the sky.\"",
@@ -220,8 +219,8 @@ namespace Tartaria.Integration
         {
             _shipsRepaired = Mathf.Max(_shipsRepaired, shipIndex + 1);
             SaveManager.Instance?.CurrentSave?.SetMoonFlag(MOON_NUM, "ships_repaired_int", _shipsRepaired);
-            HUDController.Instance?.ShowObjective($"Repair armada: [{_shipsRepaired}/3]");
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowObjective($"Repair armada: [{_shipsRepaired}/3]");
+            GameEvents.RaiseHUDShowBanner(
                 $"SHIP {shipIndex + 1} REPAIRED",
                 "Mercury-orb engine purring. Anti-grav lift confirmed.",
                 5f);
@@ -232,17 +231,17 @@ namespace Tartaria.Integration
         // ─── Beat 3: Conflict ──────────────────────────────────────
         private IEnumerator Beat3_Conflict()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "GALACTIC MOON — CONFLICT",
                 "Reset supply lines detected. Aerial combat: resonance cannons vs. Reset anti-Aether drones. " +
                 "Target their dissonance generators to disable entire squadrons.",
                 8f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Raid Reset supply lines. Destroy 3 drone squadrons with airship resonance cannons.");
 
             AudioManager.Instance?.PlaySFX2D("aerial_combat_alarm");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "THORNE (mid-dogfight)",
                 "\"Hold tight, spark. We're about to remind these parasites what it feels like to be small.\"",
                 6f);
@@ -263,18 +262,18 @@ namespace Tartaria.Integration
         // ─── Beat 4: Climax ────────────────────────────────────────
         private IEnumerator Beat4_Climax()
         {
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "NIGHT FLIGHT — ALL THREE SHIPS",
                 "Formation flight under the full moon. Below: ley lines glow as golden rivers threading through the dark continent.",
                 8f);
-            HUDController.Instance?.ShowObjective(
+            GameEvents.RaiseHUDShowObjective(
                 "Complete the night formation flight across the restored zones.");
 
             AudioManager.Instance?.PlaySFX2D("moon8_night_flight_music");
 
             yield return new WaitForSeconds(8f);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "THORNE (quiet)",
                 "\"Look at that. Rivers of light from here to the edge of the world. " +
                 "Makes a captain almost believe in endings that aren't tragic.\"",
@@ -293,7 +292,7 @@ namespace Tartaria.Integration
         {
             yield return new WaitForSeconds(2f);
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "LORE REVELATION",
                 "Airships once ferried giants between continents — one civilization connected by sky and rail. " +
                 "The Reset's greatest crime was not destroying buildings but severing connections.",
@@ -316,7 +315,7 @@ namespace Tartaria.Integration
             MoonProgressTracker.Instance?.MarkCleared(MOON_NUM);
             GameEvents.FireCriticalSaveTrigger("moon8_complete");
 
-            HUDController.Instance?.ShowBanner(
+            GameEvents.RaiseHUDShowBanner(
                 "GALACTIC MOON — COMPLETE",
                 "The armada flies. The sky routes are open. The grid grows.",
                 7f);

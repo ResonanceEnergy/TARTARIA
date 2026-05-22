@@ -200,6 +200,100 @@ namespace Tartaria.Core
         public static event Action<AetherVisionToggledEventArgs> OnAetherVisionToggledTyped;
 
         // ═══════════════════════════════════════════════════════════════════
+        // HUD DISPLAY EVENTS (New — breaks Tartaria.UI → Tartaria.Integration cyclic dependency)
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Raised when Integration systems need to display an objective message.
+        /// Subscribers: HUDController (objective text display).
+        /// </summary>
+        public static event Action<string> OnHUDShowObjective;
+
+        /// <summary>
+        /// Raised when Integration systems need to display dialogue.
+        /// Subscribers: HUDController (dialogue panel), DialoguePanel (text display).
+        /// </summary>
+        public static event Action<string, string> OnHUDShowDialogue; // speaker, message
+
+        /// <summary>
+        /// Raised when Integration systems need to display a full-screen banner.
+        /// Subscribers: HUDController (banner UI).
+        /// </summary>
+        public static event Action<string, string> OnHUDShowBanner; // title, subtitle
+
+        /// <summary>
+        /// Raised when Integration systems need to display a subtitle.
+        /// Subscribers: HUDController (subtitle display).
+        /// </summary>
+        public static event Action<string, float> OnHUDShowSubtitle; // message, duration
+
+        /// <summary>
+        /// Raised when a Moon is completed and trophy should be shown.
+        /// Subscribers: HUDController (trophy UI).
+        /// </summary>
+        public static event Action<string, string> OnHUDShowMoonTrophy; // title, subtitle
+
+        /// <summary>
+        /// Raised when a boss encounter starts.
+        /// Subscribers: HUDController (boss health bar initialization).
+        /// </summary>
+        public static event Action<string, float> OnHUDShowBossHealth; // bossName, normalizedHealth
+
+        /// <summary>
+        /// Raised when boss health changes during combat.
+        /// Subscribers: HUDController (boss health bar update).
+        /// </summary>
+        public static event Action<float> OnHUDUpdateBossHealth; // normalizedHealth
+
+        /// <summary>
+        /// Raised when boss is defeated or encounter ends.
+        /// Subscribers: HUDController (hide boss health bar).
+        /// </summary>
+        public static event Action OnHUDHideBossHealth;
+
+        /// <summary>
+        /// Raised when an interaction prompt should be shown.
+        /// Subscribers: HUDController (interaction prompt UI).
+        /// </summary>
+        public static event Action<string> OnHUDShowInteractionPrompt; // message
+
+        /// <summary>
+        /// Raised when interaction prompt should be hidden.
+        /// Subscribers: HUDController (hide interaction prompt UI).
+        /// </summary>
+        public static event Action OnHUDHideInteractionPrompt;
+
+        /// <summary>
+        /// Raised when RS (Resonance Shards) gain should be shown with flash effect.
+        /// Subscribers: HUDController (RS counter flash animation).
+        /// </summary>
+        public static event Action<float> OnHUDFlashRSGain; // amount
+
+        /// <summary>
+        /// Raised when boss nameplate should be shown (pre-combat intro).
+        /// Subscribers: HUDController (boss nameplate display).
+        /// </summary>
+        public static event Action<string, string> OnHUDShowBossNameplate; // bossName, bossTitle
+
+        /// <summary>
+        /// Raised when enemy combat bark should be shown.
+        /// Subscribers: HUDController (enemy bark UI).
+        /// </summary>
+        public static event Action<string, float> OnHUDShowEnemyBark; // message, duration
+
+        /// <summary>
+        /// Raised when corruption whisper effect should be shown.
+        /// Subscribers: HUDController (corruption whisper UI).
+        /// </summary>
+        public static event Action<string, float> OnHUDShowCorruptionWhisper; // message, duration
+
+        /// <summary>
+        /// Raised when frequency wheel should be updated (tuning mini-game).
+        /// Subscribers: HUDController (frequency wheel UI).
+        /// </summary>
+        public static event Action<float, float> OnHUDUpdateFrequencyWheel; // frequency, param
+
+        // ═══════════════════════════════════════════════════════════════════
         // RESONANCE SHARDS (RS) ECONOMY EVENTS (Legacy — preserved)
         // ═══════════════════════════════════════════════════════════════════
 
@@ -378,6 +472,100 @@ namespace Tartaria.Core
                 if (enabled) OnToggleAetherVision?.Invoke();
             }
             catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnAetherVisionToggled: {ex}"); }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // HUD RAISE METHODS (Thread-safe with null-check + exception handling)
+        // ═══════════════════════════════════════════════════════════════════
+
+        public static void RaiseHUDShowObjective(string message)
+        {
+            try { OnHUDShowObjective?.Invoke(message); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowObjective: {ex}"); }
+        }
+
+        public static void RaiseHUDShowDialogue(string speaker, string message)
+        {
+            try { OnHUDShowDialogue?.Invoke(speaker, message); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowDialogue: {ex}"); }
+        }
+
+        public static void RaiseHUDShowBanner(string title, string subtitle)
+        {
+            try { OnHUDShowBanner?.Invoke(title, subtitle); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowBanner: {ex}"); }
+        }
+
+        public static void RaiseHUDShowSubtitle(string message, float duration)
+        {
+            try { OnHUDShowSubtitle?.Invoke(message, duration); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowSubtitle: {ex}"); }
+        }
+
+        public static void RaiseHUDShowMoonTrophy(string title, string subtitle)
+        {
+            try { OnHUDShowMoonTrophy?.Invoke(title, subtitle); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowMoonTrophy: {ex}"); }
+        }
+
+        public static void RaiseHUDShowBossHealth(string bossName, float normalizedHealth)
+        {
+            try { OnHUDShowBossHealth?.Invoke(bossName, normalizedHealth); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowBossHealth: {ex}"); }
+        }
+
+        public static void RaiseHUDUpdateBossHealth(float normalizedHealth)
+        {
+            try { OnHUDUpdateBossHealth?.Invoke(normalizedHealth); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDUpdateBossHealth: {ex}"); }
+        }
+
+        public static void RaiseHUDHideBossHealth()
+        {
+            try { OnHUDHideBossHealth?.Invoke(); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDHideBossHealth: {ex}"); }
+        }
+
+        public static void RaiseHUDShowInteractionPrompt(string message)
+        {
+            try { OnHUDShowInteractionPrompt?.Invoke(message); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowInteractionPrompt: {ex}"); }
+        }
+
+        public static void RaiseHUDHideInteractionPrompt()
+        {
+            try { OnHUDHideInteractionPrompt?.Invoke(); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDHideInteractionPrompt: {ex}"); }
+        }
+
+        public static void RaiseHUDFlashRSGain(float amount)
+        {
+            try { OnHUDFlashRSGain?.Invoke(amount); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDFlashRSGain: {ex}"); }
+        }
+
+        public static void RaiseHUDShowBossNameplate(string bossName, string bossTitle)
+        {
+            try { OnHUDShowBossNameplate?.Invoke(bossName, bossTitle); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowBossNameplate: {ex}"); }
+        }
+
+        public static void RaiseHUDShowEnemyBark(string message, float duration)
+        {
+            try { OnHUDShowEnemyBark?.Invoke(message, duration); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowEnemyBark: {ex}"); }
+        }
+
+        public static void RaiseHUDShowCorruptionWhisper(string message, float duration)
+        {
+            try { OnHUDShowCorruptionWhisper?.Invoke(message, duration); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowCorruptionWhisper: {ex}"); }
+        }
+
+        public static void RaiseHUDUpdateFrequencyWheel(float frequency, float param)
+        {
+            try { OnHUDUpdateFrequencyWheel?.Invoke(frequency, param); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDUpdateFrequencyWheel: {ex}"); }
         }
     }
 
