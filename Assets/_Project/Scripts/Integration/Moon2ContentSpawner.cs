@@ -44,6 +44,7 @@ namespace Tartaria.Integration
         List<DissonanceCrystal> _dissonanceCrystals = new();
         GameObject _cassianNPC;
         bool _contentSpawned;
+        Moon2DissonanceVeinPuzzle _veinPuzzle;
 
         public bool IsMoon2Active => moon2Unlocked && !fountainPurgeComplete;
         public int CrystalsRemaining => totalCrystals - _crystalsDestroyed;
@@ -298,7 +299,7 @@ namespace Tartaria.Integration
             // Create vein puzzle system
             var puzzleGO = new GameObject("Moon2_VeinPuzzle");
             puzzleGO.transform.position = cassianSpawnPoint;
-            _veinPuzzle = puzzleGO.AddComponent<Gameplay.Moon2DissonanceVeinPuzzle>();
+            _veinPuzzle = puzzleGO.AddComponent<Moon2DissonanceVeinPuzzle>();
             _veinPuzzle.InitializePuzzle(bellTowerCenter);
 
             // Subscribe to completion

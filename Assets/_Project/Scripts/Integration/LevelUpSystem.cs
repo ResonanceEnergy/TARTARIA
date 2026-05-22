@@ -48,6 +48,9 @@ namespace Tartaria.Integration
         [SerializeField] int resonance = 5;
         [SerializeField] int strength = 5;
         [SerializeField] int agility = 5;
+
+        // Cached for logging (mirrors currentLevel)
+        int _currentLevel = 1;
         [SerializeField] int attunement = 5;
 
         public event Action<int> OnLevelUp;  // New level
