@@ -272,6 +272,30 @@ namespace Tartaria.Integration
             RememberSong();
         }
 
+        /// <summary>Boss encounter — Lirael detects dissonance.</summary>
+        public void OnBossEncountered(string bossName)
+        {
+            DialogueManager.Instance?.PlayContextDialogue($"lirael_boss_{bossName.ToLower()}_dissonance");
+            AddTrust(2f);
+            OnDissonanceDetected?.Invoke();
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        /// <summary>Boss defeated — Lirael senses purification.</summary>
+        public void OnBossDefeated(string bossName)
+        {
+            DialogueManager.Instance?.PlayContextDialogue($"lirael_boss_{bossName.ToLower()}_purified");
+            AddTrust(5f);
+            UpdateSolidity(_solidity + 0.05f);
+            Save.SaveManager.Instance?.MarkDirty();
+        }
+
+        /// <summary>Building restored — Lirael crystalline reaction.</summary>
+        public void OnBuildingRestored(string buildingId)
+        {
+            NotifyBuildingRestored();
+        }
+
         // === MOON 2 LUNAR FTUE: Lirael memory solidifies + physical relief/fracture tells (for Moon2LunarContentSpawner 5-beat) ===
         // Ties to Cassian trust/doubt arc, fountain climax, and replayable Crystal Remembers.
 

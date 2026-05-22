@@ -330,6 +330,16 @@ namespace Tartaria.Integration
             };
         }
 
+        /// <summary>
+        /// Track audio log playback for companion memory systems.
+        /// Called by AudioLogPlayable when player discovers echo memories.
+        /// </summary>
+        public void OnAudioLogPlayed(string logId)
+        {
+            Debug.Log($"[CompanionDialogueArcs] Audio log played: {logId}");
+            // Future: track specific companion reactions, unlock trust milestones
+        }
+
         // ... full save/load as R6 ...
     }
 }
