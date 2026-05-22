@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Audio;
 using Tartaria.Core;
+using Tartaria.Data;
 using Tartaria.Input;
 using Tartaria.Save;
 
@@ -14,19 +15,23 @@ namespace Tartaria.Gameplay
     /// Design:
     ///   - Fixed 10-slot grid (expandable to 20 in later phases)
     ///   - Add/Remove/GetCount API
-    ///   - Serialized to SaveData.inventoryItemIds/Counts
+    ///   - ISaveDataProvider pattern (v17 modular extensibility)
     ///   - Events trigger UI updates
     ///   - Items referenced by string id (e.g., "shovel", "aether_shard", "resonance_crystal")
+    ///   - Validates item IDs against ItemDatabase
     /// 
     /// Performance: event-driven, no per-frame cost.
     /// </summary>
     [DisallowMultipleComponent]
-    public class InventorySystem : MonoBehaviour
+    public class InventorySystem : MonoBehaviour, ISaveDataProvider
     {
         public static InventorySystem Instance { get; private set; }
 
         [Header("Capacity")]
         [SerializeField, Range(5, 50)] int maxSlots = 10;
+        
+        [Header("Database")]
+        [SerializeField] bool validateItemIDs = true;
 
         // ─── Events ───
         public event Action<string, int> OnItemAdded;      // itemId, newCount
@@ -34,6 +39,7 @@ namespace Tartaria.Gameplay
         public event Action OnInventoryChanged;             // generic refresh signal
 
         readonly Dictionary<string, int> _items = new();
+        ItemDatabase _itemDatabase;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
@@ -51,80 +57,117 @@ namespace Tartaria.Gameplay
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
             
-            // Wire save/load events
-            if (Tartaria.Save.SaveManager.Instance != null)
+            // Load item database
+            if (validateItemIDs)
             {
-                Tartaria.Save.SaveManager.Instance.OnBeforeSave += OnSave;
-                Tartaria.Save.SaveManager.Instance.OnAfterLoad += OnLoad;
+                _itemDatabase = ItemDatabase.LoadDatabase();
+                if (_itemDatabase == null)
+                {
+                    Debug.LogWarning("[Inventory] ItemDatabase not found — item validation disabled");
+                    validateItemIDs = false;
+                }
             }
+            
+            // Register with SaveManager (ISaveDataProvider pattern)
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.RegisterProvider(this);
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
             
-            // Cleanup save/load event handlers
-            if (Tartaria.Save.SaveManager.Instance != null)
-            {
-                Tartaria.Save.SaveManager.Instance.OnBeforeSave -= OnSave;
-                Tartaria.Save.SaveManager.Instance.OnAfterLoad -= OnLoad;
-            }
+            // Unregister from SaveManager
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.UnregisterProvider(this);
         }
-        
-        void OnSave(Tartaria.Save.SaveData sd)
+
+        // ═══════════════════════════════════════════════════════════════
+        // ISaveDataProvider Implementation (v17 modular save pattern)
+        // ═══════════════════════════════════════════════════════════════
+
+        public string GetProviderKey() => "Inventory";
+
+        public object GetSaveData()
         {
-            // Persist inventory to SaveData.player
-            if (sd.player != null)
+            var itemIds = new List<string>();
+            var itemCounts = new List<int>();
+
+            foreach (var kvp in _items)
             {
-                var itemIds = new List<string>();
-                var itemCounts = new List<int>();
-                
-                foreach (var kvp in _items)
-                {
-                    itemIds.Add(kvp.Key);
-                    itemCounts.Add(kvp.Value);
-                }
-                
-                sd.player.inventoryItemIds = itemIds.ToArray();
-                sd.player.inventoryItemCounts = itemCounts.ToArray();
-                
-                Debug.Log($"[Inventory] Saved {_items.Count} unique items");
+                itemIds.Add(kvp.Key);
+                itemCounts.Add(kvp.Value);
             }
+
+            return new InventoryData
+            {
+                itemIds = itemIds.ToArray(),
+                itemCounts = itemCounts.ToArray()
+            };
         }
-        
-        void OnLoad(Tartaria.Save.SaveData sd)
+
+        public void RestoreSaveData(object data)
         {
-            // Restore inventory from SaveData.player
             _items.Clear();
-            
-            if (sd.player != null && sd.player.inventoryItemIds != null && sd.player.inventoryItemCounts != null)
+
+            if (data == null)
             {
-                int count = Mathf.Min(sd.player.inventoryItemIds.Length, sd.player.inventoryItemCounts.Length);
-                for (int i = 0; i < count; i++)
-                {
-                    string itemId = sd.player.inventoryItemIds[i];
-                    int itemCount = sd.player.inventoryItemCounts[i];
-                    
-                    if (!string.IsNullOrEmpty(itemId) && itemCount > 0)
-                    {
-                        _items[itemId] = itemCount;
-                    }
-                }
-                
-                Debug.Log($"[Inventory] Loaded {_items.Count} unique items");
+                Debug.Log("[Inventory] No saved data — initialized empty");
                 OnInventoryChanged?.Invoke();
+                return;
+            }
+
+            // Provider receives JSON string from SaveManager
+            if (data is string json)
+            {
+                try
+                {
+                    var invData = JsonUtility.FromJson<InventoryData>(json);
+
+                    if (invData.itemIds != null && invData.itemCounts != null)
+                    {
+                        int count = Mathf.Min(invData.itemIds.Length, invData.itemCounts.Length);
+                        for (int i = 0; i < count; i++)
+                        {
+                            string itemId = invData.itemIds[i];
+                            int itemCount = invData.itemCounts[i];
+
+                            if (!string.IsNullOrEmpty(itemId) && itemCount > 0)
+                            {
+                                _items[itemId] = itemCount;
+                            }
+                        }
+                    }
+
+                    Debug.Log($"[Inventory] Loaded {_items.Count} unique items");
+                    OnInventoryChanged?.Invoke();
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[Inventory] Failed to deserialize: {e.Message}");
+                }
             }
         }
 
         // ─── API ───────────────────────────────────
 
         /// <summary>
-        /// Adds items to inventory. Returns false if no space.
+        /// Adds items to inventory. Returns false if no space or invalid item ID.
         /// </summary>
         public bool AddItem(string itemId, int count = 1)
         {
             if (string.IsNullOrEmpty(itemId) || count <= 0)
                 return false;
+
+            // Validate item ID against database
+            if (validateItemIDs && _itemDatabase != null)
+            {
+                if (!_itemDatabase.HasItem(itemId))
+                {
+                    Debug.LogWarning($"[Inventory] Invalid item ID '{itemId}' — not found in ItemDatabase");
+                    return false;
+                }
+            }
 
             // Check if we have space (unique item slots, not stack count)
             if (!_items.ContainsKey(itemId) && _items.Count >= maxSlots)
@@ -140,8 +183,18 @@ namespace Tartaria.Gameplay
             int newCount = _items[itemId];
 
             Debug.Log($"[Inventory] Added {count}x {itemId} (now {newCount})");
+            
+            // Fire legacy events
             OnItemAdded?.Invoke(itemId, newCount);
             OnInventoryChanged?.Invoke();
+            
+            // Fire GameEvents (decoupled pub/sub)
+            Core.GameEvents.RaiseItemPickup(new Core.ItemPickupEventArgs
+            {
+                itemId = itemId,
+                count = count,
+                totalCount = newCount
+            });
 
             AudioManager.Instance?.PlaySFX2D("ItemPickup");
             HapticFeedbackManager.Instance?.PlayDiscovery();
@@ -171,6 +224,15 @@ namespace Tartaria.Gameplay
 
             if (remaining <= 0)
                 _items.Remove(itemId);
+            
+            // Fire GameEvents (decoupled pub/sub)
+            Core.GameEvents.RaiseItemRemoved(new Core.ItemRemovedEventArgs
+            {
+                itemId = itemId,
+                count = count,
+                remainingCount = remaining,
+                reason = "manual_removal"
+            });
 
             Debug.Log($"[Inventory] Removed {count}x {itemId} (remaining {remaining})");
             OnItemRemoved?.Invoke(itemId, remaining);
@@ -206,6 +268,18 @@ namespace Tartaria.Gameplay
         }
 
         /// <summary>
+        /// Gets ItemData for an item ID from the database.
+        /// Returns null if database is not loaded or item not found.
+        /// </summary>
+        public ItemData GetItemData(string itemId)
+        {
+            if (_itemDatabase == null)
+                return null;
+
+            return _itemDatabase.GetItem(itemId);
+        }
+
+        /// <summary>
         /// Clears inventory (use with caution — no undo).
         /// </summary>
         public void Clear()
@@ -215,5 +289,16 @@ namespace Tartaria.Gameplay
             OnInventoryChanged?.Invoke();
             SaveManager.Instance?.MarkDirty();
         }
+    }
+
+    /// <summary>
+    /// Serializable data class for Inventory provider.
+    /// MUST be serializable by JsonUtility (no generics, no null collections).
+    /// </summary>
+    [Serializable]
+    public class InventoryData
+    {
+        public string[] itemIds = Array.Empty<string>();
+        public int[] itemCounts = Array.Empty<int>();
     }
 }

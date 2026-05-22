@@ -91,12 +91,58 @@ namespace Tartaria.Save
         // v16: Global game flags (not Moon-specific) for endings, unlocks, etc.
         public System.Collections.Generic.List<string> globalFlags = new();
 
+        // v17: Extensible provider-based save data (ISaveDataProvider pattern)
+        // Stores serialized JSON strings keyed by provider type name
+        public ProviderSaveData providerData = new();
+
         // v15: Helper accessors for arc scripts (bool)
         public bool GetMoonFlag(int moonNum, string key) => moonFlags.Get($"m{moonNum}_{key}");
         public void SetMoonFlag(int moonNum, string key, bool value) => moonFlags.Set($"m{moonNum}_{key}", value);
         // v15: Helper accessors for arc scripts (int)
         public int GetMoonFlag(int moonNum, string key, int defaultValue) => moonFlagsInt.Get($"m{moonNum}_{key}", defaultValue);
         public void SetMoonFlag(int moonNum, string key, int value) => moonFlagsInt.Set($"m{moonNum}_{key}", value);
+    }
+
+    /// <summary>
+    /// Serializable wrapper for provider-based save data.
+    /// JsonUtility doesn't support Dictionary<string, object> directly,
+    /// so we store JSON strings and deserialize on-demand.
+    /// </summary>
+    [Serializable]
+    public class ProviderSaveData
+    {
+        public string[] keys = System.Array.Empty<string>();
+        public string[] jsonValues = System.Array.Empty<string>();
+
+        public void SetProvider(string key, string jsonValue)
+        {
+            var keyList = new System.Collections.Generic.List<string>(keys);
+            var valueList = new System.Collections.Generic.List<string>(jsonValues);
+
+            int index = keyList.IndexOf(key);
+            if (index >= 0)
+            {
+                valueList[index] = jsonValue;
+            }
+            else
+            {
+                keyList.Add(key);
+                valueList.Add(jsonValue);
+            }
+
+            keys = keyList.ToArray();
+            jsonValues = valueList.ToArray();
+        }
+
+        public string GetProvider(string key)
+        {
+            for (int i = 0; i < keys.Length; i++)
+            {
+                if (keys[i] == key)
+                    return jsonValues[i];
+            }
+            return null;
+        }
     }
 
     [Serializable]
@@ -176,13 +222,30 @@ namespace Tartaria.Save
         public string currentZone = "echohaven";
         public float aetherCharge;
         
-        // PlayerProgression fields
+        // PlayerProgression fields (unified progression system)
         public int level = 1;
         public float currentXP = 0f;
+        public int availableStatPoints = 0;
+        
+        // Player stats (5-stat allocation system)
+        public int vitality = 5;
+        public int resonance = 5;
+        public int strength = 5;
+        public int agility = 5;
+        public int attunement = 5;
         
         // Inventory fields (itemId → count)
         public string[] inventoryItemIds = Array.Empty<string>();
         public int[] inventoryItemCounts = Array.Empty<int>();
+        
+        // Equipment fields (ScriptableObject-based equipment system)
+        // Stores itemID strings, null = empty slot
+        public string weaponSlotItemID = null;
+        public string armorSlotItemID = null;
+        public string helmetSlotItemID = null;
+        public string glovesSlotItemID = null;
+        public string bootsSlotItemID = null;
+        public string accessorySlotItemID = null;
     }
 
     [Serializable]
