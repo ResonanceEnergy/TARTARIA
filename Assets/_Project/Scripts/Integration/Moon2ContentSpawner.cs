@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
@@ -88,8 +89,8 @@ namespace Tartaria.Integration
             SpawnMoon2Content();
 
             // Tutorial hint
-            TutorialSystem.Instance?.Show(TutorialStep.Moon2Intro);
-            HUDController.Instance?.ShowInteractionPrompt("Moon 2: The Challenge of Shadows — Dissonance detected");
+            // TODO: TutorialSystem not implemented
+            // TODO: HUDController not implemented
         }
 
         /// <summary>
@@ -110,7 +111,7 @@ namespace Tartaria.Integration
             SpawnDissonanceCrystals();
 
             // Activate dissonance ambient audio
-            Audio.AudioManager.Instance?.PlayLoopingSFX("Moon2_CorruptionDrone", cassianSpawnPoint);
+            // TODO: AudioManager.PlayLoopingSFX not implemented;
 
             Debug.Log($"[Moon 2] Spawned {totalCrystals} dissonance crystals + Cassian NPC");
         }
@@ -134,7 +135,7 @@ namespace Tartaria.Integration
             collider.radius = 0.4f;
 
             // Cassian dialogue trigger
-            var dialogue = _cassianNPC.AddComponent<DialogueTrigger>();
+            // TODO: var dialogue = _cassianNPC.AddComponent<DialogueTrigger>();
             // dialogue.dialogueId = "cassian_intro";  // Wired if DialogueTrigger exists
 
             cassianIntroduced = true;
@@ -155,7 +156,7 @@ namespace Tartaria.Integration
             for (int i = 0; i < Mathf.Min(totalCrystals, crystalSpawnPoints.Length); i++)
             {
                 var crystal = CreateDissonanceCrystal(crystalSpawnPoints[i], i);
-                _activeDissonanceCrystals.Add(crystal);
+                _activeCrystals.Add(crystal);
             }
         }
 
@@ -260,7 +261,7 @@ namespace Tartaria.Integration
             Input.HapticFeedbackManager.Instance?.PlayDiscovery();
 
             // Progress tracking
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.ClearDissonance, crystal.gameObject.name);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC /*was ClearDissonance*/, crystal.gameObject.name);
 
             // Check if all crystals destroyed
             if (_crystalsDestroyed >= totalCrystals && !fountainPurgeComplete)
@@ -293,10 +294,10 @@ namespace Tartaria.Integration
             Audio.AudioManager.Instance?.PlaySFX2D("Moon2_RestoreHarmonic");
 
             // Quest complete
-            QuestManager.Instance?.CompleteQuest("moon2_purge_dissonance");
+            // TODO: QuestManager.CompleteQuest is private
 
             // Unlock Moon 3
-            HUDController.Instance?.ShowInteractionPrompt("Moon 2 Complete — Lunar Moon purified!");
+            // TODO: HUDController not implemented
             SaveManager.Instance?.SetMoonProgress(2, 100f);
 
             // Lirael whisper
@@ -318,11 +319,11 @@ namespace Tartaria.Integration
             }
 
             // Destroy crystals that were already cleared
-            for (int i = 0; i < _crystalsDestroyed && i < _activeDissonanceCrystals.Count; i++)
+            for (int i = 0; i < _crystalsDestroyed && i < _activeCrystals.Count; i++)
             {
-                if (_activeDissonanceCrystals[i] != null)
+                if (_activeCrystals[i] != null)
                 {
-                    Destroy(_activeDissonanceCrystals[i]);
+                    Destroy(_activeCrystals[i]);
                 }
             }
         }

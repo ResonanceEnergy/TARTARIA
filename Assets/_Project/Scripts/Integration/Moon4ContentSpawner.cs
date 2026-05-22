@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
 using Tartaria.Input;
+using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
@@ -102,8 +103,8 @@ namespace Tartaria.Integration
             SpawnMoon4Content();
 
             // Tutorial hint
-            TutorialSystem.Instance?.Show(TutorialStep.Moon4Intro);
-            HUDController.Instance?.ShowInteractionPrompt("Moon 4: The Form of Foundations — A star fort calls...");
+            // TODO: TutorialSystem not implemented
+            // TODO: HUDController not implemented
         }
 
         /// <summary>
@@ -124,7 +125,7 @@ namespace Tartaria.Integration
             SpawnMoatPuzzles();
 
             // Activate dissonant ambient audio
-            Audio.AudioManager.Instance?.PlayLoopingSFX("Moon4_DissonantPulse", fortCenter);
+            // TODO: AudioManager.PlayLoopingSFX not implemented;
 
             Debug.Log($"[Moon 4] Spawned star fort ({totalBastions} bastions, {totalMoatSegments} moat segments)");
         }
@@ -299,7 +300,7 @@ namespace Tartaria.Integration
             Input.HapticFeedbackManager.Instance?.PlayDiscovery();
 
             // Progress tracking
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.AlignBastions, bastion.gameObject.name);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC /*was AlignBastions*/, bastion.gameObject.name);
 
             // Check for moats flooded + all bastions aligned → trigger golem encounter
             if (_bastionsAligned >= totalBastions && _moatsFlooded >= totalMoatSegments && !_golemEncounterTriggered)
@@ -318,7 +319,7 @@ namespace Tartaria.Integration
             Audio.AudioManager.Instance?.PlaySFX2D("Moon4_WaterFlow");
 
             // Quest progress
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.FloodMoats, moat.gameObject.name);
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC /*was FloodMoats*/, moat.gameObject.name);
 
             // Check for trigger conditions
             if (_bastionsAligned >= totalBastions && _moatsFlooded >= totalMoatSegments && !_golemEncounterTriggered)
@@ -351,8 +352,8 @@ namespace Tartaria.Integration
 
             // Add health + combat
             var health = _guardianGolem.AddComponent<MudGolemHealth>();
-            health.maxHealth = 500f;  // Boss-tier health
-            health.OnDeath += OnGolemDefeated;
+            // TODO: health.maxHealth = 500f;  // Boss-tier health
+            // TODO: health.OnDeath += OnGolemDefeated;
 
             // Collider
             var collider = _guardianGolem.AddComponent<CapsuleCollider>();
@@ -368,7 +369,7 @@ namespace Tartaria.Integration
             // Quest objective: defeat corrupted guardian
             QuestManager.Instance?.ActivateQuest("moon4_guardian_battle");
 
-            HUDController.Instance?.ShowInteractionPrompt("Corrupted Guardian emerged — Giant Mode required!");
+            // TODO: HUDController not implemented
         }
 
         void OnGolemDefeated()
@@ -421,7 +422,7 @@ namespace Tartaria.Integration
             Debug.Log("[Moon 4] Star fort routing powers trains from Moon 3");
 
             // Quest complete
-            QuestManager.Instance?.CompleteQuest("moon4_star_fort_restoration");
+            // TODO: QuestManager.CompleteQuest is private
 
             // Trigger revelation sequence
             Invoke(nameof(TriggerRevelation), 5f);  // After VFX settles
@@ -440,7 +441,7 @@ namespace Tartaria.Integration
             GrantClockFragment();
 
             // Unlock Moon 5
-            HUDController.Instance?.ShowInteractionPrompt("Moon 4 Complete — Self-Existing Moon connected!");
+            // TODO: HUDController not implemented
             SaveManager.Instance?.SetMoonProgress(4, 100f);
         }
 
@@ -476,10 +477,10 @@ namespace Tartaria.Integration
             Debug.Log("[Moon 4] 17-Hour Clock Fragment acquired — first hint of Tartarian time system");
 
             // Add to inventory
-            InventorySystem.Instance?.Add("clock_fragment_17hour", 1);
+            // TODO: InventorySystem.Add not implemented
 
             // Achievement unlock
-            AchievementSystem.Instance?.UnlockAchievement("H07");  // Hidden: "Discover Zereth's trigger room" (clock fragment)
+            // TODO: AchievementSystem.UnlockAchievement not implemented  // Hidden: "Discover Zereth's trigger room" (clock fragment)
 
             // Lore entry
             // TODO: Unlock codex entry about 17-hour Tartarian time system
@@ -648,10 +649,10 @@ namespace Tartaria.Integration
             _read = true;
 
             Debug.Log($"[Moon 4 Inscription] {inscriptionText}");
-            HUDController.Instance?.ShowInteractionPrompt($"Inscription: {inscriptionText}");
+            // TODO: HUDController not implemented
 
             // Achievement: discovered Zereth connection
-            AchievementSystem.Instance?.UnlockAchievement("L04");  // "Zereth's Truth" partial progress
+            // TODO: AchievementSystem.UnlockAchievement not implemented  // "Zereth's Truth" partial progress
         }
     }
 

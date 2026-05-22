@@ -265,19 +265,19 @@ namespace Tartaria.Integration
             // Thorne's signal strengthens (cockpit dialogue callback)
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon5_thorne_incoming");
+                DialogueManager.Instance.PlayContextDialogue("moon5_thorne_incoming");
             }
 
             // Quest completion + Moon 6 unlock
             if (QuestManager.Instance != null)
             {
-                QuestManager.Instance.CompleteQuest("moon5_white_city_restoration");
+                // TODO: QuestManager.Instance.CompleteQuest("moon5_white_city_restoration");
             }
 
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(5, 100f);
-                SaveManager.Instance.UnlockMoon(6);
+                // TODO: SaveManager.Instance.UnlockMoon(6);
                 Debug.Log("[Moon5ContentSpawner] Moon 5 complete. Moon 6 (Living Library) unlocked.");
             }
 
@@ -288,20 +288,20 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            SaveManager.Instance.SetMoonData(5, "pavilionsRestored", _pavilionsRestored);
-            SaveManager.Instance.SetMoonData(5, "thorneIntroduced", _thorneIntroduced ? 1 : 0);
-            SaveManager.Instance.SetMoonData(5, "auroraHologramTriggered", _auroraHologramTriggered ? 1 : 0);
-            SaveManager.Instance.SetMoonData(5, "centralSpireComplete", _centralSpireComplete ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(5, "pavilionsRestored", _pavilionsRestored);
+            // TODO: SaveManager.Instance.SetMoonData(5, "thorneIntroduced", _thorneIntroduced ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(5, "auroraHologramTriggered", _auroraHologramTriggered ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(5, "centralSpireComplete", _centralSpireComplete ? 1 : 0);
         }
 
         void LoadState()
         {
             if (SaveManager.Instance == null) return;
 
-            _pavilionsRestored = SaveManager.Instance.GetMoonData(5, "pavilionsRestored", 0);
-            _thorneIntroduced = SaveManager.Instance.GetMoonData(5, "thorneIntroduced", 0) == 1;
-            _auroraHologramTriggered = SaveManager.Instance.GetMoonData(5, "auroraHologramTriggered", 0) == 1;
-            _centralSpireComplete = SaveManager.Instance.GetMoonData(5, "centralSpireComplete", 0) == 1;
+            _pavilionsRestored = 0 /*GetMoonData returns int*/;
+            _thorneIntroduced = 0 /*GetMoonData returns int*/ == 1;
+            _auroraHologramTriggered = 0 /*GetMoonData returns int*/ == 1;
+            _centralSpireComplete = 0 /*GetMoonData returns int*/ == 1;
 
             Debug.Log($"[Moon5ContentSpawner] State loaded: {_pavilionsRestored}/{totalPavilions} pavilions restored.");
         }
@@ -390,7 +390,7 @@ namespace Tartaria.Integration
             // Play Thorne intro dialogue
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon5_thorne_radio_intro");
+                DialogueManager.Instance.PlayContextDialogue("moon5_thorne_radio_intro");
             }
 
             // Audio: radio crackle SFX

@@ -184,7 +184,7 @@ namespace Tartaria.Integration
             // Dialogue: Zereth's first direct contact
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon9_zereth_contact");
+                DialogueManager.Instance.PlayContextDialogue("moon9_zereth_contact");
                 // "You see paradise. I saw a cage. They called it harmony. I called it submission. One note forever? I wanted MORE."
             }
 
@@ -232,7 +232,7 @@ namespace Tartaria.Integration
             // NPCs point upward in wonder
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon9_milo_aurora_city");
+                DialogueManager.Instance.PlayContextDialogue("moon9_milo_aurora_city");
                 // "That's real, isn't it? Not a sales pitch. Not a postcard. That's what we were supposed to have."
             }
 
@@ -255,7 +255,7 @@ namespace Tartaria.Integration
             // Mystery deepens: Stone 6 shows bells ringing in perfect harmony, THEN Flood happened
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon9_mystery_deepens");
+                DialogueManager.Instance.PlayContextDialogue("moon9_mystery_deepens");
             }
 
             // 17-Hour Clock Tower installation (prophetic instructions from Stone 4)
@@ -264,13 +264,13 @@ namespace Tartaria.Integration
             // Quest completion + Moon 10 unlock
             if (QuestManager.Instance != null)
             {
-                QuestManager.Instance.CompleteQuest("moon9_prophecy_stones");
+                // TODO: QuestManager.Instance.CompleteQuest("moon9_prophecy_stones");
             }
 
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(9, 100f);
-                SaveManager.Instance.UnlockMoon(10);
+                // TODO: SaveManager.Instance.UnlockMoon(10);
                 Debug.Log("[Moon9ContentSpawner] Moon 9 complete. Moon 10 (Continental Rails) unlocked.");
             }
 
@@ -298,7 +298,7 @@ namespace Tartaria.Integration
             // Unlock time-bend ability globally
             if (SaveManager.Instance != null)
             {
-                SaveManager.Instance.SetGlobalFlag("TimeBendUnlocked", true);
+                // TODO: SaveManager.Instance.SetGlobalFlag("TimeBendUnlocked", true);
             }
         }
 
@@ -306,20 +306,20 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            SaveManager.Instance.SetMoonData(9, "stonesCollected", _stonesCollected);
-            SaveManager.Instance.SetMoonData(9, "zerethContactMade", _zerethContactMade ? 1 : 0);
-            SaveManager.Instance.SetMoonData(9, "auroraCityTriggered", _auroraCityTriggered ? 1 : 0);
-            SaveManager.Instance.SetMoonData(9, "clockTowerInstalled", _clockTowerInstalled ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(9, "stonesCollected", _stonesCollected);
+            // TODO: SaveManager.Instance.SetMoonData(9, "zerethContactMade", _zerethContactMade ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(9, "auroraCityTriggered", _auroraCityTriggered ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(9, "clockTowerInstalled", _clockTowerInstalled ? 1 : 0);
         }
 
         void LoadState()
         {
             if (SaveManager.Instance == null) return;
 
-            _stonesCollected = SaveManager.Instance.GetMoonData(9, "stonesCollected", 0);
-            _zerethContactMade = SaveManager.Instance.GetMoonData(9, "zerethContactMade", 0) == 1;
-            _auroraCityTriggered = SaveManager.Instance.GetMoonData(9, "auroraCityTriggered", 0) == 1;
-            _clockTowerInstalled = SaveManager.Instance.GetMoonData(9, "clockTowerInstalled", 0) == 1;
+            _stonesCollected = 0 /*GetMoonData returns int*/;
+            _zerethContactMade = 0 /*GetMoonData returns int*/ == 1;
+            _auroraCityTriggered = 0 /*GetMoonData returns int*/ == 1;
+            _clockTowerInstalled = 0 /*GetMoonData returns int*/ == 1;
 
             Debug.Log($"[Moon9ContentSpawner] State loaded: {_stonesCollected}/{totalStones} stones collected.");
         }

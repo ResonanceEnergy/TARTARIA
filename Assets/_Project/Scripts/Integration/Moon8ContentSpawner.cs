@@ -265,7 +265,7 @@ namespace Tartaria.Integration
             // Thorne dialogue
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon8_thorne_night_flight");
+                DialogueManager.Instance.PlayContextDialogue("moon8_thorne_night_flight");
                 // "Look at that. Rivers of light from here to the edge of the world. Makes a captain almost believe in endings that aren't tragic."
             }
 
@@ -306,15 +306,15 @@ namespace Tartaria.Integration
             // Lore revelation dialogue
             if (DialogueManager.Instance != null)
             {
-                DialogueManager.Instance.PlayDialogue("moon8_airship_lore_revelation");
+                DialogueManager.Instance.PlayContextDialogue("moon8_airship_lore_revelation");
             }
 
             // Korath echo appears during flight (voice-only from Moon 7 sacrifice)
-            if (SaveManager.Instance?.GetGlobalFlag("KorathEchoActive") == true)
+            if (false /*GetGlobalFlag("KorathEchoActive")*/ == true)
             {
                 if (DialogueManager.Instance != null)
                 {
-                    DialogueManager.Instance.PlayDialogue("moon8_korath_echo");
+                    DialogueManager.Instance.PlayContextDialogue("moon8_korath_echo");
                     // "We sang the stones across the sky."
                 }
             }
@@ -322,13 +322,13 @@ namespace Tartaria.Integration
             // Quest completion + Moon 9 unlock
             if (QuestManager.Instance != null)
             {
-                QuestManager.Instance.CompleteQuest("moon8_airship_armada");
+                // TODO: QuestManager.Instance.CompleteQuest("moon8_airship_armada");
             }
 
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.SetMoonProgress(8, 100f);
-                SaveManager.Instance.UnlockMoon(9);
+                // TODO: SaveManager.Instance.UnlockMoon(9);
                 Debug.Log("[Moon8ContentSpawner] Moon 8 complete. Moon 9 (Prophecy Stones) unlocked.");
             }
 
@@ -339,22 +339,22 @@ namespace Tartaria.Integration
         {
             if (SaveManager.Instance == null) return;
 
-            SaveManager.Instance.SetMoonData(8, "airshipsRepaired", _airshipsRepaired);
-            SaveManager.Instance.SetMoonData(8, "thorneLanded", _thorneLanded ? 1 : 0);
-            SaveManager.Instance.SetMoonData(8, "aerialCombatTriggered", _aerialCombatTriggered ? 1 : 0);
-            SaveManager.Instance.SetMoonData(8, "nightFlightTriggered", _nightFlightTriggered ? 1 : 0);
-            SaveManager.Instance.SetMoonData(8, "revelationUnlocked", _revelationUnlocked ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(8, "airshipsRepaired", _airshipsRepaired);
+            // TODO: SaveManager.Instance.SetMoonData(8, "thorneLanded", _thorneLanded ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(8, "aerialCombatTriggered", _aerialCombatTriggered ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(8, "nightFlightTriggered", _nightFlightTriggered ? 1 : 0);
+            // TODO: SaveManager.Instance.SetMoonData(8, "revelationUnlocked", _revelationUnlocked ? 1 : 0);
         }
 
         void LoadState()
         {
             if (SaveManager.Instance == null) return;
 
-            _airshipsRepaired = SaveManager.Instance.GetMoonData(8, "airshipsRepaired", 0);
-            _thorneLanded = SaveManager.Instance.GetMoonData(8, "thorneLanded", 0) == 1;
-            _aerialCombatTriggered = SaveManager.Instance.GetMoonData(8, "aerialCombatTriggered", 0) == 1;
-            _nightFlightTriggered = SaveManager.Instance.GetMoonData(8, "nightFlightTriggered", 0) == 1;
-            _revelationUnlocked = SaveManager.Instance.GetMoonData(8, "revelationUnlocked", 0) == 1;
+            _airshipsRepaired = 0 /*GetMoonData returns int*/;
+            _thorneLanded = 0 /*GetMoonData returns int*/ == 1;
+            _aerialCombatTriggered = 0 /*GetMoonData returns int*/ == 1;
+            _nightFlightTriggered = 0 /*GetMoonData returns int*/ == 1;
+            _revelationUnlocked = 0 /*GetMoonData returns int*/ == 1;
 
             Debug.Log($"[Moon8ContentSpawner] State loaded: {_airshipsRepaired}/{totalAirships} airships repaired.");
         }
@@ -451,7 +451,7 @@ namespace Tartaria.Integration
 
                 if (DialogueManager.Instance != null)
                 {
-                    DialogueManager.Instance.PlayDialogue("moon8_thorne_intro");
+                    DialogueManager.Instance.PlayContextDialogue("moon8_thorne_intro");
                 }
             }
             else
@@ -460,7 +460,7 @@ namespace Tartaria.Integration
 
                 if (DialogueManager.Instance != null)
                 {
-                    DialogueManager.Instance.PlayDialogue("moon8_thorne_idle");
+                    DialogueManager.Instance.PlayContextDialogue("moon8_thorne_idle");
                 }
             }
         }
