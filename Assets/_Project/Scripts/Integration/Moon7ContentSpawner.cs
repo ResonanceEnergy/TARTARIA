@@ -382,9 +382,9 @@ namespace Tartaria.Integration
         int _sessionsComplete;
         int _sessionsRequired = 3;
 
-        public string InteractPrompt => $"Thaw Korath ({_sessionsComplete}/{_sessionsRequired}) (Hold E)";
+        public string GetInteractPrompt() => $"Thaw Korath ({_sessionsComplete}/{_sessionsRequired}) (Hold E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_sessionsComplete >= _sessionsRequired) return;
 
@@ -431,9 +431,9 @@ namespace Tartaria.Integration
 
         bool _taught;
 
-        public string InteractPrompt => _taught ? "Korath's Echo" : "Learn from Korath (E)";
+        public string GetInteractPrompt() => _taught ? "Korath's Echo" : "Learn from Korath (E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_taught) return;
 
@@ -460,9 +460,9 @@ namespace Tartaria.Integration
 
         bool _choiceMade;
 
-        public string InteractPrompt => _choiceMade ? "Choice Made" : "Confront Cassian (E)";
+        public string GetInteractPrompt() => _choiceMade ? "Choice Made" : "Confront Cassian (E)";
 
-        public void Interact()
+        public void Interact(GameObject player)
         {
             if (_choiceMade) return;
 

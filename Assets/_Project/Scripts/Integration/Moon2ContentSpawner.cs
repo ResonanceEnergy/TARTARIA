@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -337,7 +338,7 @@ namespace Tartaria.Integration
         float _health = 100f;
         bool _isBeingPurged;
 
-        public string GetPrompt() => "Hold [E] to Purge Dissonance";
+        public string GetInteractPrompt() => "Hold [E] to Purge Dissonance";
 
         public void Interact(GameObject interactor)
         {
