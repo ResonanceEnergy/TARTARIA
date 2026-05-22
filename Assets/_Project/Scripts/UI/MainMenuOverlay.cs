@@ -148,6 +148,10 @@ namespace Tartaria.UI
                 continueLabel = string.IsNullOrEmpty(label) ? "CONTINUE" : $"CONTINUE [{label}]";
             }
             string[] labels = { "NEW GAME", continueLabel, "SETTINGS", "QUIT" };
+            
+            // Guard against null GUI.skin during UIElements init race
+            if (GUI.skin == null) return;
+            
             for (int i = 0; i < labels.Length; i++)
             {
                 bool sel = (i == _selected);
