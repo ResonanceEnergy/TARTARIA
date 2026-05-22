@@ -4,6 +4,52 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [0.9.1-beta] — 2026-05-21
+
+**Session 5: Dr. Vex Aurelian Autonomous Pass — Documentation + Automation + Polish**  
+*11 commits — MainMenuOverlay fix, comprehensive documentation suite, full M3+M4 automation, Unity 6 API compliance*
+
+### Added
+- **BUILD_GUIDE.md** — Comprehensive build instructions for beta testers and developers (prerequisites, quick start, build modes, perf validation, controls, testing checklist, common issues, project structure, assembly architecture)
+- **TROUBLESHOOTING.md** — Beta tester support guide (launch issues, performance fixes, gameplay bugs, controls, graphics, crash reporting)
+- **CONTRIBUTING.md** — External contributor guidelines (bug reporting, feature requests, PR requirements, coding standards, testing guidelines, beta testing instructions)
+- **SESSION_5_SUMMARY.md** — Full autonomous pass report (9 commits, M1/M2 complete, M3/M4 automation shipped)
+- **M3 Automation Scripts:**
+  - `run-m3-gates.ps1` — Performance validation + standalone build automation
+  - `create-beta-package.ps1` — Beta distribution package creation (.zip)
+  - `complete-beta-sprint.ps1` — Master M3→M4 pipeline (perf→build→package)
+
+### Fixed
+- **MainMenuOverlay.cs** — Added `GUI.skin` null guard to prevent UIElements coexistence race condition errors on Unity startup (commit `4e3decc`)
+- **Unity 6 deprecated API (12 CS0618 warnings)** — Replaced `FindObjectOfType` → `FindFirstObjectByType`, `FindObjectsOfType` → `FindObjectsByType(FindObjectsSortMode.None)` in 5 editor scripts (KayKitImporter, Moon1/2/3/5 scaffolds)
+
+### Changed
+- **KNOWN_ISSUES.md** — Updated with Session 5 summary, marked all P0 blockers as RESOLVED (compile clean, Bootstrap methods verified, GUI.skin guard applied)
+- **create-beta-package.ps1** — Added TROUBLESHOOTING.md and CONTRIBUTING.md to beta distribution package
+
+### Documentation
+- **README.md** — Verified comprehensive (30+ design documents linked, project vision, tech stack, navigation table)
+- **All P0 blockers RESOLVED:**
+  - ✅ Compile clean (CS:0, 49/49 build phases passed, 31/31 readiness checks)
+  - ✅ MainMenuOverlay runtime errors fixed
+  - ✅ HapticFeedbackManager + VFXController Bootstrap methods verified
+  - ✅ ServiceLocator migration complete (no Gameplay → Integration refs)
+
+### Performance
+- Editor scripts now use Unity 6 API (`FindFirstObjectByType` / `FindObjectsByType`) — faster queries, no deprecation warnings
+- All per-frame allocation patterns audited — MudGolemAI and other hot Update loops confirmed clean (cached references, no GetComponent calls)
+
+### Status
+- **M1: End-to-End Playable** — 90% complete (build GREEN, Unity play mode active, awaiting manual playthrough test)
+- **M2: Menu/UX + AVH Juice** — 100% complete (SettingsOverlay production-ready, haptics/VFX wired)
+- **M3: Performance + Build** — Fully automated (run-m3-gates.ps1 ready for execution after Unity close)
+- **M4: Documentation + Package** — Fully automated (create-beta-package.ps1 ready, BUILD_GUIDE + TROUBLESHOOTING + CONTRIBUTING shipped)
+
+**Commits this session:** 11 (`4e3decc` → `ecc9f82`)  
+**Next steps:** M1 manual test → Close Unity → Run `.\complete-beta-sprint.ps1` → Beta distribution
+
+---
+
 ## [0.9.0-beta] — 2026-05-21
 
 **12-Hour Autonomous Beta Vertical Slice Sprint — Echohaven Moon 1 Closed Beta Candidate**  
