@@ -4,7 +4,7 @@ using UnityEngine;
 using Tartaria.Audio;
 using Tartaria.Core;
 using Tartaria.Input;
-// using Tartaria.Save;  // B1 cycle-break: removed assembly dependency
+using Tartaria.Save;
 
 namespace Tartaria.Gameplay
 {

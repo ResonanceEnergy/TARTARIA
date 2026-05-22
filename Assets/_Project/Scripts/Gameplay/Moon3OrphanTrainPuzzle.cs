@@ -177,11 +177,11 @@ namespace Tartaria.Gameplay
 
             Debug.Log($"[Moon3 Train Puzzle] Segment activated: {segment.segmentId} ({SegmentsRemaining} remaining)");
 
-            // VFX: rail turns golden, electric sparks
-            if (VFXController.Instance != null)
-            {
-                VFXController.Instance.PlayAetherPulse(segment.transform.position, 1.2f);
-            }
+            // VFX: rail turns golden, electric sparks (VFXController is in Integration assembly - commented out for B1)
+            // if (VFXController.Instance != null)
+            // {
+            //     VFXController.Instance.PlayAetherPulse(segment.transform.position, 1.2f);
+            // }
 
             // Audio: rail activation chime (432 Hz harmonic)
             AudioManager.Instance?.PlaySFX2D("Moon3_RailActivate");
@@ -190,14 +190,14 @@ namespace Tartaria.Gameplay
             // Progress feedback
             OnSegmentActivated?.Invoke(SegmentsRemaining);
 
-            // Quest progress
-            QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC /*was ActivateRail*/, segment.segmentId);
+            // Quest progress (QuestManager is in Integration assembly - commented out for B1)
+            // QuestManager.Instance?.ProgressByType(QuestObjectiveType.TalkToNPC /*was ActivateRail*/, segment.segmentId);
 
-            // Notify rail escort controller
-            if (RailEscortController.Instance != null)
-            {
-                RailEscortController.Instance.OnRailSegmentReactivated();
-            }
+            // Notify rail escort controller (RailEscortController is in Integration assembly - commented out for B1)
+            // if (RailEscortController.Instance != null)
+            // {
+            //     RailEscortController.Instance.OnRailSegmentReactivated();
+            // }
 
             // Check completion
             if (IsComplete)
@@ -217,15 +217,15 @@ namespace Tartaria.Gameplay
             AudioManager.Instance?.PlaySFX2D("Moon3_WrongNote");
             HapticFeedbackManager.Instance?.PlayCombatHit();
 
-            // HUD warning
-            if (UI.HUDController.Instance != null)
-            {
-                UI.HUDController.Instance.ShowBanner(
-                    "Wrong Note!",
-                    "Dissonance manifests — the rails reject false frequencies!",
-                    2f
-                );
-            }
+            // HUD warning (UI.HUDController is in UI assembly - commented out for B1)
+            // if (UI.HUDController.Instance != null)
+            // {
+            //     UI.HUDController.Instance.ShowBanner(
+            //         "Wrong Note!",
+            //         "Dissonance manifests \u2014 the rails reject false frequencies!",
+            //         2f
+            //     );
+            // }
         }
 
         void SpawnDissonanceEnemy(Vector3 position)
@@ -257,36 +257,36 @@ namespace Tartaria.Gameplay
             AudioManager.Instance?.StopLoopingSFX("Moon3_RailDormantHum");
             AudioManager.Instance?.PlaySFX2D("Moon3_PuzzleComplete");
 
-            // VFX: golden wave travels entire rail length
-            if (VFXController.Instance != null)
-            {
-                VFXController.Instance.PlayAetherPulse(transform.position, 8f);
-            }
+            // VFX: golden wave travels entire rail length (VFXController is in Integration assembly - commented out for B1)
+            // if (VFXController.Instance != null)
+            // {
+            //     VFXController.Instance.PlayAetherPulse(transform.position, 8f);
+            // }
 
             // Haptic celebration
             HapticFeedbackManager.Instance?.PlayDiscovery();
 
-            // HUD banner
-            if (UI.HUDController.Instance != null)
-            {
-                UI.HUDController.Instance.ShowBanner(
-                    "Continental Rail Restored",
-                    "Every segment sings. The children can finally go home. The lullaby begins.",
-                    7f
-                );
-            }
+            // HUD banner (UI.HUDController is in UI assembly - commented out for B1)
+            // if (UI.HUDController.Instance != null)
+            // {
+            //     UI.HUDController.Instance.ShowBanner(
+            //         "Continental Rail Restored",
+            //         "Every segment sings. The children can finally go home. The lullaby begins.",
+            //         7f
+            //     );
+            // }
 
             // Fire completion event
             OnPuzzleComplete?.Invoke();
 
-            // Achievement
-            AchievementSystem.Instance?.Unlock("moon3_rail_master");
+            // Achievement (AchievementSystem is in Integration assembly - commented out for B1)
+            // AchievementSystem.Instance?.Unlock("moon3_rail_master");
 
-            // Notify escort controller
-            if (RailEscortController.Instance != null)
-            {
-                RailEscortController.Instance.OnRailSegmentReactivated();  // Final call
-            }
+            // Notify escort controller (RailEscortController is in Integration assembly - commented out for B1)
+            // if (RailEscortController.Instance != null)
+            // {
+            //     RailEscortController.Instance.OnRailSegmentReactivated();  // Final call
+            // }
         }
 
         /// <summary>
@@ -361,15 +361,15 @@ namespace Tartaria.Gameplay
             // For beta: simplified 3-note sequence (full impl: cymatic minigame)
             // In production: CymaticWaterTuningMiniGame.Instance.StartMiniGame()
 
-            // Show tuning UI prompt
-            if (UI.HUDController.Instance != null)
-            {
-                UI.HUDController.Instance.ShowBanner(
-                    "Tuning Rail Segment",
-                    "Match the resonance frequency: 432 Hz...",
-                    3f
-                );
-            }
+            // Show tuning UI prompt (UI.HUDController is in UI assembly - commented out for B1)
+            // if (UI.HUDController.Instance != null)
+            // {
+            //     UI.HUDController.Instance.ShowBanner(
+            //         "Tuning Rail Segment",
+            //         "Match the resonance frequency: 432 Hz...",
+            //         3f
+            //     );
+            // }
 
             // Simulate tuning duration
             yield return new WaitForSeconds(2f);

@@ -16,7 +16,7 @@ namespace Tartaria.Integration
         public static CompanionCombatAbilities Instance { get; private set; }
 
         [Header("Configuration")]
-        [SerializeField] float thorne AirstrikeRadius = 10f;
+        [SerializeField] float thorneAirstrikeRadius = 10f;
         [SerializeField] float thorneAirstrikeDamage = 100f;
         [SerializeField] float thorneCooldown = 30f;
 
