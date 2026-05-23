@@ -1,0 +1,25 @@
+{
+  "name": "Tartaria.Scripts.Editor",
+  "rootNamespace": "Tartaria.Editor",
+  "references": [
+    "Tartaria.Core",
+    "Tartaria.Data",
+    "Tartaria.Gameplay",
+    "Tartaria.AI",
+    "Tartaria.Save",
+    "Tartaria.Localization",
+    "Tartaria.UI",
+    "Unity.TextMeshPro"
+  ],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": [],
+  "noEngineReferences": false
+}

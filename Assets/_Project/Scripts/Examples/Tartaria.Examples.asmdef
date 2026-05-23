@@ -1,9 +1,8 @@
 {
-  "name": "Tartaria.Data",
-  "rootNamespace": "Tartaria.Data",
+  "name": "Tartaria.Examples",
+  "rootNamespace": "Tartaria.Examples",
   "references": [
-    "Tartaria.Core",
-    "Tartaria.Localization"
+    "Tartaria.Core"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

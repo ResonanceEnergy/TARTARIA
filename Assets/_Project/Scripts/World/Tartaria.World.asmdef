@@ -1,9 +1,9 @@
 {
-  "name": "Tartaria.Data",
-  "rootNamespace": "Tartaria.Data",
+  "name": "Tartaria.World",
+  "rootNamespace": "Tartaria.World",
   "references": [
     "Tartaria.Core",
-    "Tartaria.Localization"
+    "Unity.RenderPipelines.Core.Runtime"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

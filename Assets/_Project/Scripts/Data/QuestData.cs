@@ -12,7 +12,7 @@ namespace Tartaria.Data
     public class QuestData : QuestDefinition, UnityEngine.ISerializationCallbackReceiver
     {
         [Header("Schema Version")]
-        [SerializeField] int schemaVersion = Tartaria.Save.SchemaVersion.CURRENT_QUEST;
+        [SerializeField] int schemaVersion = Tartaria.Core.DataSchemaVersion.CURRENT_QUEST;
 
         [Header("Campaign Integration")]
         [Tooltip("Moon number (1-13, 0 for meta/hub quests)")]
@@ -120,7 +120,7 @@ namespace Tartaria.Data
         /// </summary>
         public void OnAfterDeserialize()
         {
-            int currentVersion = Tartaria.Save.SchemaVersion.CURRENT_QUEST;
+            int currentVersion = Tartaria.Core.DataSchemaVersion.CURRENT_QUEST;
             
             if (schemaVersion < currentVersion)
             {

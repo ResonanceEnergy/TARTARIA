@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Tartaria.Data.Validation;
+using Tartaria.Core.Enums;
+using Tartaria.Core.Validation;
+using Tartaria.Localization;
 
 namespace Tartaria.Data
 {
@@ -13,6 +15,9 @@ namespace Tartaria.Data
     {
         [Tooltip("Text displayed to player for this choice")]
         public string choiceText;
+
+        [Tooltip("Localization key for this choice")]
+        public LocalizationKey choiceKey;
 
         [Tooltip("ID of the next node to transition to when this choice is selected")]
         public string nextNodeId;
@@ -40,7 +45,7 @@ namespace Tartaria.Data
         public int minPlayerLevel;
 
         [Tooltip("Stat check type (strength/vitality/etc)")]
-        public StatType statType;
+        public DialogueStatType statType;
 
         [Tooltip("Minimum stat value required")]
         public int minStatValue;
@@ -59,16 +64,25 @@ namespace Tartaria.Data
                     return true;
 
                 case DialogueConditionType.QuestComplete:
-                    return Integration.QuestManager.Instance != null &&
-                           Integration.QuestManager.Instance.IsQuestComplete(questId);
+                    // TODO: Move condition logic to Integration assembly (Data cannot reference Integration)
+                    // return Integration.QuestManager.Instance != null &&
+                    //        Integration.QuestManager.Instance.IsQuestComplete(questId);
+                    Debug.LogWarning($"[DialogueCondition] QuestComplete condition requires Integration assembly refactor");
+                    return true;
 
                 case DialogueConditionType.QuestActive:
-                    return Integration.QuestManager.Instance != null &&
-                           Integration.QuestManager.Instance.IsQuestActive(questId);
+                    // TODO: Move condition logic to Integration assembly (Data cannot reference Integration)
+                    // return Integration.QuestManager.Instance != null &&
+                    //        Integration.QuestManager.Instance.IsQuestActive(questId);
+                    Debug.LogWarning($"[DialogueCondition] QuestActive condition requires Integration assembly refactor");
+                    return true;
 
                 case DialogueConditionType.MinPlayerLevel:
-                    return Gameplay.PlayerProgression.Instance != null &&
-                           Gameplay.PlayerProgression.Instance.CurrentLevel >= minPlayerLevel;
+                    // TODO: Move condition logic to Gameplay assembly (Data cannot reference Gameplay)
+                    // return Gameplay.PlayerProgression.Instance != null &&
+                    //        Gameplay.PlayerProgression.Instance.CurrentLevel >= minPlayerLevel;
+                    Debug.LogWarning($"[DialogueCondition] MinPlayerLevel condition requires Gameplay assembly refactor");
+                    return true;
 
                 case DialogueConditionType.StatCheck:
                     // Placeholder: integrate with player stats when implemented
@@ -93,16 +107,6 @@ namespace Tartaria.Data
         MinPlayerLevel,
         StatCheck,
         Custom
-    }
-
-    public enum StatType
-    {
-        Strength,
-        Agility,
-        Vitality,
-        Resonance,
-        Intelligence,
-        Charisma
     }
 
     /// <summary>
@@ -270,17 +274,19 @@ namespace Tartaria.Data
         public void ExecuteNodeEvents()
         {
             // Quest activation
+            // TODO: Data assembly cannot reference Integration assembly (circular dependency risk)
+            // Move this logic to a DialogueExecutor in Integration assembly
             if (!string.IsNullOrEmpty(activateQuestId))
             {
-                Integration.QuestManager.Instance?.ActivateQuest(activateQuestId);
-                Debug.Log($"[DialogueNode] Activated quest: {activateQuestId}");
+                // Integration.QuestManager.Instance?.ActivateQuest(activateQuestId);
+                Debug.LogWarning($"[DialogueNode] Cannot activate quest: {activateQuestId} - Integration reference disabled in Data assembly");
             }
 
             // Quest completion
             if (!string.IsNullOrEmpty(completeQuestId))
             {
-                Integration.QuestManager.Instance?.CompleteQuest(completeQuestId);
-                Debug.Log($"[DialogueNode] Completed quest: {completeQuestId}");
+                // Integration.QuestManager.Instance?.CompleteQuest(completeQuestId);
+                Debug.LogWarning($"[DialogueNode] Cannot complete quest: {completeQuestId} - Integration reference disabled in Data assembly");
             }
 
             // Relationship tracking (placeholder for future NPC system)
