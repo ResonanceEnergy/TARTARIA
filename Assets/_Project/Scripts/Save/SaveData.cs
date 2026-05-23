@@ -111,8 +111,8 @@ namespace Tartaria.Save
         
         public Vector3 PlayerCheckpointPosition
         {
-            get => player.PlayerCheckpointPosition;
-            set => player.PlayerCheckpointPosition = value;
+            get => player.PlayerCheckpointPosition.ToVector3();
+            set => player.PlayerCheckpointPosition = new SerializableVector3(value);
         }
     }
 

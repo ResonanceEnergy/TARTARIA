@@ -1,9 +1,11 @@
 {
-  "name": "Tartaria.Data",
-  "rootNamespace": "Tartaria.Data",
+  "name": "Tartaria.Tests",
+  "rootNamespace": "Tartaria.Tests",
   "references": [
     "Tartaria.Core",
-    "Tartaria.Localization"
+    "Tartaria.Data",
+    "Tartaria.Gameplay",
+    "Tartaria.Save"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

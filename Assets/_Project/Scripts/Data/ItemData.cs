@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Tartaria.Data.Validation;
+using Tartaria.Core.Enums;
+using Tartaria.Core.Validation;
 using Tartaria.Localization;
 
 namespace Tartaria.Data
@@ -21,7 +22,7 @@ namespace Tartaria.Data
     public class ItemData : ScriptableObject, IValidatable, ILocalizable, UnityEngine.ISerializationCallbackReceiver
     {
         [Header("Schema Version")]
-        [SerializeField] int schemaVersion = Tartaria.Save.SchemaVersion.CURRENT_ITEM;
+        [SerializeField] int schemaVersion = Tartaria.Core.DataSchemaVersion.CURRENT_ITEM;
 
         [Header("Identity")]
         [Tooltip("Unique identifier (e.g., 'aether_shard', 'golem_core')")]
@@ -244,7 +245,7 @@ namespace Tartaria.Data
         /// </summary>
         public void OnAfterDeserialize()
         {
-            int currentVersion = Tartaria.Save.SchemaVersion.CURRENT_ITEM;
+            int currentVersion = Tartaria.Core.DataSchemaVersion.CURRENT_ITEM;
             
             if (schemaVersion < currentVersion)
             {
@@ -255,31 +256,5 @@ namespace Tartaria.Data
         }
 
         #endregion
-    }
-
-    /// <summary>
-    /// Item category enum for filtering and organization.
-    /// </summary>
-    public enum ItemCategory
-    {
-        Consumable,  // Health potions, food, buffs
-        Equipment,   // Weapons, armor, tools
-        Material,    // Crafting materials, resources
-        QuestItem,   // Quest-specific items
-        Currency,    // Resonance Shards, special currencies
-        Misc         // Everything else
-    }
-
-    /// <summary>
-    /// Item rarity enum for color coding and value scaling.
-    /// </summary>
-    public enum ItemRarity
-    {
-        Common,      // White/Gray
-        Uncommon,    // Green
-        Rare,        // Blue
-        Epic,        // Purple
-        Legendary,   // Orange/Gold
-        Mythic       // Red/Crimson
     }
 }

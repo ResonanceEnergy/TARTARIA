@@ -1,4 +1,3 @@
-// Assembly definition for Serialization namespace
 {
     "name": "Tartaria.Save.Serialization",
     "rootNamespace": "Tartaria.Save.Serialization",

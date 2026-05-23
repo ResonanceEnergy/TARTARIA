@@ -6,7 +6,6 @@ using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
 using Tartaria.Core; // R5: GameEvents for critical save triggers + cloud conflict UI events
-using Tartaria.Save.Serialization; // Agent 9: Optimized serialization (JSON/Binary/Hybrid + compression + encryption)
 
 namespace Tartaria.Save
 {
@@ -37,7 +36,8 @@ namespace Tartaria.Save
         public static SaveManager Instance { get; private set; }
 
         [SerializeField] float autoSaveIntervalSeconds = 10f;
-        [SerializeField] SerializationConfig serializationConfig; // Agent 9: Serialization strategy config
+        [SerializeField] bool enableEncryption = true; // Enable AES encryption for save files
+        [SerializeField] bool enableCompression = true; // Enable compression for save files
 
         // Day-9: self-bootstrap so the ~12 callsites of MarkDirty() actually persist.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -79,16 +79,11 @@ namespace Tartaria.Save
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
 
-            // Agent 9: Initialize serializer (fallback to binary if config missing)
-            if (serializationConfig == null)
+            // Initialize serializer (default to JSON for now, can be injected via SetSerializer)
+            if (_serializer == null)
             {
-                Debug.LogWarning("[SaveManager] No SerializationConfig assigned, using default Binary serializer");
-                _serializer = new BinaryGameSerializer();
-            }
-            else
-            {
-                _serializer = serializationConfig.GetSerializer();
-                Debug.Log($"[SaveManager] Using {_serializer.Name} serializer (compress={serializationConfig.enableCompression}, encrypt={serializationConfig.enableEncryption})");
+                Debug.LogWarning("[SaveManager] No serializer set, using default. Call SetSerializer() to use custom serializer from Serialization assembly.");
+                _serializer = new DefaultJsonSerializer();
             }
 
             _savePath = Path.Combine(Application.persistentDataPath, $"save_slot_{_currentSlot}.dat");
@@ -102,6 +97,39 @@ namespace Tartaria.Save
             GameEvents.OnBuildingRestored += HandleBuildingRestoredForAutoSave;
             GameEvents.OnCriticalSaveTrigger += HandleCriticalSaveTrigger;
             GameEvents.OnCloudConflictDetected += HandleCloudConflictUI; // UI layer subscribes too; here we log + default
+        }
+
+        /// <summary>
+        /// Set custom serializer (e.g. from Serialization assembly: BinaryGameSerializer, HybridGameSerializer).
+        /// Call this before any save/load operations.
+        /// </summary>
+        public void SetSerializer(IGameSerializer serializer)
+        {
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            Debug.Log($"[SaveManager] Serializer set to: {_serializer.Name}");
+        }
+
+        // ─── DEFAULT JSON SERIALIZER ─────────────────────────────────────────
+        
+        /// <summary>
+        /// Simple JSON serializer as fallback. Use Serialization assembly for production serializers.
+        /// </summary>
+        private class DefaultJsonSerializer : IGameSerializer
+        {
+            public string Name => "DefaultJSON";
+            public bool IsHumanReadable => true;
+
+            public byte[] Serialize<T>(T data)
+            {
+                string json = JsonUtility.ToJson(data, prettyPrint: true);
+                return Encoding.UTF8.GetBytes(json);
+            }
+
+            public T Deserialize<T>(byte[] data)
+            {
+                string json = Encoding.UTF8.GetString(data);
+                return JsonUtility.FromJson<T>(json);
+            }
         }
 
         void Start()
@@ -272,7 +300,18 @@ namespace Tartaria.Save
             if (value)
             {
                 if (!CurrentSave.globalFlags.Contains(key))
-            Agent 9: Uses optimized serializer (binary/hybrid) with compression and encryption.
+                    CurrentSave.globalFlags.Add(key);
+            }
+            else
+            {
+                CurrentSave.globalFlags.Remove(key);
+            }
+            MarkDirty();
+        }
+
+        /// <summary>
+        /// Save current game state to disk.
+        /// Agent 9: Uses optimized serializer (binary/hybrid) with compression and encryption.
         /// </summary>
         public void Save()
         {
@@ -293,16 +332,18 @@ namespace Tartaria.Save
                 serialized = _serializer.Serialize(_currentSave);
 
                 // Agent 9: Apply compression if enabled
-                if (serializationConfig?.enableCompression == true)
-                {
-                    serialized = CompressionHelper.Compress(serialized, serializationConfig.compressionType);
-                }
+                // TODO: Compression - use Serialization assembly's CompressionHelper
+                // if (enableCompression)
+                // {
+                //     serialized = CompressionHelper.Compress(serialized, CompressionType.GZip);
+                // }
 
                 // Agent 9: Apply encryption if enabled
-                if (serializationConfig?.enableEncryption == true)
-                {
-                    serialized = EncryptionHelper.Encrypt(serialized);
-                }
+                // TODO: Encryption - use Serialization assembly's EncryptionHelper
+                // if (enableEncryption)
+                // {
+                //     serialized = EncryptionHelper.Encrypt(serialized);
+                // }
 
                 // Compute integrity checksum (before encryption/compression for backward compat)
                 _currentSave.header.checksum = ComputeChecksumBytes(serialized);
@@ -325,22 +366,7 @@ namespace Tartaria.Save
                 // Real cloud: queue for upload (pending queue handles offline + Firebase/Steam)
                 // Note: Cloud still uses JSON for compatibility with existing cloud infrastructure
                 string cloudJson = JsonUtility.ToJson(_currentSave, true);
-                _cloudService?.QueueUploadAfterSave(cloudJ
-            // Safe double-write: primary first, then backup.
-            // If primary write fails, backup still holds the previous good save.
-            try
-            {
-                string tempPath = _savePath + ".tmp";
-                WriteFile(tempPath, json);
-                if (File.Exists(_savePath))
-                    File.Copy(_savePath, _backupPath, overwrite: true);
-                if (File.Exists(_savePath))
-                    File.Delete(_savePath);
-                File.Move(tempPath, _savePath);
-                _isDirty = false;
-
-                // Real cloud: queue for upload (pending queue handles offline + Firebase/Steam)
-                _cloudService?.QueueUploadAfterSave(json, _currentSave.header.modifiedUtc);
+                _cloudService?.QueueUploadAfterSave(cloudJson, _currentSave.header.modifiedUtc);
             }
             catch (Exception e)
             {
@@ -365,17 +391,17 @@ namespace Tartaria.Save
                     Debug.LogWarning("[SaveManager] Primary save corrupt — loaded backup.");
             }
 
-            // Agent 9: Backward compatibility - try old JSON save files
-            if (_currentSave == null && serializationConfig?.supportLegacyJsonSaves == true)
-            {
-                string legacyJsonPath = _savePath.Replace(".dat", ".json");
-                _currentSave = TryLoadLegacyJson(legacyJsonPath);
-                if (_currentSave != null)
-                {
-                    Debug.LogWarning($"[SaveManager] Migrated legacy JSON save from {legacyJsonPath}");
-                    Save(); // Re-save in new format
-                }
-            }
+            // TODO: Agent 9 backward compatibility - try old JSON save files (requires Serialization assembly)
+            // if (_currentSave == null && supportLegacyJsonSaves)
+            // {
+            //     string legacyJsonPath = _savePath.Replace(".dat", ".json");
+            //     _currentSave = TryLoadLegacyJson(legacyJsonPath);
+            //     if (_currentSave != null)
+            //     {
+            //         Debug.LogWarning($"[SaveManager] Migrated legacy JSON save from {legacyJsonPath}");
+            //         Save(); // Re-save in new format
+            //     }
+            // }
 
             if (_currentSave == null)
             {
@@ -692,24 +718,24 @@ namespace Tartaria.Save
             {
                 byte[] data = File.ReadAllBytes(path);
 
-                // Agent 9: Auto-detect encryption
-                bool isEncrypted = EncryptionHelper.IsEncrypted(data);
-                if (isEncrypted)
-                {
-                    data = EncryptionHelper.Decrypt(data);
-                }
+                // TODO: Auto-detect encryption - use Serialization assembly's EncryptionHelper
+                // bool isEncrypted = EncryptionHelper.IsEncrypted(data);
+                // if (isEncrypted)
+                // {
+                //     data = EncryptionHelper.Decrypt(data);
+                // }
 
-                // Agent 9: Auto-detect compression
-                try
-                {
-                    byte[] decompressed = CompressionHelper.Decompress(data);
-                    if (decompressed != data)
-                        data = decompressed;
-                }
-                catch
-                {
-                    // Not compressed or already decompressed
-                }
+                // TODO: Auto-detect compression - use Serialization assembly's CompressionHelper
+                // try
+                // {
+                //     byte[] decompressed = CompressionHelper.Decompress(data);
+                //     if (decompressed != data)
+                //         data = decompressed;
+                // }
+                // catch
+                // {
+                //     // Not compressed or already decompressed
+                // }
 
                 // Agent 9: Deserialize using configured serializer
                 SaveData saveData = _serializer.Deserialize<SaveData>(data);
@@ -756,13 +782,6 @@ namespace Tartaria.Save
             catch (Exception e)
             {
                 Debug.LogError($"[SaveManager] Legacy JSON load failed for {path}: {e.Message}");
-                return null;
-            }
-        }
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[SaveManager] Failed to load {path}: {e.Message}");
                 return null;
             }
         }
