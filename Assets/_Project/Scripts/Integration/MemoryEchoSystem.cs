@@ -22,11 +22,23 @@ namespace Tartaria.Integration
 
         readonly List<GameObject> _activeEchoes = new();
         readonly HashSet<int> _triggeredEchoes = new();
+        readonly List<Coroutine> _runningCoroutines = new(); // P0: Track coroutines for cleanup
         bool _systemActive;
 
         public bool AllEchoesViewed => _triggeredEchoes.Count >= (echoPointLocations?.Length ?? 0);
         public int EchoesViewed => _triggeredEchoes.Count;
         public int TotalEchoes => echoPointLocations?.Length ?? 0;
+
+        void OnDisable()
+        {
+            // P0: Stop all running coroutines to prevent memory leaks
+            foreach (var coroutine in _runningCoroutines)
+            {
+                if (coroutine != null)
+                    StopCoroutine(coroutine);
+            }
+            _runningCoroutines.Clear();
+        }
 
         void Start()
         {
@@ -127,8 +139,9 @@ namespace Tartaria.Integration
 
             Debug.Log($"[MemoryEcho] Triggering memory echo {echoIndex + 1}/{TotalEchoes}");
 
-            // Start vision sequence
-            StartCoroutine(PlayEchoVision(echoIndex));
+            // Start vision sequence (P0: track coroutine)
+            var coroutine = StartCoroutine(PlayEchoVision(echoIndex));
+            _runningCoroutines.Add(coroutine);
 
             // Quest progress
             QuestManager.Instance?.ProgressObjective("moon11_memory_echoes", 0, 1);
@@ -165,8 +178,9 @@ namespace Tartaria.Integration
                     renderer.material.color = echoTint;
                 }
 
-                // Animate: fade in
-                StartCoroutine(FadeGhost(renderer, 0f, 0.5f, 1f));
+                // Animate: fade in (P0: track coroutine)
+                var fadeCoroutine = StartCoroutine(FadeGhost(renderer, 0f, 0.5f, 1f));
+                _runningCoroutines.Add(fadeCoroutine);
             }
 
             // VFX: temporal distortion
@@ -195,7 +209,9 @@ namespace Tartaria.Integration
                 var renderer = child.GetComponent<Renderer>();
                 if (renderer != null)
                 {
-                    StartCoroutine(FadeGhost(renderer, 0.5f, 0f, 1f));
+                    // P0: track fade-out coroutine
+                    var fadeCoroutine = StartCoroutine(FadeGhost(renderer, 0.5f, 0f, 1f));
+                    _runningCoroutines.Add(fadeCoroutine);
                 }
             }
 
