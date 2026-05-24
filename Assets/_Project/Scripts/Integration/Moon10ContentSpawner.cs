@@ -41,6 +41,7 @@ namespace Tartaria.Integration
         readonly List<GameObject> _stations = new();
         readonly List<GameObject> _trains = new();
         readonly List<RailPathNode> _pathNodes = new();
+        readonly List<Coroutine> _runningCoroutines = new(); // P0: Track coroutines for cleanup
         GameObject _triggerRoom;
         GameObject _orphanTrainPuzzle;
         bool _contentSpawned;
@@ -65,6 +66,14 @@ namespace Tartaria.Integration
 
         void OnDestroy()
         {
+            // P0: Stop all running coroutines to prevent memory leaks
+            foreach (var coroutine in _runningCoroutines)
+            {
+                if (coroutine != null)
+                    StopCoroutine(coroutine);
+            }
+            _runningCoroutines.Clear();
+            
             if (SaveManager.Instance != null)
             {
                 SaveManager.Instance.OnBeforeSave -= OnSave;
@@ -1581,8 +1590,9 @@ namespace Tartaria.Integration
             
             psShock.Play();
 
-            // Expand shockwave
-            StartCoroutine(ExpandShockwave(shockwaveVFX));
+            // Expand shockwave (P0: track coroutine)
+            var coroutine = StartCoroutine(ExpandShockwave(shockwaveVFX));
+            _runningCoroutines.Add(coroutine);
 
             // Audio
             Audio.AudioManager.Instance?.PlaySFX3D("SeismicTremor", transform.position);

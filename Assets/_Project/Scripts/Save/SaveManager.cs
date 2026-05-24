@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -52,6 +52,7 @@ namespace Tartaria.Save
         SaveData _currentSave;
         float _autoSaveTimer;
         bool _isDirty;
+        readonly object _dirtyLock = new object(); // P0: Thread-safe _isDirty access
         string _savePath;
         string _backupPath;
 
@@ -209,13 +210,25 @@ namespace Tartaria.Save
             if (UnityEngine.Input.GetKeyDown(KeyCode.F9)) { QuickLoad(); }
 #endif
 
-            if (!_isDirty) return;
+            // P0: Thread-safe dirty flag check
+            bool shouldSave = false;
+            lock (_dirtyLock)
+            {
+                if (_isDirty)
+                {
+                    _autoSaveTimer += Time.deltaTime;
+                    if (_autoSaveTimer >= autoSaveIntervalSeconds)
+                    {
+                        shouldSave = true;
+                        _isDirty = false;
+                        _autoSaveTimer = 0f;
+                    }
+                }
+            }
 
-            _autoSaveTimer += Time.deltaTime;
-            if (_autoSaveTimer >= autoSaveIntervalSeconds)
+            if (shouldSave)
             {
                 Save();
-                _autoSaveTimer = 0f;
             }
         }
 
@@ -236,13 +249,28 @@ namespace Tartaria.Save
 
         void OnApplicationFocus(bool hasFocus)
         {
-            // Emergency save on alt-tab
-            if (!hasFocus && _isDirty)
+            // Emergency save on alt-tab (thread-safe)
+            bool shouldSave = false;
+            lock (_dirtyLock)
+            {
+                if (!hasFocus && _isDirty)
+                {
+                    shouldSave = true;
+                    _isDirty = false;
+                }
+            }
+            
+            if (shouldSave)
                 Save();
         }
 
         void OnApplicationQuit()
         {
+            // Final save on quit (thread-safe)
+            lock (_dirtyLock)
+            {
+                _isDirty = false;
+            }
             Save();
             _cloudService?.FlushPendingQueue(); // full offline support: flush any queued on exit
         }
@@ -251,10 +279,14 @@ namespace Tartaria.Save
 
         /// <summary>
         /// Marks save data as modified — will be written at next auto-save interval.
+        /// Thread-safe: protected by _dirtyLock.
         /// </summary>
         public void MarkDirty()
         {
-            _isDirty = true;
+            lock (_dirtyLock)
+            {
+                _isDirty = true;
+            }
         }
 
         /// <summary>

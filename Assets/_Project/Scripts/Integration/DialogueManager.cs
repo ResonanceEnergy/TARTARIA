@@ -72,6 +72,9 @@ namespace Tartaria.Integration
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
+            
+            // P0: Cancel any pending Invoke to prevent memory leaks
+            CancelInvoke();
         }
 
         // ─── Public API ──────────────────────────────
