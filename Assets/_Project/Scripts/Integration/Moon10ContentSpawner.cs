@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Input;
@@ -1446,6 +1446,10 @@ namespace Tartaria.Integration
         float _moveSpeed = 8f;
         bool _isDefeated;
         int _currentPhase = 1;
+        
+        // PERFORMANCE: Cache shockwave material (Agent 4 P0 fix)
+        static Material _cachedShockwaveMaterial;
+        static Shader _cachedShockwaveShader;
 
         void Start()
         {
@@ -1563,9 +1567,17 @@ namespace Tartaria.Integration
             shapeShock.shapeType = ParticleSystemShapeType.Circle;
             shapeShock.radius = 1f;
             
+            // PERFORMANCE: Use cached material instead of creating new one per attack
             var rendererShock = shockwaveVFX.GetComponent<ParticleSystemRenderer>();
-            rendererShock.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
-            rendererShock.material.SetColor("_BaseColor", new Color(0.8f, 0.4f, 0.2f));
+            if (_cachedShockwaveMaterial == null)
+            {
+                if (_cachedShockwaveShader == null)
+                    _cachedShockwaveShader = Shader.Find("Universal Render Pipeline/Particles/Unlit");
+                
+                _cachedShockwaveMaterial = new Material(_cachedShockwaveShader);
+                _cachedShockwaveMaterial.SetColor("_BaseColor", new Color(0.8f, 0.4f, 0.2f));
+            }
+            rendererShock.sharedMaterial = _cachedShockwaveMaterial;
             
             psShock.Play();
 
