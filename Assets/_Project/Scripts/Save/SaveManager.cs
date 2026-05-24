@@ -344,6 +344,7 @@ namespace Tartaria.Save
         /// <summary>
         /// Save current game state to disk.
         /// Agent 9: Uses optimized serializer (binary/hybrid) with compression and encryption.
+        /// V18 ENHANCEMENTS: Backup rotation (keep last 3 saves) + extended metadata
         /// </summary>
         public void Save()
         {
@@ -352,6 +353,9 @@ namespace Tartaria.Save
             FireBeforeSave();
             _currentSave.header.modifiedUtc = DateTime.UtcNow.ToString("o");
             _currentSave.header.playTimeSeconds += _autoSaveTimer;
+            
+            // V18: Update extended metadata
+            UpdateExtendedMetadata();
 
             // Zero checksum before computing so hash matches load-time recomputation
             _currentSave.header.checksum = "";
@@ -379,6 +383,9 @@ namespace Tartaria.Save
 
                 // Compute integrity checksum (before encryption/compression for backward compat)
                 _currentSave.header.checksum = ComputeChecksumBytes(serialized);
+                
+                // V18: ROTATE BACKUPS BEFORE SAVING (keep last 3 backups)
+                RotateBackups();
 
                 // Safe double-write: primary first, then backup.
                 // If primary write fails, backup still holds the previous good save.
@@ -410,17 +417,40 @@ namespace Tartaria.Save
         /// Loads save from disk, or creates a fresh save if none exists.
         /// Validates checksum on load. Falls back to backup if primary is corrupt.
         /// Agent 9: Supports binary, hybrid, and legacy JSON saves with auto-migration.
+        /// V18 ENHANCEMENTS: Full rollback chain recovery (.backup.0 → .backup.1 → .backup.2)
         /// </summary>
         public void LoadOrCreate()
         {
+            SaveData loadedSave = null;
+            float corruptedPlayTime = 0f;
+            int corruptedVersion = 0;
+            
+            // Try primary save first
             _currentSave = TryLoadFromPath(_savePath);
 
             if (_currentSave == null)
             {
-                // Try backup
+                Debug.LogWarning("[SaveManager] Primary save failed — trying immediate backup");
+                
+                // Try immediate backup (old system)
                 _currentSave = TryLoadFromPath(_backupPath);
+                
                 if (_currentSave != null)
-                    Debug.LogWarning("[SaveManager] Primary save corrupt — loaded backup.");
+                {
+                    Debug.LogWarning("[SaveManager] ✅ Loaded from immediate backup (legacy .backup.dat)");
+                    loadedSave = _currentSave;
+                }
+            }
+            else
+            {
+                loadedSave = _currentSave;
+            }
+            
+            // V18: If still null, try rollback chain
+            if (_currentSave == null)
+            {
+                Debug.LogWarning("[SaveManager] V18: Both primary and legacy backup failed — attempting rollback chain");
+                _currentSave = AttemptRollbackRecovery(corruptedPlayTime, corruptedVersion);
             }
 
             // TODO: Agent 9 backward compatibility - try old JSON save files (requires Serialization assembly)
@@ -553,6 +583,9 @@ namespace Tartaria.Save
 
         /// <summary>R6: Returns all archived conflicts for UI review / recovery tools.</summary>
         public ArchivedConflict[] GetArchivedConflicts() => _currentSave?.conflictArchive?.archivedConflicts ?? System.Array.Empty<ArchivedConflict>();
+        
+        /// <summary>V18: Returns rollback history for debugging and player transparency.</summary>
+        public System.Collections.Generic.List<RollbackEntry> GetRollbackHistory() => _currentSave?.rollbackHistory ?? new System.Collections.Generic.List<RollbackEntry>();
 
         // ─── R6 Slot Management (multi-slot foundation, current active slot 0 default) ─────
 
@@ -741,6 +774,7 @@ namespace Tartaria.Save
         /// <summary>
         /// Agent 9: Try load from path using optimized serializer.
         /// Supports binary, hybrid, and auto-detects encryption/compression.
+        /// V18 ENHANCEMENTS: Checksum validation + automatic rollback recovery
         /// </summary>
         SaveData TryLoadFromPath(string path)
         {
@@ -778,7 +812,35 @@ namespace Tartaria.Save
                     return null;
                 }
 
-                // Validate checksum (skip for now, will re-save with new checksum)
+                // V18: CHECKSUM VALIDATION — detect corrupted saves
+                if (!string.IsNullOrEmpty(saveData.header.checksum))
+                {
+                    // Compute checksum of loaded data (excluding the checksum field itself)
+                    string savedChecksum = saveData.header.checksum;
+                    saveData.header.checksum = ""; // Zero it for recomputation
+                    
+                    byte[] reserializedForCheck = _serializer.Serialize(saveData);
+                    string computedChecksum = ComputeChecksumBytes(reserializedForCheck);
+                    
+                    // Restore original checksum
+                    saveData.header.checksum = savedChecksum;
+                    
+                    if (savedChecksum != computedChecksum)
+                    {
+                        Debug.LogError($"[SaveManager] ❌ CHECKSUM MISMATCH in {path}!");
+                        Debug.LogError($"  Expected: {savedChecksum.Substring(0, 16)}...");
+                        Debug.LogError($"  Computed: {computedChecksum.Substring(0, 16)}...");
+                        Debug.LogError($"  Save file is CORRUPTED — attempting rollback recovery");
+                        
+                        // Track this corruption for rollback history
+                        RecordCorruptionEvent(path, savedChecksum, saveData.version, saveData.header.playTimeSeconds);
+                        
+                        return null; // Will trigger backup fallback in LoadOrCreate
+                    }
+                    
+                    Debug.Log($"[SaveManager] ✅ Checksum validated for {path} ({savedChecksum.Substring(0, 8)}...)");
+                }
+
                 Debug.Log($"[SaveManager] Loaded {path} successfully ({data.Length / 1024f:F1} KB)");
                 return saveData;
             }
@@ -1078,6 +1140,201 @@ namespace Tartaria.Save
             }
         }
 
+
+        // ═══════════════════════════════════════════════════════════════
+        // V18 ENHANCEMENTS: Backup Rotation + Checksum + Rollback System
+        // ═══════════════════════════════════════════════════════════════
+        
+        /// <summary>
+        /// V18: Update extended metadata fields in save header.
+        /// Called before every save to track progression metrics.
+        /// </summary>
+        void UpdateExtendedMetadata()
+        {
+            if (_currentSave?.header == null) return;
+            
+            var header = _currentSave.header;
+            
+            // Current moon (infer from completed moons or moon flags)
+            header.currentMoon = CalculateCurrentMoon();
+            
+            // Quest completion rate (completed quests / total quests)
+            header.questCompletionRate = CalculateQuestCompletionRate();
+            
+            // Buildings restored count
+            header.buildingsRestored = _currentSave.world?.buildings?
+                .Count(b => b.state >= 3) ?? 0; // state >= 3 = emerging/active
+            
+            // Note: totalDeaths and enemiesDefeated would be updated by
+            // PlayerHealthController and CombatManager respectively via MarkDirty()
+        }
+        
+        /// <summary>
+        /// V18: Calculate current moon based on progression.
+        /// </summary>
+        int CalculateCurrentMoon()
+        {
+            if (_currentSave?.campaign == null) return 1;
+            
+            // Check completed moons (assuming campaign tracks this)
+            int completedMoons = _currentSave.campaign.currentMoon;
+            
+            // If not tracked, infer from moon flags
+            if (completedMoons <= 0)
+            {
+                for (int moon = 13; moon >= 1; moon--)
+                {
+                    if (_currentSave.GetMoonFlag(moon, "started"))
+                        return moon;
+                }
+            }
+            
+            return completedMoons > 0 ? completedMoons : 1;
+        }
+        
+        /// <summary>
+        /// V18: Calculate quest completion percentage.
+        /// </summary>
+        float CalculateQuestCompletionRate()
+        {
+            if (_currentSave?.quests == null) return 0f;
+            
+            // Count completed quests
+            int completed = _currentSave.quests.completedQuestIds?.Length ?? 0;
+            
+            // Total quests in game (from audit report: 184 total quests)
+            const int TOTAL_QUESTS = 184;
+            
+            return completed / (float)TOTAL_QUESTS;
+        }
+        
+        /// <summary>
+        /// V18: Rotate backups to keep last 3 save versions.
+        /// Backup naming: save_slot_N.backup.0.dat (most recent) → .backup.2.dat (oldest)
+        /// </summary>
+        void RotateBackups()
+        {
+            try
+            {
+                string backupDir = Path.GetDirectoryName(_savePath);
+                string baseName = Path.GetFileNameWithoutExtension(_savePath);
+                
+                // Shift backups: .backup.2 ← .backup.1 ← .backup.0 ← current
+                for (int i = 2; i >= 1; i--)
+                {
+                    string older = Path.Combine(backupDir, $"{baseName}.backup.{i-1}.dat");
+                    string newer = Path.Combine(backupDir, $"{baseName}.backup.{i}.dat");
+                    
+                    if (File.Exists(older))
+                    {
+                        File.Copy(older, newer, overwrite: true);
+                    }
+                }
+                
+                // Copy current primary save to .backup.0
+                if (File.Exists(_savePath))
+                {
+                    string latestBackup = Path.Combine(backupDir, $"{baseName}.backup.0.dat");
+                    File.Copy(_savePath, latestBackup, overwrite: true);
+                }
+                
+                Debug.Log("[SaveManager] V18: Backup rotation complete (3 backups maintained)");
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[SaveManager] Backup rotation failed: {e.Message}");
+            }
+        }
+        
+        /// <summary>
+        /// V18: Record corruption event for rollback history tracking.
+        /// </summary>
+        void RecordCorruptionEvent(string corruptedPath, string badChecksum, int saveVersion, float playTime)
+        {
+            if (_currentSave == null) return;
+            
+            var entry = new RollbackEntry
+            {
+                timestamp = DateTime.UtcNow.ToString("o"),
+                reason = $"Corruption detected in {Path.GetFileName(corruptedPath)}",
+                previousVersion = saveVersion,
+                previousChecksum = badChecksum,
+                playTimeLost = 0f // Will be calculated after rollback
+            };
+            
+            // Keep only last 10 rollback entries
+            _currentSave.rollbackHistory.Add(entry);
+            if (_currentSave.rollbackHistory.Count > 10)
+            {
+                _currentSave.rollbackHistory.RemoveAt(0);
+            }
+            
+            Debug.LogWarning($"[SaveManager] V18: Recorded corruption event (total events: {_currentSave.rollbackHistory.Count})");
+        }
+        
+        /// <summary>
+        /// V18: Attempt rollback recovery from backup chain (try .backup.0 → .backup.1 → .backup.2).
+        /// Returns recovered save or null if all backups corrupted.
+        /// </summary>
+        SaveData AttemptRollbackRecovery(float corruptedPlayTime, int corruptedVersion)
+        {
+            Debug.LogWarning("[SaveManager] V18: ⚠️ PRIMARY SAVE CORRUPTED — Attempting rollback recovery...");
+            
+            string backupDir = Path.GetDirectoryName(_savePath);
+            string baseName = Path.GetFileNameWithoutExtension(_savePath);
+            
+            // Try backups in order: .backup.0 (most recent) → .backup.2 (oldest)
+            for (int i = 0; i <= 2; i++)
+            {
+                string backupPath = Path.Combine(backupDir, $"{baseName}.backup.{i}.dat");
+                
+                if (!File.Exists(backupPath))
+                {
+                    Debug.LogWarning($"[SaveManager]   Backup {i} not found: {backupPath}");
+                    continue;
+                }
+                
+                Debug.Log($"[SaveManager]   Trying backup {i}: {backupPath}");
+                SaveData backup = TryLoadFromPath(backupPath);
+                
+                if (backup != null)
+                {
+                    Debug.Log($"[SaveManager] ✅ ROLLBACK SUCCESSFUL from backup {i}");
+                    
+                    // Calculate playtime lost
+                    float playTimeLost = corruptedPlayTime - (backup.header?.playTimeSeconds ?? 0f);
+                    
+                    // Record successful rollback
+                    var rollbackEntry = new RollbackEntry
+                    {
+                        timestamp = DateTime.UtcNow.ToString("o"),
+                        reason = $"Rolled back to backup {i} after primary corruption",
+                        previousVersion = corruptedVersion,
+                        previousChecksum = "",
+                        playTimeLost = playTimeLost
+                    };
+                    
+                    backup.rollbackHistory.Add(rollbackEntry);
+                    
+                    // Show notification to player
+                    GameEvents.FireHUDAchievementToast($"⚠️ Save restored from backup (-{playTimeLost:F0}s progress lost)");
+                    
+                    // Restore as primary save
+                    File.Copy(backupPath, _savePath, overwrite: true);
+                    
+                    return backup;
+                }
+                else
+                {
+                    Debug.LogError($"[SaveManager]   Backup {i} also corrupted or invalid");
+                }
+            }
+            
+            Debug.LogError("[SaveManager] ❌ ALL ROLLBACK ATTEMPTS FAILED — No valid backup found!");
+            GameEvents.FireHUDAchievementToast("⚠️ Save corrupted — all backups failed. Starting new game.");
+            
+            return null; // No recovery possible
+        }
 
         static string ComputeChecksum(string content)
         {

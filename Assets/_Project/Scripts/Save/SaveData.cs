@@ -94,6 +94,9 @@ namespace Tartaria.Save
         // v17: Extensible provider-based save data (ISaveDataProvider pattern)
         // Stores serialized JSON strings keyed by provider type name
         public ProviderSaveData providerData = new();
+        
+        // V18 ENHANCEMENTS: Rollback history (keep last 3 rollback events)
+        public System.Collections.Generic.List<RollbackEntry> rollbackHistory = new();
 
         // v15: Helper accessors for arc scripts (bool)
         public bool GetMoonFlag(int moonNum, string key) => moonFlags.Get($"m{moonNum}_{key}");
@@ -226,6 +229,27 @@ namespace Tartaria.Save
         public string modifiedUtc;
         public float playTimeSeconds;
         public string checksum;
+        
+        // V18 ENHANCEMENTS: Extended metadata for better save management
+        public int currentMoon = 1;              // Which moon player is on (1-13)
+        public float questCompletionRate = 0f;  // 0.0-1.0 (0%-100%)
+        public int totalDeaths = 0;             // Death counter
+        public int enemiesDefeated = 0;         // Combat stats
+        public int buildingsRestored = 0;       // Progression metric
+    }
+    
+    /// <summary>
+    /// V18: Rollback entry — tracks when and why a rollback occurred.
+    /// Used for corruption recovery and save history auditing.
+    /// </summary>
+    [Serializable]
+    public class RollbackEntry
+    {
+        public string timestamp;        // When rollback occurred (ISO 8601)
+        public string reason;           // Why rolled back (e.g., "Corruption detected", "Migration failed")
+        public int previousVersion;     // Save version before rollback
+        public string previousChecksum; // Hash of the corrupted/rolled-back save
+        public float playTimeLost;      // How much playtime was lost in rollback (seconds)
     }
 
     [Serializable]
