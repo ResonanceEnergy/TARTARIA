@@ -51,12 +51,10 @@ namespace Tartaria.Gameplay
         [SerializeField] int strength = 5;
         [SerializeField] int agility = 5;
         [SerializeField] int attunement = 5;
-
-        // Events
-        public event Action<int> OnLevelUp;  // New level
-        public event Action<int> OnXPGained;  // XP amount
-        public event Action<StatType, int> OnStatAllocated;  // Stat type, new value
-
+    
+    [Header("Caps (Edge Case Protection)")]
+    [SerializeField] int maxStatValue = 999;  // Prevent integer overflow
+    [SerializeField] int maxXP = 999999999;    // ~1 billion XP cap
         // Properties
         public int CurrentLevel => currentLevel;
         public int CurrentXP => currentXP;
@@ -74,7 +72,7 @@ namespace Tartaria.Gameplay
         public float AbilityPowerMultiplier => 1f + (resonance * 0.02f);
         public float MeleeDamageMultiplier => 1f + (strength * 0.03f);
         public int CarryWeight => 50 + (strength * 5);
-        public float DodgeChance => 0.05f + (agility * 0.01f);
+        public float DodgeChance => Mathf.Min(0.7f, 0.05f + (agility * 0.01f));  // AGENT 5: Capped at 70% to prevent invincibility
         public float MovementSpeedMultiplier => 1f + (agility * 0.02f);
         public float MagicDamageMultiplier => 1f + (attunement * 0.03f);
         public float RSRegenRate => 1f + (attunement * 0.1f);
@@ -85,6 +83,7 @@ namespace Tartaria.Gameplay
             get
             {
                 int xpRequired = GetXPRequiredForNextLevel();
+                if (xpRequired <= 0) return 1f; // BUG-001 FIX: Prevent division by zero
                 return Mathf.Clamp01((float)currentXP / xpRequired);
             }
         }
@@ -183,18 +182,33 @@ namespace Tartaria.Gameplay
 
         /// <summary>
         /// Add experience points. Triggers level-up if threshold reached.
-        /// </summary>
-        public void AddXP(int amount, string source = "unknown")
+    /// BUG-002 FIX: Negative XP protection, integer overflow guards.
+    /// </summary>
+    public void AddXP(int amount, string source = "unknown")
+    {
+        if (currentLevel >= maxLevel)
         {
-            if (currentLevel >= maxLevel)
-            {
-                Debug.Log("[PlayerProgression] Already at max level");
-                return;
-            }
-
+            Debug.Log("[PlayerProgression] Already at max level");
+            return;
+        }
+        
+        // BUG-002 FIX: Reject negative XP
+        if (amount < 0)
+        {
+            Debug.LogWarning($"[PlayerProgression] Negative XP rejected ({amount} from {source})");
+            return;
+        }
+        
+        // BUG-002 FIX: Prevent integer overflow
+        if (currentXP > maxXP - amount)
+        {
+            Debug.LogWarning($"[PlayerProgression] XP overflow prevented (current: {currentXP}, adding: {amount})");
+            currentXP = maxXP;
+        }
+        else
+        {
             currentXP += amount;
-            
-            // Fire both legacy event and new GameEvents
+        }
             OnXPGained?.Invoke(amount);
             Core.GameEvents.RaiseXPGained(new Core.XPGainedEventArgs
             {
@@ -244,35 +258,59 @@ namespace Tartaria.Gameplay
 
         /// <summary>
         /// Allocate stat point(s) to a specific stat.
-        /// </summary>
-        public bool AllocateStat(StatType statType, int points = 1)
+    /// BUG-003 FIX: Stat cap enforcement, negative point protection.
+    /// </summary>
+    public bool AllocateStat(StatType statType, int points = 1)
+    {
+        if (availableStatPoints < points)
         {
-            if (availableStatPoints < points)
-            {
-                Debug.LogWarning($"[PlayerProgression] Not enough stat points ({availableStatPoints} available, {points} requested)");
-                return false;
-            }
+            Debug.LogWarning($"[PlayerProgression] Not enough stat points ({availableStatPoints} available, {points} requested)");
+            return false;
+        }
+        
+        // BUG-003 FIX: Reject negative point allocation
+        if (points < 0)
+        {
+            Debug.LogWarning($"[PlayerProgression] Negative stat allocation rejected ({points} points)");
+            return false;
+        }
 
-            switch (statType)
-            {
-                case StatType.Vitality:
-                    vitality += points;
-                    break;
-                case StatType.Resonance:
-                    resonance += points;
-                    break;
-                case StatType.Strength:
-                    strength += points;
-                    break;
-                case StatType.Agility:
-                    agility += points;
-                    break;
-                case StatType.Attunement:
-                    attunement += points;
-                    break;
-            }
+        // BUG-003 FIX: Enforce stat caps
+        int currentValue = GetStatValue(statType);
+        if (currentValue >= maxStatValue)
+        {
+            Debug.LogWarning($"[PlayerProgression] {statType} already at max ({maxStatValue})");
+            return false;
+        }
+        
+        // Cap points to prevent overflow
+        int allowedPoints = Mathf.Min(points, maxStatValue - currentValue);
+        if (allowedPoints < points)
+        {
+            Debug.LogWarning($"[PlayerProgression] Capping {points} points to {allowedPoints} to prevent {statType} overflow");
+            points = allowedPoints;
+        }
 
-            availableStatPoints -= points;
+        switch (statType)
+        {
+            case StatType.Vitality:
+                vitality += points;
+                break;
+            case StatType.Resonance:
+                resonance += points;
+                break;
+            case StatType.Strength:
+                strength += points;
+                break;
+            case StatType.Agility:
+                agility += points;
+                break;
+            case StatType.Attunement:
+                attunement += points;
+                break;
+        }
+
+        availableStatPoints -= points;
 
             Debug.Log($"[PlayerProgression] Allocated {points} point(s) to {statType} (now {GetStatValue(statType)}, {availableStatPoints} remaining)");
 
