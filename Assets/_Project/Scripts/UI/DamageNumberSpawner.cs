@@ -64,6 +64,10 @@ namespace Tartaria.UI
 
         void Update()
         {
+            // AGENT 6: Cache camera reference to avoid Camera.main lookup every frame
+            Camera cam = Camera.main;
+            if (cam == null) return;
+
             // Update all active damage text animations
             for (int i = _activeInstances.Count - 1; i >= 0; i--)
             {
@@ -88,12 +92,9 @@ namespace Tartaria.UI
                 color.a = 1f - t;
                 instance.textMesh.color = color;
 
-                // Billboard effect (face camera)
-                if (Camera.main != null)
-                {
-                    instance.transform.LookAt(Camera.main.transform);
-                    instance.transform.Rotate(0f, 180f, 0f); // Flip to face camera
-                }
+                // Billboard effect (face camera) - AGENT 6: Cached camera ref
+                instance.transform.LookAt(cam.transform);
+                instance.transform.Rotate(0f, 180f, 0f); // Flip to face camera
             }
         }
 

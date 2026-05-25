@@ -26,8 +26,9 @@ namespace Tartaria.Integration
         [SerializeField] float korathCooldown = 20f;
 
         float _thorneLastUse = -999f;
-        float _korathLastUse = -999f;
-
+        float _korathLastUse = -999f;        
+        // AGENT 6: Pre-allocated buffers for Physics.OverlapSphereNonAlloc
+        readonly Collider[] _abilityHitBuffer = new Collider[32];
         void Awake()
         {
             if (Instance != null && Instance != this)
@@ -140,8 +141,10 @@ namespace Tartaria.Integration
             Audio.AudioManager.Instance?.PlaySFX3D("Barrel_Explosion", explosionPos);
 
             // Damage enemies in radius
-            Collider[] hits = Physics.OverlapSphere(explosionPos, thorneAirstrikeRadius);
-            foreach (Collider hit in hits)
+            int hitCount = Physics.OverlapSphereNonAlloc(explosionPos, thorneAirstrikeRadius, _abilityHitBuffer);
+            for (int i = 0; i < hitCount; i++)
+            {
+                Collider hit = _abilityHitBuffer[i];
             {
                 if (hit.CompareTag("Enemy"))
                 {
@@ -245,9 +248,10 @@ namespace Tartaria.Integration
             Destroy(frostRing, 3f);
 
             // Damage and freeze enemies
-            Collider[] hits = Physics.OverlapSphere(targetPosition, korathFrostRadius);
-            foreach (Collider hit in hits)
+            int hitCount = Physics.OverlapSphereNonAlloc(targetPosition, korathFrostRadius, _abilityHitBuffer);
+            for (int i = 0; i < hitCount; i++)
             {
+                Collider hit = _abilityHitBuffer[i];
                 if (hit.CompareTag("Enemy"))
                 {
                     var health = hit.GetComponent<EnemyHealth>();
