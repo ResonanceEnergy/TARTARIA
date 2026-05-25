@@ -1,0 +1,601 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using UnityEditor;
+using UnityEngine;
+
+namespace Tartaria.Editor.LiveOps
+{
+    /// <summary>
+    /// Editor tool for parsing, categorizing, and prioritizing beta tester feedback.
+    /// Auto-categorizes by keywords, detects duplicate reports, and assigns priority scores.
+    /// </summary>
+    public class FeedbackAnalyzer : EditorWindow
+    {
+        private const string FEEDBACK_DIR = "Feedback";
+        private List<ParsedFeedback> _feedbackList = new List<ParsedFeedback>();
+        private Vector2 _scrollPosition;
+        private string _feedbackPath = "";
+        private bool _showDuplicatesOnly = false;
+        private FeedbackPriority _filterPriority = FeedbackPriority.All;
+        private string _searchKeyword = "";
+
+        public enum FeedbackPriority
+        {
+            All = -1,
+            P0_Crash = 0,
+            P1_ProgressionBlocker = 1,
+            P2_Balance = 2,
+            P3_Polish = 3
+        }
+
+        [Serializable]
+        public class ParsedFeedback
+        {
+            public string filepath;
+            public string feedbackText;
+            public string category;
+            public DateTime timestamp;
+            public FeedbackPriority priority;
+            public string[] keywords;
+            public int similarityGroup;
+            public string playerLevel;
+            public string currentMoon;
+            public string sceneName;
+            public bool analyzed;
+        }
+
+        [MenuItem("TARTARIA/LiveOps/Feedback Analyzer")]
+        public static void ShowWindow()
+        {
+            var window = GetWindow<FeedbackAnalyzer>("Feedback Analyzer");
+            window.minSize = new Vector2(800, 600);
+        }
+
+        private void OnEnable()
+        {
+            _feedbackPath = Path.Combine(Application.persistentDataPath, FEEDBACK_DIR);
+            LoadFeedback();
+        }
+
+        private void OnGUI()
+        {
+            EditorGUILayout.BeginVertical();
+
+            // Header
+            GUILayout.Label("TARTARIA Feedback Analyzer", EditorStyles.boldLabel);
+            GUILayout.Label($"Feedback Path: {_feedbackPath}", EditorStyles.miniLabel);
+            EditorGUILayout.Space();
+
+            // Controls
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Refresh Feedback", GUILayout.Width(150)))
+            {
+                LoadFeedback();
+            }
+            if (GUILayout.Button("Export Report", GUILayout.Width(150)))
+            {
+                ExportReport();
+            }
+            if (GUILayout.Button("Open Feedback Folder", GUILayout.Width(180)))
+            {
+                EditorUtility.RevealInFinder(_feedbackPath);
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space();
+
+            // Filters
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.Label("Filters:", GUILayout.Width(50));
+            _filterPriority = (FeedbackPriority)EditorGUILayout.EnumPopup(_filterPriority, GUILayout.Width(150));
+            _showDuplicatesOnly = EditorGUILayout.Toggle("Show Duplicates Only", _showDuplicatesOnly, GUILayout.Width(150));
+            _searchKeyword = EditorGUILayout.TextField("Search:", _searchKeyword, GUILayout.Width(200));
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space();
+
+            // Summary
+            DisplaySummary();
+            EditorGUILayout.Space();
+
+            // Feedback list
+            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
+            DisplayFeedbackList();
+            EditorGUILayout.EndScrollView();
+
+            EditorGUILayout.EndVertical();
+        }
+
+        private void LoadFeedback()
+        {
+            _feedbackList.Clear();
+
+            if (!Directory.Exists(_feedbackPath))
+            {
+                Debug.LogWarning($"[FeedbackAnalyzer] Feedback directory not found: {_feedbackPath}");
+                return;
+            }
+
+            var files = Directory.GetFiles(_feedbackPath, "feedback_*.json");
+            Debug.Log($"[FeedbackAnalyzer] Found {files.Length} feedback files.");
+
+            foreach (var file in files)
+            {
+                try
+                {
+                    string json = File.ReadAllText(file);
+                    var feedbackData = JsonUtility.FromJson<FeedbackData>(json);
+
+                    var parsed = new ParsedFeedback
+                    {
+                        filepath = file,
+                        feedbackText = feedbackData.feedbackText,
+                        category = feedbackData.category,
+                        timestamp = DateTime.Parse(feedbackData.timestamp),
+                        playerLevel = feedbackData.playerState?.playerLevel.ToString() ?? "Unknown",
+                        currentMoon = feedbackData.playerState?.currentMoon.ToString() ?? "Unknown",
+                        sceneName = feedbackData.playerState?.sceneName ?? "Unknown"
+                    };
+
+                    // Analyze feedback
+                    AnalyzeFeedback(parsed);
+                    _feedbackList.Add(parsed);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[FeedbackAnalyzer] Error parsing {file}: {ex.Message}");
+                }
+            }
+
+            // Detect duplicates
+            DetectDuplicates();
+
+            Debug.Log($"[FeedbackAnalyzer] Loaded and analyzed {_feedbackList.Count} feedback items.");
+        }
+
+        private void AnalyzeFeedback(ParsedFeedback feedback)
+        {
+            string text = feedback.feedbackText.ToLower();
+            
+            // Extract keywords
+            var keywords = new List<string>();
+            
+            // Crash keywords (P0)
+            if (Regex.IsMatch(text, @"\b(crash|freeze|hang|stuck|unresponsive|black screen|infinite loop)\b"))
+            {
+                keywords.Add("crash");
+                feedback.priority = FeedbackPriority.P0_Crash;
+            }
+            
+            // Progression blocker keywords (P1)
+            else if (Regex.IsMatch(text, @"\b(can't progress|blocked|stuck on quest|can't complete|softlock|game breaking)\b"))
+            {
+                keywords.Add("progression_blocker");
+                feedback.priority = FeedbackPriority.P1_ProgressionBlocker;
+            }
+            
+            // Balance keywords (P2)
+            else if (Regex.IsMatch(text, @"\b(too easy|too hard|overpowered|underpowered|unfair|balance|difficulty)\b"))
+            {
+                keywords.Add("balance");
+                feedback.priority = FeedbackPriority.P2_Balance;
+            }
+            
+            // Polish (P3) - default
+            else
+            {
+                feedback.priority = FeedbackPriority.P3_Polish;
+            }
+
+            // Additional categorization
+            if (Regex.IsMatch(text, @"\b(bug|error|broken|not working|doesn't work)\b"))
+            {
+                keywords.Add("bug");
+            }
+            if (Regex.IsMatch(text, @"\b(ui|interface|menu|button|hud|tooltip)\b"))
+            {
+                keywords.Add("ui");
+            }
+            if (Regex.IsMatch(text, @"\b(quest|dialogue|story|narrative)\b"))
+            {
+                keywords.Add("quest");
+            }
+            if (Regex.IsMatch(text, @"\b(combat|fight|enemy|weapon|attack)\b"))
+            {
+                keywords.Add("combat");
+            }
+            if (Regex.IsMatch(text, @"\b(moon|level|area|zone|exploration)\b"))
+            {
+                keywords.Add("moon");
+            }
+            if (Regex.IsMatch(text, @"\b(performance|fps|lag|stutter|loading)\b"))
+            {
+                keywords.Add("performance");
+            }
+            if (Regex.IsMatch(text, @"\b(audio|sound|music|voice|sfx)\b"))
+            {
+                keywords.Add("audio");
+            }
+
+            feedback.keywords = keywords.ToArray();
+            feedback.analyzed = true;
+        }
+
+        private void DetectDuplicates()
+        {
+            // Simple similarity detection based on keyword overlap
+            int groupId = 0;
+            var processed = new HashSet<ParsedFeedback>();
+
+            foreach (var feedback in _feedbackList)
+            {
+                if (processed.Contains(feedback))
+                    continue;
+
+                var similarItems = new List<ParsedFeedback> { feedback };
+                processed.Add(feedback);
+
+                // Find similar feedback
+                foreach (var other in _feedbackList)
+                {
+                    if (processed.Contains(other))
+                        continue;
+
+                    if (AreSimilar(feedback, other))
+                    {
+                        similarItems.Add(other);
+                        processed.Add(other);
+                    }
+                }
+
+                // Assign group ID if duplicates found
+                if (similarItems.Count > 1)
+                {
+                    foreach (var item in similarItems)
+                    {
+                        item.similarityGroup = groupId;
+                    }
+                    groupId++;
+                }
+                else
+                {
+                    feedback.similarityGroup = -1;
+                }
+            }
+        }
+
+        private bool AreSimilar(ParsedFeedback a, ParsedFeedback b)
+        {
+            // Simple keyword overlap similarity
+            if (a.keywords.Length == 0 || b.keywords.Length == 0)
+                return false;
+
+            int overlap = a.keywords.Intersect(b.keywords).Count();
+            float similarity = (float)overlap / Math.Min(a.keywords.Length, b.keywords.Length);
+
+            // Also check text similarity (simple word overlap)
+            var wordsA = a.feedbackText.ToLower().Split(new[] { ' ', '.', ',', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
+            var wordsB = b.feedbackText.ToLower().Split(new[] { ' ', '.', ',', '!', '?' }, StringSplitOptions.RemoveEmptyEntries);
+            
+            if (wordsA.Length > 5 && wordsB.Length > 5)
+            {
+                int wordOverlap = wordsA.Intersect(wordsB).Count();
+                float wordSimilarity = (float)wordOverlap / Math.Min(wordsA.Length, wordsB.Length);
+                
+                if (wordSimilarity > 0.6f)
+                    return true;
+            }
+
+            return similarity > 0.7f;
+        }
+
+        private void DisplaySummary()
+        {
+            var filtered = GetFilteredFeedback();
+            
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            GUILayout.Label("Summary", EditorStyles.boldLabel);
+            
+            GUILayout.Label($"Total Feedback: {_feedbackList.Count}");
+            GUILayout.Label($"Filtered: {filtered.Count}");
+            
+            EditorGUILayout.Space();
+            
+            // Priority breakdown
+            GUILayout.Label("Priority Breakdown:", EditorStyles.boldLabel);
+            GUILayout.Label($"  P0 (Crash): {_feedbackList.Count(f => f.priority == FeedbackPriority.P0_Crash)}");
+            GUILayout.Label($"  P1 (Progression Blocker): {_feedbackList.Count(f => f.priority == FeedbackPriority.P1_ProgressionBlocker)}");
+            GUILayout.Label($"  P2 (Balance): {_feedbackList.Count(f => f.priority == FeedbackPriority.P2_Balance)}");
+            GUILayout.Label($"  P3 (Polish): {_feedbackList.Count(f => f.priority == FeedbackPriority.P3_Polish)}");
+            
+            EditorGUILayout.Space();
+            
+            // Top keywords
+            var allKeywords = _feedbackList.SelectMany(f => f.keywords).ToList();
+            var keywordCounts = allKeywords.GroupBy(k => k).OrderByDescending(g => g.Count()).Take(5);
+            
+            GUILayout.Label("Top 5 Keywords:", EditorStyles.boldLabel);
+            foreach (var kw in keywordCounts)
+            {
+                GUILayout.Label($"  {kw.Key}: {kw.Count()}");
+            }
+            
+            EditorGUILayout.EndVertical();
+        }
+
+        private List<ParsedFeedback> GetFilteredFeedback()
+        {
+            var filtered = _feedbackList.AsEnumerable();
+
+            if (_filterPriority != FeedbackPriority.All)
+            {
+                filtered = filtered.Where(f => f.priority == _filterPriority);
+            }
+
+            if (_showDuplicatesOnly)
+            {
+                filtered = filtered.Where(f => f.similarityGroup >= 0);
+            }
+
+            if (!string.IsNullOrWhiteSpace(_searchKeyword))
+            {
+                string keyword = _searchKeyword.ToLower();
+                filtered = filtered.Where(f => 
+                    f.feedbackText.ToLower().Contains(keyword) || 
+                    f.keywords.Any(k => k.Contains(keyword)));
+            }
+
+            return filtered.OrderBy(f => f.priority).ThenByDescending(f => f.timestamp).ToList();
+        }
+
+        private void DisplayFeedbackList()
+        {
+            var filtered = GetFilteredFeedback();
+
+            foreach (var feedback in filtered)
+            {
+                EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+                
+                // Header
+                EditorGUILayout.BeginHorizontal();
+                
+                // Priority badge
+                Color priorityColor = GetPriorityColor(feedback.priority);
+                GUI.backgroundColor = priorityColor;
+                GUILayout.Label(feedback.priority.ToString(), EditorStyles.miniButton, GUILayout.Width(100));
+                GUI.backgroundColor = Color.white;
+                
+                // Duplicate badge
+                if (feedback.similarityGroup >= 0)
+                {
+                    GUI.backgroundColor = Color.yellow;
+                    GUILayout.Label($"Duplicate Group {feedback.similarityGroup}", EditorStyles.miniButton, GUILayout.Width(120));
+                    GUI.backgroundColor = Color.white;
+                }
+                
+                GUILayout.Label($"{feedback.category}", EditorStyles.miniLabel, GUILayout.Width(80));
+                GUILayout.Label($"{feedback.timestamp:yyyy-MM-dd HH:mm}", EditorStyles.miniLabel, GUILayout.Width(130));
+                GUILayout.FlexibleSpace();
+                
+                EditorGUILayout.EndHorizontal();
+                
+                // Content
+                GUILayout.Label($"Text: {feedback.feedbackText}", EditorStyles.wordWrappedLabel);
+                
+                // Metadata
+                EditorGUILayout.BeginHorizontal();
+                GUILayout.Label($"Level: {feedback.playerLevel} | Moon: {feedback.currentMoon} | Scene: {feedback.sceneName}", EditorStyles.miniLabel);
+                EditorGUILayout.EndHorizontal();
+                
+                // Keywords
+                if (feedback.keywords.Length > 0)
+                {
+                    GUILayout.Label($"Keywords: {string.Join(", ", feedback.keywords)}", EditorStyles.miniLabel);
+                }
+                
+                // Actions
+                EditorGUILayout.BeginHorizontal();
+                if (GUILayout.Button("View Full", GUILayout.Width(80)))
+                {
+                    ViewFullFeedback(feedback);
+                }
+                if (GUILayout.Button("Open File", GUILayout.Width(80)))
+                {
+                    EditorUtility.RevealInFinder(feedback.filepath);
+                }
+                EditorGUILayout.EndHorizontal();
+                
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.Space();
+            }
+        }
+
+        private Color GetPriorityColor(FeedbackPriority priority)
+        {
+            switch (priority)
+            {
+                case FeedbackPriority.P0_Crash: return new Color(1f, 0.3f, 0.3f);
+                case FeedbackPriority.P1_ProgressionBlocker: return new Color(1f, 0.6f, 0.2f);
+                case FeedbackPriority.P2_Balance: return new Color(1f, 1f, 0.4f);
+                case FeedbackPriority.P3_Polish: return new Color(0.6f, 0.8f, 1f);
+                default: return Color.white;
+            }
+        }
+
+        private void ViewFullFeedback(ParsedFeedback feedback)
+        {
+            try
+            {
+                string json = File.ReadAllText(feedback.filepath);
+                var fullData = JsonUtility.FromJson<FeedbackData>(json);
+                
+                var popup = EditorWindow.GetWindow<FeedbackDetailWindow>("Feedback Detail");
+                popup.SetFeedback(fullData, feedback);
+                popup.Show();
+            }
+            catch (Exception ex)
+            {
+                EditorUtility.DisplayDialog("Error", $"Could not load feedback: {ex.Message}", "OK");
+            }
+        }
+
+        private void ExportReport()
+        {
+            string path = EditorUtility.SaveFilePanel("Export Feedback Report", "", "feedback_report.md", "md");
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            try
+            {
+                var sb = new StringBuilder();
+                sb.AppendLine("# TARTARIA Beta Feedback Report");
+                sb.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                sb.AppendLine();
+                
+                sb.AppendLine("## Summary");
+                sb.AppendLine($"- **Total Feedback**: {_feedbackList.Count}");
+                sb.AppendLine($"- **P0 (Crash)**: {_feedbackList.Count(f => f.priority == FeedbackPriority.P0_Crash)}");
+                sb.AppendLine($"- **P1 (Progression Blocker)**: {_feedbackList.Count(f => f.priority == FeedbackPriority.P1_ProgressionBlocker)}");
+                sb.AppendLine($"- **P2 (Balance)**: {_feedbackList.Count(f => f.priority == FeedbackPriority.P2_Balance)}");
+                sb.AppendLine($"- **P3 (Polish)**: {_feedbackList.Count(f => f.priority == FeedbackPriority.P3_Polish)}");
+                sb.AppendLine();
+                
+                // Top 10 issues
+                sb.AppendLine("## Top 10 Issues by Frequency");
+                var keywordCounts = _feedbackList.SelectMany(f => f.keywords)
+                    .GroupBy(k => k)
+                    .OrderByDescending(g => g.Count())
+                    .Take(10);
+                
+                foreach (var kw in keywordCounts)
+                {
+                    sb.AppendLine($"- **{kw.Key}**: {kw.Count()} reports");
+                }
+                sb.AppendLine();
+                
+                // Detailed feedback
+                sb.AppendLine("## Detailed Feedback");
+                var sorted = _feedbackList.OrderBy(f => f.priority).ThenByDescending(f => f.timestamp);
+                
+                foreach (var feedback in sorted)
+                {
+                    sb.AppendLine($"### [{feedback.priority}] {feedback.category} - {feedback.timestamp:yyyy-MM-dd HH:mm}");
+                    sb.AppendLine($"**Text**: {feedback.feedbackText}");
+                    sb.AppendLine($"**Keywords**: {string.Join(", ", feedback.keywords)}");
+                    sb.AppendLine($"**Player State**: Level {feedback.playerLevel}, Moon {feedback.currentMoon}, Scene {feedback.sceneName}");
+                    if (feedback.similarityGroup >= 0)
+                    {
+                        sb.AppendLine($"**Duplicate Group**: {feedback.similarityGroup}");
+                    }
+                    sb.AppendLine();
+                }
+                
+                File.WriteAllText(path, sb.ToString());
+                EditorUtility.DisplayDialog("Success", $"Report exported to:\n{path}", "OK");
+                EditorUtility.RevealInFinder(path);
+            }
+            catch (Exception ex)
+            {
+                EditorUtility.DisplayDialog("Error", $"Export failed: {ex.Message}", "OK");
+            }
+        }
+
+        // Nested classes for data structures
+        [Serializable]
+        private class FeedbackData
+        {
+            public string feedbackText;
+            public string category;
+            public string timestamp;
+            public PlayerStateSnapshot playerState;
+            public string logSnippet;
+            public string screenshotPath;
+            public string sessionId;
+            public string buildVersion;
+            public string platform;
+        }
+
+        [Serializable]
+        private class PlayerStateSnapshot
+        {
+            public int playerLevel;
+            public int currentMoon;
+            public string activeQuest;
+            public float playTime;
+            public Vector3 position;
+            public string sceneName;
+            public int inventoryCount;
+            public float health;
+            public float maxHealth;
+        }
+    }
+
+    // Detail popup window
+    public class FeedbackDetailWindow : EditorWindow
+    {
+        private FeedbackAnalyzer.FeedbackData _data;
+        private FeedbackAnalyzer.ParsedFeedback _parsed;
+        private Vector2 _scrollPosition;
+
+        public void SetFeedback(FeedbackAnalyzer.FeedbackData data, FeedbackAnalyzer.ParsedFeedback parsed)
+        {
+            _data = data;
+            _parsed = parsed;
+        }
+
+        private void OnGUI()
+        {
+            if (_data == null || _parsed == null)
+            {
+                GUILayout.Label("No feedback loaded.");
+                return;
+            }
+
+            _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition);
+            
+            GUILayout.Label("Feedback Detail", EditorStyles.boldLabel);
+            EditorGUILayout.Space();
+            
+            GUILayout.Label($"Priority: {_parsed.priority}");
+            GUILayout.Label($"Category: {_data.category}");
+            GUILayout.Label($"Timestamp: {_parsed.timestamp:yyyy-MM-dd HH:mm:ss}");
+            GUILayout.Label($"Build Version: {_data.buildVersion}");
+            GUILayout.Label($"Platform: {_data.platform}");
+            EditorGUILayout.Space();
+            
+            GUILayout.Label("Feedback Text:", EditorStyles.boldLabel);
+            EditorGUILayout.TextArea(_data.feedbackText, EditorStyles.wordWrappedLabel, GUILayout.MinHeight(60));
+            EditorGUILayout.Space();
+            
+            GUILayout.Label("Player State:", EditorStyles.boldLabel);
+            if (_data.playerState != null)
+            {
+                GUILayout.Label($"  Level: {_data.playerState.playerLevel}");
+                GUILayout.Label($"  Moon: {_data.playerState.currentMoon}");
+                GUILayout.Label($"  Scene: {_data.playerState.sceneName}");
+                GUILayout.Label($"  Position: {_data.playerState.position}");
+                GUILayout.Label($"  Play Time: {_data.playerState.playTime:F1}s");
+            }
+            EditorGUILayout.Space();
+            
+            if (!string.IsNullOrEmpty(_data.screenshotPath))
+            {
+                GUILayout.Label($"Screenshot: {_data.screenshotPath}");
+                if (GUILayout.Button("Open Screenshot", GUILayout.Width(150)))
+                {
+                    EditorUtility.RevealInFinder(_data.screenshotPath);
+                }
+            }
+            EditorGUILayout.Space();
+            
+            GUILayout.Label("Log Snippet:", EditorStyles.boldLabel);
+            EditorGUILayout.TextArea(_data.logSnippet ?? "No log available", EditorStyles.wordWrappedLabel, GUILayout.MinHeight(150));
+            
+            EditorGUILayout.EndScrollView();
+        }
+    }
+}

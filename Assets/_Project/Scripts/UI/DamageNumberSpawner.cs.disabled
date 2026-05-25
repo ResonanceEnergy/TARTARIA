@@ -1,0 +1,322 @@
+using UnityEngine;
+using TMPro;
+using System.Collections.Generic;
+using Tartaria.Core;
+using Tartaria.AI;
+
+namespace Tartaria.UI
+{
+    /// <summary>
+    /// Spawns floating damage numbers at combat hit positions.
+    /// Subscribes to GameEvents.OnEnemyKilled and MudGolemHealth.OnDamaged.
+    /// Uses object pooling (20 TextMeshPro instances) to avoid GC allocations.
+    /// Color coding: white (normal), yellow (crit), red (player damage).
+    /// Animation: rise up 1m over 0.8s with fade-out.
+    /// </summary>
+    public class DamageNumberSpawner : MonoBehaviour
+    {
+        [Header("Pool Configuration")]
+        [SerializeField] private int _poolSize = 20;
+        [SerializeField] private GameObject _damageTextPrefab;
+
+        [Header("Animation Settings")]
+        [SerializeField] private float _riseDistance = 1f;
+        [SerializeField] private AnimationCurve _riseCurve = AnimationCurve.EaseOut(0f, 0f, 1f, 1f);
+
+        [Header("Color Coding")]
+        [SerializeField] private Color _normalDamageColor = Color.white;
+        [SerializeField] private Color _critDamageColor = Color.yellow;
+        [SerializeField] private Color _playerDamageColor = Color.red;
+
+        [Header("Font Settings")]
+        [SerializeField] private float _normalFontSize = 3f;
+
+        // Pooling
+        private Queue<DamageTextInstance> _availablePool = new Queue<DamageTextInstance>();
+        private List<DamageTextInstance> _activeInstances = new List<DamageTextInstance>();
+
+        // Tracked MudGolems for damage subscription
+        private List<MudGolemHealth> _subscribedGolems = new List<MudGolemHealth>();
+
+        void Awake()
+        {
+            InitializePool();
+        }
+
+        void OnEnable()
+        {
+            GameEvents.OnEnemyKilled += HandleEnemyKilled;
+        }
+
+        void OnDisable()
+        {
+            GameEvents.OnEnemyKilled -= HandleEnemyKilled;
+            UnsubscribeAllGolems();
+        }
+
+        void Start()
+        {
+            // Find all MudGolems in scene and subscribe to their damage events
+            SubscribeToAllGolems();
+        }
+
+        void Update()
+        {
+            // Update all active damage text animations
+            for (int i = _activeInstances.Count - 1; i >= 0; i--)
+            {
+                DamageTextInstance instance = _activeInstances[i];
+                instance.elapsed += Time.deltaTime;
+
+                float t = instance.elapsed / GameBalanceConfig.Instance.damageNumberAnimationDuration;
+                if (t >= 1f)
+                {
+                    // Animation complete - return to pool
+                    ReturnToPool(instance);
+                    _activeInstances.RemoveAt(i);
+                    continue;
+                }
+
+                // Animate position (rise up)
+                float riseAmount = _riseCurve.Evaluate(t) * _riseDistance;
+                instance.transform.position = instance.startPosition + Vector3.up * riseAmount;
+
+                // Fade out alpha
+                Color color = instance.textMesh.color;
+                color.a = 1f - t;
+                instance.textMesh.color = color;
+
+                // Billboard effect (face camera)
+                if (Camera.main != null)
+                {
+                    instance.transform.LookAt(Camera.main.transform);
+                    instance.transform.Rotate(0f, 180f, 0f); // Flip to face camera
+                }
+            }
+        }
+
+        private void InitializePool()
+        {
+            // Create pool container
+            Transform poolParent = new GameObject("DamageNumberPool").transform;
+            poolParent.SetParent(transform);
+
+            for (int i = 0; i < _poolSize; i++)
+            {
+                GameObject obj = CreateDamageTextObject();
+                obj.transform.SetParent(poolParent);
+                obj.SetActive(false);
+
+                DamageTextInstance instance = new DamageTextInstance
+                {
+                    gameObject = obj,
+                    transform = obj.transform,
+                    textMesh = obj.GetComponent<TextMeshPro>()
+                };
+
+                _availablePool.Enqueue(instance);
+            }
+
+            Debug.Log($"[DamageNumberSpawner] Initialized pool with {_poolSize} instances");
+        }
+
+        private GameObject CreateDamageTextObject()
+        {
+            GameObject obj;
+
+            if (_damageTextPrefab != null)
+            {
+                // Use prefab if provided
+                obj = Instantiate(_damageTextPrefab);
+            }
+            else
+            {
+                // Create procedural TextMeshPro object
+                obj = new GameObject("DamageText");
+                TextMeshPro tmp = obj.AddComponent<TextMeshPro>();
+                tmp.alignment = TextAlignmentOptions.Center;
+                tmp.fontSize = _normalFontSize;
+                tmp.enableWordWrapping = false;
+                tmp.sortingOrder = 10; // Render on top
+            }
+
+            return obj;
+        }
+
+        private void SubscribeToAllGolems()
+        {
+            MudGolemHealth[] golems = FindObjectsByType<MudGolemHealth>(FindObjectsSortMode.None);
+            foreach (var golem in golems)
+            {
+                SubscribeToGolem(golem);
+            }
+
+            if (golems.Length > 0)
+            {
+                Debug.Log($"[DamageNumberSpawner] Subscribed to {golems.Length} MudGolems");
+            }
+        }
+
+        private void SubscribeToGolem(MudGolemHealth golem)
+        {
+            if (_subscribedGolems.Contains(golem)) return;
+
+            golem.OnDamaged += HandleGolemDamaged;
+            _subscribedGolems.Add(golem);
+        }
+
+        private void UnsubscribeAllGolems()
+        {
+            foreach (var golem in _subscribedGolems)
+            {
+                if (golem != null)
+                {
+                    golem.OnDamaged -= HandleGolemDamaged;
+                }
+            }
+            _subscribedGolems.Clear();
+        }
+
+        private void HandleGolemDamaged(float damageAmount, float remainingHealth)
+        {
+            // MudGolemHealth.OnDamaged doesn't provide position, so use golem transform
+            MudGolemHealth golem = FindGolemByEvent();
+            if (golem != null)
+            {
+                SpawnDamageNumber(damageAmount, golem.transform.position + Vector3.up * 2f, DamageType.Normal);
+            }
+        }
+
+        private MudGolemHealth FindGolemByEvent()
+        {
+            // Unity events don't provide sender context easily, so we'll fallback to finding damaged golems
+            // In production, you'd want to pass position via the event signature
+            foreach (var golem in _subscribedGolems)
+            {
+                if (golem != null && golem.isActiveAndEnabled)
+                {
+                    return golem;
+                }
+            }
+            return null;
+        }
+
+        private void HandleEnemyKilled(EnemyKilledEventArgs args)
+        {
+            // Show death damage number (typically the final hit)
+            // For enemy kills, we show XP reward instead of damage
+            if (args.xpReward > 0)
+            {
+                SpawnXPNumber(args.xpReward, args.position + Vector3.up * 2f);
+            }
+        }
+
+        /// <summary>
+        /// Spawn a damage number at the specified position.
+        /// </summary>
+        public void SpawnDamageNumber(float damage, Vector3 position, DamageType type = DamageType.Normal)
+        {
+            if (_availablePool.Count == 0)
+            {
+                Debug.LogWarning("[DamageNumberSpawner] Pool exhausted, damage number not shown");
+                return;
+            }
+
+            DamageTextInstance instance = _availablePool.Dequeue();
+            instance.gameObject.SetActive(true);
+            instance.startPosition = position;
+            instance.transform.position = position;
+            instance.elapsed = 0f;
+
+            // Configure text
+            int displayDamage = Mathf.CeilToInt(damage);
+            instance.textMesh.text = displayDamage.ToString();
+
+            // Configure color and size based on type
+            switch (type)
+            {
+                case DamageType.Critical:
+                    instance.textMesh.color = _critDamageColor;
+                    instance.textMesh.fontSize = GameBalanceConfig.Instance.damageCritFontSize;
+                    instance.textMesh.text = $"{displayDamage}!"; // Add exclamation for crits
+                    break;
+                case DamageType.PlayerDamage:
+                    instance.textMesh.color = _playerDamageColor;
+                    instance.textMesh.fontSize = _normalFontSize;
+                    break;
+                default:
+                    instance.textMesh.color = _normalDamageColor;
+                    instance.textMesh.fontSize = _normalFontSize;
+                    break;
+            }
+
+            _activeInstances.Add(instance);
+        }
+
+        /// <summary>
+        /// Spawn an XP reward number (green color, +XP prefix).
+        /// </summary>
+        public void SpawnXPNumber(int xp, Vector3 position)
+        {
+            if (_availablePool.Count == 0) return;
+
+            DamageTextInstance instance = _availablePool.Dequeue();
+            instance.gameObject.SetActive(true);
+            instance.startPosition = position;
+            instance.transform.position = position;
+            instance.elapsed = 0f;
+
+            instance.textMesh.text = $"+{xp} XP";
+            instance.textMesh.color = GameBalanceConfig.Instance.damageHealColor; // Bright green
+            instance.textMesh.fontSize = _normalFontSize * GameBalanceConfig.Instance.healFontSizeMultiplier;
+
+            _activeInstances.Add(instance);
+        }
+
+        private void ReturnToPool(DamageTextInstance instance)
+        {
+            instance.gameObject.SetActive(false);
+            instance.elapsed = 0f;
+            _availablePool.Enqueue(instance);
+        }
+
+        /// <summary>
+        /// Public API: Register a new MudGolem for damage tracking (called by spawner).
+        /// </summary>
+        public void RegisterGolem(MudGolemHealth golem)
+        {
+            if (golem != null)
+            {
+                SubscribeToGolem(golem);
+            }
+        }
+
+        /// <summary>
+        /// Public API: Unregister a golem when it dies (optional cleanup).
+        /// </summary>
+        public void UnregisterGolem(MudGolemHealth golem)
+        {
+            if (golem != null && _subscribedGolems.Contains(golem))
+            {
+                golem.OnDamaged -= HandleGolemDamaged;
+                _subscribedGolems.Remove(golem);
+            }
+        }
+
+        private class DamageTextInstance
+        {
+            public GameObject gameObject;
+            public Transform transform;
+            public TextMeshPro textMesh;
+            public Vector3 startPosition;
+            public float elapsed;
+        }
+
+        public enum DamageType
+        {
+            Normal,
+            Critical,
+            PlayerDamage
+        }
+    }
+}

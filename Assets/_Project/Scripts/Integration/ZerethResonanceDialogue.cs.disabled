@@ -1,0 +1,268 @@
+using System.Collections;
+using Tartaria.Core;
+using Tartaria.Audio;
+using UnityEngine;
+
+namespace Tartaria.Integration
+{
+    /// <summary>
+    /// Zereth Resonance Dialogue System - harmonic conversation mechanic.
+    /// Moon 13: The Zereth confrontation is not combat, but emotional resonance matching.
+    /// Player aligns their frequency with Zereth's pain, calming the tormented echo.
+    /// This is the most important emotional moment before the final choice.
+    /// </summary>
+    public class ZerethResonanceDialogue : MonoBehaviour
+    {
+        [Header("Configuration")]
+        [SerializeField] int totalResonancePhases = 5; // 5 emotional beats to calm Zereth
+        [SerializeField] float phaseTransitionDelay = 8f;
+        [SerializeField] GameObject zerethVisual;
+
+        [Header("State")]
+        int _currentPhase;
+        bool _confrontationActive;
+        bool _confrontationComplete;
+        readonly List<System.Collections.Coroutine> _activeCoroutines = new();
+
+        readonly string[] _zerethPainLines = new[]
+        {
+            "Phase 1: Guilt - 'I only wanted to help them see... but I made them blind'",
+            "Phase 2: Betrayal - 'Two of my own, smiling faces at my workbench, rotting hearts beneath'",
+            "Phase 3: Loss - 'Every city I loved is mud now. Every voice I knew is dust.'",
+            "Phase 4: Isolation - '200 years of echoing. Screaming at walls that don't remember me.'",
+            "Phase 5: Hope - 'You... you can hear me. After all this time. Someone hears me.'"
+        };
+
+        readonly string[] _playerResponsePrompts = new[]
+        {
+            "Align resonance: 'You wanted beauty, not destruction. We know.'",
+            "Align resonance: 'You were betrayed. The Cabal used your hands for their chaos.'",
+            "Align resonance: 'We remember them too. The cities sing in our bones.'",
+            "Align resonance: 'You weren't alone. Lirael was with you, waiting.'",
+            "Align resonance: 'We hear you now. Let us carry the song forward together.'"
+        };
+
+        public bool IsComplete => _confrontationComplete;
+
+        void OnDisable()
+        {
+            foreach (var co in _activeCoroutines)
+            {
+                if (co != null) StopCoroutine(co);
+            }
+            _activeCoroutines.Clear();
+        }
+
+        /// <summary>
+        /// Begin Zereth resonance dialogue confrontation
+        /// </summary>
+        public void BeginConfrontation()
+        {
+            if (_confrontationActive || _confrontationComplete)
+            {
+                Debug.LogWarning("[ZerethResonance] Confrontation already in progress or complete");
+                return;
+            }
+
+            _confrontationActive = true;
+            _currentPhase = 0;
+
+            Debug.Log("[ZerethResonance] Beginning emotional resonance sequence — 5 phases to calm Zereth's tormented echo");
+
+            var co = StartCoroutine(PlayResonanceSequence());
+            _activeCoroutines.Add(co);
+        }
+
+        IEnumerator PlayResonanceSequence()
+        {
+            // Prologue: Zereth manifests, dissonant and agonized
+            Debug.Log("[ZerethResonance] Zereth manifests — corrupted violet echo, frequency spiking");
+
+            GameEvents.RaiseHUDShowBanner(
+                "Zereth's Echo",
+                "Not a battle. A conversation. Match his pain with understanding.",
+                6f
+            );
+
+            // Ambient: dissonant frequency (harsh, unstable)
+            Audio.AudioManager.Instance?.PlayTone(128f, 30f, 0.7f); // Dissonant low hum
+
+            yield return new WaitForSeconds(5f);
+
+            // Play 5 resonance phases
+            for (int i = 0; i < totalResonancePhases; i++)
+            {
+                yield return PlayResonancePhase(i);
+                yield return new WaitForSeconds(2f);
+            }
+
+            // Confrontation complete — Zereth calmed
+            CompleteConfrontation();
+        }
+
+        IEnumerator PlayResonancePhase(int phaseIndex)
+        {
+            _currentPhase = phaseIndex;
+
+            Debug.Log($"[ZerethResonance] PHASE {phaseIndex + 1}/{totalResonancePhases} — {_zerethPainLines[phaseIndex]}");
+
+            // Zereth's pain (dissonant)
+            DialogueManager.Instance?.PlayContextDialogue($"zereth_pain_{phaseIndex + 1}");
+
+            GameEvents.RaiseHUDShowDialogue(
+                "Zereth (tormented)",
+                _zerethPainLines[phaseIndex]
+            );
+
+            // Visual: Zereth's body flickers with pain (color shift)
+            if (zerethVisual != null)
+            {
+                var co1 = StartCoroutine(FlickerZerethPain());
+                _activeCoroutines.Add(co1);
+            }
+
+            yield return new WaitForSeconds(5f);
+
+            // Player response choice (always positive resonance in this sequence)
+            Debug.Log($"[ZerethResonance] Player aligns resonance: {_playerResponsePrompts[phaseIndex]}");
+
+            GameEvents.RaiseHUDShowDialogue(
+                "You",
+                _playerResponsePrompts[phaseIndex]
+            );
+
+            // Lirael joins harmonically (phases 2-5)
+            if (phaseIndex >= 1)
+            {
+                DialogueManager.Instance?.PlayContextDialogue($"lirael_harmonizes_{phaseIndex}");
+                GameEvents.RaiseHUDShowObjective("Lirael harmonizes — frequency stabilizing");
+            }
+
+            // Play harmonic tone (432 Hz + overtones)
+            Audio.AudioManager.Instance?.PlayTone(432f * (1 + phaseIndex * 0.1f), 4f, 0.6f);
+
+            yield return new WaitForSeconds(4f);
+
+            // Zereth responds (frequency calming slightly)
+            DialogueManager.Instance?.PlayContextDialogue($"zereth_calming_{phaseIndex + 1}");
+
+            // Visual: Zereth's color shifts from dark purple → golden (gradual)
+            if (zerethVisual != null)
+            {
+                var co2 = StartCoroutine(ShiftZerethColor(phaseIndex));
+                _activeCoroutines.Add(co2);
+            }
+
+            // Quest progress
+            QuestManager.Instance?.ProgressObjective("moon13_zereth_resonance", 0, 1);
+
+            Debug.Log($"[ZerethResonance] Phase {phaseIndex + 1} complete — Zereth's frequency stabilizing");
+
+            yield return new WaitForSeconds(phaseTransitionDelay);
+        }
+
+        IEnumerator FlickerZerethPain()
+        {
+            if (zerethVisual == null) yield break;
+
+            var renderer = zerethVisual.GetComponentInChildren<Renderer>();
+            if (renderer == null) yield break;
+
+            Color originalColor = renderer.material.color;
+            Color painColor = new Color(0.5f, 0.1f, 0.2f, 1f); // Dark red pain
+
+            // Flicker between pain and torment colors
+            for (int i = 0; i < 10; i++)
+            {
+                renderer.material.color = painColor;
+                yield return new WaitForSeconds(0.1f);
+                renderer.material.color = originalColor;
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+
+        IEnumerator ShiftZerethColor(int phase)
+        {
+            if (zerethVisual == null) yield break;
+
+            var renderer = zerethVisual.GetComponentInChildren<Renderer>();
+            if (renderer == null) yield break;
+
+            // Gradually shift from dark purple (torment) to golden (peace)
+            Color startColor = new Color(0.3f, 0.1f, 0.4f, 0.8f); // Dark purple
+            Color endColor = new Color(1f, 0.9f, 0.5f, 0.8f); // Golden peace
+            float t = phase / (float)(totalResonancePhases - 1);
+
+            Color targetColor = Color.Lerp(startColor, endColor, t);
+
+            float elapsed = 0f;
+            float duration = 3f;
+            Color currentColor = renderer.material.color;
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                renderer.material.color = Color.Lerp(currentColor, targetColor, elapsed / duration);
+                yield return null;
+            }
+
+            renderer.material.color = targetColor;
+        }
+
+        void CompleteConfrontation()
+        {
+            _confrontationComplete = true;
+            _confrontationActive = false;
+
+            Debug.Log("[ZerethResonance] CONFRONTATION COMPLETE — Zereth calmed, frequency harmonized");
+
+            // Final Zereth transformation: fully golden and at peace
+            if (zerethVisual != null)
+            {
+                var renderer = zerethVisual.GetComponentInChildren<Renderer>();
+                if (renderer != null)
+                {
+                    renderer.material.color = new Color(1f, 0.9f, 0.5f, 0.9f); // Golden peace
+                }
+            }
+
+            // Final dialogue: Zereth's gratitude
+            GameEvents.RaiseHUDShowDialogue(
+                "Zereth (at peace)",
+                "Thank you... for hearing me. For seeing me. I am... at last... free."
+            );
+
+            // Play 432 Hz sustained tone (perfect harmony)
+            Audio.AudioManager.Instance?.PlayTone(432f, 20f, 0.8f);
+
+            // Lirael final line
+            DialogueManager.Instance?.PlayContextDialogue("lirael_you_gave_him_peace");
+
+            // Quest complete
+            QuestManager.Instance?.CompleteQuest("moon13_zereth_resonance_dialogue");
+
+            // Achievement
+            AchievementSystem.Instance?.Unlock("zereth_harmonized");
+
+            Debug.Log("[ZerethResonance] The most important conversation in the game — complete");
+            Debug.Log("[ZerethResonance] Zereth is now ready to support whichever ending path the player chooses");
+        }
+
+        /// <summary>
+        /// Get resonance phase progress for save persistence
+        /// </summary>
+        public int GetCurrentPhase() => _currentPhase;
+
+        /// <summary>
+        /// Set resonance phase (for save/load)
+        /// </summary>
+        public void SetCurrentPhase(int phase)
+        {
+            _currentPhase = Mathf.Clamp(phase, 0, totalResonancePhases);
+            if (_currentPhase >= totalResonancePhases)
+            {
+                _confrontationComplete = true;
+            }
+        }
+    }
+}
