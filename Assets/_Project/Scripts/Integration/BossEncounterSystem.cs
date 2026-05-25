@@ -136,6 +136,13 @@ namespace Tartaria.Integration
             if (Instance == this) Instance = null;
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        static void ResetStatics()
+        {
+            // NamedBossLookup is readonly dictionary with constant data - clearing not needed
+            // but we reset for consistency in case it's modified in future
+        }
+
         // ─── Named Boss Lookup ────────────────────────
         static readonly Dictionary<string, int> NamedBossLookup = new()
         {
@@ -1268,9 +1275,158 @@ namespace Tartaria.Integration
                 8 => BuildVoidArchitect("Void Shaper", 1600f, 30f, 120f),
                 9 => BuildVoidArchitect("Rift Walker", 2000f, 35f, 130f),
                 10 => BuildVoidArchitect("Ley Devourer", 2200f, 38f, 140f),
-                11 => BuildVoidArchitect("Anti-Resonance", 2500f, 42f, 150f),
-                12 => BuildTrueHistoryGuardian(),
+                11 => BuildAquiferGuardian(),  // AGENT 5: Dedicated Moon 11 boss
+                12 => BuildCrystalMatrix(),     // AGENT 5: Dedicated Moon 12 boss
                 _ => BuildCorruptionTitan("Unnamed Boss", 500f, 15f, 60f)
+            };
+        }
+
+        // ═══════════════════════════════════════════════════════════════════════
+        // AGENT 5: Endgame Boss Definitions (Moon 11-12)
+        // ═══════════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// MOON 11 BOSS: Aquifer Guardian
+        /// 3-phase water elemental boss for planetary fountain restoration climax.
+        /// Total HP: 4500 (1500 per phase), RS Reward: 150, Par Time: 180s (3 minutes)
+        /// </summary>
+        static BossDefinition BuildAquiferGuardian()
+        {
+            return new BossDefinition
+            {
+                bossName = "Aquifer Guardian",
+                bossType = BossType.VoidArchitect,  // Water elemental uses Void logic
+                totalHP = 4500f,  // 3 phases × 1500 HP
+                baseRSReward = 150f,
+                parTime = 180f,
+                phases = new List<BossPhase>
+                {
+                    new BossPhase
+                    {
+                        phaseName = "Tidal Wrath",
+                        entranceDialogue = "The Aquifer Guardian rises from the deep — ancient protector of pure water!",
+                        hpThresholdToAdvance = 0.66f,  // 4500 → 3000 HP
+                        attackInterval = 2.2f,
+                        vulnerableDuration = 4.5f,
+                        invulnerableDuration = 3.0f,
+                        attackPatterns = new List<BossAttackPattern>
+                        {
+                            BossAttackPattern.CorruptionWave,  // Tidal wave attack
+                            BossAttackPattern.Sweep,           // Water jet sweep
+                            BossAttackPattern.Enrage           // Pressure pulse
+                        }
+                    },
+                    new BossPhase
+                    {
+                        phaseName = "Deep Purge",
+                        entranceDialogue = "Into the aquifer! The guardian descends to its domain — follow and purge the corruption!",
+                        hpThresholdToAdvance = 0.33f,  // 3000 → 1500 HP
+                        attackInterval = 1.8f,
+                        vulnerableDuration = 5.0f,  // Longer window (underwater combat)
+                        invulnerableDuration = 2.5f,
+                        attackPatterns = new List<BossAttackPattern>
+                        {
+                            BossAttackPattern.Slam,            // Vortex pull
+                            BossAttackPattern.FrequencyJam,    // Pressure disruption
+                            BossAttackPattern.CorruptionWave   // Tidal slam
+                        }
+                    },
+                    new BossPhase
+                    {
+                        phaseName = "Resonance Cleanse",
+                        entranceDialogue = "The guardian channels the aquifer's ancient song — match its frequency to purify!",
+                        hpThresholdToAdvance = 0f,  // Final phase
+                        attackInterval = 1.5f,
+                        vulnerableDuration = 6.0f,  // Longest window (frequency puzzle)
+                        invulnerableDuration = 2.0f,
+                        attackPatterns = new List<BossAttackPattern>
+                        {
+                            BossAttackPattern.FrequencyJam,    // Frequency shift
+                            BossAttackPattern.CrystalBarrage,  // Harmonic cascade
+                            BossAttackPattern.Enrage           // Regeneration burst
+                        }
+                    }
+                }
+            };
+        }
+
+        /// <summary>
+        /// MOON 12 BOSS: Crystal Matrix
+        /// Recursive fractal boss with 12-segment synchronization mechanic.
+        /// Total HP: 5000 (12 segments × ~416 HP), RS Reward: 150, Par Time: 200s
+        /// </summary>
+        static BossDefinition BuildCrystalMatrix()
+        {
+            return new BossDefinition
+            {
+                bossName = "Crystal Matrix",
+                bossType = BossType.MirrorSovereign,  // Fractal/recursive logic
+                totalHP = 5000f,  // 12 segments × 416 HP
+                baseRSReward = 150f,
+                parTime = 200f,
+                phases = new List<BossPhase>
+                {
+                    new BossPhase
+                    {
+                        phaseName = "Fractal Emergence",
+                        entranceDialogue = "The Crystal Matrix awakens — 12 towers, 12 fragments, infinite recursion!",
+                        hpThresholdToAdvance = 0.75f,  // 5000 → 3750 HP (3 segments down)
+                        attackInterval = 2.0f,
+                        vulnerableDuration = 4.0f,
+                        invulnerableDuration = 3.5f,
+                        attackPatterns = new List<BossAttackPattern>
+                        {
+                            BossAttackPattern.MirrorClone,     // Spawns 2 mirror clones
+                            BossAttackPattern.CrystalBarrage,  // Crystal shard rain
+                            BossAttackPattern.FrequencyJam     // Bell dissonance
+                        }
+                    },
+                    new BossPhase
+                    {
+                        phaseName = "Recursive Collapse",
+                        entranceDialogue = "Each tower you synchronize weakens the matrix — but it adapts!",
+                        hpThresholdToAdvance = 0.50f,  // 3750 → 2500 HP (6 segments down)
+                        attackInterval = 1.7f,
+                        vulnerableDuration = 4.5f,
+                        invulnerableDuration = 3.0f,
+                        attackPatterns = new List<BossAttackPattern>
+                        {
+                            BossAttackPattern.MirrorClone,     // 4 clones now
+                            BossAttackPattern.Sweep,           // Fractal beam sweep
+                            BossAttackPattern.CrystalBarrage   // Denser shard storm
+                        }
+                    },
+                    new BossPhase
+                    {
+                        phaseName = "Harmonic Singularity",
+                        entranceDialogue = "All 12 towers ring as one — the matrix fractures into infinity!",
+                        hpThresholdToAdvance = 0.25f,  // 2500 → 1250 HP (9 segments down)
+                        attackInterval = 1.5f,
+                        vulnerableDuration = 5.0f,  // Longer window (planetary ring active)
+                        invulnerableDuration = 2.5f,
+                        attackPatterns = new List<BossAttackPattern>
+                        {
+                            BossAttackPattern.FrequencyJam,    // Bell resonance disruption
+                            BossAttackPattern.CrystalBarrage,  // Endless crystal cascade
+                            BossAttackPattern.Enrage           // Matrix overload
+                        }
+                    },
+                    new BossPhase
+                    {
+                        phaseName = "Final Synchronization",
+                        entranceDialogue = "The matrix collapses into its true form — one final frequency!",
+                        hpThresholdToAdvance = 0f,  // Final phase
+                        attackInterval = 1.2f,
+                        vulnerableDuration = 6.0f,  // Maximum window (12-tower sync puzzle)
+                        invulnerableDuration = 2.0f,
+                        attackPatterns = new List<BossAttackPattern>
+                        {
+                            BossAttackPattern.MirrorClone,     // Final clone wave
+                            BossAttackPattern.FrequencyJam,    // Perfect frequency required
+                            BossAttackPattern.Slam             // Matrix collapse slam
+                        }
+                    }
+                }
             };
         }
 
