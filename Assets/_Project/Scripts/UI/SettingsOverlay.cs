@@ -279,6 +279,33 @@ namespace Tartaria.UI
             }
             row += 26;
 
+            // Difficulty Settings (Agent 7 cognitive accessibility)
+            DrawSectionHeader("DIFFICULTY & ASSISTANCE", ref row, lx, W - 48);
+            GUI.Label(new Rect(lx, row, 180, 22), "Difficulty Preset:");
+            int diff = PlayerPrefs.GetInt("TARTARIA_DifficultyMode", 1); // 0=Story, 1=Balanced, 2=Challenge
+            int newDiff = diff;
+            if (GUI.Toggle(new Rect(sx, row, 70, 20), diff == 0, "Story")) newDiff = 0;
+            if (GUI.Toggle(new Rect(sx + 75, row, 90, 20), diff == 1, "Balanced")) newDiff = 1;
+            if (GUI.Toggle(new Rect(sx + 170, row, 90, 20), diff == 2, "Challenge")) newDiff = 2;
+            if (newDiff != diff)
+            {
+                PlayerPrefs.SetInt("TARTARIA_DifficultyMode", newDiff);
+                var diffSettings = Tartaria.Core.DifficultySettings.CreatePreset((Tartaria.Core.DifficultySettings.DifficultyMode)newDiff);
+                diffSettings.SaveToPlayerPrefs();
+                SetToast("Difficulty Changed");
+            }
+            row += 26;
+
+            // Auto-evade assistance
+            bool autoEvade = PlayerPrefs.GetInt("TARTARIA_AutoEvade", 0) == 1;
+            if (GUI.Toggle(new Rect(lx, row, 280, 20), autoEvade, "Auto-Evade at Low Health (assists motor control)"))
+            {
+                autoEvade = !autoEvade;
+                PlayerPrefs.SetInt("TARTARIA_AutoEvade", autoEvade ? 1 : 0);
+                SetToast("Auto-Evade " + (autoEvade ? "Enabled" : "Disabled"));
+            }
+            row += 26;
+
             DrawSectionHeader("DISPLAY & PERFORMANCE", ref row, lx, W - 48);
 
             // Resolution
