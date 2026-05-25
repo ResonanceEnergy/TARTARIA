@@ -1,0 +1,311 @@
+using System.Collections;
+using System.Collections.Generic;
+using Tartaria.Core;
+using Tartaria.Audio;
+using UnityEngine;
+
+namespace Tartaria.Integration
+{
+    /// <summary>
+    /// Companion Farewell System - orchestrates farewell sequences for all 4 companions before final choice.
+    /// Moon 13: Milo, Thorne, Lirael, Korath each get emotional goodbye moments.
+    /// This is the emotional payoff for 13 moons of journey together.
+    /// </summary>
+    public class CompanionFarewellSystem : MonoBehaviour
+    {
+        [Header("Configuration")]
+        [SerializeField] float farewellDuration = 30f; // Each companion gets 30s
+        [SerializeField] Vector3 farewellLocation = new(0f, 0f, 100f); // Scenic overlook
+
+        [Header("State")]
+        bool _farewellsComplete;
+        bool _farewellsActive;
+        Coroutine _farewellSequenceCoroutine;
+
+        readonly HashSet<string> _farewellsGiven = new();
+
+        public bool AllFarewellsComplete => _farewellsComplete;
+
+        readonly string[] _companionNames = { "Milo", "Thorne", "Lirael", "Korath" };
+
+        void OnDisable()
+        {
+            if (_farewellSequenceCoroutine != null) { StopCoroutine(_farewellSequenceCoroutine); _farewellSequenceCoroutine = null; }
+        }
+
+        /// <summary>
+        /// Begin farewell sequence for all 4 companions
+        /// </summary>
+        public void BeginFarewells()
+        {
+            if (_farewellsActive || _farewellsComplete)
+            {
+                Debug.LogWarning("[CompanionFarewell] Farewells already played");
+                return;
+            }
+
+            _farewellsActive = true;
+            Debug.Log("[CompanionFarewell] Beginning companion farewell sequence — 4 companions, ~2 minutes total");
+
+            if (_farewellSequenceCoroutine != null) StopCoroutine(_farewellSequenceCoroutine);
+            _farewellSequenceCoroutine = StartCoroutine(PlayFarewellSequence());
+        }
+
+        IEnumerator PlayFarewellSequence()
+        {
+            // Teleport player to scenic overlook (final node viewing platform)
+            Debug.Log("[CompanionFarewell] Moving to farewell platform — all companions gathered");
+
+            // Ambient: quiet wind, distant bells
+            Audio.AudioManager.Instance?.PlayLoopingSFX("FarewellAmbience", farewellLocation, 0.4f);
+
+            // Opening narration
+            GameEvents.RaiseHUDShowBanner(
+                "Before the Final Choice",
+                "Your companions wish to speak with you one last time."
+            );
+
+            yield return new WaitForSeconds(5f);
+
+            // Farewell 1: Milo (the orphan boy, first friend)
+            yield return PlayMiloFarewell();
+
+            yield return new WaitForSeconds(2f);
+
+            // Farewell 2: Thorne (the pragmatic engineer)
+            yield return PlayThorneFarewell();
+
+            yield return new WaitForSeconds(2f);
+
+            // Farewell 3: Lirael (the ghost-girl made real)
+            yield return PlayLiraelFarewell();
+
+            yield return new WaitForSeconds(2f);
+
+            // Farewell 4: Korath (the ancient giant's echo)
+            yield return PlayKorathFarewell();
+
+            yield return new WaitForSeconds(3f);
+
+            // All farewells complete
+            _farewellsComplete = true;
+            _farewellsActive = false;
+
+            Debug.Log("[CompanionFarewell] All farewells complete — ready for final choice");
+
+            GameEvents.RaiseHUDShowBanner(
+                "Companions Stand Ready",
+                "Whatever you choose, they will honor it."
+            );
+
+            // Quest progression
+            QuestManager.Instance?.CompleteQuest("moon13_companion_farewells");
+        }
+
+        IEnumerator PlayMiloFarewell()
+        {
+            if (_farewellsGiven.Contains("Milo")) yield break;
+            _farewellsGiven.Add("Milo");
+
+            Debug.Log("[CompanionFarewell] MILO — 'You taught me mud can heal, not just bury'");
+
+            // Spawn Milo visual (or activate companion GameObject)
+            var milo = SpawnCompanionForFarewell("Milo", farewellLocation + Vector3.left * 5f);
+
+            // Dialogue sequence
+            DialogueManager.Instance?.PlayContextDialogue("milo_farewell_1");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("milo_farewell_2");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("milo_farewell_3");
+            yield return new WaitForSeconds(5f);
+
+            // Final Milo line
+            GameEvents.RaiseHUDShowDialogue(
+                "Milo",
+                "No matter what happens... I won't forget you. The mud remembers. I remember."
+            );
+            yield return new WaitForSeconds(4f);
+
+            // Milo gift: Lucky Compass (symbolic item)
+            Debug.Log("[CompanionFarewell] Milo gives you his father's compass — 'So you never lose your way'");
+            GameEvents.RaiseHUDShowObjective("Milo's Compass received — It always points to hope");
+
+            yield return new WaitForSeconds(3f);
+
+            // Achievement
+            AchievementSystem.Instance?.Unlock("milos_goodbye");
+        }
+
+        IEnumerator PlayThorneFarewell()
+        {
+            if (_farewellsGiven.Contains("Thorne")) yield break;
+            _farewellsGiven.Add("Thorne");
+
+            Debug.Log("[CompanionFarewell] THORNE — 'Built airships all my life. Never flew this high.'");
+
+            var thorne = SpawnCompanionForFarewell("Thorne", farewellLocation + Vector3.right * 5f);
+
+            // Thorne is practical, emotional walls down now
+            DialogueManager.Instance?.PlayContextDialogue("thorne_farewell_1");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("thorne_farewell_2");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("thorne_farewell_3");
+            yield return new WaitForSeconds(5f);
+
+            // Final Thorne line
+            GameEvents.RaiseHUDShowDialogue(
+                "Thorne",
+                "Whatever choice you make... I'll build the world it needs. That's what engineers do."
+            );
+            yield return new WaitForSeconds(4f);
+
+            // Thorne gift: Master's Wrench (symbolic)
+            Debug.Log("[CompanionFarewell] Thorne gives you his master's wrench — 'Built every ship with this. Now it's yours.'");
+            GameEvents.RaiseHUDShowObjective("Thorne's Wrench received — The tools to rebuild anything");
+
+            yield return new WaitForSeconds(3f);
+
+            AchievementSystem.Instance?.Unlock("thornes_goodbye");
+        }
+
+        IEnumerator PlayLiraelFarewell()
+        {
+            if (_farewellsGiven.Contains("Lirael")) yield break;
+            _farewellsGiven.Add("Lirael");
+
+            Debug.Log("[CompanionFarewell] LIRAEL — 'I was a ghost. You made me real.'");
+
+            var lirael = SpawnCompanionForFarewell("Lirael", farewellLocation + Vector3.forward * 5f);
+
+            // Lirael is now fully solid, tears visible
+            DialogueManager.Instance?.PlayContextDialogue("lirael_farewell_1");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("lirael_farewell_2");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("lirael_farewell_3");
+            yield return new WaitForSeconds(5f);
+
+            // Lirael sings the Silver Passage lullaby (full 432 Hz version)
+            Debug.Log("[CompanionFarewell] Lirael sings the complete Silver Passage lullaby — first time in 200 years");
+            Audio.AudioManager.Instance?.PlaySFX2D("LiraelLullabyComplete", 1f);
+
+            GameEvents.RaiseHUDShowDialogue(
+                "Lirael",
+                "The song was always for you. Thank you for hearing it."
+            );
+            yield return new WaitForSeconds(10f); // Lullaby duration
+
+            // Lirael gift: Silver Thread (symbolic)
+            Debug.Log("[CompanionFarewell] Lirael gives you a silver thread from her dress — 'So we're always connected'");
+            GameEvents.RaiseHUDShowObjective("Lirael's Thread received — Binds across all timelines");
+
+            yield return new WaitForSeconds(3f);
+
+            AchievementSystem.Instance?.Unlock("liraels_goodbye");
+        }
+
+        IEnumerator PlayKorathFarewell()
+        {
+            if (_farewellsGiven.Contains("Korath")) yield break;
+            _farewellsGiven.Add("Korath");
+
+            Debug.Log("[CompanionFarewell] KORATH — 'I was the last. Now I am the first again.'");
+
+            var korath = SpawnCompanionForFarewell("Korath", farewellLocation + Vector3.back * 5f, scale: 3f);
+
+            // Korath (giant echo, now golden and at peace)
+            DialogueManager.Instance?.PlayContextDialogue("korath_farewell_1");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("korath_farewell_2");
+            yield return new WaitForSeconds(5f);
+
+            DialogueManager.Instance?.PlayContextDialogue("korath_farewell_3");
+            yield return new WaitForSeconds(5f);
+
+            // Final Korath wisdom
+            GameEvents.RaiseHUDShowDialogue(
+                "Korath",
+                "The bells ring. The fountains flow. The planet remembers its song. You did this. We are... grateful."
+            );
+            yield return new WaitForSeconds(6f);
+
+            // Korath gift: Resonance Stone (symbolic)
+            Debug.Log("[CompanionFarewell] Korath places his hand on your shoulder — resonance imprint remains");
+            GameEvents.RaiseHUDShowObjective("Korath's Blessing received — Carry the giants' song forever");
+
+            yield return new WaitForSeconds(3f);
+
+            AchievementSystem.Instance?.Unlock("koraths_goodbye");
+        }
+
+        GameObject SpawnCompanionForFarewell(string name, Vector3 position, float scale = 1f)
+        {
+            var companion = new GameObject($"Companion_{name}_Farewell");
+            companion.transform.position = position;
+
+            // Simple capsule visual (would be proper character model in production)
+            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            body.name = "Body";
+            body.transform.SetParent(companion.transform);
+            body.transform.localScale = new Vector3(1f, 2f, 1f) * scale;
+            body.transform.localPosition = Vector3.zero;
+
+            var renderer = body.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                // Color-code companions
+                Color color = name switch
+                {
+                    "Milo" => new Color(0.6f, 0.4f, 0.2f), // Brown (mud-touched)
+                    "Thorne" => new Color(0.5f, 0.5f, 0.5f), // Gray (engineer)
+                    "Lirael" => new Color(0.9f, 0.9f, 1f), // Pale blue (ghost)
+                    "Korath" => new Color(1f, 0.9f, 0.5f), // Golden (giant)
+                    _ => Color.white
+                };
+                renderer.material.color = color;
+            }
+
+            Debug.Log($"[CompanionFarewell] {name} visual spawned at farewell platform");
+            return companion;
+        }
+
+        /// <summary>
+        /// Get farewell completion state for save persistence
+        /// </summary>
+        public bool[] GetFarewellState()
+        {
+            return new bool[]
+            {
+                _farewellsGiven.Contains("Milo"),
+                _farewellsGiven.Contains("Thorne"),
+                _farewellsGiven.Contains("Lirael"),
+                _farewellsGiven.Contains("Korath")
+            };
+        }
+
+        /// <summary>
+        /// Restore farewell state from save data
+        /// </summary>
+        public void RestoreFarewellState(bool[] state)
+        {
+            if (state == null || state.Length < 4) return;
+
+            _farewellsGiven.Clear();
+            if (state[0]) _farewellsGiven.Add("Milo");
+            if (state[1]) _farewellsGiven.Add("Thorne");
+            if (state[2]) _farewellsGiven.Add("Lirael");
+            if (state[3]) _farewellsGiven.Add("Korath");
+
+            _farewellsComplete = _farewellsGiven.Count >= 4;
+        }
+    }
+}

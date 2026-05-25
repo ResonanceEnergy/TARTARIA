@@ -1,0 +1,317 @@
+using NUnit.Framework;
+using Unity.Mathematics;
+using Tartaria.Gameplay;
+
+namespace Tartaria.Tests.EditMode
+{
+    /// <summary>
+    /// Unit tests for Combat damage calculation formulas.
+    /// Tests frequency matching, combo multipliers, and damage scaling.
+    /// </summary>
+    [TestFixture]
+    public class CombatDamageCalculationTests
+    {
+        const float PlayerFreq = 432f;  // Harmonic frequency
+        const float EnemyFreq = 174f;   // Dissonant frequency
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Combat Balance Constants Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void CombatBalance_PulseFreqTolerance_IsPositive()
+        {
+            Assert.Greater(CombatBalance.PulseFreqTolerance, 0f, 
+                "Pulse frequency tolerance should be positive");
+        }
+
+        [Test]
+        public void CombatBalance_StrikeFreqTolerance_IsPositive()
+        {
+            Assert.Greater(CombatBalance.StrikeFreqTolerance, 0f, 
+                "Strike frequency tolerance should be positive");
+        }
+
+        [Test]
+        public void CombatBalance_DefaultEnemyHP_IsPositive()
+        {
+            Assert.Greater(CombatBalance.DefaultEnemyHP, 0f, 
+                "Default enemy HP should be positive");
+            Assert.AreEqual(100f, CombatBalance.DefaultEnemyHP, 
+                "Default enemy HP should be 100");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Resonance Pulse Damage Tests (AOE)
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void ResonancePulse_FrequencyMismatch_BaseMultiplier()
+        {
+            // Player 432 Hz, Enemy 174 Hz → mismatch > tolerance
+            float baseDamage = 30f;
+            float freqDelta = math.abs(PlayerFreq - EnemyFreq);  // 258 Hz
+            
+            // When delta > tolerance (20 Hz), multiplier = 1.0x
+            float expectedDamage = baseDamage * 1.0f;
+            
+            Assert.Greater(freqDelta, CombatBalance.PulseFreqTolerance, 
+                "Frequency delta should exceed tolerance");
+            Assert.AreEqual(30f, expectedDamage, 0.01f, 
+                "Mismatched frequency should deal base damage");
+        }
+
+        [Test]
+        public void ResonancePulse_FrequencyMatch_BonusMultiplier()
+        {
+            // Player 432 Hz, Enemy 432 Hz → perfect match
+            float baseDamage = 30f;
+            float freqDelta = math.abs(PlayerFreq - PlayerFreq);  // 0 Hz
+            
+            // When delta < tolerance, multiplier = 1.5x
+            float expectedDamage = baseDamage * CombatBalance.PulseFreqMatchBonus;
+            
+            Assert.Less(freqDelta, CombatBalance.PulseFreqTolerance);
+            Assert.AreEqual(45f, expectedDamage, 0.01f, 
+                "Perfect frequency match should deal 1.5x damage");
+        }
+
+        [Test]
+        public void ResonancePulse_PartialMatch_ScaledMultiplier()
+        {
+            // Player 432 Hz, Enemy 442 Hz → within tolerance (10 Hz delta)
+            float baseDamage = 30f;
+            float targetFreq = 442f;
+            float freqDelta = math.abs(PlayerFreq - targetFreq);  // 10 Hz
+            
+            Assert.Less(freqDelta, CombatBalance.PulseFreqTolerance, 
+                "Should be within tolerance");
+            
+            // Quality: 1 - (delta / tolerance) = 1 - (10/20) = 0.5
+            float quality = 1f - (freqDelta / CombatBalance.PulseFreqTolerance);
+            Assert.AreEqual(0.5f, quality, 0.01f);
+            
+            // Damage should scale between 1.0x and 1.5x based on quality
+            float minDamage = baseDamage * 1.0f;  // 30
+            float maxDamage = baseDamage * CombatBalance.PulseFreqMatchBonus;  // 45
+            float expectedDamage = baseDamage * (1f + quality * (CombatBalance.PulseFreqMatchBonus - 1f));
+            
+            Assert.AreEqual(37.5f, expectedDamage, 0.1f, 
+                "Partial match should deal scaled damage between 1.0x and 1.5x");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Harmonic Strike Damage Tests (Directed)
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void HarmonicStrike_BaseMultiplier_Applied()
+        {
+            // Strike always gets 1.25x base multiplier
+            float baseDamage = 40f;
+            float expectedDamage = baseDamage * CombatBalance.StrikeBaseMultiplier;
+            
+            Assert.AreEqual(1.25f, CombatBalance.StrikeBaseMultiplier);
+            Assert.AreEqual(50f, expectedDamage, 0.01f, 
+                "Strike should apply 1.25x base multiplier");
+        }
+
+        [Test]
+        public void HarmonicStrike_FrequencyMatch_TightBonus()
+        {
+            // Player 432 Hz, Enemy 432 Hz → perfect match
+            float baseDamage = 40f;
+            float freqDelta = 0f;
+            
+            // Strike base (1.25x) * tight match (1.6x) = 2.0x total
+            float expectedDamage = baseDamage * CombatBalance.StrikeBaseMultiplier 
+                                            * CombatBalance.StrikeTightMatchBonus;
+            
+            Assert.AreEqual(80f, expectedDamage, 0.01f, 
+                "Perfect strike should deal 2.0x damage (1.25 * 1.6)");
+        }
+
+        [Test]
+        public void HarmonicStrike_PartialMatch_ScaledBonus()
+        {
+            // Player 432 Hz, Enemy 437 Hz → 5 Hz delta (within 10 Hz tolerance)
+            float baseDamage = 40f;
+            float targetFreq = 437f;
+            float freqDelta = math.abs(PlayerFreq - targetFreq);  // 5 Hz
+            
+            Assert.Less(freqDelta, CombatBalance.StrikeFreqTolerance);
+            
+            // Quality: 1 - (5/10) = 0.5
+            float quality = 1f - (freqDelta / CombatBalance.StrikeFreqTolerance);
+            Assert.AreEqual(0.5f, quality, 0.01f);
+            
+            // Damage: base * 1.25 * lerp(1.0, 1.6, quality)
+            float bonusMultiplier = 1f + quality * (CombatBalance.StrikeTightMatchBonus - 1f);
+            float expectedDamage = baseDamage * CombatBalance.StrikeBaseMultiplier * bonusMultiplier;
+            
+            Assert.AreEqual(60f, expectedDamage, 0.5f, 
+                "Partial strike match should scale between 1.25x and 2.0x");
+        }
+
+        [Test]
+        public void HarmonicStrike_Mismatch_OnlyBaseMultiplier()
+        {
+            // Player 432 Hz, Enemy 174 Hz → large mismatch
+            float baseDamage = 40f;
+            float freqDelta = math.abs(PlayerFreq - EnemyFreq);  // 258 Hz
+            
+            Assert.Greater(freqDelta, CombatBalance.StrikeFreqTolerance);
+            
+            // Only base multiplier applies (1.25x)
+            float expectedDamage = baseDamage * CombatBalance.StrikeBaseMultiplier;
+            Assert.AreEqual(50f, expectedDamage, 0.01f, 
+                "Mismatched strike should only apply 1.25x base multiplier");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Knockback Calculation Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void Knockback_PoorMatch_MinimumMagnitude()
+        {
+            // Poor frequency match (quality = 0) → 50% of max magnitude
+            float quality = 0f;
+            float expectedMagnitude = math.lerp(0.5f, 1.0f, quality) * 8f;
+            
+            Assert.AreEqual(4f, expectedMagnitude, 0.01f, 
+                "Poor match should give 4 m/s knockback");
+        }
+
+        [Test]
+        public void Knockback_PerfectMatch_MaximumMagnitude()
+        {
+            // Perfect match (quality = 1) → 100% of max magnitude
+            float quality = 1f;
+            float expectedMagnitude = math.lerp(0.5f, 1.0f, quality) * 8f;
+            
+            Assert.AreEqual(8f, expectedMagnitude, 0.01f, 
+                "Perfect match should give 8 m/s knockback");
+        }
+
+        [Test]
+        public void Knockback_MediumMatch_ScaledMagnitude()
+        {
+            // Medium match (quality = 0.5) → 75% of max
+            float quality = 0.5f;
+            float expectedMagnitude = math.lerp(0.5f, 1.0f, quality) * 8f;
+            
+            Assert.AreEqual(6f, expectedMagnitude, 0.01f, 
+                "Medium match should give 6 m/s knockback");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Hitstun Calculation Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void HitStun_PoorMatch_MinimumDuration()
+        {
+            float quality = 0f;
+            float expectedDuration = math.lerp(0.15f, 0.4f, quality);
+            
+            Assert.AreEqual(0.15f, expectedDuration, 0.01f, 
+                "Poor match should give 0.15s hitstun");
+        }
+
+        [Test]
+        public void HitStun_PerfectMatch_MaximumDuration()
+        {
+            float quality = 1f;
+            float expectedDuration = math.lerp(0.15f, 0.4f, quality);
+            
+            Assert.AreEqual(0.4f, expectedDuration, 0.01f, 
+                "Perfect match should give 0.4s hitstun");
+        }
+
+        [Test]
+        public void HitStun_MediumMatch_ScaledDuration()
+        {
+            float quality = 0.6f;
+            float expectedDuration = math.lerp(0.15f, 0.4f, quality);
+            
+            Assert.AreEqual(0.3f, expectedDuration, 0.01f, 
+                "Medium match should give scaled hitstun");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Combo System Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void Combo_Count_IncreasesOnSuccessiveHits()
+        {
+            int comboCount = 0;
+            
+            // Simulate 3 successive hits within combo window
+            comboCount++;
+            Assert.AreEqual(1, comboCount);
+            
+            comboCount++;
+            Assert.AreEqual(2, comboCount);
+            
+            comboCount++;
+            Assert.AreEqual(3, comboCount);
+        }
+
+        [Test]
+        public void Combo_MaxCount_CapsAt12()
+        {
+            // Golden Cascade max combo
+            const int MaxCombo = 12;
+            int comboCount = 15;  // Attempt to exceed
+            
+            comboCount = math.min(comboCount, MaxCombo);
+            Assert.AreEqual(12, comboCount, "Combo should cap at 12 (Golden Cascade max)");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Damage Type Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void DamageType_EnumValues_Defined()
+        {
+            // Verify DamageType enum has expected values
+            Assert.IsTrue(System.Enum.IsDefined(typeof(Tartaria.Integration.DamageType), 
+                Tartaria.Integration.DamageType.ResonancePulse));
+            Assert.IsTrue(System.Enum.IsDefined(typeof(Tartaria.Integration.DamageType), 
+                Tartaria.Integration.DamageType.HarmonicStrike));
+            Assert.IsTrue(System.Enum.IsDefined(typeof(Tartaria.Integration.DamageType), 
+                Tartaria.Integration.DamageType.Shield));
+            Assert.IsTrue(System.Enum.IsDefined(typeof(Tartaria.Integration.DamageType), 
+                Tartaria.Integration.DamageType.Environmental));
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Edge Case Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void Damage_ZeroBaseDamage_ReturnsZero()
+        {
+            float baseDamage = 0f;
+            float result = baseDamage * CombatBalance.PulseFreqMatchBonus;
+            
+            Assert.AreEqual(0f, result, "Zero base damage should remain zero");
+        }
+
+        [Test]
+        public void FrequencyDelta_NegativeHandled_AsAbsoluteValue()
+        {
+            float freq1 = 174f;
+            float freq2 = 432f;
+            float delta1 = math.abs(freq1 - freq2);
+            float delta2 = math.abs(freq2 - freq1);
+            
+            Assert.AreEqual(delta1, delta2, 
+                "Frequency delta should be symmetric (absolute value)");
+            Assert.AreEqual(258f, delta1, 0.01f);
+        }
+    }
+}

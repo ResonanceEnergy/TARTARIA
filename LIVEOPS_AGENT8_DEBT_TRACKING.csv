@@ -1,0 +1,60 @@
+ID,Category,Priority,File,Line,Description,Impact,Effort (hours),Sprint,Status,Assignee,Notes
+D001,Circular Dependency,P0,DialogueNodeData.cs,67,Move condition logic to Integration assembly,Blocks dialogue expansion,8,Sprint 1,Not Started,,Extract IDialogueCondition
+D002,Circular Dependency,P0,DialogueNodeData.cs,74,Move condition logic to Integration assembly,Blocks relationship tracking,8,Sprint 1,Not Started,,Extract IDialogueCondition
+D003,Circular Dependency,P0,DialogueNodeData.cs,81,Move condition logic to Gameplay assembly,Blocks quest-gated dialogue,8,Sprint 1,Not Started,,Extract IDialogueCondition
+D004,Circular Dependency,P0,DialogueNodeData.cs,277,Data assembly cannot reference Integration,Blocks cross-system conditions,8,Sprint 1,Not Started,,Extract IDialogueCondition
+D005,Legacy System,P0,SaveManager.cs,381,Compression - use Serialization assembly,Blocks save optimization,4,Sprint 4,Not Started,,Use CompressionHelper
+D006,Legacy System,P0,SaveManager.cs,456,Agent 9 backward compat - try old JSON saves,Blocks save migration,12,Sprint 4,Not Started,,Remove JSON fallback
+D007,Legacy System,P0,SaveManager.cs,795,Auto-detect compression,Blocks cloud save support,4,Sprint 4,Not Started,,Implement auto-detect
+D008,Architecture,P0,PlayerAbilities.cs,43,Integrate with ResonanceScoreSystem (ECS),Blocks ability scaling,16,Sprint 5,Not Started,,ECS integration
+D009,Architecture,P0,PlayerAbilities.cs,75,Integrate with ResonanceScoreSystem,Blocks buff system,16,Sprint 5,Not Started,,ECS integration
+D010,Feature Gap,P0,TelemetryService.cs,237,Implement cloud upload,Blocks analytics pipeline,20,Sprint 7,Not Started,,Unity Cloud Diagnostics
+D011,Feature Gap,P0,TelemetryService.cs,306,Implement queue persistence,Blocks crash recovery,8,Sprint 7,Not Started,,Persist to disk
+D012,Content,P0,AetherResonanceSystem.cs,8,Implement full aether resonance mechanics,Blocks Moon 6-13 gameplay,40,Q4 2026,Not Started,,Core mechanic
+D013,God Object,P0,Moon10ContentSpawner.cs,1-1600,Split 1600-line class into 5 focused classes,Blocks DLC development,40,Sprint 1,Not Started,,Split into Architecture/Rail/Boss/Puzzle/VFX
+D014,God Object,P0,AudioManager.cs,1-600,Split 600-line class into 4 focused classes,Blocks audio expansion,40,Sprint 2,Not Started,,Split into SFX/Music/Tone/Mixer
+D015,God Object,P0,UIManager.cs,1-150,Split 150-line class into focused managers,Blocks UI expansion,40,Sprint 2,Not Started,,Enforce single-responsibility
+D016,Magic Numbers,P0,All Moon spawners,Various,500+ magic numbers in spawn positions,Impossible to tune,30,Sprint 2,Not Started,,Extract to config
+D017,Magic Numbers,P0,Combat systems,Various,150+ magic numbers in damage/cooldowns,Impossible to balance,20,Sprint 2,Not Started,,Extract to config
+D018,Magic Numbers,P0,UI systems,Various,80+ magic numbers in layout/animations,Impossible to polish,10,Sprint 2,Not Started,,Extract to config
+D019,Singleton,P0,SaveManager.cs,38,Non-thread-safe singleton,Race conditions in save,4,Sprint 3,Not Started,,Use Lazy<T>
+D020,Singleton,P0,AudioManager.cs,62,Non-thread-safe singleton,Race conditions in audio,4,Sprint 3,Not Started,,Use bootstrap
+D021,Singleton,P0,UIManager.cs,21,Non-thread-safe singleton,Race conditions in UI,4,Sprint 3,Not Started,,Use bootstrap
+D022,Singleton,P0,PlayerProgression.cs,37,Non-thread-safe singleton,Race conditions in progression,4,Sprint 3,Not Started,,Use bootstrap
+D023,Singleton,P0,HUDController.cs,Various,Non-thread-safe singleton,Race conditions in HUD,4,Sprint 3,Not Started,,Use bootstrap
+D024,Singleton,P0,LocalizationManager.cs,Various,Non-thread-safe singleton,Race conditions in I18n,4,Sprint 3,Not Started,,Use bootstrap
+D025,Singleton,P0,PlayerAbilityManager.cs,Various,Non-thread-safe singleton,Race conditions in abilities,4,Sprint 3,Not Started,,Use bootstrap
+D026-D042,Singleton,P0,Various UI managers,Various,17 more non-thread-safe singletons,Race conditions,52,Sprint 3,Not Started,,Batch migration
+D043,Legacy System,P0,GameEvents.cs,112,Deprecate legacy event handlers,Technical debt,24,Sprint 4,Not Started,,18 events to migrate
+D044,Legacy System,P0,QuestManager.cs,28,Migrate legacy quest array to database,Blocks quest expansion,40,Sprint 5,Not Started,,133 callsites
+D045,Legacy System,P0,DialogueManager.cs,Various,Consolidate 3 dialogue systems to Yarn,Blocks dialogue expansion,80,Sprint 4,Not Started,,90% migration to Yarn
+D046,Duplication,P1,All singletons,Various,23 duplicate singleton patterns,Maintenance burden,16,Sprint 6,Not Started,,Extract to base class
+D047,Duplication,P1,8 FSM classes,Various,Duplicate state machine code,Maintenance burden,24,Sprint 6,Not Started,,Extract to StateMachine<T>
+D048,Duplication,P1,4 pools,Various,Duplicate pool setup code,Maintenance burden,16,Sprint 6,Not Started,,Extract to GenericObjectPool<T>
+D049,Duplication,P1,13 MoonContentSpawners,Various,Duplicate save/load patterns,Maintenance burden,40,Sprint 6,Not Started,,Extract to ISaveable<TState>
+D050,Duplication,P1,CompanionManager.cs,241,11-parameter SyncCompanionToDOTS method,Maintenance nightmare,24,Sprint 6,Not Started,,Split into focused methods
+D051,Pattern Gap,P1,All spawners,Various,200+ Instantiate() calls - no Factory pattern,No pooling abstraction,40,Sprint 5,Not Started,,Implement IEntityFactory
+D052,Pattern Gap,P1,PlayerCombat.cs,Various,Hardcoded damage calculations - no Strategy,No pluggable mechanics,24,Sprint 6,Not Started,,Implement IDamageStrategy
+D053,Pattern Gap,P1,PlayerAbilities.cs,Various,No Command pattern - no undo/redo,No ability macros,16,Q1 2027,Not Started,,Implement ICommand
+D054,TODO,P1,EquipmentUI.cs,311,Pass candidate item for comparison,Equipment preview broken,2,Sprint 7,Not Started,,Simple fix
+D055,TODO,P1,DataRegistry.cs,270,Store extractors for efficient updates,Query performance,4,Sprint 7,Not Started,,Cache extractors
+D056,TODO,P1,ShopUI.cs,31,Implement shop UI,Economy system incomplete,16,Sprint 7,Not Started,,Full implementation
+D057,TODO,P1,PlayerHUDOverlay.cs,163,Replace with actual currency system,Economy UI incomplete,4,Sprint 7,Not Started,,Wire to PlayerProgression
+D058,TODO,P1,PlayerHUDOverlay.cs,200,Add actual RS tracking to PlayerProgression,Progression display incomplete,2,Sprint 7,Not Started,,Simple field addition
+D059,TODO,P1,PlayerHUDOverlay.cs,454,Replace with actual gold icon texture,UI polish,1,Q1 2027,Not Started,,Import asset
+D060,TODO,P1,EnemyAIController.cs,202,Implement freeze status effect,Combat depth incomplete,8,Sprint 7,Not Started,,Add FreezeBehaviour
+D061,TODO,P1,AddressableAssetLoader.cs,299,Swap to lower LOD variants,Memory optimization,12,Q1 2027,Not Started,,LOD system
+D062,TODO,P1,PlayerAbilities.cs,87,Set ability flags update UI (8 instances),Ability system UI incomplete,16,Sprint 7,Not Started,,Wire to HUD
+D063,TODO,P1,InventoryGridUI.cs,216,Link to player stats (STR-based carry),Inventory system incomplete,8,Q1 2027,Not Started,,Carry capacity logic
+D064,TODO,P1,InventoryGridUI.cs,304,Implement drag visual feedback,UX polish,4,Q1 2027,Not Started,,Drag preview sprite
+D065,TODO,P1,ProceduralSFXLibrary.cs,180,Implement Moon 4 SFX generators,Audio content incomplete,8,Q4 2026,Not Started,,Procedural audio
+D066,TODO,P1,ProceduralSFXLibrary.cs,236,Implement Moons 8-13 SFX generators,Audio content incomplete,24,Q4 2026,Not Started,,Procedural audio
+D067,TODO,P1,AudioManager.cs,279,Track and stop looping SFX sources,Audio system incomplete,4,Q1 2027,Not Started,,Source tracking
+D068,TODO,P1,Moon2LunarVisualsManager.cs,8,Implement full lunar cycle visualization,Moon 2 polish,20,Q4 2026,Not Started,,Visual effects
+D069,TODO,P1,Moon4ContentSpawner.cs,798,Replace with golden-ratio alignment minigame,Moon 4 gameplay incomplete,16,Q4 2026,Not Started,,Minigame implementation
+D070,TODO,P1,Moon4ContentSpawner.cs,839,Replace with pipe puzzle minigame,Moon 4 gameplay incomplete,16,Q4 2026,Not Started,,Puzzle implementation
+D071,TODO,P1,Moon4ContentSpawner.cs,869,Implement 17-hour day/night cycle,Moon 4 atmosphere incomplete,12,Q4 2026,Not Started,,Time system
+D072,TODO,P1,Moon5NPCsAndSystems.cs,249,Integrate with UI system,Boss UI incomplete,4,Q1 2027,Not Started,,Health bar integration
+D073-D110,TODO,P2,Various,Various,38 minor TODOs (polish placeholders future features),Low priority tech debt,118,Q1-Q2 2027,Not Started,,Backlog
+D111-D150,Legacy Compat,P2,Various,Various,40 legacy fallback fields/methods,Backward compatibility,0,Ongoing,Not Started,,Keep until v2.0
+D151-D237,Test Coverage,P2,Various,Various,87 untested classes/methods,Test coverage gaps,240,Q1-Q2 2027,Not Started,,Integration/UI/Audio tests
