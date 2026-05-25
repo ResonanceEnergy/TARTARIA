@@ -91,7 +91,20 @@ namespace Tartaria.Core
 
         public void AddCurrency(CurrencyType type, int amount)
         {
-            if (amount <= 0) return;
+            // SECURITY: Block negative amounts (exploit prevention)
+            if (amount <= 0)
+            {
+                Debug.LogWarning($"[Economy] Rejected negative currency add: {amount}");
+                return;
+            }
+            
+            // SECURITY: Prevent integer overflow
+            if (amount > int.MaxValue / 10)
+            {
+                Debug.LogError($"[Economy] Rejected overflow amount: {amount}");
+                return;
+            }
+            
             // Premium currencies (StarFragments) bypass RS/moon multipliers
             bool isPremium = type == CurrencyType.StarFragments;
             int scaled = isPremium ? amount : Mathf.RoundToInt(amount * _rsMultiplier * _moonMultiplier);
@@ -100,42 +113,74 @@ namespace Tartaria.Core
             {
                 case CurrencyType.AetherShards:
                     old = _aetherShards;
-                    _aetherShards += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_aetherShards > int.MaxValue - scaled)
+                        _aetherShards = int.MaxValue;
+                    else
+                        _aetherShards += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _aetherShards);
                     break;
                 case CurrencyType.ResonanceCrystals:
                     old = _resonanceCrystals;
-                    _resonanceCrystals += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_resonanceCrystals > int.MaxValue - scaled)
+                        _resonanceCrystals = int.MaxValue;
+                    else
+                        _resonanceCrystals += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _resonanceCrystals);
                     break;
                 case CurrencyType.StarFragments:
                     old = _starFragments;
-                    _starFragments += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_starFragments > int.MaxValue - scaled)
+                        _starFragments = int.MaxValue;
+                    else
+                        _starFragments += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _starFragments);
                     break;
                 case CurrencyType.HarmonicFragments:
                     old = _harmonicFragments;
-                    _harmonicFragments += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_harmonicFragments > int.MaxValue - scaled)
+                        _harmonicFragments = int.MaxValue;
+                    else
+                        _harmonicFragments += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _harmonicFragments);
                     break;
                 case CurrencyType.EchoMemories:
                     old = _echoMemories;
-                    _echoMemories += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_echoMemories > int.MaxValue - scaled)
+                        _echoMemories = int.MaxValue;
+                    else
+                        _echoMemories += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _echoMemories);
                     break;
                 case CurrencyType.CrystallineDust:
                     old = _crystallineDust;
-                    _crystallineDust += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_crystallineDust > int.MaxValue - scaled)
+                        _crystallineDust = int.MaxValue;
+                    else
+                        _crystallineDust += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _crystallineDust);
                     break;
                 case CurrencyType.ForgeTokens:
                     old = _forgeTokens;
-                    _forgeTokens += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_forgeTokens > int.MaxValue - scaled)
+                        _forgeTokens = int.MaxValue;
+                    else
+                        _forgeTokens += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _forgeTokens);
                     break;
                 case CurrencyType.ResonanceShards:
                     old = _resonanceShards;
-                    _resonanceShards += scaled;
+                    // SECURITY: Cap at int.MaxValue to prevent overflow
+                    if (_resonanceShards > int.MaxValue - scaled)
+                        _resonanceShards = int.MaxValue;
+                    else
+                        _resonanceShards += scaled;
                     OnCurrencyChanged?.Invoke(type, old, _resonanceShards);
                     break;
                 default:

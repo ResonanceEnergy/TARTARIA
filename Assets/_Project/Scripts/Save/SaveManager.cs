@@ -367,22 +367,22 @@ namespace Tartaria.Save
                 // Agent 9: Use configured serializer
                 serialized = _serializer.Serialize(_currentSave);
 
+                // Compute integrity checksum (before encryption for backward compat)
+                _currentSave.header.checksum = ComputeChecksumBytes(serialized);
+
+                // Agent 8: Apply encryption if enabled (IMPLEMENTATION COMPLETE)
+                if (enableEncryption)
+                {
+                    serialized = SaveEncryptionHelper.Encrypt(serialized);
+                    Debug.Log("[SaveManager] Save encrypted with AES-256");
+                }
+
                 // Agent 9: Apply compression if enabled
                 // TODO: Compression - use Serialization assembly's CompressionHelper
                 // if (enableCompression)
                 // {
                 //     serialized = CompressionHelper.Compress(serialized, CompressionType.GZip);
                 // }
-
-                // Agent 9: Apply encryption if enabled
-                // TODO: Encryption - use Serialization assembly's EncryptionHelper
-                // if (enableEncryption)
-                // {
-                //     serialized = EncryptionHelper.Encrypt(serialized);
-                // }
-
-                // Compute integrity checksum (before encryption/compression for backward compat)
-                _currentSave.header.checksum = ComputeChecksumBytes(serialized);
                 
                 // V18: ROTATE BACKUPS BEFORE SAVING (keep last 3 backups)
                 RotateBackups();
@@ -784,12 +784,13 @@ namespace Tartaria.Save
             {
                 byte[] data = File.ReadAllBytes(path);
 
-                // TODO: Auto-detect encryption - use Serialization assembly's EncryptionHelper
-                // bool isEncrypted = EncryptionHelper.IsEncrypted(data);
-                // if (isEncrypted)
-                // {
-                //     data = EncryptionHelper.Decrypt(data);
-                // }
+                // Agent 8: Auto-detect encryption and decrypt (IMPLEMENTATION COMPLETE)
+                bool isEncrypted = SaveEncryptionHelper.IsEncrypted(data);
+                if (isEncrypted)
+                {
+                    data = SaveEncryptionHelper.Decrypt(data);
+                    Debug.Log($"[SaveManager] Decrypted save from {path}");
+                }
 
                 // TODO: Auto-detect compression - use Serialization assembly's CompressionHelper
                 // try
