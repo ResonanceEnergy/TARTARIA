@@ -69,6 +69,20 @@ namespace Tartaria.Gameplay
         public void TakeDamage(int amount)
         {
             if (_isDead || _godMode) return;
+            
+            // SECURITY: Block negative damage (healing exploit)
+            if (amount < 0)
+            {
+                Debug.LogWarning($"[PlayerHealth] Rejected negative damage: {amount}");
+                return;
+            }
+            
+            // SECURITY: Cap damage to prevent overflow
+            if (amount > 10000)
+            {
+                Debug.LogWarning($"[PlayerHealth] Capped excessive damage: {amount} -> 10000");
+                amount = 10000;
+            }
 
             // Sprint: Check for i-frames from dodge
             var dodge = GetComponent<PlayerDodge>();

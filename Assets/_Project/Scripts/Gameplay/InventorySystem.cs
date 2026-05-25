@@ -179,7 +179,18 @@ namespace Tartaria.Gameplay
             if (!_items.ContainsKey(itemId))
                 _items[itemId] = 0;
 
-            _items[itemId] += count;
+            // SECURITY: Prevent integer overflow on stack count
+            const int MAX_STACK = 999999; // 1M cap
+            if (_items[itemId] > MAX_STACK - count)
+            {
+                Debug.LogWarning($"[Inventory] Stack overflow prevented for {itemId} (current: {_items[itemId]}, add: {count})");
+                _items[itemId] = MAX_STACK;
+            }
+            else
+            {
+                _items[itemId] += count;
+            }
+            
             int newCount = _items[itemId];
 
             Debug.Log($"[Inventory] Added {count}x {itemId} (now {newCount})");
@@ -199,27 +210,34 @@ namespace Tartaria.Gameplay
             AudioManager.Instance?.PlaySFX2D("ItemPickup");
             HapticFeedbackManager.Instance?.PlayDiscovery();
             
-            // Mark save dirty
-            SaveManager.Instance?.MarkDirty();
+            // Mark save dirty (BUG-003 FIX: Null check)
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.MarkDirty();
 
             return true;
         }
 
         /// <summary>
         /// Removes items from inventory. Returns false if not enough quantity.
+        /// BUG-004 FIX: Negative count protection.
         /// </summary>
         public bool RemoveItem(string itemId, int count = 1)
         {
             if (string.IsNullOrEmpty(itemId) || count <= 0)
+            {
+                if (count < 0)
+                    Debug.LogWarning($"[Inventory] Negative count rejected for RemoveItem ({count})");
                 return false;
+            }
 
             if (!_items.TryGetValue(itemId, out int current) || current < count)
             {
                 Debug.LogWarning($"[Inventory] Cannot remove {count}x {itemId} (have {current})");
                 return false;
             }
-
-            _items[itemId] -= count;
+            
+            // BUG-004 FIX: Clamp to prevent negative values
+            _items[itemId] = Mathf.Max(0, current - count);
             int remaining = _items[itemId];
 
             if (remaining <= 0)
@@ -238,8 +256,9 @@ namespace Tartaria.Gameplay
             OnItemRemoved?.Invoke(itemId, remaining);
             OnInventoryChanged?.Invoke();
             
-            // Mark save dirty
-            SaveManager.Instance?.MarkDirty();
+            // Mark save dirty (BUG-003 FIX: Null check)
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.MarkDirty();
 
             return true;
         }
@@ -287,7 +306,9 @@ namespace Tartaria.Gameplay
             _items.Clear();
             Debug.Log("[Inventory] Cleared");
             OnInventoryChanged?.Invoke();
-            SaveManager.Instance?.MarkDirty();
+            // BUG-003 FIX: Null check
+            if (SaveManager.Instance != null)
+                SaveManager.Instance.MarkDirty();
         }
     }
 
