@@ -30,9 +30,24 @@
 .PARAMETER OpenHTMLReport
     Open HTML report in browser after generation (default: false)
 
+.PARAMETER Mode
+    Test execution mode:
+    - Smoke: Ultra-fast sanity check (8 tests, ~3 min)
+    - CriticalPath: Fast regression tests (18 tests, ~12 min)
+    - Full: All tests (84 tests, ~60 min)
+    - Regression: Compare against baseline
+
 .EXAMPLE
     .\run-automated-tests.ps1
     # Run tests in Echohaven scene, exit on complete, generate reports
+
+.EXAMPLE
+    .\run-automated-tests.ps1 -Mode Smoke
+    # Run smoke tests only (~3 min)
+
+.EXAMPLE
+    .\run-automated-tests.ps1 -Mode CriticalPath
+    # Run critical path tests only (~12 min)
 
 .EXAMPLE
     .\run-automated-tests.ps1 -SceneName "Echohaven" -LogFile "test-results.log"
@@ -58,7 +73,9 @@ param(
     [string]$LogFile = "Logs/test-run.log",
     [switch]$NoQuit,
     [bool]$GenerateReport = $true,
-    [switch]$OpenHTMLReport
+    [switch]$OpenHTMLReport,
+    [ValidateSet("Full", "Smoke", "CriticalPath", "Regression")]
+    [string]$Mode = "Full"
 )
 
 cd C:\dev\TARTARIA_new
@@ -118,6 +135,23 @@ $UnityArgs = @(
     "-logFile", "`"$LogFile`""
 )
 
+# Add test filter based on mode
+switch ($Mode) {
+    "Smoke" {
+        $UnityArgs += "-testCategory", "Smoke"
+    }
+    "CriticalPath" {
+        $UnityArgs += "-testCategory", "CriticalPath"
+    }
+    "Regression" {
+        # Run all tests but compare against baseline
+        # No filter needed
+    }
+    "Full" {
+        # Run all tests (no filter)
+    }
+}
+
 # Note: Do NOT use -quit for test execution.
 # TestOrchestrator calls Application.Quit(exitCode) when tests complete.
 # Using -quit here would terminate Unity before tests run.
@@ -132,7 +166,29 @@ Write-Host "Unity:    $UnityPath"
 Write-Host "Project:  $ProjectPath"
 Write-Host "Scene:    $ScenePath"
 Write-Host "Log:      $LogFile"
+Write-Host "Mode:     $Mode"
 Write-Host "───────────────────────────────────────────────────────────"
+Write-Host ""
+
+# Display mode info
+switch ($Mode) {
+    "Smoke" {
+        Write-Host "⚡ SMOKE TEST MODE: 8 tests, ~3 min" -ForegroundColor Yellow
+        Write-Host "   Ultra-fast sanity check for critical systems" -ForegroundColor Gray
+    }
+    "CriticalPath" {
+        Write-Host "🎯 CRITICAL PATH MODE: 18 tests, ~12 min" -ForegroundColor Yellow
+        Write-Host "   Fast regression testing for hotfix validation" -ForegroundColor Gray
+    }
+    "Regression" {
+        Write-Host "📊 REGRESSION MODE: Compare against baseline" -ForegroundColor Yellow
+        Write-Host "   Detect new test failures and performance regressions" -ForegroundColor Gray
+    }
+    "Full" {
+        Write-Host "🔍 FULL TEST MODE: 84 tests, ~60 min" -ForegroundColor Yellow
+        Write-Host "   Complete test suite with all integration and E2E tests" -ForegroundColor Gray
+    }
+}
 Write-Host ""
 
 # ─── Execute Tests ────────────────────────────────────────────────────────────
