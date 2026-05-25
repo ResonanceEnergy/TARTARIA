@@ -32,6 +32,9 @@ namespace Tartaria.Gameplay
 
         float _lastSwingStart = -10f;
         Unity.Cinemachine.CinemachineImpulseSource _impulseSource;
+        
+        // AGENT 6: Performance optimization - pre-allocated buffer for Physics.OverlapSphereNonAlloc
+        readonly Collider[] _hitBuffer = new Collider[16];
 
         void Awake()
         {
@@ -69,10 +72,12 @@ namespace Tartaria.Gameplay
                 // Sphere swept forward in front of player chest
                 Vector3 origin = transform.position + Vector3.up * 1.2f + transform.forward * (reach * 0.5f);
                 int hit = 0;
-                var cols = Physics.OverlapSphere(origin, radius, ~0, QueryTriggerInteraction.Collide);
-                for (int i = 0; i < cols.Length; i++)
+                
+                // AGENT 6: Use NonAlloc variant to eliminate GC allocation
+                int colCount = Physics.OverlapSphereNonAlloc(origin, radius, _hitBuffer, ~0, QueryTriggerInteraction.Collide);
+                for (int i = 0; i < colCount; i++)
                 {
-                    var c = cols[i];
+                    var c = _hitBuffer[i];
                     if (c == null) continue;
                     if (c.transform.IsChildOf(transform) || c.transform == transform) continue;
                     

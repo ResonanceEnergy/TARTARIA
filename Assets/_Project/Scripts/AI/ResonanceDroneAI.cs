@@ -158,9 +158,10 @@ namespace Tartaria.AI
         void UpdateNearbyEnemies()
         {
             _nearbyEnemies.Clear();
-            var colliders = Physics.OverlapSphere(transform.position, buffRadius);
-            foreach (var col in colliders)
+            int count = Physics.OverlapSphereNonAlloc(transform.position, buffRadius, _buffRadiusBuffer);
+            for (int i = 0; i < count; i++)
             {
+                var col = _buffRadiusBuffer[i];
                 var enemy = col.GetComponent<EnemyAIController>();
                 if (enemy != null && enemy != this)
                 {

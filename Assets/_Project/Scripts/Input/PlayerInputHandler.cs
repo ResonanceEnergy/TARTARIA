@@ -391,8 +391,10 @@ namespace Tartaria.Input
                 }
             }
             // Fallback sphere
-            var cols = Physics.OverlapSphere(transform.position + transform.forward * 1.5f, interactRadius, interactableLayer);
-            foreach (var c in cols)
+            int colCount = Physics.OverlapSphereNonAlloc(transform.position + transform.forward * 1.5f, interactRadius, _interactBuffer, interactableLayer);
+            for (int i = 0; i < colCount; i++)
+            {
+                var c = _interactBuffer[i];
             {
                 var mb = c.GetComponent<MonoBehaviour>();
                 if (mb != null)
