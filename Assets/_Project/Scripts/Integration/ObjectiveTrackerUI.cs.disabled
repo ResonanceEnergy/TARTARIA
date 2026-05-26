@@ -3,8 +3,6 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using TMPro;
 using Tartaria.Core;
-using Tartaria.Core.Enums;
-using Tartaria.Data;
 using Tartaria.Integration;
 
 namespace Tartaria.Integration

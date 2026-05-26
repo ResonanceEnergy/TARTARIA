@@ -3,7 +3,6 @@ using UnityEditor;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Core;
-using Tartaria.Data;
 using Tartaria.Integration;
 using Tartaria.Gameplay;
 using Tartaria.Input;

@@ -72,7 +72,7 @@ namespace Tartaria.Integration
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
-            
+
             // P0: Cancel any pending Invoke to prevent memory leaks
             CancelInvoke();
         }
@@ -160,7 +160,7 @@ namespace Tartaria.Integration
                 Debug.LogError($"[Dialogue] Line load failure: {line.id} has no text. Showing placeholder. (Auto-logged to CrashReporter)");
             }
 
-            UIManager.Instance?.ShowDialogue(line.speaker, displayText);
+            // UIManager.Instance?.ShowDialogue(line.speaker, displayText); // UI assembly disabled (Phase 7)
 
             // P1 AUDIT FIX: Skip VO playback when line text is missing to avoid audio/text desync
             if (!isMissing)
@@ -187,7 +187,7 @@ namespace Tartaria.Integration
 
         void HideLine()
         {
-            UIManager.Instance?.HideDialogue();
+            // UIManager.Instance?.HideDialogue(); // UI assembly disabled (Phase 7)
         }
 
         // ─── Database ────────────────────────────────

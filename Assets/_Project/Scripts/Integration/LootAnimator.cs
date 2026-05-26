@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using Tartaria.Core.Enums;
 
 namespace Tartaria.Integration
 {
@@ -179,21 +180,21 @@ namespace Tartaria.Integration
         /// <summary>
         /// Static helper: Spawn loot with rarity tier (auto-colors).
         /// </summary>
-        public static GameObject SpawnLootWithRarity(GameObject lootPrefab, Vector3 position, Data.ItemRarity rarity)
+        public static GameObject SpawnLootWithRarity(GameObject lootPrefab, Vector3 position, ItemRarity rarity)
         {
             Color color = GetRarityColor(rarity);
             return SpawnLoot(lootPrefab, position, color);
         }
 
-        static Color GetRarityColor(Data.ItemRarity rarity)
+        static Color GetRarityColor(ItemRarity rarity)
         {
             return rarity switch
             {
-                Data.ItemRarity.Common => Color.white,
-                Data.ItemRarity.Rare => new Color(0.3f, 0.6f, 1f), // Blue
-                Data.ItemRarity.Epic => new Color(0.7f, 0.3f, 1f), // Purple
-                Data.ItemRarity.Legendary => new Color(1f, 0.7f, 0.2f), // Gold
-                Data.ItemRarity.Mythic => new Color(1f, 0.2f, 0.2f), // Red
+                ItemRarity.Common => Color.white,
+                ItemRarity.Rare => new Color(0.3f, 0.6f, 1f), // Blue
+                ItemRarity.Epic => new Color(0.7f, 0.3f, 1f), // Purple
+                ItemRarity.Legendary => new Color(1f, 0.7f, 0.2f), // Gold
+                ItemRarity.Mythic => new Color(1f, 0.2f, 0.2f), // Red
                 _ => Color.white
             };
         }

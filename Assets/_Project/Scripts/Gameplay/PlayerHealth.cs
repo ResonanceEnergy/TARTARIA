@@ -69,14 +69,14 @@ namespace Tartaria.Gameplay
         public void TakeDamage(int amount)
         {
             if (_isDead || _godMode) return;
-            
+
             // SECURITY: Block negative damage (healing exploit)
             if (amount < 0)
             {
                 Debug.LogWarning($"[PlayerHealth] Rejected negative damage: {amount}");
                 return;
             }
-            
+
             // SECURITY: Cap damage to prevent overflow
             if (amount > 10000)
             {
@@ -95,12 +95,12 @@ namespace Tartaria.Gameplay
             _currentHealth -= amount;
             _lastDamageTime = Time.time;
 
-            // Trigger hit reactor VFX/SFX
-            var reactor = GetComponent<CombatHitReactor>();
-            if (reactor != null)
-            {
-                reactor.OnHit(transform.position, Vector3.up);
-            }
+            // Trigger hit reactor VFX/SFX (CombatHitReactor disabled - Phase 23)
+            // var reactor = GetComponent<CombatHitReactor>();
+            // if (reactor != null)
+            // {
+            //     reactor.OnHit(transform.position, Vector3.up);
+            // }
 
             if (_currentHealth <= 0)
             {

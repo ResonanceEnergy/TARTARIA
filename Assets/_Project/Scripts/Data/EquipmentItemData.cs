@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Tartaria.Data.Validation;
+using Tartaria.Core.Validation;
 using Tartaria.Localization;
 
 namespace Tartaria.Data
@@ -8,18 +8,18 @@ namespace Tartaria.Data
     /// <summary>
     /// EquipmentItemData — ScriptableObject for equipment items.
     /// Replaces serializable EquipmentItem class with editor-friendly asset-based system.
-    /// 
+    ///
     /// Features:
     /// - Create equipment assets in Project window
     /// - Define stat bonuses (STR/AGI/VIT/RES/ATT/ARM)
     /// - Assign icons for UI display
     /// - Special effects (passive bonuses, procs)
-    /// 
+    ///
     /// Usage:
     /// - Create via: Assets > Create > Tartaria > Equipment Item
     /// - Reference in EquipmentSlotManager
     /// - Equip via InventorySystem integration
-    /// 
+    ///
     /// GDD refs: §07 (Equipment System), §06 (Character Stats)
     /// </summary>
     [CreateAssetMenu(fileName = "New Equipment", menuName = "Tartaria/Equipment Item", order = 200)]
@@ -220,7 +220,8 @@ namespace Tartaria.Data
             {
                 results.Add(ValidationResult.Info(
                     "meshPrefab is not assigned",
-                    "Equipment without mesh prefabs won't be visible when equipped"
+                    "Equipment without mesh prefabs won't be visible when equipped",
+                    "Assign a prefab to the meshPrefab field if equipment should be visible"
                 ));
             }
 

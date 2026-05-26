@@ -54,8 +54,8 @@ namespace Tartaria.Gameplay
             }
         }
 
-        void OnEnable()  { PlayerCombat.OnSwing += HandleSwing; }
-        void OnDisable() { PlayerCombat.OnSwing -= HandleSwing; }
+        void OnEnable()  { /* PlayerCombat.OnSwing += HandleSwing; */ } // PlayerCombat disabled (Phase 12)
+        void OnDisable() { /* PlayerCombat.OnSwing -= HandleSwing; */ }
 
         void HandleSwing()
         {
@@ -71,7 +71,8 @@ namespace Tartaria.Gameplay
             bool isSprinting = false;
             if (inputHandler != null && inputHandler.IsMoving)
             {
-                isSprinting = PlayerStamina.Instance != null && PlayerStamina.Instance.IsSprinting;
+                // PlayerStamina disabled (Phase 12)
+                // isSprinting = PlayerStamina.Instance != null && PlayerStamina.Instance.IsSprinting;
                 speed = isSprinting ? 1.5f : 1f;
             }
             if (_hasSpeed) _animator.SetFloat(SpeedId, speed);

@@ -3,7 +3,7 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.Linq;
 using Tartaria.Data;
-using Tartaria.Core.Validation;
+using Tartaria.Data.Validation;
 using Tartaria.Core;
 
 namespace Tartaria.Editor

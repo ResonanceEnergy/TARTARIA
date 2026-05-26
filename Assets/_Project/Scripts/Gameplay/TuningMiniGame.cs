@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Tartaria.Audio;
 using Tartaria.Core;
+using Tartaria.Core.Enums;
 using Tartaria.Input;
 
 namespace Tartaria.Gameplay

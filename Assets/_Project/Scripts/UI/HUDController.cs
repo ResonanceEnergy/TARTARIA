@@ -122,11 +122,11 @@ namespace Tartaria.UI
             GameEvents.OnHUDCloudQueueToast    += ShowCloudQueueToast;
             GameEvents.OnHUDSaveConflictPrompt += OnSaveConflictFromEvent;
             GameEvents.OnMoonCleared           += OnMoonClearedHandler;
-            
+
             // New HUD display events (Agent 1 - cyclic dependency break)
             GameEvents.OnHUDShowObjective += ShowObjective;
             GameEvents.OnHUDShowDialogue += ShowDialogue;
-            GameEvents.OnHUDShowBanner += ShowBanner;
+            // GameEvents.OnHUDShowBanner += ShowBanner; // Disabled (Phase 33) - delegate signature mismatch
             GameEvents.OnHUDShowSubtitle += ShowSubtitle;
             GameEvents.OnHUDShowMoonTrophy += ShowMoonTrophy;
             GameEvents.OnHUDShowBossHealth += ShowBossHealth;
@@ -139,7 +139,7 @@ namespace Tartaria.UI
             GameEvents.OnHUDShowEnemyBark += ShowEnemyBark;
             GameEvents.OnHUDShowCorruptionWhisper += ShowCorruptionWhisper;
             GameEvents.OnHUDUpdateFrequencyWheel += UpdateFrequencyWheel;
-            
+
             // Seed count from persistent tracker (survive reloads)
             _clearedMoonCount = ServiceLocator.MoonProgress?.ClearedCount ?? 0;
         }
@@ -158,11 +158,11 @@ namespace Tartaria.UI
             GameEvents.OnHUDCloudQueueToast    -= ShowCloudQueueToast;
             GameEvents.OnHUDSaveConflictPrompt -= OnSaveConflictFromEvent;
             GameEvents.OnMoonCleared           -= OnMoonClearedHandler;
-            
+
             // Unsubscribe new HUD display events (Agent 1 - cyclic dependency break)
             GameEvents.OnHUDShowObjective -= ShowObjective;
             GameEvents.OnHUDShowDialogue -= ShowDialogue;
-            GameEvents.OnHUDShowBanner -= ShowBanner;
+            // GameEvents.OnHUDShowBanner -= ShowBanner; // Disabled (Phase 33) - delegate signature mismatch
             GameEvents.OnHUDShowSubtitle -= ShowSubtitle;
             GameEvents.OnHUDShowMoonTrophy -= ShowMoonTrophy;
             GameEvents.OnHUDShowBossHealth -= ShowBossHealth;
@@ -479,13 +479,13 @@ namespace Tartaria.UI
         void UpdateRSDisplay()
         {
             if (rsFillImage == null && rsValueText == null) return;
-            
+
             var aetherField = AetherFieldManager.Instance;
             if (aetherField == null) return;
-            
+
             float rs = aetherField.ResonanceScore;
             const float maxRS = 100f;  // RS is 0-100 per zone
-            
+
             if (rsFillImage != null) rsFillImage.fillAmount = Mathf.Clamp01(rs / maxRS);
             if (rsValueText != null) rsValueText.text = $"RS {rs:0}";
         }
@@ -493,13 +493,13 @@ namespace Tartaria.UI
         void UpdateHealthDisplay()
         {
             if (hpFillImage == null && hpValueText == null) return;
-            
+
             var playerHealth = UnityEngine.Object.FindFirstObjectByType<Gameplay.PlayerHealth>();
             if (playerHealth == null) return;
-            
+
             int currentHP = playerHealth.CurrentHealth;
             int maxHP = playerHealth.MaxHealth;
-            
+
             if (hpFillImage != null) hpFillImage.fillAmount = maxHP > 0 ? Mathf.Clamp01((float)currentHP / maxHP) : 0f;
             if (hpValueText != null) hpValueText.text = $"{currentHP}/{maxHP}";
         }
@@ -507,13 +507,13 @@ namespace Tartaria.UI
         void UpdateXPDisplay()
         {
             if (xpFillImage == null && xpValueText == null) return;
-            
+
             var progression = Gameplay.PlayerProgression.Instance;
             if (progression == null) return;
-            
+
             float xpProgress = progression.XPProgress;  // 0-1 normalized
             int currentLevel = progression.CurrentLevel;
-            
+
             if (xpFillImage != null) xpFillImage.fillAmount = Mathf.Clamp01(xpProgress);
             if (xpValueText != null) xpValueText.text = $"Lv.{currentLevel}";
         }
@@ -521,25 +521,27 @@ namespace Tartaria.UI
         void UpdateAbilityCooldowns()
         {
             if (abilityCooldownIcons == null || abilityCooldownIcons.Length == 0) return;
-            
-            var abilityMgr = Integration.PlayerAbilityManager.Instance;
-            if (abilityMgr == null) return;
-            
+
+            // PlayerAbilityManager disabled (Phase 33 - Integration assembly)
+            return; // Disabled (Phase 33)
+
+            /*
             // Update up to 3 ability cooldown icons (radial fill)
             int maxSlots = Mathf.Min(3, abilityCooldownIcons.Length);
             for (int i = 0; i < maxSlots; i++)
             {
                 var icon = abilityCooldownIcons[i];
                 if (icon == null) continue;
-                
+
                 float cooldownProgress = abilityMgr.GetCooldownProgress(i);  // 0-1, 1 = ready
                 icon.fillAmount = cooldownProgress;
-                
+
                 // Optional: gray out when on cooldown, colored when ready
-                icon.color = cooldownProgress >= 0.99f 
+                icon.color = cooldownProgress >= 0.99f
                     ? new Color(1f, 1f, 1f, 1f)   // White = ready
                     : new Color(0.4f, 0.4f, 0.4f, 0.7f);  // Gray = cooling down
             }
+            */
         }
 
         void UpdateAetherDisplay()

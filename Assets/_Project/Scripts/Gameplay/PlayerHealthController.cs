@@ -3,7 +3,6 @@ using System;
 using System.Collections;
 using Tartaria.Save;
 using Tartaria.Core;
-using Tartaria.Integration;
 
 namespace Tartaria.Gameplay
 {
@@ -57,23 +56,23 @@ namespace Tartaria.Gameplay
 
         void OnEnable()
         {
-            if (SaveLoadManager.Instance != null)
+            if (SaveManager.Instance != null)
             {
-                SaveLoadManager.Instance.RegisterProvider(this);
+                SaveManager.Instance.RegisterProvider(this);
             }
 
             // Subscribe to building restoration for checkpoint updates
-            GameEvents.BuildingRestored += OnBuildingRestored;
+            GameEvents.OnBuildingRestoredTyped += OnBuildingRestored;
         }
 
         void OnDisable()
         {
-            if (SaveLoadManager.Instance != null)
+            if (SaveManager.Instance != null)
             {
-                SaveLoadManager.Instance.UnregisterProvider(this);
+                SaveManager.Instance.UnregisterProvider(this);
             }
 
-            GameEvents.BuildingRestored -= OnBuildingRestored;
+            GameEvents.OnBuildingRestoredTyped -= OnBuildingRestored;
         }
 
         void Start()
@@ -106,13 +105,8 @@ namespace Tartaria.Gameplay
         {
             if (!IsAlive || _isDead || IsInvulnerable) return;
 
-            // Shield mitigation (50% damage reduction)
-            if (PlayerAbilityController.Instance != null && PlayerAbilityController.Instance.ShieldActive)
-            {
-                amount *= 0.5f;
-                Debug.Log($"[PlayerHealth] Shield absorbed 50% damage. Final: {amount:F1}");
-            }
-
+            // Shield mitigation disabled (PlayerAbilityController not active)
+            // TODO: Re-enable when ability system restored
             float previousHealth = CurrentHealth;
             CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
             _lastDamageTime = Time.time;
@@ -257,21 +251,45 @@ namespace Tartaria.Gameplay
 
         #region ISaveDataProvider Implementation
 
-        public void SaveState(SaveData data)
+        public string GetProviderKey() => "PlayerHealth";
+
+        public object GetSaveData()
         {
-            data.PlayerCurrentHealth = CurrentHealth;
-            data.PlayerCheckpointPosition = _lastCheckpointPosition;
+            return new PlayerHealthData
+            {
+                currentHealth = CurrentHealth,
+                checkpointPosition = _lastCheckpointPosition
+            };
         }
 
-        public void LoadState(SaveData data)
+        public void RestoreSaveData(object data)
         {
-            CurrentHealth = data.PlayerCurrentHealth > 0 ? data.PlayerCurrentHealth : MaxHealth;
-            _lastCheckpointPosition = data.PlayerCheckpointPosition;
-            _isDead = false;
-            IsInvulnerable = false;
+            if (data == null)
+            {
+                CurrentHealth = MaxHealth;
+                _lastCheckpointPosition = Vector3.zero;
+                Debug.Log("[PlayerHealth] No saved data - initialized to defaults");
+                return;
+            }
 
-            OnHealthChanged?.Invoke(HealthPercent);
-            Debug.Log($"[PlayerHealth] Loaded state: {CurrentHealth:F1}/{MaxHealth:F1} HP, Checkpoint: {_lastCheckpointPosition}");
+            if (data is string json)
+            {
+                try
+                {
+                    var healthData = JsonUtility.FromJson<PlayerHealthData>(json);
+                    CurrentHealth = healthData.currentHealth > 0 ? healthData.currentHealth : MaxHealth;
+                    _lastCheckpointPosition = healthData.checkpointPosition;
+                    _isDead = false;
+                    IsInvulnerable = false;
+
+                    OnHealthChanged?.Invoke(HealthPercent);
+                    Debug.Log($"[PlayerHealth] Loaded state: {CurrentHealth:F1}/{MaxHealth:F1} HP, Checkpoint: {_lastCheckpointPosition}");
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[PlayerHealth] Failed to deserialize: {e.Message}");
+                }
+            }
         }
 
         #endregion
@@ -302,5 +320,16 @@ namespace Tartaria.Gameplay
             }
             GUILayout.EndArea();
         }
+    }
+
+    /// <summary>
+    /// Serializable data class for PlayerHealthController save/load.
+    /// MUST be serializable by JsonUtility (no generics, no null collections).
+    /// </summary>
+    [Serializable]
+    public class PlayerHealthData
+    {
+        public float currentHealth = 100f;
+        public Vector3 checkpointPosition = Vector3.zero;
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Tartaria.Core.Enums;
+// using Tartaria.Gameplay; // DISABLED: Circular dependency (Core can't reference Gameplay)
 
 namespace Tartaria.Core
 {
@@ -110,11 +111,14 @@ namespace Tartaria.Core
             }
 
             // Inventory tracking
-            if (Gameplay.InventorySystem.Instance != null)
+            // DISABLED: InventorySystem is in Tartaria.Gameplay (circular dependency)
+            /*
+            if (InventorySystem.Instance != null)
             {
-                Gameplay.InventorySystem.Instance.OnItemAdded += HandleItemAdded;
-                Gameplay.InventorySystem.Instance.OnItemRemoved += HandleItemRemoved;
+                InventorySystem.Instance.OnItemAdded += HandleItemAdded;
+                InventorySystem.Instance.OnItemRemoved += HandleItemRemoved;
             }
+            */
 
             // XP tracking
             GameEvents.OnXPGained += HandleXPGained;
@@ -130,11 +134,14 @@ namespace Tartaria.Core
                 EconomySystem.Instance.OnCurrencyChanged -= HandleCurrencyChanged;
             }
 
-            if (Gameplay.InventorySystem.Instance != null)
+            // DISABLED: InventorySystem is in Tartaria.Gameplay (circular dependency)
+            /*
+            if (InventorySystem.Instance != null)
             {
-                Gameplay.InventorySystem.Instance.OnItemAdded -= HandleItemAdded;
-                Gameplay.InventorySystem.Instance.OnItemRemoved -= HandleItemRemoved;
+                InventorySystem.Instance.OnItemAdded -= HandleItemAdded;
+                InventorySystem.Instance.OnItemRemoved -= HandleItemRemoved;
             }
+            */
 
             GameEvents.OnXPGained -= HandleXPGained;
             GameEvents.OnItemPickup -= HandleItemPickup;
@@ -199,11 +206,14 @@ namespace Tartaria.Core
             _itemsPickedUp[itemId]++;
 
             // Track rarity distribution if item data available
+            // DISABLED: Gameplay reference (circular dependency)
+            /*
             var itemData = Gameplay.InventorySystem.Instance?.GetItemData(itemId);
             if (itemData != null && itemData is Data.ItemData typedData)
             {
                 _rarityDistribution[typedData.rarity]++;
             }
+            */
 
             // Check for suspicious pickup rate
             float intervalMinutes = (Time.time - _intervalStartTime) / 60f;

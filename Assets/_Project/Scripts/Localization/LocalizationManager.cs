@@ -6,24 +6,24 @@ namespace Tartaria.Localization
 {
     /// <summary>
     /// LocalizationManager — singleton managing all translated strings.
-    /// 
+    ///
     /// Features:
     /// - CSV/JSON string table loading from Resources
     /// - Language switching at runtime
     /// - Zero-allocation GetText() via cached dictionaries
     /// - Fallback to English for missing translations
     /// - Editor tools integration for string extraction
-    /// 
+    ///
     /// Architecture:
     /// - String tables stored in Resources/Localization/{category}_{lang}.csv
     /// - Format: key,en,es,fr,de,jp,cn,ru,pt
     /// - Separate tables per category (items, quests, dialogue, etc.)
     /// - Dictionary-based lookup: O(1) access time
-    /// 
+    ///
     /// Usage:
     ///     LocalizationManager.Instance.SetLanguage(SystemLanguage.Spanish);
     ///     string text = LocalizationManager.Instance.GetText(localizationKey);
-    /// 
+    ///
     /// CSV Format Example:
     ///     key,en,es,fr,de,jp,cn,ru,pt
     ///     aether_shard,Aether Shard,Fragmento de Éter,Éclat d'Éther,...
@@ -38,7 +38,7 @@ namespace Tartaria.Localization
             {
                 if (_instance == null)
                 {
-                    _instance = FindObjectOfType<LocalizationManager>();
+                    _instance = FindFirstObjectByType<LocalizationManager>(); // Unity 6 API
                     if (_instance == null)
                     {
                         GameObject go = new GameObject("[LocalizationManager]");

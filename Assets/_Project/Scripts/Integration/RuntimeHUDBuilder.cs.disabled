@@ -55,7 +55,6 @@ namespace Tartaria.Integration
         bool _prevArchiveKey;
         bool _prevTuneKey;
         GameObject _tuningOverlayGO;
-        readonly List<Coroutine> _activeCoroutines = new();
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
@@ -99,11 +98,6 @@ namespace Tartaria.Integration
             GameEvents.OnTogglePause -= HandleTogglePause;
             GameEvents.OnToggleAetherVision -= HandleAetherVisionToggle;
             GameEvents.OnBuildingRestored -= HandleBuildingRestored;
-            foreach (var co in _activeCoroutines)
-            {
-                if (co != null) StopCoroutine(co);
-            }
-            _activeCoroutines.Clear();
         }
 
         void Update()
@@ -818,8 +812,7 @@ namespace Tartaria.Integration
                 Random.Range(-20f, 20f), Random.Range(10f, 30f), 0f);
 
             // Fade out via coroutine
-            var co = StartCoroutine(FadeDamageNumber(tmp));
-            _activeCoroutines.Add(co);
+            StartCoroutine(FadeDamageNumber(tmp));
         }
 
         System.Collections.IEnumerator FadeDamageNumber(TextMeshProUGUI tmp)
@@ -1132,8 +1125,7 @@ namespace Tartaria.Integration
         public void FlashDiscovery()
         {
             if (_flashRunning || _discoveryFlashImage == null) return;
-            var co = StartCoroutine(DoDiscoveryFlash());
-            _activeCoroutines.Add(co);
+            StartCoroutine(DoDiscoveryFlash());
         }
 
         System.Collections.IEnumerator DoDiscoveryFlash()
@@ -1615,10 +1607,7 @@ namespace Tartaria.Integration
         {
             _aetherVisionActive = !_aetherVisionActive;
             if (!_aetherFadeRunning && _aetherVisionOverlay != null)
-            {
-                var co = StartCoroutine(FadeAetherVision(_aetherVisionActive));
-                _activeCoroutines.Add(co);
-            }
+                StartCoroutine(FadeAetherVision(_aetherVisionActive));
         }
 
         System.Collections.IEnumerator FadeAetherVision(bool fadeIn)

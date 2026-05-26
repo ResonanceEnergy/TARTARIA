@@ -9,25 +9,25 @@ namespace Tartaria.Gameplay
     /// CraftingStationManager — manages crafting stations (workbench, forge, alchemy table).
     /// Player interacts with station → opens crafting UI → selects recipe → consumes materials → produces item.
     /// Recipes unlock via quests, discoveries, skill level.
-    /// 
+    ///
     /// Station Types:
     /// - Workbench → basic tools, building materials
     /// - Forge → weapons, armor, metal refinement
     /// - AlchemyTable → potions, buffs, resonance consumables
-    /// 
+    ///
     /// Recipe Format:
     /// - ID: "iron_sword"
     /// - Name: "Iron Sword"
     /// - Ingredients: { "iron_ore": 5, "wood": 2 }
     /// - Output: "iron_sword" × 1
     /// - Unlock: QuestID or SkillLevel
-    /// 
+    ///
     /// Usage:
     /// - Place crafting station in world
     /// - Define recipes in inspector or ScriptableObject
     /// - Player interacts via IInteractable
     /// - Integrates with InventorySystem for materials + outputs
-    /// 
+    ///
     /// GDD refs: §07 (Crafting System), §02 (Aether Economy)
     /// </summary>
     public class CraftingStationManager : MonoBehaviour
@@ -67,24 +67,15 @@ namespace Tartaria.Gameplay
         /// </summary>
         public CraftingRecipe[] GetRecipesForStation(StationType stationType)
         {
-            // Try to use high-performance registry first
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (Data.Query.CraftingRecipeRegistry.Count > 0)
-            {
-                var recipes = Data.Query.CraftingRecipeRegistry.GetByStation(stationType);
-                return System.Array.ConvertAll(recipes.ToArray(), r => new CraftingRecipe
-                {
-                    recipeID = r.recipeId,
-                    requiredStation = r.requiredStation,
-                    ingredients = r.ingredients != null 
-                        ? System.Array.ConvertAll(r.ingredients, i => new CraftingIngredient { itemID = i.itemId, quantity = i.quantity })
-                        : System.Array.Empty<CraftingIngredient>(),
-                    outputItemID = r.outputItemId,
-                    outputQuantity = r.outputQuantity
-                });
-            }
-            #endif
-            
+            // Query.CraftingRecipeRegistry disabled (Phase 13) — using fallback O(n) search
+            // #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // if (Data.Query.CraftingRecipeRegistry.Count > 0)
+            // {
+            //     var recipes = Data.Query.CraftingRecipeRegistry.GetByStation(stationType);
+            //     return System.Array.ConvertAll(recipes.ToArray(), r => new CraftingRecipe...);
+            // }
+            // #endif
+
             // Fallback to O(n) search
             return _recipesByID.Values
                 .Where(r => r.requiredStation == stationType)
@@ -98,24 +89,15 @@ namespace Tartaria.Gameplay
         public CraftingRecipe[] GetUnlockedRecipesForStation(StationType stationType)
         {
             // Try to use high-performance registry first
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (Data.Query.CraftingRecipeRegistry.Count > 0)
-            {
-                var recipes = Data.Query.CraftingRecipeRegistry.GetByStation(stationType);
-                var unlocked = recipes.Where(r => IsRecipeUnlocked(r.recipeId)).ToArray();
-                return System.Array.ConvertAll(unlocked, r => new CraftingRecipe
-                {
-                    recipeID = r.recipeId,
-                    requiredStation = r.requiredStation,
-                    ingredients = r.ingredients != null 
-                        ? System.Array.ConvertAll(r.ingredients, i => new CraftingIngredient { itemID = i.itemId, quantity = i.quantity })
-                        : System.Array.Empty<CraftingIngredient>(),
-                    outputItemID = r.outputItemId,
-                    outputQuantity = r.outputQuantity
-                });
-            }
-            #endif
-            
+            // Query.CraftingRecipeRegistry disabled (Phase 13)
+            // #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // if (Data.Query.CraftingRecipeRegistry.Count > 0)
+            // {
+            //     var recipes = Data.Query.CraftingRecipeRegistry.GetByStation(stationType);
+            //     var unlocked = recipes.Where(r => IsRecipeUnlocked(r.recipeId)).ToArray();
+            //     return System.Array.ConvertAll(unlocked, r => new CraftingRecipe...);\n            // }
+            // #endif
+
             // Fallback to O(n) search
             return _recipesByID.Values
                 .Where(r => r.requiredStation == stationType && IsRecipeUnlocked(r.recipeID))

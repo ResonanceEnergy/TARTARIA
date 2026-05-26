@@ -20,18 +20,12 @@ namespace Tartaria.Integration
         [Header("State")]
         bool _farewellsComplete;
         bool _farewellsActive;
-        Coroutine _farewellSequenceCoroutine;
 
         readonly HashSet<string> _farewellsGiven = new();
 
         public bool AllFarewellsComplete => _farewellsComplete;
 
         readonly string[] _companionNames = { "Milo", "Thorne", "Lirael", "Korath" };
-
-        void OnDisable()
-        {
-            if (_farewellSequenceCoroutine != null) { StopCoroutine(_farewellSequenceCoroutine); _farewellSequenceCoroutine = null; }
-        }
 
         /// <summary>
         /// Begin farewell sequence for all 4 companions
@@ -47,8 +41,7 @@ namespace Tartaria.Integration
             _farewellsActive = true;
             Debug.Log("[CompanionFarewell] Beginning companion farewell sequence — 4 companions, ~2 minutes total");
 
-            if (_farewellSequenceCoroutine != null) StopCoroutine(_farewellSequenceCoroutine);
-            _farewellSequenceCoroutine = StartCoroutine(PlayFarewellSequence());
+            StartCoroutine(PlayFarewellSequence());
         }
 
         IEnumerator PlayFarewellSequence()

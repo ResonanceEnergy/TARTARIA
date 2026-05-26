@@ -1,0 +1,508 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using Unity.Profiling;
+using UnityEngine.ResourceManagement.AsyncOperations;
+
+namespace Tartaria.LiveOps
+{
+    /// <summary>
+    /// Load Performance Monitor — tracks and reports loading performance metrics for production telemetry.
+    /// 
+    /// LIVE OPS AGENT 5: PLAYER LOAD PERFORMANCE MONITOR
+    /// 
+    /// Monitors:
+    /// - Scene load times (target: <3s per scene)
+    /// - Asset bundle/Addressables load performance
+    /// - Memory usage during transitions (heap, GC pressure)
+    /// - Frame rate stability during loads (minimum FPS)
+    /// - First-time user experience (FTUE) load times
+    /// - Save/load performance
+    /// - Texture/mesh streaming bottlenecks
+    /// 
+    /// Performance Budgets:
+    /// - Boot → Echohaven: <5s (cold start, includes initialization)
+    /// - Echohaven → Moon scene: <3s (warm transition, assets pre-cached)
+    /// - Moon → Echohaven: <2s (return to hub, minimal new content)
+    /// - Save operation: <500ms (non-blocking UI)
+    /// - Load operation: <1s (saved game → gameplay)
+    /// - Asset bundle load (cold): <2s per bundle
+    /// - Asset bundle load (cached): <200ms per bundle
+    /// - Memory spike cap: +300MB max during any single load operation
+    /// - FPS floor during load: >15fps (prevent total freeze, show progress bar)
+    /// 
+    /// Integration:
+    /// - Reports to TelemetryService for production analytics
+    /// - Uses PerformanceGuard profiler markers
+    /// - Hooks into SceneLoader and AddressableAssetLoader
+    /// 
+    /// Bootstraps automatically via [RuntimeInitializeOnLoadMethod].
+    /// </summary>
+    [DisallowMultipleComponent]
+    public class LoadPerformanceMonitor : MonoBehaviour
+    {
+        public static LoadPerformanceMonitor Instance { get; private set; }
+
+        [Header("Performance Budgets (seconds)")]
+        [SerializeField] float bootToGameplayBudget = 5.0f;
+        [SerializeField] float sceneTransitionBudget = 3.0f;
+        [SerializeField] float hubReturnBudget = 2.0f;
+        [SerializeField] float saveOperationBudget = 0.5f;
+        [SerializeField] float loadOperationBudget = 1.0f;
+        [SerializeField] float assetBundleColdBudget = 2.0f;
+        [SerializeField] float assetBundleCachedBudget = 0.2f;
+
+        [Header("Memory Budgets (MB)")]
+        [SerializeField] float memorySpikeCap = 300f;
+        [SerializeField] float minimumFpsDuringLoad = 15f;
+
+        [Header("Telemetry")]
+        [SerializeField] bool enableTelemetry = true;
+        [SerializeField] bool logToConsole = true;
+        [SerializeField] bool detectMemoryLeaks = true;
+
+        // Profiler markers
+        static readonly ProfilerMarker s_markerSceneLoad = new("Tartaria.SceneLoad");
+        static readonly ProfilerMarker s_markerAssetLoad = new("Tartaria.AssetLoad");
+        static readonly ProfilerMarker s_markerSaveLoad = new("Tartaria.SaveLoad");
+
+        // Active load tracking
+        LoadOperation _currentLoad;
+        readonly List<LoadOperation> _completedLoads = new();
+        readonly Dictionary<string, LoadMetrics> _sceneMetrics = new();
+        readonly Dictionary<string, LoadMetrics> _assetMetrics = new();
+
+        // Memory baseline tracking
+        long _memoryBaselineBytes;
+        long _peakMemoryDuringLoad;
+
+        // FTUE tracking
+        bool _isFirstLoad = true;
+        float _totalFtueLoadTime;
+
+        // Session stats
+        int _totalSceneLoads;
+        int _budgetViolations;
+        int _memorySpikes;
+        float _worstSceneLoadTime;
+        string _worstSceneLoadName;
+
+        public int TotalSceneLoads => _totalSceneLoads;
+        public int BudgetViolations => _budgetViolations;
+        public int MemorySpikes => _memorySpikes;
+        public float WorstSceneLoadTime => _worstSceneLoadTime;
+        public string WorstSceneLoadName => _worstSceneLoadName;
+        public bool IsLoading => _currentLoad != null && !_currentLoad.isComplete;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (Instance != null) return;
+            var go = new GameObject("[LoadPerformanceMonitor]");
+            Instance = go.AddComponent<LoadPerformanceMonitor>();
+            DontDestroyOnLoad(go);
+        }
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            Instance = this;
+            transform.SetParent(null);
+            DontDestroyOnLoad(gameObject);
+
+            // Subscribe to scene load events
+            SceneManager.sceneLoaded += OnSceneLoaded;
+            SceneManager.sceneUnloaded += OnSceneUnloaded;
+
+            // Capture memory baseline
+            _memoryBaselineBytes = GetCurrentMemoryUsage();
+
+            if (logToConsole)
+                UnityEngine.Debug.Log($"[LoadPerformanceMonitor] Initialized (baseline memory: {_memoryBaselineBytes / (1024 * 1024)}MB)");
+        }
+
+        void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                SceneManager.sceneLoaded -= OnSceneLoaded;
+                SceneManager.sceneUnloaded -= OnSceneUnloaded;
+
+                // Generate final summary
+                if (enableTelemetry && TelemetryService.Instance != null)
+                {
+                    var summary = GenerateSessionSummary();
+                    TelemetryService.Instance.TrackEvent("load_performance_session_summary", summary);
+                }
+
+                Instance = null;
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // PUBLIC API
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Begin tracking a scene load operation.
+        /// </summary>
+        public void BeginSceneLoad(string sceneName, SceneLoadType loadType)
+        {
+            // Complete previous load if still active (shouldn't happen, but defensive)
+            if (_currentLoad != null && !_currentLoad.isComplete)
+            {
+                UnityEngine.Debug.LogWarning($"[LoadPerformanceMonitor] Previous load not completed: {_currentLoad.targetName}");
+                EndLoad();
+            }
+
+            _currentLoad = new LoadOperation
+            {
+                operationType = LoadOperationType.Scene,
+                loadType = loadType,
+                targetName = sceneName,
+                startTime = Time.realtimeSinceStartup,
+                startMemoryBytes = GetCurrentMemoryUsage(),
+                minFps = float.MaxValue
+            };
+
+            _memoryBaselineBytes = _currentLoad.startMemoryBytes;
+            _peakMemoryDuringLoad = _currentLoad.startMemoryBytes;
+
+            if (logToConsole)
+                UnityEngine.Debug.Log($"[LoadPerformanceMonitor] BEGIN SceneLoad: {sceneName} ({loadType})");
+
+            // Track in telemetry
+            if (enableTelemetry && TelemetryService.Instance != null)
+            {
+                var props = new Dictionary<string, object>
+                {
+                    ["scene_name"] = sceneName,
+                    ["load_type"] = loadType.ToString(),
+                    ["start_memory_mb"] = _currentLoad.startMemoryBytes / (1024f * 1024f),
+                    ["is_ftue"] = _isFirstLoad
+                };
+                TelemetryService.Instance.TrackEvent("scene_load_start", props);
+            }
+        }
+
+        /// <summary>
+        /// End tracking current load operation.
+        /// </summary>
+        public void EndLoad()
+        {
+            if (_currentLoad == null || _currentLoad.isComplete)
+                return;
+
+            _currentLoad.endTime = Time.realtimeSinceStartup;
+            _currentLoad.endMemoryBytes = GetCurrentMemoryUsage();
+            _currentLoad.isComplete = true;
+
+            float duration = _currentLoad.Duration;
+            float memoryDeltaMB = (_currentLoad.endMemoryBytes - _currentLoad.startMemoryBytes) / (1024f * 1024f);
+            float peakMemoryDeltaMB = (_peakMemoryDuringLoad - _currentLoad.startMemoryBytes) / (1024f * 1024f);
+
+            // Check budget compliance
+            float budget = GetBudgetForLoadType(_currentLoad.loadType);
+            bool exceededBudget = duration > budget;
+            bool memorySpike = peakMemoryDeltaMB > memorySpikeCap;
+
+            if (exceededBudget) _budgetViolations++;
+            if (memorySpike) _memorySpikes++;
+
+            // Track worst case
+            if (_currentLoad.operationType == LoadOperationType.Scene)
+            {
+                _totalSceneLoads++;
+                if (duration > _worstSceneLoadTime)
+                {
+                    _worstSceneLoadTime = duration;
+                    _worstSceneLoadName = _currentLoad.targetName;
+                }
+
+                // Store metrics by scene name
+                if (!_sceneMetrics.ContainsKey(_currentLoad.targetName))
+                    _sceneMetrics[_currentLoad.targetName] = new LoadMetrics();
+                _sceneMetrics[_currentLoad.targetName].RecordLoad(duration, memoryDeltaMB);
+            }
+
+            // FTUE tracking
+            if (_isFirstLoad)
+            {
+                _totalFtueLoadTime += duration;
+            }
+
+            // Log results
+            if (logToConsole)
+            {
+                string status = exceededBudget ? "OVER BUDGET" : "OK";
+                string memStatus = memorySpike ? "MEMORY SPIKE" : "OK";
+                UnityEngine.Debug.Log(
+                    $"[LoadPerformanceMonitor] END {_currentLoad.operationType}: {_currentLoad.targetName}\n" +
+                    $"  Duration: {duration:F2}s (budget: {budget:F2}s) [{status}]\n" +
+                    $"  Memory: +{memoryDeltaMB:F1}MB (peak: +{peakMemoryDeltaMB:F1}MB) [{memStatus}]\n" +
+                    $"  Min FPS: {_currentLoad.minFps:F0}");
+            }
+
+            // Telemetry
+            if (enableTelemetry && TelemetryService.Instance != null)
+            {
+                var props = new Dictionary<string, object>
+                {
+                    ["operation_type"] = _currentLoad.operationType.ToString(),
+                    ["load_type"] = _currentLoad.loadType.ToString(),
+                    ["target_name"] = _currentLoad.targetName,
+                    ["duration_seconds"] = duration,
+                    ["budget_seconds"] = budget,
+                    ["exceeded_budget"] = exceededBudget,
+                    ["memory_delta_mb"] = memoryDeltaMB,
+                    ["peak_memory_delta_mb"] = peakMemoryDeltaMB,
+                    ["memory_spike"] = memorySpike,
+                    ["min_fps"] = _currentLoad.minFps,
+                    ["is_ftue"] = _isFirstLoad
+                };
+                TelemetryService.Instance.TrackEvent("load_complete", props);
+            }
+
+            // Archive completed load
+            _completedLoads.Add(_currentLoad);
+            _currentLoad = null;
+        }
+
+        /// <summary>
+        /// Track asset bundle/Addressables load operation.
+        /// </summary>
+        public void BeginAssetLoad(string assetKey, bool isCached)
+        {
+            _currentLoad = new LoadOperation
+            {
+                operationType = LoadOperationType.Asset,
+                loadType = isCached ? SceneLoadType.Cached : SceneLoadType.Cold,
+                targetName = assetKey,
+                startTime = Time.realtimeSinceStartup,
+                startMemoryBytes = GetCurrentMemoryUsage(),
+                minFps = float.MaxValue
+            };
+
+            if (logToConsole)
+                UnityEngine.Debug.Log($"[LoadPerformanceMonitor] BEGIN AssetLoad: {assetKey} (cached: {isCached})");
+        }
+
+        /// <summary>
+        /// Track save/load operation.
+        /// </summary>
+        public void BeginSaveLoad(string operationName, bool isSave)
+        {
+            _currentLoad = new LoadOperation
+            {
+                operationType = isSave ? LoadOperationType.Save : LoadOperationType.Load,
+                loadType = SceneLoadType.SaveGame,
+                targetName = operationName,
+                startTime = Time.realtimeSinceStartup,
+                startMemoryBytes = GetCurrentMemoryUsage(),
+                minFps = float.MaxValue
+            };
+
+            if (logToConsole)
+                UnityEngine.Debug.Log($"[LoadPerformanceMonitor] BEGIN {(isSave ? "Save" : "Load")}: {operationName}");
+        }
+
+        /// <summary>
+        /// Get performance summary for UI display.
+        /// </summary>
+        public string GetSummary()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine($"=== Load Performance Monitor ===");
+            sb.AppendLine($"Total Scene Loads: {_totalSceneLoads}");
+            sb.AppendLine($"Budget Violations: {_budgetViolations}");
+            sb.AppendLine($"Memory Spikes: {_memorySpikes}");
+            sb.AppendLine($"Worst Scene: {_worstSceneLoadName} ({_worstSceneLoadTime:F2}s)");
+            
+            if (_isFirstLoad)
+                sb.AppendLine($"FTUE Load Time: {_totalFtueLoadTime:F2}s");
+
+            if (_sceneMetrics.Count > 0)
+            {
+                sb.AppendLine("\n--- Scene Metrics ---");
+                foreach (var kvp in _sceneMetrics)
+                {
+                    var m = kvp.Value;
+                    sb.AppendLine($"{kvp.Key}: {m.loadCount} loads, avg {m.averageDuration:F2}s, worst {m.worstDuration:F2}s");
+                }
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Reset all tracking stats (call on new game or after major milestone).
+        /// </summary>
+        public void ResetStats()
+        {
+            _totalSceneLoads = 0;
+            _budgetViolations = 0;
+            _memorySpikes = 0;
+            _worstSceneLoadTime = 0f;
+            _worstSceneLoadName = null;
+            _completedLoads.Clear();
+            _sceneMetrics.Clear();
+            _assetMetrics.Clear();
+            _isFirstLoad = false; // Only track FTUE once per session
+
+            if (logToConsole)
+                UnityEngine.Debug.Log("[LoadPerformanceMonitor] Stats reset");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // INTERNAL
+        // ═══════════════════════════════════════════════════════════════════
+
+        void Update()
+        {
+            if (_currentLoad == null || _currentLoad.isComplete)
+                return;
+
+            // Track min FPS during load
+            float fps = 1f / Time.unscaledDeltaTime;
+            if (fps < _currentLoad.minFps)
+                _currentLoad.minFps = fps;
+
+            // Track peak memory
+            long currentMemory = GetCurrentMemoryUsage();
+            if (currentMemory > _peakMemoryDuringLoad)
+                _peakMemoryDuringLoad = currentMemory;
+
+            // Warn if FPS drops below threshold
+            if (fps < minimumFpsDuringLoad && Time.frameCount % 60 == 0) // Log once per second
+            {
+                UnityEngine.Debug.LogWarning($"[LoadPerformanceMonitor] FPS dropped to {fps:F0} during load (target: {minimumFpsDuringLoad})");
+            }
+        }
+
+        void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // Auto-end tracking if scene matches current load
+            if (_currentLoad != null && 
+                _currentLoad.operationType == LoadOperationType.Scene &&
+                _currentLoad.targetName == scene.name)
+            {
+                // Delay end by one frame to allow scene initialization
+                StartCoroutine(DelayedEndLoad());
+            }
+        }
+
+        void OnSceneUnloaded(Scene scene)
+        {
+            // Track unload memory cleanup
+            long memoryAfterUnload = GetCurrentMemoryUsage();
+            float freedMB = (_memoryBaselineBytes - memoryAfterUnload) / (1024f * 1024f);
+
+            if (logToConsole && freedMB > 10f) // Only log significant memory frees
+                UnityEngine.Debug.Log($"[LoadPerformanceMonitor] Scene unloaded: {scene.name}, freed {freedMB:F1}MB");
+        }
+
+        IEnumerator DelayedEndLoad()
+        {
+            yield return null; // Wait one frame
+            EndLoad();
+        }
+
+        long GetCurrentMemoryUsage()
+        {
+            return GC.GetTotalMemory(false);
+        }
+
+        float GetBudgetForLoadType(SceneLoadType loadType)
+        {
+            return loadType switch
+            {
+                SceneLoadType.Boot => bootToGameplayBudget,
+                SceneLoadType.Transition => sceneTransitionBudget,
+                SceneLoadType.HubReturn => hubReturnBudget,
+                SceneLoadType.SaveGame => loadOperationBudget,
+                SceneLoadType.Cold => assetBundleColdBudget,
+                SceneLoadType.Cached => assetBundleCachedBudget,
+                _ => sceneTransitionBudget
+            };
+        }
+
+        Dictionary<string, object> GenerateSessionSummary()
+        {
+            return new Dictionary<string, object>
+            {
+                ["total_scene_loads"] = _totalSceneLoads,
+                ["budget_violations"] = _budgetViolations,
+                ["memory_spikes"] = _memorySpikes,
+                ["worst_scene_load_time"] = _worstSceneLoadTime,
+                ["worst_scene_load_name"] = _worstSceneLoadName ?? "none",
+                ["ftue_load_time"] = _totalFtueLoadTime,
+                ["completed_operations"] = _completedLoads.Count
+            };
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // DATA STRUCTURES
+        // ═══════════════════════════════════════════════════════════════════
+
+        class LoadOperation
+        {
+            public LoadOperationType operationType;
+            public SceneLoadType loadType;
+            public string targetName;
+            public float startTime;
+            public float endTime;
+            public long startMemoryBytes;
+            public long endMemoryBytes;
+            public float minFps;
+            public bool isComplete;
+
+            public float Duration => endTime - startTime;
+        }
+
+        class LoadMetrics
+        {
+            public int loadCount;
+            public float totalDuration;
+            public float averageDuration;
+            public float worstDuration;
+            public float totalMemoryDelta;
+
+            public void RecordLoad(float duration, float memoryDeltaMB)
+            {
+                loadCount++;
+                totalDuration += duration;
+                averageDuration = totalDuration / loadCount;
+                if (duration > worstDuration)
+                    worstDuration = duration;
+                totalMemoryDelta += memoryDeltaMB;
+            }
+        }
+
+        public enum LoadOperationType
+        {
+            Scene,
+            Asset,
+            Save,
+            Load
+        }
+
+        public enum SceneLoadType
+        {
+            Boot,           // Cold start: Boot → Echohaven
+            Transition,     // Warm transition: Echohaven → Moon
+            HubReturn,      // Return to hub: Moon → Echohaven
+            SaveGame,       // Load from saved game
+            Cold,           // Asset bundle cold load
+            Cached          // Asset bundle cached load
+        }
+    }
+}

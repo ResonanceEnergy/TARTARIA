@@ -10,7 +10,7 @@ namespace Tartaria.Data
     /// </summary>
     public interface IQuestProvider
     {
-        event Action<string, QuestStatus> OnQuestStatusChanged;
+        event Action<string, Core.Enums.QuestStatus> OnQuestStatusChanged;
         event Action<string, int> OnObjectiveProgressed;
         List<string> GetActiveQuestIds();
         List<string> GetCompletedQuestIds();

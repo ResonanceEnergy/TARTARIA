@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -1200,8 +1200,8 @@ namespace Tartaria.Save
         {
             if (_currentSave?.quests == null) return 0f;
             
-            // Count completed quests
-            int completed = _currentSave.quests.completedQuestIds?.Length ?? 0;
+            // Count completed quests from entries (status == completed)
+            int completed = _currentSave.quests.entries?.Count(e => e.status == 2) ?? 0; // 2 = completed
             
             // Total quests in game (from audit report: 184 total quests)
             const int TOTAL_QUESTS = 184;

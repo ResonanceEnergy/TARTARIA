@@ -95,7 +95,9 @@ namespace Tartaria.Integration
                 Health = 100f,
                 MaxHealth = 100f,
                 AetherCharge = 0f,
-                MaxAetherCharge = 100f * (1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.AetherCapacity) ?? 0f)),
+                // DISABLED (Phase 46) - SkillModifierType not available
+                // MaxAetherCharge = 100f * (1f + (Gameplay.SkillTreeSystem.Instance?.GetModifier(Gameplay.SkillModifierType.AetherCapacity) ?? 0f)),
+                MaxAetherCharge = 100f, // Base capacity without skill modifiers
                 CurrentFrequency = 432f, // Harmonic (player)
                 ComboCount = 0,
                 IsGiantMode = false

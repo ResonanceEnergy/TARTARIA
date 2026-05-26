@@ -37,6 +37,7 @@ namespace Tartaria.AI
         Color _originalColor;
 
         List<EnemyAIController> _nearbyEnemies = new List<EnemyAIController>();
+        Collider[] _buffRadiusBuffer = new Collider[16]; // NonAlloc buffer for OverlapSphere
 
         enum DroneState { Orbiting, Beaming, Dead }
         DroneState _state = DroneState.Orbiting;
@@ -144,13 +145,13 @@ namespace Tartaria.AI
 
         void DamagePlayerWithBeam()
         {
-            var playerHealth = _player?.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
+            // SendMessage pattern - AI↔Gameplay circular dep broken (Phase 15)
+            if (_player != null)
             {
                 int damage = Mathf.RoundToInt(beamDamagePerSecond * Time.deltaTime);
                 if (damage > 0)
                 {
-                    playerHealth.TakeDamage(damage);
+                    _player.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
                 }
             }
         }
@@ -176,7 +177,7 @@ namespace Tartaria.AI
             foreach (var enemy in _nearbyEnemies)
             {
                 if (enemy == null) continue;
-                
+
                 // Note: In full implementation, this would modify enemy damage
                 // For now, just visual feedback
                 var rend = enemy.GetComponentInChildren<Renderer>();
@@ -221,9 +222,9 @@ namespace Tartaria.AI
             _state = DroneState.Dead;
             _beamLine.enabled = false;
             Debug.Log("[ResonanceDrone] Defeated");
-            
+
             VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position);
-            
+
             // Drop loot
             if (InventorySystem.Instance != null)
             {

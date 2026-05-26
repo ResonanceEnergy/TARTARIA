@@ -27,7 +27,6 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
         Vector2 _hiddenPosition;
         Vector2 _visiblePosition;
         bool _isAnimating;
-        Coroutine _animationCoroutine;
 
         void Awake()
         {
@@ -53,12 +52,6 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
             }
 
             gameObject.SetActive(false);  // Hidden until triggered
-        }
-
-        void OnDisable()
-        {
-            if (_animationCoroutine != null) StopCoroutine(_animationCoroutine);
-            _animationCoroutine = null;
         }
 
         void OnDestroy()
@@ -88,8 +81,7 @@ namespace Tartaria.Integration  // NOTE: Lives in UI folder but part of Integrat
             if (iconImage != null && icon != null) iconImage.sprite = icon;
 
             gameObject.SetActive(true);
-            if (_animationCoroutine != null) StopCoroutine(_animationCoroutine);
-            _animationCoroutine = StartCoroutine(AnimateToast());
+            StartCoroutine(AnimateToast());
         }
 
         IEnumerator AnimateToast()

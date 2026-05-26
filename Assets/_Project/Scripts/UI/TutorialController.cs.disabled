@@ -94,18 +94,14 @@ namespace Tartaria.UI
             _initTimer = initialDelay;
         }
 
-        void OnEnable()
+        void Start()
         {
             SubscribeToEvents();
         }
 
-        void OnDisable()
-        {
-            UnsubscribeFromEvents();
-        }
-
         void OnDestroy()
         {
+            UnsubscribeFromEvents();
             if (Instance == this) Instance = null;
         }
 

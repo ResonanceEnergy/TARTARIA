@@ -55,9 +55,9 @@ namespace Tartaria.Gameplay
 
             // Apply damage
             hit.collider.SendMessageUpwards("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
-            
-            // Spawn damage number
-            DamageNumberPool.Spawn(damage, hit.point);
+
+            // Spawn damage number (DamageNumberPool disabled - Phase 22)
+            // DamageNumberPool.Spawn(damage, hit.point);
 
             Debug.Log($"[Arrow] Hit {hit.collider.name} for {damage} damage");
 

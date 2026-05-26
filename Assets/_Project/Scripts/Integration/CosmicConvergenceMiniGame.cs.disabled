@@ -128,7 +128,6 @@ namespace Tartaria.Integration
             GameStateManager.Instance?.TransitionTo(GameState.Cinematic);
             Debug.Log("[CosmicConvergence] The Cosmic Convergence begins!");
 
-            StopAllCoroutines();
             StartCoroutine(ConvergenceSequence());
         }
 

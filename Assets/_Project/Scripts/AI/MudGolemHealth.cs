@@ -141,10 +141,11 @@ namespace Tartaria.AI
             if (_dropLootOnDeath)
             {
                 lootCount = UnityEngine.Random.Range(1, 4); // 1-3 shards
-                Tartaria.Gameplay.InventorySystem.Instance?.AddItem(lootItem, lootCount);
-                Debug.Log($"[MudGolemHealth] {gameObject.name} dropped {lootCount}x {lootItem}");
+                // Loot system disabled (InventorySystem not active)
+                // Tartaria.Gameplay.InventorySystem.Instance?.AddItem(lootItem, lootCount);
+                Debug.Log($"[MudGolemHealth] {gameObject.name} dropped {lootCount}x {lootItem} (InventorySystem disabled, loot lost)");
             }
-            
+
             // Fire GameEvents for enemy killed (decoupled pub/sub)
             Core.GameEvents.RaiseEnemyKilled(new Core.EnemyKilledEventArgs
             {

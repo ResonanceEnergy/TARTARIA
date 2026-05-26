@@ -166,7 +166,8 @@ namespace Tartaria.Integration
             _autoAdvanceTimer = 0f;
 
             // Hide dialogue UI
-            UIManager.Instance?.HideDialogue();
+            // UIManager.Instance?.HideDialogue(); // UI assembly disabled (Phase 7)
+            // TODO: Re-enable when UI assembly restored
 
             Debug.Log($"[DialoguePlayer] Conversation ended: {treeId}");
             OnConversationEnded?.Invoke(treeId);
@@ -204,7 +205,7 @@ namespace Tartaria.Integration
             if (string.IsNullOrEmpty(displayText))
                 displayText = "[MISSING DIALOGUE TEXT]";
 
-            UIManager.Instance?.ShowDialogue(node.speakerName, displayText);
+            // UIManager.Instance?.ShowDialogue(node.speakerName, displayText); // UI assembly disabled (Phase 7)
 
             // Play voice line if available
             if (!string.IsNullOrEmpty(node.voiceLineId))
@@ -254,14 +255,14 @@ namespace Tartaria.Integration
             OnChoicesAvailable?.Invoke(_currentChoices);
 
             // Fallback: if no UI integration, display in console
-            if (UIManager.Instance == null)
-            {
+            // if (UIManager.Instance == null) // UI assembly disabled (Phase 7)
+            // {
                 Debug.Log("[DialoguePlayer] Available choices:");
                 for (int i = 0; i < _currentChoices.Count; i++)
                 {
                     Debug.Log($"  [{i}] {_currentChoices[i].choiceText}");
                 }
-            }
+            // }
         }
 
         /// <summary>

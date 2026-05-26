@@ -80,7 +80,7 @@ namespace Tartaria.Integration
             // Show boss nameplate + intro line
             GameEvents.RaiseHUDShowBossNameplate(bossName, bossTitle);
             GameEvents.RaiseHUDShowSubtitle($"<b>{bossName}:</b> {introLine}", 6f);
-            
+
             AudioManager.Instance?.PlayVoiceLine($"boss_{bossName.ToLower()}_intro");
 
             // Companion reactions to boss intro
@@ -113,7 +113,8 @@ namespace Tartaria.Integration
             TriggerCompanionReactions("boss_defeat");
 
             // Quest progression
-            QuestManager.Instance?.ProgressObjective($"defeat_{bossName.ToLower()}", 0, 1);
+            // DISABLED (Phase 46) - QuestManager not yet available
+            // QuestManager.Instance?.ProgressObjective($"defeat_{bossName.ToLower()}", 0, 1);
 
             Debug.Log($"[BossDialogue] {bossName} defeated — outro played.");
         }
@@ -201,7 +202,7 @@ namespace Tartaria.Integration
         void OnDamageTaken(float damage)
         {
             _inCombat = true;
-            
+
             // Combat bark (occasionally)
             if (Time.time - _lastBarkTime > 8f && combatBarks.Length > 0 && Random.value < 0.4f)
             {
@@ -223,7 +224,7 @@ namespace Tartaria.Integration
         {
             // Show subtle subtitle (not as prominent as boss dialogue)
             GameEvents.RaiseHUDShowEnemyBark(line, 2.5f);
-            
+
             // Play audio
             string clipName = isCombat ? $"enemy_{enemyType.ToString().ToLower()}_combat" : $"enemy_{enemyType.ToString().ToLower()}_idle";
             AudioManager.Instance?.PlaySFX3D(clipName, transform.position, 0.6f);
@@ -262,10 +263,10 @@ namespace Tartaria.Integration
         void PlayCorruptionWhisper()
         {
             string whisper = corruptionWhispers[Random.Range(0, corruptionWhispers.Length)];
-            
+
             // Subtle, ominous subtitle (different style from normal dialogue)
             GameEvents.RaiseHUDShowCorruptionWhisper(whisper, 5f);
-            
+
             // Distorted, reverb-heavy audio
             AudioManager.Instance?.PlaySFX2D("CorruptionWhisper", 0.4f);
 

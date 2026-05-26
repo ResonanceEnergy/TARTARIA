@@ -36,7 +36,6 @@ namespace Tartaria.Integration
         Beat _current = Beat.Discovery;
         bool _running;
         bool _moonClearedFromActivator;
-        Coroutine _runSequenceCoroutine;
 
         void OnEnable()
         {
@@ -56,8 +55,7 @@ namespace Tartaria.Integration
                 Debug.LogWarning("[MoonBeatRunner] No definition assigned on " + name);
                 return;
             }
-            if (_runSequenceCoroutine != null) StopCoroutine(_runSequenceCoroutine);
-            _runSequenceCoroutine = StartCoroutine(RunSequence());
+            StartCoroutine(RunSequence());
         }
 
         void HandleMoonClearedFromActivator(int moon)

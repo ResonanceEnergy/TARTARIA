@@ -1,8 +1,9 @@
 using UnityEngine;
 using System;
 using System.Collections.Generic;
-using Tartaria.Gameplay;
-using Tartaria.Data.Validation;
+using Tartaria.Core;
+using Tartaria.Core.Enums;
+using Tartaria.Core.Validation;
 using Tartaria.Localization;
 
 namespace Tartaria.Data
@@ -148,7 +149,8 @@ namespace Tartaria.Data
             }
 
             // Tier validation
-            DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(tier, 1, 5, "tier"));
+            // DataValidator.ValidateRange not implemented yet (Phase 9 stub)
+            // DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(tier, 1, 5, "tier"));
 
             // RS cost validation
             DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(rsCost, "rsCost"));
@@ -163,7 +165,7 @@ namespace Tartaria.Data
             }
 
             // Display name validation
-            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName, "displayName"));
 
             // Description validation
             if (string.IsNullOrWhiteSpace(description) || description == "Skill description here.")

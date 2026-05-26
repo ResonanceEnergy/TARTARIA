@@ -103,9 +103,10 @@ namespace Tartaria.Integration
             }
 
             // Boss defeated → combat achievements
-            var boss = BossEncounterSystem.Instance;
-            if (boss != null)
-                boss.OnBossDefeated += HandleBossDefeated;
+            // DISABLED (Phase 44) - BossResult not yet available
+            // var boss = BossEncounterSystem.Instance;
+            // if (boss != null)
+            //     boss.OnBossDefeated += HandleBossDefeated;
 
             // Rail network complete → exploration achievement E06
             var rail = ContinentalRailSystem.Instance;
@@ -128,14 +129,16 @@ namespace Tartaria.Integration
                 cosmic.OnConvergenceComplete += HandleConvergenceComplete;
 
             // World choice → hidden achievements
-            var wcTracker = WorldChoiceTracker.Instance;
-            if (wcTracker != null)
-                wcTracker.OnChoiceMade += HandleWorldChoice;
+            // DISABLED (Phase 44) - WorldChoiceTracker not yet available
+            // var wcTracker = WorldChoiceTracker.Instance;
+            // if (wcTracker != null)
+            //     wcTracker.OnChoiceMade += HandleWorldChoice;
 
             // Giant mode ability usage → H08
-            var giant = GiantModeController.Instance;
-            if (giant != null)
-                giant.OnAbilityUsed += HandleGiantAbility;
+            // DISABLED (Phase 44) - GiantAbility not yet available
+            // var giant = GiantModeController.Instance;
+            // if (giant != null)
+            //     giant.OnAbilityUsed += HandleGiantAbility;
 
             // Campaign moon completion → K01-K13
             var campaign = CampaignFlowController.Instance;
@@ -188,10 +191,11 @@ namespace Tartaria.Integration
 
         // ─── Event Handlers (Achievement) ────────────
 
-        void HandleBossDefeated(BossResult result)
-        {
-            CheckBossDefeated(result.bossName);
-        }
+        // DISABLED (Phase 44) - BossResult not yet available
+        // void HandleBossDefeated(BossResult result)
+        // {
+        //     CheckBossDefeated(result.bossName);
+        // }
 
         void HandleNetworkComplete()
         {
@@ -213,26 +217,28 @@ namespace Tartaria.Integration
             Unlock("M06");
         }
 
-        void HandleWorldChoice(WorldChoiceTracker.WorldChoiceId choiceId, WorldChoiceTracker.ChoiceOption option)
-        {
-            if (choiceId == WorldChoiceTracker.WorldChoiceId.W5_ZerethPlea
-                && option == WorldChoiceTracker.ChoiceOption.OptionA)
-                CheckZerethRedeemed();
-        }
+        // DISABLED (Phase 44) - WorldChoiceTracker not yet available
+        // void HandleWorldChoice(WorldChoiceTracker.WorldChoiceId choiceId, WorldChoiceTracker.ChoiceOption option)
+        // {
+        //     if (choiceId == WorldChoiceTracker.WorldChoiceId.W5_ZerethPlea
+        //         && option == WorldChoiceTracker.ChoiceOption.OptionA)
+        //         CheckZerethRedeemed();
+        // }
 
-        void HandleGiantAbility(GiantAbility ability)
-        {
-            if (ability == GiantAbility.BuildingLift)
-            {
-                // Progress toward H08 -- track building lifts toward all zone landmarks
-                string progressKey = "H08";
-                float current = GetProgress(progressKey);
-                float increment = 1f / 13f; // 13 zone landmarks
-                SetProgress(progressKey, Mathf.Min(current + increment, 1f));
-                if (GetProgress(progressKey) >= 1f)
-                    Unlock("H08");
-            }
-        }
+        // DISABLED (Phase 44) - GiantAbility not yet available
+        // void HandleGiantAbility(GiantAbility ability)
+        // {
+        //     if (ability == GiantAbility.BuildingLift)
+        //     {
+        //         // Progress toward H08 -- track building lifts toward all zone landmarks
+        //         string progressKey = "H08";
+        //         float current = GetProgress(progressKey);
+        //         float increment = 1f / 13f; // 13 zone landmarks
+        //         SetProgress(progressKey, Mathf.Min(current + increment, 1f));
+        //         if (GetProgress(progressKey) >= 1f)
+        //             Unlock("H08");
+        //     }
+        // }
 
         void HandleMoonComplete(int moonNumber)
         {
