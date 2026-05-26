@@ -11,7 +11,7 @@ namespace Tartaria.Integration
     /// - Spawn VFX (rarity-colored particle burst)
     /// - Vacuum pickup (flies to player in arc when in range)
     /// - Auto-cleanup (destroys after 60s if not picked up)
-    /// 
+    ///
     /// Attach to loot pickup GameObjects or use static helper methods.
     /// </summary>
     [DisallowMultipleComponent]

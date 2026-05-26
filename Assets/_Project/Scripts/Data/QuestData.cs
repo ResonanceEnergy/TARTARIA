@@ -122,7 +122,7 @@ namespace Tartaria.Data
         public void OnAfterDeserialize()
         {
             int currentVersion = Tartaria.Core.DataSchemaVersion.CURRENT_QUEST;
-            
+
             if (schemaVersion < currentVersion)
             {
                 Debug.Log($"[QuestData] {questId}: Auto-migrating from v{schemaVersion} to v{currentVersion}");

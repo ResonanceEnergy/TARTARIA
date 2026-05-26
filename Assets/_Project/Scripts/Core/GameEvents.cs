@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using QuestStatus = Tartaria.Core.Enums.QuestStatus;
 
 namespace Tartaria.Core
 {
@@ -7,12 +8,12 @@ namespace Tartaria.Core
     /// Centralized Game Events System — decouples cross-assembly communication.
     /// Reduces direct Instance?.Method() calls that create tight coupling.
     /// All events are thread-safe with null-check before invoke.
-    /// 
+    ///
     /// USAGE:
     ///   Subscribe: GameEvents.OnEnemyKilled += HandleEnemyKilled;
     ///   Unsubscribe: GameEvents.OnEnemyKilled -= HandleEnemyKilled; (in OnDestroy!)
     ///   Raise: GameEvents.RaiseEnemyKilled(new EnemyKilledEventArgs { enemyType = "golem", xpReward = 50 });
-    /// 
+    ///
     /// MEMORY SAFETY:
     ///   Always unsubscribe in OnDestroy to prevent memory leaks.
     ///   Example:
@@ -40,7 +41,7 @@ namespace Tartaria.Core
 
         /// <summary>
         /// Raised when a Tartarian building completes restoration (tuning complete).
-        /// Subscribers: QuestManager (quest progress), HUDController (UI feedback), 
+        /// Subscribers: QuestManager (quest progress), HUDController (UI feedback),
         ///              GameLoopController (RS award), AudioController (SFX).
         /// </summary>
         public static event Action<BuildingRestoredEventArgs> OnBuildingRestoredTyped;

@@ -122,7 +122,7 @@ namespace Tartaria.Editor
             // Report results
             Debug.Log("[BatchReadinessValidator] ================================================");
             Debug.Log($"[BatchReadinessValidator] RESULTS: {checksPassed}/{totalChecks} checks passed");
-            
+
             if (failures.Count > 0)
             {
                 Debug.LogError($"[BatchReadinessValidator] {failures.Count} failures:");
