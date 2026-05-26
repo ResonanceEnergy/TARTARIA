@@ -34,7 +34,7 @@ namespace Tartaria.Editor
                 // Phase 1: Force script recompilation
                 Debug.Log($"{BuildTag} Phase 1: Validating script compilation...");
                 AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
-                
+
                 // Note: Unity 6 will exit with code 1 if there are compilation errors,
                 // so if we reach this point, compilation succeeded
                 Debug.Log($"{BuildTag} OK: Scripts compiled successfully");
@@ -51,7 +51,7 @@ namespace Tartaria.Editor
                         Debug.Log($"{BuildTag}   Found: {assembly.GetName().Name}");
                     }
                 }
-                
+
                 if (tartariaAssemblies == 0)
                 {
                     Debug.LogError($"{BuildTag} FAIL: No Tartaria assemblies found");
@@ -137,7 +137,7 @@ namespace Tartaria.Editor
 
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
                 string status = success ? "SUCCESS" : "FAILURE";
-                
+
                 string report = $@"═══════════════════════════════════════════════════════════
 TARTARIA BUILD REPORT
 ═══════════════════════════════════════════════════════════

@@ -4,6 +4,8 @@ using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Audio;
 using Tartaria.Data;
+using Tartaria.Gameplay;
+using QuestStatus = Tartaria.Core.Enums.QuestStatus;
 
 namespace Tartaria.Integration
 {
@@ -50,7 +52,7 @@ namespace Tartaria.Integration
             DontDestroyOnLoad(gameObject);
             QuestProviderLocator.Current = this;
             ServiceLocator.Quest = this;
-            
+
             // Wire save/load events
             if (Save.SaveManager.Instance != null)
             {
@@ -63,7 +65,7 @@ namespace Tartaria.Integration
         {
             if (Instance == this) Instance = null;
             if (ServiceLocator.Quest == (IQuestService)this) ServiceLocator.Quest = null;
-            
+
             // Cleanup save/load event handlers
             if (Save.SaveManager.Instance != null)
             {
@@ -71,14 +73,14 @@ namespace Tartaria.Integration
                 Save.SaveManager.Instance.OnAfterLoad -= OnLoad;
             }
         }
-        
+
         void OnSave(Save.SaveData sd)
         {
             // Persist quest states to SaveData.quests
             if (sd.quests != null)
             {
                 var entries = new List<Save.QuestSaveEntry>();
-                
+
                 foreach (var kvp in _questStates)
                 {
                     entries.Add(new Save.QuestSaveEntry
@@ -88,12 +90,12 @@ namespace Tartaria.Integration
                         objectiveProgress = kvp.Value.objectiveProgress ?? System.Array.Empty<int>()
                     });
                 }
-                
+
                 sd.quests.entries = entries.ToArray();
                 Debug.Log($"[QuestManager] Saved {entries.Count} quest states");
             }
         }
-        
+
         void OnLoad(Save.SaveData sd)
         {
             // Restore quest states from SaveData.quests
@@ -102,7 +104,7 @@ namespace Tartaria.Integration
                 foreach (var entry in sd.quests.entries)
                 {
                     if (string.IsNullOrEmpty(entry.questId)) continue;
-                    
+
                     // Only restore if quest exists in database
                     if (_questStates.ContainsKey(entry.questId))
                     {
@@ -113,7 +115,7 @@ namespace Tartaria.Integration
                         };
                     }
                 }
-                
+
                 _questListsDirty = true;
                 Debug.Log($"[QuestManager] Loaded {sd.quests.entries.Length} quest states");
             }
@@ -177,6 +179,8 @@ namespace Tartaria.Integration
 
         void LoadFromBuilder()
         {
+            // TODO: Enable when QuestDatabaseBuilder is implemented
+            /*
             questDatabase = QuestDatabaseBuilder.BuildAll();
             if (questDatabase != null)
             {
@@ -192,6 +196,7 @@ namespace Tartaria.Integration
                 }
                 Debug.Log($"[QuestManager] Auto-populated {_questLookup.Count} quests from QuestDatabaseBuilder.");
             }
+            */
         }
 
         // ─── Public API ──────────────────────────────
@@ -220,7 +225,7 @@ namespace Tartaria.Integration
             state.status = QuestStatus.Active;
             _questStates[questId] = state;
             _questListsDirty = true;
-            
+
             // Fire both legacy event and GameEvents
             OnQuestStatusChanged?.Invoke(questId, QuestStatus.Active);
             Core.GameEvents.RaiseQuestStatusChanged(new Core.QuestStatusChangedEventArgs
@@ -240,8 +245,8 @@ namespace Tartaria.Integration
 
             Debug.Log($"[QuestManager] Quest activated: {questId}");
 
-            // Tutorial: first quest accepted
-            TutorialSystem.Instance?.ForceComplete(TutorialStep.QuestAccept);
+            // TODO: Enable when TutorialSystem is active
+            // TutorialSystem.Instance?.ForceComplete(TutorialStep.QuestAccept);
         }
 
         /// <summary>
@@ -265,7 +270,7 @@ namespace Tartaria.Integration
                 def.objectives[objectiveIndex].targetCount);
 
             _questStates[questId] = state;
-            
+
             // Fire both legacy event and GameEvents
             OnObjectiveProgressed?.Invoke(questId, objectiveIndex);
             Core.GameEvents.RaiseQuestObjectiveProgressed(new Core.QuestObjectiveProgressedEventArgs
@@ -329,7 +334,7 @@ namespace Tartaria.Integration
         /// Get the first active quest's data (for simple single-quest-at-a-time UIs).
         /// Feature 4: returns current active quest.
         /// </summary>
-        public QuestData GetActiveQuest()
+        public QuestDisplayData GetActiveQuest()
         {
             RebuildCachedListsIfDirty();
             if (_cachedActiveIds.Count == 0) return null;
@@ -338,7 +343,7 @@ namespace Tartaria.Integration
             if (!_questLookup.TryGetValue(questId, out var def)) return null;
             if (!_questStates.TryGetValue(questId, out var state)) return null;
 
-            return new QuestData
+            return new QuestDisplayData
             {
                 id = questId,
                 title = def.displayName,
@@ -411,7 +416,7 @@ namespace Tartaria.Integration
         public void CompleteQuest(string questId)
         {
             if (!_questStates.TryGetValue(questId, out var state)) return;
-            
+
             QuestStatus oldStatus = state.status;
             state.status = QuestStatus.Completed;
             _questStates[questId] = state;
@@ -429,8 +434,9 @@ namespace Tartaria.Integration
             if (_questLookup.TryGetValue(questId, out var def))
             {
                 // Grant RS reward
-                if (def.rsReward > 0f)
-                    GameLoopController.Instance?.QueueRSReward(def.rsReward, "quest_complete");
+                // TODO: Enable when GameLoopController is active
+                // if (def.rsReward > 0f)
+                //     GameLoopController.Instance?.QueueRSReward(def.rsReward, "quest_complete");
 
                 // Grant enhanced rewards if QuestData
                 if (def is QuestData questData)
@@ -471,7 +477,7 @@ namespace Tartaria.Integration
         {
             if (!_questStates.TryGetValue(questId, out var state)) return false;
             if (!_questLookup.TryGetValue(questId, out var def)) return false;
-            
+
             // Use enhanced objectives if QuestData
             var objectives = (def is QuestData qd) ? qd.GetRuntimeObjectives() : def.objectives;
             if (objectives == null) return true;
@@ -493,20 +499,11 @@ namespace Tartaria.Integration
         {
             if (questData == null) return true;
 
-            float currentRS = GameLoopController.Instance?.GetCurrentRS() ?? 0f;
-            int currentLevel = PlayerProgression.Instance?.GetCurrentLevel() ?? 1;
+            // TODO: Enable when GameLoopController is active
+            float currentRS = 0f; // GameLoopController.Instance?.GetCurrentRS() ?? 0f;
+            int currentLevel = PlayerProgression.Instance?.CurrentLevel ?? 1;
 
             return questData.ArePrerequisitesMet(currentRS, currentLevel, IsQuestComplete);
-        }
-
-        /// <summary>
-        /// Check if a quest is completed.
-        /// </summary>
-        bool IsQuestComplete(string questId)
-        {
-            if (!_questStates.TryGetValue(questId, out var state))
-                return false;
-            return state.status == QuestStatus.Completed;
         }
 
         /// <summary>
@@ -538,7 +535,7 @@ namespace Tartaria.Integration
             // Grant XP
             if (questData.xpReward > 0)
             {
-                PlayerProgression.Instance?.AddExperience(questData.xpReward);
+                PlayerProgression.Instance?.AddXP(questData.xpReward, "quest_complete");
                 Debug.Log($"[QuestManager] Granted {questData.xpReward} XP");
             }
 
@@ -559,9 +556,9 @@ namespace Tartaria.Integration
                 foreach (var unlockId in questData.unlockRewards)
                 {
                     if (string.IsNullOrEmpty(unlockId)) continue;
-                    // Hook to progression/unlock system
-                    PlayerProgression.Instance?.UnlockFeature(unlockId);
-                    Debug.Log($"[QuestManager] Unlocked: {unlockId}");
+                    // TODO: Implement unlock system
+                    // PlayerProgression.Instance?.UnlockFeature(unlockId);
+                    Debug.Log($"[QuestManager] Unlocked: {unlockId} (stub)");
                 }
             }
         }
@@ -590,7 +587,7 @@ namespace Tartaria.Integration
     /// Simple quest data container for UI/HUD display (Feature 4).
     /// Contains only the essential fields needed to show active quest info.
     /// </summary>
-    public class QuestData
+    public class QuestDisplayData
     {
         public string id;
         public string title;

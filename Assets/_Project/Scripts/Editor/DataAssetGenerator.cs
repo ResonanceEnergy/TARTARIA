@@ -10,13 +10,13 @@ namespace Tartaria.Editor
     /// <summary>
     /// Data Asset Generator — Creates ItemDatabase + starter items/equipment/enemies.
     /// Menu: Tools → TARTARIA → Generate All Data Assets
-    /// 
+    ///
     /// Creates:
     /// - 1 ItemDatabase.asset
     /// - 10 consumable items
     /// - 10 equipment pieces
     /// - 5 enemy data assets
-    /// 
+    ///
     /// Addresses Agent 1 finding: "Zero data assets created" blocker.
     /// </summary>
     public static class DataAssetGenerator
@@ -53,7 +53,7 @@ namespace Tartaria.Editor
             AssetDatabase.Refresh();
 
             Debug.Log($"[DataAssetGenerator] === COMPLETE === {assetsCreated} assets created");
-            EditorUtility.DisplayDialog("Data Asset Generation", 
+            EditorUtility.DisplayDialog("Data Asset Generation",
                 $"Successfully created {assetsCreated} data assets!\n\n" +
                 $"• ItemDatabase.asset\n" +
                 $"• 10 consumable items\n" +
@@ -77,7 +77,7 @@ namespace Tartaria.Editor
         static int GenerateItemDatabase()
         {
             string dbPath = RESOURCES_PATH + "/ItemDatabase.asset";
-            
+
             if (File.Exists(dbPath))
             {
                 Debug.LogWarning("[DataAssetGenerator] ItemDatabase.asset already exists — skipping");
@@ -127,7 +127,7 @@ namespace Tartaria.Editor
                 item.rarity = rarity;
                 item.stackSize = stack;
                 item.category = ItemCategory.Consumable;
-                
+
                 AssetDatabase.CreateAsset(item, path);
                 Debug.Log($"[DataAssetGenerator] Created {id}.asset");
                 created++;
@@ -176,7 +176,7 @@ namespace Tartaria.Editor
                 item.attunementBonus = att;
                 item.armorValue = arm;
                 // Note: Equipment uses different value system, approximating from item value
-                
+
                 AssetDatabase.CreateAsset(item, path);
                 Debug.Log($"[DataAssetGenerator] Created {id}.asset (equipment)");
                 created++;
@@ -221,7 +221,7 @@ namespace Tartaria.Editor
                 enemy.xpReward = xp;
                 enemy.rsReward = rs;
                 enemy.archetype = arch;
-                
+
                 // Add spawn moons (Moon 1 for all except Goliath = Moon 2)
                 if (id == "corrupted_goliath")
                 {
@@ -231,7 +231,7 @@ namespace Tartaria.Editor
                 {
                     enemy.spawnMoons.Add(1);
                 }
-                
+
                 // Add basic loot tables
                 if (id == "mud_golem")
                 {
@@ -243,7 +243,7 @@ namespace Tartaria.Editor
                     enemy.lootTable.Add(new LootDrop { itemID = "resonance_crystal", dropChance = 0.50f, minQuantity = 1, maxQuantity = 2 });
                     enemy.lootTable.Add(new LootDrop { itemID = "aether_shard", dropChance = 0.80f, minQuantity = 3, maxQuantity = 5 });
                 }
-                
+
                 AssetDatabase.CreateAsset(enemy, path);
                 Debug.Log($"[DataAssetGenerator] Created {id}.asset (enemy)");
                 created++;
@@ -284,7 +284,7 @@ namespace Tartaria.Editor
             AssetDatabase.SaveAssets();
 
             Debug.Log($"[DataAssetGenerator] Populated ItemDatabase with {added} items");
-            EditorUtility.DisplayDialog("Database Population", 
+            EditorUtility.DisplayDialog("Database Population",
                 $"Added {added} items to ItemDatabase!", "OK");
         }
     }

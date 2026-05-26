@@ -41,7 +41,7 @@ namespace Tartaria.Core.Enums
 
     /// <summary>
     /// Item rarity enum for color coding and value scaling.
-    /// Canonical version from ItemData with Mythic tier.
+    /// Canonical version from ItemData with Mythic + Ascendant (Moon 13) tier.
     /// </summary>
     public enum ItemRarity
     {
@@ -50,7 +50,8 @@ namespace Tartaria.Core.Enums
         Rare,           // Blue
         Epic,           // Purple
         Legendary,      // Orange/Gold
-        Mythic          // Red/Crimson
+        Mythic,         // Red/Crimson
+        Ascendant       // Cyan/White (Moon 13 endgame)
     }
 
     /// <summary>

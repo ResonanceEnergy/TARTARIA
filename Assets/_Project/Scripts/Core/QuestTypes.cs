@@ -1,16 +1,9 @@
 using System;
 using UnityEngine;
+using QuestStatus = Tartaria.Core.Enums.QuestStatus;
 
 namespace Tartaria.Core
 {
-    public enum QuestStatus : byte
-    {
-        Locked = 0,
-        Active = 1,
-        Completed = 2,
-        Failed = 3
-    }
-
     public enum QuestObjectiveType : byte
     {
         DiscoverBuilding = 0,
@@ -29,7 +22,7 @@ namespace Tartaria.Core
         ReachAirshipDestination = 13,
         RaiseCompanionTrust = 14,
         HiddenDiscovery = 15,
-        
+
         // Moon-specific objectives (added for 13-Moon campaign)
         PurgeCrystals = 20,       // Moon 2: Dissonance crystal purge
         FreeOrphans = 21,         // Moon 3: Orphan train escort
