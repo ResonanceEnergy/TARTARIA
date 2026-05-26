@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using QuestDef = Tartaria.Core.QuestDefinition;
 
 namespace Tartaria.Data
 {
