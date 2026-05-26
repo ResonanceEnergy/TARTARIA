@@ -1,6 +1,6 @@
 using UnityEngine;
 using Tartaria.Input;
-using Tartaria.AI;
+// NOTE: Cannot use 'using Tartaria.AI;' - would create circular dependency (AI depends on Gameplay)
 using Tartaria.Audio;
 
 namespace Tartaria.Gameplay
@@ -109,23 +109,22 @@ namespace Tartaria.Gameplay
                     return;
                 }
 
-                // Deal damage to enemy
-                MudGolemHealth enemyHealth = hit.collider.GetComponent<MudGolemHealth>();
-                if (enemyHealth != null)
-                {
-                    float damageMultiplier = _progression != null ? _progression.MeleeDamageMultiplier : 1f;
-                    float totalDamage = baseDamage * damageMultiplier;
-                    
-                    enemyHealth.TakeDamage(totalDamage, gameObject);
+                // Calculate damage
+                float damageMultiplier = _progression != null ? _progression.MeleeDamageMultiplier : 1f;
+                float totalDamage = baseDamage * damageMultiplier;
 
-                    // Spawn hit VFX
-                    SpawnHitVFX(hit.point, hit.normal);
+                // Deal damage to enemy using SendMessage to avoid circular dependency
+                // MudGolemHealth.TakeDamage(float damage, GameObject instigator = null)
+                // SendMessage only supports single parameter, so we pass just damage
+                hit.collider.SendMessage("TakeDamage", totalDamage, SendMessageOptions.DontRequireReceiver);
 
-                    // Play hit sound
-                    AudioManager.Instance?.PlaySFX3D(hitSoundName, hit.point, 0.7f);
+                // Spawn hit VFX
+                SpawnHitVFX(hit.point, hit.normal);
 
-                    Debug.Log($"[PlayerCombat] Hit {hit.collider.name} for {totalDamage:F1} damage (base: {baseDamage}, multiplier: {damageMultiplier:F2})");
-                }
+                // Play hit sound
+                AudioManager.Instance?.PlaySFX3D(hitSoundName, hit.point, 0.7f);
+
+                Debug.Log($"[PlayerCombat] Hit {hit.collider.name} for {totalDamage:F1} damage (base: {baseDamage}, multiplier: {damageMultiplier:F2})");
             }
         }
 

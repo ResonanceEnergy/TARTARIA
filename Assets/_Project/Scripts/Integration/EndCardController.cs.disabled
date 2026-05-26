@@ -1,7 +1,6 @@
 using System.Collections;
 using TMPro;
 using Tartaria.Core;
-using Tartaria.Core.Enums;
 using Tartaria.Save;
 using UnityEngine;
 using UnityEngine.UI;

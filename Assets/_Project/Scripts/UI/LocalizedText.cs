@@ -6,22 +6,22 @@ namespace Tartaria.UI
 {
     /// <summary>
     /// LocalizedText — automatic TextMeshProUGUI integration for localization.
-    /// 
+    ///
     /// Features:
     /// - Auto-updates text when language changes
     /// - Support for formatted strings (e.g., "Collect {0} items")
     /// - Fallback to key path if translation missing
     /// - Zero-allocation updates (cached string lookups)
-    /// 
+    ///
     /// Usage:
     /// 1. Add component to TextMeshProUGUI GameObject
     /// 2. Set localizationKey (category.subcategory.id)
     /// 3. Optionally set formatArgs for dynamic text
-    /// 
+    ///
     /// Example:
     ///     LocalizationKey = "ui.label.health"
     ///     → Text updates to "Health" (EN), "Salud" (ES), etc.
-    /// 
+    ///
     ///     LocalizationKey = "ui.message.collect_items"
     ///     FormatArgs = [5]
     ///     → Text updates to "Collect 5 items"
@@ -181,7 +181,7 @@ namespace Tartaria.UI
         /// <summary>
         /// Get current localized text.
         /// </summary>
-        public string LocalizedText => _textComponent != null ? _textComponent.text : string.Empty;
+        public string CurrentText => _textComponent != null ? _textComponent.text : string.Empty;
 
 #if UNITY_EDITOR
         /// <summary>

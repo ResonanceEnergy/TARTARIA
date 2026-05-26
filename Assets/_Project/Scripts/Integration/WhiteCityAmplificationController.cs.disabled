@@ -68,7 +68,6 @@ namespace Tartaria.Integration
         List<Light> _amplifiedOrbLights = new List<Light>();
         GameObject _spireVisual;
         GameObject _dockVisual;
-        readonly List<Coroutine> _activeCoroutines = new();
 
         bool _sequenceStarted;
         bool _climaxFired;
@@ -83,11 +82,6 @@ namespace Tartaria.Integration
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
-            foreach (var co in _activeCoroutines)
-            {
-                if (co != null) StopCoroutine(co);
-            }
-            _activeCoroutines.Clear();
         }
 
         public void BeginAmplificationSequence()
@@ -102,8 +96,7 @@ namespace Tartaria.Integration
                 // Cleared visit: permanent golden world state already applied (leys, bright orbs, max hum, full dock/platforms)
                 GameEvents.RaiseHUDShowObjective("<b>WHITE CITY — THE RADIANCE ENDURES</b>\nIntercontinental Aurora Bridge active. Fast travel open. The grid sings forever.");
                 Moon5WhiteCityAudioManager.Instance?.SetResonanceLevel(1.0f);
-                var co0 = StartCoroutine(AmplifiedOrbPulseLoop());
-                _activeCoroutines.Add(co0);
+                StartCoroutine(AmplifiedOrbPulseLoop());
                 return; // no discovery glow or "amplify" flow for already-complete emotional payoff state
             }
 
@@ -133,12 +126,10 @@ namespace Tartaria.Integration
             CreatePavilionStatusOrbs();
 
             // Light the first two pavilions as "already faintly glowing" (discovery feel)
-            var co1 = StartCoroutine(InitialDiscoveryGlow());
-            _activeCoroutines.Add(co1);
+            StartCoroutine(InitialDiscoveryGlow());
 
             // Start gentle ongoing orb pulse loop (reacts to resonance on every amplify)
-            var co2 = StartCoroutine(AmplifiedOrbPulseLoop());
-            _activeCoroutines.Add(co2);
+            StartCoroutine(AmplifiedOrbPulseLoop());
         }
 
         IEnumerator InitialDiscoveryGlow()

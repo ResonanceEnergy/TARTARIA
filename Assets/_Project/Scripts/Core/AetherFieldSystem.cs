@@ -32,11 +32,9 @@ namespace Tartaria.Core
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            using (s_aetherMarker.Auto()) // R6 production marker (visible in Profiler + guard)
+            using (s_aetherMarker.Auto()) // R6 production marker (visible in Profiler)
             {
-                var guard = PerformanceGuard.Instance;
-                float startMs = guard != null ? (Time.realtimeSinceStartup * 1000f) : 0f;
-
+                // NOTE: PerformanceGuard calls removed — Burst doesn't support managed object null checks
                 var config = SystemAPI.GetSingleton<AetherFieldConfig>();
                 float deltaTime = SystemAPI.Time.DeltaTime;
 
@@ -87,12 +85,6 @@ namespace Tartaria.Core
 
                 sources.Dispose(state.Dependency);
                 sinks.Dispose(state.Dependency);
-
-                if (guard != null)
-                {
-                    float elapsed = (Time.realtimeSinceStartup * 1000f) - startMs;
-                    guard.RecordSystemTime(SystemTag.Aether, Mathf.Max(0f, elapsed));
-                }
             }
         }
 

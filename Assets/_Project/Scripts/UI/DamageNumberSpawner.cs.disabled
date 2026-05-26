@@ -21,6 +21,7 @@ namespace Tartaria.UI
 
         [Header("Animation Settings")]
         [SerializeField] private float _riseDistance = 1f;
+        [SerializeField] private float _animationDuration = 0.8f;
         [SerializeField] private AnimationCurve _riseCurve = AnimationCurve.EaseOut(0f, 0f, 1f, 1f);
 
         [Header("Color Coding")]
@@ -30,6 +31,7 @@ namespace Tartaria.UI
 
         [Header("Font Settings")]
         [SerializeField] private float _normalFontSize = 3f;
+        [SerializeField] private float _critFontSize = 4.5f;
 
         // Pooling
         private Queue<DamageTextInstance> _availablePool = new Queue<DamageTextInstance>();
@@ -62,13 +64,17 @@ namespace Tartaria.UI
 
         void Update()
         {
+            // AGENT 6: Cache camera reference to avoid Camera.main lookup every frame
+            Camera cam = Camera.main;
+            if (cam == null) return;
+
             // Update all active damage text animations
             for (int i = _activeInstances.Count - 1; i >= 0; i--)
             {
                 DamageTextInstance instance = _activeInstances[i];
                 instance.elapsed += Time.deltaTime;
 
-                float t = instance.elapsed / GameBalanceConfig.Instance.damageNumberAnimationDuration;
+                float t = instance.elapsed / _animationDuration;
                 if (t >= 1f)
                 {
                     // Animation complete - return to pool
@@ -86,12 +92,9 @@ namespace Tartaria.UI
                 color.a = 1f - t;
                 instance.textMesh.color = color;
 
-                // Billboard effect (face camera)
-                if (Camera.main != null)
-                {
-                    instance.transform.LookAt(Camera.main.transform);
-                    instance.transform.Rotate(0f, 180f, 0f); // Flip to face camera
-                }
+                // Billboard effect (face camera) - AGENT 6: Cached camera ref
+                instance.transform.LookAt(cam.transform);
+                instance.transform.Rotate(0f, 180f, 0f); // Flip to face camera
             }
         }
 
@@ -237,7 +240,7 @@ namespace Tartaria.UI
             {
                 case DamageType.Critical:
                     instance.textMesh.color = _critDamageColor;
-                    instance.textMesh.fontSize = GameBalanceConfig.Instance.damageCritFontSize;
+                    instance.textMesh.fontSize = _critFontSize;
                     instance.textMesh.text = $"{displayDamage}!"; // Add exclamation for crits
                     break;
                 case DamageType.PlayerDamage:
@@ -267,8 +270,8 @@ namespace Tartaria.UI
             instance.elapsed = 0f;
 
             instance.textMesh.text = $"+{xp} XP";
-            instance.textMesh.color = GameBalanceConfig.Instance.damageHealColor; // Bright green
-            instance.textMesh.fontSize = _normalFontSize * GameBalanceConfig.Instance.healFontSizeMultiplier;
+            instance.textMesh.color = new Color(0.3f, 1f, 0.3f, 1f); // Bright green
+            instance.textMesh.fontSize = _normalFontSize * 1.2f;
 
             _activeInstances.Add(instance);
         }

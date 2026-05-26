@@ -44,14 +44,14 @@ namespace Tartaria.Data
         /// </summary>
         public QuestData[] GetQuestsByMoon(int moonId)
         {
-            // Try to use high-performance registry first
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (Query.QuestRegistry.Count > 0)
-            {
-                return Query.QuestRegistry.GetByMoon(moonId).ToArray();
-            }
-            #endif
-            
+            // Query.QuestRegistry disabled (Phase 11) — using fallback O(n) search
+            // #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // if (Query.QuestRegistry.Count > 0)
+            // {
+            //     return Query.QuestRegistry.GetByMoon(moonId).ToArray();
+            // }
+            // #endif
+
             // Fallback to O(n) search (pre-initialization or build-time)
             EnsureIndexed();
             return allQuests.Where(q => q != null && q.moonId == moonId).ToArray();
@@ -64,14 +64,14 @@ namespace Tartaria.Data
         /// </summary>
         public QuestData[] GetQuestsByCategory(QuestCategory category)
         {
-            // Try to use high-performance registry first
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (Query.QuestRegistry.Count > 0)
-            {
-                return Query.QuestRegistry.GetByCategory(category).ToArray();
-            }
-            #endif
-            
+            // Query.QuestRegistry disabled (Phase 11) — using fallback O(n) search
+            // #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // if (Query.QuestRegistry.Count > 0)
+            // {
+            //     return Query.QuestRegistry.GetByCategory(category).ToArray();
+            // }
+            // #endif
+
             // Fallback to O(n) search (pre-initialization or build-time)
             EnsureIndexed();
             return allQuests.Where(q => q != null && q.category == category).ToArray();

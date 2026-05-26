@@ -1,16 +1,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Tartaria.Core.Enums;
 
 namespace Tartaria.Data
 {
     /// <summary>
     /// Item Database — ScriptableObject collection of all game items.
     /// Provides centralized lookup and validation for item IDs.
-    /// 
+    ///
     /// Create asset via: Assets → Create → Tartaria → Item Database
     /// Place at: Assets/_Project/Resources/ItemDatabase.asset
-    /// 
+    ///
     /// Usage:
     ///   var db = ItemDatabase.LoadDatabase();
     ///   ItemData item = db.GetItem("aether_shard");
@@ -55,12 +56,12 @@ namespace Tartaria.Data
             }
 
             _itemLookup.TryGetValue(itemID, out ItemData item);
-            
+
             if (item == null)
             {
                 Debug.LogWarning($"[ItemDatabase] Item '{itemID}' not found in database");
             }
-            
+
             return item;
         }
 
@@ -92,14 +93,14 @@ namespace Tartaria.Data
         /// </summary>
         public List<ItemData> GetItemsByCategory(ItemCategory category)
         {
-            // Try to use high-performance registry first
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (Query.ItemRegistry.Count > 0)
-            {
-                return Query.ItemRegistry.GetByCategory(category).ToList();
-            }
-            #endif
-            
+            // Query.ItemRegistry disabled (Phase 11) — using fallback O(n) search
+            // #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // if (Query.ItemRegistry.Count > 0)
+            // {
+            //     return Query.ItemRegistry.GetByCategory(category).ToList();
+            // }
+            // #endif
+
             // Fallback to O(n) search (pre-initialization or build-time)
             return items.Where(item => item.category == category).ToList();
         }
@@ -111,14 +112,14 @@ namespace Tartaria.Data
         /// </summary>
         public List<ItemData> GetItemsByRarity(ItemRarity rarity)
         {
-            // Try to use high-performance registry first
-            #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            if (Query.ItemRegistry.Count > 0)
-            {
-                return Query.ItemRegistry.GetByRarity(rarity).ToList();
-            }
-            #endif
-            
+            // Query.ItemRegistry disabled (Phase 11) — using fallback O(n) search
+            // #if UNITY_EDITOR || DEVELOPMENT_BUILD
+            // if (Query.ItemRegistry.Count > 0)
+            // {
+            //     return Query.ItemRegistry.GetByRarity(rarity).ToList();
+            // }
+            // #endif
+
             // Fallback to O(n) search (pre-initialization or build-time)
             return items.Where(item => item.rarity == rarity).ToList();
         }
@@ -146,7 +147,7 @@ namespace Tartaria.Data
 
             items.Add(item);
             _itemLookup = null; // Invalidate cache
-            
+
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
             #endif
@@ -162,7 +163,7 @@ namespace Tartaria.Data
 
             items.Remove(item);
             _itemLookup = null; // Invalidate cache
-            
+
             #if UNITY_EDITOR
             UnityEditor.EditorUtility.SetDirty(this);
             #endif

@@ -55,6 +55,12 @@ namespace Tartaria.Gameplay
     [Header("Caps (Edge Case Protection)")]
     [SerializeField] int maxStatValue = 999;  // Prevent integer overflow
     [SerializeField] int maxXP = 999999999;    // ~1 billion XP cap
+
+    // Events
+    public event Action<int> OnXPGained;
+    public event Action<int> OnLevelUp;
+    public event Action<StatType, int> OnStatAllocated;
+
         // Properties
         public int CurrentLevel => currentLevel;
         public int CurrentXP => currentXP;
@@ -236,6 +242,11 @@ namespace Tartaria.Gameplay
             int oldLevel = currentLevel;
             currentLevel++;
             availableStatPoints += statPointsPerLevel;
+
+            // Calculate level-up bonuses (derived from stat scaling)
+            int maxHealthBonus = 10;  // From Vitality scaling (10 HP per point)
+            float damageBonus = 0.03f;  // From Strength/Attunement scaling (3% per point)
+            float movementSpeedBonus = 0.02f;  // From Agility scaling (2% per point)
 
             Debug.Log($"[PlayerProgression] LEVEL UP! → Level {currentLevel} (+{statPointsPerLevel} stat points, {availableStatPoints} total)");
             

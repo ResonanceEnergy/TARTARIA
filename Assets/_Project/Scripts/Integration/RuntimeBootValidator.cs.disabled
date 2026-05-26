@@ -29,17 +29,11 @@ namespace Tartaria.Integration
         int _failed;
         bool _validated;
         static GUIStyle _overlayStyle;
-        Coroutine _validationCoroutine;
 
         void Awake()
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
-        }
-
-        void OnDisable()
-        {
-            if (_validationCoroutine != null) { StopCoroutine(_validationCoroutine); _validationCoroutine = null; }
         }
 
         void OnDestroy()
@@ -51,8 +45,7 @@ namespace Tartaria.Integration
         void Start()
         {
             // Wait for scene loading to complete before validating
-            if (_validationCoroutine != null) StopCoroutine(_validationCoroutine);
-            _validationCoroutine = StartCoroutine(WaitThenValidate());
+            StartCoroutine(WaitThenValidate());
         }
 
         System.Collections.IEnumerator WaitThenValidate()

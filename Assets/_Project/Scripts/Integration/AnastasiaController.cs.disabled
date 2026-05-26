@@ -49,11 +49,6 @@ namespace Tartaria.Integration
         [SerializeField] float followSpeed = 2f;
         [SerializeField] float hoverHeight = 0.03f;      // 2–3 cm above ground
 
-        // Coroutine tracking
-        Coroutine _manifestCoroutine;
-        Coroutine _remanifestCoroutine;
-        Coroutine _solidificationCoroutine;
-
         [Header("Mode Timings")]
         [SerializeField] float conversationIdleThreshold = 30f;
         [SerializeField] float whisperExitDelay = 30f;
@@ -151,13 +146,6 @@ namespace Tartaria.Integration
             SetMode(AnastasiaMode.Invisible);
         }
 
-        void OnDisable()
-        {
-            if (_manifestCoroutine != null) { StopCoroutine(_manifestCoroutine); _manifestCoroutine = null; }
-            if (_remanifestCoroutine != null) { StopCoroutine(_remanifestCoroutine); _remanifestCoroutine = null; }
-            if (_solidificationCoroutine != null) { StopCoroutine(_solidificationCoroutine); _solidificationCoroutine = null; }
-        }
-
         void OnDestroy()
         {
             StopAllCoroutines();
@@ -201,8 +189,7 @@ namespace Tartaria.Integration
             if (_currentMode == AnastasiaMode.Invisible &&
                 gsState != GameState.Combat)
             {
-                if (_remanifestCoroutine != null) StopCoroutine(_remanifestCoroutine);
-                _remanifestCoroutine = StartCoroutine(RemanifestCoroutine());
+                StartCoroutine(RemanifestCoroutine());
                 return;
             }
 
@@ -379,8 +366,7 @@ namespace Tartaria.Integration
         public void TriggerFirstManifestation()
         {
             if (_hasManifested) return;
-            if (_manifestCoroutine != null) StopCoroutine(_manifestCoroutine);
-            _manifestCoroutine = StartCoroutine(FirstManifestCoroutine());
+            StartCoroutine(FirstManifestCoroutine());
         }
 
         IEnumerator FirstManifestCoroutine()
@@ -637,8 +623,7 @@ namespace Tartaria.Integration
         public void TriggerSolidification()
         {
             if (_solidPhase != SolidificationPhase.NotTriggered) return;
-            if (_solidificationCoroutine != null) StopCoroutine(_solidificationCoroutine);
-            _solidificationCoroutine = StartCoroutine(SolidificationCoroutine());
+            StartCoroutine(SolidificationCoroutine());
         }
 
         IEnumerator SolidificationCoroutine()

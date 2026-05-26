@@ -42,7 +42,6 @@ namespace Tartaria.Integration
         Transform _pool;
         float _worldPaletteRS;
         Coroutine _domeBreathingCo;
-        readonly List<Coroutine> _activeCoroutines = new();
 
         // ──────────────────────────────────────────────────────────────────────────
         // Lifecycle
@@ -71,12 +70,6 @@ namespace Tartaria.Integration
             
             // Unsubscribe from event system
             VFXEventSystem.OnVFXRequested -= HandleVFXRequest;
-            
-            foreach (var co in _activeCoroutines)
-            {
-                if (co != null) StopCoroutine(co);
-            }
-            _activeCoroutines.Clear();
         }
         
         void HandleVFXRequest(VFXEventArgs args)
@@ -392,14 +385,12 @@ namespace Tartaria.Integration
                 reused.transform.position = pos;
                 reused.SetActive(true);
                 reused.name = baseName;
-                var co1 = StartCoroutine(ReturnToPoolAfter(reused, lifetime));
-                _activeCoroutines.Add(co1);
+                StartCoroutine(ReturnToPoolAfter(reused, lifetime));
                 return reused;
             }
             var go = new GameObject(baseName);
             go.transform.position = pos;
-            var co2 = StartCoroutine(ReturnToPoolAfter(go, lifetime));
-            _activeCoroutines.Add(co2);
+            StartCoroutine(ReturnToPoolAfter(go, lifetime));
             return go;
         }
 
@@ -534,7 +525,6 @@ namespace Tartaria.Integration
         {
             if (_domeBreathingCo != null) StopCoroutine(_domeBreathingCo);
             _domeBreathingCo = StartCoroutine(DomeBreathLoop());
-            _activeCoroutines.Add(_domeBreathingCo);
         }
         IEnumerator DomeBreathLoop()
         {
@@ -855,8 +845,7 @@ namespace Tartaria.Integration
             lr.material = mat;
 
             // Breathing harmonic wave (scale width over time)
-            var co3 = StartCoroutine(BreatheAuroraBridge(lr, 15f));
-            _activeCoroutines.Add(co3);
+            StartCoroutine(BreatheAuroraBridge(lr, 15f));
 
             // Extra particle ribbon along the path
             for (int s = 0; s < 7; s++)

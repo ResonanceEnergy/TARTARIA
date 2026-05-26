@@ -7,7 +7,7 @@ namespace Tartaria.Data
     /// <summary>
     /// Enemy Data — ScriptableObject definition for enemy types.
     /// Stores all enemy metadata: stats, behavior, loot, visuals.
-    /// 
+    ///
     /// Create assets via: Assets → Create → Tartaria → Enemy Data
     /// Place in: Assets/_Project/Resources/Enemies/
     /// </summary>
@@ -17,10 +17,10 @@ namespace Tartaria.Data
         [Header("Identity")]
         [Tooltip("Unique identifier (e.g., 'golem_worker', 'echo_phantom')")]
         public string enemyID;
-        
+
         [Tooltip("Display name shown in UI")]
         public string displayName;
-        
+
         [TextArea(3, 6)]
         [Tooltip("Lore description")]
         public string description;
@@ -28,7 +28,7 @@ namespace Tartaria.Data
         [Header("Visuals")]
         [Tooltip("Enemy prefab for spawning")]
         public GameObject prefab;
-        
+
         [Tooltip("Icon for UI display (bestiary, death notifications)")]
         public Sprite icon;
 
@@ -36,23 +36,23 @@ namespace Tartaria.Data
         [Tooltip("Maximum health points")]
         [Range(10f, 10000f)]
         public float maxHealth = 100f;
-        
+
         [Tooltip("Movement speed (m/s)")]
         [Range(0f, 20f)]
         public float moveSpeed = 3.5f;
-        
+
         [Tooltip("Attack damage per hit")]
         [Range(1f, 500f)]
         public float attackDamage = 10f;
-        
+
         [Tooltip("Attack range (meters)")]
         [Range(1f, 50f)]
         public float attackRange = 5f;
-        
+
         [Tooltip("Attack cooldown (seconds)")]
         [Range(0.1f, 10f)]
         public float attackCooldown = 2f;
-        
+
         [Tooltip("Detection range (meters)")]
         [Range(1f, 100f)]
         public float detectionRange = 15f;
@@ -60,10 +60,10 @@ namespace Tartaria.Data
         [Header("Combat Behavior")]
         [Tooltip("Enemy AI archetype")]
         public EnemyArchetype archetype = EnemyArchetype.Melee;
-        
+
         [Tooltip("Special abilities (e.g., 'Shield Bash', 'Teleport', 'Summon Minions')")]
         public List<string> specialAbilities = new();
-        
+
         [Tooltip("Damage resistances (% reduction)")]
         public DamageResistances resistances = new();
 
@@ -71,18 +71,18 @@ namespace Tartaria.Data
         [Tooltip("RS awarded on defeat")]
         [Range(0f, 1000f)]
         public float rsReward = 10f;
-        
+
         [Tooltip("XP awarded on defeat")]
         [Range(0, 10000)]
         public int xpReward = 50;
-        
+
         [Tooltip("Loot table: item IDs with drop chances (0-1)")]
         public List<LootDrop> lootTable = new();
 
         [Header("Spawn Settings")]
         [Tooltip("Moon IDs where this enemy can spawn (e.g., 1, 2, 3)")]
         public List<int> spawnMoons = new();
-        
+
         [Tooltip("Minimum player level to encounter this enemy")]
         [Range(1, 50)]
         public int minPlayerLevel = 1;
@@ -90,10 +90,10 @@ namespace Tartaria.Data
         [Header("Audio")]
         [Tooltip("Attack sound effect")]
         public AudioClip attackSound;
-        
+
         [Tooltip("Death sound effect")]
         public AudioClip deathSound;
-        
+
         [Tooltip("Idle/ambient sound effect")]
         public AudioClip ambientSound;
 
@@ -139,14 +139,14 @@ namespace Tartaria.Data
     {
         [Tooltip("Item ID to drop")]
         public string itemID;
-        
+
         [Tooltip("Drop chance (0 = never, 1 = always)")]
         [Range(0f, 1f)]
         public float dropChance;
-        
+
         [Tooltip("Min quantity if dropped")]
         public int minQuantity;
-        
+
         [Tooltip("Max quantity if dropped")]
         public int maxQuantity;
     }
@@ -157,11 +157,11 @@ namespace Tartaria.Data
         [Range(-100f, 100f)]
         [Tooltip("Physical damage resistance (%)")]
         public float physical;
-        
+
         [Range(-100f, 100f)]
         [Tooltip("Resonance damage resistance (%)")]
         public float resonance;
-        
+
         [Range(-100f, 100f)]
         [Tooltip("Environmental damage resistance (%)")]
         public float environmental;
@@ -198,15 +198,7 @@ namespace Tartaria.Data
         Legendary
     }
 
-    public enum EquipSlot
-    {
-        Head,
-        Chest,
-        Legs,
-        Feet,
-        Hands,
-        Weapon,
-        Accessory1,
-        Accessory2
-    }
+    // EquipSlot enum defined in EquipmentItemData.cs (Phase 8)
+    // Duplicate definition removed to prevent CS0101 conflict
+    // Use: Tartaria.Data.EquipSlot
 }

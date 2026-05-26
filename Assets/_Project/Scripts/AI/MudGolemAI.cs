@@ -35,12 +35,12 @@ namespace Tartaria.AI
         [SerializeField] float attackRange = 3f;
         [SerializeField] float attackCooldown = 1.5f;
         [SerializeField] float patrolWaitTime = 5f;
-        
+
         [Header("Sprint Batch 3: Perception")]
         [SerializeField] float sightRange = 18f;
         [SerializeField] float sightFOV = 90f;
         [SerializeField] float lostTargetSearchDuration = 8f;
-        
+
         [Header("Sprint Batch 3: Attack Telegraph")]
         [SerializeField] float telegraphDuration = 0.5f;
 
@@ -447,13 +447,9 @@ namespace Tartaria.AI
             {
                 if (hit.collider.CompareTag("Player"))
                 {
-                    // Deal damage via PlayerHealth component (assumed)
-                    var health = hit.collider.GetComponent<Gameplay.PlayerHealth>();
-                    if (health != null)
-                    {
-                        health.TakeDamage(meleeDamage);
-                        Debug.Log($"[MudGolem] Hit player for {meleeDamage} damage");
-                    }
+                    // Deal damage via SendMessage (PlayerHealthController not in current assembly)
+                    hit.collider.SendMessage("TakeDamage", meleeDamage, SendMessageOptions.DontRequireReceiver);
+                    Debug.Log($"[MudGolem] Hit player for {meleeDamage} damage");
 
                     // SFX via GameEvents (no direct Audio dependency)
                     // VFX handled elsewhere
@@ -498,8 +494,8 @@ namespace Tartaria.AI
             _currentHealth -= damage;
             Debug.Log($"[MudGolem] Took {damage} damage, HP={_currentHealth}");
 
-            // Sprint: Spawn damage number
-            DamageNumberPool.Spawn(damage, transform.position);
+            // Sprint: Spawn damage number (disabled — DamageNumberPool in UI assembly)
+            // DamageNumberPool.Spawn(damage, transform.position);
 
             // Sprint: Hit-flash (white emission for 0.08s)
             StartCoroutine(HitFlash());
@@ -549,8 +545,8 @@ namespace Tartaria.AI
         {
             TransitionTo(GolemState.Dead);
 
-            // Spawn death decal at hit position
-            Gameplay.DecalHitPool.Spawn(transform.position, Vector3.up);
+            // Spawn death decal at hit position (disabled — DecalHitPool in Gameplay assembly)
+            // Gameplay.DecalHitPool.Spawn(transform.position, Vector3.up);
 
             if (_hasNavMesh && _agent != null)
                 _agent.enabled = false;
@@ -620,7 +616,7 @@ namespace Tartaria.AI
                 rb.isKinematic = false;
                 rb.useGravity = true;
                 rb.constraints = RigidbodyConstraints.None;
-                
+
                 // Death impulse (backward from player)
                 if (_player != null)
                 {

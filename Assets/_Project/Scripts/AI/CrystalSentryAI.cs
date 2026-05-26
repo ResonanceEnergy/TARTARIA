@@ -126,13 +126,13 @@ namespace Tartaria.AI
             if (_player == null) return;
 
             Vector3 direction = (_player.position - transform.position).normalized;
-            
+
             // Create projectile
             var projectile = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             projectile.name = "CrystalProjectile";
             projectile.transform.position = transform.position + Vector3.up + direction * 1.5f;
             projectile.transform.localScale = Vector3.one * 0.5f;
-            
+
             // Cyan crystal color
             var projRenderer = projectile.GetComponent<Renderer>();
             if (projRenderer != null)
@@ -159,7 +159,7 @@ namespace Tartaria.AI
         void UpdateReloadVisuals(bool reloading)
         {
             if (_renderer == null) return;
-            
+
             // Dim color during reload (vulnerable)
             Color targetColor = reloading ? new Color(0.3f, 0.3f, 0.3f) : _originalColor;
             _renderer.material.color = targetColor;
@@ -205,9 +205,9 @@ namespace Tartaria.AI
         {
             _state = SentryState.Dead;
             Debug.Log("[CrystalSentry] Defeated");
-            
+
             VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position);
-            
+
             // Drop loot
             if (InventorySystem.Instance != null)
             {
@@ -269,12 +269,9 @@ namespace Tartaria.AI
         {
             if (other.CompareTag("Player"))
             {
-                var playerHealth = other.GetComponent<PlayerHealth>();
-                if (playerHealth != null)
-                {
-                    playerHealth.TakeDamage(Mathf.RoundToInt(_damage));
-                    // VFXController.Instance  // B1: Cross-assembly call commented (VFXController in Integration)?.PlayEffect(VFXEffect.Spark, transform.position);
-                }
+                // SendMessage pattern - AI↔Gameplay circular dep broken (Phase 16)
+                other.SendMessage("TakeDamage", Mathf.RoundToInt(_damage), SendMessageOptions.DontRequireReceiver);
+                // VFXController.Instance  // B1: Cross-assembly call commented (VFXController in Integration)?.PlayEffect(VFXEffect.Spark, transform.position);
                 Destroy(gameObject);
             }
             else if (!other.isTrigger)

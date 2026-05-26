@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Tartaria.Gameplay;
+using Tartaria.Core.Enums;
 
 namespace Tartaria.Data
 {

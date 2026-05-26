@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Yarn.Unity;
 using Tartaria.Core;
-using Tartaria.Core.Enums;
 using Tartaria.Gameplay;
 using Tartaria.Input;
 

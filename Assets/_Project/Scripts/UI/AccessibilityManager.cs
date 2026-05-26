@@ -112,14 +112,15 @@ namespace Tartaria.UI
                     var rendererData = dataList[0] as UniversalRendererData;
                     if (rendererData != null)
                     {
-                        foreach (var feature in rendererData.rendererFeatures)
-                        {
-                            if (feature is ColorblindRendererFeature cbf)
-                            {
-                                cbf.SetActive(_colorblindMode != ColorblindMode.None);
-                                break;
-                            }
-                        }
+                        // ColorblindRendererFeature hook disabled (Phase 30)
+                        // foreach (var feature in rendererData.rendererFeatures)
+                        // {
+                        //     if (feature is ColorblindRendererFeature cbf)
+                        //     {
+                        //         cbf.SetActive(_colorblindMode != ColorblindMode.None);
+                        //         break;
+                        //     }
+                        // }
                     }
                 }
             }
@@ -407,7 +408,7 @@ namespace Tartaria.UI
         }
 
         /// <summary>
-        /// Announces text to screen readers (Narrator, NVDA, JAWS). 
+        /// Announces text to screen readers (Narrator, NVDA, JAWS).
         /// Updates the live region text so tools pick it up immediately. Also surfaces via caption HUD.
         /// Called for every major action, combat feedback, skill unlock, giant synergy, onboarding step.
         /// </summary>

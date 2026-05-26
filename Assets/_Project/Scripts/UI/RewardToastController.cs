@@ -28,8 +28,8 @@ namespace Tartaria.UI
         [SerializeField] private float _holdDuration = 2f;
         [SerializeField] private float _slideOutDuration = 0.3f;
         [SerializeField] private float _slideDistance = 150f;
-        [SerializeField] private AnimationCurve _slideInCurve = AnimationCurve.EaseOut(0f, 0f, 1f, 1f);
-        [SerializeField] private AnimationCurve _slideOutCurve = AnimationCurve.EaseIn(0f, 0f, 1f, 1f);
+        [SerializeField] private AnimationCurve _slideInCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f); // PHASE 53 FIX: EaseOut doesn't exist
+        [SerializeField] private AnimationCurve _slideOutCurve = AnimationCurve.Linear(0f, 0f, 1f, 1f); // PHASE 53 FIX: EaseIn doesn't exist
 
         [Header("Visual Settings")]
         [SerializeField] private Color _rsColor = new Color(1f, 0.84f, 0f, 1f); // Gold

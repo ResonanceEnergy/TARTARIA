@@ -1,0 +1,345 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.IO;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Tartaria.LiveOps
+{
+    /// <summary>
+    /// Crash reporter: hooks Application.logMessageReceivedThreaded,
+    /// writes Exception + StackTrace to Logs/crash-{timestamp}.txt.
+    /// 
+    /// AGENT 1 ENHANCEMENTS:
+    /// - Device/game context capture (scene, FPS, memory, RS, playtime)
+    /// - Frame time spike detection (>100ms = HITCH event)
+    /// - Breadcrumb trail (last 10 significant events)
+    /// - Consecutive hitch tracking (5 in 10s = warning)
+    /// 
+    /// Self-bootstraps via [RuntimeInitializeOnLoadMethod].
+    /// Note: Sentry SDK integration pending (requires package + subscription).
+    /// </summary>
+    public class CrashReporter : MonoBehaviour
+    {
+        static CrashReporter _instance;
+        string _logDir;
+
+        // Context capture
+        StringBuilder _deviceInfo;
+        Queue<string> _breadcrumbs = new Queue<string>(10);
+        
+        // Spike detection
+        const float HITCH_THRESHOLD_MS = 100f;
+        const int HITCH_WARNING_COUNT = 5;
+        const float HITCH_WARNING_WINDOW_SEC = 10f;
+        
+        Queue<float> _recentHitchTimes = new Queue<float>(HITCH_WARNING_COUNT);
+        int _hitchCount;
+        int _totalCrashCount;
+        float _sessionStartTime;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void Bootstrap()
+        {
+            if (_instance != null) return;
+            var go = new GameObject("[CrashReporter]");
+            _instance = go.AddComponent<CrashReporter>();
+            DontDestroyOnLoad(go);
+        }
+
+        void Awake()
+        {
+            _logDir = Path.Combine(Application.dataPath, "..", "Logs");
+            if (!Directory.Exists(_logDir))
+                Directory.CreateDirectory(_logDir);
+
+            Application.logMessageReceivedThreaded += HandleLog;
+            _sessionStartTime = Time.realtimeSinceStartup;
+            CaptureDeviceInfo();
+            
+            Debug.Log("[CrashReporter] Initialized with context capture + spike detection. Logs: " + _logDir);
+        }
+
+        void OnDestroy()
+        {
+            Application.logMessageReceivedThreaded -= HandleLog;
+        }
+
+        void Update()
+        {
+            // Frame spike detection
+            float frameMs = Time.unscaledDeltaTime * 1000f;
+            if (frameMs > HITCH_THRESHOLD_MS)
+            {
+                _hitchCount++;
+                _recentHitchTimes.Enqueue(Time.realtimeSinceStartup);
+                
+                // Trim old hitches outside warning window
+                while (_recentHitchTimes.Count > 0 && 
+                       Time.realtimeSinceStartup - _recentHitchTimes.Peek() > HITCH_WARNING_WINDOW_SEC)
+                {
+                    _recentHitchTimes.Dequeue();
+                }
+                
+                // Log hitch
+                LogHitch(frameMs);
+                
+                // Warning if too many consecutive hitches
+                if (_recentHitchTimes.Count >= HITCH_WARNING_COUNT)
+                {
+                    LogHitchWarning();
+                    _recentHitchTimes.Clear(); // Reset after warning
+                }
+                
+                // Add to breadcrumbs
+                AddBreadcrumb($"HITCH: {frameMs:F1}ms frame spike");
+            }
+        }
+
+        void CaptureDeviceInfo()
+        {
+            _deviceInfo = new StringBuilder();
+            _deviceInfo.AppendLine("=== DEVICE INFO ===");
+            _deviceInfo.AppendLine($"Unity: {Application.unityVersion}");
+            _deviceInfo.AppendLine($"OS: {SystemInfo.operatingSystem}");
+            _deviceInfo.AppendLine($"GPU: {SystemInfo.graphicsDeviceName}");
+            _deviceInfo.AppendLine($"VRAM: {SystemInfo.graphicsMemorySize}MB");
+            _deviceInfo.AppendLine($"CPU: {SystemInfo.processorType} ({SystemInfo.processorCount} cores)");
+            _deviceInfo.AppendLine($"RAM: {SystemInfo.systemMemorySize}MB");
+            _deviceInfo.AppendLine($"Screen: {Screen.width}x{Screen.height} @{Screen.currentResolution.refreshRate}Hz");
+        }
+
+        string CaptureGameContext()
+        {
+            var context = new StringBuilder();
+            context.AppendLine("\n=== GAME CONTEXT ===");
+            context.AppendLine($"Scene: {SceneManager.GetActiveScene().name}");
+            context.AppendLine($"Playtime: {Time.realtimeSinceStartup - _sessionStartTime:F1}s this session");
+            context.AppendLine($"FPS: {1f / Time.unscaledDeltaTime:F1}");
+            context.AppendLine($"Memory: {UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong() / 1048576}MB allocated");
+            
+            // Try to get RS score (may fail if ECS not ready)
+            try
+            {
+                var world = Unity.Entities.World.DefaultGameObjectInjectionWorld;
+                if (world != null && world.IsCreated)
+                {
+                    var em = world.EntityManager;
+                    var query = em.CreateEntityQuery(typeof(ResonanceScore));
+                    if (query.CalculateEntityCount() > 0)
+                    {
+                        var entity = query.GetSingletonEntity();
+                        var rs = em.GetComponentData<ResonanceScore>(entity);
+                        context.AppendLine($"RS: {rs.CurrentRS:F1}/100");
+                    }
+                    query.Dispose();
+                }
+            }
+            catch { /* Safe to ignore — context capture shouldn't crash the crash reporter */ }
+            
+            context.AppendLine($"Hitches this session: {_hitchCount}");
+            context.AppendLine($"Crashes this session: {_totalCrashCount}");
+            
+            // AGENT 2 ENHANCEMENT: Player state context
+            context.Append(CapturePlayerState());
+            
+            return context.ToString();
+        }
+
+        string CapturePlayerState()
+        {
+            var state = new StringBuilder();
+            state.AppendLine("\n=== PLAYER STATE ===");
+            
+            // Player Progression (level, XP, stats)
+            try
+            {
+                var playerProg = UnityEngine.Object.FindObjectOfType<Tartaria.Gameplay.PlayerProgression>();
+                if (playerProg != null)
+                {
+                    state.AppendLine($"Level: {playerProg.CurrentLevel} (XP: {playerProg.CurrentXP})");
+                    state.AppendLine($"Stat Points Available: {playerProg.AvailableStatPoints}");
+                    state.AppendLine($"Stats: VIT={playerProg.Vitality} RES={playerProg.Resonance} STR={playerProg.Strength} AGI={playerProg.Agility} ATT={playerProg.Attunement}");
+                    state.AppendLine($"Derived: MaxHP={playerProg.MaxHP} MaxRS={playerProg.MaxRS}");
+                }
+                else
+                {
+                    state.AppendLine("Level: <PlayerProgression not found>");
+                }
+            }
+            catch { state.AppendLine("Level: <error fetching>"); }
+            
+            // Inventory Summary (top 5 items by count)
+            try
+            {
+                var inventory = Tartaria.Gameplay.InventorySystem.Instance;
+                if (inventory != null)
+                {
+                    var items = inventory.GetAllItems();
+                    if (items.Count > 0)
+                    {
+                        state.AppendLine($"Inventory: {items.Count} unique items");
+                        var topItems = new List<KeyValuePair<string, int>>(items);
+                        topItems.Sort((a, b) => b.Value.CompareTo(a.Value)); // Sort by count descending
+                        
+                        state.Append("  Top items: ");
+                        for (int i = 0; i < System.Math.Min(5, topItems.Count); i++)
+                        {
+                            state.Append($"{topItems[i].Key} x{topItems[i].Value}");
+                            if (i < System.Math.Min(5, topItems.Count) - 1)
+                                state.Append(", ");
+                        }
+                        state.AppendLine();
+                    }
+                    else
+                    {
+                        state.AppendLine("Inventory: Empty");
+                    }
+                }
+                else
+                {
+                    state.AppendLine("Inventory: <InventorySystem not found>");
+                }
+            }
+            catch { state.AppendLine("Inventory: <error fetching>"); }
+            
+            // Quest Progress (active quests)
+            try
+            {
+                var questManager = UnityEngine.Object.FindObjectOfType<Tartaria.Integration.QuestManager>();
+                if (questManager != null)
+                {
+                    var activeQuests = questManager.GetActiveQuests();
+                    if (activeQuests != null && activeQuests.Count > 0)
+                    {
+                        state.AppendLine($"Active Quests: {activeQuests.Count}");
+                        foreach (var quest in activeQuests)
+                        {
+                            if (quest != null)
+                                state.AppendLine($"  - {quest.questID}");
+                        }
+                    }
+                    else
+                    {
+                        state.AppendLine("Active Quests: None");
+                    }
+                }
+                else
+                {
+                    state.AppendLine("Active Quests: <QuestManager not found>");
+                }
+            }
+            catch { state.AppendLine("Active Quests: <error fetching>"); }
+            
+            return state.ToString();
+        }
+
+        string CaptureBreadcrumbs()
+        {
+            var sb = new StringBuilder();
+            sb.AppendLine("\n=== BREADCRUMB TRAIL (last 10 events) ===");
+            foreach (var crumb in _breadcrumbs)
+            {
+                sb.AppendLine(crumb);
+            }
+            return sb.ToString();
+        }
+
+        public static void AddBreadcrumb(string message)
+        {
+            if (_instance == null) return;
+            
+            string timestamped = $"[{Time.realtimeSinceStartup:F1}s] {message}";
+            _instance._breadcrumbs.Enqueue(timestamped);
+            if (_instance._breadcrumbs.Count > 10)
+                _instance._breadcrumbs.Dequeue();
+        }
+
+        void LogHitch(float frameMs)
+        {
+            string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-fff");
+            string filename = $"hitch-{timestamp}.txt";
+            string filepath = Path.Combine(_logDir, filename);
+
+            try
+            {
+                using (var writer = new StreamWriter(filepath, false))
+                {
+                    writer.WriteLine($"[HITCH] {System.DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+                    writer.WriteLine($"Frame Time: {frameMs:F2}ms (threshold: {HITCH_THRESHOLD_MS}ms)");
+                    writer.Write(_deviceInfo);
+                    writer.Write(CaptureGameContext());
+                    writer.Write(CaptureBreadcrumbs());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[CrashReporter] Failed to write hitch log: {ex.Message}");
+            }
+        }
+
+        void LogHitchWarning()
+        {
+            Debug.LogWarning($"[CrashReporter] HITCH WARNING: {HITCH_WARNING_COUNT} hitches in {HITCH_WARNING_WINDOW_SEC}s window — performance degradation detected");
+            
+            string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+            string filename = $"hitch-warning-{timestamp}.txt";
+            string filepath = Path.Combine(_logDir, filename);
+
+            try
+            {
+                using (var writer = new StreamWriter(filepath, false))
+                {
+                    writer.WriteLine($"[HITCH WARNING] {System.DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                    writer.WriteLine($"Consecutive Hitches: {HITCH_WARNING_COUNT} in {HITCH_WARNING_WINDOW_SEC}s");
+                    writer.WriteLine($"Total Hitches This Session: {_hitchCount}");
+                    writer.Write(_deviceInfo);
+                    writer.Write(CaptureGameContext());
+                    writer.Write(CaptureBreadcrumbs());
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[CrashReporter] Failed to write hitch warning: {ex.Message}");
+            }
+        }
+
+        void HandleLog(string logString, string stackTrace, LogType type)
+        {
+            if (type == LogType.Exception || type == LogType.Error)
+            {
+                _totalCrashCount++;
+                
+                string timestamp = System.DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss-fff");
+                string filename = $"crash-{timestamp}.txt";
+                string filepath = Path.Combine(_logDir, filename);
+
+                try
+                {
+                    using (var writer = new StreamWriter(filepath, false))
+                    {
+                        writer.WriteLine($"[{type}] {System.DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}");
+                        writer.WriteLine(logString);
+                        writer.WriteLine("\nStack Trace:");
+                        writer.WriteLine(stackTrace);
+                        writer.Write(_deviceInfo);
+                        writer.Write(CaptureGameContext());
+                        writer.Write(CaptureBreadcrumbs());
+                        writer.WriteLine("\n=== END CRASH REPORT ===");
+                    }
+                    
+                    Debug.Log($"[CrashReporter] Crash #{_totalCrashCount} logged to: {filename}");
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"[CrashReporter] Failed to write crash log: {ex.Message}");
+                }
+            }
+        }
+
+        // Public API
+        public static int GetCrashCount() => _instance?._totalCrashCount ?? 0;
+        public static int GetHitchCount() => _instance?._hitchCount ?? 0;
+        public static float GetSessionUptime() => _instance != null ? Time.realtimeSinceStartup - _instance._sessionStartTime : 0f;
+    }
+}

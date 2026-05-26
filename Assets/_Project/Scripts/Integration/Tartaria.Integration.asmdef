@@ -3,6 +3,7 @@
     "rootNamespace": "Tartaria.Integration",
     "references": [
         "Tartaria.Core",
+        "Tartaria.Data",
         "Tartaria.Gameplay",
         "Tartaria.AI",
         "Tartaria.Audio",

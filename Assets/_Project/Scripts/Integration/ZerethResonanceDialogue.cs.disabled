@@ -22,7 +22,6 @@ namespace Tartaria.Integration
         int _currentPhase;
         bool _confrontationActive;
         bool _confrontationComplete;
-        readonly List<System.Collections.Coroutine> _activeCoroutines = new();
 
         readonly string[] _zerethPainLines = new[]
         {
@@ -44,15 +43,6 @@ namespace Tartaria.Integration
 
         public bool IsComplete => _confrontationComplete;
 
-        void OnDisable()
-        {
-            foreach (var co in _activeCoroutines)
-            {
-                if (co != null) StopCoroutine(co);
-            }
-            _activeCoroutines.Clear();
-        }
-
         /// <summary>
         /// Begin Zereth resonance dialogue confrontation
         /// </summary>
@@ -69,8 +59,7 @@ namespace Tartaria.Integration
 
             Debug.Log("[ZerethResonance] Beginning emotional resonance sequence — 5 phases to calm Zereth's tormented echo");
 
-            var co = StartCoroutine(PlayResonanceSequence());
-            _activeCoroutines.Add(co);
+            StartCoroutine(PlayResonanceSequence());
         }
 
         IEnumerator PlayResonanceSequence()
@@ -117,8 +106,7 @@ namespace Tartaria.Integration
             // Visual: Zereth's body flickers with pain (color shift)
             if (zerethVisual != null)
             {
-                var co1 = StartCoroutine(FlickerZerethPain());
-                _activeCoroutines.Add(co1);
+                StartCoroutine(FlickerZerethPain());
             }
 
             yield return new WaitForSeconds(5f);
@@ -149,8 +137,7 @@ namespace Tartaria.Integration
             // Visual: Zereth's color shifts from dark purple → golden (gradual)
             if (zerethVisual != null)
             {
-                var co2 = StartCoroutine(ShiftZerethColor(phaseIndex));
-                _activeCoroutines.Add(co2);
+                StartCoroutine(ShiftZerethColor(phaseIndex));
             }
 
             // Quest progress

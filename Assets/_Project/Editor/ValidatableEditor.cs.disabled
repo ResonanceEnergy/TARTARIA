@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
-using Tartaria.Core.Validation;
+using Tartaria.Data.Validation;
 
 namespace Tartaria.Editor
 {

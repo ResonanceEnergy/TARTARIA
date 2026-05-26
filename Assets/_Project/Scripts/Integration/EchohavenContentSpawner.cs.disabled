@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.Data;
 using Tartaria.Gameplay;
 using Tartaria.Audio;
 using Tartaria.Input;
@@ -109,23 +108,13 @@ namespace Tartaria.Integration
             }
         }
 
-        void OnEnable()
-        {
-            SubscribeVFXEvents();
-        }
-
-        void OnDisable()
-        {
-            UnsubscribeVFXEvents();
-        }
-
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
             CancelInvoke(nameof(IntroduceMilo));     // Gap 2: prevent null-object call on early destroy
             CancelInvoke(nameof(IntroduceLirael));   // Gap 4: same safety for Lirael introduction
             StopAllCoroutines();                     // Safety for BeckonPlayerForward onboarding coroutine
-            UnsubscribeVFXEvents();                  // Belt-and-suspenders cleanup
+            UnsubscribeVFXEvents();
         }
 
         void Start()
@@ -163,6 +152,7 @@ namespace Tartaria.Integration
             PlaceDigSiteMarkers();                                      // Visual markers over dig sites
             SpawnAnastasia();                                           // Anastasia ghost companion
             SpawnKayKitScatter();                                       // KayKit rocks + foliage runtime scatter
+            SubscribeVFXEvents();
             ActivateStartingQuest();                                    // Gap 11: activate first quest on HUD
             AdaptiveMusicController.Instance?.SetZone(0);              // Gap 14: Moon 1 zone music
             CompanionManager.Instance?.CheckUnlocks(0);                // Gap 25: companion unlock check
@@ -1889,53 +1879,30 @@ namespace Tartaria.Integration
             // ProximityTrigger at RS thresholds already handles spawning via enemyPrefab
             // We pre-register encounters so the system knows about them
 
-            // Store encounter defs for later use when RS thresholds are reached
-            _rs25Encounter = CombatWaveManager.BuildZoneEncounter(0, "echohaven_rs25");
-            _rs50Encounter = CombatWaveManager.BuildZoneEncounter(0, "echohaven_rs50");
-            _rs75Encounter = CombatWaveManager.BuildZoneEncounter(0, "echohaven_rs75");
+            // CombatWaveManager disabled (Phase 10) — wave encounters deferred
+            // _rs25Encounter = CombatWaveManager.BuildZoneEncounter(0, "echohaven_rs25");
+            // _rs50Encounter = CombatWaveManager.BuildZoneEncounter(0, "echohaven_rs50");
+            // _rs75Encounter = CombatWaveManager.BuildZoneEncounter(0, "echohaven_rs75");
 
-            Debug.Log("[EchohavenContentSpawner] Enemy wave encounters configured.");
+            // Wire RS change listener to trigger encounters
+            // GameEvents.OnRSChanged += HandleRSChangedForEncounters; // CombatWaveManager disabled
+
+            Debug.Log("[EchohavenContentSpawner] Enemy wave encounters configured (deferred).");
         }
 
-        WaveEncounterDef _rs25Encounter;
-        WaveEncounterDef _rs50Encounter;
-        WaveEncounterDef _rs75Encounter;
+        // WaveEncounterDef disabled (Phase 10) — CombatWaveManager not active
+        // WaveEncounterDef _rs25Encounter;
+        // WaveEncounterDef _rs50Encounter;
+        // WaveEncounterDef _rs75Encounter;
         bool _rs25Triggered, _rs50Triggered, _rs75Triggered;
 
-        void HandleRSChangedForEncounters(float newRS)
-        {
-            var waveManager = CombatWaveManager.Instance;
-            if (waveManager == null) return;
-
-            AchievementSystem.Instance?.CheckZoneRS(newRS);         // Gap 20: achievement zone RS check
-
-            if (!_rs25Triggered && newRS >= 25f)
-            {
-                _rs25Triggered = true;
-                waveManager.StartEncounter(_rs25Encounter, new Vector3(40f, 0f, 30f));
-                SpawnEnemyGroup(new Vector3(40f, 0f, 30f), 3);
-                AdaptiveMusicController.Instance?.EnterCombat();            // Gap 16: combat music
-                HapticFeedbackManager.Instance?.PlayBuildingEmergence();    // Gap 22: wave haptic
-            }
-            if (!_rs50Triggered && newRS >= 50f)
-            {
-                _rs50Triggered = true;
-                waveManager.StartEncounter(_rs50Encounter, new Vector3(-35f, 0f, 45f));
-                SpawnEnemyGroup(new Vector3(-35f, 0f, 45f), 5);
-                AdaptiveMusicController.Instance?.EnterCombat();
-                HapticFeedbackManager.Instance?.PlayBuildingEmergence();
-            }
-            if (!_rs75Triggered && newRS >= 75f)
-            {
-                _rs75Triggered = true;
-                waveManager.StartEncounter(_rs75Encounter, new Vector3(10f, 0f, -50f));
-                SpawnEnemyGroup(new Vector3(10f, 0f, -50f), 7);
-                AdaptiveMusicController.Instance?.EnterCombat();
-                HapticFeedbackManager.Instance?.PlayBuildingEmergence();
-                // Gap 23: all waves triggered — unsubscribe to avoid redundant RS callbacks
-                GameEvents.OnRSChanged -= HandleRSChangedForEncounters;
-            }
-        }
+        // HandleRSChangedForEncounters disabled (Phase 10) — CombatWaveManager not active
+        // void HandleRSChangedForEncounters(float newRS)
+        // {
+        //     var waveManager = CombatWaveManager.Instance;
+        //     if (waveManager == null) return;
+        //     ... [method body omitted]
+        // }
 
         void SpawnEnemyGroup(Vector3 center, int count)
         {
@@ -2190,8 +2157,6 @@ namespace Tartaria.Integration
 
         void SubscribeVFXEvents()
         {
-            GameEvents.OnRSChanged += HandleRSChangedForEncounters;
-
             if (ExcavationSystem.Instance != null)
             {
                 ExcavationSystem.Instance.OnSiteDiscovered     += VFX_SiteDiscovered;
@@ -2203,7 +2168,7 @@ namespace Tartaria.Integration
 
         void UnsubscribeVFXEvents()
         {
-            GameEvents.OnRSChanged -= HandleRSChangedForEncounters;
+            // GameEvents.OnRSChanged -= HandleRSChangedForEncounters; // CombatWaveManager disabled (Phase 10)
 
             if (ExcavationSystem.Instance != null)
             {
@@ -2436,7 +2401,7 @@ namespace Tartaria.Integration
             GameObject beamVFX = new GameObject("Beam_VFX");
             beamVFX.transform.SetParent(marker.transform);
             beamVFX.transform.localPosition = new Vector3(0f, 3f, 0f);
-            
+
             ParticleSystem ps = beamVFX.AddComponent<ParticleSystem>();
             var main = ps.main;
             main.startLifetime = 2.5f;
@@ -2445,19 +2410,19 @@ namespace Tartaria.Integration
             main.startColor = new Color(0.3f, 0.7f, 0.3f, 0.6f);
             main.maxParticles = 100;
             main.simulationSpace = ParticleSystemSimulationSpace.Local;
-            
+
             var emission = ps.emission;
             emission.rateOverTime = 50f;
-            
+
             var shape = ps.shape;
             shape.shapeType = ParticleSystemShapeType.Cone;
             shape.angle = 5f;
             shape.radius = 0.2f;
-            
+
             var renderer = beamVFX.GetComponent<ParticleSystemRenderer>();
             renderer.material = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
             renderer.material.SetColor("_BaseColor", new Color(0.1f, 0.8f, 0.2f));
-            
+
             ps.Play();
 
             // Point light for visibility at range
@@ -2475,7 +2440,7 @@ namespace Tartaria.Integration
             GameObject ringVFX = new GameObject("GroundRing_VFX");
             ringVFX.transform.SetParent(marker.transform);
             ringVFX.transform.localPosition = new Vector3(0f, 0.02f, 0f);
-            
+
             ParticleSystem psRing = ringVFX.AddComponent<ParticleSystem>();
             var mainRing = psRing.main;
             mainRing.startLifetime = 2.5f;
@@ -2485,14 +2450,14 @@ namespace Tartaria.Integration
             mainRing.maxParticles = 120;
             mainRing.loop = true;
             mainRing.simulationSpace = ParticleSystemSimulationSpace.Local;
-            
+
             var emissionRing = psRing.emission;
             emissionRing.rateOverTime = 40f;
-            
+
             var shapeRing = psRing.shape;
             shapeRing.shapeType = ParticleSystemShapeType.Circle;
             shapeRing.radius = 3f;
-            
+
             var rendererRing = ringVFX.GetComponent<ParticleSystemRenderer>();
             var mat = new Material(Shader.Find("Universal Render Pipeline/Particles/Unlit"));
             mat.SetColor("_BaseColor", new Color(0.1f, 0.5f, 0.15f));
@@ -2503,7 +2468,7 @@ namespace Tartaria.Integration
             mat.EnableKeyword("_SURFACE_TYPE_TRANSPARENT");
             mat.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
             rendererRing.material = mat;
-            
+
             psRing.Play();
 
             // Floating label

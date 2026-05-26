@@ -38,7 +38,6 @@ namespace Tartaria.Integration
         bool _eventCompleted;
         float _eventTimer;
         int _currentMemoryZone;
-        Coroutine _dottSequenceCoroutine;
 
         public bool IsEventActive => _eventActive;
         public bool IsEventCompleted => _eventCompleted;
@@ -62,11 +61,6 @@ namespace Tartaria.Integration
         {
             if (Instance != null && Instance != this) { Destroy(gameObject); return; }
             Instance = this;
-        }
-
-        void OnDisable()
-        {
-            if (_dottSequenceCoroutine != null) { StopCoroutine(_dottSequenceCoroutine); _dottSequenceCoroutine = null; }
         }
 
         void OnDestroy()
@@ -112,8 +106,7 @@ namespace Tartaria.Integration
             Tartaria.Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             Debug.Log("[DotT] Day Out of Time has begun.");
 
-            if (_dottSequenceCoroutine != null) StopCoroutine(_dottSequenceCoroutine);
-            _dottSequenceCoroutine = StartCoroutine(DotTSequence());
+            StartCoroutine(DotTSequence());
         }
 
         IEnumerator DotTSequence()

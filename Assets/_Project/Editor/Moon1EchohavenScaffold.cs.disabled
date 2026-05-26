@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEditor;
 using Tartaria.Core;
-using Tartaria.Core.Enums;
 using Tartaria.Integration;
 using Tartaria.UI;
 using Tartaria.Input;

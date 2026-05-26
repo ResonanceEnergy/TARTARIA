@@ -1,6 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Tartaria.Data.Validation;
+using Tartaria.Core.Validation;
 using Tartaria.Localization;
 
 namespace Tartaria.Core
@@ -10,14 +10,14 @@ namespace Tartaria.Core
     {
         [Header("Identity")]
         public string questId;
-        
+
         [Header("Localization")]
         [Tooltip("Localization key for quest title (quests.title.{questId})")]
         public LocalizationKey titleKey;
-        
+
         [Tooltip("Localization key for quest description (quests.desc.{questId})")]
         public LocalizationKey descKey;
-        
+
         [Header("Legacy Text (Fallback)")]
         public string displayName;
         [TextArea(2, 5)]
@@ -49,7 +49,7 @@ namespace Tartaria.Core
             DataValidator.AddIfNotNull(results, DataValidator.ValidateIDFormat(questId, "questId"));
 
             // Display name validation
-            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName, "displayName"));
 
             // Description validation
             if (string.IsNullOrWhiteSpace(description))
@@ -91,7 +91,8 @@ namespace Tartaria.Core
                     {
                         results.Add(ValidationResult.Warning(
                             $"objectives[{i}].description is empty",
-                            "Objective descriptions improve quest clarity"
+                            "Objective descriptions improve quest clarity",
+                            "Add a description string to this QuestObjective"
                         ));
                     }
 
@@ -158,7 +159,7 @@ namespace Tartaria.Core
         public virtual LocalizationKey[] GetLocalizationKeys()
         {
             var keys = new List<LocalizationKey> { titleKey, descKey };
-            
+
             // Add objective description keys if objectives exist
             if (objectives != null)
             {
@@ -171,7 +172,7 @@ namespace Tartaria.Core
                     }
                 }
             }
-            
+
             return keys.ToArray();
         }
 
@@ -196,12 +197,14 @@ namespace Tartaria.Core
         /// </summary>
         public string GetLocalizedTitle()
         {
-            if (titleKey.IsValid && LocalizationManager.Instance != null)
-            {
-                string localized = LocalizationManager.Instance.GetText(titleKey);
-                if (!localized.StartsWith("[MISSING:"))
-                    return localized;
-            }
+            // LocalizationManager.Instance disabled (Phase 8) — assembly visibility issue
+            // TODO: Investigate why Core can't see Localization.Instance despite asmdef reference
+            // if (titleKey.IsValid && LocalizationManager.Instance != null)
+            // {
+            //     string localized = LocalizationManager.Instance.GetText(titleKey);
+            //     if (!localized.StartsWith("[MISSING:"))
+            //         return localized;
+            // }
             return displayName;
         }
 
@@ -210,12 +213,13 @@ namespace Tartaria.Core
         /// </summary>
         public string GetLocalizedDescription()
         {
-            if (descKey.IsValid && LocalizationManager.Instance != null)
-            {
-                string localized = LocalizationManager.Instance.GetText(descKey);
-                if (!localized.StartsWith("[MISSING:"))
-                    return localized;
-            }
+            // LocalizationManager.Instance disabled (Phase 8) — assembly visibility issue
+            // if (descKey.IsValid && LocalizationManager.Instance != null)
+            // {
+            //     string localized = LocalizationManager.Instance.GetText(descKey);
+            //     if (!localized.StartsWith("[MISSING:"))
+            //         return localized;
+            // }
             return description;
         }
 

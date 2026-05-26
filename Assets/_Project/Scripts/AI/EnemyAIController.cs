@@ -155,13 +155,9 @@ namespace Tartaria.AI
         {
             if (_player == null) return;
 
-            // Deal damage to player
-            var playerHealth = _player.GetComponent<Gameplay.PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(Mathf.RoundToInt(attackDamage));
-                Debug.Log($"[EnemyAI] {gameObject.name} attacked player for {attackDamage} damage");
-            }
+            // Deal damage to player (SendMessage pattern - AI↔Gameplay circular dep broken)
+            _player.SendMessage("TakeDamage", Mathf.RoundToInt(attackDamage), SendMessageOptions.DontRequireReceiver);
+            Debug.Log($"[EnemyAI] {gameObject.name} attacked player for {attackDamage} damage");
 
             // Play attack SFX (fully qualified to avoid assembly dependency)
             Tartaria.Audio.AudioManager.Instance?.PlaySFX("EnemyAttack", transform.position, 0.5f);

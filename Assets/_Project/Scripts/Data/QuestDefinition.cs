@@ -12,14 +12,14 @@ namespace Tartaria.Data
     {
         [Header("Identity")]
         public string questId;
-        
+
         [Header("Localization")]
         [Tooltip("Localization key for quest title (quests.title.{questId})")]
         public LocalizationKey titleKey;
-        
+
         [Tooltip("Localization key for quest description (quests.desc.{questId})")]
         public LocalizationKey descKey;
-        
+
         [Header("Legacy Text (Fallback)")]
         public string displayName;
         [TextArea(2, 5)]
@@ -51,7 +51,7 @@ namespace Tartaria.Data
             DataValidator.AddIfNotNull(results, DataValidator.ValidateIDFormat(questId, "questId"));
 
             // Display name validation
-            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName, "displayName"));
 
             // Description validation
             if (string.IsNullOrWhiteSpace(description))
@@ -93,7 +93,8 @@ namespace Tartaria.Data
                     {
                         results.Add(ValidationResult.Warning(
                             $"objectives[{i}].description is empty",
-                            "Objective descriptions improve quest clarity"
+                            "Objective descriptions improve quest clarity",
+                            "Add a description to objectives array"
                         ));
                     }
 
@@ -160,7 +161,7 @@ namespace Tartaria.Data
         public virtual LocalizationKey[] GetLocalizationKeys()
         {
             var keys = new List<LocalizationKey> { titleKey, descKey };
-            
+
             // Add objective description keys if objectives exist
             if (objectives != null)
             {
@@ -173,7 +174,7 @@ namespace Tartaria.Data
                     }
                 }
             }
-            
+
             return keys.ToArray();
         }
 

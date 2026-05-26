@@ -4,7 +4,6 @@ using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.Core.Enums;
 using Tartaria.Audio;
 using Tartaria.Save;
 using Tartaria.Input;

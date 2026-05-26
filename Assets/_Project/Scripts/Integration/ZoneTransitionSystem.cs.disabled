@@ -28,7 +28,6 @@ namespace Tartaria.Integration
 
         int _currentZoneIndex = -1;
         bool _transitioning;
-        readonly List<System.Collections.Coroutine> _activeCoroutines = new();
 
         public ZoneDefinition CurrentZone =>
             _currentZoneIndex >= 0 && _currentZoneIndex < zones.Length
@@ -50,11 +49,6 @@ namespace Tartaria.Integration
             StopAllCoroutines();
             _transitioning = false;
             if (Instance == this) Instance = null;
-            foreach (var co in _activeCoroutines)
-            {
-                if (co != null) StopCoroutine(co);
-            }
-            _activeCoroutines.Clear();
         }
 
         void Start()
@@ -103,8 +97,7 @@ namespace Tartaria.Integration
                 }
             }
 
-            var co1 = StartCoroutine(TransitionSequence(next));
-            _activeCoroutines.Add(co1);
+            StartCoroutine(TransitionSequence(next));
         }
 
         /// <summary>
@@ -114,8 +107,7 @@ namespace Tartaria.Integration
         {
             if (zones == null || zoneIndex < 0 || zoneIndex >= zones.Length) return;
             if (zoneIndex == _currentZoneIndex) return;
-            var co2 = StartCoroutine(TransitionSequence(zoneIndex));
-            _activeCoroutines.Add(co2);
+            StartCoroutine(TransitionSequence(zoneIndex));
         }
 
         /// <summary>

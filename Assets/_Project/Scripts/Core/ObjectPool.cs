@@ -209,6 +209,9 @@ namespace Tartaria.Core
             return ps;
         }
 
+        // DISABLED: Generic GameObject pooling broken (GameObject is not Component)
+        // Use SpawnParticle for ParticleSystem VFX instead
+        /*
         /// <summary>
         /// Spawn a generic VFX GameObject from the pool
         /// </summary>
@@ -230,6 +233,7 @@ namespace Tartaria.Core
 
             return vfx;
         }
+        */
 
         /// <summary>
         /// Return a particle effect to its pool
@@ -248,6 +252,8 @@ namespace Tartaria.Core
             }
         }
 
+        // DISABLED: Generic GameObject pooling broken (GameObject is not Component)
+        /*
         /// <summary>
         /// Return a VFX GameObject to its pool
         /// </summary>
@@ -261,6 +267,7 @@ namespace Tartaria.Core
                 return;
             }
         }
+        */
 
         /// <summary>
         /// Get pool statistics for debugging
@@ -275,10 +282,13 @@ namespace Tartaria.Core
                 sb.AppendLine($"{kvp.Key.name}: {kvp.Value.CountActive} active, {kvp.Value.CountAvailable} available, {kvp.Value.CountTotal} total");
             }
 
+            // DISABLED: _genericPools removed (GameObject not Component)
+            /*
             foreach (var kvp in _genericPools)
             {
                 sb.AppendLine($"{kvp.Key.name}: {kvp.Value.CountActive} active, {kvp.Value.CountAvailable} available, {kvp.Value.CountTotal} total");
             }
+            */
 
             return sb.ToString();
         }

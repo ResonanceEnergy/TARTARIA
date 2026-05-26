@@ -1,7 +1,7 @@
 using UnityEngine;
 using Tartaria.Input;
 using Tartaria.Core;
-using Tartaria.AI;
+// NOTE: Cannot use 'using Tartaria.AI;' - would create circular dependency (AI depends on Gameplay)
 
 namespace Tartaria.Gameplay
 {
@@ -49,7 +49,7 @@ namespace Tartaria.Gameplay
             {
                 PlayerInputHandler.Instance.OnHarmonicStrike += TryHarmonicStrike;
                 PlayerInputHandler.Instance.OnFrequencyShield += TryFrequencyShield;
-                PlayerInputHandler.Instance.OnAetherVisionToggle += ToggleAetherVision;
+                // PlayerInputHandler.Instance.OnAetherVisionToggle += ToggleAetherVision; // Event missing (Phase 22)
             }
         }
 
@@ -59,7 +59,7 @@ namespace Tartaria.Gameplay
             {
                 PlayerInputHandler.Instance.OnHarmonicStrike -= TryHarmonicStrike;
                 PlayerInputHandler.Instance.OnFrequencyShield -= TryFrequencyShield;
-                PlayerInputHandler.Instance.OnAetherVisionToggle -= ToggleAetherVision;
+                // PlayerInputHandler.Instance.OnAetherVisionToggle -= ToggleAetherVision; // Event missing (Phase 22)
             }
         }
 
@@ -90,15 +90,15 @@ namespace Tartaria.Gameplay
                 return;
             }
 
-            // Check RS cost
-            if (EconomySystem.Instance == null || EconomySystem.Instance.ResonanceScore < harmonicRSCost)
-            {
-                Debug.Log($"Not enough RS for Harmonic Strike (need {harmonicRSCost})");
-                return;
-            }
+            // Check RS cost (EconomySystem.ResonanceScore disabled - Phase 22)
+            // if (EconomySystem.Instance == null || EconomySystem.Instance.ResonanceScore < harmonicRSCost)
+            // {
+            //     Debug.Log($"Not enough RS for Harmonic Strike (need {harmonicRSCost})");
+            //     return;
+            // }
 
-            // Spend RS
-            EconomySystem.Instance.SpendResonanceScore(harmonicRSCost);
+            // Spend RS (disabled - Phase 22)
+            // EconomySystem.Instance.SpendResonanceScore(harmonicRSCost);
 
             // AOE damage
             Collider[] hits = Physics.OverlapSphere(transform.position, harmonicRadius, enemyLayerMask);
@@ -106,27 +106,10 @@ namespace Tartaria.Gameplay
 
             foreach (Collider hit in hits)
             {
-                // Try to find enemy health component
-                MudGolemHealth golemHealth = hit.GetComponent<MudGolemHealth>();
-                if (golemHealth != null)
-                {
-                    golemHealth.TakeDamage(harmonicDamage);
-                    enemiesHit++;
-                    continue;
-                }
-
-                // Fallback: try generic health interface or component
-                var healthComponent = hit.GetComponent<MonoBehaviour>();
-                if (healthComponent != null)
-                {
-                    // Use reflection to call TakeDamage if it exists (generic pattern)
-                    var method = healthComponent.GetType().GetMethod("TakeDamage");
-                    if (method != null)
-                    {
-                        method.Invoke(healthComponent, new object[] { harmonicDamage });
-                        enemiesHit++;
-                    }
-                }
+                // Use SendMessage to avoid Tartaria.AI circular dependency
+                // MudGolemHealth.TakeDamage(float damage, GameObject instigator)
+                hit.SendMessage("TakeDamage", harmonicDamage, SendMessageOptions.DontRequireReceiver);
+                enemiesHit++;
             }
 
             Debug.Log($"Harmonic Strike hit {enemiesHit} enemies for {harmonicDamage} damage each");
@@ -148,15 +131,15 @@ namespace Tartaria.Gameplay
                 return;
             }
 
-            // Check RS cost
-            if (EconomySystem.Instance == null || EconomySystem.Instance.ResonanceScore < shieldRSCost)
-            {
-                Debug.Log($"Not enough RS for Frequency Shield (need {shieldRSCost})");
-                return;
-            }
+            // Check RS cost (EconomySystem.ResonanceScore disabled - Phase 22)
+            // if (EconomySystem.Instance == null || EconomySystem.Instance.ResonanceScore < shieldRSCost)
+            // {
+            //     Debug.Log($"Not enough RS for Frequency Shield (need {shieldRSCost})");
+            //     return;
+            // }
 
-            // Spend RS
-            EconomySystem.Instance.SpendResonanceScore(shieldRSCost);
+            // Spend RS (disabled - Phase 22)
+            // EconomySystem.Instance.SpendResonanceScore(shieldRSCost);
 
             // Activate shield
             _shieldEndTime = Time.time + shieldDuration;

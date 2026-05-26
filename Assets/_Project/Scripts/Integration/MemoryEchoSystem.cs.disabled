@@ -22,8 +22,8 @@ namespace Tartaria.Integration
 
         readonly List<GameObject> _activeEchoes = new();
         readonly HashSet<int> _triggeredEchoes = new();
+        readonly List<Coroutine> _runningCoroutines = new(); // P0: Track coroutines for cleanup
         bool _systemActive;
-        readonly List<Coroutine> _activeVisionCoroutines = new();
 
         public bool AllEchoesViewed => _triggeredEchoes.Count >= (echoPointLocations?.Length ?? 0);
         public int EchoesViewed => _triggeredEchoes.Count;
@@ -31,11 +31,13 @@ namespace Tartaria.Integration
 
         void OnDisable()
         {
-            foreach (var co in _activeVisionCoroutines)
+            // P0: Stop all running coroutines to prevent memory leaks
+            foreach (var coroutine in _runningCoroutines)
             {
-                if (co != null) StopCoroutine(co);
+                if (coroutine != null)
+                    StopCoroutine(coroutine);
             }
-            _activeVisionCoroutines.Clear();
+            _runningCoroutines.Clear();
         }
 
         void Start()
@@ -137,9 +139,9 @@ namespace Tartaria.Integration
 
             Debug.Log($"[MemoryEcho] Triggering memory echo {echoIndex + 1}/{TotalEchoes}");
 
-            // Start vision sequence
-            var co = StartCoroutine(PlayEchoVision(echoIndex));
-            _activeVisionCoroutines.Add(co);
+            // Start vision sequence (P0: track coroutine)
+            var coroutine = StartCoroutine(PlayEchoVision(echoIndex));
+            _runningCoroutines.Add(coroutine);
 
             // Quest progress
             QuestManager.Instance?.ProgressObjective("moon11_memory_echoes", 0, 1);
@@ -176,9 +178,9 @@ namespace Tartaria.Integration
                     renderer.material.color = echoTint;
                 }
 
-                // Animate: fade in
-                var fadeInCo = StartCoroutine(FadeGhost(renderer, 0f, 0.5f, 1f));
-                _activeVisionCoroutines.Add(fadeInCo);
+                // Animate: fade in (P0: track coroutine)
+                var fadeCoroutine = StartCoroutine(FadeGhost(renderer, 0f, 0.5f, 1f));
+                _runningCoroutines.Add(fadeCoroutine);
             }
 
             // VFX: temporal distortion
@@ -207,8 +209,9 @@ namespace Tartaria.Integration
                 var renderer = child.GetComponent<Renderer>();
                 if (renderer != null)
                 {
-                    var fadeOutCo = StartCoroutine(FadeGhost(renderer, 0.5f, 0f, 1f));
-                    _activeVisionCoroutines.Add(fadeOutCo);
+                    // P0: track fade-out coroutine
+                    var fadeCoroutine = StartCoroutine(FadeGhost(renderer, 0.5f, 0f, 1f));
+                    _runningCoroutines.Add(fadeCoroutine);
                 }
             }
 

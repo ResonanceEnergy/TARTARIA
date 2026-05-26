@@ -6,7 +6,7 @@ namespace Tartaria.Gameplay
     /// <summary>
     /// Dodge + i-frames: Shift or Gamepad-East (B) triggers 0.35s dash
     /// with 0.30s invulnerability window. 0.8s cooldown. Cancels attacks.
-    /// 
+    ///
     /// Auto-attached by CharacterPrefabFactory.
     /// </summary>
     [DisallowMultipleComponent]
@@ -65,11 +65,12 @@ namespace Tartaria.Gameplay
             _invulnerable = true;
 
             // Cancel attack
-            var combat = GetComponent<PlayerCombat>();
-            if (combat != null && combat.IsSwinging)
-            {
-                Debug.Log("[PlayerDodge] Cancelled swing with dodge");
-            }
+            // PlayerCombat disabled (Phase 12)
+            // var combat = GetComponent<PlayerCombat>();
+            // if (combat != null && combat.IsSwinging)
+            // {
+            //     Debug.Log("[PlayerDodge] Cancelled swing with dodge");
+            // }
 
             Debug.Log("[PlayerDodge] Dodge! i-frames active");
         }

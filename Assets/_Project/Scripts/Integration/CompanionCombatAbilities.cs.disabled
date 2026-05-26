@@ -26,10 +26,9 @@ namespace Tartaria.Integration
         [SerializeField] float korathCooldown = 20f;
 
         float _thorneLastUse = -999f;
-        float _korathLastUse = -999f;
-
-        readonly List<Coroutine> _activeCoroutines = new();
-
+        float _korathLastUse = -999f;        
+        // AGENT 6: Pre-allocated buffers for Physics.OverlapSphereNonAlloc
+        readonly Collider[] _abilityHitBuffer = new Collider[32];
         void Awake()
         {
             if (Instance != null && Instance != this)
@@ -38,15 +37,6 @@ namespace Tartaria.Integration
                 return;
             }
             Instance = this;
-        }
-
-        void OnDisable()
-        {
-            foreach (var co in _activeCoroutines)
-            {
-                if (co != null) StopCoroutine(co);
-            }
-            _activeCoroutines.Clear();
         }
 
         /// <summary>
@@ -74,8 +64,7 @@ namespace Tartaria.Integration
             _thorneLastUse = Time.time;
 
             Debug.Log($"[CompanionCombat] Thorne airstrike called at {targetPosition}");
-            var co = StartCoroutine(ExecuteThorneAirstrike(targetPosition));
-            _activeCoroutines.Add(co);
+            StartCoroutine(ExecuteThorneAirstrike(targetPosition));
         }
 
         IEnumerator ExecuteThorneAirstrike(Vector3 targetPosition)
@@ -113,8 +102,7 @@ namespace Tartaria.Integration
                 Rigidbody rb = barrel.AddComponent<Rigidbody>();
 
                 // Explosion on impact
-                var co = StartCoroutine(BarrelExplosion(barrel, rb));
-                _activeCoroutines.Add(co);
+                StartCoroutine(BarrelExplosion(barrel, rb));
 
                 yield return new WaitForSeconds(0.3f);
             }
@@ -153,8 +141,10 @@ namespace Tartaria.Integration
             Audio.AudioManager.Instance?.PlaySFX3D("Barrel_Explosion", explosionPos);
 
             // Damage enemies in radius
-            Collider[] hits = Physics.OverlapSphere(explosionPos, thorneAirstrikeRadius);
-            foreach (Collider hit in hits)
+            int hitCount = Physics.OverlapSphereNonAlloc(explosionPos, thorneAirstrikeRadius, _abilityHitBuffer);
+            for (int i = 0; i < hitCount; i++)
+            {
+                Collider hit = _abilityHitBuffer[i];
             {
                 if (hit.CompareTag("Enemy"))
                 {
@@ -194,8 +184,7 @@ namespace Tartaria.Integration
             _korathLastUse = Time.time;
 
             Debug.Log($"[CompanionCombat] Korath frost hammer at {targetPosition}");
-            var co = StartCoroutine(ExecuteKorathFrostHammer(targetPosition));
-            _activeCoroutines.Add(co);
+            StartCoroutine(ExecuteKorathFrostHammer(targetPosition));
         }
 
         IEnumerator ExecuteKorathFrostHammer(Vector3 targetPosition)
@@ -259,9 +248,10 @@ namespace Tartaria.Integration
             Destroy(frostRing, 3f);
 
             // Damage and freeze enemies
-            Collider[] hits = Physics.OverlapSphere(targetPosition, korathFrostRadius);
-            foreach (Collider hit in hits)
+            int hitCount = Physics.OverlapSphereNonAlloc(targetPosition, korathFrostRadius, _abilityHitBuffer);
+            for (int i = 0; i < hitCount; i++)
             {
+                Collider hit = _abilityHitBuffer[i];
                 if (hit.CompareTag("Enemy"))
                 {
                     var health = hit.GetComponent<EnemyHealth>();

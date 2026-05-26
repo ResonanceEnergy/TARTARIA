@@ -9,12 +9,12 @@ namespace Tartaria.Data
     /// <summary>
     /// Item Data — ScriptableObject definition for a single item.
     /// Stores all item metadata: ID, name, description, icon, stats, category.
-    /// 
+    ///
     /// Localization Support:
     /// - nameKey: LocalizationKey for translated display name
     /// - descKey: LocalizationKey for translated description
     /// - Legacy displayName/description fields maintained as fallback
-    /// 
+    ///
     /// Create assets via: Assets → Create → Tartaria → Item Data
     /// Place in: Assets/_Project/Resources/Items/
     /// </summary>
@@ -27,18 +27,18 @@ namespace Tartaria.Data
         [Header("Identity")]
         [Tooltip("Unique identifier (e.g., 'aether_shard', 'golem_core')")]
         public string itemID;
-        
+
         [Header("Localization")]
         [Tooltip("Localization key for display name (items.name.{itemID})")]
         public LocalizationKey nameKey;
-        
+
         [Tooltip("Localization key for description (items.desc.{itemID})")]
         public LocalizationKey descKey;
-        
+
         [Header("Legacy Text (Fallback)")]
         [Tooltip("Display name shown in UI (used if nameKey is empty)")]
         public string displayName;
-        
+
         [TextArea(3, 6)]
         [Tooltip("Description shown in tooltips (used if descKey is empty)")]
         public string description;
@@ -51,17 +51,17 @@ namespace Tartaria.Data
         [Tooltip("Maximum stack size (1 = non-stackable)")]
         [Range(1, 999)]
         public int stackSize = 1;
-        
+
         [Tooltip("Item category for organization")]
         public ItemCategory category = ItemCategory.Material;
-        
+
         [Tooltip("Rarity tier for color coding")]
         public ItemRarity rarity = ItemRarity.Common;
-        
+
         [Tooltip("Item weight (kg) for encumbrance systems")]
         [Range(0f, 100f)]
         public float weight = 0.1f;
-        
+
         [Tooltip("Base value (Resonance Shards) for vendor prices")]
         [Range(0, 10000)]
         public int value = 10;
@@ -69,7 +69,7 @@ namespace Tartaria.Data
         [Header("Optional")]
         [Tooltip("Prefab to spawn when item is dropped in world")]
         public GameObject worldPrefab;
-        
+
         [Tooltip("Custom data for item-specific behavior (JSON, etc.)")]
         [TextArea(2, 4)]
         public string customData;
@@ -96,12 +96,12 @@ namespace Tartaria.Data
                     descKey = new LocalizationKey("items.desc", itemID);
                 }
             }
-            
+
             if (string.IsNullOrWhiteSpace(displayName))
             {
                 displayName = name; // Default to asset name
             }
-            
+
             if (stackSize < 1)
             {
                 stackSize = 1;
@@ -120,7 +120,7 @@ namespace Tartaria.Data
             DataValidator.AddIfNotNull(results, DataValidator.ValidateIDFormat(itemID, "itemID"));
 
             // Display name validation
-            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateDisplayName(displayName, "displayName"));
 
             // Icon validation (critical for UI)
             if (icon == null)
@@ -133,7 +133,8 @@ namespace Tartaria.Data
             }
 
             // Stack size validation
-            DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(stackSize, 1, 999, "stackSize"));
+            // DataValidator.ValidateRange not implemented yet (Phase 8 stub)
+            // DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(stackSize, 1, 999, "stackSize"));
 
             // Weight validation
             DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(weight, "weight"));
@@ -162,7 +163,8 @@ namespace Tartaria.Data
             {
                 results.Add(ValidationResult.Info(
                     "description is empty",
-                    "Item descriptions improve player understanding"
+                    "Item descriptions improve player understanding",
+                    "Add a description string to this ItemData asset"
                 ));
             }
 
@@ -246,7 +248,7 @@ namespace Tartaria.Data
         public void OnAfterDeserialize()
         {
             int currentVersion = Tartaria.Core.DataSchemaVersion.CURRENT_ITEM;
-            
+
             if (schemaVersion < currentVersion)
             {
                 Debug.Log($"[ItemData] {name}: Auto-migrating from v{schemaVersion} to v{currentVersion}");

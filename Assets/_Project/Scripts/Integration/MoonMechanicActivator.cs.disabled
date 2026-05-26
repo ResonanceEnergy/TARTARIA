@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.AI;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
@@ -25,16 +24,6 @@ namespace Tartaria.Integration
 
         readonly List<MudGolemHealth> _alive = new();
         bool _booted;
-        Coroutine _runCoroutine;
-
-        void OnDisable()
-        {
-            if (_runCoroutine != null) { StopCoroutine(_runCoroutine); _runCoroutine = null; }
-            
-            // Clear stale enemy references to prevent null access on re-enable
-            _alive.Clear();
-            _booted = false;
-        }
 
         void Start()
         {
@@ -45,8 +34,7 @@ namespace Tartaria.Integration
                 Debug.LogWarning("[MoonMechanic] No definition on " + name);
                 return;
             }
-            if (_runCoroutine != null) StopCoroutine(_runCoroutine);
-            _runCoroutine = StartCoroutine(Run());
+            StartCoroutine(Run());
         }
 
         IEnumerator Run()

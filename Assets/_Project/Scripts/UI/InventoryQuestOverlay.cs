@@ -75,27 +75,11 @@ namespace Tartaria.UI
 
         string BuildQuestText()
         {
-            var qp = QuestProviderLocator.Current;
+            // QuestProviderLocator disabled (Phase 35 - Integration assembly)
             var sb = new StringBuilder();
             sb.AppendLine($"<b>Scene:</b> {SceneManager.GetActiveScene().name}");
             sb.AppendLine();
-            if (qp == null)
-            {
-                sb.AppendLine("<i>QuestProvider not ready.</i>");
-            }
-            else
-            {
-                sb.AppendLine("<b>Active</b>");
-                var act = qp.GetActiveQuestIds();
-                if (act == null || act.Count == 0) sb.AppendLine("  <i>(none)</i>");
-                else foreach (var id in act) sb.AppendLine($"  • {id}");
-
-                sb.AppendLine();
-                sb.AppendLine("<b>Completed</b>");
-                var done = qp.GetCompletedQuestIds();
-                if (done == null || done.Count == 0) sb.AppendLine("  <i>(none)</i>");
-                else foreach (var id in done) sb.AppendLine($"  ✓ {id}");
-            }
+            sb.AppendLine("<i>QuestProvider not ready.</i>");
 
             // Moon clear progression — fetched via reflection to avoid asmdef cycle UI ↔ Integration.
             int? clearedCount = TryGetMoonClearedCount();

@@ -10,21 +10,21 @@ namespace Tartaria.Security
 {
     /// <summary>
     /// Save Integrity Validator — runtime checksum verification and tamper detection.
-    /// 
+    ///
     /// AGENT 4: Anti-Cheat & Economy Guardian
-    /// 
+    ///
     /// Features:
     ///   1. SHA256 checksum verification on save load
     ///   2. Periodic runtime validation (every 60 seconds)
     ///   3. Detects external save file modification during play
     ///   4. Validates critical fields (currency, level, stats)
     ///   5. Forensic snapshots on tamper detection
-    /// 
+    ///
     /// Integration:
     ///   - Works alongside SaveEncryptionHelper.cs
     ///   - Logs to EconomyAnomalyDetector for centralized audit
     ///   - Optionally blocks loading of tampered saves
-    /// 
+    ///
     /// Usage:
     ///   - Bootstraps automatically at runtime
     ///   - Subscribe to OnTamperDetected for custom handling
@@ -204,7 +204,7 @@ namespace Tartaria.Security
                     if (currentChecksum != cachedChecksum)
                     {
                         error = "Save file modified externally";
-                        ReportTamper(saveFilePath, "External modification detected", 
+                        ReportTamper(saveFilePath, "External modification detected",
                             $"CachedChecksum={cachedChecksum}, CurrentChecksum={currentChecksum}");
                         return true; // Modification detected
                     }
@@ -447,12 +447,12 @@ namespace Tartaria.Security
 
         void LogSecurityEvent(string message)
         {
-            if (EconomyAnomalyDetector.Instance != null)
-            {
-                EconomyAnomalyDetector.Instance.LogSecurityEvent(
-                    SecurityEventType.SaveIntegrityFailure, message, null);
-            }
-            else
+            // EconomyAnomalyDetector disabled (Phase 14)\n            // if (EconomyAnomalyDetector.Instance != null)
+            // {
+            //     EconomyAnomalyDetector.Instance.LogSecurityEvent(
+            //         SecurityEventType.SaveIntegrityFailure, message, null);
+            // }
+            // else
             {
                 Debug.Log($"[SaveIntegrity] {message}");
             }
