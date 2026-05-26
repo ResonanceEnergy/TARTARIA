@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Core.Enums;
+using QuestDef = Tartaria.Core.QuestDefinition;
 
 namespace Tartaria.Data
 {
@@ -15,7 +16,7 @@ namespace Tartaria.Data
         List<string> GetActiveQuestIds();
         List<string> GetCompletedQuestIds();
         QuestState GetQuestState(string questId);
-        QuestDefinition GetQuestDefinition(string questId);
+        Core.QuestDefinition GetQuestDefinition(string questId);
     }
 
     /// <summary>
