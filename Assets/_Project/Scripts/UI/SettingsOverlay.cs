@@ -154,6 +154,12 @@ namespace Tartaria.UI
                     RestoreCursor();
                 }
             }
+
+            // Bug fix (Agent 6): Ensure cursor remains visible when switching to mouse/keyboard mode in settings
+            if (_visible && !Tartaria.Input.InputPromptHelper.GamepadActive)
+            {
+                if (!Cursor.visible) Cursor.visible = true;
+            }
         }
 
         void UnlockCursorForUI()
@@ -195,23 +201,23 @@ namespace Tartaria.UI
             GUI.Box(new Rect(x + 3, y + 3, W - 6, H - 6), "");
             GUI.color = c;
 
-            var title = new GUIStyle(GUI.skin.label) 
-            { 
-                fontSize = 22, 
-                alignment = TextAnchor.MiddleCenter, 
-                fontStyle = FontStyle.Bold, 
-                normal = { textColor = new Color(0.98f, 0.9f, 0.55f) } 
+            var title = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 22,
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = FontStyle.Bold,
+                normal = { textColor = new Color(0.98f, 0.9f, 0.55f) }
             };
             GUI.Label(new Rect(x, y + 8, W, 28), "SETTINGS — TARTARIA", title);
 
             var sub = new GUIStyle(GUI.skin.label) { fontSize = 10, alignment = TextAnchor.MiddleCenter, normal = { textColor = new Color(0.75f, 0.72f, 0.6f) } };
             GUI.Label(new Rect(x, y + 34, W, 16), "Golden Age • Accessible • Immersive", sub);
 
-            var sub2 = new GUIStyle(GUI.skin.label) 
-            { 
-                fontSize = 11, 
-                alignment = TextAnchor.MiddleCenter, 
-                normal = { textColor = new Color(0.65f, 0.62f, 0.55f) } 
+            var sub2 = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 11,
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = new Color(0.65f, 0.62f, 0.55f) }
             };
             GUI.Label(new Rect(x, y + 36, W, 18), "Tune the Resonance", sub2);
 
@@ -564,7 +570,7 @@ namespace Tartaria.UI
                 var m = t.GetMethod("SetMouseSensitivity", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Instance);
                 if (m != null)
                 {
-                    var inst = FindObjectOfType(t) as MonoBehaviour;
+                    var inst = FindFirstObjectByType(t) as MonoBehaviour;
                     m.Invoke(inst, new object[] { _sens });
                 }
             }

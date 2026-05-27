@@ -57,7 +57,7 @@ namespace Tartaria.Integration
         /// Level 40-49: Epic (5%) + Legendary (1%)
         /// Level 50+: Epic (10%) + Legendary (3%) + Ascendant (1%)
         /// </summary>
-        public static void SpawnTieredLoot(Vector3 position, int playerLevel) /* DISABLED (Phase 49) - BossType not yet defined */
+        public static void SpawnTieredLoot(Vector3 position, int playerLevel, BossType bossType)
         {
             ItemRarity rarity = ItemRarity.Common;
 
@@ -85,13 +85,13 @@ namespace Tartaria.Integration
                 return;
             }
 
-            SpawnItemByRarity(position, rarity /* , bossType */);
+            SpawnItemByRarity(position, rarity, bossType);
         }
 
         /// <summary>
         /// AGENT 5: Spawn item of specific rarity with boss-themed drops.
         /// </summary>
-        static void SpawnItemByRarity(Vector3 position, ItemRarity rarity /* DISABLED (Phase 49) - BossType not yet defined */)
+        static void SpawnItemByRarity(Vector3 position, ItemRarity rarity, BossType bossType)
         {
             Drop pick;
 
@@ -104,10 +104,9 @@ namespace Tartaria.Integration
             else if (rarity == ItemRarity.Legendary)
             {
                 // Legendary: Boss-specific themed drops
-                // DISABLED (Phase 49) - BossType check removed
-                // if (bossType == BossType.VoidArchitect)  // Aquifer Guardian
-                //     pick = EndgameTable[3];  // Aquifer Essence
-                // else
+                if (bossType == BossType.VoidArchitect)  // Aquifer Guardian
+                    pick = EndgameTable[3];  // Aquifer Essence
+                else
                     pick = EndgameTable[2];  // Legendary Crystal
             }
             else if (rarity == ItemRarity.Ascendant)

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 
 namespace Tartaria.UI
@@ -27,7 +28,7 @@ namespace Tartaria.UI
 
         [Header("Settings")]
         [SerializeField] bool showInRelease = false;
-        [SerializeField] KeyCode toggleKey = KeyCode.F3;
+        [SerializeField] Key toggleKey = Key.F3;
 
         [Header("Format")]
         [SerializeField] string formatString = "v{0} | {1} | {2}";
@@ -48,7 +49,8 @@ namespace Tartaria.UI
 
         void Update()
         {
-            if (UnityEngine.Input.GetKeyDown(toggleKey))
+            var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard[toggleKey].wasPressedThisFrame)
             {
                 ToggleVisibility();
             }

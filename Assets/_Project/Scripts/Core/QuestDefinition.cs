@@ -197,14 +197,12 @@ namespace Tartaria.Core
         /// </summary>
         public string GetLocalizedTitle()
         {
-            // LocalizationManager.Instance disabled (Phase 8) — assembly visibility issue
-            // TODO: Investigate why Core can't see Localization.Instance despite asmdef reference
-            // if (titleKey.IsValid && LocalizationManager.Instance != null)
-            // {
-            //     string localized = LocalizationManager.Instance.GetText(titleKey);
-            //     if (!localized.StartsWith("[MISSING:"))
-            //         return localized;
-            // }
+            if (titleKey.IsValid && LocalizationManager.Instance != null)
+            {
+                string localized = LocalizationManager.Instance.GetText(titleKey);
+                if (!localized.StartsWith("[MISSING:"))
+                    return localized;
+            }
             return displayName;
         }
 
@@ -213,13 +211,12 @@ namespace Tartaria.Core
         /// </summary>
         public string GetLocalizedDescription()
         {
-            // LocalizationManager.Instance disabled (Phase 8) — assembly visibility issue
-            // if (descKey.IsValid && LocalizationManager.Instance != null)
-            // {
-            //     string localized = LocalizationManager.Instance.GetText(descKey);
-            //     if (!localized.StartsWith("[MISSING:"))
-            //         return localized;
-            // }
+            if (descKey.IsValid && LocalizationManager.Instance != null)
+            {
+                string localized = LocalizationManager.Instance.GetText(descKey);
+                if (!localized.StartsWith("[MISSING:"))
+                    return localized;
+            }
             return description;
         }
 

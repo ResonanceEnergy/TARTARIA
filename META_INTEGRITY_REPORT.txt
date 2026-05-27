@@ -1,0 +1,1251 @@
+﻿
+════════════════════════════════════════════════
+    META FILE INTEGRITY REPORT
+════════════════════════════════════════════════
+
+Total .cs files scanned: 454
+Valid .meta files: 454
+Total issues found: 204
+
+[OK] No duplicate GUIDs found
+
+[OK] No orphaned .meta files found
+
+[OK] All .cs files have corresponding .meta files
+
+════════════════════════════════════════════════
+TIMESTAMP MISMATCHES (204)
+════════════════════════════════════════════════
+(.cs modified after .meta - may need reimport)
+
+CompanionBehaviorSystem.cs
+  Path: Assets\_Project\Scripts\AI\CompanionBehaviorSystem.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 22:12:25
+  Delta: 1754.77 seconds
+
+CompanionDOTSTypes.cs
+  Path: Assets\_Project\Scripts\AI\CompanionDOTSTypes.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 22:01:34
+  Delta: 2406.03 seconds
+
+CompanionState.cs
+  Path: Assets\_Project\Scripts\AI\CompanionState.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:55:04
+  Delta: 2796.41 seconds
+
+CrystalSentryAI.cs
+  Path: Assets\_Project\Scripts\AI\CrystalSentryAI.cs
+  Script time: 05/25/2026 15:50:18
+  Meta time: 05/25/2026 14:11:16
+  Delta: 5941.95 seconds
+
+EnemyAIController.cs
+  Path: Assets\_Project\Scripts\AI\EnemyAIController.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 14:07:41
+  Delta: 71828.18 seconds
+
+MudGolemAI.cs
+  Path: Assets\_Project\Scripts\AI\MudGolemAI.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 11:29:20
+  Delta: 81328.45 seconds
+
+MudGolemHealth.cs
+  Path: Assets\_Project\Scripts\AI\MudGolemHealth.cs
+  Script time: 05/26/2026 02:03:16
+  Meta time: 05/25/2026 11:29:20
+  Delta: 52435.33 seconds
+
+ResonanceDroneAI.cs
+  Path: Assets\_Project\Scripts\AI\ResonanceDroneAI.cs
+  Script time: 05/25/2026 15:50:18
+  Meta time: 05/25/2026 14:07:41
+  Delta: 6156.95 seconds
+
+AdaptiveMusicController.cs
+  Path: Assets\_Project\Scripts\Audio\AdaptiveMusicController.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4699293.3 seconds
+
+AudioController.cs
+  Path: Assets\_Project\Scripts\Audio\AudioController.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/26/2026 00:03:43
+  Delta: 269.24 seconds
+
+AudioCue.cs
+  Path: Assets\_Project\Scripts\Audio\AudioCue.cs
+  Script time: 04/30/2026 11:36:01
+  Meta time: 04/29/2026 17:28:49
+  Delta: 65231.93 seconds
+
+AudioCueLibrary.cs
+  Path: Assets\_Project\Scripts\Audio\AudioCueLibrary.cs
+  Script time: 04/30/2026 11:36:01
+  Meta time: 04/29/2026 17:28:49
+  Delta: 65231.94 seconds
+
+AudioManager.cs
+  Path: Assets\_Project\Scripts\Audio\AudioManager.cs
+  Script time: 05/26/2026 10:04:48
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4699291.63 seconds
+
+HapticBridge.cs
+  Path: Assets\_Project\Scripts\Audio\HapticBridge.cs
+  Script time: 05/25/2026 07:19:53
+  Meta time: 05/22/2026 11:33:27
+  Delta: 243986.45 seconds
+
+MasterMixerLocator.cs
+  Path: Assets\_Project\Scripts\Audio\MasterMixerLocator.cs
+  Script time: 05/11/2026 17:47:34
+  Meta time: 05/10/2026 23:34:29
+  Delta: 65584.7 seconds
+
+Moon5WhiteCityAudioManager.cs
+  Path: Assets\_Project\Scripts\Audio\Moon5WhiteCityAudioManager.cs
+  Script time: 05/23/2026 21:08:22
+  Meta time: 05/22/2026 11:33:27
+  Delta: 120894.53 seconds
+
+ProceduralSFXLibrary.cs
+  Path: Assets\_Project\Scripts\Audio\ProceduralSFXLibrary.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 04/06/2026 15:07:53
+  Delta: 4309089.65 seconds
+
+VFXBridge.cs
+  Path: Assets\_Project\Scripts\Audio\VFXBridge.cs
+  Script time: 05/25/2026 07:19:53
+  Meta time: 05/22/2026 11:33:27
+  Delta: 243986.45 seconds
+
+VOPlaceholderLibrary.cs
+  Path: Assets\_Project\Scripts\Audio\VOPlaceholderLibrary.cs
+  Script time: 05/25/2026 07:19:53
+  Meta time: 05/11/2026 12:53:21
+  Delta: 1189592.72 seconds
+
+CameraController.cs
+  Path: Assets\_Project\Scripts\Camera\CameraController.cs
+  Script time: 05/26/2026 00:08:11
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4663493.94 seconds
+
+DialogueCameraRig.cs
+  Path: Assets\_Project\Scripts\Camera\DialogueCameraRig.cs
+  Script time: 05/22/2026 11:35:07
+  Meta time: 05/11/2026 12:53:21
+  Delta: 945706.14 seconds
+
+AddressableAssetLoader.cs
+  Path: Assets\_Project\Scripts\Core\AddressableAssetLoader.cs
+  Script time: 05/25/2026 07:19:53
+  Meta time: 05/20/2026 12:22:32
+  Delta: 413841.5 seconds
+
+AetherComponents.cs
+  Path: Assets\_Project\Scripts\Core\AetherComponents.cs
+  Script time: 05/20/2026 12:47:05
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4190628.65 seconds
+
+AetherFieldManager.cs
+  Path: Assets\_Project\Scripts\Core\AetherFieldManager.cs
+  Script time: 05/26/2026 01:09:07
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4667150.55 seconds
+
+AetherFieldRenderBridge.cs
+  Path: Assets\_Project\Scripts\Core\AetherFieldRenderBridge.cs
+  Script time: 05/20/2026 12:47:05
+  Meta time: 05/12/2026 23:06:40
+  Delta: 654025.9 seconds
+
+AetherFieldSystem.cs
+  Path: Assets\_Project\Scripts\Core\AetherFieldSystem.cs
+  Script time: 05/25/2026 11:06:11
+  Meta time: 05/23/2026 21:08:22
+  Delta: 136669 seconds
+
+AetherFogRendererFeature.cs
+  Path: Assets\_Project\Scripts\Core\AetherFogRendererFeature.cs
+  Script time: 05/13/2026 18:15:00
+  Meta time: 05/13/2026 07:35:32
+  Delta: 38367.94 seconds
+
+ArchiveDatabase.cs
+  Path: Assets\_Project\Scripts\Core\ArchiveDatabase.cs
+  Script time: 04/18/2026 10:56:51
+  Meta time: 04/18/2026 10:41:42
+  Delta: 908.94 seconds
+
+ArchiveEntry.cs
+  Path: Assets\_Project\Scripts\Core\ArchiveEntry.cs
+  Script time: 04/18/2026 10:56:51
+  Meta time: 04/18/2026 10:41:42
+  Delta: 908.91 seconds
+
+AssemblyInfo.cs
+  Path: Assets\_Project\Scripts\Core\AssemblyInfo.cs
+  Script time: 05/12/2026 20:32:06
+  Meta time: 04/02/2026 00:43:17
+  Delta: 3527329.52 seconds
+
+BuildInfo.cs
+  Path: Assets\_Project\Scripts\Core\BuildInfo.cs
+  Script time: 05/22/2026 17:55:09
+  Meta time: 05/11/2026 08:25:56
+  Delta: 984553.09 seconds
+
+EconomyBalanceMonitor.cs
+  Path: Assets\_Project\Scripts\Core\EconomyBalanceMonitor.cs
+  Script time: 05/25/2026 10:11:10
+  Meta time: 05/25/2026 09:53:15
+  Delta: 1074.99 seconds
+
+EconomySystem.cs
+  Path: Assets\_Project\Scripts\Core\EconomySystem.cs
+  Script time: 05/25/2026 08:32:34
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4607357.57 seconds
+
+ECSMonoBehaviour.cs
+  Path: Assets\_Project\Scripts\Core\ECSMonoBehaviour.cs
+  Script time: 04/07/2026 14:07:20
+  Meta time: 04/07/2026 13:55:34
+  Delta: 706.01 seconds
+
+FeedbackReporter.cs
+  Path: Assets\_Project\Scripts\Core\FeedbackReporter.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 08:32:37
+  Delta: 50942.85 seconds
+
+FrameBudgetMonitor.cs
+  Path: Assets\_Project\Scripts\Core\FrameBudgetMonitor.cs
+  Script time: 05/20/2026 12:47:05
+  Meta time: 05/11/2026 08:14:50
+  Delta: 793935.81 seconds
+
+GameBootstrap.cs
+  Path: Assets\_Project\Scripts\Core\GameBootstrap.cs
+  Script time: 05/22/2026 11:33:27
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4359010.22 seconds
+
+GameEvents.cs
+  Path: Assets\_Project\Scripts\Core\GameEvents.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4658302.9 seconds
+
+GameStateManager.cs
+  Path: Assets\_Project\Scripts\Core\GameStateManager.cs
+  Script time: 05/20/2026 12:47:05
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4190628.65 seconds
+
+LeyLineManager.cs
+  Path: Assets\_Project\Scripts\Core\LeyLineManager.cs
+  Script time: 05/20/2026 12:47:05
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4190628.65 seconds
+
+MemoryWatchdog.cs
+  Path: Assets\_Project\Scripts\Core\MemoryWatchdog.cs
+  Script time: 05/20/2026 20:41:17
+  Meta time: 05/20/2026 20:27:54
+  Delta: 803.78 seconds
+
+MoonDefinition.cs
+  Path: Assets\_Project\Scripts\Core\MoonDefinition.cs
+  Script time: 05/22/2026 11:33:27
+  Meta time: 05/09/2026 17:14:25
+  Delta: 1102742.27 seconds
+
+ObjectPool.cs
+  Path: Assets\_Project\Scripts\Core\ObjectPool.cs
+  Script time: 05/25/2026 10:11:22
+  Meta time: 05/25/2026 09:53:15
+  Delta: 1086.54 seconds
+
+ParticleEffectPool.cs
+  Path: Assets\_Project\Scripts\Core\ParticleEffectPool.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/22/2026 11:35:07
+  Delta: 347456.01 seconds
+
+PerformanceGuard.cs
+  Path: Assets\_Project\Scripts\Core\PerformanceGuard.cs
+  Script time: 05/25/2026 07:19:54
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4602996.68 seconds
+
+PerformanceHelpers.cs
+  Path: Assets\_Project\Scripts\Core\PerformanceHelpers.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 05/25/2026 09:53:15
+  Delta: 49065 seconds
+
+PerformanceProfile.cs
+  Path: Assets\_Project\Scripts\Core\PerformanceProfile.cs
+  Script time: 05/20/2026 13:29:11
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4193153.81 seconds
+
+PlayerSentimentTracker.cs
+  Path: Assets\_Project\Scripts\Core\PlayerSentimentTracker.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 08:32:37
+  Delta: 50942.84 seconds
+
+QuestDefinition.cs
+  Path: Assets\_Project\Scripts\Core\QuestDefinition.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 11:49:21
+  Delta: 80127.76 seconds
+
+QuestTypes.cs
+  Path: Assets\_Project\Scripts\Core\QuestTypes.cs
+  Script time: 05/25/2026 19:03:38
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4645221.3 seconds
+
+SceneLoader.cs
+  Path: Assets\_Project\Scripts\Core\SceneLoader.cs
+  Script time: 05/26/2026 20:53:27
+  Meta time: 04/02/2026 18:46:22
+  Delta: 4673225.23 seconds
+
+ScreenTransitionManager.cs
+  Path: Assets\_Project\Scripts\Core\ScreenTransitionManager.cs
+  Script time: 05/23/2026 21:08:22
+  Meta time: 05/22/2026 11:35:07
+  Delta: 120794.63 seconds
+
+ServiceLocator.cs
+  Path: Assets\_Project\Scripts\Core\ServiceLocator.cs
+  Script time: 05/23/2026 21:08:22
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4479904.77 seconds
+
+ServiceRegistry.cs
+  Path: Assets\_Project\Scripts\Core\ServiceRegistry.cs
+  Script time: 05/25/2026 19:03:39
+  Meta time: 05/25/2026 18:05:49
+  Delta: 3469.69 seconds
+
+TartarianCalendar.cs
+  Path: Assets\_Project\Scripts\Core\TartarianCalendar.cs
+  Script time: 05/20/2026 20:34:58
+  Meta time: 05/20/2026 12:22:32
+  Delta: 29546.37 seconds
+
+CharacterVisualProfile.cs
+  Path: Assets\_Project\Scripts\Core\Data\CharacterVisualProfile.cs
+  Script time: 04/30/2026 11:36:01
+  Meta time: 04/29/2026 17:28:49
+  Delta: 65231.93 seconds
+
+MaterialVariantSet.cs
+  Path: Assets\_Project\Scripts\Core\Data\MaterialVariantSet.cs
+  Script time: 04/30/2026 11:36:01
+  Meta time: 04/29/2026 17:28:49
+  Delta: 65231.93 seconds
+
+GameplayEnums.cs
+  Path: Assets\_Project\Scripts\Core\Enums\GameplayEnums.cs
+  Script time: 05/25/2026 19:30:32
+  Meta time: 05/25/2026 08:32:34
+  Delta: 39477.51 seconds
+
+DataValidator.cs
+  Path: Assets\_Project\Scripts\Core\Validation\DataValidator.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/25/2026 11:40:46
+  Delta: 80643.28 seconds
+
+IValidatable.cs
+  Path: Assets\_Project\Scripts\Core\Validation\IValidatable.cs
+  Script time: 05/25/2026 12:07:39
+  Meta time: 05/25/2026 11:40:46
+  Delta: 1612.19 seconds
+
+ValidationResult.cs
+  Path: Assets\_Project\Scripts\Core\Validation\ValidationResult.cs
+  Script time: 05/25/2026 12:07:39
+  Meta time: 05/25/2026 11:40:46
+  Delta: 1612.19 seconds
+
+DialogueNodeData.cs
+  Path: Assets\_Project\Scripts\Data\DialogueNodeData.cs
+  Script time: 05/26/2026 02:03:16
+  Meta time: 05/25/2026 11:42:28
+  Delta: 51648.07 seconds
+
+EnemyData.cs
+  Path: Assets\_Project\Scripts\Data\EnemyData.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 11:47:07
+  Delta: 39273.27 seconds
+
+EquipmentItemData.cs
+  Path: Assets\_Project\Scripts\Data\EquipmentItemData.cs
+  Script time: 05/25/2026 12:07:37
+  Meta time: 05/25/2026 11:38:34
+  Delta: 1743.32 seconds
+
+IQuestProvider.cs
+  Path: Assets\_Project\Scripts\Data\IQuestProvider.cs
+  Script time: 05/25/2026 19:03:38
+  Meta time: 05/25/2026 14:43:38
+  Delta: 15600.2 seconds
+
+ItemData.cs
+  Path: Assets\_Project\Scripts\Data\ItemData.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 11:38:34
+  Delta: 80774.77 seconds
+
+ItemDatabase.cs
+  Path: Assets\_Project\Scripts\Data\ItemDatabase.cs
+  Script time: 05/25/2026 12:07:39
+  Meta time: 05/25/2026 12:05:43
+  Delta: 116.09 seconds
+
+QuestData.cs
+  Path: Assets\_Project\Scripts\Data\QuestData.cs
+  Script time: 05/25/2026 19:03:39
+  Meta time: 05/25/2026 11:47:07
+  Delta: 26192.5 seconds
+
+QuestDatabase.cs
+  Path: Assets\_Project\Scripts\Data\QuestDatabase.cs
+  Script time: 05/25/2026 12:07:37
+  Meta time: 05/25/2026 12:05:43
+  Delta: 114.74 seconds
+
+SkillNodeData.cs
+  Path: Assets\_Project\Scripts\Data\SkillNodeData.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 11:57:07
+  Delta: 79661.32 seconds
+
+SkillTreeAsset.cs
+  Path: Assets\_Project\Scripts\Data\SkillTreeAsset.cs
+  Script time: 05/25/2026 12:07:37
+  Meta time: 05/25/2026 11:57:07
+  Delta: 629.94 seconds
+
+BatchReadinessValidator.cs
+  Path: Assets\_Project\Scripts\Editor\BatchReadinessValidator.cs
+  Script time: 05/25/2026 19:03:39
+  Meta time: 05/25/2026 17:09:45
+  Delta: 6834.2 seconds
+
+CleanMissingScripts.cs
+  Path: Assets\_Project\Scripts\Editor\CleanMissingScripts.cs
+  Script time: 05/26/2026 20:06:04
+  Meta time: 05/26/2026 18:29:41
+  Delta: 5782.2 seconds
+
+CreateGameBalanceConfig.cs
+  Path: Assets\_Project\Scripts\Editor\CreateGameBalanceConfig.cs
+  Script time: 05/26/2026 20:06:04
+  Meta time: 05/26/2026 18:29:41
+  Delta: 5782.19 seconds
+
+CreateMissingAssetsMenu.cs
+  Path: Assets\_Project\Scripts\Editor\CreateMissingAssetsMenu.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/25/2026 23:36:34
+  Delta: 1898.59 seconds
+
+DataAssetGenerator.cs
+  Path: Assets\_Project\Scripts\Editor\DataAssetGenerator.cs
+  Script time: 05/25/2026 19:03:38
+  Meta time: 05/25/2026 17:12:11
+  Delta: 6687.64 seconds
+
+OneClickBuild.cs
+  Path: Assets\_Project\Scripts\Editor\OneClickBuild.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 17:30:26
+  Delta: 18674.12 seconds
+
+SceneAnalysisOnLoad.cs
+  Path: Assets\_Project\Scripts\Editor\SceneAnalysisOnLoad.cs
+  Script time: 05/26/2026 22:53:57
+  Meta time: 05/26/2026 22:53:56
+  Delta: 0.59 seconds
+
+SceneMissingScriptAnalyzer.cs
+  Path: Assets\_Project\Scripts\Editor\SceneMissingScriptAnalyzer.cs
+  Script time: 05/26/2026 22:51:19
+  Meta time: 05/26/2026 22:51:19
+  Delta: 0.1 seconds
+
+TartariaAssetImporter.cs
+  Path: Assets\_Project\Scripts\Editor\AssetImport\TartariaAssetImporter.cs
+  Script time: 05/26/2026 20:06:04
+  Meta time: 05/26/2026 14:24:20
+  Delta: 20503.23 seconds
+
+SaveEncryptionTests.cs
+  Path: Assets\_Project\Scripts\Editor\Tests\SaveEncryptionTests.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/26/2026 09:18:46
+  Delta: 2764.22 seconds
+
+ArrowProjectile.cs
+  Path: Assets\_Project\Scripts\Gameplay\ArrowProjectile.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 14:31:22
+  Delta: 70406.34 seconds
+
+BuildingDefinition.cs
+  Path: Assets\_Project\Scripts\Gameplay\BuildingDefinition.cs
+  Script time: 05/26/2026 13:22:22
+  Meta time: 05/25/2026 11:21:39
+  Delta: 93642.59 seconds
+
+CraftingStationManager.cs
+  Path: Assets\_Project\Scripts\Gameplay\CraftingStationManager.cs
+  Script time: 05/25/2026 14:06:58
+  Meta time: 05/25/2026 12:12:56
+  Delta: 6841.77 seconds
+
+CymaticWaterTuningMiniGame.cs
+  Path: Assets\_Project\Scripts\Gameplay\CymaticWaterTuningMiniGame.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 14:19:12
+  Delta: 78410.36 seconds
+
+FrequencyShieldVFX.cs
+  Path: Assets\_Project\Scripts\Gameplay\FrequencyShieldVFX.cs
+  Script time: 05/26/2026 02:03:16
+  Meta time: 05/26/2026 01:21:00
+  Delta: 2535.76 seconds
+
+HarmonicStrikeVFX.cs
+  Path: Assets\_Project\Scripts\Gameplay\HarmonicStrikeVFX.cs
+  Script time: 05/26/2026 02:03:16
+  Meta time: 05/26/2026 01:21:00
+  Delta: 2535.75 seconds
+
+InventoryManager.cs
+  Path: Assets\_Project\Scripts\Gameplay\InventoryManager.cs
+  Script time: 05/26/2026 02:03:16
+  Meta time: 05/26/2026 01:28:11
+  Delta: 2104.56 seconds
+
+PlayerAbilities.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerAbilities.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 14:43:38
+  Delta: 76945.61 seconds
+
+PlayerAbilityController.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerAbilityController.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 14:30:49
+  Delta: 77713.65 seconds
+
+PlayerAnimationController.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerAnimationController.cs
+  Script time: 05/26/2026 01:09:06
+  Meta time: 05/26/2026 00:27:33
+  Delta: 2493.59 seconds
+
+PlayerAnimatorBridge.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerAnimatorBridge.cs
+  Script time: 05/25/2026 14:06:58
+  Meta time: 05/25/2026 12:09:21
+  Delta: 7056.32 seconds
+
+PlayerCombat.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerCombat.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 14:30:49
+  Delta: 70439.43 seconds
+
+PlayerCombatController.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerCombatController.cs
+  Script time: 05/26/2026 02:03:15
+  Meta time: 05/25/2026 14:31:22
+  Delta: 41512.66 seconds
+
+PlayerDodge.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerDodge.cs
+  Script time: 05/25/2026 14:06:58
+  Meta time: 05/25/2026 12:09:21
+  Delta: 7056.55 seconds
+
+PlayerHealth.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerHealth.cs
+  Script time: 05/26/2026 13:22:21
+  Meta time: 05/25/2026 14:36:52
+  Delta: 81929.52 seconds
+
+PlayerProgression.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerProgression.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 11:19:17
+  Delta: 89205.77 seconds
+
+PlayerStatsTracker.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerStatsTracker.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 14:38:26
+  Delta: 77257.14 seconds
+
+PlayerWeaponSwitcher.cs
+  Path: Assets\_Project\Scripts\Gameplay\PlayerWeaponSwitcher.cs
+  Script time: 05/25/2026 14:06:58
+  Meta time: 05/25/2026 12:09:21
+  Delta: 7056.37 seconds
+
+SkillTreeSystem.cs
+  Path: Assets\_Project\Scripts\Gameplay\SkillTreeSystem.cs
+  Script time: 05/26/2026 13:22:21
+  Meta time: 05/25/2026 11:22:13
+  Delta: 93607.96 seconds
+
+HapticFeedbackManager.cs
+  Path: Assets\_Project\Scripts\Input\HapticFeedbackManager.cs
+  Script time: 05/22/2026 11:35:07
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4359110.3 seconds
+
+InputPromptHelper.cs
+  Path: Assets\_Project\Scripts\Input\InputPromptHelper.cs
+  Script time: 05/25/2026 07:19:54
+  Meta time: 05/13/2026 19:29:08
+  Delta: 993046 seconds
+
+LogitechControllerSupport.cs
+  Path: Assets\_Project\Scripts\Input\LogitechControllerSupport.cs
+  Script time: 05/25/2026 08:26:06
+  Meta time: 04/06/2026 15:07:53
+  Delta: 4209492.35 seconds
+
+PlayerInputHandler.cs
+  Path: Assets\_Project\Scripts\Input\PlayerInputHandler.cs
+  Script time: 05/26/2026 13:22:22
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4711144.97 seconds
+
+AchievementSystem.cs
+  Path: Assets\_Project\Scripts\Integration\AchievementSystem.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 21:39:45
+  Delta: 44703.73 seconds
+
+AetherResonanceSystem.cs
+  Path: Assets\_Project\Scripts\Integration\AetherResonanceSystem.cs
+  Script time: 05/26/2026 12:06:04
+  Meta time: 05/25/2026 21:39:45
+  Delta: 51979.1 seconds
+
+AnastasiaController.cs
+  Path: Assets\_Project\Scripts\Integration\AnastasiaController.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.76 seconds
+
+AquiferPurgeMiniGame.cs
+  Path: Assets\_Project\Scripts\Integration\AquiferPurgeMiniGame.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 15:39:10
+  Delta: 66338.65 seconds
+
+ArchiveManager.cs
+  Path: Assets\_Project\Scripts\Integration\ArchiveManager.cs
+  Script time: 05/26/2026 02:03:15
+  Meta time: 05/25/2026 21:39:45
+  Delta: 15809.96 seconds
+
+BellTowerSyncMiniGame.cs
+  Path: Assets\_Project\Scripts\Integration\BellTowerSyncMiniGame.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 15:39:10
+  Delta: 66338.64 seconds
+
+BossEncounterSystem.cs
+  Path: Assets\_Project\Scripts\Integration\BossEncounterSystem.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 21:39:45
+  Delta: 44703.4 seconds
+
+BuildingSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\BuildingSpawner.cs
+  Script time: 05/26/2026 16:23:10
+  Meta time: 05/25/2026 21:39:45
+  Delta: 67404.65 seconds
+
+CampaignFlowController.cs
+  Path: Assets\_Project\Scripts\Integration\CampaignFlowController.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:39:45
+  Delta: 3714.69 seconds
+
+CombatBridge.cs
+  Path: Assets\_Project\Scripts\Integration\CombatBridge.cs
+  Script time: 05/26/2026 10:04:48
+  Meta time: 05/25/2026 21:39:45
+  Delta: 44703.36 seconds
+
+CombatDialogue.cs
+  Path: Assets\_Project\Scripts\Integration\CombatDialogue.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 21:39:45
+  Delta: 44703.64 seconds
+
+CompanionCombatAbilities.cs
+  Path: Assets\_Project\Scripts\Integration\CompanionCombatAbilities.cs
+  Script time: 05/25/2026 22:47:38
+  Meta time: 05/25/2026 21:39:45
+  Delta: 4072.61 seconds
+
+CompanionManager.cs
+  Path: Assets\_Project\Scripts\Integration\CompanionManager.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 21:39:45
+  Delta: 51977.79 seconds
+
+CorruptionSystem.cs
+  Path: Assets\_Project\Scripts\Integration\CorruptionSystem.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:39:45
+  Delta: 3714.9 seconds
+
+CymaticTuningPuzzle.cs
+  Path: Assets\_Project\Scripts\Integration\CymaticTuningPuzzle.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 19:03:43
+  Delta: 54065.96 seconds
+
+DialogueConditionEvaluator.cs
+  Path: Assets\_Project\Scripts\Integration\DialogueConditionEvaluator.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/26/2026 01:47:39
+  Delta: 29830.16 seconds
+
+DialogueManager.cs
+  Path: Assets\_Project\Scripts\Integration\DialogueManager.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 11:42:28
+  Delta: 80541.12 seconds
+
+DialogueNodeExecutor.cs
+  Path: Assets\_Project\Scripts\Integration\DialogueNodeExecutor.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/26/2026 01:59:40
+  Delta: 29109.11 seconds
+
+DialoguePlayer.cs
+  Path: Assets\_Project\Scripts\Integration\DialoguePlayer.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 11:42:28
+  Delta: 80541.23 seconds
+
+DialogueTreeRunner.cs
+  Path: Assets\_Project\Scripts\Integration\DialogueTreeRunner.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:39:45
+  Delta: 3715.1 seconds
+
+EchohavenCombatArena.cs
+  Path: Assets\_Project\Scripts\Integration\EchohavenCombatArena.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.77 seconds
+
+EchohavenContentSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\EchohavenContentSpawner.cs
+  Script time: 05/26/2026 13:22:21
+  Meta time: 05/25/2026 21:39:45
+  Delta: 56556.15 seconds
+
+EchohavenProgressionSystem.cs
+  Path: Assets\_Project\Scripts\Integration\EchohavenProgressionSystem.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/25/2026 21:39:45
+  Delta: 44705.07 seconds
+
+EndCardController.cs
+  Path: Assets\_Project\Scripts\Integration\EndCardController.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:39:45
+  Delta: 3715.09 seconds
+
+EnvironmentalStorytelling.cs
+  Path: Assets\_Project\Scripts\Integration\EnvironmentalStorytelling.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.78 seconds
+
+GameLoopController.cs
+  Path: Assets\_Project\Scripts\Integration\GameLoopController.cs
+  Script time: 05/26/2026 13:22:21
+  Meta time: 05/25/2026 21:39:45
+  Delta: 56556.18 seconds
+
+GiantModeController.cs
+  Path: Assets\_Project\Scripts\Integration\GiantModeController.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.78 seconds
+
+InteractableBuilding.cs
+  Path: Assets\_Project\Scripts\Integration\InteractableBuilding.cs
+  Script time: 05/26/2026 13:22:21
+  Meta time: 05/25/2026 21:39:45
+  Delta: 56556.23 seconds
+
+LiraelController.cs
+  Path: Assets\_Project\Scripts\Integration\LiraelController.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.79 seconds
+
+LootAnimator.cs
+  Path: Assets\_Project\Scripts\Integration\LootAnimator.cs
+  Script time: 05/25/2026 19:03:39
+  Meta time: 05/25/2026 15:51:27
+  Delta: 11531.62 seconds
+
+LootDropper.cs
+  Path: Assets\_Project\Scripts\Integration\LootDropper.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/25/2026 19:03:43
+  Delta: 54066.92 seconds
+
+MicroGiantController.cs
+  Path: Assets\_Project\Scripts\Integration\MicroGiantController.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.79 seconds
+
+Moon10ContentSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\Moon10ContentSpawner.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 21:39:45
+  Delta: 51977.84 seconds
+
+Moon13ContentSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\Moon13ContentSpawner.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.8 seconds
+
+Moon2AtmosphereAudioManager.cs
+  Path: Assets\_Project\Scripts\Integration\Moon2AtmosphereAudioManager.cs
+  Script time: 05/25/2026 23:30:50
+  Meta time: 05/25/2026 21:39:45
+  Delta: 6664.54 seconds
+
+Moon2BuildingRestorationSequencer.cs
+  Path: Assets\_Project\Scripts\Integration\Moon2BuildingRestorationSequencer.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 05/25/2026 21:39:45
+  Delta: 6675.05 seconds
+
+Moon2ExplorationSecrets.cs
+  Path: Assets\_Project\Scripts\Integration\Moon2ExplorationSecrets.cs
+  Script time: 05/26/2026 00:08:11
+  Meta time: 05/25/2026 21:39:45
+  Delta: 8905.85 seconds
+
+Moon2LiraelIntroTrigger.cs
+  Path: Assets\_Project\Scripts\Integration\Moon2LiraelIntroTrigger.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.81 seconds
+
+Moon2LunarVisualsManager.cs
+  Path: Assets\_Project\Scripts\Integration\Moon2LunarVisualsManager.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 21:39:45
+  Delta: 51978.06 seconds
+
+Moon2ProgressionSystem.cs
+  Path: Assets\_Project\Scripts\Integration\Moon2ProgressionSystem.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:39:45
+  Delta: 3714.66 seconds
+
+Moon3RailAudioManager.cs
+  Path: Assets\_Project\Scripts\Integration\Moon3RailAudioManager.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/25/2026 21:39:45
+  Delta: 8906.52 seconds
+
+Moon6RhythmicArc.cs
+  Path: Assets\_Project\Scripts\Integration\Moon6RhythmicArc.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/25/2026 21:39:45
+  Delta: 8906.62 seconds
+
+Moon7ContentSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\Moon7ContentSpawner.cs
+  Script time: 05/26/2026 13:22:22
+  Meta time: 05/25/2026 21:39:45
+  Delta: 56556.89 seconds
+
+Moon7ResonantArc.cs
+  Path: Assets\_Project\Scripts\Integration\Moon7ResonantArc.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 05/25/2026 21:39:45
+  Delta: 6675.09 seconds
+
+Moon8ContentSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\Moon8ContentSpawner.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 05/25/2026 21:39:45
+  Delta: 6675.09 seconds
+
+Moon8GalacticArc.cs
+  Path: Assets\_Project\Scripts\Integration\Moon8GalacticArc.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 05/25/2026 21:39:45
+  Delta: 6675.1 seconds
+
+Moon9ContentSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\Moon9ContentSpawner.cs
+  Script time: 05/25/2026 21:54:15
+  Meta time: 05/25/2026 21:39:45
+  Delta: 869.55 seconds
+
+Moon9SolarArc.cs
+  Path: Assets\_Project\Scripts\Integration\Moon9SolarArc.cs
+  Script time: 05/25/2026 23:30:50
+  Meta time: 05/25/2026 21:39:45
+  Delta: 6664.57 seconds
+
+MoonBeatRunner.cs
+  Path: Assets\_Project\Scripts\Integration\MoonBeatRunner.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.82 seconds
+
+MoonMechanicActivator.cs
+  Path: Assets\_Project\Scripts\Integration\MoonMechanicActivator.cs
+  Script time: 05/26/2026 10:04:48
+  Meta time: 05/25/2026 21:39:45
+  Delta: 44703.38 seconds
+
+MoonNarrativeController.cs
+  Path: Assets\_Project\Scripts\Integration\MoonNarrativeController.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 21:39:45
+  Delta: 51977.87 seconds
+
+MoonPortalSelector.cs
+  Path: Assets\_Project\Scripts\Integration\MoonPortalSelector.cs
+  Script time: 05/26/2026 00:08:11
+  Meta time: 05/25/2026 21:39:45
+  Delta: 8905.73 seconds
+
+NarrativeBeatSystems.cs
+  Path: Assets\_Project\Scripts\Integration\NarrativeBeatSystems.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.81 seconds
+
+NotificationSystem.cs
+  Path: Assets\_Project\Scripts\Integration\NotificationSystem.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 21:48:19
+  Delta: 51464.29 seconds
+
+NPCArchetypes.cs
+  Path: Assets\_Project\Scripts\Integration\NPCArchetypes.cs
+  Script time: 05/25/2026 21:47:53
+  Meta time: 05/25/2026 21:39:45
+  Delta: 487.58 seconds
+
+PlayerSpawner.cs
+  Path: Assets\_Project\Scripts\Integration\PlayerSpawner.cs
+  Script time: 05/26/2026 20:48:30
+  Meta time: 05/25/2026 21:39:45
+  Delta: 83325.09 seconds
+
+QuestDatabaseBuilder.cs
+  Path: Assets\_Project\Scripts\Integration\QuestDatabaseBuilder.cs
+  Script time: 05/26/2026 12:06:04
+  Meta time: 05/25/2026 21:39:45
+  Delta: 51978.4 seconds
+
+QuestGiverInteractable.cs
+  Path: Assets\_Project\Scripts\Integration\QuestGiverInteractable.cs
+  Script time: 05/25/2026 21:47:53
+  Meta time: 05/25/2026 21:39:45
+  Delta: 487.58 seconds
+
+QuestLogUIPanel.cs
+  Path: Assets\_Project\Scripts\Integration\QuestLogUIPanel.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:39:45
+  Delta: 3714.65 seconds
+
+QuestManager.cs
+  Path: Assets\_Project\Scripts\Integration\QuestManager.cs
+  Script time: 05/26/2026 13:22:21
+  Meta time: 05/25/2026 18:51:53
+  Delta: 66627.94 seconds
+
+QuestToastNotification.cs
+  Path: Assets\_Project\Scripts\Integration\QuestToastNotification.cs
+  Script time: 05/26/2026 01:09:08
+  Meta time: 05/26/2026 00:58:23
+  Delta: 644.29 seconds
+
+RunProgressTracker.cs
+  Path: Assets\_Project\Scripts\Integration\RunProgressTracker.cs
+  Script time: 05/26/2026 08:38:57
+  Meta time: 05/25/2026 21:39:45
+  Delta: 39551.88 seconds
+
+RuntimeHUDBuilder.cs
+  Path: Assets\_Project\Scripts\Integration\RuntimeHUDBuilder.cs
+  Script time: 05/26/2026 13:22:21
+  Meta time: 05/25/2026 21:39:45
+  Delta: 56556.16 seconds
+
+TutorialController.cs
+  Path: Assets\_Project\Scripts\Integration\TutorialController.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.83 seconds
+
+VFXController.cs
+  Path: Assets\_Project\Scripts\Integration\VFXController.cs
+  Script time: 05/26/2026 12:06:04
+  Meta time: 05/25/2026 21:39:45
+  Delta: 51978.95 seconds
+
+WhiteCityAmplificationController.cs
+  Path: Assets\_Project\Scripts\Integration\WhiteCityAmplificationController.cs
+  Script time: 05/26/2026 00:08:11
+  Meta time: 05/25/2026 21:39:45
+  Delta: 8906.21 seconds
+
+ZoneController.cs
+  Path: Assets\_Project\Scripts\Integration\ZoneController.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.77 seconds
+
+ZoneTransitionSystem.cs
+  Path: Assets\_Project\Scripts\Integration\ZoneTransitionSystem.cs
+  Script time: 05/25/2026 21:46:51
+  Meta time: 05/25/2026 21:39:45
+  Delta: 425.76 seconds
+
+_STUBS_CrashReporter.cs
+  Path: Assets\_Project\Scripts\Integration\_STUBS_CrashReporter.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:11:42
+  Delta: 5398.61 seconds
+
+_STUBS_LiveOpsEventService.cs
+  Path: Assets\_Project\Scripts\Integration\_STUBS_LiveOpsEventService.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:11:42
+  Delta: 5398.61 seconds
+
+_STUBS_TutorialHookManager.cs
+  Path: Assets\_Project\Scripts\Integration\_STUBS_TutorialHookManager.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 21:11:42
+  Delta: 5398.61 seconds
+
+LocalizationManager.cs
+  Path: Assets\_Project\Scripts\Localization\LocalizationManager.cs
+  Script time: 05/25/2026 22:41:40
+  Meta time: 05/25/2026 11:35:53
+  Delta: 39946.57 seconds
+
+SaveData.cs
+  Path: Assets\_Project\Scripts\Save\SaveData.cs
+  Script time: 05/25/2026 08:32:35
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4607357.96 seconds
+
+SaveEncryptionHelper.cs
+  Path: Assets\_Project\Scripts\Save\SaveEncryptionHelper.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/25/2026 09:53:15
+  Delta: 87095.18 seconds
+
+SaveFileVersion.cs
+  Path: Assets\_Project\Scripts\Save\SaveFileVersion.cs
+  Script time: 05/23/2026 21:08:22
+  Meta time: 05/22/2026 11:35:08
+  Delta: 120794.19 seconds
+
+SaveManager.cs
+  Path: Assets\_Project\Scripts\Save\SaveManager.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 04/02/2026 00:43:17
+  Delta: 4661263.39 seconds
+
+SaveEncryptionHelper.cs
+  Path: Assets\_Project\Scripts\Security\SaveEncryptionHelper.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/25/2026 12:16:56
+  Delta: 78474.48 seconds
+
+SaveIntegrityValidator.cs
+  Path: Assets\_Project\Scripts\Security\SaveIntegrityValidator.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 12:16:56
+  Delta: 85747.27 seconds
+
+HotfixRollbackManager.cs
+  Path: Assets\_Project\Scripts\Testing\HotfixRollbackManager.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/25/2026 21:00:08
+  Delta: 11283.99 seconds
+
+HotfixValidator.cs
+  Path: Assets\_Project\Scripts\Testing\HotfixValidator.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/25/2026 20:56:47
+  Delta: 11485.74 seconds
+
+PerformanceProfiler.cs
+  Path: Assets\_Project\Scripts\Testing\PerformanceProfiler.cs
+  Script time: 05/26/2026 01:09:07
+  Meta time: 05/26/2026 00:58:23
+  Delta: 644.09 seconds
+
+WCAGContrastValidator.cs
+  Path: Assets\_Project\Scripts\Testing\WCAGContrastValidator.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 05/25/2026 20:51:59
+  Delta: 9541.11 seconds
+
+SaveEncryptionValidator.cs
+  Path: Assets\_Project\Scripts\Tests\SaveEncryptionValidator.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/26/2026 09:27:11
+  Delta: 2259.42 seconds
+
+AccessibilityManager.cs
+  Path: Assets\_Project\Scripts\UI\AccessibilityManager.cs
+  Script time: 05/25/2026 23:31:00
+  Meta time: 05/25/2026 14:48:00
+  Delta: 31380.15 seconds
+
+ArchiveUI.cs
+  Path: Assets\_Project\Scripts\UI\ArchiveUI.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/25/2026 15:08:33
+  Delta: 68177.52 seconds
+
+BuildInfoDisplay.cs
+  Path: Assets\_Project\Scripts\UI\BuildInfoDisplay.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/25/2026 14:55:40
+  Delta: 33152.46 seconds
+
+DebugConsole.cs
+  Path: Assets\_Project\Scripts\UI\DebugConsole.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 14:55:40
+  Delta: 68948.76 seconds
+
+EquipmentSlotUI.cs
+  Path: Assets\_Project\Scripts\UI\EquipmentSlotUI.cs
+  Script time: 05/25/2026 15:50:19
+  Meta time: 05/25/2026 15:03:29
+  Delta: 2810 seconds
+
+EquipmentUI.cs
+  Path: Assets\_Project\Scripts\UI\EquipmentUI.cs
+  Script time: 05/26/2026 12:06:03
+  Meta time: 05/25/2026 23:15:38
+  Delta: 46224.61 seconds
+
+HUDController.cs
+  Path: Assets\_Project\Scripts\UI\HUDController.cs
+  Script time: 05/26/2026 20:06:04
+  Meta time: 05/25/2026 14:57:38
+  Delta: 104906.05 seconds
+
+InventoryGridUI.cs
+  Path: Assets\_Project\Scripts\UI\InventoryGridUI.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/26/2026 00:07:53
+  Delta: 35815.5 seconds
+
+InventoryQuestOverlay.cs
+  Path: Assets\_Project\Scripts\UI\InventoryQuestOverlay.cs
+  Script time: 05/25/2026 15:50:18
+  Meta time: 05/25/2026 15:05:41
+  Delta: 2676.29 seconds
+
+ItemTooltip.cs
+  Path: Assets\_Project\Scripts\UI\ItemTooltip.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 20:18:15
+  Delta: 49593.59 seconds
+
+LocalizedText.cs
+  Path: Assets\_Project\Scripts\UI\LocalizedText.cs
+  Script time: 05/25/2026 15:50:19
+  Meta time: 05/25/2026 15:18:40
+  Delta: 1899.28 seconds
+
+MainMenuOverlay.cs
+  Path: Assets\_Project\Scripts\UI\MainMenuOverlay.cs
+  Script time: 05/26/2026 20:06:04
+  Meta time: 05/25/2026 15:11:08
+  Delta: 104095.78 seconds
+
+PerformanceMetricsOverlay.cs
+  Path: Assets\_Project\Scripts\UI\PerformanceMetricsOverlay.cs
+  Script time: 05/26/2026 00:08:12
+  Meta time: 05/25/2026 16:06:11
+  Delta: 28921.8 seconds
+
+RewardToastController.cs
+  Path: Assets\_Project\Scripts\UI\RewardToastController.cs
+  Script time: 05/25/2026 19:03:38
+  Meta time: 05/25/2026 16:07:19
+  Delta: 10579.02 seconds
+
+SettingsOverlay.cs
+  Path: Assets\_Project\Scripts\UI\SettingsOverlay.cs
+  Script time: 05/26/2026 10:04:50
+  Meta time: 05/25/2026 14:58:38
+  Delta: 68771.93 seconds
+
+ShopUI.cs
+  Path: Assets\_Project\Scripts\UI\ShopUI.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 16:14:03
+  Delta: 64246 seconds
+
+SkillTreeUI.cs
+  Path: Assets\_Project\Scripts\UI\SkillTreeUI.cs
+  Script time: 05/26/2026 10:04:49
+  Meta time: 05/25/2026 21:48:19
+  Delta: 44190.09 seconds
+
+════════════════════════════════════════════════
+SUMMARY
+════════════════════════════════════════════════
+[i] INFO: 204 timestamp mismatch(es) - may need reimport
+
+════════════════════════════════════════════════
+

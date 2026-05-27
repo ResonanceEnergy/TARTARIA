@@ -204,21 +204,142 @@ namespace Tartaria.Gameplay
         {
             // NOTE: Data-driven architecture requires SkillTreeAsset ScriptableObjects in Resources/SkillTrees/
             // These assets are currently disabled due to Gameplay->Data circular dependency.
-            // Temporary fix: Initialize empty trees. Add hardcoded skills or re-enable SkillTreeAsset + fix circular dep.
-            
-            Debug.LogWarning("[SkillTree] SkillTreeAsset loading disabled - skill trees will be empty until assets are created");
-            
-            _trees[SkillTreeType.Resonator] = new SkillTree { type = SkillTreeType.Resonator, nodes = new List<SkillNode>() };
-            _trees[SkillTreeType.Architect] = new SkillTree { type = SkillTreeType.Architect, nodes = new List<SkillNode>() };
-            _trees[SkillTreeType.Guardian] = new SkillTree { type = SkillTreeType.Guardian, nodes = new List<SkillNode>() };
-            _trees[SkillTreeType.Historian] = new SkillTree { type = SkillTreeType.Historian, nodes = new List<SkillNode>() };
-            
-            // FIXME: Either create SkillTreeAsset ScriptableObjects, or add hardcoded trees here
-            // Original data-driven loading (disabled until circular dep resolved):
-            // _trees[SkillTreeType.Resonator] = LoadTreeFromAsset("SkillTrees/Resonator");
-            // _trees[SkillTreeType.Architect] = LoadTreeFromAsset("SkillTrees/Architect");
-            // _trees[SkillTreeType.Guardian] = LoadTreeFromAsset("SkillTrees/Guardian");
-            // _trees[SkillTreeType.Historian] = LoadTreeFromAsset("SkillTrees/Historian");
+            // Temporary fix: Hardcoded skill trees below. Re-enable SkillTreeAsset when circular dep is resolved.
+
+            Debug.Log("[SkillTree] Building hardcoded skill trees (SkillTreeAsset disabled due to circular dependency)");
+
+            _trees[SkillTreeType.Resonator] = BuildResonatorTree();
+            _trees[SkillTreeType.Architect] = BuildArchitectTree();
+            _trees[SkillTreeType.Guardian] = BuildGuardianTree();
+            _trees[SkillTreeType.Historian] = BuildHistorianTree();
+        }
+
+        SkillTree BuildResonatorTree()
+        {
+            var tree = new SkillTree { type = SkillTreeType.Resonator, nodes = new List<SkillNode>() };
+
+            // Tier 1: Frequency Sense (entry skill)
+            tree.nodes.Add(new SkillNode(SkillId.Res_FreqSense, 1, 100f,
+                "Frequency Sense", "Increased sensitivity to resonant frequencies. +10% tuning precision.",
+                SkillModifierType.TuningPrecision, 0.1f, SkillId.None));
+
+            // Tier 2: Tuning Speed
+            tree.nodes.Add(new SkillNode(SkillId.Res_TuneSpeed, 2, 200f,
+                "Tuning Speed", "Tune buildings 20% faster.",
+                SkillModifierType.TuningSpeed, 0.2f, SkillId.Res_FreqSense));
+
+            // Tier 3: Aether Pool
+            tree.nodes.Add(new SkillNode(SkillId.Res_AetherPool, 3, 350f,
+                "Aether Pool", "Increase max aether capacity by 25%.",
+                SkillModifierType.AetherCapacity, 0.25f, SkillId.Res_TuneSpeed));
+
+            // Tier 4: Cascade
+            tree.nodes.Add(new SkillNode(SkillId.Res_Cascade, 4, 500f,
+                "Cascade Resonance", "Extend combo duration by 3 seconds.",
+                SkillModifierType.ComboDuration, 3f, SkillId.Res_AetherPool));
+
+            // Tier 5: Master Frequency
+            tree.nodes.Add(new SkillNode(SkillId.Res_MasterFreq, 5, 800f,
+                "Master Frequency", "Perfect tuning grants +50% RS reward.",
+                SkillModifierType.RSMultiplier, 0.5f, SkillId.Res_Cascade));
+
+            return tree;
+        }
+
+        SkillTree BuildArchitectTree()
+        {
+            var tree = new SkillTree { type = SkillTreeType.Architect, nodes = new List<SkillNode>() };
+
+            // Tier 1: Blueprint Scan
+            tree.nodes.Add(new SkillNode(SkillId.Arc_BlueprintScan, 1, 100f,
+                "Blueprint Scan", "Reveal building weak points. +10% repair speed.",
+                SkillModifierType.RepairSpeed, 0.1f, SkillId.None));
+
+            // Tier 2: Quick Repair
+            tree.nodes.Add(new SkillNode(SkillId.Arc_QuickRepair, 2, 200f,
+                "Quick Repair", "Restore buildings 25% faster.",
+                SkillModifierType.RepairSpeed, 0.25f, SkillId.Arc_BlueprintScan));
+
+            // Tier 3: Fortify
+            tree.nodes.Add(new SkillNode(SkillId.Arc_Fortify, 3, 350f,
+                "Fortify Structure", "Restored buildings resist corruption 20% better.",
+                SkillModifierType.BuildingResistance, 0.2f, SkillId.Arc_QuickRepair));
+
+            // Tier 4: Mass Restore
+            tree.nodes.Add(new SkillNode(SkillId.Arc_MassRestore, 4, 500f,
+                "Mass Restoration", "Restoration aura affects nearby structures.",
+                SkillModifierType.RepairSpeed, 0.15f, SkillId.Arc_Fortify));
+
+            // Tier 5: Golden Ratio
+            tree.nodes.Add(new SkillNode(SkillId.Arc_GoldenRatio, 5, 800f,
+                "Golden Ratio", "Perfect geometric alignment grants +30% RS from buildings.",
+                SkillModifierType.RSMultiplier, 0.3f, SkillId.Arc_MassRestore));
+
+            return tree;
+        }
+
+        SkillTree BuildGuardianTree()
+        {
+            var tree = new SkillTree { type = SkillTreeType.Guardian, nodes = new List<SkillNode>() };
+
+            // Tier 1: Strong Pulse
+            tree.nodes.Add(new SkillNode(SkillId.Grd_StrongPulse, 1, 100f,
+                "Strong Pulse", "Increase pulse damage by 15%.",
+                SkillModifierType.PulseDamage, 0.15f, SkillId.None));
+
+            // Tier 2: Shield Duration
+            tree.nodes.Add(new SkillNode(SkillId.Grd_ShieldDuration, 2, 200f,
+                "Shield Duration", "Frequency shield lasts 3 seconds longer.",
+                SkillModifierType.ShieldDuration, 3f, SkillId.Grd_StrongPulse));
+
+            // Tier 3: Strike Range
+            tree.nodes.Add(new SkillNode(SkillId.Grd_StrikeRange, 3, 350f,
+                "Strike Range", "Increase attack range by 30%.",
+                SkillModifierType.StrikeRange, 0.3f, SkillId.Grd_ShieldDuration));
+
+            // Tier 4: AOE Purge
+            tree.nodes.Add(new SkillNode(SkillId.Grd_AOEPurge, 4, 500f,
+                "AOE Purge", "Pulse attacks hit multiple enemies.",
+                SkillModifierType.PulseDamage, 0.2f, SkillId.Grd_StrikeRange));
+
+            // Tier 5: Invulnerable
+            tree.nodes.Add(new SkillNode(SkillId.Grd_Invulnerable, 5, 800f,
+                "Invulnerable Stance", "Critical health triggers 5s immunity (once per encounter).",
+                SkillModifierType.CorruptionResistance, 0.5f, SkillId.Grd_AOEPurge));
+
+            return tree;
+        }
+
+        SkillTree BuildHistorianTree()
+        {
+            var tree = new SkillTree { type = SkillTreeType.Historian, nodes = new List<SkillNode>() };
+
+            // Tier 1: Lore Reveal
+            tree.nodes.Add(new SkillNode(SkillId.His_LoreReveal, 1, 100f,
+                "Lore Reveal", "Discover hidden lore fragments. +10% RS from exploration.",
+                SkillModifierType.RSMultiplier, 0.1f, SkillId.None));
+
+            // Tier 2: Secret Paths
+            tree.nodes.Add(new SkillNode(SkillId.His_SecretPaths, 2, 200f,
+                "Secret Paths", "Reveal hidden passages and shortcuts.",
+                SkillModifierType.RSMultiplier, 0.1f, SkillId.His_LoreReveal));
+
+            // Tier 3: Memory Echo
+            tree.nodes.Add(new SkillNode(SkillId.His_MemoryEcho, 3, 350f,
+                "Memory Echo", "Interact with ancient echoes for bonus RS.",
+                SkillModifierType.RSMultiplier, 0.15f, SkillId.His_SecretPaths));
+
+            // Tier 4: Ancient Map
+            tree.nodes.Add(new SkillNode(SkillId.His_AncientMap, 4, 500f,
+                "Ancient Map", "Reveal all undiscovered buildings on current Moon.",
+                SkillModifierType.RSMultiplier, 0.1f, SkillId.His_MemoryEcho));
+
+            // Tier 5: True History
+            tree.nodes.Add(new SkillNode(SkillId.His_TrueHistory, 5, 800f,
+                "True History", "Unlock the full story. +50% RS from all lore discoveries.",
+                SkillModifierType.RSMultiplier, 0.5f, SkillId.His_AncientMap));
+
+            return tree;
         }
 
         SkillTree LoadTreeFromAsset(string resourcePath)
@@ -227,7 +348,7 @@ namespace Tartaria.Gameplay
             // var asset = Resources.Load<Data.SkillTreeAsset>(resourcePath);
             Debug.LogWarning($"[SkillTree] LoadTreeFromAsset({resourcePath}) disabled - returning empty tree");
             return new SkillTree { type = SkillTreeType.Resonator, nodes = new List<SkillNode>() };
-            
+
             /* ORIGINAL CODE (disabled):
             if (asset == null)
             {
@@ -236,7 +357,7 @@ namespace Tartaria.Gameplay
             }
 
             var tree = new SkillTree { type = asset.treeType };
-            
+
             // Convert ScriptableObject data to runtime SkillNode instances
             foreach (var nodeData in asset.nodes)
             {
@@ -244,7 +365,7 @@ namespace Tartaria.Gameplay
 
                 // Support multiple prerequisites (use first one for backward compat)
                 var prereq = nodeData.prerequisiteIds.Count > 0 ? nodeData.prerequisiteIds[0] : SkillId.None;
-                
+
                 tree.nodes.Add(new SkillNode(
                     nodeData.skillId,
                     nodeData.tier,

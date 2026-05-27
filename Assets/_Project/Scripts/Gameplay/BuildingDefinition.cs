@@ -48,6 +48,7 @@ namespace Tartaria.Gameplay
 
         [Header("Economy")]
         public int baseIncome = 10;
+        public int rsReward = 150; // RS granted on building discovery/restoration
 
         /// <summary>
         /// Returns the golden ratio accuracy for this building's proportions.

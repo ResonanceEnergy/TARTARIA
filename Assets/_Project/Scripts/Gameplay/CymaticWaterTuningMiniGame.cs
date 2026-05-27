@@ -29,7 +29,7 @@ namespace Tartaria.Gameplay
             Instance = this;
         }
 
-        public void StartMiniGame(float customTime = -1) { _active = true; Debug.Log("[Cymatic] Mini-game started (Moon 1 stub)."); }
+        public void StartMiniGame(float customTime = -1) { _active = true; Debug.Log("[Cymatic] Mini-game started."); }
         public void EndMiniGame(bool success) { _active = false; if (success) _completions++; }
         public void OnTuningInput(float freq, float amp) { }
         public float GetCurrentAccuracy() => _bestAccuracy;

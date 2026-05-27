@@ -220,7 +220,7 @@ namespace Tartaria.Core
         /// Raised when Integration systems need to display a full-screen banner.
         /// Subscribers: HUDController (banner UI).
         /// </summary>
-        public static event Action<string, string> OnHUDShowBanner; // title, subtitle
+        public static event Action<string, string, float> OnHUDShowBanner; // title, subtitle, duration
 
         /// <summary>
         /// Raised when Integration systems need to display a subtitle.
@@ -491,9 +491,9 @@ namespace Tartaria.Core
             catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowDialogue: {ex}"); }
         }
 
-        public static void RaiseHUDShowBanner(string title, string subtitle)
+        public static void RaiseHUDShowBanner(string title, string subtitle, float duration = 5f)
         {
-            try { OnHUDShowBanner?.Invoke(title, subtitle); }
+            try { OnHUDShowBanner?.Invoke(title, subtitle, duration); }
             catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnHUDShowBanner: {ex}"); }
         }
 

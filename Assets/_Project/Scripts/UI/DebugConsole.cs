@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ namespace Tartaria.UI
     /// <summary>
     /// DebugConsole — in-game command terminal for testing + cheats.
     /// Toggle with ~ (tilde) or F1. Auto-complete with Tab. Command history with Up/Down arrows.
-    /// 
+    ///
     /// Built-in commands:
     /// - /help → list all commands
     /// - /moon <N> → unlock Moon N
@@ -21,7 +22,7 @@ namespace Tartaria.UI
     /// - /god → toggle godmode
     /// - /speed <N> → set player speed multiplier
     /// - /clear → clear console log
-    /// 
+    ///
     /// Usage:
     /// - Attach to Canvas GameObject
     /// - RegisterCommand("cmdname", callback) for custom commands
@@ -38,8 +39,8 @@ namespace Tartaria.UI
         [SerializeField] ScrollRect scrollRect;
 
         [Header("Settings")]
-        [SerializeField] KeyCode toggleKey = KeyCode.BackQuote;  // Tilde ~
-        [SerializeField] KeyCode toggleKeyAlt = KeyCode.F1;
+        [SerializeField] Key toggleKey = Key.Backquote; // ~ (tilde)
+        [SerializeField] Key toggleKeyAlt = Key.F1;
         [SerializeField] int maxOutputLines = 100;
         [SerializeField] bool startHidden = true;
 
@@ -70,8 +71,11 @@ namespace Tartaria.UI
 
         void Update()
         {
+            var keyboard = Keyboard.current;
+            if (keyboard == null) return;
+
             // Toggle console
-            if (UnityEngine.Input.GetKeyDown(toggleKey) || UnityEngine.Input.GetKeyDown(toggleKeyAlt))
+            if (keyboard[toggleKey].wasPressedThisFrame || keyboard[toggleKeyAlt].wasPressedThisFrame)
             {
                 ToggleConsole();
             }
@@ -79,17 +83,17 @@ namespace Tartaria.UI
             if (!_isVisible) return;
 
             // Command history navigation
-            if (UnityEngine.Input.GetKeyDown(KeyCode.UpArrow))
+            if (keyboard[Key.UpArrow].wasPressedThisFrame)
             {
                 NavigateHistory(-1);
             }
-            else if (UnityEngine.Input.GetKeyDown(KeyCode.DownArrow))
+            else if (keyboard[Key.DownArrow].wasPressedThisFrame)
             {
                 NavigateHistory(1);
             }
 
             // Submit command
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Return) || UnityEngine.Input.GetKeyDown(KeyCode.KeypadEnter))
+            if (keyboard[Key.Enter].wasPressedThisFrame || keyboard[Key.NumpadEnter].wasPressedThisFrame)
             {
                 if (inputField != null && !string.IsNullOrWhiteSpace(inputField.text))
                 {
@@ -100,7 +104,7 @@ namespace Tartaria.UI
             }
 
             // Auto-complete with Tab
-            if (UnityEngine.Input.GetKeyDown(KeyCode.Tab))
+            if (keyboard[Key.Tab].wasPressedThisFrame)
             {
                 AutoComplete();
             }
@@ -149,25 +153,17 @@ namespace Tartaria.UI
                 if (args.Length < 1) { LogError("Usage: /rs <amount>"); return; }
                 if (float.TryParse(args[0], out float amount))
                 {
-                    var trackerType = System.Type.GetType("Tartaria.Integration.RunProgressTracker, Tartaria.Integration");
-                    var tracker = trackerType != null ? FindObjectOfType(trackerType) : null;
-                    if (tracker != null)
+                    var aether = Core.AetherFieldManager.Instance;
+                    if (aether != null)
                     {
-                        // Set RS via reflection or direct access
-                        var field = tracker.GetType().GetField("_totalRS", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                        if (field != null)
-                        {
-                            field.SetValue(tracker, amount);
-                            Log($"RS set to {amount}");
-                        }
-                        else
-                        {
-                            LogError("RS field not found (reflection failed)");
-                        }
+                        // Set RS by calculating delta from current
+                        float delta = amount - aether.ResonanceScore;
+                        aether.AddResonanceScore(delta);
+                        Log($"RS set to {aether.ResonanceScore:F1}");
                     }
                     else
                     {
-                        LogError("RunProgressTracker not found");
+                        LogError("AetherFieldManager not found");
                     }
                 }
                 else

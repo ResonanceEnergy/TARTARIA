@@ -160,7 +160,7 @@ namespace Tartaria.Integration
                 Debug.LogError($"[Dialogue] Line load failure: {line.id} has no text. Showing placeholder. (Auto-logged to CrashReporter)");
             }
 
-            // UIManager.Instance?.ShowDialogue(line.speaker, displayText); // UI assembly disabled (Phase 7)
+            UI.UIManager.Instance?.ShowDialogue(line.speaker, displayText);
 
             // P1 AUDIT FIX: Skip VO playback when line text is missing to avoid audio/text desync
             if (!isMissing)
@@ -187,7 +187,7 @@ namespace Tartaria.Integration
 
         void HideLine()
         {
-            // UIManager.Instance?.HideDialogue(); // UI assembly disabled (Phase 7)
+            UI.UIManager.Instance?.HideDialogue();
         }
 
         // ─── Database ────────────────────────────────

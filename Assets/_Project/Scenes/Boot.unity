@@ -164,6 +164,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Tartaria.Save::Tartaria.Save.SaveManager
   autoSaveIntervalSeconds: 10
+  enableEncryption: 1
+  enableCompression: 1
 --- !u!1 &222391999
 GameObject:
   m_ObjectHideFlags: 0
@@ -208,6 +210,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df3c9216c944c46418bc2df606c15ae1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tartaria.Audio::Tartaria.Audio.AudioManager
+  mixer: {fileID: 0}
+  musicGroup: {fileID: 0}
+  sfxGroup: {fileID: 0}
+  uiGroup: {fileID: 0}
+  ambienceGroup: {fileID: 0}
+  footstepsGroup: {fileID: 0}
+  explorationSnapshot: {fileID: 0}
+  combatSnapshot: {fileID: 0}
+  snapshotTransitionSeconds: 1.5
+  autoTransitionWithGameState: 1
+  cueLibrary: {fileID: 0}
+  explorationMusic: {fileID: 0}
+  musicVolume: 0.3
   sfxPoolSize: 16
   tonePoolSize: 4
 --- !u!1 &233746781
@@ -219,7 +234,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 233746782}
-  - component: {fileID: 233746783}
   m_Layer: 0
   m_Name: AccessibilityManager
   m_TagString: Untagged
@@ -242,18 +256,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1979584547}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &233746783
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 233746781}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e502685373174704da258a9909956996, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.UI::Tartaria.UI.AccessibilityManager
 --- !u!1 &494198716
 GameObject:
   m_ObjectHideFlags: 0
@@ -477,6 +479,8 @@ MonoBehaviour:
   aetherCellSize: 2
   aetherDissipation: 0.05
   aetherAdvectionSpeed: 1
+  performanceProfile: {fileID: 0}
+  autoDetectHardwareTier: 1
 --- !u!4 &913557910
 Transform:
   m_ObjectHideFlags: 0

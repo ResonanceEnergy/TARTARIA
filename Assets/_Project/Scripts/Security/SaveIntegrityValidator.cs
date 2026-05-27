@@ -113,10 +113,10 @@ namespace Tartaria.Security
                 byte[] saveData = File.ReadAllBytes(saveFilePath);
 
                 // 1. Decrypt if encrypted
-                bool isEncrypted = SaveEncryptionHelper.IsEncrypted(saveData);
+                bool isEncrypted = Tartaria.Save.SaveEncryptionHelper.IsEncrypted(saveData);
                 if (isEncrypted)
                 {
-                    saveData = SaveEncryptionHelper.Decrypt(saveData);
+                    saveData = Tartaria.Save.SaveEncryptionHelper.Decrypt(saveData);
                 }
 
                 // 2. Parse JSON
@@ -337,36 +337,6 @@ namespace Tartaria.Security
 
             return ValidateCriticalFields(structure, out error);
         }
-
-        // DISABLED: SaveFile type does not exist - dead code overload
-        /*
-        bool ValidateCriticalFields(SaveFile save, out string error)
-        {
-            // Wrapper for SaveFile → SaveFileStructure conversion
-            var structure = new SaveFileStructure
-            {
-                version = save.version,
-                player = new PlayerDataStructure
-                {
-                    level = save.playerLevel,
-                    xp = save.playerXP,
-                    vitality = save.playerVitality,
-                    resonance = save.playerResonance,
-                    strength = save.playerStrength,
-                    agility = save.playerAgility,
-                    attunement = save.playerAttunement
-                },
-                economy = new EconomyDataStructure
-                {
-                    aetherShards = save.aetherShards,
-                    resonanceCrystals = save.resonanceCrystals,
-                    starFragments = save.starFragments
-                }
-            };
-
-            return ValidateCriticalFields(structure, out error);
-        }
-        */
 
         void PeriodicValidation()
         {

@@ -18,18 +18,21 @@ namespace Tartaria.UI
         int _selected = 0;            // currently highlighted button index
         const int BUTTON_COUNT = 4;   // NEW GAME / CONTINUE / SETTINGS / QUIT
         float _navCooldown;           // debounce stick repeat
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future overwrite-save confirmation modal
         bool _showNewGameConfirm;     // overwrite-save confirmation modal
+#pragma warning restore CS0414
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        static void Bootstrap()
-        {
-            // Bypass for dev / replay sessions.
-            if (PlayerPrefs.GetInt("TARTARIA_SkipMainMenu", 0) == 1) return;
-            GameBootstrap.MainMenuActive = true;
-            var go = new GameObject("MainMenuOverlay");
-            DontDestroyOnLoad(go);
-            _instance = go.AddComponent<MainMenuOverlay>();
-        }
+        // DISABLED for controller testing - menu was blocking scene load
+        // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        // static void Bootstrap()
+        // {
+        //     // Bypass for dev / replay sessions.
+        //     if (PlayerPrefs.GetInt("TARTARIA_SkipMainMenu", 0) == 1) return;
+        //     GameBootstrap.MainMenuActive = true;
+        //     var go = new GameObject("MainMenuOverlay");
+        //     DontDestroyOnLoad(go);
+        //     _instance = go.AddComponent<MainMenuOverlay>();
+        // }
 
         void Update()
         {
@@ -148,10 +151,10 @@ namespace Tartaria.UI
                 continueLabel = string.IsNullOrEmpty(label) ? "CONTINUE" : $"CONTINUE [{label}]";
             }
             string[] labels = { "NEW GAME", continueLabel, "SETTINGS", "QUIT" };
-            
+
             // Guard against null GUI.skin during UIElements init race
             if (GUI.skin == null) return;
-            
+
             for (int i = 0; i < labels.Length; i++)
             {
                 bool sel = (i == _selected);

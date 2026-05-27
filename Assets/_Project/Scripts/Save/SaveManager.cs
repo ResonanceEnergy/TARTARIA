@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace Tartaria.Save
     ///   - Zone transitions, quest completion, building placed
     ///   - Alt-tab / minimize (emergency serialize < 2s)
     ///   - Application quit
-    /// 
+    ///
     /// Agent 9 Optimizations:
     ///   - Binary serialization (10x faster than JSON)
     ///   - GZip compression (10x smaller files)
@@ -37,7 +37,9 @@ namespace Tartaria.Save
 
         [SerializeField] float autoSaveIntervalSeconds = 10f;
         [SerializeField] bool enableEncryption = true; // Enable AES encryption for save files
+#pragma warning disable CS0414 // Assigned but never used - compression planned
         [SerializeField] bool enableCompression = true; // Enable compression for save files
+#pragma warning restore CS0414
 
         // Day-9: self-bootstrap so the ~12 callsites of MarkDirty() actually persist.
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -83,7 +85,7 @@ namespace Tartaria.Save
             // Initialize serializer (default to JSON for now, can be injected via SetSerializer)
             if (_serializer == null)
             {
-                Debug.LogWarning("[SaveManager] No serializer set, using default. Call SetSerializer() to use custom serializer from Serialization assembly.");
+                // Using default JSON serializer (custom serializer can be injected via SetSerializer if needed)
                 _serializer = new DefaultJsonSerializer();
             }
 
@@ -111,7 +113,7 @@ namespace Tartaria.Save
         }
 
         // ─── DEFAULT JSON SERIALIZER ─────────────────────────────────────────
-        
+
         /// <summary>
         /// Simple JSON serializer as fallback. Use Serialization assembly for production serializers.
         /// </summary>
@@ -137,7 +139,7 @@ namespace Tartaria.Save
         {
             // v17: Auto-discover all ISaveDataProvider implementations
             DiscoverProviders();
-            
+
             LoadOrCreate();
             // Phase 3 R4: background cloud check for newer save + conflict resolution (offline safe)
             _cloudService?.CheckForNewerCloudSaveAndResolve();
@@ -259,7 +261,7 @@ namespace Tartaria.Save
                     _isDirty = false;
                 }
             }
-            
+
             if (shouldSave)
                 Save();
         }
@@ -353,7 +355,7 @@ namespace Tartaria.Save
             FireBeforeSave();
             _currentSave.header.modifiedUtc = DateTime.UtcNow.ToString("o");
             _currentSave.header.playTimeSeconds += _autoSaveTimer;
-            
+
             // V18: Update extended metadata
             UpdateExtendedMetadata();
 
@@ -363,7 +365,7 @@ namespace Tartaria.Save
             try
             {
                 byte[] serialized;
-                
+
                 // Agent 9: Use configured serializer
                 serialized = _serializer.Serialize(_currentSave);
 
@@ -383,7 +385,7 @@ namespace Tartaria.Save
                 // {
                 //     serialized = CompressionHelper.Compress(serialized, CompressionType.GZip);
                 // }
-                
+
                 // V18: ROTATE BACKUPS BEFORE SAVING (keep last 3 backups)
                 RotateBackups();
 
@@ -391,13 +393,13 @@ namespace Tartaria.Save
                 // If primary write fails, backup still holds the previous good save.
                 string tempPath = _savePath + ".tmp";
                 File.WriteAllBytes(tempPath, serialized);
-                
+
                 if (File.Exists(_savePath))
                     File.Copy(_savePath, _backupPath, overwrite: true);
                 if (File.Exists(_savePath))
                     File.Delete(_savePath);
                 File.Move(tempPath, _savePath);
-                
+
                 _isDirty = false;
 
                 Debug.Log($"[SaveManager] Save completed: {serialized.Length / 1024f:F1} KB ({_serializer.Name})");
@@ -424,17 +426,17 @@ namespace Tartaria.Save
             SaveData loadedSave = null;
             float corruptedPlayTime = 0f;
             int corruptedVersion = 0;
-            
+
             // Try primary save first
             _currentSave = TryLoadFromPath(_savePath);
 
             if (_currentSave == null)
             {
                 Debug.LogWarning("[SaveManager] Primary save failed — trying immediate backup");
-                
+
                 // Try immediate backup (old system)
                 _currentSave = TryLoadFromPath(_backupPath);
-                
+
                 if (_currentSave != null)
                 {
                     Debug.LogWarning("[SaveManager] ✅ Loaded from immediate backup (legacy .backup.dat)");
@@ -445,7 +447,7 @@ namespace Tartaria.Save
             {
                 loadedSave = _currentSave;
             }
-            
+
             // V18: If still null, try rollback chain
             if (_currentSave == null)
             {
@@ -583,7 +585,7 @@ namespace Tartaria.Save
 
         /// <summary>R6: Returns all archived conflicts for UI review / recovery tools.</summary>
         public ArchivedConflict[] GetArchivedConflicts() => _currentSave?.conflictArchive?.archivedConflicts ?? System.Array.Empty<ArchivedConflict>();
-        
+
         /// <summary>V18: Returns rollback history for debugging and player transparency.</summary>
         public System.Collections.Generic.List<RollbackEntry> GetRollbackHistory() => _currentSave?.rollbackHistory ?? new System.Collections.Generic.List<RollbackEntry>();
 
@@ -752,7 +754,7 @@ namespace Tartaria.Save
             catch (Exception ex)
             {
                 Debug.LogWarning("[SaveManager] Compression failed (falling back): " + ex.Message);
-                
+
                 // P1 AUDIT FIX: Use GameEvents instead of direct UI reference (assembly dependency issue)
                 GameEvents.FireHUDAchievementToast("⚠️ Save file not compressed (low disk space?)");
             }
@@ -819,26 +821,26 @@ namespace Tartaria.Save
                     // Compute checksum of loaded data (excluding the checksum field itself)
                     string savedChecksum = saveData.header.checksum;
                     saveData.header.checksum = ""; // Zero it for recomputation
-                    
+
                     byte[] reserializedForCheck = _serializer.Serialize(saveData);
                     string computedChecksum = ComputeChecksumBytes(reserializedForCheck);
-                    
+
                     // Restore original checksum
                     saveData.header.checksum = savedChecksum;
-                    
+
                     if (savedChecksum != computedChecksum)
                     {
                         Debug.LogError($"[SaveManager] ❌ CHECKSUM MISMATCH in {path}!");
                         Debug.LogError($"  Expected: {savedChecksum.Substring(0, 16)}...");
                         Debug.LogError($"  Computed: {computedChecksum.Substring(0, 16)}...");
                         Debug.LogError($"  Save file is CORRUPTED — attempting rollback recovery");
-                        
+
                         // Track this corruption for rollback history
                         RecordCorruptionEvent(path, savedChecksum, saveData.version, saveData.header.playTimeSeconds);
-                        
+
                         return null; // Will trigger backup fallback in LoadOrCreate
                     }
-                    
+
                     Debug.Log($"[SaveManager] ✅ Checksum validated for {path} ({savedChecksum.Substring(0, 8)}...)");
                 }
 
@@ -930,7 +932,7 @@ namespace Tartaria.Save
 
         /// <summary>
         /// Schema migration — ensures old saves work with new code.
-        /// 
+        ///
         /// V1-V17: Legacy manual migrations (preserved for backward compatibility)
         /// V18+: New migration pipeline system with MigrationPipeline and SchemaVersion
         /// </summary>
@@ -950,7 +952,7 @@ namespace Tartaria.Save
                 if (data.version < SchemaVersion.CURRENT_SAVE)
                 {
                     Debug.Log($"[SaveManager] Migrating save v{data.version} → v{SchemaVersion.CURRENT_SAVE}");
-                    
+
                     // Build migration pipeline
                     var pipeline = new MigrationPipeline<SaveData>();
                     pipeline.Register(new SaveDataMigrator_V17_to_V18());
@@ -974,7 +976,7 @@ namespace Tartaria.Save
 
             // ── Legacy Manual Migrations (v1-v17) ───────────────────────────
             // Preserved for saves created before v18 migration system
-            
+
             if (data.header.schemaVersion < 2)
             {
                 // v1 → v2: add Anastasia, quest, workshop, zone blocks
@@ -1145,7 +1147,7 @@ namespace Tartaria.Save
         // ═══════════════════════════════════════════════════════════════
         // V18 ENHANCEMENTS: Backup Rotation + Checksum + Rollback System
         // ═══════════════════════════════════════════════════════════════
-        
+
         /// <summary>
         /// V18: Update extended metadata fields in save header.
         /// Called before every save to track progression metrics.
@@ -1153,33 +1155,33 @@ namespace Tartaria.Save
         void UpdateExtendedMetadata()
         {
             if (_currentSave?.header == null) return;
-            
+
             var header = _currentSave.header;
-            
+
             // Current moon (infer from completed moons or moon flags)
             header.currentMoon = CalculateCurrentMoon();
-            
+
             // Quest completion rate (completed quests / total quests)
             header.questCompletionRate = CalculateQuestCompletionRate();
-            
+
             // Buildings restored count
             header.buildingsRestored = _currentSave.world?.buildings?
                 .Count(b => b.state >= 3) ?? 0; // state >= 3 = emerging/active
-            
+
             // Note: totalDeaths and enemiesDefeated would be updated by
             // PlayerHealthController and CombatManager respectively via MarkDirty()
         }
-        
+
         /// <summary>
         /// V18: Calculate current moon based on progression.
         /// </summary>
         int CalculateCurrentMoon()
         {
             if (_currentSave?.campaign == null) return 1;
-            
+
             // Check completed moons (assuming campaign tracks this)
             int completedMoons = _currentSave.campaign.currentMoon;
-            
+
             // If not tracked, infer from moon flags
             if (completedMoons <= 0)
             {
@@ -1189,26 +1191,26 @@ namespace Tartaria.Save
                         return moon;
                 }
             }
-            
+
             return completedMoons > 0 ? completedMoons : 1;
         }
-        
+
         /// <summary>
         /// V18: Calculate quest completion percentage.
         /// </summary>
         float CalculateQuestCompletionRate()
         {
             if (_currentSave?.quests == null) return 0f;
-            
+
             // Count completed quests from entries (status == completed)
             int completed = _currentSave.quests.entries?.Count(e => e.status == 2) ?? 0; // 2 = completed
-            
+
             // Total quests in game (from audit report: 184 total quests)
             const int TOTAL_QUESTS = 184;
-            
+
             return completed / (float)TOTAL_QUESTS;
         }
-        
+
         /// <summary>
         /// V18: Rotate backups to keep last 3 save versions.
         /// Backup naming: save_slot_N.backup.0.dat (most recent) → .backup.2.dat (oldest)
@@ -1219,26 +1221,26 @@ namespace Tartaria.Save
             {
                 string backupDir = Path.GetDirectoryName(_savePath);
                 string baseName = Path.GetFileNameWithoutExtension(_savePath);
-                
+
                 // Shift backups: .backup.2 ← .backup.1 ← .backup.0 ← current
                 for (int i = 2; i >= 1; i--)
                 {
                     string older = Path.Combine(backupDir, $"{baseName}.backup.{i-1}.dat");
                     string newer = Path.Combine(backupDir, $"{baseName}.backup.{i}.dat");
-                    
+
                     if (File.Exists(older))
                     {
                         File.Copy(older, newer, overwrite: true);
                     }
                 }
-                
+
                 // Copy current primary save to .backup.0
                 if (File.Exists(_savePath))
                 {
                     string latestBackup = Path.Combine(backupDir, $"{baseName}.backup.0.dat");
                     File.Copy(_savePath, latestBackup, overwrite: true);
                 }
-                
+
                 Debug.Log("[SaveManager] V18: Backup rotation complete (3 backups maintained)");
             }
             catch (Exception e)
@@ -1246,14 +1248,14 @@ namespace Tartaria.Save
                 Debug.LogWarning($"[SaveManager] Backup rotation failed: {e.Message}");
             }
         }
-        
+
         /// <summary>
         /// V18: Record corruption event for rollback history tracking.
         /// </summary>
         void RecordCorruptionEvent(string corruptedPath, string badChecksum, int saveVersion, float playTime)
         {
             if (_currentSave == null) return;
-            
+
             var entry = new RollbackEntry
             {
                 timestamp = DateTime.UtcNow.ToString("o"),
@@ -1262,17 +1264,17 @@ namespace Tartaria.Save
                 previousChecksum = badChecksum,
                 playTimeLost = 0f // Will be calculated after rollback
             };
-            
+
             // Keep only last 10 rollback entries
             _currentSave.rollbackHistory.Add(entry);
             if (_currentSave.rollbackHistory.Count > 10)
             {
                 _currentSave.rollbackHistory.RemoveAt(0);
             }
-            
+
             Debug.LogWarning($"[SaveManager] V18: Recorded corruption event (total events: {_currentSave.rollbackHistory.Count})");
         }
-        
+
         /// <summary>
         /// V18: Attempt rollback recovery from backup chain (try .backup.0 → .backup.1 → .backup.2).
         /// Returns recovered save or null if all backups corrupted.
@@ -1280,31 +1282,31 @@ namespace Tartaria.Save
         SaveData AttemptRollbackRecovery(float corruptedPlayTime, int corruptedVersion)
         {
             Debug.LogWarning("[SaveManager] V18: ⚠️ PRIMARY SAVE CORRUPTED — Attempting rollback recovery...");
-            
+
             string backupDir = Path.GetDirectoryName(_savePath);
             string baseName = Path.GetFileNameWithoutExtension(_savePath);
-            
+
             // Try backups in order: .backup.0 (most recent) → .backup.2 (oldest)
             for (int i = 0; i <= 2; i++)
             {
                 string backupPath = Path.Combine(backupDir, $"{baseName}.backup.{i}.dat");
-                
+
                 if (!File.Exists(backupPath))
                 {
                     Debug.LogWarning($"[SaveManager]   Backup {i} not found: {backupPath}");
                     continue;
                 }
-                
+
                 Debug.Log($"[SaveManager]   Trying backup {i}: {backupPath}");
                 SaveData backup = TryLoadFromPath(backupPath);
-                
+
                 if (backup != null)
                 {
                     Debug.Log($"[SaveManager] ✅ ROLLBACK SUCCESSFUL from backup {i}");
-                    
+
                     // Calculate playtime lost
                     float playTimeLost = corruptedPlayTime - (backup.header?.playTimeSeconds ?? 0f);
-                    
+
                     // Record successful rollback
                     var rollbackEntry = new RollbackEntry
                     {
@@ -1314,15 +1316,15 @@ namespace Tartaria.Save
                         previousChecksum = "",
                         playTimeLost = playTimeLost
                     };
-                    
+
                     backup.rollbackHistory.Add(rollbackEntry);
-                    
+
                     // Show notification to player
                     GameEvents.FireHUDAchievementToast($"⚠️ Save restored from backup (-{playTimeLost:F0}s progress lost)");
-                    
+
                     // Restore as primary save
                     File.Copy(backupPath, _savePath, overwrite: true);
-                    
+
                     return backup;
                 }
                 else
@@ -1330,10 +1332,10 @@ namespace Tartaria.Save
                     Debug.LogError($"[SaveManager]   Backup {i} also corrupted or invalid");
                 }
             }
-            
+
             Debug.LogError("[SaveManager] ❌ ALL ROLLBACK ATTEMPTS FAILED — No valid backup found!");
             GameEvents.FireHUDAchievementToast("⚠️ Save corrupted — all backups failed. Starting new game.");
-            
+
             return null; // No recovery possible
         }
 
@@ -1381,7 +1383,7 @@ namespace Tartaria.Save
         void FireBeforeSave()
         {
             OnBeforeSave?.Invoke(_currentSave);
-            
+
             // v17: Serialize all registered providers
             SerializeProviders();
         }
@@ -1389,7 +1391,7 @@ namespace Tartaria.Save
         void FireAfterLoad()
         {
             OnAfterLoad?.Invoke(_currentSave);
-            
+
             // v17: Deserialize all registered providers
             DeserializeProviders();
         }
@@ -1407,7 +1409,7 @@ namespace Tartaria.Save
         {
             if (provider == null) return;
             if (_registeredProviders.Contains(provider)) return;
-            
+
             _registeredProviders.Add(provider);
             Debug.Log($"[SaveManager] Registered provider: {provider.GetProviderKey()}");
         }
@@ -1427,12 +1429,12 @@ namespace Tartaria.Save
         /// </summary>
         void DiscoverProviders()
         {
-            var providers = FindObjectsOfType<MonoBehaviour>().OfType<ISaveDataProvider>();
+            var providers = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ISaveDataProvider>();
             foreach (var provider in providers)
             {
                 RegisterProvider(provider);
             }
-            
+
             Debug.Log($"[SaveManager] Discovered {_registeredProviders.Count} save data providers");
         }
 
@@ -1450,7 +1452,7 @@ namespace Tartaria.Save
                 {
                     string key = provider.GetProviderKey();
                     object data = provider.GetSaveData();
-                    
+
                     if (data == null)
                     {
                         Debug.LogWarning($"[SaveManager] Provider {key} returned null data");
@@ -1460,7 +1462,7 @@ namespace Tartaria.Save
                     // Serialize to JSON string (JsonUtility requires serializable types)
                     string json = JsonUtility.ToJson(data);
                     _currentSave.providerData.SetProvider(key, json);
-                    
+
                     Debug.Log($"[SaveManager] Serialized provider: {key} ({json.Length} bytes)");
                 }
                 catch (Exception e)
@@ -1484,7 +1486,7 @@ namespace Tartaria.Save
                 {
                     string key = provider.GetProviderKey();
                     string json = _currentSave.providerData.GetProvider(key);
-                    
+
                     if (string.IsNullOrEmpty(json))
                     {
                         Debug.LogWarning($"[SaveManager] No saved data for provider: {key}");
@@ -1495,7 +1497,7 @@ namespace Tartaria.Save
                     // Provider must handle deserialization (knows its own type)
                     // We pass the JSON string and let provider deserialize
                     provider.RestoreSaveData(json);
-                    
+
                     Debug.Log($"[SaveManager] Deserialized provider: {key} ({json.Length} bytes)");
                 }
                 catch (Exception e)
@@ -1572,10 +1574,10 @@ namespace Tartaria.Save
                     catch (Exception ex)
                     {
                         UnityEngine.Debug.LogWarning("[SteamCloudBackend] Upload error: " + ex.Message);
-                        
+
                         // P1 AUDIT FIX: Show UI notification for Steam cloud failures
                         GameEvents.FireHUDCloudQueueToast("Steam cloud sync error - will retry");
-                        
+
                         return false;
                     }
                 }
@@ -1613,10 +1615,10 @@ namespace Tartaria.Save
                     catch (Exception ex)
                     {
                         UnityEngine.Debug.LogWarning("[FirebaseCloudBackend] Upload failed (will retry via queue): " + ex.Message);
-                        
-                        // P1 AUDIT FIX: Show UI notification for Firebase cloud failures  
+
+                        // P1 AUDIT FIX: Show UI notification for Firebase cloud failures
                         GameEvents.FireHUDCloudQueueToast("Cloud backup error - will retry");
-                        
+
                         return false;
                     }
                 }
@@ -1691,7 +1693,7 @@ namespace Tartaria.Save
                 catch (Exception e)
                 {
                     Debug.LogWarning("[CloudSaveService] ForceApply failed: " + e.Message);
-                    
+
                     // P1 AUDIT FIX: Show UI notification when cloud merge fails
                     GameEvents.FireHUDAchievementToast("⚠️ Cloud save merge failed - check connection");
                 }
@@ -1815,7 +1817,7 @@ namespace Tartaria.Save
                         catch (Exception ex)
                         {
                             Debug.LogWarning("[Cloud] Steam backend failed: " + ex.Message);
-                            
+
                             // P1 AUDIT FIX: Immediate feedback on upload exception
                             if (p.retryCount == 0)
                                 GameEvents.FireHUDCloudQueueToast("Cloud sync error detected...");
@@ -1832,7 +1834,7 @@ namespace Tartaria.Save
                         {
                             // P1 AUDIT FIX: Log Firebase failures for debugging + show immediate UI feedback
                             Debug.LogWarning($"[Cloud] Firebase backend failed (retry {p.retryCount}): " + ex.Message);
-                            
+
                             // Show immediate feedback on first failure
                             if (p.retryCount == 0)
                                 GameEvents.FireHUDCloudQueueToast("Cloud backup error - retrying...");
@@ -1847,7 +1849,7 @@ namespace Tartaria.Save
                                 Debug.Log($"[CloudSaveService] Cloud upload verified (checksum match path) for {p.timestampUtc}");
                             _pending.RemoveAt(i);
                             GameEvents.FireHUDAchievementToast("Cloud sync complete");
-                            
+
                             // P1 AUDIT FIX: Clear persistent sync indicator when successful
                             if (_pending.Count == 0)
                                 GameEvents.FireHUDCloudQueueToast(""); // Clear indicator
@@ -1855,14 +1857,14 @@ namespace Tartaria.Save
                         else
                         {
                             p.retryCount++;
-                            
+
                             // P1 AUDIT FIX: Show persistent UI indicator for pending/failing syncs
                             if (p.retryCount >= 3)
                             {
                                 // After 3 failures, show persistent warning
                                 GameEvents.FireHUDCloudQueueToast($"Cloud sync retrying ({p.retryCount}/5)...");
                             }
-                            
+
                             if (p.retryCount > 5)
                             {
                                 // P1 AUDIT FIX: Alert user when save is dropped after max retries
@@ -1877,7 +1879,7 @@ namespace Tartaria.Save
                     {
                         // R6: In deep sim offline, still allow forced flush path but increment retries visibly
                         p.retryCount++;
-                        
+
                         // P1 AUDIT FIX: Show offline indicator
                         if (p.retryCount == 1)
                         {
@@ -1941,7 +1943,7 @@ namespace Tartaria.Save
                 catch (Exception e)
                 {
                     Debug.LogWarning("[CloudSaveService] Cloud check failed (offline safe): " + e.Message);
-                    
+
                     // P1 AUDIT FIX: Show UI notification for cloud conflict resolution failures
                     GameEvents.FireHUDAchievementToast("Cloud save check failed (offline mode)");
                 }

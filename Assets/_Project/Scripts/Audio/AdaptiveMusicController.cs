@@ -6,12 +6,16 @@ namespace Tartaria.Audio
     /// <summary>
     /// Adaptive Music Controller — 4-layer RS-reactive music system.
     ///
-    /// Layer 0 (RS 0-25):   Ambient drone, desolate, sparse
-    /// Layer 1 (RS 15-50):  Melodic fragments emerge, hope
+    /// Layer 0 (RS 0-25):   Ambient drone, desolate, sparse (fades out)
+    /// Layer 1 (RS 15-55):  Melodic fragments emerge, hope (fades in 15-50, fades out 50-55)
     /// Layer 2 (RS 40-75):  Full orchestral, harmonic richness
     /// Layer 3 (RS 65-100): Triumphant, golden cascade, choir
+    /// Schumann (RS 48-100): 7.83 Hz resonance layer (crossfades with L1 at RS 48-55)
     /// Combat overlay:      Percussive rhythm, low pulse
     /// Boss overlay:        Dissonant tritone tension
+    ///
+    /// CROSSFADE FIX (RS 50): Layer 1 fades out 50-55 while Schumann fades in 48-100,
+    /// preventing layer congestion and AudioMixer routing conflicts.
     ///
     /// All audio generated procedurally at runtime (prototype mode).
     /// Zone-specific motifs via golden-ratio frequency stepping.
@@ -203,7 +207,12 @@ namespace Tartaria.Audio
         void UpdateLayerVolumes()
         {
             float l0 = RS2Volume(0f, 25f, inverse: true);
-            float l1 = RS2Volume(15f, 50f);
+
+            // Layer 1: Fade in 15-50, fade out 50-55 (crossfade with Schumann)
+            float l1In = RS2Volume(15f, 50f);
+            float l1Out = 1f - RS2Volume(50f, 55f);
+            float l1 = l1In * l1Out;
+
             float l2 = RS2Volume(40f, 75f);
             float l3 = RS2Volume(65f, 100f);
 
@@ -212,9 +221,15 @@ namespace Tartaria.Audio
             SmoothVolume(_layer2Orchestral, l2 * masterVolume);
             SmoothVolume(_layer3Triumphant, l3 * masterVolume);
 
-            // Schumann layer fades in at RS 50+ (restoration progress)
-            float lSch = RS2Volume(50f, 100f);
+            // Schumann layer: Start at RS 48 for 2-point overlap with L1 fadeout
+            float lSch = RS2Volume(48f, 100f);
             SmoothVolume(_schumannLayer, lSch * masterVolume * 0.6f);
+
+            // Debug logging at RS 50 threshold (only log when crossing)
+            if (_currentRS >= 49.5f && _currentRS <= 50.5f && Time.frameCount % 60 == 0)
+            {
+                Debug.Log($"[AdaptiveMusic] RS {_currentRS:F1} — L1:{l1:F2} L2:{l2:F2} Sch:{lSch:F2}");
+            }
         }
 
         float RS2Volume(float start, float end, bool inverse = false)

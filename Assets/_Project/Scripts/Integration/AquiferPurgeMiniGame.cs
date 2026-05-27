@@ -161,9 +161,8 @@ namespace Tartaria.Integration
             if (_currentLayer == 2)
             {
                 OnBossSpawned?.Invoke();
-                // DISABLED (Phase 45) - BossEncounterSystem not yet available
-                // BossEncounterSystem.Instance?.SpawnBoss("sludge_leviathan");
-                Debug.Log("[AquiferPurge] Layer 3 — Sludge Leviathan spawned! (Boss spawn disabled)");
+                BossEncounterSystem.Instance?.SpawnBoss("sludge_leviathan");
+                Debug.Log("[AquiferPurge] Layer 3 — Sludge Leviathan spawned!");
             }
 
             Debug.Log($"[AquiferPurge] Tracing layer {_currentLayer + 1}");
@@ -267,10 +266,9 @@ namespace Tartaria.Integration
             float reward = RSRewardPerLayer;
             if (avgAccuracy >= 0.95f) reward += RSBonusPerfectPurge;
 
-            // DISABLED (Phase 45) - GameLoopController/QuestManager not yet available
-            // GameLoopController.Instance?.OnMiniGameCompleted(reward, "aquifer_purge");
+            GameLoopController.Instance?.OnMiniGameCompleted(reward, "aquifer_purge");
             OnLayerPurged?.Invoke(_currentLayer, avgAccuracy);
-            // QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteMiniGame, "aquifer_purge");
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteMiniGame, "aquifer_purge");
             Audio.AudioManager.Instance?.PlaySFX2D("LayerPurged");
             Input.HapticFeedbackManager.Instance?.PlayDiscovery();
 
@@ -282,13 +280,12 @@ namespace Tartaria.Integration
                 OnAllLayersPurged?.Invoke();
                 Audio.AdaptiveMusicController.Instance?.PlayRestoration();
                 Save.SaveManager.Instance?.MarkDirty();
-                // DISABLED (Phase 45) - VFXController/AchievementSystem/Controllers not yet available
-                // VFXController.Instance?.SpawnAquiferPurificationCascade(transform.position);
+                VFXController.Instance?.SpawnAquiferPurificationCascade(transform.position);
 
                 // Achievement
-                // AchievementSystem.Instance?.Unlock("M05");
-                // KorathController.Instance?.NotifyBuildingRestored();
-                // ThorneController.Instance?.NotifyZoneSecured();
+                AchievementSystem.Instance?.Unlock("M05");
+                KorathController.Instance?.NotifyBuildingRestored();
+                ThorneController.Instance?.NotifyZoneSecured();
                 Debug.Log("[AquiferPurge] All layers purged! Fountain chain activated.");
             }
         }

@@ -197,6 +197,15 @@ namespace Tartaria.Localization
         }
 
         /// <summary>
+        /// STUB: Static accessor for string-based key lookup (for backward compatibility).
+        /// TODO: Migrate callers to Instance.GetText(LocalizationKey).
+        /// </summary>
+        public static string Get(string keyString)
+        {
+            return Instance?.GetText(new LocalizationKey("hud", keyString)) ?? $"[LOC:{keyString}]";
+        }
+
+        /// <summary>
         /// Get translated text with format args (e.g., "Collect {0} items").
         /// </summary>
         public string GetTextFormatted(LocalizationKey key, params object[] args)

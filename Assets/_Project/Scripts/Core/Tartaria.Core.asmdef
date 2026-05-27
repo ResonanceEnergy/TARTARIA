@@ -11,6 +11,7 @@
         "Unity.RenderPipelines.Core.Runtime",
         "Unity.Addressables",
         "Unity.ResourceManager",
+        "Unity.InputSystem",
         "Tartaria.Localization"
     ],
     "includePlatforms": [],

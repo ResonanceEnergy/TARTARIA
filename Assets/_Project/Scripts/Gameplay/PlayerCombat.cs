@@ -85,8 +85,8 @@ namespace Tartaria.Gameplay
                     c.SendMessageUpwards("TakeDamage", (int)effectiveDamage, SendMessageOptions.DontRequireReceiver);
                     c.SendMessageUpwards("TakeDamage", (float)effectiveDamage, SendMessageOptions.DontRequireReceiver);
 
-                    // Sprint: Spawn damage number at hit position (DamageNumberPool disabled - Phase 22)
-                    // DamageNumberPool.Spawn(effectiveDamage, c.transform.position);
+                    // Spawn damage number at hit position
+                    DamageNumberPool.Spawn((int)effectiveDamage, c.transform.position);
 
                     hit++;
                 }

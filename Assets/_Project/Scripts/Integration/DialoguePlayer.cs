@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Data;
+using DialogueChoice = Tartaria.Data.DialogueChoice;
 
 namespace Tartaria.Integration
 {
@@ -24,7 +25,7 @@ namespace Tartaria.Integration
     {
         DialogueTreeAsset _currentTree;
         DialogueNodeData _currentNode;
-        List<DialogueChoice> _currentChoices = new List<DialogueChoice>();
+        List<Tartaria.Data.DialogueChoice> _currentChoices = new List<Tartaria.Data.DialogueChoice>();
         HashSet<string> _visitedNodes = new HashSet<string>();
 
         bool _isPlaying;
@@ -32,14 +33,14 @@ namespace Tartaria.Integration
         float _autoAdvanceTimer;
 
         public event Action<DialogueNodeData> OnNodeDisplayed;
-        public event Action<List<DialogueChoice>> OnChoicesAvailable;
+        public event Action<List<Tartaria.Data.DialogueChoice>> OnChoicesAvailable;
         public event Action<string> OnConversationEnded; // Passes tree ID
 
         public bool IsPlaying => _isPlaying;
         public bool WaitingForChoice => _waitingForChoice;
         public DialogueTreeAsset CurrentTree => _currentTree;
         public DialogueNodeData CurrentNode => _currentNode;
-        public List<DialogueChoice> CurrentChoices => _currentChoices;
+        public List<Tartaria.Data.DialogueChoice> CurrentChoices => _currentChoices;
 
         void Update()
         {
@@ -166,8 +167,7 @@ namespace Tartaria.Integration
             _autoAdvanceTimer = 0f;
 
             // Hide dialogue UI
-            // UIManager.Instance?.HideDialogue(); // UI assembly disabled (Phase 7)
-            // TODO: Re-enable when UI assembly restored
+            UI.UIManager.Instance?.HideDialogue();
 
             Debug.Log($"[DialoguePlayer] Conversation ended: {treeId}");
             OnConversationEnded?.Invoke(treeId);
@@ -205,7 +205,7 @@ namespace Tartaria.Integration
             if (string.IsNullOrEmpty(displayText))
                 displayText = "[MISSING DIALOGUE TEXT]";
 
-            // UIManager.Instance?.ShowDialogue(node.speakerName, displayText); // UI assembly disabled (Phase 7)
+            UI.UIManager.Instance?.ShowDialogue(node.speakerName, displayText);
 
             // Play voice line if available
             if (!string.IsNullOrEmpty(node.voiceLineId))

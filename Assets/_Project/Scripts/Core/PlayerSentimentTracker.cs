@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -13,43 +14,43 @@ namespace Tartaria.Core
     /// - Restart frequency (retrying same quest repeatedly)
     /// - Idle time (stuck/confused players)
     /// - Input spam (mashing buttons in frustration)
-    /// 
+    ///
     /// This is NOT invasive telemetry — it's aggregate behavioral analysis
     /// to help identify pain points early in beta testing.
-    /// 
+    ///
     /// All data is LOCAL ONLY (no cloud upload without explicit consent).
     /// </summary>
     public class PlayerSentimentTracker : MonoBehaviour
     {
         static PlayerSentimentTracker _instance;
         string _sentimentDir;
-        
+
         // Session tracking
         float _sessionStartTime;
         float _lastInputTime;
         float _totalIdleTime;
         int _sessionCount;
-        
+
         // Behavioral flags
         bool _playerDiedRecently;
         float _deathTime;
         const float RAGE_QUIT_WINDOW_SEC = 60f; // Quit within 60s of death = possible rage quit
-        
+
         int _consecutiveDeaths;
         string _lastFailedQuest;
         int _questRestartCount;
-        
+
         float _lastFrameTime;
         int _inputSpamCount;
         const int INPUT_SPAM_THRESHOLD = 10; // 10+ inputs in 1 second = spam
         float _inputSpamWindow;
-        
+
         // Metrics
         List<float> _sessionLengths = new List<float>();
         int _rageQuitCount;
         int _longIdleCount; // >5min idle
         int _inputSpamEvents;
-        
+
         // Sentiment report
         SentimentReport _currentReport;
 
@@ -67,20 +68,20 @@ namespace Tartaria.Core
             _sentimentDir = Path.Combine(Application.dataPath, "..", "Logs", "Sentiment");
             if (!Directory.Exists(_sentimentDir))
                 Directory.CreateDirectory(_sentimentDir);
-            
+
             _sessionStartTime = Time.realtimeSinceStartup;
             _lastInputTime = Time.realtimeSinceStartup;
             _lastFrameTime = Time.realtimeSinceStartup;
             _sessionCount++;
-            
+
             _currentReport = new SentimentReport
             {
                 sessionID = SystemInfo.deviceUniqueIdentifier,
                 sessionStartTime = DateTime.Now
             };
-            
+
             LoadHistoricalData();
-            
+
             Debug.Log($"[PlayerSentimentTracker] Initialized. Session #{_sessionCount}");
         }
 
@@ -88,9 +89,10 @@ namespace Tartaria.Core
         {
             float deltaTime = Time.realtimeSinceStartup - _lastFrameTime;
             _lastFrameTime = Time.realtimeSinceStartup;
-            
+
             // Input activity tracking
-            bool hasInput = Input.anyKey || Input.GetMouseButton(0) || Input.GetMouseButton(1);
+            bool hasInput = (Keyboard.current != null && Keyboard.current.anyKey.isPressed) ||
+                            (Mouse.current != null && (Mouse.current.leftButton.isPressed || Mouse.current.rightButton.isPressed));
             if (hasInput)
             {
                 // Input spam detection
@@ -109,7 +111,7 @@ namespace Tartaria.Core
                     _inputSpamCount = 1;
                     _inputSpamWindow = Time.realtimeSinceStartup;
                 }
-                
+
                 _lastInputTime = Time.realtimeSinceStartup;
             }
             else
@@ -138,16 +140,16 @@ namespace Tartaria.Core
                     Debug.Log($"[PlayerSentimentTracker] Possible rage quit detected ({timeSinceDeath:F1}s after death)");
                 }
             }
-            
+
             // Record session length
             float sessionLength = Time.realtimeSinceStartup - _sessionStartTime;
             _sessionLengths.Add(sessionLength);
             _currentReport.sessionLengthSeconds = (int)sessionLength;
-            
+
             // Save sentiment report
             SaveSentimentReport();
             SaveHistoricalData();
-            
+
             Debug.Log($"[PlayerSentimentTracker] Session ended. Length: {sessionLength:F0}s, RageQuits: {_rageQuitCount}");
         }
 
@@ -199,7 +201,7 @@ namespace Tartaria.Core
             {
                 string filename = $"sentiment-{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt";
                 string filepath = Path.Combine(_sentimentDir, filename);
-                
+
                 using (var writer = new StreamWriter(filepath, false))
                 {
                     writer.WriteLine("=== PLAYER SENTIMENT REPORT ===");
@@ -207,7 +209,7 @@ namespace Tartaria.Core
                     writer.WriteLine($"Session Length: {_currentReport.sessionLengthSeconds}s ({_currentReport.sessionLengthSeconds / 60f:F1}min)");
                     writer.WriteLine($"Session ID: {_currentReport.sessionID}");
                     writer.WriteLine();
-                    
+
                     writer.WriteLine("=== BEHAVIORAL FLAGS ===");
                     writer.WriteLine($"Rage Quit: {_currentReport.rageQuitDetected}");
                     if (_currentReport.rageQuitDetected)
@@ -223,27 +225,27 @@ namespace Tartaria.Core
                         writer.WriteLine($"  Last Failed Quest: {_lastFailedQuest}");
                     }
                     writer.WriteLine();
-                    
+
                     writer.WriteLine("=== SESSION HISTORY ===");
                     writer.WriteLine($"Total Sessions: {_sessionCount}");
                     writer.WriteLine($"Total Rage Quits: {_rageQuitCount}");
                     writer.WriteLine($"Rage Quit Rate: {(_rageQuitCount / (float)_sessionCount * 100f):F1}%");
-                    
+
                     if (_sessionLengths.Count > 0)
                     {
                         float avgSession = 0f;
                         foreach (var length in _sessionLengths)
                             avgSession += length;
                         avgSession /= _sessionLengths.Count;
-                        
+
                         writer.WriteLine($"Average Session: {avgSession / 60f:F1}min");
                         writer.WriteLine($"Shortest Session: {GetMinSessionLength() / 60f:F1}min");
                         writer.WriteLine($"Longest Session: {GetMaxSessionLength() / 60f:F1}min");
                     }
-                    
+
                     writer.WriteLine("\n=== END SENTIMENT REPORT ===");
                 }
-                
+
                 Debug.Log($"[PlayerSentimentTracker] Sentiment report saved: {filename}");
             }
             catch (Exception ex)
@@ -290,11 +292,11 @@ namespace Tartaria.Core
         public static void RecordPlayerDeath(string questID = null)
         {
             if (_instance == null) return;
-            
+
             _instance._playerDiedRecently = true;
             _instance._deathTime = Time.realtimeSinceStartup;
             _instance._consecutiveDeaths++;
-            
+
             if (!string.IsNullOrEmpty(questID))
             {
                 if (_instance._lastFailedQuest == questID)
@@ -309,7 +311,7 @@ namespace Tartaria.Core
                     _instance._questRestartCount = 1;
                 }
             }
-            
+
             // TODO: Restore after implementing event-driven telemetry (CrashReporter moved to LiveOps)
             // CrashReporter.AddBreadcrumb($"PLAYER_DEATH: {questID ?? "unknown"} (deaths: {_instance._consecutiveDeaths})");
             Debug.Log($"[PlayerSentimentTracker] Player died in {questID ?? "unknown"} (deaths: {_instance._consecutiveDeaths})");
@@ -318,12 +320,12 @@ namespace Tartaria.Core
         public static void RecordQuestSuccess(string questID)
         {
             if (_instance == null) return;
-            
+
             // Reset death counters on success
             _instance._consecutiveDeaths = 0;
             _instance._lastFailedQuest = null;
             _instance._questRestartCount = 0;
-            
+
             // TODO: Restore after implementing event-driven telemetry (CrashReporter moved to LiveOps)
             // CrashReporter.AddBreadcrumb($"QUEST_SUCCESS: {questID}");
         }
@@ -331,7 +333,7 @@ namespace Tartaria.Core
         public static SentimentMetrics GetMetrics()
         {
             if (_instance == null) return new SentimentMetrics();
-            
+
             return new SentimentMetrics
             {
                 totalSessions = _instance._sessionCount,

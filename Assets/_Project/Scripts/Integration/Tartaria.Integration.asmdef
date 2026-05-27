@@ -10,6 +10,8 @@
         "Tartaria.Camera",
         "Tartaria.Input",
         "Tartaria.Save",
+        "Tartaria.UI",
+        "Tartaria.Localization",
         "Unity.InputSystem",
         "Unity.Entities",
         "Unity.Collections",

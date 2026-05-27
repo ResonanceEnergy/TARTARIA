@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,14 @@ namespace Tartaria.UI
     /// PerformanceMetricsOverlay — real-time FPS, frame time, memory, draw calls display.
     /// Toggle with F2. Lightweight circular buffer for frame time history.
     /// Color-coded warnings: Green (>60 FPS), Yellow (30-60 FPS), Red (<30 FPS).
-    /// 
+    ///
     /// Metrics:
     /// - FPS (current, min, max, avg)
     /// - Frame time (ms)
     /// - Memory (allocated, reserved, GC count)
     /// - Draw calls, batches, tris
     /// - CPU main thread time
-    /// 
+    ///
     /// Usage:
     /// - Attach to Canvas GameObject (auto-creates if needed)
     /// - Toggle with F2 or call ToggleVisibility()
@@ -33,7 +34,7 @@ namespace Tartaria.UI
         [SerializeField] CanvasGroup canvasGroup;
 
         [Header("Settings")]
-        [SerializeField] KeyCode toggleKey = KeyCode.F2;
+        [SerializeField] Key toggleKey = Key.F2;
         [SerializeField] float updateInterval = 0.25f;  // Update display 4x per second
         [SerializeField] int frameSampleSize = 120;  // 2 seconds at 60 FPS
         [SerializeField] bool startVisible = false;
@@ -83,7 +84,8 @@ namespace Tartaria.UI
         void Update()
         {
             // Toggle visibility
-            if (UnityEngine.Input.GetKeyDown(toggleKey))
+            var keyboard = Keyboard.current;
+            if (keyboard != null && keyboard[toggleKey].wasPressedThisFrame)
             {
                 ToggleVisibility();
             }

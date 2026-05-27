@@ -202,9 +202,8 @@ namespace Tartaria.Integration
             // Progress quest whenever a tower newly syncs
             if (_towersSynced > previousSynced)
             {
-                // DISABLED (Phase 45) - QuestManager not yet available
-                // QuestManager.Instance?.ProgressByType(
-                //     QuestObjectiveType.CompleteMiniGame, "bell_tower_sync");
+                QuestManager.Instance?.ProgressByType(
+                    QuestObjectiveType.CompleteMiniGame, "bell_tower_sync");
             }
         }
 
@@ -227,10 +226,9 @@ namespace Tartaria.Integration
                 _cascadeTriggered = true;
                 OnCascadeTriggered?.Invoke();
                 Audio.AdaptiveMusicController.Instance?.PlayRestoration();
-                // DISABLED (Phase 45) - QuestManager/GameLoopController not yet available
-                // QuestManager.Instance?.ProgressByType(
-                //     QuestObjectiveType.CompleteMiniGame, "bell_tower_sync_game");
-                // GameLoopController.Instance?.OnMiniGameCompleted(_planetaryResonanceScore * 30f, "BellTowerSync");
+                QuestManager.Instance?.ProgressByType(
+                    QuestObjectiveType.CompleteMiniGame, "bell_tower_sync_game");
+                GameLoopController.Instance?.OnMiniGameCompleted(_planetaryResonanceScore * 30f, "BellTowerSync");
                 Save.SaveManager.Instance?.MarkDirty();
                 HapticFeedbackManager.Instance?.PlayBuildingEmergence();
                 Debug.Log($"[BellTowerSync] PLANETARY RESONANCE CASCADE! Score: {_planetaryResonanceScore:F3}");

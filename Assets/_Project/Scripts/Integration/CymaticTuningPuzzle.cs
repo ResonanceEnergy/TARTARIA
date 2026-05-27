@@ -210,11 +210,8 @@ namespace Tartaria.Integration
             // Dialogue
             DialogueManager.Instance?.PlayContextDialogue("korath_frequencies_aligned");
 
-            // DISABLED (Phase 51) - QuestManager not yet available
-            // QuestManager.Instance?.ProgressObjective("moon12_cymatic_tuning", 0, 1);
-
-            // DISABLED (Phase 51) - AchievementSystem not yet available
-            // AchievementSystem.Instance?.Unlock("harmonic_master");
+            QuestManager.Instance?.ProgressObjective("moon12_cymatic_tuning", 0, 1);
+            AchievementSystem.Instance?.Unlock("harmonic_master");
 
             Debug.Log("[CymaticTuning] Planetary resonance frequency locked — bell tower synchronized");
         }

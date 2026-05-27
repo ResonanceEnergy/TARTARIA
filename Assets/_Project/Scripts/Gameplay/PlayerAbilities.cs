@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 using Tartaria.Core;
 
 namespace Tartaria.Gameplay
@@ -21,6 +22,11 @@ namespace Tartaria.Gameplay
 
         float _lastDodgeTime;
         float _lastSpecialTime;
+
+        // Buff multipliers (Moon 5 amplification fields)
+        readonly Dictionary<string, float> _rsMultipliers = new();
+        readonly Dictionary<string, float> _speedMultipliers = new();
+        readonly Dictionary<string, float> _resistanceMultipliers = new();
 
         public bool CanChannelResonance => canChannelRS;
         public float ChannelRate => channelRatePerSecond;
@@ -72,10 +78,13 @@ namespace Tartaria.Gameplay
         /// </summary>
         public bool ConsumeRS(float amount)
         {
-            // TODO: Integrate with ResonanceScoreSystem
-            // For now, always return true (assume infinite RS for beta)
-            Debug.Log($"[PlayerAbilities] ConsumeRS: {amount} RS consumed");
-            return true;
+            var economy = EconomySystem.Instance;
+            if (economy == null)
+            {
+                Debug.LogWarning("[PlayerAbilities] ConsumeRS: EconomySystem not found");
+                return false;
+            }
+            return economy.SpendCurrency(CurrencyType.ResonanceShards, (int)amount);
         }
 
         /// <summary>
@@ -83,8 +92,8 @@ namespace Tartaria.Gameplay
         /// </summary>
         public void Unlock9BandEnergy()
         {
+            PlayerProgression.Instance?.UnlockFeature("9band_energy");
             Debug.Log("[PlayerAbilities] 9-Band Energy unlocked!");
-            // TODO: Set ability flags, update UI
         }
 
         /// <summary>
@@ -92,47 +101,79 @@ namespace Tartaria.Gameplay
         /// </summary>
         public void UnlockHarmonicRockCutting()
         {
+            PlayerProgression.Instance?.UnlockFeature("harmonic_rock_cutting");
             Debug.Log("[PlayerAbilities] Harmonic Rock Cutting unlocked!");
-            // TODO: Set ability flags, update UI
         }
 
-        // --- Temporary stat multiplier stubs (Moon 5 amplification fields) ---
-        // TODO: Integrate with proper stat/buff system
+        // --- Buff multiplier system (Moon 5 amplification fields) ---
 
         public void AddRSMultiplier(string id, float multiplier)
         {
+            _rsMultipliers[id] = multiplier;
             Debug.Log($"[PlayerAbilities] AddRSMultiplier: {id} = +{multiplier * 100}%");
-            // TODO: Apply actual multiplier to RS generation
         }
 
         public void AddSpeedMultiplier(string id, float multiplier)
         {
+            _speedMultipliers[id] = multiplier;
             Debug.Log($"[PlayerAbilities] AddSpeedMultiplier: {id} = +{multiplier * 100}%");
-            // TODO: Apply actual speed boost
         }
 
         public void AddResistanceMultiplier(string id, float multiplier)
         {
+            _resistanceMultipliers[id] = multiplier;
             Debug.Log($"[PlayerAbilities] AddResistanceMultiplier: {id} = +{multiplier * 100}%");
-            // TODO: Apply actual damage resistance
         }
 
         public void RemoveRSMultiplier(string id)
         {
+            _rsMultipliers.Remove(id);
             Debug.Log($"[PlayerAbilities] RemoveRSMultiplier: {id}");
-            // TODO: Remove multiplier
         }
 
         public void RemoveSpeedMultiplier(string id)
         {
+            _speedMultipliers.Remove(id);
             Debug.Log($"[PlayerAbilities] RemoveSpeedMultiplier: {id}");
-            // TODO: Remove multiplier
         }
 
         public void RemoveResistanceMultiplier(string id)
         {
+            _resistanceMultipliers.Remove(id);
             Debug.Log($"[PlayerAbilities] RemoveResistanceMultiplier: {id}");
-            // TODO: Remove multiplier
+        }
+
+        /// <summary>
+        /// Get total RS multiplier from all active buffs (1.0 = no buffs).
+        /// </summary>
+        public float GetTotalRSMultiplier()
+        {
+            float total = 1f;
+            foreach (var mult in _rsMultipliers.Values)
+                total += mult;
+            return total;
+        }
+
+        /// <summary>
+        /// Get total speed multiplier from all active buffs (1.0 = no buffs).
+        /// </summary>
+        public float GetTotalSpeedMultiplier()
+        {
+            float total = 1f;
+            foreach (var mult in _speedMultipliers.Values)
+                total += mult;
+            return total;
+        }
+
+        /// <summary>
+        /// Get total resistance multiplier from all active buffs (1.0 = no buffs).
+        /// </summary>
+        public float GetTotalResistanceMultiplier()
+        {
+            float total = 1f;
+            foreach (var mult in _resistanceMultipliers.Values)
+                total += mult;
+            return total;
         }
     }
 }

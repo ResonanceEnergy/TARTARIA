@@ -15,40 +15,69 @@ namespace Tartaria.Integration
         [SerializeField] float villageRadius = 80f;
         [SerializeField] int villageBuildings = 9;
 
-        [Header("Materials")]
-        [SerializeField] Material stoneMaterial;
-        [SerializeField] Material mudMaterial;
-        [SerializeField] Material goldTrimMaterial;
-        [SerializeField] Material groundMaterial;
+        [Header("PBR Materials (from Assets/_Project/Materials/PBR)")]
+        [SerializeField] Material rocksMaterial;        // Rocks023.mat
+        [SerializeField] Material pavingStonesMaterial; // PavingStones150.mat
+        [SerializeField] Material marbleMaterial;       // Marble006.mat
+        [SerializeField] Material bricksMaterial;       // Bricks075A.mat
+        [SerializeField] Material groundMaterial;       // Ground037.mat or Ground054.mat
+        [SerializeField] Material plasterMaterial;      // Plaster001.mat
+        [SerializeField] Material woodMaterial;         // Wood063.mat
+
+        [Header("KayKit Models (from Assets/KayKit_Forest_Nature_Pack_1.0_FREE)")]
+        [SerializeField] GameObject[] rockPrefabs;      // Rock_1_A through Rock_3_R
+        [SerializeField] GameObject[] treePrefabs;      // Tree_1_A through Tree_Bare_2_C
+        [SerializeField] GameObject[] bushPrefabs;      // Bush_1_A through Bush_4_F
+        [SerializeField] GameObject[] grassPrefabs;     // Grass_1_A through Grass_2_D
+
+        [Header("Existing Building Prefabs")]
+        [SerializeField] GameObject starDomePrefab;     // Echohaven_StarDome.prefab
+        [SerializeField] GameObject fountainPrefab;     // Echohaven_HarmonicFountain.prefab
+        [SerializeField] GameObject spirePrefab;        // Echohaven_CrystalSpire.prefab
 
         void Start()
         {
             LoadMaterials();
             CreateVillageGrid();
             CreateGroundPlane();
-            Debug.Log("[Moon1LevelBuilder] Echohaven village generated - 9 buildings + ground plane");
+            Debug.Log("[Moon1LevelBuilder] Echohaven village generated - 9 buildings with KayKit rock composition + PBR materials + environmental scatter (bushes/grass)");
         }
 
         void LoadMaterials()
         {
-            if (stoneMaterial == null)
-                stoneMaterial = Resources.Load<Material>("Materials/M_Building_Stone");
-            if (mudMaterial == null)
-                mudMaterial = Resources.Load<Material>("Materials/M_Mud_Fresh");
-            if (goldTrimMaterial == null)
-                goldTrimMaterial = Resources.Load<Material>("Materials/M_Gold_Ornament");
+            // Load PBR materials from Assets/_Project/Materials/PBR/
+            if (rocksMaterial == null)
+                rocksMaterial = Resources.Load<Material>("Materials/PBR/Rocks023");
+            if (pavingStonesMaterial == null)
+                pavingStonesMaterial = Resources.Load<Material>("Materials/PBR/PavingStones150");
+            if (marbleMaterial == null)
+                marbleMaterial = Resources.Load<Material>("Materials/PBR/Marble006");
+            if (bricksMaterial == null)
+                bricksMaterial = Resources.Load<Material>("Materials/PBR/Bricks075A");
+            if (groundMaterial == null)
+                groundMaterial = Resources.Load<Material>("Materials/PBR/Ground037");
+            if (plasterMaterial == null)
+                plasterMaterial = Resources.Load<Material>("Materials/PBR/Plaster001");
+            if (woodMaterial == null)
+                woodMaterial = Resources.Load<Material>("Materials/PBR/Wood063");
+
+            // Fallback to existing M_ materials if PBR not found
+            if (rocksMaterial == null)
+                rocksMaterial = Resources.Load<Material>("Materials/M_Rock");
             if (groundMaterial == null)
                 groundMaterial = Resources.Load<Material>("Materials/M_Ground_Terrain");
 
-            // Create materials procedurally with textures if not found
-            if (stoneMaterial == null)
-                stoneMaterial = RuntimeTextureGenerator.CreateMaterialWithTextures("M_Stone_Generated", RuntimeTextureGenerator.MaterialType.Stone);
-            if (mudMaterial == null)
-                mudMaterial = RuntimeTextureGenerator.CreateMaterialWithTextures("M_Mud_Generated", RuntimeTextureGenerator.MaterialType.Mud);
-            if (goldTrimMaterial == null)
-                goldTrimMaterial = RuntimeTextureGenerator.CreateMaterialWithTextures("M_Gold_Generated", RuntimeTextureGenerator.MaterialType.Gold);
+            // Final fallback: create basic material
+            if (rocksMaterial == null)
+            {
+                rocksMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                rocksMaterial.color = new Color(0.6f, 0.6f, 0.6f);
+            }
             if (groundMaterial == null)
-                groundMaterial = RuntimeTextureGenerator.CreateMaterialWithTextures("M_Grass_Generated", RuntimeTextureGenerator.MaterialType.Grass);
+            {
+                groundMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                groundMaterial.color = new Color(0.4f, 0.5f, 0.3f);
+            }
         }
 
         void CreateVillageGrid()
@@ -84,8 +113,8 @@ namespace Tartaria.Integration
             // Calculate golden ratio dimensions based on type
             Vector3 dimensions = GetBuildingDimensions(type);
             
-            // Create base structure
-            CreateBuildingGeometry(building, dimensions, type);
+            // Create building using KayKit rock models (modular composition)
+            CreateBuildingFromKayKitRocks(building, dimensions, type);
 
             // Add Tartarian architectural enhancements
             var architecturalStyle = type switch
@@ -101,6 +130,9 @@ namespace Tartaria.Integration
             // Add excavation marker
             CreateExcavationMound(building, dimensions);
 
+            // Add scattered environment props (bushes, grass, small rocks)
+            ScatterEnvironmentProps(building, dimensions);
+
             // Add to excavation system
             var excavation = ExcavationSystem.Instance;
             if (excavation != null)
@@ -115,7 +147,91 @@ namespace Tartaria.Integration
             // Add InteractableBuilding component
             var interactable = building.AddComponent<InteractableBuilding>();
             interactable.SetBuildingId(id);
-            interactable.SetMaterials(mudMaterial, mudMaterial, stoneMaterial);
+            
+            // Use proper PBR materials
+            Material mudMat = Resources.Load<Material>("Materials/M_Mud_Fresh");
+            interactable.SetMaterials(mudMat, mudMat, rocksMaterial);
+        }
+
+        void CreateBuildingFromKayKitRocks(GameObject parent, Vector3 dimensions, BuildingType type)
+        {
+            // If rock prefabs are assigned, use them for modular building composition
+            if (rockPrefabs != null && rockPrefabs.Length > 0)
+            {
+                // Use large rocks as building blocks
+                int rockCount = type switch
+                {
+                    BuildingType.House => 8,
+                    BuildingType.Tower => 12,
+                    BuildingType.Temple => 16,
+                    BuildingType.Workshop => 10,
+                    _ => 8
+                };
+
+                for (int i = 0; i < rockCount; i++)
+                {
+                    GameObject rockPrefab = rockPrefabs[UnityEngine.Random.Range(0, rockPrefabs.Length)];
+                    GameObject rock = Instantiate(rockPrefab, parent.transform);
+                    
+                    // Arrange rocks in circular pattern for buildings
+                    float angle = (360f / rockCount) * i;
+                    float radius = dimensions.x * 0.4f;
+                    Vector3 offset = Quaternion.Euler(0f, angle, 0f) * new Vector3(radius, 0f, 0f);
+                    rock.transform.localPosition = offset + Vector3.up * (dimensions.y * 0.3f * (i % 3));
+                    rock.transform.localScale = Vector3.one * (dimensions.x * 0.15f);
+                    rock.transform.Rotate(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+
+                    // Apply PBR rock material
+                    var renderers = rock.GetComponentsInChildren<Renderer>();
+                    foreach (var rend in renderers)
+                    {
+                        rend.material = rocksMaterial;
+                    }
+                }
+            }
+            else
+            {
+                // Fallback: create simple geometry
+                CreateBuildingGeometry(parent, dimensions, type);
+            }
+        }
+
+        void ScatterEnvironmentProps(GameObject building, Vector3 dimensions)
+        {
+            if (bushPrefabs == null || bushPrefabs.Length == 0) return;
+
+            // Scatter 3-5 bushes around building
+            int bushCount = UnityEngine.Random.Range(3, 6);
+            for (int i = 0; i < bushCount; i++)
+            {
+                GameObject bushPrefab = bushPrefabs[UnityEngine.Random.Range(0, bushPrefabs.Length)];
+                GameObject bush = Instantiate(bushPrefab, building.transform);
+                
+                // Random position around building perimeter
+                float angle = UnityEngine.Random.Range(0f, 360f);
+                float distance = dimensions.x * UnityEngine.Random.Range(0.6f, 0.9f);
+                Vector3 offset = Quaternion.Euler(0f, angle, 0f) * new Vector3(distance, 0f, 0f);
+                bush.transform.localPosition = offset;
+                bush.transform.localScale = Vector3.one * UnityEngine.Random.Range(0.8f, 1.2f);
+                bush.transform.Rotate(0f, UnityEngine.Random.Range(0f, 360f), 0f);
+            }
+
+            // Add grass patches if prefabs available
+            if (grassPrefabs != null && grassPrefabs.Length > 0)
+            {
+                int grassCount = UnityEngine.Random.Range(5, 10);
+                for (int i = 0; i < grassCount; i++)
+                {
+                    GameObject grassPrefab = grassPrefabs[UnityEngine.Random.Range(0, grassPrefabs.Length)];
+                    GameObject grass = Instantiate(grassPrefab, building.transform);
+                    
+                    float angle = UnityEngine.Random.Range(0f, 360f);
+                    float distance = dimensions.x * UnityEngine.Random.Range(0.4f, 0.8f);
+                    Vector3 offset = Quaternion.Euler(0f, angle, 0f) * new Vector3(distance, 0f, 0f);
+                    grass.transform.localPosition = offset;
+                    grass.transform.localScale = Vector3.one * UnityEngine.Random.Range(0.5f, 1.0f);
+                }
+            }
         }
 
         void CreateBuildingGeometry(GameObject parent, Vector3 dimensions, BuildingType type)
@@ -145,7 +261,7 @@ namespace Tartaria.Integration
             body.transform.SetParent(parent.transform);
             body.transform.localPosition = Vector3.up * dimensions.y * 0.5f;
             body.transform.localScale = dimensions;
-            body.GetComponent<Renderer>().material = stoneMaterial;
+            body.GetComponent<Renderer>().material = bricksMaterial != null ? bricksMaterial : rocksMaterial;
             Destroy(body.GetComponent<Collider>()); // Parent handles collision
 
             // Roof (pyramid)
@@ -155,7 +271,7 @@ namespace Tartaria.Integration
             roof.transform.localPosition = Vector3.up * (dimensions.y + dimensions.y * 0.25f);
             roof.transform.localScale = new Vector3(dimensions.x * 1.1f, dimensions.y * 0.5f, dimensions.z * 1.1f);
             roof.transform.rotation = Quaternion.Euler(0f, 45f, 0f);
-            roof.GetComponent<Renderer>().material = mudMaterial;
+            roof.GetComponent<Renderer>().material = pavingStonesMaterial != null ? pavingStonesMaterial : rocksMaterial;
             Destroy(roof.GetComponent<Collider>());
         }
 
@@ -167,16 +283,16 @@ namespace Tartaria.Integration
             tower.transform.SetParent(parent.transform);
             tower.transform.localPosition = Vector3.up * dimensions.y * 0.5f;
             tower.transform.localScale = new Vector3(dimensions.x, dimensions.y, dimensions.z);
-            tower.GetComponent<Renderer>().material = stoneMaterial;
+            tower.GetComponent<Renderer>().material = rocksMaterial;
             Destroy(tower.GetComponent<Collider>());
 
-            // Decorative golden band
+            // Decorative stone band
             var band = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-            band.name = "GoldenBand";
+            band.name = "StoneBand";
             band.transform.SetParent(parent.transform);
             band.transform.localPosition = Vector3.up * dimensions.y * 0.7f;
             band.transform.localScale = new Vector3(dimensions.x * 1.05f, dimensions.y * 0.1f, dimensions.z * 1.05f);
-            band.GetComponent<Renderer>().material = goldTrimMaterial;
+            band.GetComponent<Renderer>().material = pavingStonesMaterial != null ? pavingStonesMaterial : rocksMaterial;
             Destroy(band.GetComponent<Collider>());
 
             // Top dome
@@ -185,7 +301,7 @@ namespace Tartaria.Integration
             dome.transform.SetParent(parent.transform);
             dome.transform.localPosition = Vector3.up * dimensions.y;
             dome.transform.localScale = Vector3.one * dimensions.x * 1.2f;
-            dome.GetComponent<Renderer>().material = goldTrimMaterial;
+            dome.GetComponent<Renderer>().material = marbleMaterial != null ? marbleMaterial : rocksMaterial;
             Destroy(dome.GetComponent<Collider>());
         }
 
@@ -197,7 +313,7 @@ namespace Tartaria.Integration
             base_obj.transform.SetParent(parent.transform);
             base_obj.transform.localPosition = Vector3.up * dimensions.y * 0.3f;
             base_obj.transform.localScale = new Vector3(dimensions.x * 1.2f, dimensions.y * 0.6f, dimensions.z * 1.2f);
-            base_obj.GetComponent<Renderer>().material = stoneMaterial;
+            base_obj.GetComponent<Renderer>().material = marbleMaterial != null ? marbleMaterial : rocksMaterial;
             Destroy(base_obj.GetComponent<Collider>());
 
             // Temple columns (4 corners)
@@ -211,7 +327,7 @@ namespace Tartaria.Integration
                 column.transform.SetParent(parent.transform);
                 column.transform.localPosition = offset + Vector3.up * dimensions.y * 0.5f;
                 column.transform.localScale = new Vector3(dimensions.x * 0.15f, dimensions.y, dimensions.z * 0.15f);
-                column.GetComponent<Renderer>().material = goldTrimMaterial;
+                column.GetComponent<Renderer>().material = plasterMaterial != null ? plasterMaterial : marbleMaterial;
                 Destroy(column.GetComponent<Collider>());
             }
 
@@ -221,7 +337,7 @@ namespace Tartaria.Integration
             roof.transform.SetParent(parent.transform);
             roof.transform.localPosition = Vector3.up * dimensions.y;
             roof.transform.localScale = new Vector3(dimensions.x * 1.3f, dimensions.y * 0.2f, dimensions.z * 1.3f);
-            roof.GetComponent<Renderer>().material = stoneMaterial;
+            roof.GetComponent<Renderer>().material = pavingStonesMaterial != null ? pavingStonesMaterial : rocksMaterial;
             Destroy(roof.GetComponent<Collider>());
         }
 
@@ -233,7 +349,7 @@ namespace Tartaria.Integration
             body.transform.SetParent(parent.transform);
             body.transform.localPosition = Vector3.up * dimensions.y * 0.5f;
             body.transform.localScale = new Vector3(dimensions.x * 1.5f, dimensions.y * 0.8f, dimensions.z);
-            body.GetComponent<Renderer>().material = stoneMaterial;
+            body.GetComponent<Renderer>().material = bricksMaterial != null ? bricksMaterial : rocksMaterial;
             Destroy(body.GetComponent<Collider>());
 
             // Chimney
@@ -242,7 +358,7 @@ namespace Tartaria.Integration
             chimney.transform.SetParent(parent.transform);
             chimney.transform.localPosition = new Vector3(dimensions.x * 0.4f, dimensions.y * 1.2f, 0f);
             chimney.transform.localScale = new Vector3(dimensions.x * 0.2f, dimensions.y * 0.6f, dimensions.z * 0.2f);
-            chimney.GetComponent<Renderer>().material = mudMaterial;
+            chimney.GetComponent<Renderer>().material = rocksMaterial;
             Destroy(chimney.GetComponent<Collider>());
         }
 
@@ -254,7 +370,14 @@ namespace Tartaria.Integration
             mound.transform.SetParent(parent.transform);
             mound.transform.localPosition = Vector3.up * dimensions.y * 0.4f;
             mound.transform.localScale = new Vector3(dimensions.x * 1.5f, dimensions.y * 0.8f, dimensions.z * 1.5f);
-            mound.GetComponent<Renderer>().material = mudMaterial;
+            
+            Material mudMat = Resources.Load<Material>("Materials/M_Mud_Fresh");
+            if (mudMat == null)
+            {
+                mudMat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
+                mudMat.color = new Color(0.35f, 0.25f, 0.15f);
+            }
+            mound.GetComponent<Renderer>().material = mudMat;
             Destroy(mound.GetComponent<Collider>()); // Parent handles collision
         }
 

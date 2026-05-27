@@ -5,6 +5,7 @@ using Tartaria.Core;
 using Tartaria.Audio;
 using Tartaria.Data;
 using Tartaria.Gameplay;
+using Tartaria.Save;
 using QuestStatus = Tartaria.Core.Enums.QuestStatus;
 
 namespace Tartaria.Integration
@@ -22,7 +23,7 @@ namespace Tartaria.Integration
     /// Now supports QuestDatabase integration with prerequisite validation.
     /// </summary>
     [DisallowMultipleComponent]
-    public class QuestManager : MonoBehaviour, IQuestProvider, IQuestService
+    public class QuestManager : MonoBehaviour, IQuestProvider, IQuestService, ISaveDataProvider
     {
         public static QuestManager Instance { get; private set; }
 
@@ -58,6 +59,7 @@ namespace Tartaria.Integration
             {
                 Save.SaveManager.Instance.OnBeforeSave += OnSave;
                 Save.SaveManager.Instance.OnAfterLoad += OnLoad;
+                Save.SaveManager.Instance.RegisterProvider(this);  // ISaveDataProvider registration
             }
         }
 
@@ -71,6 +73,7 @@ namespace Tartaria.Integration
             {
                 Save.SaveManager.Instance.OnBeforeSave -= OnSave;
                 Save.SaveManager.Instance.OnAfterLoad -= OnLoad;
+                Save.SaveManager.Instance.UnregisterProvider(this);  // ISaveDataProvider cleanup
             }
         }
 
@@ -118,6 +121,71 @@ namespace Tartaria.Integration
 
                 _questListsDirty = true;
                 Debug.Log($"[QuestManager] Loaded {sd.quests.entries.Length} quest states");
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // ISaveDataProvider Implementation
+        // ═══════════════════════════════════════════════════════════════
+
+        public string GetProviderKey() => "QuestManager";
+
+        public object GetSaveData()
+        {
+            var entries = new List<QuestManagerSaveData.QuestEntry>();
+
+            foreach (var kvp in _questStates)
+            {
+                entries.Add(new QuestManagerSaveData.QuestEntry
+                {
+                    questId = kvp.Key,
+                    status = (int)kvp.Value.status,
+                    objectiveProgress = kvp.Value.objectiveProgress ?? System.Array.Empty<int>()
+                });
+            }
+
+            return new QuestManagerSaveData
+            {
+                entries = entries.ToArray()
+            };
+        }
+
+        public void RestoreSaveData(object data)
+        {
+            if (data is string json)
+            {
+                try
+                {
+                    var saveData = JsonUtility.FromJson<QuestManagerSaveData>(json);
+                    if (saveData?.entries != null)
+                    {
+                        foreach (var entry in saveData.entries)
+                        {
+                            if (string.IsNullOrEmpty(entry.questId)) continue;
+
+                            // Only restore if quest exists in database
+                            if (_questStates.ContainsKey(entry.questId))
+                            {
+                                _questStates[entry.questId] = new QuestState
+                                {
+                                    status = (QuestStatus)entry.status,
+                                    objectiveProgress = entry.objectiveProgress ?? System.Array.Empty<int>()
+                                };
+                            }
+                        }
+
+                        _questListsDirty = true;
+                        Debug.Log($"[QuestManager] Restored {saveData.entries.Length} quest states via ISaveDataProvider");
+                    }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"[QuestManager] Failed to restore save data: {e.Message}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("[QuestManager] RestoreSaveData received invalid data type");
             }
         }
 
@@ -179,8 +247,7 @@ namespace Tartaria.Integration
 
         void LoadFromBuilder()
         {
-            // TODO: Enable when QuestDatabaseBuilder is implemented
-            /*
+            // QuestDatabaseBuilder is implemented — build Moons 1-13 quest database
             questDatabase = QuestDatabaseBuilder.BuildAll();
             if (questDatabase != null)
             {
@@ -196,7 +263,6 @@ namespace Tartaria.Integration
                 }
                 Debug.Log($"[QuestManager] Auto-populated {_questLookup.Count} quests from QuestDatabaseBuilder.");
             }
-            */
         }
 
         // ─── Public API ──────────────────────────────
@@ -433,10 +499,9 @@ namespace Tartaria.Integration
 
             if (_questLookup.TryGetValue(questId, out var def))
             {
-                // Grant RS reward
-                // TODO: Enable when GameLoopController is active
-                // if (def.rsReward > 0f)
-                //     GameLoopController.Instance?.QueueRSReward(def.rsReward, "quest_complete");
+                // Grant RS reward via GameLoopController
+                if (def.rsReward > 0f)
+                    GameLoopController.Instance?.QueueRSReward(def.rsReward, "quest_complete");
 
                 // Grant enhanced rewards if QuestData
                 if (def is QuestData questData)
@@ -499,8 +564,8 @@ namespace Tartaria.Integration
         {
             if (questData == null) return true;
 
-            // TODO: Enable when GameLoopController is active
-            float currentRS = 0f; // GameLoopController.Instance?.GetCurrentRS() ?? 0f;
+            // Check prerequisites via GameLoopController
+            float currentRS = GameLoopController.Instance?.GetCurrentRS() ?? 0f;
             int currentLevel = PlayerProgression.Instance?.CurrentLevel ?? 1;
 
             return questData.ArePrerequisitesMet(currentRS, currentLevel, IsQuestComplete);
@@ -556,9 +621,8 @@ namespace Tartaria.Integration
                 foreach (var unlockId in questData.unlockRewards)
                 {
                     if (string.IsNullOrEmpty(unlockId)) continue;
-                    // TODO: Implement unlock system
-                    // PlayerProgression.Instance?.UnlockFeature(unlockId);
-                    Debug.Log($"[QuestManager] Unlocked: {unlockId} (stub)");
+                    Gameplay.PlayerProgression.Instance?.UnlockFeature(unlockId);
+                    Debug.Log($"[QuestManager] Feature unlocked: {unlockId}");
                 }
             }
         }
@@ -596,4 +660,22 @@ namespace Tartaria.Integration
     }
 
     // Quest types (QuestStatus, QuestState, QuestDefinition, etc.) are defined in Tartaria.Core.QuestTypes
+
+    /// <summary>
+    /// Serializable save data for QuestManager ISaveDataProvider.
+    /// Must be JSON-serializable (no MonoBehaviour, no Unity objects).
+    /// </summary>
+    [Serializable]
+    public class QuestManagerSaveData
+    {
+        public QuestEntry[] entries;
+
+        [Serializable]
+        public class QuestEntry
+        {
+            public string questId;
+            public int status;  // QuestStatus enum as int
+            public int[] objectiveProgress;
+        }
+    }
 }

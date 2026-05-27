@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.InputSystem.Controls;
 using System;
 using System.IO;
 using System.Text;
@@ -14,7 +16,7 @@ namespace Tartaria.Core
     /// - Privacy-first design (no PII without consent)
     /// - Offline queue (sync when online)
     /// - Integration with CrashReporter context capture
-    /// 
+    ///
     /// Usage:
     /// FeedbackReporter.SubmitFeedback(FeedbackType.Bug, "Combat feels unresponsive", "Attacks not registering");
     /// FeedbackReporter.OpenFeedbackUI(); // Bind to hotkey (F8)
@@ -24,23 +26,23 @@ namespace Tartaria.Core
         static FeedbackReporter _instance;
         string _feedbackDir;
         Queue<FeedbackReport> _offlineQueue = new Queue<FeedbackReport>();
-        
+
         // Privacy settings (can be toggled in Settings menu)
         public static bool AllowScreenshots { get; set; } = true;
         public static bool AllowDeviceInfo { get; set; } = true;
         public static bool AllowGameContext { get; set; } = true;
-        
+
         // Submission throttle (prevent spam)
         const float SUBMIT_COOLDOWN_SEC = 30f;
         float _lastSubmitTime = -999f;
-        
+
         // Feedback UI state
         bool _feedbackUIOpen;
         FeedbackType _selectedType = FeedbackType.Bug;
         string _feedbackTitle = "";
         string _feedbackDescription = "";
         Vector2 _scrollPos;
-        
+
         // Stats
         int _totalSubmissions;
         int _pendingSync;
@@ -59,7 +61,7 @@ namespace Tartaria.Core
             _feedbackDir = Path.Combine(Application.dataPath, "..", "Logs", "Feedback");
             if (!Directory.Exists(_feedbackDir))
                 Directory.CreateDirectory(_feedbackDir);
-            
+
             LoadOfflineQueue();
             Debug.Log($"[FeedbackReporter] Initialized. Feedback dir: {_feedbackDir}");
         }
@@ -67,13 +69,13 @@ namespace Tartaria.Core
         void Update()
         {
             // F8 hotkey to open feedback UI
-            if (Input.GetKeyDown(KeyCode.F8))
+            if (Keyboard.current != null && Keyboard.current[Key.F8].wasPressedThisFrame)
             {
                 OpenFeedbackUI();
             }
-            
+
             // ESC to close
-            if (_feedbackUIOpen && Input.GetKeyDown(KeyCode.Escape))
+            if (_feedbackUIOpen && Keyboard.current != null && Keyboard.current[Key.Escape].wasPressedThisFrame)
             {
                 _feedbackUIOpen = false;
             }
@@ -82,10 +84,10 @@ namespace Tartaria.Core
         void OnGUI()
         {
             if (!_feedbackUIOpen) return;
-            
+
             // Semi-transparent background
             GUI.Box(new Rect(0, 0, Screen.width, Screen.height), "");
-            
+
             // Feedback panel (centered, 600x500)
             float panelWidth = 600f;
             float panelHeight = 500f;
@@ -95,14 +97,14 @@ namespace Tartaria.Core
                 panelWidth,
                 panelHeight
             );
-            
+
             GUI.Box(panelRect, "");
             GUILayout.BeginArea(panelRect);
-            
+
             GUILayout.Space(10);
             GUILayout.Label("<size=18><b>Beta Feedback Reporter</b></size>", new GUIStyle(GUI.skin.label) { richText = true, alignment = TextAnchor.UpperCenter });
             GUILayout.Space(10);
-            
+
             // Category selector
             GUILayout.Label("<b>Feedback Type:</b>", new GUIStyle(GUI.skin.label) { richText = true });
             GUILayout.BeginHorizontal();
@@ -114,50 +116,50 @@ namespace Tartaria.Core
                 }
             }
             GUILayout.EndHorizontal();
-            
+
             GUILayout.Space(10);
-            
+
             // Title field
             GUILayout.Label("<b>Title (required):</b>", new GUIStyle(GUI.skin.label) { richText = true });
             _feedbackTitle = GUILayout.TextField(_feedbackTitle, 100, GUILayout.Height(25));
-            
+
             GUILayout.Space(10);
-            
+
             // Description field (scrollable)
             GUILayout.Label("<b>Description:</b>", new GUIStyle(GUI.skin.label) { richText = true });
             _scrollPos = GUILayout.BeginScrollView(_scrollPos, GUILayout.Height(200));
             _feedbackDescription = GUILayout.TextArea(_feedbackDescription, 2000, GUILayout.ExpandHeight(true));
             GUILayout.EndScrollView();
-            
+
             GUILayout.Space(10);
-            
+
             // Privacy notice
             GUILayout.Label($"<size=10><i>Privacy: Screenshot={AllowScreenshots}, DeviceInfo={AllowDeviceInfo}, GameContext={AllowGameContext}</i></size>",
                 new GUIStyle(GUI.skin.label) { richText = true, alignment = TextAnchor.UpperCenter });
-            
+
             GUILayout.Space(5);
-            
+
             // Submit/Cancel buttons
             GUILayout.BeginHorizontal();
-            
+
             // Throttle check
-            bool canSubmit = !string.IsNullOrWhiteSpace(_feedbackTitle) && 
+            bool canSubmit = !string.IsNullOrWhiteSpace(_feedbackTitle) &&
                            (Time.realtimeSinceStartup - _lastSubmitTime >= SUBMIT_COOLDOWN_SEC);
-            
+
             GUI.enabled = canSubmit;
             if (GUILayout.Button("Submit Feedback", GUILayout.Height(35)))
             {
                 SubmitFeedbackInternal();
             }
             GUI.enabled = true;
-            
+
             if (GUILayout.Button("Cancel", GUILayout.Height(35)))
             {
                 _feedbackUIOpen = false;
             }
-            
+
             GUILayout.EndHorizontal();
-            
+
             // Cooldown warning
             if (!canSubmit && !string.IsNullOrWhiteSpace(_feedbackTitle))
             {
@@ -168,11 +170,11 @@ namespace Tartaria.Core
                         new GUIStyle(GUI.skin.label) { richText = true, alignment = TextAnchor.UpperCenter });
                 }
             }
-            
+
             GUILayout.Space(5);
             GUILayout.Label($"<size=10>Total submissions: {_totalSubmissions} | Pending sync: {_pendingSync}</size>",
                 new GUIStyle(GUI.skin.label) { richText = true, alignment = TextAnchor.UpperCenter });
-            
+
             GUILayout.EndArea();
         }
 
@@ -188,7 +190,7 @@ namespace Tartaria.Core
                 buildVersion = Application.version,
                 unityVersion = Application.unityVersion
             };
-            
+
             // Capture optional context based on privacy settings
             if (AllowDeviceInfo)
             {
@@ -196,7 +198,7 @@ namespace Tartaria.Core
                 report.deviceGPU = SystemInfo.graphicsDeviceName;
                 report.deviceRAM = SystemInfo.systemMemorySize;
             }
-            
+
             if (AllowGameContext)
             {
                 report.sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
@@ -208,33 +210,33 @@ namespace Tartaria.Core
                 // report.crashCount = CrashReporter.GetCrashCount();
                 // report.hitchCount = CrashReporter.GetHitchCount();
             }
-            
+
             // Capture screenshot (PNG, compressed)
             if (AllowScreenshots)
             {
                 report.screenshotPath = CaptureScreenshot();
             }
-            
+
             // Save to disk
             SaveFeedbackReport(report);
-            
+
             // Add to sync queue
             _offlineQueue.Enqueue(report);
             _pendingSync = _offlineQueue.Count;
-            
+
             // Update stats
             _totalSubmissions++;
             _lastSubmitTime = Time.realtimeSinceStartup;
-            
+
             // Reset form
             _feedbackTitle = "";
             _feedbackDescription = "";
             _feedbackUIOpen = false;
-            
+
             // Notify player
             Debug.Log($"[FeedbackReporter] Feedback submitted: {report.type} - {report.title}");
             ShowNotification("Feedback submitted! Thank you for helping improve TARTARIA.");
-            
+
             // Try to sync (if online)
             TrySyncFeedback();
         }
@@ -261,7 +263,7 @@ namespace Tartaria.Core
             {
                 string filename = $"feedback-{report.timestamp:yyyy-MM-dd_HH-mm-ss-fff}.txt";
                 string filepath = Path.Combine(_feedbackDir, filename);
-                
+
                 using (var writer = new StreamWriter(filepath, false))
                 {
                     writer.WriteLine("=== BETA FEEDBACK REPORT ===");
@@ -271,14 +273,14 @@ namespace Tartaria.Core
                     writer.WriteLine($"Build: {report.buildVersion} (Unity {report.unityVersion})");
                     writer.WriteLine($"Session ID: {report.sessionID}");
                     writer.WriteLine();
-                    
+
                     if (!string.IsNullOrEmpty(report.description))
                     {
                         writer.WriteLine("Description:");
                         writer.WriteLine(report.description);
                         writer.WriteLine();
                     }
-                    
+
                     if (AllowDeviceInfo)
                     {
                         writer.WriteLine("=== DEVICE INFO ===");
@@ -287,7 +289,7 @@ namespace Tartaria.Core
                         writer.WriteLine($"RAM: {report.deviceRAM}MB");
                         writer.WriteLine();
                     }
-                    
+
                     if (AllowGameContext)
                     {
                         writer.WriteLine("=== GAME CONTEXT ===");
@@ -299,15 +301,15 @@ namespace Tartaria.Core
                         writer.WriteLine($"Hitches: {report.hitchCount}");
                         writer.WriteLine();
                     }
-                    
+
                     if (!string.IsNullOrEmpty(report.screenshotPath))
                     {
                         writer.WriteLine($"Screenshot: {report.screenshotPath}");
                     }
-                    
+
                     writer.WriteLine("\n=== END FEEDBACK REPORT ===");
                 }
-                
+
                 Debug.Log($"[FeedbackReporter] Report saved: {filename}");
             }
             catch (Exception ex)
@@ -337,13 +339,13 @@ namespace Tartaria.Core
             // TODO: Implement cloud sync (e.g., upload to web API, Google Forms, Discord webhook)
             // For beta launch, feedback reports are stored locally
             // Dev team can collect via Steam Cloud save sync or manual file sharing
-            
+
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
                 Debug.Log("[FeedbackReporter] Offline — feedback queued for sync");
                 return;
             }
-            
+
             // Placeholder for future web API integration
             Debug.Log($"[FeedbackReporter] Sync not implemented yet — {_pendingSync} reports queued locally");
         }
@@ -408,7 +410,7 @@ namespace Tartaria.Core
                 Debug.LogWarning("[FeedbackReporter] Instance not initialized");
                 return;
             }
-            
+
             _instance._selectedType = type;
             _instance._feedbackTitle = title;
             _instance._feedbackDescription = description;
@@ -439,12 +441,12 @@ namespace Tartaria.Core
         public string sessionID;
         public string buildVersion;
         public string unityVersion;
-        
+
         // Device info (optional, privacy-gated)
         public string deviceOS;
         public string deviceGPU;
         public int deviceRAM;
-        
+
         // Game context (optional, privacy-gated)
         public string sceneName;
         public int playtimeSeconds;
@@ -452,7 +454,7 @@ namespace Tartaria.Core
         public float resonanceScore;
         public int crashCount;
         public int hitchCount;
-        
+
         // Screenshot (optional, privacy-gated)
         public string screenshotPath;
     }

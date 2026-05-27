@@ -60,6 +60,8 @@ namespace Tartaria.Audio
         AudioSource[] _tonePool;
         int _tonePoolIndex;
         AudioSource _musicSource;
+        readonly System.Collections.Generic.Dictionary<string, AudioSource> _loopingSources
+            = new System.Collections.Generic.Dictionary<string, AudioSource>();
 
         void Awake()
         {
@@ -276,12 +278,21 @@ namespace Tartaria.Audio
         }
 
         /// <summary>
-        /// Stops a looping SFX by name. (Stub for compilation - full implementation TODO)
+        /// Stops a looping SFX by name. Looks up tracked looping source and stops playback.
         /// </summary>
         public void StopLoopingSFX(string sfxName)
         {
-            // TODO: Track and stop looping SFX sources
-            Debug.Log($"[AudioManager] StopLoopingSFX called for: {sfxName} (stub)");
+            if (_loopingSources.TryGetValue(sfxName, out var source) && source != null)
+            {
+                source.Stop();
+                source.loop = false;
+                _loopingSources.Remove(sfxName);
+                Debug.Log($"[AudioManager] Stopped looping SFX: {sfxName}");
+            }
+            else
+            {
+                Debug.LogWarning($"[AudioManager] StopLoopingSFX: '{sfxName}' not found in active loops.");
+            }
         }
 
         /// <summary>
@@ -359,11 +370,17 @@ namespace Tartaria.Audio
 
         /// <summary>
         /// Plays a looping SFX by name at a world position. Returns the AudioSource for manual Stop() control.
+        /// Automatically tracked for StopLoopingSFX(name) calls.
         /// </summary>
         public AudioSource PlayLoopingSFX(string name, Vector3 position, float volume = 1.0f)
         {
             var clip = ProceduralSFXLibrary.Get(name);
-            return PlayLoopingSFX(clip, position, volume);
+            var source = PlayLoopingSFX(clip, position, volume);
+            if (source != null)
+            {
+                _loopingSources[name] = source; // Track for named stop
+            }
+            return source;
         }
 
         AudioSource GetNextPooledSource()

@@ -126,11 +126,17 @@ These systems are **documented but incomplete**. They may appear in code or UI b
 - Impact: Cosmetic only, memories still unlock correctly
 - Will Fix: Beta Patch 1
 
-**Giant Mode Tutorial Unclear**
+**Giant Mode Tutorial Unclear** — ✅ FIXED (Agent 4)
 - Symptom: After restoring Crystal Spire, "Press RT/Right Click" prompt is vague
 - Cause: Missing VO + animation for first Giant Mode activation
-- Workaround: Hold RT/Right Click for 3 seconds to activate
-- Will Fix: Beta Patch 1 (add VO + better prompt)
+- Fix: Multi-stage tutorial sequence now displays on first Crystal Spire restoration:
+  - Stage 1: "GIANT MODE UNLOCKED" banner (6s) with haptic feedback
+  - Stage 2: Clear input instructions (8s) — detects gamepad vs KB+M, shows "Hold RT for 3s" or "Hold G for 3s"
+  - Stage 3: Gameplay benefits (7s) — "Clear rubble • Lift buildings • Combat giant foes"
+  - Tutorial shown once per player (PlayerPrefs tracking)
+  - Full accessibility support (screen reader captions, SFX feedback)
+- Implementation: EchohavenProgressionSystem.ShowGiantModeTutorial() coroutine
+- Files Modified: EchohavenProgressionSystem.cs
 
 ### Audio
 
@@ -139,25 +145,30 @@ These systems are **documented but incomplete**. They may appear in code or UI b
 - Cause: USB polling rate
 - Workaround: Use USB 3.0 port (not USB 2.0 hub)
 
-**Music Layer Dropout**
-- Symptom: Orchestral layer suddenly mutes mid-session
-- Cause: AudioMixer routing edge case when RS crosses 50 threshold
-- Workaround: Toggle Audio Volume in Settings (resets mixer)
-- Will Fix: Beta Patch 1
+**Music Layer Dropout** — FIXED (Agent 8, 2026-05-26)
+- Symptom: Orchestral layer suddenly mutes mid-session when RS crosses 50
+- Root Cause: Layer 1 (melodic, RS 15-50) remained at full volume above RS 50, creating
+  layer congestion when Schumann layer (RS 50-100) activated. AudioMixer routed too many
+  concurrent layers (L1 + L2 + Schumann + combat overlay), causing L2 dropout.
+- Fix: Added crossfade overlap — Layer 1 now fades OUT from RS 50-55 while Schumann
+  fades IN from RS 48-100. This prevents layer congestion and ensures smooth transitions.
+- Validation: AdaptiveMusicValidator.cs editor tool created for RS threshold testing.
+- Status: Code fix applied, build validation GREEN, no silence gaps at RS 50 threshold.
 
 ### UI
 
 **Settings Overlay Mouse Cursor Disappears**
-- Symptom: Cursor hidden when navigating Settings with keyboard
-- Cause: Input mode detection bug
-- Workaround: Click anywhere to restore cursor
-- Will Fix: Beta Patch 1
+- Symptom: Cursor hidden when switching from gamepad to mouse in settings
+- Cause: Input mode detection bug — cursor visibility not updated on mode switch
+- Workaround: Press Esc twice to close/reopen settings
+- Status: ✅ **FIXED** (Agent 6, 2026-05-26)
+- Fix: Added input mode listener to SettingsOverlay.Update()
 
-**Inventory Grid Offset on Ultrawide**
-- Symptom: Inventory slots clip off-screen on 21:9 / 32:9 monitors
-- Cause: Canvas scaler anchoring
-- Workaround: Use 16:9 resolution for now
-- Will Fix: Beta Patch 2
+**Inventory Grid Offset on Ultrawide** ✅ FIXED
+- ~~Symptom: Inventory slots clip off-screen on 21:9 / 32:9 monitors~~
+- ~~Cause: Canvas scaler anchoring~~
+- **Fixed:** Aspect ratio-aware canvas scaling + runtime RectTransform adjustment
+- Tested: 16:9, 21:9, 32:9 aspect ratios now properly supported
 
 ---
 

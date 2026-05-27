@@ -32,10 +32,20 @@ namespace Tartaria.Data
     /// <summary>
     /// DialogueCondition — requirements that must be met for a choice/node to be available.
     /// Supports quest states, player level, and stat checks.
+    ///
+    /// Evaluation delegate pattern:
+    ///   - Data assembly cannot reference Integration/Gameplay assemblies
+    ///   - Static EvaluateDelegate is set by DialogueConditionEvaluator (Integration)
+    ///   - Allows condition checks to access QuestManager/PlayerProgression without assembly violations
     /// </summary>
     [Serializable]
     public struct DialogueCondition
     {
+        /// <summary>
+        /// Static delegate for condition evaluation. Set by DialogueConditionEvaluator in Integration assembly.
+        /// </summary>
+        public static System.Func<DialogueCondition, bool> EvaluateDelegate;
+
         public DialogueConditionType type;
 
         [Tooltip("Quest ID (for QuestComplete/QuestActive checks)")]
@@ -55,47 +65,19 @@ namespace Tartaria.Data
 
         /// <summary>
         /// Evaluates if this condition is currently met.
+        /// Uses delegate if set (Integration assembly), otherwise returns true (fallback).
         /// </summary>
         public bool Evaluate()
         {
-            switch (type)
+            // Use delegate if registered (normal case)
+            if (EvaluateDelegate != null)
             {
-                case DialogueConditionType.None:
-                    return true;
-
-                case DialogueConditionType.QuestComplete:
-                    // TODO: Move condition logic to Integration assembly (Data cannot reference Integration)
-                    // return Integration.QuestManager.Instance != null &&
-                    //        Integration.QuestManager.Instance.IsQuestComplete(questId);
-                    Debug.LogWarning($"[DialogueCondition] QuestComplete condition requires Integration assembly refactor");
-                    return true;
-
-                case DialogueConditionType.QuestActive:
-                    // TODO: Move condition logic to Integration assembly (Data cannot reference Integration)
-                    // return Integration.QuestManager.Instance != null &&
-                    //        Integration.QuestManager.Instance.IsQuestActive(questId);
-                    Debug.LogWarning($"[DialogueCondition] QuestActive condition requires Integration assembly refactor");
-                    return true;
-
-                case DialogueConditionType.MinPlayerLevel:
-                    // TODO: Move condition logic to Gameplay assembly (Data cannot reference Gameplay)
-                    // return Gameplay.PlayerProgression.Instance != null &&
-                    //        Gameplay.PlayerProgression.Instance.CurrentLevel >= minPlayerLevel;
-                    Debug.LogWarning($"[DialogueCondition] MinPlayerLevel condition requires Gameplay assembly refactor");
-                    return true;
-
-                case DialogueConditionType.StatCheck:
-                    // Placeholder: integrate with player stats when implemented
-                    Debug.LogWarning($"[DialogueCondition] StatCheck not yet implemented for {statType}");
-                    return true;
-
-                case DialogueConditionType.Custom:
-                    // Delegate to custom condition handler
-                    return DialogueConditionHandler.EvaluateCustom(customConditionKey);
-
-                default:
-                    return true;
+                return EvaluateDelegate(this);
             }
+
+            // Fallback: if delegate not set (editor mode or early initialization), return true to avoid blocking
+            Debug.LogWarning($"[DialogueCondition] EvaluateDelegate not set, returning true for {type} (DialogueConditionEvaluator may not be initialized)");
+            return true;
         }
     }
 
@@ -183,7 +165,7 @@ namespace Tartaria.Data
         public LocalizationKey[] GetLocalizationKeys()
         {
             var keys = new List<LocalizationKey> { speakerKey, textKey };
-            
+
             // Add choice keys
             if (choices != null)
             {
@@ -193,7 +175,7 @@ namespace Tartaria.Data
                         keys.Add(choice.choiceKey);
                 }
             }
-            
+
             return keys.ToArray();
         }
 
@@ -270,35 +252,32 @@ namespace Tartaria.Data
         /// <summary>
         /// Executes node events (quest activation/completion, relationship changes).
         /// Called by DialoguePlayer when node is displayed.
+        ///
+        /// Delegate pattern: Data assembly cannot reference Integration assembly.
+        /// DialogueNodeExecutor (Integration) sets ExecuteDelegate to bridge this gap.
         /// </summary>
+        public static System.Action<DialogueNodeData> ExecuteDelegate;
+
         public void ExecuteNodeEvents()
         {
-            // Quest activation
-            // TODO: Data assembly cannot reference Integration assembly (circular dependency risk)
-            // Move this logic to a DialogueExecutor in Integration assembly
+            // Use delegate if registered (normal case)
+            if (ExecuteDelegate != null)
+            {
+                ExecuteDelegate(this);
+                return;
+            }
+
+            // Fallback: log warnings if delegate not set
+            Debug.LogWarning($"[DialogueNode] ExecuteDelegate not set (DialogueNodeExecutor may not be initialized)");
+
             if (!string.IsNullOrEmpty(activateQuestId))
             {
-                // Integration.QuestManager.Instance?.ActivateQuest(activateQuestId);
-                Debug.LogWarning($"[DialogueNode] Cannot activate quest: {activateQuestId} - Integration reference disabled in Data assembly");
+                Debug.LogWarning($"[DialogueNode] Cannot activate quest: {activateQuestId} - ExecuteDelegate not registered");
             }
 
-            // Quest completion
             if (!string.IsNullOrEmpty(completeQuestId))
             {
-                // Integration.QuestManager.Instance?.CompleteQuest(completeQuestId);
-                Debug.LogWarning($"[DialogueNode] Cannot complete quest: {completeQuestId} - Integration reference disabled in Data assembly");
-            }
-
-            // Relationship tracking (placeholder for future NPC system)
-            if (setRelationshipValue >= 0)
-            {
-                Debug.Log($"[DialogueNode] Set {speakerName} relationship to {setRelationshipValue}");
-                // TODO: Wire to NPC relationship system when implemented
-            }
-            else if (relationshipDelta != 0)
-            {
-                Debug.Log($"[DialogueNode] Modified {speakerName} relationship by {relationshipDelta:+0;-0}");
-                // TODO: Wire to NPC relationship system when implemented
+                Debug.LogWarning($"[DialogueNode] Cannot complete quest: {completeQuestId} - ExecuteDelegate not registered");
             }
         }
 

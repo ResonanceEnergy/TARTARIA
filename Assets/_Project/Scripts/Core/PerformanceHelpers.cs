@@ -96,7 +96,9 @@ namespace Tartaria.Core
         [Header("Results")]
         [SerializeField, ReadOnly] int totalRenderers;
         [SerializeField, ReadOnly] int staticBatchedRenderers;
+#pragma warning disable CS0414 // Assigned but never used - future batching analytics
         [SerializeField, ReadOnly] int dynamicBatchableRenderers;
+#pragma warning restore CS0414
         [SerializeField, ReadOnly] int instancedRenderers;
         [SerializeField, ReadOnly] int uniqueMaterials;
 
@@ -123,7 +125,7 @@ namespace Tartaria.Core
 
         public void Analyze()
         {
-            var allRenderers = FindObjectsOfType<Renderer>();
+            var allRenderers = FindObjectsByType<Renderer>(FindObjectsSortMode.None);
             totalRenderers = allRenderers.Length;
 
             staticBatchedRenderers = 0;

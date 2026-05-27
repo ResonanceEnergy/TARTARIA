@@ -25,7 +25,9 @@ namespace Tartaria.Save
         [SerializeField] private float maxDifficultyMultiplier = 3f;
         [SerializeField] private bool carryOverEquipment = true;
         [SerializeField] private bool carryOverAbilities = true;
+#pragma warning disable CS0414 // Assigned but never used - future NG+ resource carryover
         [SerializeField] private bool carryOverResources = false;
+#pragma warning restore CS0414
 
         [Header("Current State")]
         [SerializeField] private NewGamePlusData currentNGPlusData;
