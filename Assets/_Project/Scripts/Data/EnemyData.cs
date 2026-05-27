@@ -195,7 +195,9 @@ namespace Tartaria.Data
         Uncommon,
         Rare,
         Epic,
-        Legendary
+        Legendary,
+        Mythic,         // Red/Crimson
+        Ascendant       // Cyan/White (Moon 13 endgame)
     }
 
     // EquipSlot enum defined in EquipmentItemData.cs (Phase 8)

@@ -40,7 +40,9 @@ namespace Tartaria.Core
         // Events for basic integration
         public event Action<int> OnDayAdvanced;
         public event Action<MoonBeat> OnBeatAdvanced;
+#pragma warning disable CS0067 // Event never used - future integration
         public event Action OnSeventeenthHour;
+#pragma warning restore CS0067
 
         // Live ops stubs (no-op for Moon 1 readiness)
         public int FairEntryCount => 0;

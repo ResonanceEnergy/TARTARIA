@@ -10,6 +10,7 @@
         "Tartaria.Camera",
         "Tartaria.Save",
         "Tartaria.Localization",
+        "LeanTween",
         "Unity.TextMeshPro",
         "Unity.RenderPipelines.Universal.Runtime",
         "Unity.RenderPipelines.Core.Runtime",

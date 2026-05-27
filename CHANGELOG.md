@@ -4,6 +4,32 @@ All notable changes to the TARTARIA WORLD OF WONDER Game Design Document are doc
 
 ---
 
+## [1.0.1-beta] — 2026-05-26
+
+**Agent 8: Music Layer Dropout Fix — RS 50 Threshold Crossfade**  
+*Audio System Team — Fixed critical AudioMixer routing bug causing orchestral layer dropout*
+
+### Fixed
+- **Bug #4: Music Layer Dropout at RS 50** — Orchestral layer (L2) no longer mutes when Resonance Score crosses 50 threshold
+  - Root cause: Layer 1 (melodic) remained at full volume above RS 50, creating layer congestion (5 concurrent AudioSources) that overwhelmed AudioMixer routing
+  - Fix: Layer 1 now fades OUT from RS 50-55 while Schumann layer fades IN from RS 48-100 (7-point crossfade overlap)
+  - Result: Smooth transitions, no silence gaps, max 3-4 concurrent layers (down from 5)
+  - Files modified: `Assets/_Project/Scripts/Audio/AdaptiveMusicController.cs`
+
+### Added
+- **AdaptiveMusicValidator.cs** — QA tool for testing adaptive music layer blending
+  - Access: Unity Menu → `TARTARIA > QA > Adaptive Music Validator`
+  - Features: Manual RS slider, auto-sweep mode (RS 45→55→45), live volume analysis, crossfade validation
+  - Use case: Validate layer transitions at critical RS thresholds (48, 50, 52, 55)
+- **AGENT8_MUSIC_LAYER_DROPOUT_FIX_REPORT.md** — Comprehensive root cause analysis + fix documentation
+- **AGENT8_QUICK_REFERENCE.md** — Quick reference for music layer fix deployment
+
+### Changed
+- **BUILD_NOTES.md** — Bug #4 status updated to FIXED with root cause explanation
+- **AdaptiveMusicController.cs** — Updated documentation header to reflect new layer crossfade behavior (L1: RS 15-55, Schumann: RS 48-100)
+
+---
+
 ## [1.0.0-beta] — 2026-05-22
 
 **Session 6: Production Audit + Documentation Complete — Beta Shippable**  

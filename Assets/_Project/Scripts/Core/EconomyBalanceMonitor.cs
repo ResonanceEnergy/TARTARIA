@@ -10,15 +10,15 @@ namespace Tartaria.Core
     /// <summary>
     /// Economy Balance Monitor — real-time tracking of currency gain rates,
     /// loot drops, and economy health metrics for beta testing.
-    /// 
+    ///
     /// AGENT 4: Anti-Cheat & Economy Guardian
-    /// 
+    ///
     /// Monitors:
     ///   - Currency gain rates (RS/hour per source)
     ///   - Loot drop frequency and rarity distribution
     ///   - Inventory overflow attempts
     ///   - Suspicious activity patterns (rapid gains, impossible rates)
-    /// 
+    ///
     /// Data is logged to Debug.Log and can be exported for analytics.
     /// Integrates with EconomySystem and InventorySystem via events.
     /// </summary>
@@ -30,7 +30,9 @@ namespace Tartaria.Core
         [Header("Monitoring Settings")]
         [SerializeField] bool enableMonitoring = true;
         [SerializeField] float reportIntervalSeconds = 60f; // Report every minute
+#pragma warning disable CS0414 // Assigned but never used - future anti-cheat
         [SerializeField] int suspiciousGainThreshold = 10000; // RS per minute triggers warning
+#pragma warning restore CS0414
 
         [Header("Alert Thresholds")]
         [SerializeField] int maxCurrencyGainPerMinute = 5000; // Normal max gain rate
@@ -306,7 +308,7 @@ namespace Tartaria.Core
             Debug.Log($"  XP Gained: {_xpGainedThisInterval:F0} ({_xpGainedThisInterval / intervalMinutes:F0}/min)");
             Debug.Log($"  Items Added: {_totalItemsAdded} ({_totalItemsAdded / intervalMinutes:F0}/min)");
             Debug.Log($"  Rarity Distribution: {string.Join(", ", _rarityDistribution.Select(kvp => $"{kvp.Key}={kvp.Value}"))}");
-            
+
             if (_suspiciousActivityCount > 0)
             {
                 Debug.LogWarning($"  ⚠ Suspicious Activity: {_suspiciousActivityCount} events");

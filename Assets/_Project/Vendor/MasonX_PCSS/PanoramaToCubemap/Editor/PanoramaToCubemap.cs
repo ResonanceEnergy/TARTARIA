@@ -5,6 +5,8 @@
  * Version  : 1.0.0
  */ 
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 using UnityEngine;
 using UnityEditor;
 using System.IO;

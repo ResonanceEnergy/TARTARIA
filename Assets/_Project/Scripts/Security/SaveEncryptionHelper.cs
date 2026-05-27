@@ -1,41 +1,54 @@
 using System;
+using TartariaSave = Tartaria.Save;
 
 namespace Tartaria.Security
 {
     /// <summary>
-    /// Save Encryption Helper — stub for save file encryption/decryption.
-    /// TODO: Implement actual AES encryption when needed.
+    /// Save Encryption Helper — DEPRECATED STUB (redirect to Tartaria.Save.SaveEncryptionHelper)
+    ///
+    /// Agent 9: This stub redirects to the real implementation in Tartaria.Save namespace.
+    /// The actual AES-256-CBC encryption + HMAC-SHA256 integrity validation is in:
+    ///   Assets/_Project/Scripts/Save/SaveEncryptionHelper.cs
+    ///
+    /// This stub exists for backward compatibility only.
     /// </summary>
+    [Obsolete("Use Tartaria.Save.SaveEncryptionHelper instead", false)]
     public static class SaveEncryptionHelper
     {
         /// <summary>
         /// Check if save data is encrypted.
-        /// Current stub: always returns false (no encryption).
+        /// Redirects to Tartaria.Save.SaveEncryptionHelper.IsEncrypted()
         /// </summary>
         public static bool IsEncrypted(byte[] saveData)
         {
-            // Stub: no encryption implemented yet
-            return false;
+            return TartariaSave.SaveEncryptionHelper.IsEncrypted(saveData);
         }
 
         /// <summary>
         /// Decrypt save data.
-        /// Current stub: returns data unchanged.
+        /// Redirects to Tartaria.Save.SaveEncryptionHelper.Decrypt()
         /// </summary>
         public static byte[] Decrypt(byte[] encryptedData)
         {
-            // Stub: passthrough (no decryption)
-            return encryptedData;
+            return TartariaSave.SaveEncryptionHelper.Decrypt(encryptedData);
         }
 
         /// <summary>
         /// Encrypt save data.
-        /// Current stub: returns data unchanged.
+        /// Redirects to Tartaria.Save.SaveEncryptionHelper.Encrypt()
         /// </summary>
         public static byte[] Encrypt(byte[] plainData)
         {
-            // Stub: passthrough (no encryption)
-            return plainData;
+            return TartariaSave.SaveEncryptionHelper.Encrypt(plainData);
+        }
+
+        /// <summary>
+        /// Validate data integrity using HMAC-SHA256.
+        /// Redirects to Tartaria.Save.SaveEncryptionHelper.ValidateIntegrity()
+        /// </summary>
+        public static byte[] ValidateIntegrity(byte[] data)
+        {
+            return TartariaSave.SaveEncryptionHelper.ValidateIntegrity(data);
         }
     }
 }

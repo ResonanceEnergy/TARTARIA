@@ -47,6 +47,7 @@ namespace Tartaria.Input
         bool _loggedMoveActionOk;
         bool _firstMove = true;
         float _externalMoveMultiplier = 1f;
+        readonly Collider[] _interactBuffer = new Collider[10];
 
         /// <summary>Debug: External speed multiplier (set via DebugConsole /speed command).</summary>
         public float SpeedMultiplier { get => _externalMoveMultiplier; set => _externalMoveMultiplier = Mathf.Clamp(value, 0.1f, 10f); }
@@ -201,12 +202,18 @@ namespace Tartaria.Input
 
         void Update()
         {
-            if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
+            // EMERGENCY BYPASS: Always allow movement for debugging
+            // Original check: if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
 
             HandleMovementInput();
-            HandleContinuousActions();
-            HandleActionFallbacks();
-            HandleGiantAdvancedInput();
+
+            // Only do other stuff if actually playing
+            if (GameStateManager.Instance != null && GameStateManager.Instance.IsPlaying)
+            {
+                HandleContinuousActions();
+                HandleActionFallbacks();
+                HandleGiantAdvancedInput();
+            }
         }
 
         void HandleContinuousActions()
@@ -387,12 +394,15 @@ namespace Tartaria.Input
                 {
                     mb.SendMessage("Interact", gameObject, SendMessageOptions.DontRequireReceiver);
                     OnInteract?.Invoke();
+
+                    // Audio + haptic feedback
+                    Audio.AudioManager.Instance?.PlaySFX2D("interact_confirm");
+                    HapticFeedbackManager.Instance?.PlayContextual();
+
                     return;
                 }
             }
-            // Fallback sphere - DISABLED: _interactBuffer field missing
-            // TODO: Add `readonly Collider[] _interactBuffer = new Collider[10];` field declaration
-            /*
+            // Fallback sphere cast if raycast misses
             int colCount = Physics.OverlapSphereNonAlloc(transform.position + transform.forward * 1.5f, interactRadius, _interactBuffer, interactableLayer);
             for (int i = 0; i < colCount; i++)
             {
@@ -402,10 +412,14 @@ namespace Tartaria.Input
                 {
                     mb.SendMessage("Interact", gameObject, SendMessageOptions.DontRequireReceiver);
                     OnInteract?.Invoke();
+
+                    // Audio + haptic feedback
+                    Audio.AudioManager.Instance?.PlaySFX2D("interact_confirm");
+                    HapticFeedbackManager.Instance?.PlayContextual();
+
                     break;
                 }
             }
-            */
         }
 
         // Public API used by other systems — [Moon 1 fix: stub, giant debug only in Integration scenes]

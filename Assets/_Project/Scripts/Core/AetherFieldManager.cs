@@ -17,11 +17,19 @@ namespace Tartaria.Core
         [Header("Resonance Score")]
         [SerializeField, Range(0f, 100f)] float startingRS = 0f;
 
+        [Header("Aether Charge")]
+        [SerializeField, Range(0f, 100f)] float maxAetherCharge = 100f;
+
         float _resonanceScore;
+        float _aetherCharge;
 
         public float ResonanceScore => _resonanceScore;
+        public float AetherCharge => _aetherCharge;
+        public float MaxAetherCharge => maxAetherCharge;
+        public float AetherChargeNormalized => maxAetherCharge > 0 ? _aetherCharge / maxAetherCharge : 0f;
 
         public event System.Action<float> OnResonanceScoreChanged;
+        public event System.Action<float> OnAetherChargeChanged;
 
         void Awake()
         {
@@ -51,6 +59,22 @@ namespace Tartaria.Core
         public void DeductRS(float amount)
         {
             AddResonanceScore(-amount);
+        }
+
+        public void AddAetherCharge(float amount)
+        {
+            _aetherCharge = Mathf.Clamp(_aetherCharge + amount, 0f, maxAetherCharge);
+            OnAetherChargeChanged?.Invoke(_aetherCharge);
+        }
+
+        public void DeductAetherCharge(float amount)
+        {
+            AddAetherCharge(-amount);
+        }
+
+        public bool CanSpendAetherCharge(float amount)
+        {
+            return _aetherCharge >= amount;
         }
     }
 }

@@ -87,8 +87,17 @@ namespace Tartaria.UI
         public void Open()
         {
             _open = true;
-            if (archivePanel != null) archivePanel.SetActive(true);
-            RefreshList();
+            if (archivePanel != null)
+            {
+                archivePanel.SetActive(true);
+                RefreshList();
+                // Force Canvas layout update before display to prevent flicker
+                Canvas.ForceUpdateCanvases();
+            }
+            else
+            {
+                RefreshList();
+            }
         }
 
         public void Close()

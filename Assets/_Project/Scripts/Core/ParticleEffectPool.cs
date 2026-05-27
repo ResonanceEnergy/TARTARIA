@@ -145,8 +145,7 @@ namespace Tartaria.Core
         /// </summary>
         public void PreloadCommonEffects()
         {
-            // Placeholder - would load from Resources or AssetBundle
-            Debug.Log("[ParticlePool] Preload common effects (stub)");
+            // Placeholder - would load from Resources or AssetBundle if needed
         }
 
         void OnDestroy()

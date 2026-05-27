@@ -149,8 +149,7 @@ namespace Tartaria.Data
             }
 
             // Tier validation
-            // DataValidator.ValidateRange not implemented yet (Phase 9 stub)
-            // DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(tier, 1, 5, "tier"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(tier, 1, 5, "tier"));
 
             // RS cost validation
             DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(rsCost, "rsCost"));

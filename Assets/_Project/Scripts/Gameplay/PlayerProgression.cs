@@ -1,5 +1,7 @@
 using UnityEngine;
 using System;
+using System.Collections.Generic;
+using Tartaria.Core;
 using Tartaria.Save;
 
 namespace Tartaria.Gameplay
@@ -7,7 +9,7 @@ namespace Tartaria.Gameplay
     /// <summary>
     /// Player Progression System — unified level/XP/stat allocation.
     /// Singleton instance. Replaces LevelUpSystem (eliminated duplicate).
-    /// 
+    ///
     /// Features:
     /// - XP/Leveling: exponential curve (100 * level^1.5), max level 50
     /// - Stat Allocation: 3 points per level across 5 stats
@@ -15,19 +17,19 @@ namespace Tartaria.Gameplay
     /// - Derived Stats: MaxHP, MaxRS, damage multipliers, dodge, movement speed
     /// - Respec: refund all allocated points (costs RS, pending economy integration)
     /// - Save Integration: ISaveDataProvider pattern (v17 modular extensibility)
-    /// 
+    ///
     /// Stats (5 base + scaling):
     /// - Vitality → +10 HP per point
     /// - Resonance → +5 RS per point, ability power +2%
     /// - Strength → melee damage +3%, carry weight +5 kg
     /// - Agility → dodge chance +1%, movement speed +2%
     /// - Attunement → magic damage +3%, RS regen +10%
-    /// 
+    ///
     /// Usage:
     /// - PlayerProgression.Instance.AddXP(50)
     /// - PlayerProgression.Instance.AllocateStat(StatType.Vitality, 1)
     /// - Subscribe to OnLevelUp/OnStatAllocated events
-    /// 
+    ///
     /// GDD refs: §06 (Player Progression), §09 (Combat Scaling)
     /// </summary>
     public class PlayerProgression : MonoBehaviour, ISaveDataProvider
@@ -51,7 +53,10 @@ namespace Tartaria.Gameplay
         [SerializeField] int strength = 5;
         [SerializeField] int agility = 5;
         [SerializeField] int attunement = 5;
-    
+
+        // Feature unlocks (quest rewards, achievements, etc.)
+        readonly HashSet<string> _unlockedFeatures = new();
+
     [Header("Caps (Edge Case Protection)")]
     [SerializeField] int maxStatValue = 999;  // Prevent integer overflow
     [SerializeField] int maxXP = 999999999;    // ~1 billion XP cap
@@ -71,6 +76,10 @@ namespace Tartaria.Gameplay
         public int Strength => strength;
         public int Agility => agility;
         public int Attunement => attunement;
+
+        // Feature unlock checks
+        public bool IsFeatureUnlocked(string featureId) => _unlockedFeatures.Contains(featureId);
+        public System.Collections.Generic.IReadOnlyCollection<string> UnlockedFeatures => _unlockedFeatures;
 
         // Derived stats
         public int MaxHP => 100 + (vitality * 10);
@@ -109,19 +118,39 @@ namespace Tartaria.Gameplay
             Instance = this;
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
-            
+
             // Register with SaveManager (ISaveDataProvider pattern)
             if (SaveManager.Instance != null)
                 SaveManager.Instance.RegisterProvider(this);
         }
-        
+
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
-            
+
             // Unregister from SaveManager
             if (SaveManager.Instance != null)
                 SaveManager.Instance.UnregisterProvider(this);
+        }
+
+        void OnEnable()
+        {
+            // Subscribe to enemy killed events for XP rewards
+            Core.GameEvents.OnEnemyKilled += HandleEnemyKilled;
+        }
+
+        void OnDisable()
+        {
+            // Unsubscribe from events
+            Core.GameEvents.OnEnemyKilled -= HandleEnemyKilled;
+        }
+
+        void HandleEnemyKilled(Core.EnemyKilledEventArgs args)
+        {
+            if (args.xpReward > 0)
+            {
+                AddXP(args.xpReward, $"Defeated {args.enemyType}");
+            }
         }
 
         // ═══════════════════════════════════════════════════════════════
@@ -141,7 +170,8 @@ namespace Tartaria.Gameplay
                 resonance = this.resonance,
                 strength = this.strength,
                 agility = this.agility,
-                attunement = this.attunement
+                attunement = this.attunement,
+                unlockedFeatures = new System.Collections.Generic.List<string>(_unlockedFeatures).ToArray()
             };
         }
 
@@ -169,8 +199,19 @@ namespace Tartaria.Gameplay
                     agility = Mathf.Max(5, ppd.agility);
                     attunement = Mathf.Max(5, ppd.attunement);
 
+                    // Restore feature unlocks
+                    _unlockedFeatures.Clear();
+                    if (ppd.unlockedFeatures != null)
+                    {
+                        foreach (var feature in ppd.unlockedFeatures)
+                        {
+                            _unlockedFeatures.Add(feature);
+                        }
+                    }
+
                     Debug.Log($"[PlayerProgression] Loaded: Level {currentLevel}, XP {currentXP}, " +
-                              $"Stats V{vitality}/R{resonance}/S{strength}/A{agility}/At{attunement}");
+                              $"Stats V{vitality}/R{resonance}/S{strength}/A{agility}/At{attunement}, " +
+                              $"{_unlockedFeatures.Count} features unlocked");
                 }
                 catch (Exception e)
                 {
@@ -197,14 +238,14 @@ namespace Tartaria.Gameplay
             Debug.Log("[PlayerProgression] Already at max level");
             return;
         }
-        
+
         // BUG-002 FIX: Reject negative XP
         if (amount < 0)
         {
             Debug.LogWarning($"[PlayerProgression] Negative XP rejected ({amount} from {source})");
             return;
         }
-        
+
         // BUG-002 FIX: Prevent integer overflow
         if (currentXP > maxXP - amount)
         {
@@ -249,7 +290,7 @@ namespace Tartaria.Gameplay
             float movementSpeedBonus = 0.02f;  // From Agility scaling (2% per point)
 
             Debug.Log($"[PlayerProgression] LEVEL UP! → Level {currentLevel} (+{statPointsPerLevel} stat points, {availableStatPoints} total)");
-            
+
             // Fire both legacy event and new GameEvents
             OnLevelUp?.Invoke(currentLevel);
             Core.GameEvents.RaiseLevelUp(new Core.LevelUpEventArgs
@@ -278,7 +319,7 @@ namespace Tartaria.Gameplay
             Debug.LogWarning($"[PlayerProgression] Not enough stat points ({availableStatPoints} available, {points} requested)");
             return false;
         }
-        
+
         // BUG-003 FIX: Reject negative point allocation
         if (points < 0)
         {
@@ -293,7 +334,7 @@ namespace Tartaria.Gameplay
             Debug.LogWarning($"[PlayerProgression] {statType} already at max ({maxStatValue})");
             return false;
         }
-        
+
         // Cap points to prevent overflow
         int allowedPoints = Mathf.Min(points, maxStatValue - currentValue);
         if (allowedPoints < points)
@@ -367,12 +408,26 @@ namespace Tartaria.Gameplay
         }
 
         /// <summary>
-        /// Reset stats (costs RS, pending economy integration).
+        /// Reset stats (costs RS).
         /// </summary>
         public bool RespecStats(int rsCost = 100)
         {
-            // TODO: Integrate with economy system to deduct RS cost
-            Debug.Log($"[PlayerProgression] Respec requested (cost: {rsCost} RS) - economy integration pending");
+            // Check if player has enough RS
+            if (AetherFieldManager.Instance == null)
+            {
+                Debug.LogWarning("[PlayerProgression] Respec failed - AetherFieldManager not available");
+                return false;
+            }
+
+            if (AetherFieldManager.Instance.ResonanceScore < rsCost)
+            {
+                Debug.LogWarning($"[PlayerProgression] Respec failed - insufficient RS ({AetherFieldManager.Instance.ResonanceScore}/{rsCost})");
+                return false;
+            }
+
+            // Deduct RS cost
+            AetherFieldManager.Instance.DeductRS(rsCost);
+            Debug.Log($"[PlayerProgression] Respec cost {rsCost} RS deducted");
 
             // Reset to base stats (5 each)
             int totalPointsSpent = (vitality - 5) + (resonance - 5) + (strength - 5) + (agility - 5) + (attunement - 5);
@@ -403,6 +458,32 @@ namespace Tartaria.Gameplay
             SaveManager.Instance?.MarkDirty();
         }
 
+        // === Feature Unlock System ===
+
+        /// <summary>
+        /// Unlock a feature by ID. Called by quest system, achievements, moon completions.
+        /// Feature IDs examples: "fast_travel", "crafting_tier2", "companion_helena", "skill_harmonic_strike"
+        /// </summary>
+        public void UnlockFeature(string featureId)
+        {
+            if (string.IsNullOrEmpty(featureId))
+            {
+                Debug.LogWarning("[PlayerProgression] UnlockFeature called with null/empty ID");
+                return;
+            }
+
+            if (_unlockedFeatures.Contains(featureId))
+            {
+                Debug.LogWarning($"[PlayerProgression] Feature '{featureId}' already unlocked");
+                return;
+            }
+
+            _unlockedFeatures.Add(featureId);
+            Debug.Log($"[PlayerProgression] Feature unlocked: {featureId} (total: {_unlockedFeatures.Count})");
+
+            SaveManager.Instance?.MarkDirty();
+        }
+
         // === Stat Type Enum ===
 
         public enum StatType : byte
@@ -430,5 +511,6 @@ namespace Tartaria.Gameplay
         public int strength = 5;
         public int agility = 5;
         public int attunement = 5;
+        public string[] unlockedFeatures = System.Array.Empty<string>();
     }
 }

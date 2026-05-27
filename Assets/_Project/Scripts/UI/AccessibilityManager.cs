@@ -343,7 +343,7 @@ namespace Tartaria.UI
         /// </summary>
         public void ApplyGlobalButtonSizing()
         {
-            var buttons = FindObjectsOfType<Button>(true);
+            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
             foreach (var btn in buttons)
             {
                 var rt = btn.GetComponent<RectTransform>();

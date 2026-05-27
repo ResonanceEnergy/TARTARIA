@@ -190,12 +190,34 @@ namespace Tartaria.AI
         }
 
         /// <summary>
-        /// Apply freeze debuff (stub - full status effect system pending).
+        /// Apply freeze debuff - stops enemy movement for duration.
         /// </summary>
         public void ApplyFreeze(float duration)
         {
-            Debug.Log($"[EnemyAI] {name} frozen for {duration}s (stub)");
-            // TODO: Implement freeze status effect (stop NavMeshAgent, visual VFX)
+            if (_agent != null && _agent.enabled)
+            {
+                StopAllCoroutines();
+                StartCoroutine(FreezeCoroutine(duration));
+                Debug.Log($"[EnemyAI] {name} frozen for {duration}s");
+            }
+        }
+
+        System.Collections.IEnumerator FreezeCoroutine(float duration)
+        {
+            float originalSpeed = _agent.speed;
+            _agent.isStopped = true;
+            _agent.velocity = Vector3.zero;
+
+            // TODO: Add visual VFX (ice particles, blue tint shader)
+
+            yield return new WaitForSeconds(duration);
+
+            if (_agent != null && _agent.enabled)
+            {
+                _agent.isStopped = false;
+                _agent.speed = originalSpeed;
+                Debug.Log($"[EnemyAI] {name} unfrozen");
+            }
         }
     }
 }

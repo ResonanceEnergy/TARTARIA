@@ -9,7 +9,10 @@
     "Tartaria.Save",
     "Tartaria.Localization",
     "Tartaria.UI",
-    "Unity.TextMeshPro"
+    "Tartaria.Integration",
+    "Tartaria.Input",
+    "Unity.TextMeshPro",
+    "Unity.InputSystem"
   ],
   "includePlatforms": [
     "Editor"

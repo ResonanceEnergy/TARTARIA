@@ -40,6 +40,11 @@ namespace Tartaria.UI
         [SerializeField] TMPro.TextMeshProUGUI xpValueText;
         [SerializeField] UnityEngine.UI.Image[] abilityCooldownIcons;  // 3 circular icons with radial fill overlays
 
+        [Header("Ability Cooldowns (Runtime Wired)")]
+        [SerializeField] UnityEngine.UI.Image abilityCooldownPulse;   // Resonance Pulse (melee)
+        [SerializeField] UnityEngine.UI.Image abilityCooldownStrike;  // Harmonic Strike (AoE)
+        [SerializeField] UnityEngine.UI.Image abilityCooldownShield;  // Frequency Shield
+
         [Header("Boss Health Bar")]
         [SerializeField] RectTransform bossHealthPanel;
         [SerializeField] UnityEngine.UI.Image bossHealthFill;
@@ -54,6 +59,20 @@ namespace Tartaria.UI
 
         [Header("Wave Counter")]
         [SerializeField] RectTransform waveCounterPanel;
+        [SerializeField] TMPro.TextMeshProUGUI waveCounterText;
+
+        [Header("Achievement Toast")]
+        [SerializeField] RectTransform achievementToastPanel;
+        [SerializeField] TMPro.TextMeshProUGUI achievementToastText;
+
+        [Header("Moon Trophy")]
+        [SerializeField] RectTransform moonTrophyPanel;
+        [SerializeField] TMPro.TextMeshProUGUI moonTrophyText;
+        [SerializeField] TMPro.TextMeshProUGUI moonTrophySubtext;
+
+        [Header("Objective")]
+        [SerializeField] RectTransform objectivePanel;
+        [SerializeField] TMPro.TextMeshProUGUI objectiveText;
 
         // ... (other existing fields preserved for compatibility)
 
@@ -126,7 +145,7 @@ namespace Tartaria.UI
             // New HUD display events (Agent 1 - cyclic dependency break)
             GameEvents.OnHUDShowObjective += ShowObjective;
             GameEvents.OnHUDShowDialogue += ShowDialogue;
-            // GameEvents.OnHUDShowBanner += ShowBanner; // Disabled (Phase 33) - delegate signature mismatch
+            GameEvents.OnHUDShowBanner += ShowBanner;
             GameEvents.OnHUDShowSubtitle += ShowSubtitle;
             GameEvents.OnHUDShowMoonTrophy += ShowMoonTrophy;
             GameEvents.OnHUDShowBossHealth += ShowBossHealth;
@@ -162,7 +181,7 @@ namespace Tartaria.UI
             // Unsubscribe new HUD display events (Agent 1 - cyclic dependency break)
             GameEvents.OnHUDShowObjective -= ShowObjective;
             GameEvents.OnHUDShowDialogue -= ShowDialogue;
-            // GameEvents.OnHUDShowBanner -= ShowBanner; // Disabled (Phase 33) - delegate signature mismatch
+            GameEvents.OnHUDShowBanner -= ShowBanner;
             GameEvents.OnHUDShowSubtitle -= ShowSubtitle;
             GameEvents.OnHUDShowMoonTrophy -= ShowMoonTrophy;
             GameEvents.OnHUDShowBossHealth -= ShowBossHealth;
@@ -270,7 +289,7 @@ namespace Tartaria.UI
 
             bool combat = (GameStateManager.Instance?.CurrentState ?? GameState.Exploration) == GameState.Combat;
             bool giantReady = _giantReady;
-            bool fountainRestored = false; // would be queried from GameLoop in real integration
+            // fountainRestored would be queried from GameLoop in real integration - future feature
 
             if (combat && giantReady)
             {
@@ -520,35 +539,59 @@ namespace Tartaria.UI
 
         void UpdateAbilityCooldowns()
         {
-            if (abilityCooldownIcons == null || abilityCooldownIcons.Length == 0) return;
+            // Poll PlayerCombatController for cooldown timers
+            var combat = UnityEngine.Object.FindFirstObjectByType<Tartaria.Gameplay.PlayerCombatController>();
+            if (combat == null) return;
 
-            // PlayerAbilityManager disabled (Phase 33 - Integration assembly)
-            return; // Disabled (Phase 33)
+            var combatType = combat.GetType();
 
-            /*
-            // Update up to 3 ability cooldown icons (radial fill)
-            int maxSlots = Mathf.Min(3, abilityCooldownIcons.Length);
-            for (int i = 0; i < maxSlots; i++)
+            // Resonance Pulse (melee attack)
+            if (abilityCooldownPulse != null)
             {
-                var icon = abilityCooldownIcons[i];
-                if (icon == null) continue;
-
-                float cooldownProgress = abilityMgr.GetCooldownProgress(i);  // 0-1, 1 = ready
-                icon.fillAmount = cooldownProgress;
-
-                // Optional: gray out when on cooldown, colored when ready
-                icon.color = cooldownProgress >= 0.99f
-                    ? new Color(1f, 1f, 1f, 1f)   // White = ready
-                    : new Color(0.4f, 0.4f, 0.4f, 0.7f);  // Gray = cooling down
+                float cooldownTimer = GetPrivateFieldValue<float>(combat, combatType, "_cooldownTimer");
+                float attackCooldown = GetPrivateFieldValue<float>(combat, combatType, "attackCooldown");
+                float progress = attackCooldown > 0 ? Mathf.Clamp01(1f - (cooldownTimer / attackCooldown)) : 1f;
+                abilityCooldownPulse.fillAmount = 1f - progress; // Inverted for countdown visual
+                abilityCooldownPulse.color = progress >= 0.99f ? new Color(0.9f, 0.7f, 0.3f, 0.6f) : new Color(0.4f, 0.4f, 0.4f, 0.4f);
             }
-            */
+
+            // Harmonic Strike (AoE)
+            if (abilityCooldownStrike != null)
+            {
+                float cooldownTimer = GetPrivateFieldValue<float>(combat, combatType, "_harmonicStrikeCooldownTimer");
+                float cooldown = GetPrivateFieldValue<float>(combat, combatType, "harmonicStrikeCooldown");
+                float progress = cooldown > 0 ? Mathf.Clamp01(1f - (cooldownTimer / cooldown)) : 1f;
+                abilityCooldownStrike.fillAmount = 1f - progress;
+                abilityCooldownStrike.color = progress >= 0.99f ? new Color(0.9f, 0.3f, 0.3f, 0.6f) : new Color(0.4f, 0.4f, 0.4f, 0.4f);
+            }
+
+            // Frequency Shield
+            if (abilityCooldownShield != null)
+            {
+                float cooldownTimer = GetPrivateFieldValue<float>(combat, combatType, "_shieldCooldownTimer");
+                float cooldown = GetPrivateFieldValue<float>(combat, combatType, "shieldCooldown");
+                float progress = cooldown > 0 ? Mathf.Clamp01(1f - (cooldownTimer / cooldown)) : 1f;
+                abilityCooldownShield.fillAmount = 1f - progress;
+                abilityCooldownShield.color = progress >= 0.99f ? new Color(0.3f, 0.6f, 0.9f, 0.6f) : new Color(0.4f, 0.4f, 0.4f, 0.4f);
+            }
         }
 
         void UpdateAetherDisplay()
         {
-            // AetherCharge not yet exposed on AetherFieldManager; leave bars at 0 until wired.
-            if (aetherChargeBar != null) aetherChargeBar.fillAmount = 0f;
-            if (aetherValueText != null) aetherValueText.text = "0%";
+            if (aetherChargeBar == null && aetherValueText == null) return;
+
+            var aetherField = AetherFieldManager.Instance;
+            if (aetherField == null) return;
+
+            float chargeNormalized = aetherField.AetherChargeNormalized;
+            float charge = aetherField.AetherCharge;
+            float maxCharge = aetherField.MaxAetherCharge;
+
+            if (aetherChargeBar != null)
+                aetherChargeBar.fillAmount = chargeNormalized;
+
+            if (aetherValueText != null)
+                aetherValueText.text = $"{charge:0}/{maxCharge:0}";
         }
 
         void UpdatePromptFade()
@@ -926,6 +969,19 @@ namespace Tartaria.UI
             GUI.color = new Color(0.7f, 0.95f, 1f, 0.55f);
             GUI.DrawTexture(new Rect(x, y, w, 2), Texture2D.whiteTexture);
             GUI.DrawTexture(new Rect(x, y + h - 2, w, 2), Texture2D.whiteTexture);
+        }
+
+        // ─── Reflection Helpers (for cross-assembly private field access) ───
+
+        T GetPrivateFieldValue<T>(object obj, System.Type type, string fieldName)
+        {
+            var field = type.GetField(fieldName, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if (field == null)
+            {
+                Debug.LogWarning($"[HUDController] GetPrivateFieldValue: field '{fieldName}' not found on type {type.Name}");
+                return default(T);
+            }
+            return (T)field.GetValue(obj);
         }
     }
 }

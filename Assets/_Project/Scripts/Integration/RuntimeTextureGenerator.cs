@@ -4,8 +4,12 @@ namespace Tartaria.Integration
 {
     /// <summary>
     /// Runtime Texture Generator — Creates procedural textures for buildings and terrain
-    /// Generates noise-based textures when asset files are missing
-    /// All textures optimized for URP Forward+ with proper filtering
+    /// 
+    /// ⚠️ DEPRECATED: This system is no longer needed.
+    /// The project has high-quality PBR materials with 2K textures from AmbientCG/Polyhaven.
+    /// Use Assets/_Project/Materials/PBR/ materials instead (Rocks023, PavingStones150, Marble006, etc.)
+    /// 
+    /// Kept for backward compatibility and as fallback if PBR materials are missing.
     /// </summary>
     public static class RuntimeTextureGenerator
     {

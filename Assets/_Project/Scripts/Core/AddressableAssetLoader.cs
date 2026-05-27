@@ -10,7 +10,7 @@ namespace Tartaria.Core
     /// AddressableAssetLoader — central safe wrapper for Unity Addressables 2.x.
     /// Provides group labels, async prefab/scene loads, streaming ring helpers.
     /// Falls back gracefully for editor / pre-Addressables bootstrap.
-    /// 
+    ///
     /// Groups (per 09_TECHNICAL_SPEC.md + Phase 2):
     /// - Echohaven_Core : core Echohaven prefabs, initial content
     /// - KayKit_Assets : all KayKit forest/character/props (high reuse)
@@ -18,7 +18,7 @@ namespace Tartaria.Core
     /// - Audio_Common : SFX, ambient clips (music streamed separately)
     /// - Zone_Moon1_Echohaven : Moon 1 / Echohaven specific assets + subscene
     /// - Zone_Moon2 : Moon 2 zone assets
-    /// 
+    ///
     /// Memory budgets enforced via release handles. 500m streaming ring support.
     /// </summary>
     public static class AddressableAssetLoader
@@ -63,7 +63,8 @@ namespace Tartaria.Core
             }
             catch (System.Exception ex)
             {
-                Debug.LogWarning($"[AddressableAssetLoader] Initialize exception (safe fallback): {ex.Message}");
+                // Safe fallback - using direct references instead of Addressables
+                Debug.Log($"[AddressableAssetLoader] Using direct references (Addressables: {ex.Message})");
             }
         }
 

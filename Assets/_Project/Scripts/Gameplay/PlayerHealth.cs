@@ -92,8 +92,22 @@ namespace Tartaria.Gameplay
                 return;
             }
 
+            // Check for Frequency Shield damage reduction
+            var combat = GetComponent<PlayerCombatController>();
+            if (combat != null && combat.IsShieldActive())
+            {
+                float absorption = combat.GetShieldAbsorption();
+                int originalAmount = amount;
+                amount = Mathf.RoundToInt(amount * (1f - absorption));
+                Debug.Log($"[PlayerHealth] Frequency Shield absorbed {(absorption * 100):F0}% damage ({originalAmount} -> {amount})");
+            }
+
             _currentHealth -= amount;
             _lastDamageTime = Time.time;
+
+            // Audio + haptic feedback
+            Audio.AudioManager.Instance?.PlaySFX3D("player_damage", transform.position);
+            Input.HapticFeedbackManager.Instance?.PlayCombatHit();
 
             // Trigger hit reactor VFX/SFX (CombatHitReactor disabled - Phase 23)
             // var reactor = GetComponent<CombatHitReactor>();
@@ -124,6 +138,10 @@ namespace Tartaria.Gameplay
         {
             _isDead = true;
             OnDeath?.Invoke();
+
+            // Audio + haptic feedback
+            Audio.AudioManager.Instance?.PlaySFX3D("player_death", transform.position);
+            Input.HapticFeedbackManager.Instance?.PlayGolemDeath();
 
             Debug.Log("[PlayerHealth] Player died");
             // Day-15: DeathOverlay subscribes via FindFirstObjectByType + OnDeath, drives Respawn().

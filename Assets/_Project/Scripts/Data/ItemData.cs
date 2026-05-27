@@ -133,8 +133,7 @@ namespace Tartaria.Data
             }
 
             // Stack size validation
-            // DataValidator.ValidateRange not implemented yet (Phase 8 stub)
-            // DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(stackSize, 1, 999, "stackSize"));
+            DataValidator.AddIfNotNull(results, DataValidator.ValidateRange(stackSize, 1, 999, "stackSize"));
 
             // Weight validation
             DataValidator.AddIfNotNull(results, DataValidator.ValidateNonNegative(weight, "weight"));

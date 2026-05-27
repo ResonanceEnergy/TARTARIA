@@ -494,8 +494,7 @@ namespace Tartaria.AI
             _currentHealth -= damage;
             Debug.Log($"[MudGolem] Took {damage} damage, HP={_currentHealth}");
 
-            // Sprint: Spawn damage number (disabled — DamageNumberPool in UI assembly)
-            // DamageNumberPool.Spawn(damage, transform.position);
+            Gameplay.DamageNumberPool.Spawn(damage, transform.position);
 
             // Sprint: Hit-flash (white emission for 0.08s)
             StartCoroutine(HitFlash());
@@ -545,8 +544,7 @@ namespace Tartaria.AI
         {
             TransitionTo(GolemState.Dead);
 
-            // Spawn death decal at hit position (disabled — DecalHitPool in Gameplay assembly)
-            // Gameplay.DecalHitPool.Spawn(transform.position, Vector3.up);
+            Gameplay.DecalHitPool.Spawn(transform.position, Vector3.up);
 
             if (_hasNavMesh && _agent != null)
                 _agent.enabled = false;

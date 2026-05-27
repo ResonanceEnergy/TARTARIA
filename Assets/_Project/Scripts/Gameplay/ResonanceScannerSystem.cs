@@ -115,6 +115,7 @@ namespace Tartaria.Gameplay
             float effectiveRadius = Mathf.Lerp(baseScanRadius, maxScanRadius, rsNorm);
 
             OnScanStarted?.Invoke();
+            AudioManager.Instance?.PlaySFX2D("scan_pulse");
 
             // Scan for POIs
             _lastResults.Clear();

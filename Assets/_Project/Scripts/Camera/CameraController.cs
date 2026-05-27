@@ -59,11 +59,25 @@ namespace Tartaria.Camera
 
         // M2: Live mouse sensitivity from Settings
         public static float MouseSensitivityMultiplier { get; private set; } = 1f;
+        public static bool InvertCameraY { get; private set; } = false; // Default: not inverted (push up = look up)
+        public static bool InvertCameraX { get; private set; } = false; // Default: not inverted (push right = orbit right)
 
         public static void SetMouseSensitivity(float value)
         {
             MouseSensitivityMultiplier = Mathf.Clamp(value, 0.25f, 3f);
             PlayerPrefs.SetFloat("TARTARIA_MouseSens", MouseSensitivityMultiplier);
+        }
+
+        public static void SetInvertCameraY(bool inverted)
+        {
+            InvertCameraY = inverted;
+            PlayerPrefs.SetInt("TARTARIA_InvertY", inverted ? 1 : 0);
+        }
+
+        public static void SetInvertCameraX(bool inverted)
+        {
+            InvertCameraX = inverted;
+            PlayerPrefs.SetInt("TARTARIA_InvertX", inverted ? 1 : 0);
         }
         Coroutine _closeUpCoroutine;
         GameState _preCloseUpState;
@@ -100,6 +114,11 @@ namespace Tartaria.Camera
             _currentYaw = 180f; // Face north — toward the StarDome / Fountain cluster
             _targetFOV = exploreFOV;
             _playerSearchCooldown = 0f; // Search immediately on first frame
+
+            // Load camera inversion settings
+            InvertCameraY = PlayerPrefs.GetInt("TARTARIA_InvertY", 0) == 1;
+            InvertCameraX = PlayerPrefs.GetInt("TARTARIA_InvertX", 0) == 1;
+            MouseSensitivityMultiplier = PlayerPrefs.GetFloat("TARTARIA_MouseSens", 1f);
         }
 
         void OnEnable()
@@ -223,7 +242,8 @@ namespace Tartaria.Camera
             if (mouse != null && mouse.middleButton.isPressed)
             {
                 float mouseX = mouse.delta.ReadValue().x * 0.1f;
-                if (PlayerPrefs.GetInt("TARTARIA_ReducedMotion", 0) == 0 || !Input.GetKey(KeyCode.LeftAlt)) // reduced motion skips free look shake
+                var kb = Keyboard.current;
+                if (PlayerPrefs.GetInt("TARTARIA_ReducedMotion", 0) == 0 || (kb == null || !kb.leftAltKey.isPressed)) // reduced motion skips free look shake
                     _currentYaw += mouseX * orbitSpeed * MouseSensitivityMultiplier * Time.deltaTime;
             }
 
@@ -241,9 +261,13 @@ namespace Tartaria.Camera
             Vector2 rightStick = _gamepadOrbitAction != null ? _gamepadOrbitAction.ReadValue<Vector2>() : Vector2.zero;
             if (rightStick.sqrMagnitude > 0.02f)
             {
-                _currentYaw += rightStick.x * gamepadOrbitSpeed * Time.deltaTime;
+                // Apply inversion settings (default: not inverted = push up looks up, push right orbits right)
+                float yawInput = InvertCameraX ? -rightStick.x : rightStick.x;
+                float pitchInput = InvertCameraY ? -rightStick.y : rightStick.y;
+
+                _currentYaw += yawInput * gamepadOrbitSpeed * Time.deltaTime;
                 _currentPitch = Mathf.Clamp(
-                    _currentPitch - rightStick.y * gamepadOrbitSpeed * 0.5f * Time.deltaTime,
+                    _currentPitch + pitchInput * gamepadOrbitSpeed * 0.5f * Time.deltaTime,
                     20f, 80f);
             }
         }

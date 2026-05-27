@@ -160,14 +160,11 @@ namespace Tartaria.Audio
             // ═══ Moon 4 (Resonance Moon — Water Temple + Golem Puzzle) — EXCLUSIVE ═══
             // Water flow restoration, bastion tuning snaps, golem awakening bass, bell tower harmony waves,
             // memory crystal chimes. All 432Hz + water overtones + earth rumbles.
-            // TODO: Implement Moon 4 SFX generators
-            /*
             Register("Moon4_BastionSnap", GenMoon4BastionSnap());
             Register("Moon4_WaterFlow", GenMoon4WaterFlowRestoration());
             Register("Moon4_GolemRoar", GenMoon4GolemRoar());
             Register("Moon4_BellTowerWaves", GenMoon4BellTowerHarmony());
             Register("Moon4_MemoryCrystal", GenMoon4MemoryCrystal());
-            */
 
             // ═══ Moon 5 (Overtone Moon — White City Echo District Amplification) — EXCLUSIVE ═══
             // 432Hz + PHI harmonic overtones for tuning stingers, 6-band healing auras (528 family),
@@ -216,8 +213,6 @@ namespace Tartaria.Audio
             // ═══ Moons 8-13 (Late Game — Continental Scale + Boss Encounters) — EXCLUSIVE ═══
             // Airship propulsion, rail network hum, aquifer purification, seismic tremors,
             // bell tower harmonies, aether tremors, fountain chains, leviathan death, final victory fanfare.
-            // TODO: Implement Moons 8-13 SFX generators
-            /*
             Register("Moon8_AirshipLaunch", GenMoon8AirshipLaunch());
             Register("Moon9_RailHum", GenMoon9RailNetworkHum());
             Register("Moon10_LeviathanRoar", GenMoon10LeviathanRoar());
@@ -228,7 +223,7 @@ namespace Tartaria.Audio
             Register("Moon12_TowerHarmony", GenMoon12TowerHarmonyRing());
             Register("Moon13_AetherTremor", GenMoon13AetherTremor());
             Register("Moon13_SeismicTremor", GenMoon13SeismicTremor());
-            */
+
             Register("BossPhaseTransition", GenBossPhaseTransition());
 
             // ═══ Global — Moon Clear + End Game fanfares ═══

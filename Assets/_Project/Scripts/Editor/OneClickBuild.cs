@@ -4,6 +4,7 @@ using UnityEditor.Build.Reporting;
 using UnityEditor.Compilation;
 using System;
 using System.IO;
+using System.Linq;
 
 namespace Tartaria.Editor
 {
@@ -16,6 +17,45 @@ namespace Tartaria.Editor
     {
         private const string BuildTag = "[Tartaria.OneClickBuild]";
         private const string ReportPath = "Logs/tartaria-build-report.txt";
+        private const string SentinelPath = "Library/TARTARIA_AUTOPLAY";
+
+        /// <summary>
+        /// Auto-trigger build when sentinel file is detected (called by tartaria-play.ps1).
+        /// </summary>
+        [InitializeOnLoadMethod]
+        private static void CheckForAutoPlay()
+        {
+            // Skip if not in batch mode and sentinel exists
+            if (File.Exists(SentinelPath))
+            {
+                Debug.Log($"{BuildTag} SENTINEL DETECTED -- Auto-triggering build pipeline");
+
+                // Delete sentinel so it doesn't trigger again
+                try { File.Delete(SentinelPath); } catch { }
+
+                // Delay to ensure Unity is fully initialized
+                EditorApplication.delayCall += () =>
+                {
+                    RunBuild();
+
+                    // After build, open Boot scene and enter play mode
+                    EditorApplication.delayCall += () =>
+                    {
+                        var bootScene = "Assets/_Project/Scenes/Boot.unity";
+                        if (File.Exists(bootScene))
+                        {
+                            UnityEditor.SceneManagement.EditorSceneManager.OpenScene(bootScene);
+                            EditorApplication.isPlaying = true;
+                            Debug.Log($"{BuildTag} Entering play mode...");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"{BuildTag} Boot.unity not found at {bootScene}");
+                        }
+                    };
+                };
+            }
+        }
 
         /// <summary>
         /// Main build entry point (called from batch mode).
@@ -108,7 +148,11 @@ namespace Tartaria.Editor
             bool allFound = true;
             foreach (var managerName in coreManagers)
             {
-                var type = Type.GetType(managerName);
+                // Search across all loaded assemblies (Type.GetType only works for mscorlib types without assembly name)
+                var type = System.AppDomain.CurrentDomain.GetAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .FirstOrDefault(t => t.FullName == managerName);
+
                 if (type != null)
                 {
                     Debug.Log($"{BuildTag}   Found: {managerName}");

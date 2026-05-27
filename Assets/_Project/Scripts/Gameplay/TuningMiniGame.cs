@@ -404,6 +404,10 @@ namespace Tartaria.Gameplay
                     OnTuningComplete?.Invoke(_accuracy);
                     AudioManager.Instance?.PlaySFX2D("TuningComplete");
 
+                    // Perfect match bonus SFX
+                    if (_accuracy >= 0.95f)
+                        AudioManager.Instance?.PlaySFX2D("tuning_match");
+
                     // Haptic feedback for success
                     if (HapticFeedbackManager.Instance != null)
                     {

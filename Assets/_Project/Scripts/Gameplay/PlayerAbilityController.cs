@@ -15,13 +15,13 @@ namespace Tartaria.Gameplay
         [SerializeField] float harmonicDamage = 50f;
         [SerializeField] float harmonicRadius = 5f;
         [SerializeField] float harmonicCooldown = 8f;
-        [SerializeField] int harmonicRSCost = 20;
+        // [SerializeField] int harmonicRSCost = 20; // Phase 22: Economy integration pending
         [SerializeField] LayerMask enemyLayerMask = -1; // Default to all layers
 
         [Header("Frequency Shield (Q)")]
         [SerializeField] float shieldDuration = 5f;
         [SerializeField] float shieldCooldown = 12f;
-        [SerializeField] int shieldRSCost = 15;
+        // [SerializeField] int shieldRSCost = 15; // Phase 22: Economy integration pending
 
         [Header("Aether Vision (V)")]
         [SerializeField] bool aetherVisionEnabled = false;
