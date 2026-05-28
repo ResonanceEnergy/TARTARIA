@@ -33,8 +33,9 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Bright bloom - heavenly radiance
-            if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>())
             {
+                var bloom = profile.Add<Bloom>();
                 bloom.intensity.Override(0.7f);
                 bloom.threshold.Override(0.7f);
                 bloom.scatter.Override(0.7f);
@@ -42,21 +43,23 @@ namespace Tartaria.Integration
             }
 
             // Subtle Chromatic Aberration - ethereal
-            if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>())
             {
+                var ca = profile.Add<ChromaticAberration>();
                 ca.intensity.Override(0.08f);
             }
 
             // Vignette - soft cloud edges
-            if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>())
             {
+                var vignette = profile.Add<Vignette>();
                 vignette.intensity.Override(0.15f);
                 vignette.smoothness.Override(0.6f);
                 vignette.color.Override(new Color(0.7f, 0.8f, 0.9f)); // Light blue
             }
 
             // Color Adjustments - bright sky palette
-            if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>())
             {
                 colorAdj.saturation.Override(10f);
                 colorAdj.contrast.Override(5f); // Soft contrast
@@ -64,7 +67,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - neutral bright
-            if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>())
             {
                 wb.temperature.Override(5f); // Slightly warm
             }

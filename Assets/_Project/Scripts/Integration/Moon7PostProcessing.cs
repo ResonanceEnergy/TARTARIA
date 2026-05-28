@@ -33,8 +33,9 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Soft bloom - bioluminescent glow
-            if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>())
             {
+                var bloom = profile.Add<Bloom>();
                 bloom.intensity.Override(0.5f);
                 bloom.threshold.Override(0.7f);
                 bloom.scatter.Override(0.8f);
@@ -42,21 +43,23 @@ namespace Tartaria.Integration
             }
 
             // Chromatic Aberration - water refraction
-            if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>())
             {
+                var ca = profile.Add<ChromaticAberration>();
                 ca.intensity.Override(0.2f);
             }
 
             // Vignette - deep water darkness
-            if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>())
             {
+                var vignette = profile.Add<Vignette>();
                 vignette.intensity.Override(0.4f);
                 vignette.smoothness.Override(0.5f);
                 vignette.color.Override(new Color(0f, 0.05f, 0.1f)); // Deep blue-black
             }
 
             // Color Adjustments - underwater palette
-            if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>())
             {
                 colorAdj.saturation.Override(-5f); // Muted underwater
                 colorAdj.contrast.Override(5f); // Low contrast
@@ -64,7 +67,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - cool underwater
-            if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>())
             {
                 wb.temperature.Override(-15f);
             }

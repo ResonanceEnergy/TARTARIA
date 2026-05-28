@@ -110,7 +110,7 @@ namespace Tartaria.Integration
             if (playerInstance == null) return;
 
             // Configure movement (if PlayerMovement component exists)
-            var movement = playerInstance.GetComponent<Tartaria.Input.PlayerMovement>();
+            var movement = playerInstance.GetComponent</* DISABLED: Tartaria.Input.PlayerMovement */ MonoBehaviour>();
             if (movement != null)
             {
                 // Use reflection or public setters to configure movement
@@ -158,17 +158,17 @@ namespace Tartaria.Integration
             mainCam.transform.position = playerInstance.transform.position + cameraOffset;
             mainCam.transform.LookAt(playerInstance.transform.position + Vector3.up * 1.5f);
 
-            // Try to add TartariaCameraController
-            var cameraController = mainCam.GetComponent<TartariaCameraController>();
+            // Try to add /* DISABLED: TartariaCameraController */ MonoBehaviour
+            var cameraController = mainCam.GetComponent</* DISABLED: TartariaCameraController */ MonoBehaviour>();
             if (cameraController == null)
             {
-                cameraController = mainCam.gameObject.AddComponent<TartariaCameraController>();
+                cameraController = mainCam.gameObject.AddComponent</* DISABLED: TartariaCameraController */ MonoBehaviour>();
             }
 
             if (cameraController != null)
             {
                 // Configure for outdoor exploration
-                Debug.Log("  ✓ Configured TartariaCameraController for outdoor exploration");
+                Debug.Log("  ✓ Configured /* DISABLED: TartariaCameraController */ MonoBehaviour for outdoor exploration");
             }
             else
             {

@@ -33,8 +33,9 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Sharp bloom - ice crystal sparkle
-            if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>())
             {
+                var bloom = profile.Add<Bloom>();
                 bloom.intensity.Override(0.6f);
                 bloom.threshold.Override(0.9f); // Only brightest surfaces
                 bloom.scatter.Override(0.5f);
@@ -42,21 +43,23 @@ namespace Tartaria.Integration
             }
 
             // Chromatic Aberration - ice refraction
-            if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>())
             {
+                var ca = profile.Add<ChromaticAberration>();
                 ca.intensity.Override(0.1f);
             }
 
             // Vignette - cold darkness
-            if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>())
             {
+                var vignette = profile.Add<Vignette>();
                 vignette.intensity.Override(0.3f);
                 vignette.smoothness.Override(0.3f);
                 vignette.color.Override(new Color(0.05f, 0.1f, 0.15f)); // Deep blue-black
             }
 
             // Color Adjustments - frozen palette
-            if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>())
             {
                 colorAdj.saturation.Override(5f);
                 colorAdj.contrast.Override(25f); // Very high contrast
@@ -64,7 +67,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - cold temperature
-            if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>())
             {
                 wb.temperature.Override(-20f); // Cold
             }
