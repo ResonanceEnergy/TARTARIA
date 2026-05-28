@@ -14,17 +14,39 @@ namespace Tartaria.Editor
         [MenuItem("Tartaria/Auto-Setup Moon1 Level Builder", false, 102)]
         public static void AutoSetupLevelBuilder()
         {
-            // Find Moon1LevelBuilder component in scene
+            // Find all Moon1 components in scene
             var levelBuilder = Object.FindObjectOfType<Tartaria.Integration.Moon1LevelBuilder>();
-            if (levelBuilder == null)
+            var envDecorator = Object.FindObjectOfType<Tartaria.Integration.Moon1EnvironmentDecorator>();
+            var pathGenerator = Object.FindObjectOfType<Tartaria.Integration.Moon1PathGenerator>();
+
+            if (levelBuilder == null && envDecorator == null && pathGenerator == null)
             {
-                Debug.LogError("[Moon1LevelBuilderAutoSetup] No Moon1LevelBuilder found in scene! Make sure the component exists first.");
+                Debug.LogError("[Moon1LevelBuilderAutoSetup] No Moon1 components found in scene! Add Moon1LevelBuilder, Moon1EnvironmentDecorator, or Moon1PathGenerator first.");
                 return;
             }
 
-            Debug.Log("[Moon1LevelBuilderAutoSetup] Found Moon1LevelBuilder, auto-assigning assets...");
+            Debug.Log("[Moon1LevelBuilderAutoSetup] Auto-assigning assets to Moon1 components...");
 
-            // Use SerializedObject for proper undo/redo support
+            // Setup each component
+            if (levelBuilder != null)
+            {
+                SetupLevelBuilder(levelBuilder);
+            }
+            if (envDecorator != null)
+            {
+                SetupEnvironmentDecorator(envDecorator);
+            }
+            if (pathGenerator != null)
+            {
+                SetupPathGenerator(pathGenerator);
+            }
+
+            Debug.Log("[Moon1LevelBuilderAutoSetup] ✅ Auto-setup complete!");
+        }
+
+        static void SetupLevelBuilder(Tartaria.Integration.Moon1LevelBuilder levelBuilder)
+        {
+            Debug.Log("[Moon1LevelBuilderAutoSetup] Setting up Moon1LevelBuilder...");
             var serializedObject = new SerializedObject(levelBuilder);
 
             // Assign PBR Materials
@@ -70,22 +92,72 @@ namespace Tartaria.Editor
             Debug.Log($"  • 3 hero building prefabs assigned");
         }
 
-        static void AssignMaterial(SerializedObject obj, string propertyName, string assetPath)
+        static void SetupEnvironmentDecorator(Tartaria.Integration.Moon1EnvironmentDecorator decorator)
         {
-            var material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
-            if (material != null)
+            Debug.Log("[Moon1LevelBuilderAutoSetup] Setting up Moon1EnvironmentDecorator...");
+            var serializedObject = new SerializedObject(decorator);
+
+            // Assign prefab arrays
+            var treePrefabs = FindKayKitAssets("Tree_", "fbx");
+            AssignPrefabArray(serializedObject, "treePrefabs", treePrefabs);
+
+            var rockPrefabs = FindKayKitAssets("Rock_", "fbx");
+            AssignPrefabArray(serializedObject, "rockPrefabs", rockPrefabs);
+
+            var bushPrefabs = FindKayKitAssets("Bush_", "fbx");
+            AssignPrefabArray(serializedObject, "bushPrefabs", bushPrefabs);
+
+            var grassPrefabs = FindKayKitAssets("Grass_", "fbx");
+            AssignPrefabArray(serializedObject, "grassPrefabs", grassPrefabs);
+
+            // Assign RPG props (tools, lanterns, etc.)
+            var propPrefabs = FindKayKitAssets("", "fbx", "Assets/KayKit_RPGToolsBits_1.0_FREE");
+            AssignPrefabArray(serializedObject, "propPrefabs", propPrefabs);
+
+            // Assign terrain material
+            AssignMaterial(serializedObject, "terrainMaterial", "Assets/_Project/Materials/PBR/Ground037.mat");
+
+            serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(decorator);
+
+            Debug.Log($"[Moon1LevelBuilderAutoSetup] ✓ Environment decorator setup complete");
+            Debug.Log($"  • {treePrefabs.Length} tree prefabs");
+            Debug.Log($"  • {rockPrefabs.Length} rock prefabs");
+            Debug.Log($"  • {bushPrefabs.Length} bush prefabs");
+            Debug.Log($"  • {grassPrefabs.Length} grass prefabs");
+            Debug.Log($"  • {propPrefabs.Length} prop prefabs");
+        }
+
+        static void SetupPathGenerator(Tartaria.Integration.Moon1PathGenerator generator)
+        {
+            Debug.Log("[Moon1LevelBuilderAutoSetup] Setting up Moon1PathGenerator...");
+            var serializedObject = new SerializedObject(generator);
+
+            // Assign path materials
+            AssignMaterial(serializedObject, "pathMaterial", "Assets/_Project/Materials/PBR/PavingStones150.mat");
+            AssignMaterial(serializedObject, "dirtMaterial", "Assets/_Project/Materials/PBR/Ground037.mat");
+
+            // TODO: Assign hex road tiles when available
+
+            serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(generator);
+
+            Debug.Log($"[Moon1LevelBuilderAutoSetup] ✓ Path generator setup complete");
+        }
+, string searchPath = "Assets/KayKit_Forest_Nature_Pack_1.0_FREE")
+        {
+            var guids = AssetDatabase.FindAssets($"{namePrefix} t:GameObject", new[] { searchPath });
+            var prefabs = guids
+                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
+                .Where(path => path.EndsWith($".{extension}"))
+                .Select(path => AssetDatabase.LoadAssetAtPath<GameObject>(path))
+                .Where(obj => obj != null)
+                .OrderBy(obj => obj.name)
+                .ToArray();
+
+            if (prefabs.Length == 0)
             {
-                var prop = obj.FindProperty(propertyName);
-                if (prop != null)
-                {
-                    prop.objectReferenceValue = material;
-                    Debug.Log($"  ✓ Assigned {propertyName}: {material.name}");
-                }
-            }
-            else
-            {
-                Debug.LogWarning($"  ✗ Material not found: {assetPath}");
-            }
+                Debug.LogWarning($"  ✗ No KayKit assets found matching: {namePrefix}*.{extension} in {searchPath
         }
 
         static void AssignPrefab(SerializedObject obj, string propertyName, string assetPath)
