@@ -130,10 +130,10 @@ namespace Tartaria.Integration
             mainCam.transform.LookAt(playerInstance.transform.position + Vector3.up * 1.5f);
 
             // Add simple follow
-            var follow = mainCam.GetComponent<// DISABLED: Moon1PlayerSetup.SimpleCameraFollow>();
+            var follow = mainCam.GetComponent<MonoBehaviour>() // DISABLED: was SimpleCameraFollow;
             if (follow == null)
             {
-                follow = mainCam.gameObject.AddComponent<// DISABLED: Moon1PlayerSetup.SimpleCameraFollow>();
+                follow = mainCam.gameObject.AddComponent<MonoBehaviour>() // DISABLED: was SimpleCameraFollow;
             }
             follow.target = playerInstance.transform;
             follow.distance = cameraDistance;

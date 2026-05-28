@@ -33,7 +33,7 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Vibrant bloom - prismatic refraction
-            if (if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>(out var bloom))
             {
                 bloom.intensity.Override(0.7f);
                 bloom.threshold.Override(0.6f);
@@ -42,13 +42,13 @@ namespace Tartaria.Integration
             }
 
             // Light Chromatic Aberration - rainbow split
-            if (if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>(out var ca))
             {
                 ca.intensity.Override(0.2f);
             }
 
             // Minimal Vignette - let colors shine
-            if (if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>(out var vignette))
             {
                 vignette.intensity.Override(0.1f);
                 vignette.smoothness.Override(0.5f);
@@ -56,7 +56,7 @@ namespace Tartaria.Integration
             }
 
             // Color Adjustments - maximum vibrancy
-            if (if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>(out var colorAdj))
             {
                 colorAdj.saturation.Override(40f); // Hyper-saturated rainbow
                 colorAdj.contrast.Override(15f);
@@ -64,7 +64,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - neutral (let spectrum shine)
-            if (if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>(out var wb))
             {
                 wb.temperature.Override(0f);
             }

@@ -33,7 +33,7 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Purple bloom - corrupt energy
-            if (if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>(out var bloom))
             {
                 bloom.intensity.Override(0.6f);
                 bloom.threshold.Override(0.6f);
@@ -42,13 +42,13 @@ namespace Tartaria.Integration
             }
 
             // Heavy Chromatic Aberration - reality distortion
-            if (if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>(out var ca))
             {
                 ca.intensity.Override(0.35f);
             }
 
             // Vignette - dark corruption
-            if (if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>(out var vignette))
             {
                 vignette.intensity.Override(0.45f);
                 vignette.smoothness.Override(0.35f);
@@ -56,7 +56,7 @@ namespace Tartaria.Integration
             }
 
             // Color Adjustments - twisted palette
-            if (if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>(out var colorAdj))
             {
                 colorAdj.saturation.Override(25f); // Hyper-saturated
                 colorAdj.contrast.Override(30f); // Extreme contrast
@@ -64,7 +64,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - unnatural tint
-            if (if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>(out var wb))
             {
                 wb.temperature.Override(-10f);
                 wb.tint.Override(15f); // Magenta shift
