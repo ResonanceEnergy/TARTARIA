@@ -95,7 +95,7 @@ namespace Tartaria.Integration
                     if (x == 0 && z == 0) continue;
 
                     Vector3 position = villageCenter + new Vector3(x * spacing, 0f, z * spacing);
-                    
+
                     // Randomize building type
                     BuildingType type = (BuildingType)(buildingIndex % 4);
                     CreateVillageBuilding($"village_{buildingIndex}", position, type);
@@ -112,7 +112,7 @@ namespace Tartaria.Integration
 
             // Calculate golden ratio dimensions based on type
             Vector3 dimensions = GetBuildingDimensions(type);
-            
+
             // Create building using KayKit rock models (modular composition)
             CreateBuildingFromKayKitRocks(building, dimensions, type);
 
@@ -147,7 +147,7 @@ namespace Tartaria.Integration
             // Add InteractableBuilding component
             var interactable = building.AddComponent<InteractableBuilding>();
             interactable.SetBuildingId(id);
-            
+
             // Use proper PBR materials
             Material mudMat = Resources.Load<Material>("Materials/M_Mud_Fresh");
             interactable.SetMaterials(mudMat, mudMat, rocksMaterial);
@@ -172,7 +172,7 @@ namespace Tartaria.Integration
                 {
                     GameObject rockPrefab = rockPrefabs[UnityEngine.Random.Range(0, rockPrefabs.Length)];
                     GameObject rock = Instantiate(rockPrefab, parent.transform);
-                    
+
                     // Arrange rocks in circular pattern for buildings
                     float angle = (360f / rockCount) * i;
                     float radius = dimensions.x * 0.4f;
@@ -206,7 +206,7 @@ namespace Tartaria.Integration
             {
                 GameObject bushPrefab = bushPrefabs[UnityEngine.Random.Range(0, bushPrefabs.Length)];
                 GameObject bush = Instantiate(bushPrefab, building.transform);
-                
+
                 // Random position around building perimeter
                 float angle = UnityEngine.Random.Range(0f, 360f);
                 float distance = dimensions.x * UnityEngine.Random.Range(0.6f, 0.9f);
@@ -224,7 +224,7 @@ namespace Tartaria.Integration
                 {
                     GameObject grassPrefab = grassPrefabs[UnityEngine.Random.Range(0, grassPrefabs.Length)];
                     GameObject grass = Instantiate(grassPrefab, building.transform);
-                    
+
                     float angle = UnityEngine.Random.Range(0f, 360f);
                     float distance = dimensions.x * UnityEngine.Random.Range(0.4f, 0.8f);
                     Vector3 offset = Quaternion.Euler(0f, angle, 0f) * new Vector3(distance, 0f, 0f);
@@ -321,7 +321,7 @@ namespace Tartaria.Integration
             {
                 float angle = i * 90f;
                 Vector3 offset = Quaternion.Euler(0f, angle, 0f) * new Vector3(dimensions.x * 0.4f, 0f, dimensions.z * 0.4f);
-                
+
                 var column = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 column.name = $"Column_{i}";
                 column.transform.SetParent(parent.transform);
@@ -370,7 +370,7 @@ namespace Tartaria.Integration
             mound.transform.SetParent(parent.transform);
             mound.transform.localPosition = Vector3.up * dimensions.y * 0.4f;
             mound.transform.localScale = new Vector3(dimensions.x * 1.5f, dimensions.y * 0.8f, dimensions.z * 1.5f);
-            
+
             Material mudMat = Resources.Load<Material>("Materials/M_Mud_Fresh");
             if (mudMat == null)
             {
@@ -403,7 +403,7 @@ namespace Tartaria.Integration
         Vector3 GetBuildingDimensions(BuildingType type)
         {
             const float PHI = 1.618f;
-            
+
             return type switch
             {
                 BuildingType.House => new Vector3(8f, 8f * PHI, 8f), // Golden ratio height
