@@ -349,7 +349,7 @@ namespace Tartaria.Input
             }
 
             // Apply movement
-            Vector3 move = new Vector3(_moveInput.x, 0, _moveInput.y);
+            Vector3 move = new Vector3(_moveInput.y, 0, -_moveInput.x); // Fixed: Joystick was rotated 90° CW
             if (move.sqrMagnitude > 0.01f)
             {
                 move = move.normalized;
