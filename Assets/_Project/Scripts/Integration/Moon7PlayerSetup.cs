@@ -54,7 +54,7 @@ namespace Tartaria.Integration
 
         void SetupCamera(GameObject player)
         {
-            var mainCam = Camera.main;
+            var mainCam = UnityEngine.Camera.main;
             if (mainCam == null)
             {
                 mainCam = new GameObject("MainCamera").AddComponent<Camera>();

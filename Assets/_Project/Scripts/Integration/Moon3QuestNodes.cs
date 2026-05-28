@@ -143,7 +143,7 @@ namespace Tartaria.Integration
             }
             else if (nodeType == "Objective")
             {
-                QuestManager.Instance?.ProgressByType(Core.Enums.QuestObjectiveType.ReachLocation, questId);
+                QuestManager.Instance?.ProgressByType(Core.Enums.QuestObjectiveType.CompleteZone, questId);
                 Debug.Log($"[QuestTrigger] Reached objective: {questId}");
                 triggered = true;
             }

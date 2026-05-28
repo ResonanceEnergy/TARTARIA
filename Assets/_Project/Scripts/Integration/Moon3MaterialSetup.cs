@@ -52,7 +52,7 @@ namespace Tartaria.Integration
 
         void ApplyMaterialToChildren(string namePattern, Material mat)
         {
-            foreach (var obj in FindObjectsOfType<GameObject>())
+            foreach (var obj in FindObjectsByType<GameObject>(FindObjectsSortMode.None))
             {
                 if (obj.name.Contains(namePattern))
                 {

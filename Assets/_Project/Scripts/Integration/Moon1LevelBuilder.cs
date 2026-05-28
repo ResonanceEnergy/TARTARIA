@@ -134,7 +134,7 @@ namespace Tartaria.Integration
             ScatterEnvironmentProps(building, dimensions);
 
             // Add to excavation system
-            var excavation = ExcavationSystem.Instance;
+            var excavation = // DISABLED: ExcavationSystem.Instance;
             if (excavation != null)
             {
                 excavation.RegisterSite(id, position, UnityEngine.Random.Range(2, 5), false, id);

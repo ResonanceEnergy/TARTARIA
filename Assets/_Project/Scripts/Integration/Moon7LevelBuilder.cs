@@ -47,7 +47,7 @@ namespace Tartaria.Integration
             // Coral formations
             for (int i = 0; i < 30; i++)
             {
-                var coral = GameObject.CreatePrimitive(PrimitiveType.Cone);
+                var coral = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 coral.name = "Coral";
                 coral.transform.SetParent(parent.transform);
                 coral.transform.position = new Vector3(Random.Range(-40f, 40f), Random.Range(-50f, 0f), Random.Range(-40f, 40f));

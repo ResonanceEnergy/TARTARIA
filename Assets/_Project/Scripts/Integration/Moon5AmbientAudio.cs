@@ -73,7 +73,7 @@ namespace Tartaria.Integration
             var reverb = zone.AddComponent<AudioReverbZone>();
             reverb.minDistance = radius * 0.5f;
             reverb.maxDistance = radius;
-            reverb.reverbPreset = AudioReverbPreset.Stonecorridor; // Cold stone halls
+            reverb.reverbPreset = AudioReverbPreset.Hallway; // Cold stone halls
         }
     }
 }

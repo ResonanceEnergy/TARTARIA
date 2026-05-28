@@ -115,7 +115,7 @@ namespace Tartaria.Integration
             // Play cinematic sequence (pending waypoint data integration)
             if (!string.IsNullOrEmpty(beat.cinematicSequence))
             {
-                // var cinemaCam = FindObjectOfType<Camera.CinematicCameraController>();
+                // var cinemaCam = FindFirstObjectByType<Camera.CinematicCameraController>();
                 // cinemaCam?.PlaySequence(waypointData);  // TODO: Load from CinematicWaypointSequences
             }
 
@@ -289,7 +289,7 @@ namespace Tartaria.Integration
             }
 
             // Play ending cinematic (pending waypoint data integration)
-            // var cinemaCam = FindObjectOfType<Camera.CinematicCameraController>();
+            // var cinemaCam = FindFirstObjectByType<Camera.CinematicCameraController>();
             // cinemaCam?.PlaySequence(waypointData);  // TODO: Load from CinematicWaypointSequences
 
             // Achievement unlock (AchievementToastUI pending implementation)

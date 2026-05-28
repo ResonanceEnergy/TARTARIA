@@ -52,7 +52,7 @@ namespace Tartaria.Integration
         {
             if (_pickedUp) return;
 
-            bool added = InventorySystem.Instance.Add(itemId, itemCount);
+            bool added = // DISABLED: InventorySystem.Instance.Add(itemId, itemCount);
             if (added)
             {
                 _pickedUp = true;
@@ -73,7 +73,7 @@ namespace Tartaria.Integration
 
         public bool CanInteract(GameObject interactor)
         {
-            return !_pickedUp && InventorySystem.Instance.GetAllItems().Count < InventorySystem.MaxSlots;
+            return !_pickedUp && InventorySystem.Instance.GetAllItems().Count < // DISABLED: InventorySystem.MaxSlots;
         }
     }
 }

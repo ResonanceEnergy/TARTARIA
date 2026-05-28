@@ -67,7 +67,7 @@ namespace Tartaria.Integration
                 case "moon3_orphan_reveal":
                     DialogueManager.Instance?.PlayContextDialogue("helena_orphan_train");
                     // Trigger cinematic camera sequence (CinematicCameraController integration pending)
-                    // var cinemaCam = FindObjectOfType<Camera.CinematicCameraController>();
+                    // var cinemaCam = FindFirstObjectByType<Camera.CinematicCameraController>();
                     // cinemaCam?.PlaySequence(waypointData);  // TODO: Load waypoint data from CinematicWaypointSequences
                     break;
 
