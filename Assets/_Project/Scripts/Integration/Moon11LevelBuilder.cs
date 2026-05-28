@@ -1,6 +1,7 @@
 using UnityEngine;
 
 namespace Tartaria.Integration
+    #pragma warning disable CS0414, CS0219 // Placeholder fields/vars for planned features
 {
     /// <summary>
     /// Moon 11 Level Builder — The Prismatic Nexus

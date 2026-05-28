@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Tartaria.Integration
 {
-#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
+#pragma warning disable CS0414, CS0219 // Field assigned but never used - reserved for future implementation
     /// <summary>
     /// Moon 1 Level Builder — Procedurally generates Echohaven village with Tartarian architecture
     /// Creates 12 buildings total: 3 hero buildings + 9 village structures
