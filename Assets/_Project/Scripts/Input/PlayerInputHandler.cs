@@ -8,8 +8,8 @@ using Pointer = UnityEngine.InputSystem.Pointer;
 #endif
 
 namespace Tartaria.Input
-#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
 {
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
     /// <summary>
     /// Player Input Handler — processes keyboard/mouse/gamepad input
     /// and dispatches to the appropriate game system based on GameState.

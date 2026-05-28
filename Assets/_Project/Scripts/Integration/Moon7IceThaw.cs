@@ -6,8 +6,8 @@ using Tartaria.Input;
 using Tartaria.Save;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 7 ice thaw multi-session mechanics.
     /// Korath awakening requires 3 thaw sessions with RS channeling.

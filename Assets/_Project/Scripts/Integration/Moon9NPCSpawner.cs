@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 9 NPC Spawner — The Blighted Wastes
     /// Spawns corrupted cultists, void walkers, and twisted survivors

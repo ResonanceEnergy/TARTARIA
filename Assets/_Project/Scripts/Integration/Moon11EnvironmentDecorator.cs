@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 11 Environment Decorator — The Prismatic Nexus
     /// Spawns prism shards, rainbow crystals, light beams, and refraction nodes

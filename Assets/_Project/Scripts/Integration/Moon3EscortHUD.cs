@@ -6,8 +6,8 @@ using TMPro;
 using Tartaria.Gameplay; // for SpectralOrphanAdoption
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Dedicated non-OnGUI Lullaby/Escort HUD for Moon 3 Orphan Train Escort (R7 production depth).
     /// Displays: progress, shield strength, frequency match, companion status (physical tells + trust forks), wave timer.

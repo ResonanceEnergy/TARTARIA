@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 12 Environment Decorator — The Umbral Sanctum
     /// Spawns shadow obelisks, dark crystals, void portals, and umbral monuments

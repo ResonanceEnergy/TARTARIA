@@ -1,8 +1,8 @@
 using UnityEngine;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 2 NPC Spawner — Cave-dwelling scholars and crystal guardians
     /// 8 NPCs: scholars studying acoustics, guardians protecting chambers

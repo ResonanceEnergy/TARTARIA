@@ -8,8 +8,8 @@ using Tartaria.Gameplay;
 using UnityEngine.EventSystems;
 
 namespace Tartaria.UI
-#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
 {
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
     /// <summary>
     /// Skill Tree UI — Phase 3 R6 Production Polish.
     ///

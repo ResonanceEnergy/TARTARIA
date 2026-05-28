@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 7 NPC Spawner — The Abyssal Depths
     /// Spawns mer-folk, deep sea explorers, and abyssal guardians

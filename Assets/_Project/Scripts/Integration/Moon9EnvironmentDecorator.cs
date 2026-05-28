@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 9 Environment Decorator — The Blighted Wastes
     /// Spawns corruption spires, dark crystals, twisted vegetation, and void rifts

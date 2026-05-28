@@ -5,8 +5,8 @@ using System.Collections.Generic;
 using Tartaria.Data;
 
 namespace Tartaria.UI
-#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
 {
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
     /// <summary>
     /// Inventory grid UI - displays player inventory in grid layout.
     /// Called by EquipmentUI when player clicks equipment slot to swap items.

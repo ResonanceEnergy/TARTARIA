@@ -2,8 +2,8 @@ using UnityEngine;
 using Tartaria.Gameplay;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 1 Excavation Sites — Creates 5 excavation points around village buildings
     /// Each site has a mud mound visual and requires scanning to reveal the building

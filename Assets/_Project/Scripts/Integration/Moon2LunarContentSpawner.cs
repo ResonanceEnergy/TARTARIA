@@ -9,8 +9,8 @@ using Tartaria.Save;
 using Tartaria.AI;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon2LunarContentSpawner — Lane 4 Narrative/FTUE/Companions specialist for Moon 2 Lunar Moon.
     ///
