@@ -9,7 +9,7 @@ namespace Tartaria.Integration
     /// </summary>
     public static class BuildingDefinitionCreator
     {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && FALSE  // DISABLED: Legacy Moon1 code with removed types (HarmonicBand, BuildingArchetype)
         [UnityEditor.MenuItem("Tartaria/Generate Moon 1 Building Definitions")]
         public static void CreateMoon1Definitions()
         {

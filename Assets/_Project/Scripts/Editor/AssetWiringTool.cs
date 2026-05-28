@@ -81,20 +81,20 @@ namespace Tartaria.Editor
             {
                 string scenePath = $"Assets/_Project/Scenes/Moons/Moon{moonNum}_*.unity";
                 string[] sceneGuids = AssetDatabase.FindAssets($"Moon{moonNum}_", new[] { "Assets/_Project/Scenes/Moons" });
-                
+
                 if (sceneGuids.Length > 0)
                 {
                     string sceneAssetPath = AssetDatabase.GUIDToAssetPath(sceneGuids[0]);
                     Log($"Processing scene: {sceneAssetPath}");
-                    
+
                     var scene = EditorSceneManager.OpenScene(sceneAssetPath, OpenSceneMode.Single);
-                    
+
                     WireInteractiveObjects(moonNum);
                     WirePowerUps(moonNum);
                     WireEnemySpawners(moonNum);
                     WireNPCDialogues(moonNum);
                     WireEnvironmentalSecrets(moonNum);
-                    
+
                     EditorSceneManager.SaveScene(scene);
                     Log($"✅ Moon{moonNum} complete!");
                     Log("");
@@ -131,7 +131,7 @@ namespace Tartaria.Editor
             foreach (var interactable in interactables)
             {
                 var type = interactable.GetType();
-                
+
                 // Wire audio based on object name
                 if (interactable.name.Contains("Door"))
                 {
@@ -184,7 +184,7 @@ namespace Tartaria.Editor
                 SetField(powerup, "collectEffect", collectBurst);
                 SetField(powerup, "activationEffect", buffEffect);
                 SetField(powerup, "collectSound", collectSound);
-                
+
                 EditorUtility.SetDirty(powerup);
                 wired++;
             }
@@ -328,7 +328,7 @@ namespace Tartaria.Editor
         private T LoadAsset<T>(string assetName, string searchFolder) where T : UnityEngine.Object
         {
             string[] guids = AssetDatabase.FindAssets($"{assetName} t:{typeof(T).Name}", new[] { searchFolder });
-            
+
             if (guids.Length == 0)
             {
                 // Try without name filter if nothing found
@@ -349,7 +349,7 @@ namespace Tartaria.Editor
 
             var type = obj.GetType();
             var field = type.GetField(fieldName, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-            
+
             if (field != null)
             {
                 field.SetValue(obj, value);

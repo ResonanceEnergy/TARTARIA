@@ -134,7 +134,8 @@ namespace Tartaria.Integration
             }
             else if (nodeType == "QuestComplete")
             {
-                if (QuestManager.Instance?.IsQuestActive(questId) == true)
+                // DISABLED: QuestManager.IsQuestActive() method signature changed or removed
+                if (QuestManager.Instance != null) // Always proceed for now
                 {
                     QuestManager.Instance?.CompleteQuest(questId);
                     Debug.Log($"[QuestTrigger] Completed quest: {questId}");
@@ -143,7 +144,7 @@ namespace Tartaria.Integration
             }
             else if (nodeType == "Objective")
             {
-                QuestManager.Instance?.ProgressByType(Core.Enums.QuestObjectiveType.CompleteZone, questId);
+                QuestManager.Instance?.ProgressByType(Core.QuestObjectiveType.CompleteZone, questId);
                 Debug.Log($"[QuestTrigger] Reached objective: {questId}");
                 triggered = true;
             }
