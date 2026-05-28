@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 13: The Aether Convergence - Ambient Creatures (FINAL LEVEL)
     /// Execution order: -63 (after InteractiveObjects -65)

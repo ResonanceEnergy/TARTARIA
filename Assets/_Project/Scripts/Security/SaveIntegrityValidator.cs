@@ -7,8 +7,8 @@ using UnityEngine;
 using Tartaria.Save;
 
 namespace Tartaria.Security
-#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
 {
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
     /// <summary>
     /// Save Integrity Validator — runtime checksum verification and tamper detection.
     ///

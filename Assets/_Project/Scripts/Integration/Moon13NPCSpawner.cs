@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 13 NPC Spawner — The Aether Convergence
     /// FINAL LEVEL - Spawns aether masters, convergence witnesses, and tribute bearers from all 12 moons

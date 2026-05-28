@@ -2,8 +2,8 @@ using UnityEngine;
 using Tartaria.Audio;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
 {
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
     /// <summary>
     /// Moon 1 Ambient Audio — Creates spatial audio zones for Echohaven
     /// Zones: Wind/nature (forest), crystal hum (spire), water (fountain), echoes (cathedral)

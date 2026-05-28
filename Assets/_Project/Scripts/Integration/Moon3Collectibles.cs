@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using Tartaria.Input;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 3 Collectibles - Aether fragments and jungle-themed artifacts for The Verdant Labyrinth
     /// </summary>

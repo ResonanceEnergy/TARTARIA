@@ -2,8 +2,8 @@ using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
-#pragma warning disable CS0414 // Placeholder counts for planned features
 {
+#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
     /// Moon 13 Environment Decorator — The Aether Convergence
     /// FINAL LEVEL - Spawns aether crystals, convergence pillars, tribute markers, and representation of all 12 moons
