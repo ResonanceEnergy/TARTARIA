@@ -105,7 +105,17 @@ namespace Tartaria.Editor
             // Create Terrain
             TerrainData terrainData = new TerrainData();
             terrainData.size = new Vector3(terrainSize, 100f, terrainSize);
-            terrainData.SetHeights(0, 0, new float[513, 513]); // Flat terrain initially
+            // Initialize flat terrain - use heightmapResolution for correct dimensions
+            int resolution = terrainData.heightmapResolution;
+            float[,] heights = new float[resolution, resolution];
+            for (int y = 0; y < resolution; y++)
+            {
+                for (int x = 0; x < resolution; x++)
+                {
+                    heights[y, x] = 0.5f; // 0.5 = mid-height (flat terrain)
+                }
+            }
+            terrainData.SetHeights(0, 0, heights);
 
             GameObject terrainObj = Terrain.CreateTerrainGameObject(terrainData);
             terrainObj.name = "Terrain";
