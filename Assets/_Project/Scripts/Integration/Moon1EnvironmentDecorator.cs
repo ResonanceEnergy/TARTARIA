@@ -131,7 +131,7 @@ namespace Tartaria.Integration
                 GameObject obj = Instantiate(prefab, parent.transform);
                 obj.transform.position = position;
                 obj.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-                
+
                 // Random scale variation
                 Vector3 scale = new Vector3(
                     Random.Range(minScale.x, maxScale.x),
