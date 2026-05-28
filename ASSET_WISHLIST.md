@@ -1,6 +1,134 @@
 # TARTARIA — Asset Wishlist
 
-Generated: 2026-05-27
+**Generated:** 2026-05-27  
+**Last Updated:** 2026-05-27 (Post-5-Systems Integration)
+
+---
+
+## 🆕 NEW SYSTEMS ASSET NEEDS (Priority 1)
+
+### Interactive Objects Audio
+- [ ] Door_Unlock.wav - Heavy door mechanism unlocking (metallic clicks)
+- [ ] Door_Open.wav - Door swinging open (wood/metal variants)
+- [ ] Door_Locked_Rattle.wav - Door handle jiggle when locked
+- [ ] Lever_Pull.wav - Mechanical lever activation (stone grinding)
+- [ ] Lever_Release.wav - Lever snapping back to position
+- [ ] PressurePlate_Activate.wav - Stone plate depressing (rumble)
+- [ ] PressurePlate_Deactivate.wav - Plate rising back up
+- [ ] Puzzle_Rotate.wav - Stone block rotation sound (1 second loop)
+- [ ] Puzzle_Solve.wav - Satisfying "click" completion sound
+- [ ] Breakable_Crack.wav - Object cracking under stress
+- [ ] Breakable_Shatter.wav - Pottery/crate breaking into pieces
+- [ ] Breakable_Loot_Drop.wav - Items clattering to ground
+
+### NPC Dialogue Audio
+- [ ] NPC_Talk_Start.wav - Dialogue initiation blip (0.2s)
+- [ ] NPC_Talk_End.wav - Dialogue close sound
+- [ ] Merchant_ShopOpen.wav - Shop UI opening sound (coin jingle)
+- [ ] Merchant_ShopClose.wav - Shop UI closing sound
+- [ ] LoreNPC_Wisdom.wav - Mystical chime for lore reveals
+- [ ] Helper_Hint.wav - Friendly notification ping
+
+### Power-Up Audio
+- [ ] PowerUp_Spawn.wav - Power-up appearing sound (whoosh)
+- [ ] PowerUp_Collect.wav - Generic pickup sound (already in wishlist, reuse)
+- [ ] PowerUp_SpeedBoost.wav - Speed activation (whoosh + footsteps)
+- [ ] PowerUp_DamageBoost.wav - Damage activation (energy charge)
+- [ ] PowerUp_Shield.wav - Shield activation (force field hum)
+- [ ] PowerUp_VisionEnhance.wav - Vision activation (magical lens adjust)
+- [ ] PowerUp_AetherSurge.wav - Aether surge activation (explosive energy)
+- [ ] PowerUp_Expire.wav - Power-up effect ending (fade out)
+
+### Enemy Spawner Audio
+- [ ] EnemySpawn_Materialize.wav - Enemy spawning sound (dark portal)
+- [ ] BossArena_Entrance.wav - Boss music sting (5 seconds)
+- [ ] BossArena_Victory.wav - Boss defeated fanfare (8 seconds)
+
+### Environmental Secrets Audio
+- [ ] Secret_Discovered.wav - "Eureka!" moment sound (magical reveal)
+- [ ] HiddenRoom_DoorOpen.wav - Secret passage opening (stone sliding)
+- [ ] LoreTablet_Read.wav - Ancient inscription activation
+- [ ] EasterEgg_Found.wav - Playful jingle for easter egg
+- [ ] Shortcut_Unlock.wav - Path opening sound (barrier disappearing)
+- [ ] SpecialCollectible_Shimmer.wav - Rare item ambient shimmer loop
+
+---
+
+### Interactive Objects VFX
+- [ ] Door_Unlock_Glow.prefab - Gold sparkles on door unlock
+- [ ] Lever_Activate_Spark.prefab - Electric spark burst
+- [ ] PressurePlate_Glow.prefab - Ground glow when activated
+- [ ] Puzzle_Complete_Burst.prefab - Rainbow explosion on solve
+- [ ] Breakable_Debris.prefab - Wood/stone debris particles
+- [ ] Breakable_Loot_Sparkle.prefab - RS pickup glitter
+
+### NPC VFX
+- [ ] NPC_QuestGiver_Icon.prefab - Floating "!" icon above head
+- [ ] NPC_Merchant_Icon.prefab - Floating coin icon
+- [ ] NPC_Lore_Icon.prefab - Floating book icon
+- [ ] NPC_Helper_Icon.prefab - Floating "?" icon
+- [ ] NPC_Talk_Bubble.prefab - Speech bubble particle effect
+
+### Power-Up VFX
+- [ ] PowerUp_Spawn_Burst.prefab - Appearance particle effect
+- [ ] PowerUp_Idle_Glow.prefab - Floating glow aura (color-coded)
+- [ ] PowerUp_Collect_Trail.prefab - Trail to player on pickup
+- [ ] PowerUp_SpeedBoost_Trail.prefab - Blue speed lines behind player
+- [ ] PowerUp_DamageBoost_Aura.prefab - Red energy aura around player
+- [ ] PowerUp_Shield_Sphere.prefab - Green force field sphere
+- [ ] PowerUp_Vision_Pulse.prefab - Yellow scan wave emanating from player
+- [ ] PowerUp_AetherSurge_Explosion.prefab - Purple energy nova
+
+### Enemy Spawner VFX
+- [ ] EnemySpawn_Portal.prefab - Dark portal appearance effect
+- [ ] BossArena_Ground_Glow.prefab - Red glowing circle around arena
+- [ ] PatrolRoute_Waypoint_Marker.prefab - Subtle cyan ground marker
+
+### Environmental Secrets VFX
+- [ ] Secret_Reveal_Flash.prefab - White flash on discovery
+- [ ] HiddenRoom_Dust_Particles.prefab - Dust falling as door opens
+- [ ] LoreTablet_Runes_Glow.prefab - Ancient runes lighting up
+- [ ] EasterEgg_Confetti.prefab - Colorful confetti burst
+- [ ] Shortcut_Barrier_Dissolve.prefab - Magical barrier fading
+- [ ] SpecialCollectible_Rainbow_Glow.prefab - Rainbow volumetric glow
+
+---
+
+### Interactive Objects 3D Models
+- [ ] Door_Wood_Medieval.fbx - Wooden door with metal hinges
+- [ ] Door_Stone_Ancient.fbx - Heavy stone door
+- [ ] Lever_Wall_Mounted.fbx - Stone/metal wall lever
+- [ ] PressurePlate_Stone.fbx - Flat stone pressure plate
+- [ ] Puzzle_Rune_Block.fbx - Cube with rotating rune faces
+- [ ] Puzzle_Crystal_Pedestal.fbx - Crystal alignment puzzle
+- [ ] Breakable_Crate.fbx - Wooden crate (destructible)
+- [ ] Breakable_Pottery.fbx - Clay pot/vase (destructible)
+- [ ] Breakable_Barrel.fbx - Wooden barrel (destructible)
+
+### NPC 3D Models
+- [ ] NPC_QuestGiver_Base.fbx - Generic humanoid NPC (can be reskinned)
+- [ ] NPC_Merchant_Base.fbx - NPC with backpack/shop setup
+- [ ] NPC_Sage_Robed.fbx - Robed figure for lore NPCs
+- [ ] NPC_Helper_Traveler.fbx - Friendly traveler NPC
+
+### Power-Up 3D Models
+- [ ] PowerUp_Orb_Base.fbx - Floating orb base model (can be recolored)
+- [ ] PowerUp_Crystal_Shard.fbx - Crystal shard for aether surge
+- [ ] PowerUp_Rune_Stone.fbx - Runic stone for buffs
+
+### Enemy Spawner 3D Models
+- [ ] SpawnPoint_Portal_Frame.fbx - Stone portal frame structure
+- [ ] BossArena_Pillars.fbx - Arena boundary pillars (set of 4)
+- [ ] PatrolRoute_Waypoint_Marker.fbx - Small ground marker stone
+
+### Environmental Secrets 3D Models
+- [ ] HiddenRoom_Door_Seamless.fbx - Camouflaged wall door
+- [ ] LoreTablet_Stone.fbx - Stone tablet with inscription surface
+- [ ] EasterEgg_DevCube.fbx - Developer reference prop (colored cube)
+- [ ] Shortcut_Barrier_Crystal.fbx - Magical barrier frame
+- [ ] SpecialCollectible_Artifact.fbx - Unique artifact model (can vary per moon)
+
+---
 
 ## Audio Assets Needed
 
