@@ -6,6 +6,7 @@ using Tartaria.Audio;
 using Tartaria.UI;
 
 namespace Tartaria.Integration
+#pragma warning disable CS0414 // Placeholder counts for planned features
 {
     /// <summary>
     /// Per-Moon mechanic activator. Sits next to MoonRuntimeBootstrapper on each

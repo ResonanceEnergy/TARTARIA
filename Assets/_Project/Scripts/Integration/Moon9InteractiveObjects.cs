@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Tartaria.Input;
 
 namespace Tartaria.Integration
+#pragma warning disable CS0414 // Placeholder counts for planned features
 {
     [DefaultExecutionOrder(-42)]
     public class Moon9InteractiveObjects : MonoBehaviour

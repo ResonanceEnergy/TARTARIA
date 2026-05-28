@@ -1,6 +1,7 @@
 using UnityEngine;
 
 namespace Tartaria.Integration
+#pragma warning disable CS0414 // Placeholder counts for planned features
 {
     /// <summary>
     /// Moon 1 Environment Decorator — Adds natural scenery around Echohaven village

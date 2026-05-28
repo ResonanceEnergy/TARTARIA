@@ -5,6 +5,7 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 
 namespace Tartaria.AI
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
 {
     /// <summary>
     /// Resonance Drone AI — flying support enemy for Moons 8-11.
