@@ -106,7 +106,7 @@ namespace Tartaria.Integration
             }
 
             colorGrading.active = true;
-            
+
             // Warm, golden tone for ancient ruins
             colorGrading.colorFilter.overrideState = true;
             colorGrading.colorFilter.value = new Color(1f, 0.95f, 0.85f); // Warm white
