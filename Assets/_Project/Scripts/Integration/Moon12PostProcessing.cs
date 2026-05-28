@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - drained palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(-30f); // Heavy desaturation
                 colorAdj.contrast.Override(10f);
                 colorAdj.colorFilter.Override(new Color(0.7f, 0.7f, 0.8f)); // Dark blue-gray filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - cold void
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(-25f); // Very cold
             }
 

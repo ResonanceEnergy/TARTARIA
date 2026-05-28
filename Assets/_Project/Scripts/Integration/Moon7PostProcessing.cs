@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - underwater palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(-5f); // Muted underwater
                 colorAdj.contrast.Override(5f); // Low contrast
                 colorAdj.colorFilter.Override(new Color(0.6f, 0.8f, 1f)); // Blue filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - cool underwater
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(-15f);
             }
 

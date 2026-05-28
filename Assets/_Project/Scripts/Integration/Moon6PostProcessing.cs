@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - hot forge palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(20f); // Very saturated
                 colorAdj.contrast.Override(15f);
                 colorAdj.colorFilter.Override(new Color(1f, 0.7f, 0.5f)); // Hot orange filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - extreme heat
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(40f); // Very hot
             }
 

@@ -64,6 +64,7 @@ namespace Tartaria.Integration
             // Color Adjustments - epic finale palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(30f); // Very saturated
                 colorAdj.contrast.Override(20f);
                 colorAdj.colorFilter.Override(new Color(1f, 1f, 1f)); // Pure
@@ -72,6 +73,7 @@ namespace Tartaria.Integration
             // White Balance - brilliant neutral
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(5f); // Slightly warm
             }
 

@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - bright sky palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(10f);
                 colorAdj.contrast.Override(5f); // Soft contrast
                 colorAdj.colorFilter.Override(new Color(1f, 1f, 1f)); // No filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - neutral bright
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(5f); // Slightly warm
             }
 

@@ -94,4 +94,28 @@ namespace Tartaria.Integration
             zones.Clear();
         }
     }
+
+    public class AudioZoneTrigger : MonoBehaviour
+    {
+        public string zoneType;
+        public float intensity;
+
+        void OnTriggerEnter(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                Debug.Log($"🎵 Player entered {zoneType} audio zone (intensity: {intensity})");
+                // TODO: Wire to actual audio system - adjust AudioSource parameters, trigger zone-specific audio
+            }
+        }
+
+        void OnTriggerExit(Collider other)
+        {
+            if (other.CompareTag("Player"))
+            {
+                Debug.Log($"🎵 Player exited {zoneType} audio zone");
+                // TODO: Restore default audio parameters
+            }
+        }
+    }
 }
