@@ -43,7 +43,7 @@ namespace Tartaria.Integration
                 visualObject.transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime);
         }
 
-        public string GetInteractionPrompt()
+        public string GetInteractPrompt()
         {
             return $"[E] Pick up {displayName}";
         }
