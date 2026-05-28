@@ -22,6 +22,8 @@ namespace Tartaria.Integration
         [SerializeField] Moon3VisualLandmarks visualLandmarks;
         [SerializeField] Moon3AudioZones audioZones;
         [SerializeField] Moon3WeatherSystem weatherSystem;
+        [SerializeField] Moon3QuestNodes questNodes;
+        [SerializeField] Moon3Collectibles collectibles;
         [SerializeField] Moon3PostProcessing postProcessing;
         [SerializeField] bool autoInitialize = true;
 
@@ -44,6 +46,8 @@ namespace Tartaria.Integration
                 if (visualLandmarks == null) visualLandmarks = GetComponent<Moon3VisualLandmarks>();
                 if (audioZones == null) audioZones = GetComponent<Moon3AudioZones>();
                 if (weatherSystem == null) weatherSystem = GetComponent<Moon3WeatherSystem>();
+                if (questNodes == null) questNodes = GetComponent<Moon3QuestNodes>();
+                if (collectibles == null) collectibles = GetComponent<Moon3Collectibles>();
                 if (postProcessing == null) postProcessing = GetComponent<Moon3PostProcessing>();
             }
         }
