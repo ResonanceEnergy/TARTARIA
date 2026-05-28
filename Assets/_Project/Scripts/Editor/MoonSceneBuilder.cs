@@ -109,12 +109,30 @@ namespace Tartaria.Editor
             probeObj.transform.SetParent(moonRoot.transform);
 
             // Create Volume (for URP post-processing)
+            // Note: Requires com.unity.render-pipelines.universal package
             GameObject volumeObj = new GameObject("Global Volume");
-            Volume volume = volumeObj.AddComponent<Volume>();
-            volume.isGlobal = true;
-            volume.priority = 0;
-            // Note: VolumeProfile asset must be created separately and assigned
-            volumeObj.transform.SetParent(moonRoot.transform);
+            try
+            {
+                var volumeType = System.Type.GetType("UnityEngine.Rendering.Volume, Unity.RenderPipelines.Core.Runtime");
+                if (volumeType != null)
+                {
+                    var volume = volumeObj.AddComponent(volumeType);
+                    volumeType.GetProperty("isGlobal").SetValue(volume, true);
+                    volumeType.GetProperty("priority").SetValue(volume, 0f);
+                    volumeObj.transform.SetParent(moonRoot.transform);
+                    Debug.Log("[MoonSceneBuilder] Volume component added (URP)");
+                }
+                else
+                {
+                    Debug.LogWarning("[MoonSceneBuilder] Volume component not available - URP package may not be installed. Add Volume manually via: GameObject > Volume > Global Volume");
+                    volumeObj.transform.SetParent(moonRoot.transform);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[MoonSceneBuilder] Could not add Volume component: {e.Message}. Add manually if using URP.");
+                volumeObj.transform.SetParent(moonRoot.transform);
+            }
 
             // Create Camera placeholder
             GameObject camObj = new GameObject("Main Camera");
