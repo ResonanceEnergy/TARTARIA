@@ -696,7 +696,7 @@ namespace Tartaria.Integration
         /// </summary>
         void SyncRSModifiers()
         {
-            if (!_em.IsCreated || !_em.Exists(_rsEntity)) return;
+            if (_ecsWorld == null || !_ecsWorld.IsCreated || !_em.Exists(_rsEntity)) return;
 
             var rs = _em.GetComponentData<ResonanceScore>(_rsEntity);
 
@@ -740,7 +740,7 @@ namespace Tartaria.Integration
             if (_rsUpdateTimer < RS_POLL_INTERVAL) return;
             _rsUpdateTimer = 0f;
 
-            if (!_em.IsCreated || !_em.Exists(_rsEntity)) { _ecsReady = false; return; }
+            if (_ecsWorld == null || !_ecsWorld.IsCreated || !_em.Exists(_rsEntity)) { _ecsReady = false; return; }
 
             var rs = _em.GetComponentData<ResonanceScore>(_rsEntity);
             float currentRS = rs.CurrentRS;
@@ -1422,7 +1422,7 @@ namespace Tartaria.Integration
         /// </summary>
         void SyncPlayerPositionToECS()
         {
-            if (playerInput == null || !_em.IsCreated || !_em.Exists(_playerEntity)) return;
+            if (playerInput == null || _ecsWorld == null || !_ecsWorld.IsCreated || !_em.Exists(_playerEntity)) return;
 
             var pos = playerInput.transform.position;
             var rot = playerInput.transform.rotation;
