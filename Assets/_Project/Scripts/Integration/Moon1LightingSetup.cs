@@ -40,7 +40,7 @@ namespace Tartaria.Integration
         void SetupDirectionalLight()
         {
             // Find or create sun
-            _sun = FindObjectOfType<Light>();
+            _sun = FindFirstObjectByType<Light>();
             if (_sun == null || _sun.type != LightType.Directional)
             {
                 GameObject sunGO = new GameObject("Sun");
@@ -133,7 +133,7 @@ namespace Tartaria.Integration
 
         GameObject[] FindGameObjectsInLayer(int layer)
         {
-            var allObjects = FindObjectsOfType<GameObject>();
+            var allObjects = FindObjectsByType<GameObject>(FindObjectsSortMode.None);
             System.Collections.Generic.List<GameObject> result = new System.Collections.Generic.List<GameObject>();
 
             foreach (var obj in allObjects)

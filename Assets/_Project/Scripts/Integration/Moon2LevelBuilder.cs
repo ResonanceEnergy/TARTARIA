@@ -379,7 +379,7 @@ namespace Tartaria.Integration
 
         void CreateStalactite(GameObject parent, Vector3 position)
         {
-            var stalactite = GameObject.CreatePrimitive(PrimitiveType.Cone);
+            var stalactite = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             stalactite.name = "Stalactite";
             stalactite.transform.SetParent(parent.transform);
             stalactite.transform.position = position;
@@ -391,7 +391,7 @@ namespace Tartaria.Integration
 
         void CreateStalagmite(GameObject parent, Vector3 position)
         {
-            var stalagmite = GameObject.CreatePrimitive(PrimitiveType.Cone);
+            var stalagmite = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             stalagmite.name = "Stalagmite";
             stalagmite.transform.SetParent(parent.transform);
             stalagmite.transform.position = position;

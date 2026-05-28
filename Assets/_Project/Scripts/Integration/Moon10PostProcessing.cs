@@ -33,7 +33,7 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Moderate bloom - temporal energy
-            if (profile.TryAdd<Bloom>(out var bloom))
+            if (if (!profile.Has<Bloom>(out var bloom))
             {
                 bloom.intensity.Override(0.5f);
                 bloom.threshold.Override(0.8f);
@@ -42,13 +42,13 @@ namespace Tartaria.Integration
             }
 
             // Extreme Chromatic Aberration - time fracture
-            if (profile.TryAdd<ChromaticAberration>(out var ca))
+            if (if (!profile.Has<ChromaticAberration>(out var ca))
             {
                 ca.intensity.Override(0.4f);
             }
 
             // Vignette - temporal edges
-            if (profile.TryAdd<Vignette>(out var vignette))
+            if (if (!profile.Has<Vignette>(out var vignette))
             {
                 vignette.intensity.Override(0.3f);
                 vignette.smoothness.Override(0.45f);
@@ -56,7 +56,7 @@ namespace Tartaria.Integration
             }
 
             // Color Adjustments - shifting time palette
-            if (profile.TryAdd<ColorAdjustments>(out var colorAdj))
+            if (if (!profile.Has<ColorAdjustments>(out var colorAdj))
             {
                 colorAdj.saturation.Override(0f); // Neutral
                 colorAdj.contrast.Override(20f); // High contrast for clarity
@@ -64,7 +64,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - neutral (time has no color)
-            if (profile.TryAdd<WhiteBalance>(out var wb))
+            if (if (!profile.Has<WhiteBalance>(out var wb))
             {
                 wb.temperature.Override(0f);
             }

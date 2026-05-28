@@ -30,7 +30,7 @@ namespace Tartaria.Integration
             Debug.Log("[Moon1PostProcessing] Setting up post-processing effects...");
 
             // Find or create global volume
-            postProcessVolume = FindObjectOfType<Volume>();
+            postProcessVolume = FindFirstObjectByType<Volume>();
             if (postProcessVolume == null)
             {
                 var volumeObj = new GameObject("Global Post Process Volume");
@@ -57,7 +57,7 @@ namespace Tartaria.Integration
         {
             if (!enableBloom) return;
 
-            var bloom = postProcessVolume.profile.GetComponent<Bloom>();
+            var bloom = postProcessVolume.// DISABLED: profile.TryGet<Bloom>();
             if (bloom == null)
             {
                 bloom = postProcessVolume.profile.Add<Bloom>();
@@ -78,7 +78,7 @@ namespace Tartaria.Integration
         {
             if (!enableVignette) return;
 
-            var vignette = postProcessVolume.profile.GetComponent<Vignette>();
+            var vignette = postProcessVolume.// DISABLED: profile.TryGet<Vignette>();
             if (vignette == null)
             {
                 vignette = postProcessVolume.profile.Add<Vignette>();
@@ -99,7 +99,7 @@ namespace Tartaria.Integration
         {
             if (!enableColorGrading) return;
 
-            var colorGrading = postProcessVolume.profile.GetComponent<ColorAdjustments>();
+            var colorGrading = postProcessVolume.// DISABLED: profile.TryGet<ColorAdjustments>();
             if (colorGrading == null)
             {
                 colorGrading = postProcessVolume.profile.Add<ColorAdjustments>();

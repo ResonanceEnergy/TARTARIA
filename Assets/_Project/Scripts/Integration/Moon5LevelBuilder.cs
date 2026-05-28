@@ -49,7 +49,7 @@ namespace Tartaria.Integration
             // Ice spikes
             for (int i = 0; i < 40; i++)
             {
-                var spike = GameObject.CreatePrimitive(PrimitiveType.Cone);
+                var spike = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 spike.name = "Ice_Spike";
                 spike.transform.SetParent(parent.transform);
                 spike.transform.position = new Vector3(Random.Range(-55f, 55f), 0f, Random.Range(-55f, 55f));

@@ -33,7 +33,7 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Minimal bloom - only faintest glows
-            if (profile.TryAdd<Bloom>(out var bloom))
+            if (if (!profile.Has<Bloom>(out var bloom))
             {
                 bloom.intensity.Override(0.2f);
                 bloom.threshold.Override(1.2f); // Very high threshold
@@ -42,13 +42,13 @@ namespace Tartaria.Integration
             }
 
             // Subtle Chromatic Aberration - shadow distortion
-            if (profile.TryAdd<ChromaticAberration>(out var ca))
+            if (if (!profile.Has<ChromaticAberration>(out var ca))
             {
                 ca.intensity.Override(0.12f);
             }
 
             // Heavy Vignette - consuming darkness
-            if (profile.TryAdd<Vignette>(out var vignette))
+            if (if (!profile.Has<Vignette>(out var vignette))
             {
                 vignette.intensity.Override(0.55f); // Very dark edges
                 vignette.smoothness.Override(0.3f);
@@ -56,7 +56,7 @@ namespace Tartaria.Integration
             }
 
             // Color Adjustments - drained palette
-            if (profile.TryAdd<ColorAdjustments>(out var colorAdj))
+            if (if (!profile.Has<ColorAdjustments>(out var colorAdj))
             {
                 colorAdj.saturation.Override(-30f); // Heavy desaturation
                 colorAdj.contrast.Override(10f);
@@ -64,7 +64,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - cold void
-            if (profile.TryAdd<WhiteBalance>(out var wb))
+            if (if (!profile.Has<WhiteBalance>(out var wb))
             {
                 wb.temperature.Override(-25f); // Very cold
             }

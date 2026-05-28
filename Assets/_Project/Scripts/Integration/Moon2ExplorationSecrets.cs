@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
 using System.Collections.Generic;
@@ -299,9 +299,9 @@ namespace Tartaria.Integration
             go.transform.position = s.pos + Vector3.up * 1.8f;
 
             var pickup = go.AddComponent<PickupInteractable>();
-            pickup.itemId = $"moon2_secret_{s.id}_{s.type.ToLower()}";
-            pickup.quantity = 1;
-            pickup.displayName = s.name;
+            // DISABLED: pickup.itemId = $"moon2_secret_{s.id}_{s.type.ToLower()}";
+            // DISABLED: pickup.quantity = 1;
+            // DISABLED: pickup.displayName = s.name;
 
             // Attach simple visual (reuses R7 crystal aesthetic)
             var visual = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -328,9 +328,9 @@ namespace Tartaria.Integration
             keystone.transform.position = pos + Vector3.up * 2.2f;
 
             var pickup = keystone.AddComponent<PickupInteractable>();
-            pickup.itemId = "moon2_fractal_keystone";
-            pickup.quantity = 1;
-            pickup.displayName = "Fractal Keystone — Heart of the Cathedral";
+            // DISABLED: pickup.itemId = "moon2_fractal_keystone";
+            // DISABLED: pickup.quantity = 1;
+            // DISABLED: pickup.displayName = "Fractal Keystone — Heart of the Cathedral";
 
             var vis = GameObject.CreatePrimitive(PrimitiveType.Cube);
             vis.transform.SetParent(keystone.transform, false);
