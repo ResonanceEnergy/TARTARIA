@@ -18,6 +18,7 @@ namespace Tartaria.Integration
         [SerializeField] Moon11AmbientParticles ambientParticles;
         [SerializeField] Moon11InteractiveObjects interactiveObjects;
         [SerializeField] Moon11AmbientCreatures ambientCreatures;
+        [SerializeField] Moon11DynamicHazards dynamicHazards;
         [SerializeField] Moon11PostProcessing postProcessing;
         [SerializeField] bool autoInitialize = true;
 
@@ -36,6 +37,7 @@ namespace Tartaria.Integration
                 if (ambientParticles == null) ambientParticles = GetComponent<Moon11AmbientParticles>();
                 if (interactiveObjects == null) interactiveObjects = GetComponent<Moon11InteractiveObjects>();
                 if (ambientCreatures == null) ambientCreatures = GetComponent<Moon11AmbientCreatures>();
+                if (dynamicHazards == null) dynamicHazards = GetComponent<Moon11DynamicHazards>();
                 if (postProcessing == null) postProcessing = GetComponent<Moon11PostProcessing>();
             }
         }
