@@ -3,105 +3,49 @@ using System.Collections.Generic;
 
 namespace Tartaria.Integration
 {
-    /// <summary>
-    /// Moon 12: The Umbral Sanctum - Interactive Objects
-    /// Execution order: -65 (after AmbientParticles -68)
-    /// Spawns shadow-themed interactables: shadow keystones, void wells, umbral shrines, darkness essence
-    /// </summary>
-    [DefaultExecutionOrder(-65)]
+    [DefaultExecutionOrder(-42)]
     public class Moon12InteractiveObjects : MonoBehaviour
     {
-        [Header("Shadow Interactables")]
-        [SerializeField] int shadowKeystoneCount = 8;
-        [SerializeField] int voidWellCount = 6;
-        [SerializeField] int umbralShrineCount = 5;
-        [SerializeField] int darknessEssenceCount = 14;
-
-        List<GameObject> interactiveObjects = new List<GameObject>();
-
-        void Start()
+        [Header("Moon 12: Shadow Interactive Objects")]
+        [SerializeField] int doorCount = 5;
+        [SerializeField] int leverCount = 4;
+        [SerializeField] int pressurePlateCount = 3;
+        [SerializeField] int puzzleCount = 3;
+        [SerializeField] int breakableCount = 5;
+        List<GameObject> interactives = new List<GameObject>();
+        void Start() { SpawnInteractiveObjects(); }
+        void SpawnInteractiveObjects()
         {
-            SpawnInteractives();
+            for (int i = 0; i < doorCount; i++)
+                CreateDoor($"UmbralDoor_{i}", new Vector3(Random.Range(-60f, 60f), 0.5f, Random.Range(-60f, 60f)), i < 3, "Key_{i}");
+            for (int i = 0; i < leverCount; i++)
+                CreateLever($"Lever_{i}", new Vector3(Random.Range(-60f, 60f), 1.5f, Random.Range(-60f, 60f)), $"Target_{i}");
+            for (int i = 0; i < pressurePlateCount; i++)
+                CreatePressurePlate($"Plate_{i}", new Vector3(Random.Range(-60f, 60f), 0.1f, Random.Range(-60f, 60f)), 50f);
+            for (int i = 0; i < puzzleCount; i++)
+                CreatePuzzleElement($"Puzzle_{i}", new Vector3(Random.Range(-60f, 60f), 1f, Random.Range(-60f, 60f)), "PuzzleType");
+            for (int i = 0; i < breakableCount; i++)
+                CreateBreakable($"Breakable_{i}", new Vector3(Random.Range(-60f, 60f), 0.5f, Random.Range(-60f, 60f)), 30f);
+            Debug.Log($"🔧 Moon12InteractiveObjects: {interactives.Count} objects spawned");
         }
-
-        void SpawnInteractives()
-        {
-            // Shadow keystones (dark power anchors)
-            for (int i = 0; i < shadowKeystoneCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    0.5f,
-                    Random.Range(-160f, 160f)
-                );
-                CreateInteractive($"Shadow_Keystone_{i}", pos, new Vector3(1f, 3f, 1f), new Color(0.05f, 0.05f, 0.1f), "Rune");
-            }
-
-            // Void wells (shadow dimension portals)
-            for (int i = 0; i < voidWellCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    0.2f,
-                    Random.Range(-160f, 160f)
-                );
-                CreateInteractive($"Void_Well_{i}", pos, new Vector3(2.5f, 0.5f, 2.5f), new Color(0.02f, 0.02f, 0.05f), "Portal");
-            }
-
-            // Umbral shrines (shadow altars)
-            for (int i = 0; i < umbralShrineCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    0.5f,
-                    Random.Range(-160f, 160f)
-                );
-                CreateInteractive($"Umbral_Shrine_{i}", pos, new Vector3(1.8f, 2.5f, 1.8f), new Color(0.08f, 0.08f, 0.12f), "Shrine");
-            }
-
-            // Darkness essence (shadow collectibles)
-            for (int i = 0; i < darknessEssenceCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    Random.Range(0.5f, 4f),
-                    Random.Range(-160f, 160f)
-                );
-                CreateInteractive($"Darkness_Essence_{i}", pos, new Vector3(0.7f, 0.7f, 0.7f), new Color(0.1f, 0.1f, 0.15f), "Collectible");
-            }
-
-            Debug.Log($"🌑 SHADOW INTERACTIVES: {interactiveObjects.Count} objects ready for player interaction");
-        }
-
-        void CreateInteractive(string name, Vector3 position, Vector3 scale, Color color, string tag)
-        {
-            GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            obj.name = name;
-            obj.transform.position = position;
-            obj.transform.localScale = scale;
-            obj.transform.parent = transform;
-            obj.tag = tag;
-
-            Renderer renderer = obj.GetComponent<Renderer>();
-            Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            mat.color = color;
-            mat.SetFloat("_Metallic", 0.9f);
-            mat.SetFloat("_Smoothness", 0.3f);
-            renderer.material = mat;
-
-            BoxCollider collider = obj.GetComponent<BoxCollider>();
-            collider.isTrigger = true;
-
-            interactiveObjects.Add(obj);
-        }
-
-        void OnDestroy()
-        {
-            foreach (var obj in interactiveObjects)
-            {
-                if (obj != null) Destroy(obj);
-            }
-            interactiveObjects.Clear();
-        }
+        GameObject CreateDoor(string name, Vector3 pos, bool locked, string key) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(3f, 4f, 0.3f); var io = obj.AddComponent<InteractableObject>(); io.interactType = "door"; io.isLocked = locked; io.requiredKey = key; interactives.Add(obj); return obj; }
+        GameObject CreateLever(string name, Vector3 pos, string targetId) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(0.3f, 1.5f, 0.3f); var io = obj.AddComponent<InteractableObject>(); io.interactType = "lever"; io.targetId = targetId; interactives.Add(obj); return obj; }
+        GameObject CreatePressurePlate(string name, Vector3 pos, float weight) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(2f, 0.1f, 2f); var io = obj.AddComponent<InteractableObject>(); io.interactType = "pressurePlate"; io.requiredWeight = weight; interactives.Add(obj); return obj; }
+        GameObject CreatePuzzleElement(string name, Vector3 pos, string puzzleType) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere); obj.name = name; obj.transform.position = pos; var io = obj.AddComponent<InteractableObject>(); io.interactType = "puzzle"; io.puzzleType = puzzleType; interactives.Add(obj); return obj; }
+        GameObject CreateBreakable(string name, Vector3 pos, float health) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube); obj.name = name; obj.transform.position = pos; var io = obj.AddComponent<InteractableObject>(); io.interactType = "breakable"; io.health = health; interactives.Add(obj); return obj; }
+        void OnDestroy() { foreach (var obj in interactives) if (obj != null) Destroy(obj); interactives.Clear(); }
+    }
+    public class InteractableObject : MonoBehaviour, IInteractable
+    {
+        public string interactType;
+        public bool isLocked;
+        public string requiredKey;
+        public string targetId;
+        public float requiredWeight;
+        public string puzzleType;
+        public float health;
+        bool activated;
+        public string GetInteractPrompt() { if (activated) return ""; return interactType switch { "door" => isLocked ? $"Unlock Door (Need {requiredKey})" : "Open Door (E)", "lever" => "Pull Lever (E)", "pressurePlate" => "Step On Plate", "puzzle" => "Solve Puzzle (E)", "breakable" => "Break Object (E)", _ => "Interact (E)" }; }
+        public void Interact(GameObject player) { if (activated) return; activated = true; if (interactType == "door" && !isLocked) { Core.GameLoopController.Instance?.QueueRSReward(10f, "door"); Debug.Log($"Door opened: {name}"); } else if (interactType == "lever") { Core.GameLoopController.Instance?.QueueRSReward(5f, "lever"); Debug.Log($"Lever pulled: {targetId}"); } else if (interactType == "puzzle") { QuestManager.Instance?.ProgressByType(Core.Enums.QuestObjectiveType.SolvePuzzle, puzzleType); Debug.Log($"Puzzle solved: {puzzleType}"); } else if (interactType == "breakable") { Core.GameLoopController.Instance?.QueueRSReward(3f, "break"); Destroy(gameObject, 0.2f); } }
     }
 }

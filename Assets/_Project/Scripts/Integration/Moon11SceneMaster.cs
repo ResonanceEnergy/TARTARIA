@@ -24,6 +24,11 @@ namespace Tartaria.Integration
         [SerializeField] Moon11WeatherSystem weatherSystem;
         [SerializeField] Moon11QuestNodes questNodes;
         [SerializeField] Moon11Collectibles collectibles;
+        [SerializeField] Moon11InteractiveObjects interactiveObjects;
+        [SerializeField] Moon11NPCDialogues npcDialogues;
+        [SerializeField] Moon11PowerUps powerUps;
+        [SerializeField] Moon11EnemySpawners enemySpawners;
+        [SerializeField] Moon11Secrets secrets;
         [SerializeField] Moon11PostProcessing postProcessing;
         [SerializeField] bool autoInitialize = true;
 
@@ -48,6 +53,11 @@ namespace Tartaria.Integration
                 if (weatherSystem == null) weatherSystem = GetComponent<Moon11WeatherSystem>();
                 if (questNodes == null) questNodes = GetComponent<Moon11QuestNodes>();
                 if (collectibles == null) collectibles = GetComponent<Moon11Collectibles>();
+                if (interactiveObjects == null) interactiveObjects = GetComponent<Moon11InteractiveObjects>();
+                if (npcDialogues == null) npcDialogues = GetComponent<Moon11NPCDialogues>();
+                if (powerUps == null) powerUps = GetComponent<Moon11PowerUps>();
+                if (enemySpawners == null) enemySpawners = GetComponent<Moon11EnemySpawners>();
+                if (secrets == null) secrets = GetComponent<Moon11Secrets>();
                 if (postProcessing == null) postProcessing = GetComponent<Moon11PostProcessing>();
             }
         }

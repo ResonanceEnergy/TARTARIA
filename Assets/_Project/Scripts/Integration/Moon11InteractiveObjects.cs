@@ -3,123 +3,49 @@ using System.Collections.Generic;
 
 namespace Tartaria.Integration
 {
-    /// <summary>
-    /// Moon 11: The Prismatic Nexus - Interactive Objects
-    /// Execution order: -65 (after AmbientParticles -68)
-    /// Spawns prismatic-themed interactables: spectrum prisms, rainbow bridges, color essence orbs, refraction puzzles
-    /// </summary>
-    [DefaultExecutionOrder(-65)]
+    [DefaultExecutionOrder(-42)]
     public class Moon11InteractiveObjects : MonoBehaviour
     {
-        [Header("Prismatic Interactables")]
-        [SerializeField] int spectrumPrismCount = 10;
-        [SerializeField] int rainbowBridgeCount = 6;
-        [SerializeField] int colorEssenceOrbCount = 21; // 3 per color (7 colors)
-        [SerializeField] int refractionPuzzleCount = 8;
-
-        List<GameObject> interactiveObjects = new List<GameObject>();
-
-        void Start()
+        [Header("Moon 11: Prismatic Interactive Objects")]
+        [SerializeField] int doorCount = 5;
+        [SerializeField] int leverCount = 4;
+        [SerializeField] int pressurePlateCount = 3;
+        [SerializeField] int puzzleCount = 3;
+        [SerializeField] int breakableCount = 5;
+        List<GameObject> interactives = new List<GameObject>();
+        void Start() { SpawnInteractiveObjects(); }
+        void SpawnInteractiveObjects()
         {
-            SpawnInteractives();
+            for (int i = 0; i < doorCount; i++)
+                CreateDoor($"CrystalDoor_{i}", new Vector3(Random.Range(-60f, 60f), 0.5f, Random.Range(-60f, 60f)), i < 3, "Key_{i}");
+            for (int i = 0; i < leverCount; i++)
+                CreateLever($"Lever_{i}", new Vector3(Random.Range(-60f, 60f), 1.5f, Random.Range(-60f, 60f)), $"Target_{i}");
+            for (int i = 0; i < pressurePlateCount; i++)
+                CreatePressurePlate($"Plate_{i}", new Vector3(Random.Range(-60f, 60f), 0.1f, Random.Range(-60f, 60f)), 50f);
+            for (int i = 0; i < puzzleCount; i++)
+                CreatePuzzleElement($"Puzzle_{i}", new Vector3(Random.Range(-60f, 60f), 1f, Random.Range(-60f, 60f)), "PuzzleType");
+            for (int i = 0; i < breakableCount; i++)
+                CreateBreakable($"Breakable_{i}", new Vector3(Random.Range(-60f, 60f), 0.5f, Random.Range(-60f, 60f)), 30f);
+            Debug.Log($"🔧 Moon11InteractiveObjects: {interactives.Count} objects spawned");
         }
-
-        void SpawnInteractives()
-        {
-            // Spectrum prisms (light-splitting devices)
-            for (int i = 0; i < spectrumPrismCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    Random.Range(1f, 5f),
-                    Random.Range(-160f, 160f)
-                );
-                CreateInteractive($"Spectrum_Prism_{i}", pos, new Vector3(1f, 2f, 1f), Color.white, "Puzzle");
-            }
-
-            // Rainbow bridges (traversal platforms)
-            for (int i = 0; i < rainbowBridgeCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    Random.Range(5f, 12f),
-                    Random.Range(-160f, 160f)
-                );
-                Color bridgeColor = GetRainbowColor(i % 7);
-                CreateInteractive($"Rainbow_Bridge_{i}", pos, new Vector3(5f, 0.3f, 2f), bridgeColor, "Platform");
-            }
-
-            // Color essence orbs (7-color collectible set)
-            for (int i = 0; i < colorEssenceOrbCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    Random.Range(1f, 8f),
-                    Random.Range(-160f, 160f)
-                );
-                Color orbColor = GetRainbowColor(i % 7);
-                CreateInteractive($"Color_Essence_Orb_{i}", pos, new Vector3(0.8f, 0.8f, 0.8f), orbColor, "Collectible");
-            }
-
-            // Refraction puzzles (light-beam challenges)
-            for (int i = 0; i < refractionPuzzleCount; i++)
-            {
-                Vector3 pos = new Vector3(
-                    Random.Range(-160f, 160f),
-                    1f,
-                    Random.Range(-160f, 160f)
-                );
-                CreateInteractive($"Refraction_Puzzle_{i}", pos, new Vector3(1.5f, 1.5f, 1.5f), Color.white * 0.9f, "Puzzle");
-            }
-
-            Debug.Log($"🌈 PRISMATIC INTERACTIVES: {interactiveObjects.Count} objects ready for player interaction");
-        }
-
-        Color GetRainbowColor(int index)
-        {
-            Color[] rainbow = {
-                Color.red,
-                new Color(1f, 0.5f, 0f), // Orange
-                Color.yellow,
-                Color.green,
-                Color.cyan,
-                Color.blue,
-                new Color(0.5f, 0f, 1f)  // Violet
-            };
-            return rainbow[index % rainbow.Length];
-        }
-
-        void CreateInteractive(string name, Vector3 position, Vector3 scale, Color color, string tag)
-        {
-            GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            obj.name = name;
-            obj.transform.position = position;
-            obj.transform.localScale = scale;
-            obj.transform.parent = transform;
-            obj.tag = tag;
-
-            Renderer renderer = obj.GetComponent<Renderer>();
-            Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            mat.color = color;
-            mat.SetFloat("_Metallic", 0.8f);
-            mat.SetFloat("_Smoothness", 1f);
-            mat.EnableKeyword("_EMISSION");
-            mat.SetColor("_EmissionColor", color * 0.5f);
-            renderer.material = mat;
-
-            BoxCollider collider = obj.GetComponent<BoxCollider>();
-            collider.isTrigger = true;
-
-            interactiveObjects.Add(obj);
-        }
-
-        void OnDestroy()
-        {
-            foreach (var obj in interactiveObjects)
-            {
-                if (obj != null) Destroy(obj);
-            }
-            interactiveObjects.Clear();
-        }
+        GameObject CreateDoor(string name, Vector3 pos, bool locked, string key) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(3f, 4f, 0.3f); var io = obj.AddComponent<InteractableObject>(); io.interactType = "door"; io.isLocked = locked; io.requiredKey = key; interactives.Add(obj); return obj; }
+        GameObject CreateLever(string name, Vector3 pos, string targetId) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(0.3f, 1.5f, 0.3f); var io = obj.AddComponent<InteractableObject>(); io.interactType = "lever"; io.targetId = targetId; interactives.Add(obj); return obj; }
+        GameObject CreatePressurePlate(string name, Vector3 pos, float weight) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cylinder); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(2f, 0.1f, 2f); var io = obj.AddComponent<InteractableObject>(); io.interactType = "pressurePlate"; io.requiredWeight = weight; interactives.Add(obj); return obj; }
+        GameObject CreatePuzzleElement(string name, Vector3 pos, string puzzleType) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere); obj.name = name; obj.transform.position = pos; var io = obj.AddComponent<InteractableObject>(); io.interactType = "puzzle"; io.puzzleType = puzzleType; interactives.Add(obj); return obj; }
+        GameObject CreateBreakable(string name, Vector3 pos, float health) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Cube); obj.name = name; obj.transform.position = pos; var io = obj.AddComponent<InteractableObject>(); io.interactType = "breakable"; io.health = health; interactives.Add(obj); return obj; }
+        void OnDestroy() { foreach (var obj in interactives) if (obj != null) Destroy(obj); interactives.Clear(); }
+    }
+    public class InteractableObject : MonoBehaviour, IInteractable
+    {
+        public string interactType;
+        public bool isLocked;
+        public string requiredKey;
+        public string targetId;
+        public float requiredWeight;
+        public string puzzleType;
+        public float health;
+        bool activated;
+        public string GetInteractPrompt() { if (activated) return ""; return interactType switch { "door" => isLocked ? $"Unlock Door (Need {requiredKey})" : "Open Door (E)", "lever" => "Pull Lever (E)", "pressurePlate" => "Step On Plate", "puzzle" => "Solve Puzzle (E)", "breakable" => "Break Object (E)", _ => "Interact (E)" }; }
+        public void Interact(GameObject player) { if (activated) return; activated = true; if (interactType == "door" && !isLocked) { Core.GameLoopController.Instance?.QueueRSReward(10f, "door"); Debug.Log($"Door opened: {name}"); } else if (interactType == "lever") { Core.GameLoopController.Instance?.QueueRSReward(5f, "lever"); Debug.Log($"Lever pulled: {targetId}"); } else if (interactType == "puzzle") { QuestManager.Instance?.ProgressByType(Core.Enums.QuestObjectiveType.SolvePuzzle, puzzleType); Debug.Log($"Puzzle solved: {puzzleType}"); } else if (interactType == "breakable") { Core.GameLoopController.Instance?.QueueRSReward(3f, "break"); Destroy(gameObject, 0.2f); } }
     }
 }
