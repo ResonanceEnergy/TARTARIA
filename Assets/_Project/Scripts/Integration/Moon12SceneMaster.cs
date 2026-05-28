@@ -9,6 +9,9 @@ namespace Tartaria.Integration
     public class Moon12SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon12LevelBuilder levelBuilder;
+        [SerializeField] Moon12PlayerSetup playerSetup;
+        [SerializeField] Moon12LightingSetup lightingSetup;
+        [SerializeField] Moon12AmbientAudio ambientAudio;
         [SerializeField] bool autoInitialize = true;
 
         void Awake()
@@ -17,6 +20,9 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 12: THE UMBRAL SANCTUM — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon12LevelBuilder>();
+                if (playerSetup == null) playerSetup = GetComponent<Moon12PlayerSetup>();
+                if (lightingSetup == null) lightingSetup = GetComponent<Moon12LightingSetup>();
+                if (ambientAudio == null) ambientAudio = GetComponent<Moon12AmbientAudio>();
             }
         }
     }

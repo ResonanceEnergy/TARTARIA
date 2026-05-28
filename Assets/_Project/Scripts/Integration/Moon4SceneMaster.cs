@@ -9,6 +9,9 @@ namespace Tartaria.Integration
     public class Moon4SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon4LevelBuilder levelBuilder;
+        [SerializeField] Moon4PlayerSetup playerSetup;
+        [SerializeField] Moon4LightingSetup lightingSetup;
+        [SerializeField] Moon4AmbientAudio ambientAudio;
         [SerializeField] bool autoInitialize = true;
 
         void Awake()
@@ -17,6 +20,9 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 4: THE SUNSCORCHED OASIS — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon4LevelBuilder>();
+                if (playerSetup == null) playerSetup = GetComponent<Moon4PlayerSetup>();
+                if (lightingSetup == null) lightingSetup = GetComponent<Moon4LightingSetup>();
+                if (ambientAudio == null) ambientAudio = GetComponent<Moon4AmbientAudio>();
             }
         }
     }

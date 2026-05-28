@@ -9,6 +9,9 @@ namespace Tartaria.Integration
     public class Moon5SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon5LevelBuilder levelBuilder;
+        [SerializeField] Moon5PlayerSetup playerSetup;
+        [SerializeField] Moon5LightingSetup lightingSetup;
+        [SerializeField] Moon5AmbientAudio ambientAudio;
         [SerializeField] bool autoInitialize = true;
 
         void Awake()
@@ -17,6 +20,9 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 5: THE FROSTBOUND CITADEL — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon5LevelBuilder>();
+                if (playerSetup == null) playerSetup = GetComponent<Moon5PlayerSetup>();
+                if (lightingSetup == null) lightingSetup = GetComponent<Moon5LightingSetup>();
+                if (ambientAudio == null) ambientAudio = GetComponent<Moon5AmbientAudio>();
             }
         }
     }
