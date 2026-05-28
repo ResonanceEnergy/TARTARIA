@@ -1,0 +1,206 @@
+{
+  "masterMaterials": [
+    {
+      "name": "Stone_Tartarian",
+      "shaderType": "Shader Graph (URP/Lit)",
+      "properties": {
+        "baseColor": {
+          "type": "Texture2D",
+          "description": "Albedo map (precision-cut stone)",
+          "defaultPath": "Assets/_Project/Textures/Stone/PrecisionCut_Albedo.png"
+        },
+        "normalMap": {
+          "type": "Texture2D",
+          "description": "Bump detail for weathered surface",
+          "strength": 1.0
+        },
+        "roughness": {
+          "type": "Float",
+          "range": [0.6, 0.8],
+          "default": 0.7,
+          "description": "Weathered stone (not smooth)"
+        },
+        "emission": {
+          "type": "HDR Color",
+          "default": "#FFD700",
+          "intensity": 1.5,
+          "description": "Golden Aether glow on geometric lines"
+        },
+        "emissionMask": {
+          "type": "Texture2D",
+          "description": "Pattern mask for sacred geometry glow",
+          "defaultPath": "Assets/_Project/Textures/Masks/GeometricLines_Mask.png"
+        }
+      },
+      "shaderGraphNodes": [
+        "Texture Sample (BaseColor) → Multiply (Color Tint) → Main Texture",
+        "Normal Map → Normal Strength → Normal Input",
+        "Roughness Slider → Smoothness",
+        "Emission: HDR Color × Intensity × Pattern Mask → Emission Output",
+        "Lit Master Node (URP)"
+      ],
+      "usage": "Cathedral walls, floors, foundations, columns"
+    },
+    {
+      "name": "Metal_Ornate",
+      "shaderType": "Shader Graph (URP/Lit)",
+      "properties": {
+        "baseColor": {
+          "type": "Texture2D",
+          "description": "Gold/Bronze ornate texture",
+          "defaultPath": "Assets/_Project/Textures/Metal/Bronze_Albedo.png"
+        },
+        "normalMap": {
+          "type": "Texture2D",
+          "description": "Fine detail (engravings, wear)",
+          "strength": 0.8
+        },
+        "metallic": {
+          "type": "Float",
+          "range": [0.8, 1.0],
+          "default": 0.9,
+          "description": "Pure metal (high metallic)"
+        },
+        "roughness": {
+          "type": "Float",
+          "range": [0.2, 0.4],
+          "default": 0.3,
+          "description": "Polished but aged"
+        },
+        "emission": {
+          "type": "HDR Color",
+          "default": "#FFAA44",
+          "intensity": 0.5,
+          "description": "Subtle glow on edges (rim light)"
+        },
+        "fresnelPower": {
+          "type": "Float",
+          "range": [1.0, 5.0],
+          "default": 3.0,
+          "description": "Edge glow intensity"
+        }
+      },
+      "shaderGraphNodes": [
+        "Texture Sample (BaseColor) → Metallic Workflow",
+        "Normal Map → Micro-detail",
+        "Metallic Slider (0.9 default)",
+        "Roughness Slider (0.3 default)",
+        "Fresnel Effect → Multiply (Emission Color) → Emission Output",
+        "Lit Master Node (URP)"
+      ],
+      "usage": "Spire, mercury balls, ornate details, doors, engravings"
+    },
+    {
+      "name": "Crystal_Aether",
+      "shaderType": "Shader Graph (URP/Lit, Transparent)",
+      "properties": {
+        "baseColor": {
+          "type": "Color",
+          "default": "#66B3FF",
+          "description": "Translucent crystal tint (blue/white)"
+        },
+        "emission": {
+          "type": "HDR Color",
+          "default": "#FFBF00",
+          "intensityRange": [0.5, 3.0],
+          "description": "Pulsing Aether glow"
+        },
+        "pulseSpeed": {
+          "type": "Float",
+          "range": [0.1, 2.0],
+          "default": 0.5,
+          "description": "Hz - pulsing frequency"
+        },
+        "transparency": {
+          "type": "Float",
+          "range": [0.3, 0.6],
+          "default": 0.4,
+          "description": "Alpha blend amount"
+        },
+        "fresnelPower": {
+          "type": "Float",
+          "range": [1.0, 5.0],
+          "default": 2.5,
+          "description": "Rim glow intensity"
+        },
+        "refraction": {
+          "type": "Float",
+          "range": [0.0, 0.1],
+          "default": 0.02,
+          "description": "Light bending (performance cost!)"
+        }
+      },
+      "shaderGraphNodes": [
+        "Base Color (Transparent) → Color Input",
+        "Time Node → Sin → Multiply (Pulse Speed) → Emission Intensity",
+        "Emission: HDR Color × Pulsing Intensity → Emission Output",
+        "Fresnel Node → Rim Color → Add to Emission",
+        "Alpha Slider → Alpha Output",
+        "Lit Master Node (Surface Type: Transparent, Blend Mode: Alpha, Rendering Queue: Transparent)"
+      ],
+      "usage": "Aether crystals, energy fields, dome inner glow, rose window glass"
+    }
+  ],
+  "moon1Variants": [
+    {
+      "name": "Stone_Tartarian_Moon1_GoldenHour",
+      "parent": "Stone_Tartarian",
+      "colorPalette": {
+        "baseColor": "#FFA726",
+        "emissionColor": "#FFD700",
+        "emissionIntensity": 1.5
+      },
+      "description": "Amber stone with golden Aether glow for Moon 1"
+    },
+    {
+      "name": "Metal_Ornate_Moon1_Bronze",
+      "parent": "Metal_Ornate",
+      "colorPalette": {
+        "baseColor": "#CD7F32",
+        "emissionColor": "#FFAA44",
+        "emissionIntensity": 0.5,
+        "metallic": 0.9,
+        "roughness": 0.3
+      },
+      "description": "Bronze metal with warm glow for Moon 1 spire/details"
+    },
+    {
+      "name": "Crystal_Aether_Moon1_Amber",
+      "parent": "Crystal_Aether",
+      "colorPalette": {
+        "baseColor": "#FFBF0066",
+        "emissionColor": "#FFBF00",
+        "emissionIntensity": 2.0,
+        "pulseSpeed": 0.5,
+        "transparency": 0.4
+      },
+      "description": "Amber crystal with slow pulse for Moon 1 energy fields"
+    }
+  ],
+  "creationWorkflow": {
+    "step1": "Create Shader Graph in Unity: Assets → Create → Shader Graph → URP → Lit Shader Graph",
+    "step2": "Name according to master material (Stone_Tartarian.shadergraph, etc.)",
+    "step3": "Add properties as Blackboard variables (right panel)",
+    "step4": "Build node network following shaderGraphNodes array above",
+    "step5": "Connect to Lit Master Node (Fragment shader)",
+    "step6": "Save Shader Graph",
+    "step7": "Create Material instance: Assets → Create → Material",
+    "step8": "Assign Shader Graph to material (Shader dropdown)",
+    "step9": "Configure Moon 1 variant properties (colors, intensity)",
+    "step10": "Save material with Moon1 suffix naming"
+  },
+  "commonNodes": {
+    "textureMapping": "UV → Tiling and Offset → Texture Sample",
+    "emission": "HDR Color Property → Multiply (Intensity) → Multiply (Mask) → Emission",
+    "pulsing": "Time → Sin Wave → Remap (0-1) → Multiply (Intensity)",
+    "fresnel": "Fresnel Effect → Power (Exponent) → Multiply (Color)",
+    "normalMap": "Texture Sample (Normal) → Normal Strength → Normal Unpack"
+  },
+  "performanceNotes": [
+    "Emission adds minimal cost (just pixel shader math)",
+    "Transparency (Crystal_Aether) is expensive - use sparingly",
+    "Fresnel rim lights are cheap (view-dependent calculation)",
+    "Texture samples are moderate cost (4 textures = good balance)",
+    "Refraction is VERY expensive - disable for Phase 1, add in Phase 4 polish"
+  ]
+}
