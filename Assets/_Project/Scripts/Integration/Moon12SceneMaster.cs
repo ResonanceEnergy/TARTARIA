@@ -21,6 +21,7 @@ namespace Tartaria.Integration
         [SerializeField] Moon12DynamicHazards dynamicHazards;
         [SerializeField] Moon12VisualLandmarks visualLandmarks;
         [SerializeField] Moon12AudioZones audioZones;
+        [SerializeField] Moon12WeatherSystem weatherSystem;
         [SerializeField] Moon12PostProcessing postProcessing;
         [SerializeField] bool autoInitialize = true;
 
@@ -42,6 +43,7 @@ namespace Tartaria.Integration
                 if (dynamicHazards == null) dynamicHazards = GetComponent<Moon12DynamicHazards>();
                 if (visualLandmarks == null) visualLandmarks = GetComponent<Moon12VisualLandmarks>();
                 if (audioZones == null) audioZones = GetComponent<Moon12AudioZones>();
+                if (weatherSystem == null) weatherSystem = GetComponent<Moon12WeatherSystem>();
                 if (postProcessing == null) postProcessing = GetComponent<Moon12PostProcessing>();
             }
         }
