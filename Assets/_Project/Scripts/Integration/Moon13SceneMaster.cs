@@ -10,6 +10,7 @@ namespace Tartaria.Integration
     public class Moon13SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon13LevelBuilder levelBuilder;
+        [SerializeField] Moon13MaterialSetup materialSetup;
         [SerializeField] Moon13PlayerSetup playerSetup;
         [SerializeField] Moon13LightingSetup lightingSetup;
         [SerializeField] Moon13AmbientAudio ambientAudio;
@@ -24,6 +25,7 @@ namespace Tartaria.Integration
                 Debug.Log("    ✨ FINAL LEVEL - THE CULMINATION OF THE 13 MOONS ✨");
                 Debug.Log("═══════════════════════════════════════════════════════════════");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon13LevelBuilder>();
+                if (materialSetup == null) materialSetup = GetComponent<Moon13MaterialSetup>();
                 if (playerSetup == null) playerSetup = GetComponent<Moon13PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon13LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon13AmbientAudio>();

@@ -9,6 +9,7 @@ namespace Tartaria.Integration
     public class Moon7SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon7LevelBuilder levelBuilder;
+        [SerializeField] Moon7MaterialSetup materialSetup;
         [SerializeField] Moon7PlayerSetup playerSetup;
         [SerializeField] Moon7LightingSetup lightingSetup;
         [SerializeField] Moon7AmbientAudio ambientAudio;
@@ -20,6 +21,7 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 7: THE ABYSSAL DEPTHS — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon7LevelBuilder>();
+                if (materialSetup == null) materialSetup = GetComponent<Moon7MaterialSetup>();
                 if (playerSetup == null) playerSetup = GetComponent<Moon7PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon7LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon7AmbientAudio>();

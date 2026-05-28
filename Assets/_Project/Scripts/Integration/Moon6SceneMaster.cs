@@ -9,6 +9,7 @@ namespace Tartaria.Integration
     public class Moon6SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon6LevelBuilder levelBuilder;
+        [SerializeField] Moon6MaterialSetup materialSetup;
         [SerializeField] Moon6PlayerSetup playerSetup;
         [SerializeField] Moon6LightingSetup lightingSetup;
         [SerializeField] Moon6AmbientAudio ambientAudio;
@@ -20,6 +21,7 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 6: THE MOLTEN FORGE — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon6LevelBuilder>();
+                if (materialSetup == null) materialSetup = GetComponent<Moon6MaterialSetup>();
                 if (playerSetup == null) playerSetup = GetComponent<Moon6PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon6LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon6AmbientAudio>();

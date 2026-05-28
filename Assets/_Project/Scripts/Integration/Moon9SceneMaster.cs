@@ -9,6 +9,7 @@ namespace Tartaria.Integration
     public class Moon9SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon9LevelBuilder levelBuilder;
+        [SerializeField] Moon9MaterialSetup materialSetup;
         [SerializeField] Moon9PlayerSetup playerSetup;
         [SerializeField] Moon9LightingSetup lightingSetup;
         [SerializeField] Moon9AmbientAudio ambientAudio;
@@ -20,6 +21,7 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 9: THE BLIGHTED WASTES — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon9LevelBuilder>();
+                if (materialSetup == null) materialSetup = GetComponent<Moon9MaterialSetup>();
                 if (playerSetup == null) playerSetup = GetComponent<Moon9PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon9LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon9AmbientAudio>();
