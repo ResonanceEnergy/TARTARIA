@@ -18,10 +18,11 @@ namespace Tartaria.Editor
             var levelBuilder = Object.FindObjectOfType<Tartaria.Integration.Moon1LevelBuilder>();
             var envDecorator = Object.FindObjectOfType<Tartaria.Integration.Moon1EnvironmentDecorator>();
             var pathGenerator = Object.FindObjectOfType<Tartaria.Integration.Moon1PathGenerator>();
+            var heroBuilder = Object.FindObjectOfType<Tartaria.Integration.Moon1HeroBuildingSpawner>();
 
-            if (levelBuilder == null && envDecorator == null && pathGenerator == null)
+            if (levelBuilder == null && envDecorator == null && pathGenerator == null && heroBuilder == null)
             {
-                Debug.LogError("[Moon1LevelBuilderAutoSetup] No Moon1 components found in scene! Add Moon1LevelBuilder, Moon1EnvironmentDecorator, or Moon1PathGenerator first.");
+                Debug.LogError("[Moon1LevelBuilderAutoSetup] No Moon1 components found in scene! Add at least one Moon1 component first.");
                 return;
             }
 
@@ -39,6 +40,10 @@ namespace Tartaria.Editor
             if (pathGenerator != null)
             {
                 SetupPathGenerator(pathGenerator);
+            }
+            if (heroBuilder != null)
+            {
+                SetupHeroBuildingSpawner(heroBuilder);
             }
 
             Debug.Log("[Moon1LevelBuilderAutoSetup] ✅ Auto-setup complete!");
@@ -144,20 +149,38 @@ namespace Tartaria.Editor
 
             Debug.Log($"[Moon1LevelBuilderAutoSetup] ✓ Path generator setup complete");
         }
-, string searchPath = "Assets/KayKit_Forest_Nature_Pack_1.0_FREE")
-        {
-            var guids = AssetDatabase.FindAssets($"{namePrefix} t:GameObject", new[] { searchPath });
-            var prefabs = guids
-                .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
-                .Where(path => path.EndsWith($".{extension}"))
-                .Select(path => AssetDatabase.LoadAssetAtPath<GameObject>(path))
-                .Where(obj => obj != null)
-                .OrderBy(obj => obj.name)
-                .ToArray();
 
-            if (prefabs.Length == 0)
+        static void SetupHeroBuildingSpawner(Tartaria.Integration.Moon1HeroBuildingSpawner spawner)
+        {
+            Debug.Log("[Moon1LevelBuilderAutoSetup] Setting up Moon1HeroBuildingSpawner...");
+            var serializedObject = new SerializedObject(spawner);
+
+            // Assign materials
+            AssignMaterial(serializedObject, "marbleMaterial", "Assets/_Project/Materials/PBR/Marble006.mat");
+            AssignMaterial(serializedObject, "goldTrimMaterial", "Assets/_Project/Materials/PBR/Metal048A.mat");
+
+            serializedObject.ApplyModifiedProperties();
+            EditorUtility.SetDirty(spawner);
+
+            Debug.Log($"[Moon1LevelBuilderAutoSetup] ✓ Hero building spawner setup complete");
+        }
+
+        static void AssignMaterial(SerializedObject obj, string propertyName, string assetPath)
+        {
+            var material = AssetDatabase.LoadAssetAtPath<Material>(assetPath);
+            if (material != null)
             {
-                Debug.LogWarning($"  ✗ No KayKit assets found matching: {namePrefix}*.{extension} in {searchPath
+                var prop = obj.FindProperty(propertyName);
+                if (prop != null)
+                {
+                    prop.objectReferenceValue = material;
+                    Debug.Log($"  ✓ Assigned {propertyName}: {material.name}");
+                }
+            }
+            else
+            {
+                Debug.LogWarning($"  ✗ Material not found: {assetPath}");
+            }
         }
 
         static void AssignPrefab(SerializedObject obj, string propertyName, string assetPath)
@@ -194,11 +217,8 @@ namespace Tartaria.Editor
             }
         }
 
-        static GameObject[] FindKayKitAssets(string namePrefix, string extension)
+        static GameObject[] FindKayKitAssets(string namePrefix, string extension, string searchPath = "Assets/KayKit_Forest_Nature_Pack_1.0_FREE")
         {
-            // Search in KayKit Forest Nature Pack
-            string searchPath = "Assets/KayKit_Forest_Nature_Pack_1.0_FREE";
-            
             var guids = AssetDatabase.FindAssets($"{namePrefix} t:GameObject", new[] { searchPath });
             var prefabs = guids
                 .Select(guid => AssetDatabase.GUIDToAssetPath(guid))
@@ -210,7 +230,7 @@ namespace Tartaria.Editor
 
             if (prefabs.Length == 0)
             {
-                Debug.LogWarning($"  ✗ No KayKit assets found matching: {namePrefix}*.{extension}");
+                Debug.LogWarning($"  ✗ No KayKit assets found matching: {namePrefix}*.{extension} in {searchPath}");
             }
 
             return prefabs;
