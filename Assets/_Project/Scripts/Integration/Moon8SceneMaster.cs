@@ -13,6 +13,7 @@ namespace Tartaria.Integration
         [SerializeField] Moon8PlayerSetup playerSetup;
         [SerializeField] Moon8LightingSetup lightingSetup;
         [SerializeField] Moon8AmbientAudio ambientAudio;
+        [SerializeField] Moon8PostProcessing postProcessing;
         [SerializeField] bool autoInitialize = true;
 
         void Awake()
@@ -25,6 +26,7 @@ namespace Tartaria.Integration
                 if (playerSetup == null) playerSetup = GetComponent<Moon8PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon8LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon8AmbientAudio>();
+                if (postProcessing == null) postProcessing = GetComponent<Moon8PostProcessing>();
             }
         }
     }
