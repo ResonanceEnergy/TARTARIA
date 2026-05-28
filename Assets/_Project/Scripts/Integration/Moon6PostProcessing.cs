@@ -33,8 +33,9 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Intense bloom - molten glow
-            if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>())
             {
+                var bloom = profile.Add<Bloom>();
                 bloom.intensity.Override(1.0f); // Maximum intensity
                 bloom.threshold.Override(0.5f);
                 bloom.scatter.Override(0.9f);
@@ -42,21 +43,23 @@ namespace Tartaria.Integration
             }
 
             // Chromatic Aberration - extreme heat distortion
-            if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>())
             {
+                var ca = profile.Add<ChromaticAberration>();
                 ca.intensity.Override(0.3f);
             }
 
             // Vignette - dark volcanic edges
-            if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>())
             {
+                var vignette = profile.Add<Vignette>();
                 vignette.intensity.Override(0.35f);
                 vignette.smoothness.Override(0.4f);
                 vignette.color.Override(new Color(0.1f, 0.05f, 0f)); // Dark red-black
             }
 
             // Color Adjustments - hot forge palette
-            if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>())
             {
                 colorAdj.saturation.Override(20f); // Very saturated
                 colorAdj.contrast.Override(15f);
@@ -64,7 +67,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - extreme heat
-            if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>())
             {
                 wb.temperature.Override(40f); // Very hot
             }

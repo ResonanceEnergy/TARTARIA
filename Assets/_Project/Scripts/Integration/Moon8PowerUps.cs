@@ -37,6 +37,6 @@ namespace Tartaria.Integration
         public float duration;
         bool collected;
         public string GetInteractPrompt() { return collected ? "" : $"Collect {powerUpType} (E)"; }
-        public void Interact(GameObject player) { if (collected) return; collected = true; Core.GameLoopController.Instance?.QueueRSReward(2f, "powerup"); Core.GameEvents.RaiseHUDShowObjective($"Power-Up: {powerUpType}"); Audio.AudioManager.Instance?.PlaySFX2D("PowerUpCollect"); Destroy(gameObject, 0.5f); }
+        public void Interact(GameObject player) { if (collected) return; collected = true; Integration.GameLoopController.Instance?.QueueRSReward(2f, "powerup"); Core.GameEvents.RaiseHUDShowObjective($"Power-Up: {powerUpType}"); Audio.AudioManager.Instance?.PlaySFX2D("PowerUpCollect"); Destroy(gameObject, 0.5f); }
     }
 }

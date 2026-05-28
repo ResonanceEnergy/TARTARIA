@@ -129,7 +129,7 @@ namespace Tartaria.Integration
             // Notify ExcavationSystem
             if (ExcavationSystem.Instance != null)
             {
-                ExcavationSystem.Instance.RegisterExcavation(siteId);
+                // DISABLED: ExcavationSystem.Instance.RegisterExcavation(siteId);
             }
         }
 

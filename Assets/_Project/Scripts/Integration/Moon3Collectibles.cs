@@ -147,12 +147,12 @@ namespace Tartaria.Integration
             // Grant rewards
             if (rsReward > 0f)
             {
-                Core.GameLoopController.Instance?.QueueRSReward(rsReward, "collectible");
+                Integration.GameLoopController.Instance?.QueueRSReward(rsReward, "collectible");
                 Core.GameEvents.FireRSChange(rsReward);
             }
 
             // Progress quest objectives
-            QuestManager.Instance?.ProgressByType(Core.Enums.QuestObjectiveType.CollectItem, itemId);
+            QuestManager.Instance?.ProgressByType(Core.QuestObjectiveType.CollectItem, itemId);
 
             // Feedback
             Audio.AudioManager.Instance?.PlaySFX2D("ItemPickup");

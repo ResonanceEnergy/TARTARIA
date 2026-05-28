@@ -39,6 +39,6 @@ namespace Tartaria.Integration
         public float rsReward;
         bool discovered;
         public string GetInteractPrompt() { return discovered ? "" : $"Discover {secretName} (E)"; }
-        public void Interact(GameObject player) { if (discovered) return; discovered = true; Core.GameLoopController.Instance?.QueueRSReward(rsReward, "secret"); Core.GameEvents.RaiseHUDShowObjective($"Secret Found: {secretName} (+{rsReward} RS)"); Audio.AudioManager.Instance?.PlaySFX2D("SecretDiscovered"); Debug.Log($"[Secret] Discovered: {secretName}"); }
+        public void Interact(GameObject player) { if (discovered) return; discovered = true; Integration.GameLoopController.Instance?.QueueRSReward(rsReward, "secret"); Core.GameEvents.RaiseHUDShowObjective($"Secret Found: {secretName} (+{rsReward} RS)"); Audio.AudioManager.Instance?.PlaySFX2D("SecretDiscovered"); Debug.Log($"[Secret] Discovered: {secretName}"); }
     }
 }

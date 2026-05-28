@@ -33,8 +33,9 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Intense bloom - harsh sunlight
-            if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>())
             {
+                var bloom = profile.Add<Bloom>();
                 bloom.intensity.Override(0.8f);
                 bloom.threshold.Override(0.6f);
                 bloom.scatter.Override(0.8f);
@@ -42,21 +43,23 @@ namespace Tartaria.Integration
             }
 
             // Chromatic Aberration - heat distortion
-            if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>())
             {
+                var ca = profile.Add<ChromaticAberration>();
                 ca.intensity.Override(0.25f);
             }
 
             // Vignette - sun-bleached edges
-            if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>())
             {
+                var vignette = profile.Add<Vignette>();
                 vignette.intensity.Override(0.2f);
                 vignette.smoothness.Override(0.5f);
                 vignette.color.Override(new Color(0.3f, 0.25f, 0.15f)); // Dusty brown
             }
 
             // Color Adjustments - hot desert palette
-            if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>())
             {
                 colorAdj.saturation.Override(-10f); // Slight desaturation
                 colorAdj.contrast.Override(20f); // High contrast
@@ -64,7 +67,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - hot temperature
-            if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>())
             {
                 wb.temperature.Override(25f); // Warm
             }
