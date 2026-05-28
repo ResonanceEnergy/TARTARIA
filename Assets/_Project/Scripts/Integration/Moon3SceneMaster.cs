@@ -9,6 +9,7 @@ namespace Tartaria.Integration
     public class Moon3SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon3LevelBuilder levelBuilder;
+        [SerializeField] Moon3MaterialSetup materialSetup;
         [SerializeField] Moon3PlayerSetup playerSetup;
         [SerializeField] Moon3LightingSetup lightingSetup;
         [SerializeField] Moon3AmbientAudio ambientAudio;
@@ -20,6 +21,7 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 3: THE VERDANT LABYRINTH — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon3LevelBuilder>();
+                if (materialSetup == null) materialSetup = GetComponent<Moon3MaterialSetup>();
                 if (playerSetup == null) playerSetup = GetComponent<Moon3PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon3LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon3AmbientAudio>();

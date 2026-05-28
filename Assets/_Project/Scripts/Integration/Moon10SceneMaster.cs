@@ -9,6 +9,7 @@ namespace Tartaria.Integration
     public class Moon10SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon10LevelBuilder levelBuilder;
+        [SerializeField] Moon10MaterialSetup materialSetup;
         [SerializeField] Moon10PlayerSetup playerSetup;
         [SerializeField] Moon10LightingSetup lightingSetup;
         [SerializeField] Moon10AmbientAudio ambientAudio;
@@ -20,6 +21,7 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 10: THE TEMPORAL RIFT — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon10LevelBuilder>();
+                if (materialSetup == null) materialSetup = GetComponent<Moon10MaterialSetup>();
                 if (playerSetup == null) playerSetup = GetComponent<Moon10PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon10LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon10AmbientAudio>();
