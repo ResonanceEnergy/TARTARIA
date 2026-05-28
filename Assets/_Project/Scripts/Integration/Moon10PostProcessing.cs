@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - shifting time palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(0f); // Neutral
                 colorAdj.contrast.Override(20f); // High contrast for clarity
                 colorAdj.colorFilter.Override(new Color(1f, 1f, 1f)); // No filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - neutral (time has no color)
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(0f);
             }
 

@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - hot desert palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(-10f); // Slight desaturation
                 colorAdj.contrast.Override(20f); // High contrast
                 colorAdj.colorFilter.Override(new Color(1f, 0.95f, 0.85f)); // Warm filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - hot temperature
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(25f); // Warm
             }
 

@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - frozen palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(5f);
                 colorAdj.contrast.Override(25f); // Very high contrast
                 colorAdj.colorFilter.Override(new Color(0.9f, 0.95f, 1f)); // Cool blue filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - cold temperature
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(-20f); // Cold
             }
 

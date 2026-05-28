@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - maximum vibrancy
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(40f); // Hyper-saturated rainbow
                 colorAdj.contrast.Override(15f);
                 colorAdj.colorFilter.Override(new Color(1f, 1f, 1f)); // No filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - neutral (let spectrum shine)
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(0f);
             }
 

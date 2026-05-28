@@ -63,6 +63,7 @@ namespace Tartaria.Integration
             // Color Adjustments - enhance jungle greens
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(15f); // Boost saturation
                 colorAdj.contrast.Override(10f);
             }

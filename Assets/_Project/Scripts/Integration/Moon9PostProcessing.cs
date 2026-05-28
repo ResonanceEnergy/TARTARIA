@@ -61,6 +61,7 @@ namespace Tartaria.Integration
             // Color Adjustments - twisted palette
             if (!profile.Has<ColorAdjustments>())
             {
+                var colorAdj = profile.Add<ColorAdjustments>();
                 colorAdj.saturation.Override(25f); // Hyper-saturated
                 colorAdj.contrast.Override(30f); // Extreme contrast
                 colorAdj.colorFilter.Override(new Color(0.9f, 0.8f, 1f)); // Purple filter
@@ -69,6 +70,7 @@ namespace Tartaria.Integration
             // White Balance - unnatural tint
             if (!profile.Has<WhiteBalance>())
             {
+                var wb = profile.Add<WhiteBalance>();
                 wb.temperature.Override(-10f);
                 wb.tint.Override(15f); // Magenta shift
             }
