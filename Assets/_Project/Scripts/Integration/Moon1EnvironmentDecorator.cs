@@ -1,150 +1,209 @@
 using UnityEngine;
+using System.Collections.Generic;
+using Tartaria.Core;
 
 namespace Tartaria.Integration
 {
-#pragma warning disable CS0414 // Placeholder counts for planned features
     /// <summary>
-    /// Moon 1 Environment Decorator — Adds natural scenery around Echohaven village
-    /// Scatters trees, rocks, bushes, grass, and RPG props for immersion
-    /// Uses density-based placement with golden ratio spacing
+    /// Moon 1 Environment Decorator — Visual polish and atmosphere details
+    /// Props, vegetation, architectural details, ambient objects that bring Echohaven to life
     /// </summary>
-    [DefaultExecutionOrder(-84)] // After Moon1LevelBuilder (-85)
+    [DefaultExecutionOrder(-86)]
     public class Moon1EnvironmentDecorator : MonoBehaviour
     {
-        [Header("Decoration Area")]
-        [SerializeField] Vector3 decorationCenter = Vector3.zero;
-        [SerializeField] float decorationRadius = 150f;
-        [SerializeField] LayerMask buildingLayer;
-
-        [Header("Tree Placement")]
-        [SerializeField] GameObject[] treePrefabs;
-        [SerializeField] int treeCount = 30;
-        [SerializeField] float minTreeDistance = 8f;
-
-        [Header("Rock Placement")]
-        [SerializeField] GameObject[] rockPrefabs;
-        [SerializeField] int rockCount = 50;
-        [SerializeField] float minRockDistance = 3f;
-
-        [Header("Bush Placement")]
-        [SerializeField] GameObject[] bushPrefabs;
-        [SerializeField] int bushCount = 80;
-        [SerializeField] float minBushDistance = 2f;
-
-        [Header("Grass Placement")]
-        [SerializeField] GameObject[] grassPrefabs;
-        [SerializeField] int grassCount = 120;
-        [SerializeField] float minGrassDistance = 1f;
-
-        [Header("RPG Props (Tools, Lanterns, Crates)")]
-        [SerializeField] GameObject[] propPrefabs;
-        [SerializeField] int propCount = 20;
-        [SerializeField] float minPropDistance = 5f;
-
-        [Header("Materials")]
-        [SerializeField] Material terrainMaterial;
-
-        const float PHI = 1.618033988749895f; // Golden ratio
-
+        [Header("Decoration Prefabs")]
+        [SerializeField] GameObject[] propPrefabs;          // Furniture, debris, etc.
+        [SerializeField] GameObject[] vegetationPrefabs;    // Vines, moss, dead plants
+        [SerializeField] GameObject[] architecturalPrefabs; // Columns, arches, ornaments
+        [SerializeField] GameObject[] candlePrefabs;        // Light sources
+        
+        [Header("Density Settings")]
+        [SerializeField] int propsCount = 40;
+        [SerializeField] int vegetationCount = 30;
+        [SerializeField] int architecturalCount = 20;
+        [SerializeField] int candlesCount = 25;
+        
+        [Header("Placement")]
+        [SerializeField] float spawnRadius = 35f;
+        [SerializeField] bool useRandomRotation = true;
+        [SerializeField] bool snapToGround = true;
+        
+        readonly List<GameObject> _decorations = new();
+        
         void Start()
         {
             DecorateEnvironment();
+            
+            Debug.Log($"[Moon1EnvironmentDecorator] ✅ Initialized - {_decorations.Count} decorations placed");
         }
-
+        
         void DecorateEnvironment()
         {
-            Debug.Log("[Moon1EnvironmentDecorator] Starting environment decoration...");
-
-            // Create parent for organization
-            var envParent = new GameObject("Environment_Decoration");
-            envParent.transform.position = decorationCenter;
-
-            // Scatter trees (outer ring)
-            if (treePrefabs != null && treePrefabs.Length > 0)
-            {
-                var treesParent = new GameObject("Trees");
-                treesParent.transform.SetParent(envParent.transform);
-                ScatterObjects(treesParent, treePrefabs, treeCount, decorationRadius * 0.7f, decorationRadius, minTreeDistance, new Vector3(1f, 1f, 1f), new Vector3(1.5f, 1.5f, 1.5f));
-            }
-
-            // Scatter large rocks (mid ring)
-            if (rockPrefabs != null && rockPrefabs.Length > 0)
-            {
-                var rocksParent = new GameObject("Rocks");
-                rocksParent.transform.SetParent(envParent.transform);
-                ScatterObjects(rocksParent, rockPrefabs, rockCount, decorationRadius * 0.3f, decorationRadius * 0.9f, minRockDistance, new Vector3(0.5f, 0.5f, 0.5f), new Vector3(2f, 2f, 2f));
-            }
-
-            // Scatter bushes (everywhere)
-            if (bushPrefabs != null && bushPrefabs.Length > 0)
-            {
-                var bushesParent = new GameObject("Bushes");
-                bushesParent.transform.SetParent(envParent.transform);
-                ScatterObjects(bushesParent, bushPrefabs, bushCount, 5f, decorationRadius, minBushDistance, new Vector3(0.8f, 0.8f, 0.8f), new Vector3(1.3f, 1.3f, 1.3f));
-            }
-
-            // Scatter grass (dense, close to buildings)
-            if (grassPrefabs != null && grassPrefabs.Length > 0)
-            {
-                var grassParent = new GameObject("Grass");
-                grassParent.transform.SetParent(envParent.transform);
-                ScatterObjects(grassParent, grassPrefabs, grassCount, 5f, decorationRadius * 0.6f, minGrassDistance, new Vector3(0.5f, 0.5f, 0.5f), new Vector3(1.2f, 1.2f, 1.2f));
-            }
-
-            // Scatter RPG props (near buildings)
-            if (propPrefabs != null && propPrefabs.Length > 0)
-            {
-                var propsParent = new GameObject("Props");
-                propsParent.transform.SetParent(envParent.transform);
-                ScatterObjects(propsParent, propPrefabs, propCount, 10f, decorationRadius * 0.5f, minPropDistance, Vector3.one, Vector3.one);
-            }
-
-            Debug.Log("[Moon1EnvironmentDecorator] Environment decoration complete!");
-            Debug.Log($"  • {treeCount} trees");
-            Debug.Log($"  • {rockCount} rocks");
-            Debug.Log($"  • {bushCount} bushes");
-            Debug.Log($"  • {grassCount} grass patches");
-            Debug.Log($"  • {propCount} props");
+            // Place props (furniture, barrels, crates, debris)
+            PlaceDecorations(propPrefabs, propsCount, "Prop");
+            
+            // Place vegetation (vines, moss, dead plants)
+            PlaceDecorations(vegetationPrefabs, vegetationCount, "Vegetation");
+            
+            // Place architectural details (columns, arches, broken statues)
+            PlaceDecorations(architecturalPrefabs, architecturalCount, "Architectural");
+            
+            // Place candles and light sources
+            PlaceCandles();
         }
-
-        void ScatterObjects(GameObject parent, GameObject[] prefabs, int count, float minRadius, float maxRadius, float minDistance, Vector3 minScale, Vector3 maxScale)
+        
+        void PlaceDecorations(GameObject[] prefabs, int count, string category)
         {
-            int attempts = 0;
-            int maxAttempts = count * 10;
-            int placed = 0;
-
-            while (placed < count && attempts < maxAttempts)
+            if (prefabs == null || prefabs.Length == 0) return;
+            
+            for (int i = 0; i < count; i++)
             {
-                attempts++;
-
-                // Random position in ring
-                float angle = Random.Range(0f, 360f);
-                float distance = Random.Range(minRadius, maxRadius);
-                Vector3 offset = Quaternion.Euler(0f, angle, 0f) * new Vector3(distance, 0f, 0f);
-                Vector3 position = decorationCenter + offset;
-
-                // Check if too close to buildings
-                if (Physics.CheckSphere(position, minDistance, buildingLayer))
-                    continue;
-
-                // Place object
                 GameObject prefab = prefabs[Random.Range(0, prefabs.Length)];
-                GameObject obj = Instantiate(prefab, parent.transform);
-                obj.transform.position = position;
-                obj.transform.rotation = Quaternion.Euler(0f, Random.Range(0f, 360f), 0f);
-
-                // Random scale variation
-                Vector3 scale = new Vector3(
-                    Random.Range(minScale.x, maxScale.x),
-                    Random.Range(minScale.y, maxScale.y),
-                    Random.Range(minScale.z, maxScale.z)
-                );
-                obj.transform.localScale = scale;
-
-                placed++;
+                if (prefab == null) continue;
+                
+                Vector3 position = GetRandomPlacementPosition();
+                Quaternion rotation = useRandomRotation ? 
+                    Quaternion.Euler(0f, Random.Range(0f, 360f), 0f) : 
+                    Quaternion.identity;
+                
+                GameObject decoration = Instantiate(prefab, position, rotation, transform);
+                decoration.name = $"{category}_{i}";
+                
+                // Add slight scale variation
+                float scaleVariation = Random.Range(0.9f, 1.1f);
+                decoration.transform.localScale *= scaleVariation;
+                
+                _decorations.Add(decoration);
             }
-
-            Debug.Log($"[Moon1EnvironmentDecorator] Placed {placed}/{count} {parent.name} (attempts: {attempts})");
+        }
+        
+        void PlaceCandles()
+        {
+            if (candlePrefabs == null || candlePrefabs.Length == 0) return;
+            
+            // Strategic candle placement (along walls, near entrances)
+            Vector3[] candleLocations = new Vector3[]
+            {
+                // Cathedral interior
+                new Vector3(5f, 1.5f, 10f),
+                new Vector3(-5f, 1.5f, 10f),
+                new Vector3(10f, 1.5f, 5f),
+                new Vector3(-10f, 1.5f, 5f),
+                new Vector3(0f, 1.5f, 15f),
+                new Vector3(0f, 1.5f, -15f),
+                
+                // Corridors
+                new Vector3(15f, 1.5f, 0f),
+                new Vector3(-15f, 1.5f, 0f),
+                new Vector3(0f, 1.5f, 20f),
+                new Vector3(0f, 1.5f, -20f),
+                
+                // Courtyard
+                new Vector3(20f, 1.5f, 15f),
+                new Vector3(-20f, 1.5f, 15f),
+                new Vector3(20f, 1.5f, -15f),
+                new Vector3(-20f, 1.5f, -15f),
+                
+                // Altar area
+                new Vector3(2f, 1.5f, 25f),
+                new Vector3(-2f, 1.5f, 25f),
+                new Vector3(4f, 1.5f, 28f),
+                new Vector3(-4f, 1.5f, 28f),
+                
+                // Side chambers
+                new Vector3(25f, 1.5f, 8f),
+                new Vector3(-25f, 1.5f, 8f),
+                new Vector3(25f, 1.5f, -8f),
+                new Vector3(-25f, 1.5f, -8f),
+                
+                // Upper gallery
+                new Vector3(8f, 5f, 20f),
+                new Vector3(-8f, 5f, 20f),
+                new Vector3(12f, 5f, 10f),
+            };
+            
+            for (int i = 0; i < Mathf.Min(candlesCount, candleLocations.Length); i++)
+            {
+                GameObject candlePrefab = candlePrefabs[Random.Range(0, candlePrefabs.Length)];
+                if (candlePrefab == null) continue;
+                
+                GameObject candle = Instantiate(candlePrefab, candleLocations[i], Quaternion.identity, transform);
+                candle.name = $"Candle_{i}";
+                
+                // Add flickering light
+                Light candleLight = candle.GetOrAddComponent<Light>();
+                candleLight.type = LightType.Point;
+                candleLight.color = new Color(1f, 0.7f, 0.4f);  // Warm orange
+                candleLight.range = 6f;
+                candleLight.intensity = Random.Range(0.6f, 0.9f);
+                
+                // Flickering animation
+                FlickeringLight flicker = candle.AddComponent<FlickeringLight>();
+                flicker.baseIntensity = candleLight.intensity;
+                flicker.flickerSpeed = Random.Range(3f, 8f);
+                flicker.flickerAmount = 0.2f;
+                
+                _decorations.Add(candle);
+            }
+        }
+        
+        Vector3 GetRandomPlacementPosition()
+        {
+            Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
+            Vector3 position = new Vector3(randomCircle.x, 10f, randomCircle.y);
+            
+            if (snapToGround)
+            {
+                // Raycast down to find ground
+                if (Physics.Raycast(position, Vector3.down, out RaycastHit hit, 20f))
+                {
+                    return hit.point;
+                }
+            }
+            
+            return new Vector3(position.x, 0f, position.z);
+        }
+        
+        void OnDestroy()
+        {
+            foreach (GameObject decoration in _decorations)
+            {
+                if (decoration != null)
+                    Destroy(decoration);
+            }
+        }
+    }
+    
+    /// <summary>
+    /// Flickering light component for candles
+    /// </summary>
+    public class FlickeringLight : MonoBehaviour
+    {
+        public float baseIntensity = 0.8f;
+        public float flickerSpeed = 5f;
+        public float flickerAmount = 0.2f;
+        
+        Light _light;
+        float _time;
+        
+        void Start()
+        {
+            _light = GetComponent<Light>();
+            if (_light == null)
+            {
+                _light = gameObject.AddComponent<Light>();
+            }
+        }
+        
+        void Update()
+        {
+            if (_light == null) return;
+            
+            _time += Time.deltaTime * flickerSpeed;
+            
+            // Perlin noise for organic flicker
+            float flicker = Mathf.PerlinNoise(_time, 0f) * flickerAmount;
+            _light.intensity = baseIntensity + flicker;
         }
     }
 }
