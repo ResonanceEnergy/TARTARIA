@@ -135,10 +135,10 @@ namespace Tartaria.Integration
             {
                 follow = mainCam.gameObject.AddComponent<MonoBehaviour>(); // DISABLED: was SimpleCameraFollow
             } // DISABLED:
-            follow.target = playerInstance.transform; // DISABLED:
-            follow.distance = cameraDistance; // DISABLED:
-            follow.height = cameraHeight; // DISABLED:
-            follow.smoothSpeed = 7f; // Faster follow for tight spaces
+            // DISABLED: SimpleCameraFollow property - follow.target = playerInstance.transform; // DISABLED:
+            // DISABLED: SimpleCameraFollow property - follow.distance = cameraDistance; // DISABLED:
+            // DISABLED: SimpleCameraFollow property - follow.height = cameraHeight; // DISABLED:
+            // DISABLED: SimpleCameraFollow property - follow.smoothSpeed = 7f; // Faster follow for tight spaces
 
             Debug.Log($"  ✓ Camera: distance={cameraDistance}m, height={cameraHeight}m");
         }
