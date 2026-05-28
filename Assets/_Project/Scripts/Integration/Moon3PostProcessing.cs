@@ -35,7 +35,7 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Bloom - soft jungle glow
-            if (if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>(out var bloom))
             {
                 bloom.intensity.Override(0.4f);
                 bloom.threshold.Override(0.8f);
@@ -44,13 +44,13 @@ namespace Tartaria.Integration
             }
 
             // Chromatic Aberration - subtle lens distortion
-            if (if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>(out var ca))
             {
                 ca.intensity.Override(0.15f);
             }
 
             // Vignette - focus on center
-            if (if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>(out var vignette))
             {
                 vignette.intensity.Override(0.25f);
                 vignette.smoothness.Override(0.4f);
@@ -58,7 +58,7 @@ namespace Tartaria.Integration
             }
 
             // Color Adjustments - enhance jungle greens
-            if (if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>(out var colorAdj))
             {
                 colorAdj.saturation.Override(15f); // Boost saturation
                 colorAdj.contrast.Override(10f);

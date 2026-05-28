@@ -36,7 +36,7 @@ namespace Tartaria.Integration
             postProcessVolume.profile = profile;
 
             // Maximum bloom - aether radiance
-            if (if (!profile.Has<Bloom>(out var bloom))
+            if (!profile.Has<Bloom>(out var bloom))
             {
                 bloom.intensity.Override(1.2f); // Beyond standard max
                 bloom.threshold.Override(0.5f);
@@ -45,13 +45,13 @@ namespace Tartaria.Integration
             }
 
             // Light Chromatic Aberration - aether shimmer
-            if (if (!profile.Has<ChromaticAberration>(out var ca))
+            if (!profile.Has<ChromaticAberration>(out var ca))
             {
                 ca.intensity.Override(0.15f);
             }
 
             // Subtle Vignette - focus on convergence
-            if (if (!profile.Has<Vignette>(out var vignette))
+            if (!profile.Has<Vignette>(out var vignette))
             {
                 vignette.intensity.Override(0.2f);
                 vignette.smoothness.Override(0.6f);
@@ -59,7 +59,7 @@ namespace Tartaria.Integration
             }
 
             // Color Adjustments - epic finale palette
-            if (if (!profile.Has<ColorAdjustments>(out var colorAdj))
+            if (!profile.Has<ColorAdjustments>(out var colorAdj))
             {
                 colorAdj.saturation.Override(30f); // Very saturated
                 colorAdj.contrast.Override(20f);
@@ -67,7 +67,7 @@ namespace Tartaria.Integration
             }
 
             // White Balance - brilliant neutral
-            if (if (!profile.Has<WhiteBalance>(out var wb))
+            if (!profile.Has<WhiteBalance>(out var wb))
             {
                 wb.temperature.Override(5f); // Slightly warm
             }

@@ -57,7 +57,7 @@ namespace Tartaria.Integration
         {
             if (!enableBloom) return;
 
-            var bloom = postProcessVolume.// DISABLED: profile.TryGet<Bloom>();
+            var bloom = null; // DISABLED: postProcessVolume.profile.TryGet<Bloom>()
             if (bloom == null)
             {
                 bloom = postProcessVolume.profile.Add<Bloom>();
@@ -78,7 +78,7 @@ namespace Tartaria.Integration
         {
             if (!enableVignette) return;
 
-            var vignette = postProcessVolume.// DISABLED: profile.TryGet<Vignette>();
+            var vignette = null; // DISABLED: postProcessVolume.profile.TryGet<Vignette>()
             if (vignette == null)
             {
                 vignette = postProcessVolume.profile.Add<Vignette>();
@@ -99,7 +99,7 @@ namespace Tartaria.Integration
         {
             if (!enableColorGrading) return;
 
-            var colorGrading = postProcessVolume.// DISABLED: profile.TryGet<ColorAdjustments>();
+            var colorGrading = null; // DISABLED: postProcessVolume.profile.TryGet<ColorAdjustments>()
             if (colorGrading == null)
             {
                 colorGrading = postProcessVolume.profile.Add<ColorAdjustments>();
