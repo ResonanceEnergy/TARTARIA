@@ -77,7 +77,7 @@ namespace Tartaria.Integration
             trigger.size = scale;
             trigger.isTrigger = true;
 
-            Moon10AudioZones.AudioZoneTrigger zoneTrigger = zone.AddComponent<Moon10AudioZones.AudioZoneTrigger>();
+            Moon10AudioZones.Moon10AudioZoneTrigger zoneTrigger = zone.AddComponent<Moon10AudioZones.Moon10AudioZoneTrigger>();
             zoneTrigger.zoneType = zoneType;
             zoneTrigger.intensity = intensity;
 
@@ -95,7 +95,7 @@ namespace Tartaria.Integration
         }
     }
 
-    public class AudioZoneTrigger : MonoBehaviour
+    public class Moon10AudioZoneTrigger : MonoBehaviour
     {
         public string zoneType;
         public float intensity;
