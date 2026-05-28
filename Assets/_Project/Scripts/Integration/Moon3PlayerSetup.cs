@@ -69,7 +69,7 @@ namespace Tartaria.Integration
             if (mainCam == null)
             {
                 var camObj = new GameObject("MainCamera");
-                mainCam = camObj.AddComponent<Camera>();
+                mainCam = camObj.AddComponent<UnityEngine.Camera>();
                 camObj.tag = "MainCamera";
             }
 

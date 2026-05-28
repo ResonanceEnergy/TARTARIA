@@ -77,7 +77,7 @@ namespace Tartaria.Integration
             trigger.size = scale;
             trigger.isTrigger = true;
 
-            Moon7AudioZones.Moon7AudioZoneTrigger zoneTrigger = zone.AddComponent<Moon7AudioZones.Moon7AudioZoneTrigger>();
+            Moon7AudioZoneTrigger zoneTrigger = zone.AddComponent<Moon7AudioZoneTrigger>();
             zoneTrigger.zoneType = zoneType;
             zoneTrigger.intensity = intensity;
 
