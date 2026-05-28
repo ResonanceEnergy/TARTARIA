@@ -9,6 +9,7 @@ using Tartaria.Save;
 
 namespace Tartaria.Integration
 {
+    #pragma warning disable CS0414, CS0219 // Placeholder fields for future boss mechanics
     /// <summary>
     /// Boss Encounter System — multi-phase boss fights at Moon climaxes.
     ///
@@ -74,9 +75,7 @@ namespace Tartaria.Integration
         float _mudColossusSpecialTimer;
         int _mudColossusQuakeCount;
         float _telegraphPulseTimer;
-#pragma warning disable CS0414, CS0219 // Field assigned but never used - reserved for future telegraph frequency tracking
         float _lastTelegraphHz;
-#pragma warning restore CS0414
 
         // ─── R6: Extended live frequency + dedicated AI for RailWraith swarm, Dissonance Leviathan, SkyReaver aerial + full persistence harden ───
         float _railWraithSwarmTimer;
