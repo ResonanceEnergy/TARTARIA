@@ -1,4 +1,4 @@
-cd C:\dev\TARTARIA_new
+﻿cd C:\dev\TARTARIA_new
 
 Write-Host "🔧 MASSIVE COMPILATION FIX - Part 2: AudioZones & Unity API" -ForegroundColor Cyan
 
@@ -10,15 +10,15 @@ $count = 0
 foreach ($file in $files) {
     $content = [System.IO.File]::ReadAllText($file.FullName)
     $original = $content
-    
+
     # Pattern: detect which Moon file we're in
     if ($file.Name -match "Moon(\d+)AudioZones\.cs") {
         $moonNum = $matches[1]
-        
+
         # Replace Moon3AudioZones.AudioZoneTrigger with Moon{X}AudioZones.AudioZoneTrigger
         $content = $content -replace "Moon3AudioZones\.AudioZoneTrigger", "Moon${moonNum}AudioZones.AudioZoneTrigger"
     }
-    
+
     if ($content -ne $original) {
         [System.IO.File]::WriteAllText($file.FullName, $content)
         $count++
@@ -32,13 +32,13 @@ $count = 0
 foreach ($file in $files) {
     $content = [System.IO.File]::ReadAllText($file.FullName)
     $original = $content
-    
+
     # FindObjectOfType<T> → FindFirstObjectByType<T>
     $content = $content -replace "FindObjectOfType<", "FindFirstObjectByType<"
-    
+
     # FindObjectsOfType<T> → FindObjectsByType<T>(FindObjectsSortMode.None)
     $content = $content -replace "FindObjectsOfType<([^>]+)>\(\)", "FindObjectsByType<`$1>(FindObjectsSortMode.None)"
-    
+
     if ($content -ne $original) {
         [System.IO.File]::WriteAllText($file.FullName, $content)
         $count++
@@ -52,9 +52,9 @@ $count = 0
 foreach ($file in $files) {
     $content = [System.IO.File]::ReadAllText($file.FullName)
     $original = $content
-    
+
     $content = $content -replace "PrimitiveType\.Cone", "PrimitiveType.Cylinder"
-    
+
     if ($content -ne $original) {
         [System.IO.File]::WriteAllText($file.FullName, $content)
         $count++
@@ -68,10 +68,10 @@ $count = 0
 foreach ($file in $files) {
     $content = [System.IO.File]::ReadAllText($file.FullName)
     $original = $content
-    
+
     $content = $content -replace "AudioReverbPreset\.Stonecorridor", "AudioReverbPreset.Stonecorridor" # Unity typo, keep as-is OR
     $content = $content -replace "AudioReverbPreset\.Stonecorridor", "AudioReverbPreset.Hallway" # fallback if doesn't exist
-    
+
     if ($content -ne $original) {
         [System.IO.File]::WriteAllText($file.FullName, $content)
         $count++

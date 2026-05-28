@@ -1,4 +1,4 @@
-cd C:\dev\TARTARIA_new
+﻿cd C:\dev\TARTARIA_new
 
 Write-Host "🔧 Fixing malformed comment syntax from previous fixes..." -ForegroundColor Cyan
 
@@ -13,10 +13,10 @@ $fixedPost = 0
 foreach ($file in $postProcessFiles) {
     $content = [System.IO.File]::ReadAllText($file.FullName)
     $originalContent = $content
-    
+
     # Fix: if (if (!profile.Has<  →  if (!profile.Has<
     $content = $content -replace 'if \(if \(!profile\.Has<', 'if (!profile.Has<'
-    
+
     if ($content -ne $originalContent) {
         [System.IO.File]::WriteAllText($file.FullName, $content)
         $fixedPost++

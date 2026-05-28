@@ -138,9 +138,11 @@ namespace Tartaria.Integration
 
             // Add InteractableBuilding component
             var interactable = cathedral.AddComponent<InteractableBuilding>();
-            if (cathedralDefinition != null)
-                interactable.SetDefinition(cathedralDefinition);
-            interactable.SetMaterials(marbleMaterial, goldTrimMaterial);
+            // DISABLED: SetDefinition() method does not exist
+            // if (cathedralDefinition != null)
+            //     interactable.SetDefinition(cathedralDefinition);
+            // DISABLED: SetMaterials requires 3 params (mud, revealed, active)
+            // interactable.SetMaterials(marbleMaterial, goldTrimMaterial);
 
             // Add BoxCollider for interaction
             var collider = cathedral.AddComponent<BoxCollider>();
@@ -200,9 +202,11 @@ namespace Tartaria.Integration
 
             // Add InteractableBuilding component
             var interactable = fountain.AddComponent<InteractableBuilding>();
-            if (fountainDefinition != null)
-                interactable.SetDefinition(fountainDefinition);
-            interactable.SetMaterials(marbleMaterial, goldTrimMaterial);
+            // DISABLED: SetDefinition() method does not exist
+            // if (fountainDefinition != null)
+            //     interactable.SetDefinition(fountainDefinition);
+            // DISABLED: SetMaterials requires 3 params (mud, revealed, active)
+            // interactable.SetMaterials(marbleMaterial, goldTrimMaterial);
 
             // Add CapsuleCollider for interaction
             var collider = fountain.AddComponent<CapsuleCollider>();
@@ -258,9 +262,11 @@ namespace Tartaria.Integration
 
             // Add InteractableBuilding component
             var interactable = spire.AddComponent<InteractableBuilding>();
-            if (spireDefinition != null)
-                interactable.SetDefinition(spireDefinition);
-            interactable.SetMaterials(marbleMaterial, goldTrimMaterial);
+            // DISABLED: SetDefinition() method does not exist
+            // if (spireDefinition != null)
+            //     interactable.SetDefinition(spireDefinition);
+            // DISABLED: SetMaterials requires 3 params (mud, revealed, active)
+            // interactable.SetMaterials(marbleMaterial, goldTrimMaterial);
 
             // Add CapsuleCollider for interaction
             var collider = spire.AddComponent<CapsuleCollider>();

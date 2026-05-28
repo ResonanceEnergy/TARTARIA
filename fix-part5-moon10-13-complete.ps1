@@ -1,4 +1,4 @@
-cd C:\dev\TARTARIA_new
+﻿cd C:\dev\TARTARIA_new
 
 Write-Host "🔧 PART 5: Comprehensive fix for Moon10-13 + remaining errors..." -ForegroundColor Cyan
 
@@ -174,10 +174,10 @@ foreach ($file in $audioFiles) {
     if (Test-Path $file) {
         $content = [System.IO.File]::ReadAllText($file)
         $moonNum = [regex]::Match($file, 'Moon(\d+)').Groups[1].Value
-        
+
         # Replace Moon3AudioZones.AudioZoneTrigger → Moon{N}AudioZones.AudioZoneTrigger
         $content = $content -replace 'Moon3AudioZones\.AudioZoneTrigger', "Moon${moonNum}AudioZones.AudioZoneTrigger"
-        
+
         [System.IO.File]::WriteAllText($file, $content)
         Write-Host "  ✓ Moon${moonNum}AudioZones.cs" -ForegroundColor Green
     }
@@ -191,12 +191,12 @@ Write-Host "`n6️⃣ Fixing Moon1PostProcessing explicit types..." -ForegroundC
 $moon1pp = "Assets\_Project\Scripts\Integration\Moon1PostProcessing.cs"
 if (Test-Path $moon1pp) {
     $content = [System.IO.File]::ReadAllText($moon1pp)
-    
+
     # Replace: var bloom = null; with: Bloom bloom = null;
     $content = $content -replace 'var bloom = null; // DISABLED', 'Bloom bloom = null; // DISABLED'
     $content = $content -replace 'var vignette = null; // DISABLED', 'Vignette vignette = null; // DISABLED'
     $content = $content -replace 'var colorGrading = null; // DISABLED', 'ColorAdjustments colorGrading = null; // DISABLED'
-    
+
     [System.IO.File]::WriteAllText($moon1pp, $content)
     Write-Host "  ✓ Moon1PostProcessing.cs" -ForegroundColor Green
 }
