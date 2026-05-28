@@ -13,7 +13,7 @@ namespace Tartaria.Integration
         [Header("Level Configuration")]
         [SerializeField] Vector3 templeCenter = Vector3.zero;
         [SerializeField] float templeSize = 100f;
-        
+
         const float PHI = 1.618033988749895f;
 
         void Start()
@@ -28,7 +28,7 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon3_VerdantLabyrinth");
-            
+
             // Create 4 temple sections
             CreateOuterWalls(parent);
             CreateMazeSection(parent, new Vector3(-40f, 0f, 40f));
@@ -48,7 +48,7 @@ namespace Tartaria.Integration
         {
             var walls = new GameObject("Outer_Walls");
             walls.transform.SetParent(parent.transform);
-            
+
             // 4 outer walls
             CreateWall(walls, new Vector3(0f, 5f, 50f), new Vector3(100f, 10f, 2f));
             CreateWall(walls, new Vector3(0f, 5f, -50f), new Vector3(100f, 10f, 2f));
@@ -61,7 +61,7 @@ namespace Tartaria.Integration
             var section = new GameObject($"Maze_Section");
             section.transform.SetParent(parent.transform);
             section.transform.localPosition = offset;
-            
+
             // Random maze walls
             for (int i = 0; i < 8; i++)
             {
@@ -92,7 +92,7 @@ namespace Tartaria.Integration
         {
             var vegetation = new GameObject("Vegetation");
             vegetation.transform.SetParent(parent.transform);
-            
+
             // Scatter 50 trees/vines
             for (int i = 0; i < 50; i++)
             {

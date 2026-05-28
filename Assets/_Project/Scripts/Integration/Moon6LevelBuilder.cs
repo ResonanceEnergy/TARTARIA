@@ -26,14 +26,14 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon6_MoltenForge");
-            
+
             // Central forge chamber
             var forge = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             forge.name = "Central_Forge";
             forge.transform.SetParent(parent.transform);
             forge.transform.position = new Vector3(0f, 5f, 0f);
             forge.transform.localScale = new Vector3(30f, 5f, 30f);
-            
+
             // Lava pools
             for (int i = 0; i < 8; i++)
             {
@@ -45,7 +45,7 @@ namespace Tartaria.Integration
                 pool.transform.position = pos;
                 pool.transform.localScale = new Vector3(10f, 0.5f, 10f);
             }
-            
+
             // Anvil pedestals
             for (int i = 0; i < 4; i++)
             {
@@ -57,7 +57,7 @@ namespace Tartaria.Integration
                 pedestal.transform.position = pos;
                 pedestal.transform.localScale = new Vector3(4f, 4f, 4f);
             }
-            
+
             // Volcanic pillars
             for (int i = 0; i < 12; i++)
             {

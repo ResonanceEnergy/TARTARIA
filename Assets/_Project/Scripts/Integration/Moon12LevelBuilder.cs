@@ -26,14 +26,14 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon12_UmbralSanctum");
-            
+
             // Central void sphere
             var voidSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             voidSphere.name = "Void_Core";
             voidSphere.transform.SetParent(parent.transform);
             voidSphere.transform.position = new Vector3(0f, 15f, 0f);
             voidSphere.transform.localScale = new Vector3(35f, 35f, 35f);
-            
+
             // Shadow spires (6) - forming hexagram
             for (int i = 0; i < 6; i++)
             {
@@ -44,7 +44,7 @@ namespace Tartaria.Integration
                 spire.transform.SetParent(parent.transform);
                 spire.transform.position = pos;
                 spire.transform.localScale = new Vector3(8f, 25f, 8f);
-                
+
                 // Add inverted pyramid cap
                 var cap = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cap.name = "Spire_Cap";
@@ -53,7 +53,7 @@ namespace Tartaria.Integration
                 cap.transform.localScale = new Vector3(2f, 1f, 2f);
                 cap.transform.Rotate(45f, 0f, 0f);
             }
-            
+
             // Void bridges (6)
             for (int i = 0; i < 6; i++)
             {
@@ -63,7 +63,7 @@ namespace Tartaria.Integration
                 Vector3 end = Quaternion.Euler(0f, nextAngle, 0f) * new Vector3(60f, 20f, 0f);
                 CreateBridge(parent, start, end);
             }
-            
+
             // Shadow obelisks (12)
             for (int i = 0; i < 12; i++)
             {
@@ -76,7 +76,7 @@ namespace Tartaria.Integration
                 obelisk.transform.localScale = new Vector3(4f, 20f, 4f);
                 obelisk.transform.Rotate(0f, Random.Range(0f, 360f), Random.Range(-10f, 10f));
             }
-            
+
             // Void rifts (floating)
             for (int i = 0; i < 15; i++)
             {

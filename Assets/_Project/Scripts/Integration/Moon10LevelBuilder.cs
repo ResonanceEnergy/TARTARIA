@@ -26,19 +26,19 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon10_TemporalRift");
-            
+
             // Central time vortex
             var vortex = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             vortex.name = "Time_Vortex";
             vortex.transform.SetParent(parent.transform);
             vortex.transform.position = new Vector3(0f, 15f, 0f);
             vortex.transform.localScale = new Vector3(30f, 30f, 30f);
-            
+
             // 3 Time layers (past, present, future) - concentric rings
             CreateTimeLayer(parent, 25f, "Past", new Vector3(0f, 0f, 0f));
             CreateTimeLayer(parent, 50f, "Present", new Vector3(0f, 5f, 0f));
             CreateTimeLayer(parent, 75f, "Future", new Vector3(0f, 10f, 0f));
-            
+
             // Temporal anchors (8)
             for (int i = 0; i < 8; i++)
             {
@@ -51,7 +51,7 @@ namespace Tartaria.Integration
                 anchor.transform.localScale = new Vector3(5f, 16f, 5f);
                 anchor.transform.Rotate(0f, angle, 0f);
             }
-            
+
             // Floating time shards
             for (int i = 0; i < 25; i++)
             {

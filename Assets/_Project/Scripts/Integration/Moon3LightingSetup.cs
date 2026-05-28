@@ -39,7 +39,7 @@ namespace Tartaria.Integration
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = ambientColor;
             RenderSettings.ambientIntensity = 0.6f;
-            
+
             // Fog for depth (dense jungle)
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.ExponentialSquared;
@@ -51,11 +51,11 @@ namespace Tartaria.Integration
             {
                 float angle = i * 45f;
                 Vector3 pos = Quaternion.Euler(0f, angle, 0f) * new Vector3(40f, 12f, 0f);
-                
+
                 var clearingLight = new GameObject($"Clearing_Light_{i}");
                 clearingLight.transform.SetParent(transform);
                 clearingLight.transform.position = pos;
-                
+
                 var light = clearingLight.AddComponent<Light>();
                 light.type = LightType.Point;
                 light.color = new Color(1f, 0.95f, 0.7f); // Warm sunbeam

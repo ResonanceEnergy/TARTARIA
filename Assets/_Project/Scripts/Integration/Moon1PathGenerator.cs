@@ -78,7 +78,7 @@ namespace Tartaria.Integration
             {
                 float angle = i * angleStep;
                 Vector3 direction = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
-                
+
                 CreatePathStrip(parent, villageCenter, direction * 60f, pathWidth, $"Path_{i}");
             }
         }

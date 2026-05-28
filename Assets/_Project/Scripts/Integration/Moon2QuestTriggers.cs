@@ -81,7 +81,7 @@ namespace Tartaria.Integration
             trigger.isTrigger = true;
             trigger.radius = radius;
 
-            var questTrigger = triggerObj.AddComponent<QuestZoneTrigger>();
+            var questTrigger = triggerObj.AddComponent<Moon2QuestZoneTrigger>();
             questTrigger.questTitle = questTitle;
             questTrigger.onPlayerEnter = onActivate;
             questTrigger.triggerOnce = triggerOnce;
@@ -124,7 +124,7 @@ namespace Tartaria.Integration
     /// <summary>
     /// Quest Zone Trigger — Activates quest when player enters
     /// </summary>
-    public class QuestZoneTrigger : MonoBehaviour
+    public class Moon2QuestZoneTrigger : MonoBehaviour
     {
         public string questTitle;
         public System.Action onPlayerEnter;

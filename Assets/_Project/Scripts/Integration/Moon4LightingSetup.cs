@@ -39,7 +39,7 @@ namespace Tartaria.Integration
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = ambientColor;
             RenderSettings.ambientIntensity = 0.8f; // Bright ambient
-            
+
             // Heat haze fog
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.Linear;
@@ -52,11 +52,11 @@ namespace Tartaria.Integration
             {
                 float angle = i * 120f;
                 Vector3 pos = Quaternion.Euler(0f, angle, 0f) * new Vector3(15f, 3f, 0f);
-                
+
                 var waterLight = new GameObject($"Oasis_Reflection_{i}");
                 waterLight.transform.SetParent(transform);
                 waterLight.transform.position = pos;
-                
+
                 var light = waterLight.AddComponent<Light>();
                 light.type = LightType.Point;
                 light.color = new Color(0.5f, 0.7f, 1f); // Cool blue water

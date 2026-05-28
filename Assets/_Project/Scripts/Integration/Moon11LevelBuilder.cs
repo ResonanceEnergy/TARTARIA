@@ -26,7 +26,7 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon11_PrismaticNexus");
-            
+
             // Central prism
             var prism = GameObject.CreatePrimitive(PrimitiveType.Cube);
             prism.name = "Central_Prism";
@@ -34,7 +34,7 @@ namespace Tartaria.Integration
             prism.transform.position = new Vector3(0f, 20f, 0f);
             prism.transform.localScale = new Vector3(20f, 40f, 20f);
             prism.transform.Rotate(45f, 45f, 0f);
-            
+
             // 7 Color chambers (spectrum)
             string[] colors = { "Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Violet" };
             for (int i = 0; i < 7; i++)
@@ -48,7 +48,7 @@ namespace Tartaria.Integration
                 chamber.transform.localScale = new Vector3(18f, 20f, 18f);
                 chamber.transform.LookAt(parent.transform.position);
             }
-            
+
             // Crystal formations (20)
             for (int i = 0; i < 20; i++)
             {
@@ -60,7 +60,7 @@ namespace Tartaria.Integration
                 crystal.transform.Rotate(Random.Range(-15f, 15f), Random.Range(0f, 360f), Random.Range(-15f, 15f));
                 Destroy(crystal.GetComponent<Collider>());
             }
-            
+
             // Light refractors (12)
             for (int i = 0; i < 12; i++)
             {

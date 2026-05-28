@@ -54,7 +54,7 @@ namespace Tartaria.Integration
         void CreateSmallHousePrefab()
         {
             var house = new GameObject("Moon1_SmallHouse");
-            
+
             // Base: 4 large rocks in corners
             for (int i = 0; i < 4; i++)
             {
@@ -77,7 +77,7 @@ namespace Tartaria.Integration
         void CreateLargeHousePrefab()
         {
             var house = new GameObject("Moon1_LargeHouse");
-            
+
             // Base: 8 rocks in octagon
             for (int i = 0; i < 8; i++)
             {
@@ -100,7 +100,7 @@ namespace Tartaria.Integration
         void CreateTowerPrefab()
         {
             var tower = new GameObject("Moon1_Tower");
-            
+
             // Vertical stack: 12 rocks
             for (int level = 0; level < 4; level++)
             {
@@ -123,7 +123,7 @@ namespace Tartaria.Integration
         void CreateTemplePrefab()
         {
             var temple = new GameObject("Moon1_Temple");
-            
+
             // Wide base: 12 rocks in circle
             for (int i = 0; i < 12; i++)
             {
@@ -146,7 +146,7 @@ namespace Tartaria.Integration
         void CreateWorkshopPrefab()
         {
             var workshop = new GameObject("Moon1_Workshop");
-            
+
             // Long rectangular base: 6 rocks in 2 rows
             for (int row = 0; row < 2; row++)
             {

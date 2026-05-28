@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -27,10 +28,10 @@ namespace Tartaria.Integration
             CreatePowerUp("AetherSurge", new Vector3(Random.Range(-70f, 70f), Random.Range(1f, 3f), Random.Range(-70f, 70f)), "AetherSurge", 0f, new Color(0.8f, 0.3f, 1f));
             Debug.Log($"⚡ Moon8PowerUps: {powerups.Count} power-ups spawned");
         }
-        GameObject CreatePowerUp(string name, Vector3 pos, string powerUpType, float duration, Color glowColor) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere); obj.name = name; obj.transform.position = pos; obj.transform.localScale = Vector3.one * 0.5f; Destroy(obj.GetComponent<Collider>()); SphereCollider trigger = obj.AddComponent<SphereCollider>(); trigger.isTrigger = true; trigger.radius = 1.5f; var pickup = obj.AddComponent<PowerUpPickup>(); pickup.powerUpType = powerUpType; pickup.duration = duration; Renderer rend = obj.GetComponent<Renderer>(); if (rend != null) { Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit")); mat.color = glowColor; mat.SetColor("_EmissionColor", glowColor * 2f); mat.EnableKeyword("_EMISSION"); rend.material = mat; } BobAnimation bobber = obj.AddComponent<BobAnimation>(); bobber.bobSpeed = 1.5f; bobber.bobHeight = 0.4f; bobber.rotationSpeed = 60f; powerups.Add(obj); return obj; }
+        GameObject CreatePowerUp(string name, Vector3 pos, string powerUpType, float duration, Color glowColor) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Sphere); obj.name = name; obj.transform.position = pos; obj.transform.localScale = Vector3.one * 0.5f; Destroy(obj.GetComponent<Collider>()); SphereCollider trigger = obj.AddComponent<SphereCollider>(); trigger.isTrigger = true; trigger.radius = 1.5f; var pickup = obj.AddComponent<Moon8PowerUpPickup>(); pickup.powerUpType = powerUpType; pickup.duration = duration; Renderer rend = obj.GetComponent<Renderer>(); if (rend != null) { Material mat = new Material(Shader.Find("Universal Render Pipeline/Lit")); mat.color = glowColor; mat.SetColor("_EmissionColor", glowColor * 2f); mat.EnableKeyword("_EMISSION"); rend.material = mat; } BobAnimation bobber = obj.AddComponent<BobAnimation>(); bobber.bobSpeed = 1.5f; bobber.bobHeight = 0.4f; bobber.rotationSpeed = 60f; powerups.Add(obj); return obj; }
         void OnDestroy() { foreach (var pu in powerups) if (pu != null) Destroy(pu); powerups.Clear(); }
     }
-    public class PowerUpPickup : MonoBehaviour, IInteractable
+    public class Moon8PowerUpPickup : MonoBehaviour, IInteractable
     {
         public string powerUpType;
         public float duration;
