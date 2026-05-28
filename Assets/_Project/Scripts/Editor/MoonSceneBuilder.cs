@@ -59,6 +59,18 @@ namespace Tartaria.Editor
 
         void CreateMoonScene()
         {
+            // Prevent execution during Play Mode
+            if (EditorApplication.isPlaying || EditorApplication.isPaused)
+            {
+                EditorUtility.DisplayDialog(
+                    "Cannot Create Scene in Play Mode",
+                    "Please stop Play Mode (Ctrl+P) before creating scenes.\n\n" +
+                    "Editor scene creation tools only work in Edit Mode.",
+                    "OK"
+                );
+                return;
+            }
+
             string scenePath = $"Assets/_Project/Scenes/Moon{moonNumber}_{moonName}.unity";
             
             // Check if scene already exists

@@ -69,6 +69,18 @@ namespace Tartaria.Editor
 
         private void WireAllAssets()
         {
+            // Prevent execution during Play Mode
+            if (EditorApplication.isPlaying || EditorApplication.isPaused)
+            {
+                EditorUtility.DisplayDialog(
+                    "Cannot Wire Assets in Play Mode",
+                    "Please stop Play Mode (Ctrl+P) before running asset wiring.\n\n" +
+                    "Editor scene modification tools only work in Edit Mode.",
+                    "OK"
+                );
+                return;
+            }
+
             logMessages.Clear();
             wiringComplete = false;
 
