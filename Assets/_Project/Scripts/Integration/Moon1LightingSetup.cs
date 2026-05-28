@@ -33,7 +33,7 @@ namespace Tartaria.Integration
             ConfigureAmbientLighting();
             if (createAccentLights)
                 CreateBuildingAccentLights();
-            
+
             Debug.Log("[Moon1LightingSetup] Lighting configured - Forward+ URP optimized");
         }
 
@@ -54,11 +54,11 @@ namespace Tartaria.Integration
             _sun.shadows = LightShadows.Soft;
             _sun.shadowStrength = 0.85f;
             _sun.shadowResolution = UnityEngine.Rendering.LightShadowResolution.High;
-            
+
             // Forward+ optimizations
             _sun.renderMode = LightRenderMode.ForcePixel;
             _sun.cullingMask = ~0; // All layers
-            
+
             // Starting angle (morning)
             _sun.transform.rotation = Quaternion.Euler(30f, -30f, 0f);
 
@@ -135,13 +135,13 @@ namespace Tartaria.Integration
         {
             var allObjects = FindObjectsOfType<GameObject>();
             System.Collections.Generic.List<GameObject> result = new System.Collections.Generic.List<GameObject>();
-            
+
             foreach (var obj in allObjects)
             {
                 if (obj.layer == layer)
                     result.Add(obj);
             }
-            
+
             return result.ToArray();
         }
 
