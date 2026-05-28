@@ -23,6 +23,7 @@ using Tartaria.Input;
 using Tartaria.Gameplay;
 
 namespace Tartaria.Integration
+#pragma warning disable CS0414 // Placeholder counts for planned features
 {
     /// <summary>
     /// Moon 1 (Magnetic) arc orchestrator. Owns the 5-beat tutorial-grade vertical slice

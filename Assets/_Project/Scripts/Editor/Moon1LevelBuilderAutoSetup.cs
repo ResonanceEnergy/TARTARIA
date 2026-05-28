@@ -15,10 +15,10 @@ namespace Tartaria.Editor
         public static void AutoSetupLevelBuilder()
         {
             // Find all Moon1 components in scene
-            var levelBuilder = Object.FindObjectOfType<Tartaria.Integration.Moon1LevelBuilder>();
-            var envDecorator = Object.FindObjectOfType<Tartaria.Integration.Moon1EnvironmentDecorator>();
-            var pathGenerator = Object.FindObjectOfType<Tartaria.Integration.Moon1PathGenerator>();
-            var heroBuilder = Object.FindObjectOfType<Tartaria.Integration.Moon1HeroBuildingSpawner>();
+            var levelBuilder = Object.FindFirstObjectByType<Tartaria.Integration.Moon1LevelBuilder>();
+            var envDecorator = Object.FindFirstObjectByType<Tartaria.Integration.Moon1EnvironmentDecorator>();
+            var pathGenerator = Object.FindFirstObjectByType<Tartaria.Integration.Moon1PathGenerator>();
+            var heroBuilder = Object.FindFirstObjectByType<Tartaria.Integration.Moon1HeroBuildingSpawner>();
 
             if (levelBuilder == null && envDecorator == null && pathGenerator == null && heroBuilder == null)
             {

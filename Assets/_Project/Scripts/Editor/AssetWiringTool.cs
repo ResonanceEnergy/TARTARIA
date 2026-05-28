@@ -123,7 +123,7 @@ namespace Tartaria.Editor
             var explosionVFX = LoadAsset<GameObject>("SmallExplosionEffect", "Assets/EffectExamples");
 
             // Find all InteractableObject components
-            var interactables = FindObjectsOfType<MonoBehaviour>()
+            var interactables = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
                 .Where(mb => mb.GetType().Name == "InteractableObject")
                 .ToArray();
 
@@ -173,7 +173,7 @@ namespace Tartaria.Editor
             var collectSound = LoadAsset<AudioClip>("", "Assets/Casual Game Sounds U6"); // First suitable sound
 
             // Find all PowerUpPickup components
-            var powerups = FindObjectsOfType<MonoBehaviour>()
+            var powerups = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
                 .Where(mb => mb.GetType().Name == "PowerUpPickup")
                 .ToArray();
 
@@ -208,7 +208,7 @@ namespace Tartaria.Editor
             var spawnBurst = LoadAsset<GameObject>("Ground AOE explosion", "Assets/Hovl Studio");
 
             // Find all EnemySpawner components
-            var spawners = FindObjectsOfType<MonoBehaviour>()
+            var spawners = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
                 .Where(mb => mb.GetType().Name == "EnemySpawner")
                 .ToArray();
 
@@ -256,7 +256,7 @@ namespace Tartaria.Editor
             var talkSound = LoadAsset<AudioClip>("", "Assets/Casual Game Sounds U6");
 
             // Find all NPCDialogue components
-            var npcs = FindObjectsOfType<MonoBehaviour>()
+            var npcs = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
                 .Where(mb => mb.GetType().Name == "NPCDialogue")
                 .ToArray();
 
@@ -305,7 +305,7 @@ namespace Tartaria.Editor
             var discoverySound = LoadAsset<AudioClip>("", "Assets/Casual Game Sounds U6");
 
             // Find all EnvironmentalSecret components
-            var secrets = FindObjectsOfType<MonoBehaviour>()
+            var secrets = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None)
                 .Where(mb => mb.GetType().Name == "EnvironmentalSecret")
                 .ToArray();
 

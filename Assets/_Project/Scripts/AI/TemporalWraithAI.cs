@@ -4,6 +4,7 @@ using Tartaria.Core;
 using Tartaria.Gameplay;
 
 namespace Tartaria.AI
+#pragma warning disable CS0414 // Field assigned but never used - reserved for future implementation
 {
     /// <summary>
     /// Temporal Wraith AI — time-manipulation enemy for Moons 10-13.
