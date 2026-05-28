@@ -77,7 +77,7 @@ namespace Tartaria.Integration
             visual.transform.SetParent(milo.transform);
             visual.transform.localPosition = new Vector3(0f, 1f, 0f);
             visual.transform.localScale = new Vector3(0.8f, 1f, 0.8f);
-            
+
             var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
             material.color = new Color(0.3f, 0.5f, 0.8f); // Blue scholar robes
             visual.GetComponent<Renderer>().material = material;
@@ -238,7 +238,7 @@ namespace Tartaria.Integration
             }
 
             // Check if reached waypoint
-            float distance = Vector3.Distance(new Vector3(transform.position.x, 0f, transform.position.z), 
+            float distance = Vector3.Distance(new Vector3(transform.position.x, 0f, transform.position.z),
                                               new Vector3(target.x, 0f, target.z));
             if (distance < waypointReachDistance)
             {

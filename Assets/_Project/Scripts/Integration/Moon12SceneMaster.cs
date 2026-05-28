@@ -13,6 +13,7 @@ namespace Tartaria.Integration
         [SerializeField] Moon12PlayerSetup playerSetup;
         [SerializeField] Moon12LightingSetup lightingSetup;
         [SerializeField] Moon12AmbientAudio ambientAudio;
+        [SerializeField] Moon12NPCSpawner npcSpawner;
         [SerializeField] Moon12PostProcessing postProcessing;
         [SerializeField] bool autoInitialize = true;
 
@@ -26,6 +27,7 @@ namespace Tartaria.Integration
                 if (playerSetup == null) playerSetup = GetComponent<Moon12PlayerSetup>();
                 if (lightingSetup == null) lightingSetup = GetComponent<Moon12LightingSetup>();
                 if (ambientAudio == null) ambientAudio = GetComponent<Moon12AmbientAudio>();
+                if (npcSpawner == null) npcSpawner = GetComponent<Moon12NPCSpawner>();
                 if (postProcessing == null) postProcessing = GetComponent<Moon12PostProcessing>();
             }
         }
