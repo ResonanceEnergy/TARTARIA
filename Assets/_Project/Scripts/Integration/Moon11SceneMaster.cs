@@ -9,6 +9,9 @@ namespace Tartaria.Integration
     public class Moon11SceneMaster : MonoBehaviour
     {
         [SerializeField] Moon11LevelBuilder levelBuilder;
+        [SerializeField] Moon11PlayerSetup playerSetup;
+        [SerializeField] Moon11LightingSetup lightingSetup;
+        [SerializeField] Moon11AmbientAudio ambientAudio;
         [SerializeField] bool autoInitialize = true;
 
         void Awake()
@@ -17,6 +20,9 @@ namespace Tartaria.Integration
             {
                 Debug.Log("🌙 MOON 11: THE PRISMATIC NEXUS — INITIALIZING");
                 if (levelBuilder == null) levelBuilder = GetComponent<Moon11LevelBuilder>();
+                if (playerSetup == null) playerSetup = GetComponent<Moon11PlayerSetup>();
+                if (lightingSetup == null) lightingSetup = GetComponent<Moon11LightingSetup>();
+                if (ambientAudio == null) ambientAudio = GetComponent<Moon11AmbientAudio>();
             }
         }
     }
