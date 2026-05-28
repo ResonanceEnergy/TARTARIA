@@ -17,6 +17,7 @@ namespace Tartaria.Integration
         [SerializeField] Moon13NPCSpawner npcSpawner;
         [SerializeField] Moon13EnvironmentDecorator environmentDecorator;
         [SerializeField] Moon13AmbientParticles ambientParticles;
+        [SerializeField] Moon13InteractiveObjects interactiveObjects;
         [SerializeField] Moon13PostProcessing postProcessing;
         [SerializeField] bool autoInitialize = true;
 
@@ -36,6 +37,7 @@ namespace Tartaria.Integration
                 if (npcSpawner == null) npcSpawner = GetComponent<Moon13NPCSpawner>();
                 if (environmentDecorator == null) environmentDecorator = GetComponent<Moon13EnvironmentDecorator>();
                 if (ambientParticles == null) ambientParticles = GetComponent<Moon13AmbientParticles>();
+                if (interactiveObjects == null) interactiveObjects = GetComponent<Moon13InteractiveObjects>();
                 if (postProcessing == null) postProcessing = GetComponent<Moon13PostProcessing>();
             }
         }
