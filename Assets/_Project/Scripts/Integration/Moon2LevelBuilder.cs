@@ -35,7 +35,7 @@ namespace Tartaria.Integration
         [SerializeField] Vector3 echoHallPos = new Vector3(-50f, -10f, 0f);
         [SerializeField] Vector3 resonanceChamberPos = new Vector3(0f, -20f, 50f);
         [SerializeField] Vector3 crystalGrottoPos = new Vector3(60f, -15f, 20f);
-        [SerializeField] Vector3 harmonic SanctumPos = new Vector3(0f, -35f, 0f); // Deepest level
+        [SerializeField] Vector3 harmonicSanctumPos = new Vector3(0f, -35f, 0f); // Deepest level
 
         const float PHI = 1.618033988749895f;
 
@@ -339,7 +339,7 @@ namespace Tartaria.Integration
 
             Vector3 center = (start + end) / 2f;
             float length = Vector3.Distance(start, end);
-            
+
             tunnel.transform.position = center;
             tunnel.transform.localScale = new Vector3(radius * 2f, length / 2f, radius * 2f);
             tunnel.transform.LookAt(end);
