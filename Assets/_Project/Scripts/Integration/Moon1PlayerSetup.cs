@@ -15,7 +15,7 @@ namespace Tartaria.Integration
         [Header("Spawn Configuration")]
         [SerializeField] Vector3 spawnPosition = new Vector3(0f, 2f, -100f); // South of village
         [SerializeField] Quaternion spawnRotation = Quaternion.Euler(0f, 0f, 0f); // Facing north
-        
+
         [Header("Player Prefab")]
         [SerializeField] GameObject playerPrefab;
 

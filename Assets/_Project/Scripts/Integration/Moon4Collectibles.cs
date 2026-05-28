@@ -19,10 +19,10 @@ namespace Tartaria.Integration
         {
             for (int i = 0; i < aetherFragmentCount; i++)
                 CreateCollectible($"AetherFragment_Moon4_{i}", new Vector3(Random.Range(-65f, 65f), Random.Range(0.5f, 3f), Random.Range(-65f, 65f)), "AetherFragment", 5f, new Color(0.9f, 0.7f, 0.3f));
-            
+
             for (int i = 0; i < ancientRelicCount; i++)
                 CreateCollectible($"DesertRelic_Moon4_{i}", new Vector3(Random.Range(-65f, 65f), Random.Range(0.5f, 2f), Random.Range(-65f, 65f)), "DesertRelic", 15f, new Color(0.95f, 0.8f, 0.5f));
-            
+
             for (int i = 0; i < hiddenCacheCount; i++)
                 CreateCollectible($"HiddenCache_Moon4_{i}", new Vector3(Random.Range(-70f, 70f), Random.Range(0.5f, 4f), Random.Range(-70f, 70f)), "HiddenCache", 30f, new Color(0.9f, 0.6f, 0.2f));
 

@@ -26,19 +26,19 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon4_SunscorchedOasis");
-            
+
             // Central oasis
             var oasis = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             oasis.name = "Oasis_Pool";
             oasis.transform.SetParent(parent.transform);
             oasis.transform.position = new Vector3(0f, 0.1f, 0f);
             oasis.transform.localScale = new Vector3(20f, 0.1f, 20f);
-            
+
             // 3 Desert temples
             CreateTemple(parent, new Vector3(-50f, 0f, -50f), "North Temple");
             CreateTemple(parent, new Vector3(50f, 0f, -50f), "East Temple");
             CreateTemple(parent, new Vector3(0f, 0f, 50f), "South Temple");
-            
+
             // Sand dunes
             for (int i = 0; i < 30; i++)
             {

@@ -26,26 +26,26 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon5_FrostboundCitadel");
-            
+
             // Central keep
             var keep = GameObject.CreatePrimitive(PrimitiveType.Cube);
             keep.name = "Central_Keep";
             keep.transform.SetParent(parent.transform);
             keep.transform.position = new Vector3(0f, 20f, 0f);
             keep.transform.localScale = new Vector3(30f, 40f, 30f);
-            
+
             // 4 Corner towers
             CreateTower(parent, new Vector3(-40f, 0f, -40f));
             CreateTower(parent, new Vector3(40f, 0f, -40f));
             CreateTower(parent, new Vector3(-40f, 0f, 40f));
             CreateTower(parent, new Vector3(40f, 0f, 40f));
-            
+
             // Ice walls
             CreateWall(parent, new Vector3(0f, 8f, 60f), new Vector3(120f, 16f, 2f));
             CreateWall(parent, new Vector3(0f, 8f, -60f), new Vector3(120f, 16f, 2f));
             CreateWall(parent, new Vector3(60f, 8f, 0f), new Vector3(2f, 16f, 120f));
             CreateWall(parent, new Vector3(-60f, 8f, 0f), new Vector3(2f, 16f, 120f));
-            
+
             // Ice spikes
             for (int i = 0; i < 40; i++)
             {

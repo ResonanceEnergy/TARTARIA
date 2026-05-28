@@ -26,14 +26,14 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon7_AbyssalDepths");
-            
+
             // Main temple dome
             var dome = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             dome.name = "Temple_Dome";
             dome.transform.SetParent(parent.transform);
             dome.transform.position = new Vector3(0f, -20f, 0f);
             dome.transform.localScale = new Vector3(60f, 60f, 60f);
-            
+
             // 5 Pressure chambers (vertical stack)
             for (int i = 0; i < 5; i++)
             {
@@ -43,7 +43,7 @@ namespace Tartaria.Integration
                 chamber.transform.position = new Vector3(0f, -40f - (i * 15f), 0f);
                 chamber.transform.localScale = new Vector3(25f, 7f, 25f);
             }
-            
+
             // Coral formations
             for (int i = 0; i < 30; i++)
             {
@@ -54,7 +54,7 @@ namespace Tartaria.Integration
                 coral.transform.localScale = new Vector3(Random.Range(2f, 5f), Random.Range(3f, 8f), Random.Range(2f, 5f));
                 Destroy(coral.GetComponent<Collider>());
             }
-            
+
             // Pillar supports
             for (int i = 0; i < 8; i++)
             {

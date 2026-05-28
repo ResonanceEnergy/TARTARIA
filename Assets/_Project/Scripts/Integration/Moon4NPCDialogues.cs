@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -24,13 +25,13 @@ namespace Tartaria.Integration
             CreateHelper("Helper_Desert", new Vector3(0f, 0.5f, 0f), new string[] { "Need help? Follow the markers.", "Check your map." });
             Debug.Log($"💬 Moon4NPCDialogues: {npcs.Count} NPCs spawned");
         }
-        GameObject CreateQuestGiver(string name, Vector3 pos, string questId, string[] dialogue) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<DialogueNPC>(); npc.npcName = name; npc.npcType = "questGiver"; npc.dialogueLines = dialogue; npc.questId = questId; npcs.Add(obj); return obj; }
-        GameObject CreateMerchant(string name, Vector3 pos, string shopId, string[] dialogue) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<DialogueNPC>(); npc.npcName = name; npc.npcType = "merchant"; npc.dialogueLines = dialogue; npc.shopId = shopId; npcs.Add(obj); return obj; }
-        GameObject CreateLoreNPC(string name, Vector3 pos, string[] loreDialogue) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<DialogueNPC>(); npc.npcName = name; npc.npcType = "lore"; npc.dialogueLines = loreDialogue; npcs.Add(obj); return obj; }
-        GameObject CreateHelper(string name, Vector3 pos, string[] hints) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<DialogueNPC>(); npc.npcName = name; npc.npcType = "helper"; npc.dialogueLines = hints; npcs.Add(obj); return obj; }
+        GameObject CreateQuestGiver(string name, Vector3 pos, string questId, string[] dialogue) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<Moon4DialogueNPC>(); npc.npcName = name; npc.npcType = "questGiver"; npc.dialogueLines = dialogue; npc.questId = questId; npcs.Add(obj); return obj; }
+        GameObject CreateMerchant(string name, Vector3 pos, string shopId, string[] dialogue) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<Moon4DialogueNPC>(); npc.npcName = name; npc.npcType = "merchant"; npc.dialogueLines = dialogue; npc.shopId = shopId; npcs.Add(obj); return obj; }
+        GameObject CreateLoreNPC(string name, Vector3 pos, string[] loreDialogue) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<Moon4DialogueNPC>(); npc.npcName = name; npc.npcType = "lore"; npc.dialogueLines = loreDialogue; npcs.Add(obj); return obj; }
+        GameObject CreateHelper(string name, Vector3 pos, string[] hints) { GameObject obj = GameObject.CreatePrimitive(PrimitiveType.Capsule); obj.name = name; obj.transform.position = pos; obj.transform.localScale = new Vector3(1f, 2f, 1f); var npc = obj.AddComponent<Moon4DialogueNPC>(); npc.npcName = name; npc.npcType = "helper"; npc.dialogueLines = hints; npcs.Add(obj); return obj; }
         void OnDestroy() { foreach (var npc in npcs) if (npc != null) Destroy(npc); npcs.Clear(); }
     }
-    public class DialogueNPC : MonoBehaviour, IInteractable
+    public class Moon4DialogueNPC : MonoBehaviour, IInteractable
     {
         public string npcName;
         public string[] dialogueLines;

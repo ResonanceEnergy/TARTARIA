@@ -117,7 +117,7 @@ namespace Tartaria.Integration
             if (isExcavated) return;
 
             isExcavated = true;
-            
+
             // Hide mud mound
             if (mudMoundVisual != null)
             {
@@ -125,7 +125,7 @@ namespace Tartaria.Integration
             }
 
             Debug.Log($"[ExcavationSiteMarker] {siteId} excavated!");
-            
+
             // Notify ExcavationSystem
             if (ExcavationSystem.Instance != null)
             {

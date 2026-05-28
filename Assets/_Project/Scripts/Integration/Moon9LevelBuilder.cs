@@ -26,14 +26,14 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon9_BlightedWastes");
-            
+
             // Central corruption nexus
             var nexus = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             nexus.name = "Corruption_Nexus";
             nexus.transform.SetParent(parent.transform);
             nexus.transform.position = new Vector3(0f, 10f, 0f);
             nexus.transform.localScale = new Vector3(25f, 25f, 25f);
-            
+
             // Twisted spires (5)
             for (int i = 0; i < 5; i++)
             {
@@ -46,7 +46,7 @@ namespace Tartaria.Integration
                 spire.transform.localScale = new Vector3(6f, 20f, 6f);
                 spire.transform.Rotate(Random.Range(-15f, 15f), 0f, Random.Range(-15f, 15f)); // Tilt
             }
-            
+
             // Corrupted monoliths (12)
             for (int i = 0; i < 12; i++)
             {
@@ -59,7 +59,7 @@ namespace Tartaria.Integration
                 monolith.transform.localScale = new Vector3(3f, 16f, 3f);
                 monolith.transform.Rotate(0f, Random.Range(0f, 360f), Random.Range(-10f, 10f));
             }
-            
+
             // Blight craters
             for (int i = 0; i < 20; i++)
             {

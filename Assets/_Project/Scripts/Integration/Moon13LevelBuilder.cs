@@ -30,35 +30,35 @@ namespace Tartaria.Integration
             Debug.Log("═══════════════════════════════════════════════════════════════");
 
             var parent = new GameObject("Moon13_AetherConvergence");
-            
+
             // Central Aether Core - massive sphere
             var core = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             core.name = "Aether_Core";
             core.transform.SetParent(parent.transform);
             core.transform.position = new Vector3(0f, 50f, 0f);
             core.transform.localScale = new Vector3(60f, 60f, 60f);
-            
+
             // 12 Tribute platforms (one for each previous moon) in dodecahedron arrangement
             Create12TributePlatforms(parent);
-            
+
             // Golden spiral of ascending platforms
             CreateSpiralPath(parent, 50);
-            
+
             // 3 Concentric rings of pillars (past, present, future)
             CreatePillarRing(parent, 60f, 24, "Inner Ring");
             CreatePillarRing(parent, 100f, 36, "Middle Ring");
             CreatePillarRing(parent, 140f, 48, "Outer Ring");
-            
+
             // Final altar at the peak
             var altar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
             altar.name = "Final_Altar";
             altar.transform.SetParent(parent.transform);
             altar.transform.position = new Vector3(0f, 100f, 0f);
             altar.transform.localScale = new Vector3(20f, 5f, 20f);
-            
+
             // Energy conduits connecting all 12 platforms to core
             CreateEnergyConduits(parent);
-            
+
             // Floating aether shards (100)
             for (int i = 0; i < 100; i++)
             {
@@ -120,7 +120,7 @@ namespace Tartaria.Integration
                 platform.transform.SetParent(parent.transform);
                 platform.transform.position = positions[i] + new Vector3(0f, 30f, 0f);
                 platform.transform.localScale = new Vector3(15f, 2f, 15f);
-                
+
                 // Memorial obelisk on each platform
                 var obelisk = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 obelisk.name = "Memorial_Obelisk";
@@ -141,9 +141,9 @@ namespace Tartaria.Integration
                 float angle = t * Mathf.PI * 8f; // 4 full rotations
                 float radius = 20f + (t * 70f); // Expanding spiral
                 float height = t * 80f; // Rising from 0 to 80m
-                
+
                 Vector3 pos = Quaternion.Euler(0f, angle * Mathf.Rad2Deg, 0f) * new Vector3(radius, height, 0f);
-                
+
                 var step = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 step.name = $"Spiral_Step_{i:D2}";
                 step.transform.SetParent(spiralParent.transform);
@@ -162,7 +162,7 @@ namespace Tartaria.Integration
             {
                 float angle = i * (360f / count);
                 Vector3 pos = Quaternion.Euler(0f, angle, 0f) * new Vector3(radius, 0f, 0f);
-                
+
                 var pillar = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                 pillar.name = "Pillar";
                 pillar.transform.SetParent(ring.transform);
@@ -185,16 +185,16 @@ namespace Tartaria.Integration
                     var conduit = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
                     conduit.name = "Energy_Conduit";
                     conduit.transform.SetParent(conduitParent.transform);
-                    
+
                     Vector3 start = platform.position;
                     Vector3 end = new Vector3(0f, 50f, 0f); // Aether Core position
-                    
+
                     conduit.transform.position = (start + end) / 2f;
                     float length = Vector3.Distance(start, end);
                     conduit.transform.localScale = new Vector3(0.5f, length / 2f, 0.5f);
                     conduit.transform.LookAt(end);
                     conduit.transform.Rotate(90f, 0f, 0f);
-                    
+
                     Destroy(conduit.GetComponent<Collider>());
                 }
             }

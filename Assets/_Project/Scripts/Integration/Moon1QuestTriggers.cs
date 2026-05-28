@@ -35,15 +35,15 @@ namespace Tartaria.Integration
             triggerParent.transform.position = Vector3.zero;
 
             // Milo introduction trigger
-            CreateTriggerZone(triggerParent, "Milo_Quest_Trigger", miloZoneCenter, triggerRadius, 
+            CreateTriggerZone(triggerParent, "Milo_Quest_Trigger", miloZoneCenter, triggerRadius,
                 () => ActivateMiloQuest());
 
             // Cathedral discovery trigger
-            CreateTriggerZone(triggerParent, "Cathedral_Quest_Trigger", cathedralZoneCenter, triggerRadius, 
+            CreateTriggerZone(triggerParent, "Cathedral_Quest_Trigger", cathedralZoneCenter, triggerRadius,
                 () => ActivateCathedralQuest());
 
             // Spire activation trigger
-            CreateTriggerZone(triggerParent, "Spire_Quest_Trigger", spireZoneCenter, triggerRadius, 
+            CreateTriggerZone(triggerParent, "Spire_Quest_Trigger", spireZoneCenter, triggerRadius,
                 () => ActivateSpireQuest());
 
             Debug.Log("[Moon1QuestTriggers] ✅ 3 quest triggers created");
@@ -71,7 +71,7 @@ namespace Tartaria.Integration
         void ActivateMiloQuest()
         {
             Debug.Log("[Moon1QuestTriggers] Activating Milo quest...");
-            
+
             if (QuestSystem.Instance != null)
             {
                 QuestSystem.Instance.ActivateQuest(miloQuestId);
@@ -84,7 +84,7 @@ namespace Tartaria.Integration
         void ActivateCathedralQuest()
         {
             Debug.Log("[Moon1QuestTriggers] Activating Cathedral excavation quest...");
-            
+
             if (QuestSystem.Instance != null)
             {
                 QuestSystem.Instance.ActivateQuest(excavationQuestId);
@@ -96,7 +96,7 @@ namespace Tartaria.Integration
         void ActivateSpireQuest()
         {
             Debug.Log("[Moon1QuestTriggers] Activating Spire quest...");
-            
+
             if (QuestSystem.Instance != null)
             {
                 // Complete shard collection objective when player reaches spire

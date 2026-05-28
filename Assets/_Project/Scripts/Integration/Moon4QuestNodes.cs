@@ -19,10 +19,10 @@ namespace Tartaria.Integration
         {
             for (int i = 0; i < questStartNodeCount; i++)
                 CreateQuestNode($"QuestStart_Moon4_{i}", new Vector3(Random.Range(-60f, 60f), 0.5f, Random.Range(-60f, 60f)), "QuestStart", $"moon4_quest_{i}");
-            
+
             for (int i = 0; i < questCompletionNodeCount; i++)
                 CreateQuestNode($"QuestComplete_Moon4_{i}", new Vector3(Random.Range(-60f, 60f), 0.5f, Random.Range(-60f, 60f)), "QuestComplete", $"moon4_quest_{i}");
-            
+
             for (int i = 0; i < objectiveMarkerCount; i++)
                 CreateQuestNode($"Objective_Moon4_{i}", new Vector3(Random.Range(-60f, 60f), 0.5f, Random.Range(-60f, 60f)), "Objective", $"moon4_objective_{i}");
 

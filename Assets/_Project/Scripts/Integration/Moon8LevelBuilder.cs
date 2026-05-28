@@ -27,7 +27,7 @@ namespace Tartaria.Integration
 
             var parent = new GameObject("Moon8_CelestialSpires");
             parent.transform.position = skyCenter;
-            
+
             // Central spire island
             CreateIsland(parent, Vector3.zero, 40f, "Central_Spire");
             var spire = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
@@ -35,14 +35,14 @@ namespace Tartaria.Integration
             spire.transform.SetParent(parent.transform);
             spire.transform.localPosition = new Vector3(0f, 20f, 0f);
             spire.transform.localScale = new Vector3(8f, 40f, 8f);
-            
+
             // 6 Floating islands in hexagon
             for (int i = 0; i < 6; i++)
             {
                 float angle = i * 60f;
                 Vector3 offset = Quaternion.Euler(0f, angle, 0f) * new Vector3(islandSpread, Random.Range(-20f, 20f), 0f);
                 CreateIsland(parent, offset, Random.Range(20f, 35f), $"Island_{i + 1}");
-                
+
                 // Small temple on each island
                 var temple = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 temple.name = "Sky_Temple";
@@ -50,7 +50,7 @@ namespace Tartaria.Integration
                 temple.transform.localPosition = offset + Vector3.up * 5f;
                 temple.transform.localScale = new Vector3(12f, 10f, 12f);
             }
-            
+
             // Wind bridges (visual only)
             for (int i = 0; i < 6; i++)
             {

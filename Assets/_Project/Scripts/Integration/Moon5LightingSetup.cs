@@ -39,7 +39,7 @@ namespace Tartaria.Integration
             RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat;
             RenderSettings.ambientLight = ambientColor;
             RenderSettings.ambientIntensity = 0.5f;
-            
+
             // Frost fog
             RenderSettings.fog = true;
             RenderSettings.fogMode = FogMode.ExponentialSquared;
@@ -51,11 +51,11 @@ namespace Tartaria.Integration
             {
                 float angle = i * 30f;
                 Vector3 pos = Quaternion.Euler(0f, angle, 0f) * new Vector3(55f, 8f, 0f);
-                
+
                 var crystalLight = new GameObject($"Ice_Crystal_Light_{i}");
                 crystalLight.transform.SetParent(transform);
                 crystalLight.transform.position = pos;
-                
+
                 var light = crystalLight.AddComponent<Light>();
                 light.type = LightType.Point;
                 light.color = new Color(0.6f, 0.8f, 1f); // Cyan ice glow
@@ -69,11 +69,11 @@ namespace Tartaria.Integration
             {
                 float angle = i * 90f + 45f;
                 Vector3 pos = Quaternion.Euler(0f, angle, 0f) * new Vector3(60f, 20f, 0f);
-                
+
                 var beacon = new GameObject($"Tower_Beacon_{i}");
                 beacon.transform.SetParent(transform);
                 beacon.transform.position = pos;
-                
+
                 var light = beacon.AddComponent<Light>();
                 light.type = LightType.Spot;
                 light.color = new Color(0.5f, 0.7f, 1f); // Cold beacon
