@@ -3618,5 +3618,27 @@ namespace Tartaria.Integration
             QueueRSReward(amount, "manual_award");
             Debug.Log($"[GameLoop] Awarded {amount:F1} RS");
         }
+
+        /// <summary>
+        /// Sets RS to a specific value (used by SaveLoadSystem when loading saves).
+        /// </summary>
+        public void SetRS(float value)
+        {
+            if (!_ecsReady)
+            {
+                Debug.LogWarning("[GameLoop] SetRS called before ECS ready — value will be lost");
+                return;
+            }
+
+            // Set RS component value directly
+            if (_em.HasComponent<ResonanceShardComponent>(_rsEntity))
+            {
+                var rs = _em.GetComponentData<ResonanceShardComponent>(_rsEntity);
+                rs.Value = value;
+                _em.SetComponentData(_rsEntity, rs);
+                _lastRS = value;
+                Debug.Log($"[GameLoop] SetRS({value})");
+            }
+        }
     }
 }

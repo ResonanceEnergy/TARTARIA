@@ -3,6 +3,7 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using Tartaria.Core;
 using Tartaria.Integration;
+using Tartaria.Gameplay;
 
 namespace Tartaria.Integration
 {

@@ -2,8 +2,9 @@ using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Integration;
+using Tartaria.UI;
 
-namespace Tartaria.Gameplay
+namespace Tartaria.Integration
 {
     /// <summary>
     /// PlayerAbilities - Complete combat ability system.

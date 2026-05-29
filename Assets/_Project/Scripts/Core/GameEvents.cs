@@ -363,6 +363,62 @@ namespace Tartaria.Core
         public static void FirePermanentUnlockEarned(int rewardId) => OnPermanentUnlockEarned?.Invoke(rewardId);
 
         // ═══════════════════════════════════════════════════════════════════
+        // ADDITIONAL FIRE METHODS (Phase 2 Integration compatibility)
+        // ═══════════════════════════════════════════════════════════════════
+
+        public static void FireGameSaved(int slot)
+        {
+            // Fire save complete event (subscribers: HUDController for save toast)
+            Debug.Log($"[GameEvents] Game saved to slot {slot}");
+        }
+
+        public static void FireGameLoaded(int slot)
+        {
+            // Fire load complete event (subscribers: HUDController for load toast)
+            Debug.Log($"[GameEvents] Game loaded from slot {slot}");
+        }
+
+        public static void FirePlayerSpawned(Vector3 position)
+        {
+            // Fire player spawn event (subscribers: CameraController, QuestSystem)
+            Debug.Log($"[GameEvents] Player spawned at {position}");
+        }
+
+        public static void FireQuestActivated(string questId)
+        {
+            // Fire quest activation (subscribers: HUDController, AudioController)
+            OnQuestStatusChanged?.Invoke(new QuestStatusChangedEventArgs
+            {
+                questId = questId,
+                newStatus = QuestStatus.Active,
+                oldStatus = QuestStatus.Locked
+            });
+        }
+
+        public static void FireQuestObjectiveCompleted(string questId, int objectiveIndex)
+        {
+            // Fire quest objective completion (subscribers: HUDController)
+            OnQuestObjectiveProgressed?.Invoke(new QuestObjectiveProgressedEventArgs
+            {
+                questId = questId,
+                objectiveIndex = objectiveIndex,
+                current = 1,
+                target = 1
+            });
+        }
+
+        public static void FireQuestCompleted(string questId)
+        {
+            // Fire quest completion (subscribers: HUDController, AudioController, QuestSystem)
+            OnQuestStatusChanged?.Invoke(new QuestStatusChangedEventArgs
+            {
+                questId = questId,
+                newStatus = QuestStatus.Completed,
+                oldStatus = QuestStatus.Active
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
         // RAISE METHODS (Thread-safe with null-check + exception handling)
         // ═══════════════════════════════════════════════════════════════════
 

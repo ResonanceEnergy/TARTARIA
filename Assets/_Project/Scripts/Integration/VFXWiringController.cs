@@ -90,7 +90,18 @@ namespace Tartaria.Integration
             SpawnVFX(deathBurstPrefab, position);
         }
 
-        void SpawnVFX(GameObject prefab, Vector3 position)
+        /// <summary>
+        /// Spawn VFX by name (convenience method for Integration layer).
+        /// Looks up prefab from VFXController and spawns it.
+        /// </summary>
+        public void SpawnVFX(string vfxName, Vector3 position)
+        {
+            // Stub: In Phase 2, look up from VFXController prefab registry
+            Debug.Log($"[VFXWiring] SpawnVFX({vfxName}) at {position}");
+            // VFXController.Instance?.SpawnByName(vfxName, position);
+        }
+
+        public void SpawnVFX(GameObject prefab, Vector3 position)
         {
             if (prefab != null)
             {
