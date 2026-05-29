@@ -1,179 +1,14 @@
-using System;
+﻿using System;
 using UnityEngine;
 using QuestStatus = Tartaria.Core.Enums.QuestStatus;
 
 namespace Tartaria.Core
 {
     /// <summary>
-    /// Centralized Game Events System — decouples cross-assembly communication.
-    /// Reduces direct Instance?.Method() calls that create tight coupling.
     /// All events are thread-safe with null-check before invoke.
-    ///
-    /// USAGE:
-    ///   Subscribe: GameEvents.OnEnemyKilled += HandleEnemyKilled;
-    ///   Unsubscribe: GameEvents.OnEnemyKilled -= HandleEnemyKilled; (in OnDestroy!)
-    ///   Raise: GameEvents.RaiseEnemyKilled(new EnemyKilledEventArgs { enemyType = "golem", xpReward = 50 
-    // ====================================
-    // NEW EVENTS FOR BUILT SYSTEMS (2025)
-    // ====================================
-
-    // Player Spawned
-    public static event System.Action<GameObject> OnPlayerSpawned;
-    public static void FirePlayerSpawned(GameObject player) => OnPlayerSpawned?.Invoke(player);
-
-    // Resonance Score Changed
-    public static event System.Action<float> OnResonanceScoreChanged;
-    public static void FireResonanceScoreChanged(float rsValue) => OnResonanceScoreChanged?.Invoke(rsValue);
-
-    // Player Health Changed
-    public static event System.Action<float, float> OnPlayerHealthChanged;
-    public static void FirePlayerHealthChanged(float current, float max) => OnPlayerHealthChanged?.Invoke(current, max);
-
-    // Aether Energy Changed
-    public static event System.Action<float> OnAetherEnergyChanged;
-    public static void FireAetherEnergyChanged(float value) => OnAetherEnergyChanged?.Invoke(value);
-
-    // Inventory Changed
-    public static event System.Action OnInventoryChanged;
-    public static void FireInventoryChanged() => OnInventoryChanged?.Invoke();
-
-    // Quest Events
-    public static event System.Action<string> OnQuestActivated;
-    public static void FireQuestActivated(string questId) => OnQuestActivated?.Invoke(questId);
-
-    public static event System.Action<string, int> OnQuestObjectiveCompleted;
-    public static void FireQuestObjectiveCompleted(string questId, int objectiveIndex) => OnQuestObjectiveCompleted?.Invoke(questId, objectiveIndex);
-
-    public static event System.Action<string> OnQuestCompleted;
-    public static void FireQuestCompleted(string questId) => OnQuestCompleted?.Invoke(questId);
-});
-    ///
-    /// MEMORY SAFETY:
-    ///   Always unsubscribe in OnDestroy to prevent memory leaks.
-    ///   Example:
-    ///     void OnDestroy() { GameEvents.OnEnemyKilled -= HandleEnemyKilled; 
-    // ====================================
-    // NEW EVENTS FOR BUILT SYSTEMS (2025)
-    // ====================================
-
-    // Player Spawned
-    public static event System.Action<GameObject> OnPlayerSpawned;
-    public static void FirePlayerSpawned(GameObject player) => OnPlayerSpawned?.Invoke(player);
-
-    // Resonance Score Changed
-    public static event System.Action<float> OnResonanceScoreChanged;
-    public static void FireResonanceScoreChanged(float rsValue) => OnResonanceScoreChanged?.Invoke(rsValue);
-
-    // Player Health Changed
-    public static event System.Action<float, float> OnPlayerHealthChanged;
-    public static void FirePlayerHealthChanged(float current, float max) => OnPlayerHealthChanged?.Invoke(current, max);
-
-    // Aether Energy Changed
-    public static event System.Action<float> OnAetherEnergyChanged;
-    public static void FireAetherEnergyChanged(float value) => OnAetherEnergyChanged?.Invoke(value);
-
-    // Inventory Changed
-    public static event System.Action OnInventoryChanged;
-    public static void FireInventoryChanged() => OnInventoryChanged?.Invoke();
-
-    // Quest Events
-    public static event System.Action<string> OnQuestActivated;
-    public static void FireQuestActivated(string questId) => OnQuestActivated?.Invoke(questId);
-
-    public static event System.Action<string, int> OnQuestObjectiveCompleted;
-    public static void FireQuestObjectiveCompleted(string questId, int objectiveIndex) => OnQuestObjectiveCompleted?.Invoke(questId, objectiveIndex);
-
-    public static event System.Action<string> OnQuestCompleted;
-    public static void FireQuestCompleted(string questId) => OnQuestCompleted?.Invoke(questId);
-}
     /// </summary>
     public static class GameEvents
     {
-        // ═══════════════════════════════════════════════════════════════════
-        // INPUT & UI CONTROL EVENTS (Legacy — preserved for backward compat)
-        // ═══════════════════════════════════════════════════════════════════
-
-        public static event Action OnToggleAetherVision;
-        public static event Action OnTogglePause;
-        public static event Action<string, float> OnRequestPurgeCorruption;
-        public static event Action OnRequestActivateRSBuff;
-
-        public static void FireToggleAetherVision() => OnToggleAetherVision?.Invoke();
-        public static void FireTogglePause() => OnTogglePause?.Invoke();
-        public static void FireRequestPurgeCorruption(string buildingId, float amount) => OnRequestPurgeCorruption?.Invoke(buildingId, amount);
-        public static void FireRequestActivateRSBuff() => OnRequestActivateRSBuff?.Invoke();
-
-        // ═══════════════════════════════════════════════════════════════════
-        // BUILDING RESTORATION EVENTS (Enhanced with typed EventArgs)
-        // ═══════════════════════════════════════════════════════════════════
-
-        /// <summary>
-        /// Raised when a Tartarian building completes restoration (tuning complete).
-        /// Subscribers: QuestManager (quest progress), HUDController (UI feedback),
-        ///              GameLoopController (RS award), AudioController (SFX).
-        /// </summary>
-        public static event Action<BuildingRestoredEventArgs> OnBuildingRestoredTyped;
-
-        /// <summary>
-        /// Raised when player discovers a buried building (via ResonanceScanner proximity).
-        /// Subscribers: QuestManager (objective progress), HUDController (discovery tooltip).
-        /// </summary>
-        public static event Action<BuildingDiscoveredEventArgs> OnBuildingDiscoveredTyped;
-
-        // Legacy events for backward compat (deprecated, use typed versions)
-        public static event Action<string> OnBuildingRestored;   // buildingId
-        public static event Action<string, Vector3> OnBuildingDiscovered; // buildingName, position
-
-        public static void FireBuildingRestored(string buildingId) => OnBuildingRestored?.Invoke(buildingId);
-        public static void FireBuildingDiscovered(string buildingName, Vector3 position) => OnBuildingDiscovered?.Invoke(buildingName, position);
-
-        // ═══════════════════════════════════════════════════════════════════
-        // COMBAT EVENTS (New — reduces PlayerHealth/EnemyAI coupling)
-        // ═══════════════════════════════════════════════════════════════════
-
-        /// <summary>
-        /// Raised when any enemy is defeated.
-        /// Subscribers: PlayerProgression (XP award), QuestManager (kill count tracking),
-        ///              HUDController (kill feed), StatsTracker (analytics).
-        /// </summary>
-        public static event Action<EnemyKilledEventArgs> OnEnemyKilled;
-
-        /// <summary>
-        /// Raised when a boss enemy is defeated.
-        /// Subscribers: QuestManager (boss quest completion), HUDController (trophy UI),
-        ///              CinematicController (post-boss sequence), MoonProgressionSystem.
-        /// </summary>
-        public static event Action<BossDefeatedEventArgs> OnBossDefeated;
-
-        // ═══════════════════════════════════════════════════════════════════
-        // QUEST EVENTS (New — reduces QuestManager direct calls)
-        // ═══════════════════════════════════════════════════════════════════
-
-        /// <summary>
-        /// Raised when a quest is activated, completed, or failed.
-        /// Subscribers: HUDController (quest notification), AudioController (quest complete SFX),
-        ///              DialogueManager (trigger narrative beats), SaveManager (persist state).
-        /// </summary>
-        public static event Action<QuestStatusChangedEventArgs> OnQuestStatusChanged;
-
-        /// <summary>
-        /// Raised when quest objective progress updates (e.g., "Collect 5/10 shards").
-        /// Subscribers: HUDController (quest tracker UI), QuestLogUIPanel (live updates).
-        /// </summary>
-        public static event Action<QuestObjectiveProgressedEventArgs> OnQuestObjectiveProgressed;
-
-        // ═══════════════════════════════════════════════════════════════════
-        // PLAYER PROGRESSION EVENTS (New — reduces PlayerProgression coupling)
-        // ═══════════════════════════════════════════════════════════════════
-
-        /// <summary>
-        /// Raised when player gains a level.
-        /// Subscribers: HUDController (level-up notification), PlayerController (stat update),
-        ///              AudioController (level-up fanfare), AchievementSystem.
-        /// </summary>
-        public static event Action<LevelUpEventArgs> OnLevelUp;
-
-        /// <summary>
         /// Raised when player gains XP.
         /// Subscribers: HUDController (XP bar update), StatsTracker (analytics).
         /// </summary>
@@ -5802,4 +5637,5 @@ namespace Tartaria.Core
 
     public static event System.Action<string> OnQuestCompleted;
     public static void FireQuestCompleted(string questId) => OnQuestCompleted?.Invoke(questId);
+}
 }
