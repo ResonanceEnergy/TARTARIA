@@ -1,7 +1,8 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 using Tartaria.Core;
 
+#if UNITY_AI_NAVIGATION
 namespace Tartaria.Integration
 {
     /// <summary>
@@ -11,18 +12,18 @@ namespace Tartaria.Integration
     public class NavMeshBaker : MonoBehaviour
     {
         [Header("Bake Settings")]
-        [SerializeField] private NavMeshSurface navMeshSurface;
+        [SerializeField] private /*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package /*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package;
         [SerializeField] private bool bakeOnStart = true;
         [SerializeField] private LayerMask walkableLayers;
 
         void Start()
         {
-            if (navMeshSurface == null)
+            if (/*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package == null)
             {
-                navMeshSurface = GetComponent<NavMeshSurface>();
-                if (navMeshSurface == null)
+                /*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package = GetComponent</*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package>();
+                if (/*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package == null)
                 {
-                    navMeshSurface = gameObject.AddComponent<NavMeshSurface>();
+                    /*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package = gameObject.AddComponent</*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package>();
                 }
             }
 
@@ -34,11 +35,12 @@ namespace Tartaria.Integration
 
         public void BakeNavMesh()
         {
-            if (navMeshSurface != null)
+            if (/*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package != null)
             {
-                navMeshSurface.BuildNavMesh();
+                /*NavMeshSurface*/ MonoBehaviour // TODO: Install AI Navigation package.BuildNavMesh();
                 Debug.Log("[NavMeshBaker] ✅ NavMesh baked successfully!");
             }
         }
     }
 }
+#endif // UNITY_AI_NAVIGATION

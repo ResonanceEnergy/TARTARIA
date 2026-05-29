@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Input;
 using Tartaria.Gameplay;
@@ -40,7 +40,7 @@ namespace Tartaria.Integration
         int _nodesCompleted;
         float[] _nodeAccuracies = new float[3];
         bool _isDiscovered;
-        TuningMiniGameController _tuningController;
+        TuningMiniGame _tuningController;
         static readonly int DissolveProgressId = Shader.PropertyToID("_DissolveProgress");
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         static readonly int ColorId = Shader.PropertyToID("_Color");
@@ -84,9 +84,9 @@ namespace Tartaria.Integration
             _mpb = new MaterialPropertyBlock();
 
             // Find or create tuning controller
-            _tuningController = GetComponent<TuningMiniGameController>();
+            _tuningController = GetComponent<TuningMiniGame>();
             if (_tuningController == null)
-                _tuningController = gameObject.AddComponent<TuningMiniGameController>();
+                _tuningController = gameObject.AddComponent<TuningMiniGame>();
 
             _tuningController.OnTuningComplete += OnTuningComplete;
             _tuningController.OnTuningFailed += OnTuningFailed;
@@ -374,7 +374,7 @@ namespace Tartaria.Integration
             _nodeAccuracies[_nodesCompleted] = accuracy;
             _nodesCompleted++;
 
-            string tier = TuningMiniGameController.GetAccuracyTier(accuracy);
+            string tier = TuningMiniGame.GetAccuracyTier(accuracy);
             Debug.Log($"[Building] {GetDisplayName()} node {_nodesCompleted}/3 complete — {tier} ({accuracy:P0})");
             AudioManager.Instance?.PlaySFX("TuneSuccess", transform.position);
             Input.HapticFeedbackManager.Instance?.PlayTuningCorrectHit(accuracy >= 0.99f, accuracy);
