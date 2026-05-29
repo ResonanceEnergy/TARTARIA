@@ -124,7 +124,7 @@ namespace Tartaria.Integration
     }
 
     [System.Serializable]
-    public class SaveData
+    public class SaveDataLegacy
     {
         public Vector3 playerPosition;
         public float playerHealth;

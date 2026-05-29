@@ -10,6 +10,13 @@ namespace Tartaria.Integration
     /// </summary>
     public class PostProcessingSetup : MonoBehaviour
     {
+        public static PostProcessingSetup Instance { get; private set; }
+
+        void Awake()
+        {
+            if (Instance == null) Instance = this;
+            else if (Instance != this) Destroy(gameObject);
+        }
         [Header("Post-Processing Settings")]
         [SerializeField] private Volume globalVolume;
         [SerializeField] private VolumeProfile profile;

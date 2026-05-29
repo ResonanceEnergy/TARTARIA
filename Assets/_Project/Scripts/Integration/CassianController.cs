@@ -136,7 +136,7 @@ namespace Tartaria.Integration
             hasTaughtBasicCombat = true;
 
             // Grant player combat abilities
-            PlayerAbilities.Instance?.UnlockAbility("HarmonicStrike");
+            PlayerAbilitiesComplete.Instance?.UnlockAbility("HarmonicStrike");
         }
 
         public void TeachAdvancedCombat()
@@ -151,7 +151,7 @@ namespace Tartaria.Integration
             Say("Harmonic combos multiply damage. Chain your strikes.");
             hasTaughtAdvancedCombat = true;
 
-            PlayerAbilities.Instance?.UnlockAbility("HarmonicCombo");
+            PlayerAbilitiesComplete.Instance?.UnlockAbility("HarmonicCombo");
         }
 
         public void RevealDarkSecret()

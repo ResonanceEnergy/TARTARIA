@@ -17,7 +17,17 @@ namespace Tartaria.Integration
         Combat,
         Inventory,
         CompanionDialogue,
-        Complete
+        Complete,
+        // Phase 2 tutorial steps
+        Discovery,
+        HarmonicStrike,
+        ResonancePulse,
+        FrequencyShield,
+        WorkshopUpgrade,
+        BuildingRestore,
+        FirstCombat,
+        CombatComplete,
+        Tuning
     }
 
     /// <summary>

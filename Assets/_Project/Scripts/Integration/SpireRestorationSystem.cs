@@ -20,7 +20,7 @@ namespace Tartaria.Integration
             {
                 isRestored = true;
                 GameEvents.FireBuildingRestored(buildingId);
-                GameLoopController.Instance?.AwardRS(75f, "Spire Restoration");
+                GameLoopController.Instance?.AwardRS(75f);
                 Debug.Log("[SpireRestoration] ✅ COMPLETE!");
             }
         }
