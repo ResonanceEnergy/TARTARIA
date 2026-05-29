@@ -6,6 +6,21 @@ using Tartaria.Core;
 namespace Tartaria.Integration
 {
     /// <summary>
+    /// Tutorial step identifiers for programmatic tutorial completion.
+    /// </summary>
+    public enum TutorialStep
+    {
+        Welcome,
+        Movement,
+        Scanning,
+        BuildingTuning,
+        Combat,
+        Inventory,
+        CompanionDialogue,
+        Complete
+    }
+
+    /// <summary>
     /// TutorialSystem - Progressive tutorial system.
     /// Guides new players through core mechanics.
     /// </summary>
@@ -81,7 +96,35 @@ namespace Tartaria.Integration
             tutorialActive = false;
             HUDController.Instance?.ShowBanner("TUTORIAL COMPLETE!", "You are ready to explore!");
             Debug.Log("[Tutorial] ✅ Tutorial complete!");
+            OnTutorialComplete?.Invoke();
         }
+
+        /// <summary>
+        /// Force-complete a tutorial step (for debugging/testing).
+        /// </summary>
+        public void ForceComplete(TutorialStep step)
+        {
+            // TODO Phase 2: Implement step-by-step tutorial tracking
+            Debug.Log($"[Tutorial] Force-completed: {step}");
+            completedSteps.Add(step.ToString());
+        }
+
+        /// <summary>
+        /// Reset tutorial to beginning.
+        /// </summary>
+        public void ResetTutorial()
+        {
+            // TODO Phase 2: Implement tutorial reset
+            Debug.Log("[Tutorial] Tutorial reset");
+            currentStep = 0;
+            completedSteps.Clear();
+            tutorialActive = false;
+        }
+
+        /// <summary>
+        /// Event raised when entire tutorial is completed.
+        /// </summary>
+        public event System.Action OnTutorialComplete;
 
         public bool IsTutorialActive() => tutorialActive;
     }
