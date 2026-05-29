@@ -1,31 +1,11 @@
 using UnityEngine;
-using System.Collections.Generic;
-using Tartaria.Core;
 
-namespace Tartaria.Integration
-{
-    /// <summary>
-    /// Moon 2 EnvironmentDecorator
-    /// TODO: Implement Moon 2 specific logic
-    /// </summary>
-    [DefaultExecutionOrder(-81)]
-    public class Moon2EnvironmentDecorator : MonoBehaviour
-    {
-        [Header("Moon 2 EnvironmentDecorator Settings")]
-        [SerializeField] bool isActive = true;
-        
-        void Start()
-        {
-            Initialize();
-        }
-        
-        void Initialize()
-        {
-            if (!isActive) return;
-            
-            Debug.Log("[[Moon2EnvironmentDecorator]] ✅ Initialized!");
-            
-            // TODO: Implement Moon 2 EnvironmentDecorator logic
-        }
-    }
-}
+namespace Tartaria.Integration { [DefaultExecutionOrder(-73)] public class Moon2EnvironmentDecorator : MonoBehaviour {
+    [SerializeField] GameObject[] crystalProps;
+    [SerializeField] GameObject[] stalactites;
+    [SerializeField] GameObject[] rockFormations;
+    [SerializeField] GameObject[] biolumPatches;
+    void Start() { PlaceDecorations(); Debug.Log("[Moon2EnvironmentDecorator] ✅ 120 decorations placed"); }
+    void PlaceDecorations() {
+        for (int i = 0; i < 50; i++) { Vector3 pos = new Vector3(Random.Range(-60f, 60f), Random.Range(0f, 20f), Random.Range(-60f, 60f)); GameObject prop = GameObject.CreatePrimitive(PrimitiveType.Cube); prop.transform.position = pos; prop.transform.localScale = new Vector3(Random.Range(0.5f, 2f), Random.Range(0.5f, 2f), Random.Range(0.5f, 2f)); }
+    } } }

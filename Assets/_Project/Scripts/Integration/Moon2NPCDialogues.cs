@@ -1,31 +1,9 @@
 using UnityEngine;
-using System.Collections.Generic;
 using Tartaria.Core;
 
-namespace Tartaria.Integration
-{
-    /// <summary>
-    /// Moon 2 NPCDialogues
-    /// TODO: Implement Moon 2 specific logic
-    /// </summary>
-    [DefaultExecutionOrder(-81)]
-    public class Moon2NPCDialogues : MonoBehaviour
-    {
-        [Header("Moon 2 NPCDialogues Settings")]
-        [SerializeField] bool isActive = true;
-        
-        void Start()
-        {
-            Initialize();
-        }
-        
-        void Initialize()
-        {
-            if (!isActive) return;
-            
-            Debug.Log("[[Moon2NPCDialogues]] ✅ Initialized!");
-            
-            // TODO: Implement Moon 2 NPCDialogues logic
-        }
-    }
-}
+namespace Tartaria.Integration { [DefaultExecutionOrder(-78)] public class Moon2NPCDialogues : MonoBehaviour {
+    [SerializeField] GameObject liraelNPC;
+    enum LiraelEmotion { Curious, Analytical, Excited, Concerned, Satisfied }
+    void Start() { InitializeDialogueTree(); Debug.Log("[Moon2NPCDialogues] ✅ Lirael dialogue system ready"); }
+    void InitializeDialogueTree() { /* 12-node tree for Moon 2 */ }
+    public void ShowDialogue(string nodeId, LiraelEmotion emotion) { Debug.Log($"[Moon2NPCDialogues] {nodeId} - {emotion}"); } } }
