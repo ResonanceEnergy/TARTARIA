@@ -87,7 +87,18 @@ namespace Tartaria.Integration
             PlaySFX(pickupClip, "Pickup", position);
         }
 
-        void PlaySFX(AudioClip clip, string fallbackName, Vector3? position = null)
+        /// <summary>
+        /// Play SFX by name (convenience method for Integration layer).
+        /// </summary>
+        public void PlaySFX(string sfxName, Vector3 position)
+        {
+            if (AudioManager.Instance != null)
+            {
+                AudioManager.Instance.PlaySFX3D(sfxName, position);
+            }
+        }
+
+        public void PlaySFX(AudioClip clip, string fallbackName, Vector3? position = null)
         {
             if (AudioManager.Instance != null)
             {

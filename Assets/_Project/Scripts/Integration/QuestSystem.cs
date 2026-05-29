@@ -150,5 +150,10 @@ namespace Tartaria.Integration
     {
         public string description;
         public bool completed;
+        
+        // Additional fields to match Core.QuestObjective for QuestDatabaseBuilder compatibility
+        public QuestObjectiveType type;
+        public string targetId;
+        public int targetCount = 1;
     }
 }
