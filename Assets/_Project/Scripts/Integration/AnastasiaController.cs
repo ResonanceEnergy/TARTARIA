@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Tartaria.Core;
 
 namespace Tartaria.Integration
@@ -9,12 +9,6 @@ namespace Tartaria.Integration
     /// </summary>
     public class AnastasiaController : MonoBehaviour
     {
-        public static AnastasiaController Instance { get; private set; }
-
-        [Header("Character Stats")]
-        [SerializeField] private string characterName = "Anastasia";
-        [SerializeField] private int researchLevel = 0; // 0-100
-        [SerializeField] private int lorePiecesDiscovered = 0;
 
         private readonly string[] INTRO_LINES = new[]
         {

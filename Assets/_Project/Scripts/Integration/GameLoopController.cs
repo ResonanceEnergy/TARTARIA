@@ -3192,7 +3192,7 @@ namespace Tartaria.Integration
 
         // ─── Anastasia Narrative Handlers ────────────
 
-                void HandleAnastasiaMode(AnastasiaMode oldMode, AnastasiaMode newMode)
+        void HandleAnastasiaMode(AnastasiaMode oldMode, AnastasiaMode newMode)
         {
             if (newMode == AnastasiaMode.Invisible)
             {

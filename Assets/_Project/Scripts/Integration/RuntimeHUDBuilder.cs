@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Tartaria.Core;
@@ -1385,8 +1385,8 @@ namespace Tartaria.Integration
             instrRT.offsetMin = Vector2.zero;
             instrRT.offsetMax = Vector2.zero;
 
-            // ─── Wire TuningMiniGameController ───────────────────────────
-            var tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGameController>();
+            // ─── Wire TuningMiniGame ───────────────────────────
+            var tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGame>();
             if (tuning != null)
             {
                 SetField(tuning, "overlayPanel", overlayGO);
@@ -2297,7 +2297,7 @@ namespace Tartaria.Integration
     }
 
     /// <summary>
-    /// Subscribes to TuningMiniGameController.OnFrequencyChanged and keeps the
+    /// Subscribes to TuningMiniGame.OnFrequencyChanged and keeps the
     /// radial dial needle + frequency text in sync at runtime.
     /// Added to the TuningOverlay GameObject by RuntimeHUDBuilder.
     /// </summary>
@@ -2309,7 +2309,7 @@ namespace Tartaria.Integration
         TextMeshProUGUI _accText;
         Image _accFill;
         Image _resonanceOrb;  // pulsing orb for clear/fun tuning (hold when bright = satisfying commit)
-        Tartaria.Gameplay.TuningMiniGameController _tuning;
+        Tartaria.Gameplay.TuningMiniGame _tuning;
         const float MaxFrequency = 864f; // targetFreq × 2
         float _orbBaseAlpha = 0.35f;
         float _pulsePhase;
@@ -2327,7 +2327,7 @@ namespace Tartaria.Integration
 
         void OnEnable()
         {
-            _tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGameController>();
+            _tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGame>();
             if (_tuning != null)
                 _tuning.OnFrequencyChanged += OnFrequencyChanged;
         }
@@ -2338,13 +2338,13 @@ namespace Tartaria.Integration
                 _tuning.OnFrequencyChanged -= OnFrequencyChanged;
         }
 
-        // Lazy-bind: TuningMiniGameController is created by InteractableBuilding.Awake()
+        // Lazy-bind: TuningMiniGame is created by InteractableBuilding.Awake()
         // which may run long after this overlay is built. Retry every frame until found.
         void Update()
         {
             if (_tuning == null)
             {
-                _tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGameController>();
+                _tuning = FindAnyObjectByType<Tartaria.Gameplay.TuningMiniGame>();
                 if (_tuning != null)
                     _tuning.OnFrequencyChanged += OnFrequencyChanged;
             }
