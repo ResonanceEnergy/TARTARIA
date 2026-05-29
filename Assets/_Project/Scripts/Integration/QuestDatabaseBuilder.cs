@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
+using QuestObjective = Tartaria.Core.QuestObjective;
 
 namespace Tartaria.Integration
 {
