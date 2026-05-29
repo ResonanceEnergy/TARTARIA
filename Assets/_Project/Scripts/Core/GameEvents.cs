@@ -419,6 +419,25 @@ namespace Tartaria.Core
         }
 
         // ═══════════════════════════════════════════════════════════════════
+        // PHASE 2 FIRE METHODS (Stub implementations for forward compatibility)
+        // ═══════════════════════════════════════════════════════════════════
+
+        public static void FireCollectibleGathered(string id, float rs) { Debug.Log($"[GameEvents/Stub] Collectible gathered: {id}, {rs} RS"); }
+        public static void FireAchievementUnlocked(string id) { Debug.Log($"[GameEvents/Stub] Achievement unlocked: {id}"); }
+        public static void FireCompanionTrustChanged(string companionName, int trust) { Debug.Log($"[GameEvents/Stub] {companionName} trust: {trust}"); }
+        public static void FireLeverPulled(string leverId) { Debug.Log($"[GameEvents/Stub] Lever pulled: {leverId}"); }
+        public static void FireMoonProgressUpdate(int moon, float progress) { Debug.Log($"[GameEvents/Stub] Moon {moon} progress: {progress}%"); }
+        public static void FirePlayerEnteredZone(string zone) { Debug.Log($"[GameEvents/Stub] Entered zone: {zone}"); }
+        public static void FireTutorialStep(int step) { Debug.Log($"[GameEvents/Stub] Tutorial step: {step}"); }
+        public static void FireTuningNodeActivated(string nodeId) { Debug.Log($"[GameEvents/Stub] Tuning node activated: {nodeId}"); }
+
+        // Phase 2 events (stubs - will be wired in Phase 2)
+        public static event Action<string, float> OnCollectibleGathered;
+        public static event Action OnCombatStarted;
+        public static event Action OnCombatEnded;
+        public static event Action<string> OnTuningNodeActivated;
+
+        // ═══════════════════════════════════════════════════════════════════
         // RAISE METHODS (Thread-safe with null-check + exception handling)
         // ═══════════════════════════════════════════════════════════════════
 

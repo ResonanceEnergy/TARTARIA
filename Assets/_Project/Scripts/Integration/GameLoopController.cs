@@ -3620,6 +3620,15 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
+        /// Award Resonance Score with source tracking (stub for Phase 2).
+        /// </summary>
+        public void AwardRS(float amount, string source)
+        {
+            QueueRSReward(amount, source);
+            Debug.Log($"[GameLoop] Awarded {amount:F1} RS from {source}");
+        }
+
+        /// <summary>
         /// Sets RS to a specific value (used by SaveLoadSystem when loading saves).
         /// </summary>
         public void SetRS(float value)

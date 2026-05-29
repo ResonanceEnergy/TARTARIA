@@ -207,14 +207,14 @@ namespace Tartaria.Integration
                     _unlocked.Add(id);
         }
 
-        void HandleBeforeSave(SaveData data)
+        public void HandleBeforeSave(SaveData data)
         {
             if (data.archive == null) data.archive = new ArchiveSaveBlock();
             data.archive.unlockedEntryIds = GetUnlockedIds();
             data.archive.cumulativeRS     = _cumulativeRS;
         }
 
-        void HandleAfterLoad(SaveData data)
+        public void HandleAfterLoad(SaveData data)
         {
             if (data.archive == null) return;
             RestoreFromSave(data.archive.unlockedEntryIds);
