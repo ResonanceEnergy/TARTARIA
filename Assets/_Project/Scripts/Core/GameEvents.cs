@@ -136,6 +136,18 @@ namespace Tartaria.Core
         /// </summary>
         public static event Action OnPlayerRespawned;
 
+        /// <summary>
+        /// Raised when player health changes (damage, healing, max health change).
+        /// Subscribers: HUDController (health bar update).
+        /// </summary>
+        public static event Action<float, float> OnPlayerHealthChanged; // currentHealth, maxHealth
+
+        /// <summary>
+        /// Raised when Aether energy changes.
+        /// Subscribers: HUDController (aether meter update).
+        /// </summary>
+        public static event Action<float> OnAetherEnergyChanged; // aetherValue (0-100)
+
         // ═══════════════════════════════════════════════════════════════════
         // INVENTORY EVENTS (New — reduces InventorySystem coupling)
         // ═══════════════════════════════════════════════════════════════════
@@ -299,6 +311,7 @@ namespace Tartaria.Core
         // ═══════════════════════════════════════════════════════════════════
 
         public static event Action<float> OnRSChanged;
+        public static event Action<float> OnResonanceScoreChanged { add => OnRSChanged += value; remove => OnRSChanged -= value; }
         public static void FireRSChange(float amount) => OnRSChanged?.Invoke(amount);
 
         // ═══════════════════════════════════════════════════════════════════
@@ -439,6 +452,18 @@ namespace Tartaria.Core
         {
             try { OnPlayerRespawned?.Invoke(); }
             catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnPlayerRespawned: {ex}"); }
+        }
+
+        public static void RaisePlayerHealthChanged(float currentHealth, float maxHealth)
+        {
+            try { OnPlayerHealthChanged?.Invoke(currentHealth, maxHealth); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnPlayerHealthChanged: {ex}"); }
+        }
+
+        public static void RaiseAetherEnergyChanged(float aetherValue)
+        {
+            try { OnAetherEnergyChanged?.Invoke(aetherValue); }
+            catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnAetherEnergyChanged: {ex}"); }
         }
 
         public static void RaiseMoonUnlocked(MoonUnlockedEventArgs args)
@@ -689,6 +714,20 @@ namespace Tartaria.Core
     /// Payload for player-facing save conflict UI (Phase 3 R5). Contains summary stats for "This Device vs Cloud" dialog.
     /// </summary>
     [Serializable]
+
+    public class CombatEventArgs
+    {
+        public string enemyType;
+        public Vector3 position;
+        public bool isPlayerInitiated;
+    }
+
+    public class CollectibleEventArgs
+    {
+        public string collectibleId;
+        public string collectibleType;
+        public Vector3 position;
+    }
     public class SaveConflictInfo
     {
         public string localModified;
@@ -702,5 +741,4 @@ namespace Tartaria.Core
         public string recommendedAction; // "merge", "local", "cloud"
         public string details;
     }
-}
 }

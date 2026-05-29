@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 
 namespace Tartaria.Integration
@@ -8,7 +8,7 @@ namespace Tartaria.Integration
     {
         [SerializeField] GameObject crystalSparkPrefab;
         [SerializeField] GameObject caveMistPrefab;
-        [SerializeField] GameObject biolumSpore Prefab;
+        [SerializeField] GameObject biolumSporePrefab;
         
         [SerializeField] int maxCrystalSparks = 40;
         [SerializeField] int maxMistPatches = 25;

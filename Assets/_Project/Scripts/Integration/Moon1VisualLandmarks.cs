@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Tartaria.Core;
 
@@ -27,7 +27,7 @@ namespace Tartaria.Integration
         [SerializeField] Vector3 domePosition = new Vector3(0f, 30f, 0f);
         
         [Header("Restoration Settings")]
-        [SerializeField] bool enableProgressive Restoration = true;
+        [SerializeField] bool enableProgressiveRestoration = true;
         [SerializeField] float restorationProgressThreshold = 0.5f;  // 50% progress to restore landmarks
         
         readonly List<GameObject> _landmarks = new();

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
@@ -71,7 +71,7 @@ namespace Tartaria.Gameplay
                 if (bellIndex < bellButtons.Count)
                 {
                     HighlightBell(bellIndex);
-                    AudioFeedbackController.Instance?.PlaySFX($"Bell{bellIndex}", Vector3.zero);
+                    // TODO: Add audio service to ServiceLocator
                     yield return new WaitForSeconds(0.8f);
                 }
             }
@@ -100,7 +100,7 @@ namespace Tartaria.Gameplay
 
             _playerSequence.Add(bellIndex);
             HighlightBell(bellIndex);
-            AudioFeedbackController.Instance?.PlaySFX($"Bell{bellIndex}", Vector3.zero);
+            // TODO: Add audio service to ServiceLocator
 
             // Check if correct so far
             if (_playerSequence.Count <= _targetSequence.Count)
@@ -148,8 +148,8 @@ namespace Tartaria.Gameplay
             isPlaying = false;
             Debug.Log("[BellTowerSync] SUCCESS!");
 
-            AudioFeedbackController.Instance?.PlaySFX("BellTowerSuccess", Vector3.zero);
-            HUDController.Instance?.ShowBanner("SYNCHRONIZED!", "Bells ring in harmony");
+            // TODO: PlaySFX("BellTowerSuccess")
+            ServiceLocator.HUD?.ShowBanner("SYNCHRONIZED!", "Bells ring in harmony");
 
             CleanupGame();
             _onComplete?.Invoke();
@@ -160,8 +160,8 @@ namespace Tartaria.Gameplay
             isPlaying = false;
             Debug.Log("[BellTowerSync] FAILED!");
 
-            AudioFeedbackController.Instance?.PlaySFX("BellTowerFail", Vector3.zero);
-            HUDController.Instance?.ShowBanner("FAILED", "Wrong sequence");
+            // TODO: PlaySFX("BellTowerFail")
+            ServiceLocator.HUD?.ShowBanner("FAILED", "Wrong sequence");
 
             CleanupGame();
         }
