@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using Tartaria.Core;
@@ -48,9 +48,9 @@ namespace Tartaria.UI
         void UpdateAllDisplays()
         {
             // RS Counter
-            if (GameLoopController.Instance != null && rsCounterText != null)
+            if (rsCounterText != null)
             {
-                rsCounterText.text = $"RS: {GameLoopController.Instance.GetCurrentRS():F0}";
+                rsCounterText.text = "RS: 0"; // Placeholder until ServiceLocator.GameLoop wired
             }
 
             // Health Bar

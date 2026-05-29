@@ -242,32 +242,4 @@ namespace Tartaria.Integration
         }
     }
     
-    [System.Serializable]
-    public class Quest
-    {
-        public string questID;
-        public string questName;
-        public string description;
-        public QuestObjective[] objectives;
-        public QuestReward rewards;
-        public bool isActive;
-        public bool isComplete;
-    }
-    
-    [System.Serializable]
-    public class QuestObjective
-    {
-        public string description;
-        public string objectiveType;  // "tune_nodes", "collect_shards", "kill_enemies"
-        public int targetCount;
-        public int currentCount;
-        public bool isComplete;
-    }
-    
-    [System.Serializable]
-    public class QuestReward
-    {
-        public float rsReward;
-        public string unlockNextQuest;
-    }
 }

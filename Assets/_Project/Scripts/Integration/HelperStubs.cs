@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Tartaria.UI
 {
@@ -32,10 +32,4 @@ namespace Tartaria.Integration
     /// <summary>
     /// DialogueManager - Stub for showing dialogue bubbles.
     /// </summary>
-    public class DialogueManager : MonoBehaviour
-    {
-        public static DialogueManager Instance { get; private set; }
-        void Awake() { Instance = this; }
-        public void ShowDialogue(string speaker, string line, float duration) => Debug.Log($"[{speaker}]: {line}");
-    }
 }

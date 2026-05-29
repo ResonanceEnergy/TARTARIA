@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using Tartaria.Core;
@@ -65,7 +65,7 @@ namespace Tartaria.Gameplay
             Time.timeScale = 0.5f; // Slow-mo effect
 
             // Enable depth of field
-            PostProcessingSetup.Instance?.EnableDepthOfField(true);
+            // TODO: DOF enabled=true
         }
 
         void Update()
@@ -110,8 +110,8 @@ namespace Tartaria.Gameplay
             Debug.Log("[TuningMiniGame] SUCCESS!");
 
             // VFX + Audio
-            AudioFeedbackController.Instance?.PlaySFX("TuningSuccess", Vector3.zero);
-            HUDController.Instance?.ShowBanner("TUNED!", $"Frequency matched: {targetFrequency:F0} Hz");
+            // TODO: PlaySFX("TuningSuccess")
+            ServiceLocator.HUD?.ShowBanner("TUNED!", $"Frequency matched: {targetFrequency:F0} Hz");
 
             // Cleanup
             CleanupTuning();
@@ -125,8 +125,8 @@ namespace Tartaria.Gameplay
             isPlaying = false;
             Debug.Log("[TuningMiniGame] FAILED (timeout)");
 
-            AudioFeedbackController.Instance?.PlaySFX("TuningFail", Vector3.zero);
-            HUDController.Instance?.ShowBanner("FAILED", "Tuning timeout");
+            // TODO: PlaySFX("TuningFail")
+            ServiceLocator.HUD?.ShowBanner("FAILED", "Tuning timeout");
 
             CleanupTuning();
         }
@@ -141,7 +141,7 @@ namespace Tartaria.Gameplay
             Time.timeScale = 1f;
 
             // Disable depth of field
-            PostProcessingSetup.Instance?.EnableDepthOfField(false);
+            // TODO: DOF enabled=false
         }
 
         public bool IsPlaying() => isPlaying;
