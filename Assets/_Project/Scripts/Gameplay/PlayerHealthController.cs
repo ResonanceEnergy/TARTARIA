@@ -249,6 +249,15 @@ namespace Tartaria.Gameplay
             Debug.Log("[PlayerHealth] Health restored to full.");
         }
 
+        /// <summary>
+        /// Set player invulnerability state (for cutscenes, giant mode, etc.).
+        /// </summary>
+        public void SetInvulnerable(bool value)
+        {
+            // TODO Phase 2: Implement invulnerability mechanic
+            Debug.Log($"[PlayerHealth] Invulnerability: {value}");
+        }
+
         #region ISaveDataProvider Implementation
 
         public string GetProviderKey() => "PlayerHealth";

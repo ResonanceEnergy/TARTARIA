@@ -867,6 +867,15 @@ namespace Tartaria.Integration
             _playedOneTimeTrees.Clear();
             Debug.Log("[DialogueManager] Reset one-time tree tracking");
         }
+
+        /// <summary>
+        /// Shows a simple dialogue line (stub for Phase 2 full dialogue system).
+        /// </summary>
+        public void ShowDialogue(string characterName, string line)
+        {
+            // TODO Phase 2: Wire to UI dialogue panel
+            Debug.Log($"[DialogueManager] {characterName}: {line}");
+        }
     }
 
     // ROUND 4: Full set of Milo/Lirael/Korath + Anastasia/Cassian bond, Moon3 rail vertical, Moons4-6 5-beat diary, permanent world payoff (W7/W8/W9 real-time comments), 17th Hour reactivity, giant resonance harmony narrative lines added in the catalogue init (trust milestone block).

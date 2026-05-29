@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using Tartaria.Core;
+using Tartaria.Integration;
 
 namespace Tartaria.Gameplay
 {

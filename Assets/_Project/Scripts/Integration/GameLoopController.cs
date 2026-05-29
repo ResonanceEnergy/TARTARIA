@@ -259,11 +259,12 @@ namespace Tartaria.Integration
                 HarmonicRockCutting.Instance.OnCutComplete += HandleRockCutComplete;
                 HarmonicRockCutting.Instance.OnCutFailed += HandleRockCutFailed;
             }
-            if (PipeOrganMiniGame.Instance != null)
-            {
-                PipeOrganMiniGame.Instance.OnOrganComplete += HandleOrganComplete;
-                PipeOrganMiniGame.Instance.OnOrganFailed += HandleOrganFailed;
-            }
+            // TODO Phase 2: PipeOrganMiniGame needs singleton pattern
+            // if (PipeOrganMiniGame.Instance != null)
+            // {
+            //     PipeOrganMiniGame.Instance.OnOrganComplete += HandleOrganComplete;
+            //     PipeOrganMiniGame.Instance.OnOrganFailed += HandleOrganFailed;
+            // }
 
             // Wire workshop upgrade completion → VFX + economy + achievement
             if (WorkshopSystem.Instance != null)
@@ -375,11 +376,12 @@ namespace Tartaria.Integration
             }
 
             // Wire pipe organ mini-game
-            if (PipeOrganMiniGame.Instance != null)
-            {
-                PipeOrganMiniGame.Instance.OnPipePlayed += HandlePipePlayed;
-                PipeOrganMiniGame.Instance.OnChordAdvanced += HandleChordAdvanced;
-            }
+            // TODO Phase 2: PipeOrganMiniGame needs singleton pattern
+            // if (PipeOrganMiniGame.Instance != null)
+            // {
+            //     PipeOrganMiniGame.Instance.OnPipePlayed += HandlePipePlayed;
+            //     PipeOrganMiniGame.Instance.OnChordAdvanced += HandleChordAdvanced;
+            // }
 
             // Wire boss-fail event
             if (BossEncounterSystem.Instance != null)
@@ -533,11 +535,12 @@ namespace Tartaria.Integration
                 HarmonicRockCutting.Instance.OnCutComplete -= HandleRockCutComplete;
                 HarmonicRockCutting.Instance.OnCutFailed -= HandleRockCutFailed;
             }
-            if (PipeOrganMiniGame.Instance != null)
-            {
-                PipeOrganMiniGame.Instance.OnOrganComplete -= HandleOrganComplete;
-                PipeOrganMiniGame.Instance.OnOrganFailed -= HandleOrganFailed;
-            }
+            // TODO Phase 2: PipeOrganMiniGame needs singleton pattern
+            // if (PipeOrganMiniGame.Instance != null)
+            // {
+            //     PipeOrganMiniGame.Instance.OnOrganComplete -= HandleOrganComplete;
+            //     PipeOrganMiniGame.Instance.OnOrganFailed -= HandleOrganFailed;
+            // }
             if (WorkshopSystem.Instance != null)
                 WorkshopSystem.Instance.OnBuildingUpgraded -= HandleBuildingUpgraded;
             if (CampaignFlowController.Instance != null)
@@ -609,11 +612,12 @@ namespace Tartaria.Integration
                 RailAlignmentMiniGame.Instance.OnSegmentRotated -= HandleSegmentRotated;
                 RailAlignmentMiniGame.Instance.OnFlowChanged -= HandleFlowChanged;
             }
-            if (PipeOrganMiniGame.Instance != null)
-            {
-                PipeOrganMiniGame.Instance.OnPipePlayed -= HandlePipePlayed;
-                PipeOrganMiniGame.Instance.OnChordAdvanced -= HandleChordAdvanced;
-            }
+            // TODO Phase 2: PipeOrganMiniGame needs singleton pattern
+            // if (PipeOrganMiniGame.Instance != null)
+            // {
+            //     PipeOrganMiniGame.Instance.OnPipePlayed -= HandlePipePlayed;
+            //     PipeOrganMiniGame.Instance.OnChordAdvanced -= HandleChordAdvanced;
+            // }
             if (BossEncounterSystem.Instance != null)
                 BossEncounterSystem.Instance.OnBossFailed -= HandleBossFailed;
             if (ClimaxSequenceSystem.Instance != null)
@@ -3603,6 +3607,16 @@ namespace Tartaria.Integration
         {
             HUDController.Instance?.UpdateRS(newScore);
             Debug.Log($"[GameLoop] Bell tower RS changed: {newScore:F1}");
+        }
+
+        /// <summary>
+        /// Award Resonance Score to the player (stub for Phase 2).
+        /// </summary>
+        public void AwardRS(float amount)
+        {
+            // TODO Phase 2: Wire to full RS reward system
+            QueueRSReward(amount, "manual_award");
+            Debug.Log($"[GameLoop] Awarded {amount:F1} RS");
         }
     }
 }

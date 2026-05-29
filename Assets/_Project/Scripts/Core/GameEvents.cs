@@ -165,6 +165,14 @@ namespace Tartaria.Core
         /// </summary>
         public static event Action<ItemRemovedEventArgs> OnItemRemoved;
 
+        /// <summary>
+        /// Raised when inventory changes (generic event for any inventory modification).
+        /// Subscribers: AudioFeedbackController, UI panels that need generic refresh.
+        /// </summary>
+        public static event Action OnInventoryChanged;
+
+        public static void FireInventoryChanged() => OnInventoryChanged?.Invoke();
+
         // ═══════════════════════════════════════════════════════════════════
         // MOON PROGRESSION EVENTS (Enhanced with typed EventArgs)
         // ═══════════════════════════════════════════════════════════════════
