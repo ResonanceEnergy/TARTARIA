@@ -1,31 +1,9 @@
 using UnityEngine;
-using System.Collections.Generic;
 using Tartaria.Core;
 
-namespace Tartaria.Integration
-{
-    /// <summary>
-    /// Moon 2 PowerUps
-    /// TODO: Implement Moon 2 specific logic
-    /// </summary>
-    [DefaultExecutionOrder(-81)]
-    public class Moon2PowerUps : MonoBehaviour
-    {
-        [Header("Moon 2 PowerUps Settings")]
-        [SerializeField] bool isActive = true;
-        
-        void Start()
-        {
-            Initialize();
-        }
-        
-        void Initialize()
-        {
-            if (!isActive) return;
-            
-            Debug.Log("[[Moon2PowerUps]] ✅ Initialized!");
-            
-            // TODO: Implement Moon 2 PowerUps logic
-        }
-    }
-}
+namespace Tartaria.Integration { [DefaultExecutionOrder(-75)] public class Moon2PowerUps : MonoBehaviour {
+    [SerializeField] GameObject rsBoostPrefab;
+    [SerializeField] GameObject combatBoostPrefab;
+    [SerializeField] GameObject healingOrbPrefab;
+    void Start() { SpawnInitialPowerUps(); Debug.Log("[Moon2PowerUps] ✅ Power-ups spawned"); }
+    void SpawnInitialPowerUps() { for (int i = 0; i < 10; i++) { Vector3 pos = new Vector3(Random.Range(-40f, 40f), Random.Range(0f, 10f), Random.Range(-40f, 40f)); GameObject pickup = rsBoostPrefab != null ? Instantiate(rsBoostPrefab, pos, Quaternion.identity, transform) : GameObject.CreatePrimitive(PrimitiveType.Sphere); pickup.transform.position = pos; pickup.transform.localScale = Vector3.one * 0.5f; } } } }
