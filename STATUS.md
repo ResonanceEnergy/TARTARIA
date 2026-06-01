@@ -1,7 +1,31 @@
 # TARTARIA — Current Status
 
 > **The single source of truth for "where are we right now?"**
-> Updated: 2026-05-31 (late-night marathon close). This doc supersedes prior status docs.
+> Updated: 2026-06-02 (10-lane hammer sprint close). This doc supersedes prior status docs.
+
+---
+
+## 2026-06-02 HAMMER SPRINT — 10 PRs open against `feature/consolidate-moon-architecture`
+
+All ten lanes shipped as isolated branches with compile-clean proof. Runtime QA owned by Cowork.
+
+| # | Lane | PR | Branch |
+|---|------|----|--------|
+| 1 | tools | [#1](https://github.com/ResonanceEnergy/TARTARIA/pull/1) | `agent/tools/spawn-override-fix` |
+| 2 | ai | [#2](https://github.com/ResonanceEnergy/TARTARIA/pull/2) | `agent/ai/mudgolem-cleanup` |
+| 3 | audio | [#3](https://github.com/ResonanceEnergy/TARTARIA/pull/3) | `agent/audio/restoration-stinger-chain` |
+| 4 | narrative | [#4](https://github.com/ResonanceEnergy/TARTARIA/pull/4) | `agent/narrative/anastasia-reveal-yarn` |
+| 5 | ui | [#5](https://github.com/ResonanceEnergy/TARTARIA/pull/5) | `agent/ui/interaction-prompt-polish` |
+| 6 | anim | [#6](https://github.com/ResonanceEnergy/TARTARIA/pull/6) | `agent/anim/mecanim-humanoid-retarget` |
+| 7 | level | [#7](https://github.com/ResonanceEnergy/TARTARIA/pull/7) | `agent/level/moonconfig-factory-seed` |
+| 8 | systems | [#8](https://github.com/ResonanceEnergy/TARTARIA/pull/8) | `agent/systems/save-load-hardening` |
+| 9 | qa | [#9](https://github.com/ResonanceEnergy/TARTARIA/pull/9) | `agent/qa/test-scenes-mvp` |
+| 10 | gameplay | [#10](https://github.com/ResonanceEnergy/TARTARIA/pull/10) | `agent/gameplay/playerinput-movement-debug` |
+
+**Verified:** every PR `dotnet build` succeeded against its target .csproj.
+**Pending:** Cowork drives Unity Editor playtest validation. Each PR body has a `Ship-when checklist` listing the runtime artifacts needed before merge.
+
+See [docs/HANDOFFS.md](docs/HANDOFFS.md) for the WASD movement root-cause writeup (lane 10).
 
 ---
 

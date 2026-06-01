@@ -4,31 +4,15 @@
 
 ---
 
-## ⚡⚡⚡ 2026-06-01 PARALLEL EXECUTION MANDATE (latest, supersedes everything below)
+## ⚡⚡⚡ 2026-06-01 PARALLEL MANDATE (latest, supersedes everything below)
 
-**THE SWARM RUNS IN PARALLEL — NEVER SERIAL.**
+**SWARM RUNS IN PARALLEL — NEVER SERIAL.** Per NATRIX: *"ENSURE THE SUBAGENTS ARE WORKING IN PARRELLE TO MAXIMIZE VALUE AND TIME"*
 
-Per NATRIX, verbatim: *"ENSURE THE SUBAGENTS ARE WORKING IN PARRELLE TO MAXIMIZE VALUE AND TIME"*
-
-Operating rules for every multi-agent dispatch from now on (applies to VS Code Copilot Chat Agent mode, Cowork Task subagents, any future swarm tooling):
-
-1. **Concurrent dispatch by default.** When N tasks are independent (different files, different folders, different success criteria), issue ALL N worker invocations in a single batch. Never queue them one-by-one and wait on each.
-2. **No waiting on a sibling agent.** If agent N needs something from agent M's territory, append a HANDOFFS.md entry and KEEP WORKING on whatever else is in N's scope. Don't block.
-3. **Author-against-unmerged-branch is allowed.** If lane B depends on lane A's not-yet-merged work, B authors its code in parallel against A's branch, then rebases on develop after A merges. Code work happens in parallel even when merge order is sequential.
-4. **Path ownership enforced.** No two parallel lanes touch the same file. See `docs/agents/COORDINATION.md` path-ownership table. If a single PR needs files from two owners, split it into two PRs sequenced via HANDOFFS.md.
-5. **Parallel checkpoint reporting.** The dispatching Director (VS Code or Cowork) reports back at +30 min intervals listing every concurrent agent's status: writing / PR-open-awaiting-review / blocked-on-X. Don't poll one agent to completion before checking the others.
-6. **Cowork (computer-use) drives runtime QA in parallel with VS Code agents writing code.** Runtime verification on PR #(K-1) happens at the same time as code authoring on PR #K, not after.
-7. **Single dispatch prompt to VS Code.** When asking VS Code to spin up its sub-agents, send ONE prompt that lists all N lanes in one block + sets the parallel-by-default contract. Don't drip-feed N individual prompts.
-
-Anti-patterns that violate this mandate:
-- Issuing tasks sequentially ("first finish A, then start B") when A and B touch different files
-- Director chats one Copilot Chat at a time instead of opening all N concurrently
-- Cowork stops driving Unity to wait for VS Code's next PR
-- Spawning a fresh agent to do work an idle parallel agent could pick up
+When N independent tasks exist, spin up all N agents in one batch — no serial queue. Sibling agents don't block on each other (append to `docs/HANDOFFS.md` and keep working). Cowork drives runtime QA in parallel with VS Code authoring. One batched dispatch prompt per round, not N drip-fed prompts.
 
 ---
 
-## ⚡⚡ 2026-05-30 LATE-NIGHT MANDATE (latest, supersedes everything below)
+## ⚡⚡ 2026-05-30 LATE-NIGHT MANDATE
 
 **NO STUBS. NO PLACEHOLDERS. BUILD EVERYTHING OUT.**
 
