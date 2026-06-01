@@ -131,7 +131,7 @@ namespace Tartaria.AI
                 if (rend == null) continue;
                 Color c = rend.material.color;
                 c.a = visible ? 1f : 0.2f;
-                rend.material.color = c;
+                { var __m = rend.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", c); else __m.color = c; }
             }
         }
 
@@ -174,7 +174,7 @@ namespace Tartaria.AI
             foreach (var rend in _renderers)
             {
                 if (rend != null)
-                    rend.material.color = Color.red;
+                    { var __m = rend.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", Color.red); else __m.color = Color.red; }
             }
             Invoke(nameof(ResetColor), 0.15f);
 
@@ -191,7 +191,7 @@ namespace Tartaria.AI
             foreach (var rend in _renderers)
             {
                 if (rend != null)
-                    rend.material.color = _originalColor;
+                    { var __m = rend.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", _originalColor); else __m.color = _originalColor; }
             }
         }
 
@@ -222,7 +222,7 @@ namespace Tartaria.AI
             body.transform.SetParent(root.transform, false);
             body.transform.localScale = new Vector3(0.8f, 1.2f, 0.8f);
             var mat = body.GetComponent<Renderer>().material;
-            mat.color = new Color(0.1f, 0.08f, 0.12f, 0.8f); // dark purple translucent
+            { if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", new Color(0.1f, 0.08f, 0.12f, 0.8f)); else mat.color = new Color(0.1f, 0.08f, 0.12f, 0.8f); } // dark purple translucent
 
             // Add components
             root.AddComponent<NavMeshAgent>();

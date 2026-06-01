@@ -7,7 +7,7 @@ namespace Tartaria.Integration
     /// Configures: Directional sun, ambient probe, light probes, realtime GI
     /// Integrates with DayNightController for 17-hour cycle
     /// </summary>
-    [DefaultExecutionOrder(-75)] // After Moon1LevelBuilder (-85)
+    [DefaultExecutionOrder(-75)] // After Moon1 Editor builders (Moon1BuildOutBuildings / Moon1BuildOutVillage). Runtime Moon1LevelBuilder was archived 2026-05-31 (Task D1) — Editor menu builders are canonical per Moon1MasterBootstrap.
     public class Moon1LightingSetup : MonoBehaviour
     {
         [Header("Sun Configuration")]

@@ -115,7 +115,7 @@ namespace Tartaria.AI
             // Visual warning: glow bright
             if (_renderer != null)
             {
-                _renderer.material.color = Color.yellow;
+                { var __m = _renderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", Color.yellow); else __m.color = Color.yellow; }
             }
             VFXEventSystem.RequestVFX(VFXEffect.HarmonicCascade, transform.position + Vector3.up);
             Debug.Log("[CrystalSentry] Telegraphing attack...");
@@ -137,7 +137,7 @@ namespace Tartaria.AI
             var projRenderer = projectile.GetComponent<Renderer>();
             if (projRenderer != null)
             {
-                projRenderer.material.color = new Color(0.2f, 0.8f, 1f);
+                { var __m = projRenderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", new Color(0.2f, 0.8f, 1f)); else __m.color = new Color(0.2f, 0.8f, 1f); }
             }
 
             // Add projectile behavior
@@ -150,7 +150,7 @@ namespace Tartaria.AI
             // Reset visual
             if (_renderer != null)
             {
-                _renderer.material.color = _originalColor;
+                { var __m = _renderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", _originalColor); else __m.color = _originalColor; }
             }
 
             Debug.Log("[CrystalSentry] Projectile fired!");
@@ -162,7 +162,7 @@ namespace Tartaria.AI
 
             // Dim color during reload (vulnerable)
             Color targetColor = reloading ? new Color(0.3f, 0.3f, 0.3f) : _originalColor;
-            _renderer.material.color = targetColor;
+            { var __m = _renderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", targetColor); else __m.color = targetColor; }
         }
 
         public void TakeDamage(float damage)
@@ -181,7 +181,7 @@ namespace Tartaria.AI
             // Visual feedback
             if (_renderer != null)
             {
-                _renderer.material.color = Color.red;
+                { var __m = _renderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", Color.red); else __m.color = Color.red; }
             }
             Invoke(nameof(ResetColor), 0.15f);
 
@@ -197,7 +197,7 @@ namespace Tartaria.AI
         {
             if (_renderer != null && _state != SentryState.Dead)
             {
-                _renderer.material.color = _isReloading ? new Color(0.3f, 0.3f, 0.3f) : _originalColor;
+                { var __m = _renderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", _isReloading ? new Color(0.3f, 0.3f, 0.3f) : _originalColor); else __m.color = _isReloading ? new Color(0.3f, 0.3f, 0.3f) : _originalColor; }
             }
         }
 
@@ -229,7 +229,7 @@ namespace Tartaria.AI
             body.transform.SetParent(root.transform, false);
             body.transform.localScale = new Vector3(1.2f, 1.5f, 1.2f);
             var mat = body.GetComponent<Renderer>().material;
-            mat.color = new Color(0.4f, 0.7f, 1f); // cyan crystal
+            { if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", new Color(0.4f, 0.7f, 1f)); else mat.color = new Color(0.4f, 0.7f, 1f); } // cyan crystal
 
             // Add components
             root.AddComponent<CapsuleCollider>().radius = 0.8f;

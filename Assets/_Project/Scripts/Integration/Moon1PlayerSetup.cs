@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using Tartaria.Camera;
 using Tartaria.Input;
@@ -5,9 +6,16 @@ using Tartaria.Input;
 namespace Tartaria.Integration
 {
     /// <summary>
-    /// Moon 1 Player Setup — Spawns player at village entrance with proper camera
-    /// Configures movement parameters for outdoor exploration
-    /// Sets up interaction radius for buildings/NPCs
+    /// Moon 1 Player Setup — Post-spawn configuration for the Echohaven player.
+    ///
+    /// 2026-05-31 Task A3 dedupe: this component NO LONGER spawns the player.
+    /// PlayerSpawner is the canonical spawner (see CLAUDE.md + Integration/PlayerSpawner.cs).
+    /// This component now only:
+    ///   - Locates the spawned player (by tag "Player")
+    ///   - Repositions it to the Echohaven entrance
+    ///   - Configures camera follow + interaction radius
+    /// If the player hasn't spawned yet, we poll/wait until PlayerSpawner finishes
+    /// (FirePlayerSpawned in GameEvents is currently a log-only stub, so we can't subscribe).
     /// </summary>
     [DefaultExecutionOrder(-78)] // After excavation sites (-79)
     public class Moon1PlayerSetup : MonoBehaviour
@@ -15,9 +23,6 @@ namespace Tartaria.Integration
         [Header("Spawn Configuration")]
         [SerializeField] Vector3 spawnPosition = new Vector3(0f, 2f, -100f); // South of village
         [SerializeField] Quaternion spawnRotation = Quaternion.Euler(0f, 0f, 0f); // Facing north
-
-        [Header("Player Prefab")]
-        [SerializeField] GameObject playerPrefab;
 
         [Header("Movement Settings (Echohaven)")]
         [SerializeField] float walkSpeed = 5f;
@@ -29,80 +34,39 @@ namespace Tartaria.Integration
         [SerializeField] float cameraHeight = 8f;
         [SerializeField] float cameraAngle = 35f;
 
+        [Header("Wait Settings")]
+        [SerializeField] float playerWaitTimeoutSeconds = 5f;
+
         private GameObject playerInstance;
 
         void Start()
         {
-            SpawnPlayer();
+            StartCoroutine(WaitForPlayerAndConfigure());
         }
 
-        void SpawnPlayer()
+        IEnumerator WaitForPlayerAndConfigure()
         {
-            Debug.Log("[Moon1PlayerSetup] Spawning player at Echohaven entrance...");
+            float elapsed = 0f;
+            GameObject existingPlayer = GameObject.FindGameObjectWithTag("Player");
 
-            // Check if player already exists
-            var existingPlayer = GameObject.FindGameObjectWithTag("Player");
-            if (existingPlayer != null)
+            while (existingPlayer == null && elapsed < playerWaitTimeoutSeconds)
             {
-                Debug.LogWarning("[Moon1PlayerSetup] Player already exists, configuring existing player");
-                playerInstance = existingPlayer;
-                ConfigureExistingPlayer();
-                return;
+                yield return null;
+                elapsed += Time.unscaledDeltaTime;
+                existingPlayer = GameObject.FindGameObjectWithTag("Player");
             }
 
-            // Load player prefab if not assigned
-            if (playerPrefab == null)
+            if (existingPlayer == null)
             {
-                playerPrefab = Resources.Load<GameObject>("Prefabs/Player/PlayerCharacter");
+                Debug.LogError(
+                    "[Moon1PlayerSetup] No Player found after " + playerWaitTimeoutSeconds +
+                    "s. PlayerSpawner should have spawned one. Skipping Moon 1 player config.");
+                yield break;
             }
 
-            // Fallback: Create simple player
-            if (playerPrefab == null)
-            {
-                Debug.LogWarning("[Moon1PlayerSetup] No player prefab found, creating simple player");
-                CreateSimplePlayer();
-            }
-            else
-            {
-                // Instantiate prefab
-                playerInstance = Instantiate(playerPrefab, spawnPosition, spawnRotation);
-                playerInstance.name = "Player";
-                ConfigurePlayer();
-            }
-
-            Debug.Log($"[Moon1PlayerSetup] ✅ Player spawned at {spawnPosition}");
-        }
-
-        void CreateSimplePlayer()
-        {
-            playerInstance = new GameObject("Player");
-            playerInstance.tag = "Player";
-            playerInstance.transform.position = spawnPosition;
-            playerInstance.transform.rotation = spawnRotation;
-
-            // Visual representation
-            var visual = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            visual.name = "Visual";
-            visual.transform.SetParent(playerInstance.transform);
-            visual.transform.localPosition = new Vector3(0f, 1f, 0f);
-            visual.transform.localScale = new Vector3(1f, 1f, 1f);
-
-            var material = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-            material.color = new Color(0.2f, 0.6f, 0.9f); // Blue
-            visual.GetComponent<Renderer>().material = material;
-
-            // Add CharacterController
-            var controller = playerInstance.AddComponent<CharacterController>();
-            controller.center = new Vector3(0f, 1f, 0f);
-            controller.radius = 0.5f;
-            controller.height = 2f;
-
-            // Add camera target
-            var cameraTarget = new GameObject("CameraTarget");
-            cameraTarget.transform.SetParent(playerInstance.transform);
-            cameraTarget.transform.localPosition = new Vector3(0f, 1.5f, 0f);
-
-            ConfigurePlayer();
+            playerInstance = existingPlayer;
+            ConfigureExistingPlayer();
+            Debug.Log("[Moon1PlayerSetup] Configured player at " + spawnPosition);
         }
 
         void ConfigurePlayer()
@@ -133,11 +97,18 @@ namespace Tartaria.Integration
 
         void ConfigureExistingPlayer()
         {
-            // Move player to spawn position
+            // Move player to Echohaven spawn position
             if (playerInstance != null)
             {
+                // CharacterController disables direct transform writes — toggle if present.
+                var cc = playerInstance.GetComponent<UnityEngine.CharacterController>();
+                if (cc != null) cc.enabled = false;
+
                 playerInstance.transform.position = spawnPosition;
                 playerInstance.transform.rotation = spawnRotation;
+
+                if (cc != null) cc.enabled = true;
+
                 ConfigurePlayer();
             }
         }

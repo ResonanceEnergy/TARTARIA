@@ -21,7 +21,7 @@ namespace Tartaria.Editor
         
         Vector2 scrollPos;
         
-        [MenuItem("Tartaria/Automated Prefab Wiring")]
+        [MenuItem("Tartaria/3 Wire/Automated Prefab Wiring", priority = 370)]
         static void ShowWindow()
         {
             GetWindow<AutomatedPrefabWiring>("Prefab Wiring");

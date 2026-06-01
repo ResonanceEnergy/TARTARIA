@@ -163,7 +163,7 @@ namespace Tartaria.AI
                 if (rend == null) continue;
                 Color c = rend.material.color;
                 c.a = alpha;
-                rend.material.color = c;
+                { var __m = rend.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", c); else __m.color = c; }
             }
         }
 
@@ -219,7 +219,7 @@ namespace Tartaria.AI
             body.transform.SetParent(root.transform, false);
             body.transform.localScale = new Vector3(1f, 1.3f, 1f);
             var mat = body.GetComponent<Renderer>().material;
-            mat.color = new Color(0.5f, 0.2f, 0.8f, 0.7f); // purple translucent
+            { if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", new Color(0.5f, 0.2f, 0.8f, 0.7f)); else mat.color = new Color(0.5f, 0.2f, 0.8f, 0.7f); } // purple translucent
 
             // Add components
             root.AddComponent<SphereCollider>().radius = 0.6f;

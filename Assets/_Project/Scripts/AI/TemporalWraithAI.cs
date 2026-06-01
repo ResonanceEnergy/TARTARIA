@@ -176,7 +176,7 @@ namespace Tartaria.AI
             cloneBody.transform.SetParent(_activeClone.transform, false);
             cloneBody.transform.localScale = transform.localScale * 0.7f;
             var mat = cloneBody.GetComponent<Renderer>().material;
-            mat.color = new Color(_originalColor.r, _originalColor.g, _originalColor.b, 0.5f); // translucent
+            { if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", new Color(_originalColor.r, _originalColor.g, _originalColor.b, 0.5f)); else mat.color = new Color(_originalColor.r, _originalColor.g, _originalColor.b, 0.5f); } // translucent
 
             // Basic AI for clone
             var cloneAI = _activeClone.AddComponent<TemporalCloneAI>();
@@ -213,7 +213,7 @@ namespace Tartaria.AI
             foreach (var rend in _renderers)
             {
                 if (rend != null)
-                    rend.material.color = Color.cyan;
+                    { var __m = rend.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", Color.cyan); else __m.color = Color.cyan; }
             }
             Invoke(nameof(ResetColor), 0.15f);
 
@@ -230,7 +230,7 @@ namespace Tartaria.AI
             foreach (var rend in _renderers)
             {
                 if (rend != null && _state != WraithState.Dead)
-                    rend.material.color = _originalColor;
+                    { var __m = rend.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", _originalColor); else __m.color = _originalColor; }
             }
         }
 
@@ -268,7 +268,7 @@ namespace Tartaria.AI
             body.transform.SetParent(root.transform, false);
             body.transform.localScale = new Vector3(1f, 1.5f, 1f);
             var mat = body.GetComponent<Renderer>().material;
-            mat.color = new Color(0.2f, 0.8f, 0.9f, 0.8f); // cyan ghostly
+            { if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", new Color(0.2f, 0.8f, 0.9f, 0.8f)); else mat.color = new Color(0.2f, 0.8f, 0.9f, 0.8f); } // cyan ghostly
 
             // Add components
             root.AddComponent<NavMeshAgent>();

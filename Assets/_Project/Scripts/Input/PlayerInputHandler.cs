@@ -32,7 +32,7 @@ namespace Tartaria.Input
         [SerializeField, Range(-50f, -1f), Tooltip("Gravity acceleration applied each frame")] float gravity = -20f;
 
         [Header("Interaction")]
-        [SerializeField, Min(0.1f), Tooltip("Max distance to interact with objects")] float interactRadius = 3.0f;
+        [SerializeField, Min(0.1f), Tooltip("Max distance to interact with objects")] float interactRadius = 5.0f;
         [SerializeField, Tooltip("Layers that can receive interactions")] LayerMask interactableLayer;
         [SerializeField, Tooltip("Layers that identify enemies for combat")] LayerMask enemyLayer;
 
@@ -100,6 +100,16 @@ namespace Tartaria.Input
 
             // M2-M4: Logitech F310 full support (DirectInput + XInput + rumble)
             LogitechControllerSupport.EnsureF310Setup();
+
+            // 2026-05-31: defeat OS-focus-loss bug (weather widget, etc steal focus
+            // and Unity stops polling input). Keep input flowing regardless.
+            Application.runInBackground = true;
+#if ENABLE_INPUT_SYSTEM
+            UnityEngine.InputSystem.InputSystem.settings.backgroundBehavior =
+                UnityEngine.InputSystem.InputSettings.BackgroundBehavior.IgnoreFocus;
+            UnityEngine.InputSystem.InputSystem.settings.editorInputBehaviorInPlayMode =
+                UnityEngine.InputSystem.InputSettings.EditorInputBehaviorInPlayMode.AllDeviceInputAlwaysGoesToGameView;
+#endif
 
             _controller = GetComponent<CharacterController>();
             _mainCamera = Camera.main;
@@ -234,8 +244,154 @@ namespace Tartaria.Input
             }
         }
 
+        // ─────────────────────────────────────────────────────────────────────
+        // F310 button edge-detect state (was-pressed-last-frame tracking)
+        // ─────────────────────────────────────────────────────────────────────
+        bool _prevPadA, _prevPadB, _prevPadX, _prevPadY;
+        bool _prevPadLB, _prevPadRB, _prevPadLT;
+        bool _prevPadStart, _prevPadSelect;
+        bool _prevPadDpadUp, _prevPadDpadDown, _prevPadDpadLeft, _prevPadDpadRight;
+        bool _prevPadL3, _prevPadR3;
+
+        /// <summary>
+        /// Logitech F310 gamepad fallback — always runs (even when InputAction asset
+        /// is loaded) so every F310 button drives a real game feature.
+        /// Per CLAUDE.md no-stubs mandate: every button has a real binding.
+        ///
+        /// F310 X-mode button map (XInput identifiers — Input System normalizes):
+        ///   A  (south)   = Interact (Exploration) / Resonance Pulse (Combat)
+        ///   B  (east)    = Scan / Cancel
+        ///   X  (west)    = Resonance Pulse (Combat) / Interact alt
+        ///   Y  (north)   = Aether Vision toggle
+        ///   LB           = Sprint hold
+        ///   RB           = Harmonic Strike (Combat)
+        ///   LT (analog)  = Frequency Shield (Combat) — threshold > 0.5
+        ///   RT (analog)  = Sprint hold (alt) — threshold > 0.5
+        ///   Start        = Pause menu
+        ///   Back/Select  = Aether Vision toggle (alt)
+        ///   D-Pad ←/→    = Frequency adjust (Tuning + Combat)
+        ///   D-Pad ↑      = Scan
+        ///   D-Pad ↓      = Crouch / Cancel (reserved)
+        ///   L3 click     = Sprint toggle
+        ///   R3 click     = Recenter camera (CameraController handles)
+        /// </summary>
+        void HandleGamepadButtonFallbacks()
+        {
+            var pad = Gamepad.current;
+            if (pad == null) return;
+            var state = GameStateManager.Instance?.CurrentState;
+
+            // A / South — Interact OR Resonance Pulse (combat)
+            bool aDown = pad.buttonSouth.isPressed;
+            if (aDown && !_prevPadA)
+            {
+                if (state == GameState.Combat) OnResonancePulse?.Invoke();
+                else TryInteract();
+            }
+            _prevPadA = aDown;
+
+            // B / East — Scan
+            bool bDown = pad.buttonEast.isPressed;
+            if (bDown && !_prevPadB)
+            {
+                if (state == GameState.Exploration || state == GameState.Combat)
+                    OnScan?.Invoke(transform.position);
+            }
+            _prevPadB = bDown;
+
+            // X / West — Resonance Pulse / Interact alt
+            bool xDownPad = pad.buttonWest.isPressed;
+            if (xDownPad && !_prevPadX)
+            {
+                if (state == GameState.Combat) OnResonancePulse?.Invoke();
+                else TryInteract();
+            }
+            _prevPadX = xDownPad;
+
+            // Y / North — Aether Vision toggle
+            bool yDownPad = pad.buttonNorth.isPressed;
+            if (yDownPad && !_prevPadY)
+            {
+                AetherVisionActive = !AetherVisionActive;
+            }
+            _prevPadY = yDownPad;
+
+            // LB — Sprint hold
+            if (pad.leftShoulder.isPressed) _isSprinting = true;
+
+            // RB — Harmonic Strike
+            bool rbDown = pad.rightShoulder.isPressed;
+            if (rbDown && !_prevPadRB)
+            {
+                if (state == GameState.Combat) OnHarmonicStrike?.Invoke();
+            }
+            _prevPadRB = rbDown;
+
+            // LT (analog) — Frequency Shield
+            float lt = pad.leftTrigger.ReadValue();
+            bool ltDown = lt > 0.5f;
+            if (ltDown && !_prevPadLT)
+            {
+                if (state == GameState.Combat) OnFrequencyShield?.Invoke();
+            }
+            _prevPadLT = ltDown;
+
+            // RT (analog) — alternate sprint
+            if (pad.rightTrigger.ReadValue() > 0.5f) _isSprinting = true;
+
+            // Start — Pause
+            bool startDown = pad.startButton.isPressed;
+            if (startDown && !_prevPadStart)
+            {
+                OnPauseToggled?.Invoke();
+            }
+            _prevPadStart = startDown;
+
+            // Back/Select — Aether Vision (alt)
+            bool selectDown = pad.selectButton.isPressed;
+            if (selectDown && !_prevPadSelect)
+            {
+                AetherVisionActive = !AetherVisionActive;
+            }
+            _prevPadSelect = selectDown;
+
+            // D-Pad ←/→ frequency adjust during Tuning/Combat
+            bool dLeft = pad.dpad.left.isPressed;
+            bool dRight = pad.dpad.right.isPressed;
+            if (state == GameState.Tuning || state == GameState.Combat)
+            {
+                float dpadAdjust = 0f;
+                if (dLeft) dpadAdjust -= 1f;
+                if (dRight) dpadAdjust += 1f;
+                if (Mathf.Abs(dpadAdjust) > 0.01f) OnFrequencyAdjust?.Invoke(dpadAdjust);
+            }
+            _prevPadDpadLeft = dLeft;
+            _prevPadDpadRight = dRight;
+
+            // D-Pad ↑ — Scan
+            bool dUp = pad.dpad.up.isPressed;
+            if (dUp && !_prevPadDpadUp && (state == GameState.Exploration || state == GameState.Combat))
+            {
+                OnScan?.Invoke(transform.position);
+            }
+            _prevPadDpadUp = dUp;
+
+            // D-Pad ↓ — reserved for crouch/cancel
+            bool dDownBtn = pad.dpad.down.isPressed;
+            _prevPadDpadDown = dDownBtn;
+
+            // L3 — Sprint toggle
+            bool l3Down = pad.leftStickButton.isPressed;
+            if (l3Down && !_prevPadL3) _isSprinting = !_isSprinting;
+            _prevPadL3 = l3Down;
+        }
+
         void HandleActionFallbacks()
         {
+            // F310 gamepad fallback ALWAYS runs — even when InputAction asset is bound —
+            // so missing button bindings can't kill controller play.
+            HandleGamepadButtonFallbacks();
+
             if (_playerMap != null) return; // InputSystem handles
 
             var kb = Keyboard.current;

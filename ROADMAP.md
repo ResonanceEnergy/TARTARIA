@@ -1,136 +1,116 @@
 # TARTARIA — ROADMAP
 
-> Last updated: Session 4 (Moon 3+5 arcs, GameCompleteOverlay)
-> Build: CS:0 | "All checks passed. Ready to play."
+> Last updated: 2026-05-30. This doc supersedes the older session-1-through-4 roadmap (preserved at `docs/archive/ROADMAP_old.md`).
+> Working under the 2026-05-30 mandate in `CLAUDE.md`: **build all 13 Moons fully before any release discussion.**
 
 ---
 
-## COMPLETED ✅
+## The honest baseline
 
-### Foundation (Sessions 1–2)
-- [x] URP 17 Forward+ / GPU Resident Drawer / STP / APV pipeline
-- [x] Core asmdef hierarchy (Core → Input/Audio/Camera → Gameplay → AI → UI/Integration)
-- [x] PlayerController, CameraController, HapticFeedbackManager
-- [x] ServiceLocator bus (ISaveService, IHUDService, IMoonProgressService, ICompanionService, etc.)
-- [x] SaveManager + SaveData v14 schema (moon flags bool/int, companions, cloud sync)
-- [x] GameEvents static event bus (cross-assembly decoupling)
-- [x] AudioManager singleton + PlaySFX2D
-- [x] HUDController singleton (ShowObjective, ShowBanner, ShowToast)
-- [x] MoonProgressTracker + MoonProgressService
-- [x] CompanionManager (Lirael, Milo, Anastasia trust arcs)
+Previous versions of this file declared Moons 1–13 "complete" based on file existence + agent self-reports. A real audit (see `STATUS.md`) found:
 
-### Moon Arcs (complete vertical slices — Sessions 2–4)
-- [x] **Moon 1** — Magnetic / Echohaven (CrystalSpire, Lirael introduction)
-- [x] **Moon 2** — Lunar / Crystalline Caverns (5-phase purge, Cassian, Giant Mode)
-- [x] **Moon 3** — Electric / Buried Rail Junction (Orphan Train, Lirael backstory, 432Hz lullaby)
-- [x] **Moon 4** — Self-Existing / Settlement (Autonomous building, ley-line nodes)
-- [x] **Moon 5** — Overtone / White City Pavilions (Thorne radio, airship dock, World's Fair holograms)
-- [x] **Moon 6** — Rhythmic / Living Library (Pipe organ requiem, Milo awakening)
-- [x] **Moon 7** — Resonant / Resonant Spire (Aether beacon tower, crossover seeds)
-- [x] **Moon 8** — Galactic / Airship dock (Thorne arrives, aerial combat, giant arc)
-- [x] **Moon 9** — Solar / Sun Temple (Anastasia lore, solar lens mechanic)
-- [x] **Moon 10** — Planetary / Cathedral (planetary alignment puzzle, boss)
-- [x] **Moon 11** — Spectral / Underworld (spectral veil mechanic, ghost companion)
-- [x] **Moon 12** — Crystal / Crystal Core (lattice resonance, final villain reveal)
-- [x] **Moon 13** — Cosmic / Universal Spire (true timeline restoration, Zereth confrontation, game complete)
+- ~310 of 343 `MoonN*.cs` files are template stubs that `GameObject.CreatePrimitive(Sphere)` and `Debug.Log` an emoji.
+- The 11 active `Moon1*.cs` Integration scripts (Lighting, PostProcessing, AmbientCreatures, QuestTriggers, ExcavationSites, LevelBuilder, HeroBuildingSpawner, NPCSpawner, PlayerSetup, MaterialSetup, BuildingPrefabCreator) have **ZERO scene references** — written but never instantiated.
+- The `Echohaven_VerticalSlice.unity` scene has a shell (3 hero buildings + props + NPCs + atmosphere) but is missing the Moon-1-specific gameplay called for in `docs/03_CAMPAIGN_13_MOONS.md` and `docs/15_MVP_BUILD_SPEC.md`.
 
-### UI
-- [x] HUDController (objectives, banner, toast, minimap hooks)
-- [x] DeathOverlay (4s auto-respawn, IMGUI)
-- [x] PauseOverlay / PauseMenu
-- [x] MainMenuOverlay (skip flag, new game confirm)
-- [x] SettingsOverlay (graphics, audio, controls)
-- [x] InventoryUI + CraftingOverlay
-- [x] SkillTreeUI
-- [x] AchievementToastOverlay + AchievementListOverlay
-- [x] **GameCompleteOverlay** (fade-in credits, completion stats, Continue/Main Menu)
-
-### Systems
-- [x] BuildingSystem + BuildingDefinition (restoration phases)
-- [x] CombatSystem + KnockbackSystem + HitStopController
-- [x] InventorySystem + CraftingSystem
-- [x] SkillTreeSystem (Moon 2 permanent blessings)
-- [x] ExcavationSystem
-- [x] DayNightCycleController
-- [x] SpectralOrphanAdoption (Moon 3 mechanic)
-- [x] OrphanTrainPuzzle
-- [x] BatchReadinessValidator (35/35 phases, OneClickBuild)
+So the real roadmap below is what we have to *build*, not what's been "shipped".
 
 ---
 
-## IN PROGRESS 🔨
+## Track: Moon 1 — Magnetic / Echohaven
 
-- [ ] **Settings persistence** — verify PlayerPrefs round-trip for all SettingsOverlay sliders
-- [ ] **Moon 3 rail escort scene** — hook Moon3ElectricArc to Moon3StartEscortTrigger + Moon3EscortHUD
-- [ ] **Airship dock scene** — Moon 5 dock layout with platform prefabs wired to Moon5OvertoneArc refs
+**Status:** ~40% — shell + props + NPCs + atmosphere done; canonical gameplay mostly absent.
 
----
+### Done
+- Player movement (left stick + WASD), camera follow, HUD live, audio listener clean, URP material colors clean.
+- 3 hero buildings buried at correct depths (Spire 60% / Dome 80% / Fountain 95%) with `InteractableBuilding` + 3-node tuning + restoration VFX + 5s raise animation.
+- 9 village structures from cathedral kit (decorative).
+- 6 POIs (Mud Pools / Carved Stone / Overlook / Root Chamber).
+- 120 vegetation, 69 props, 4 NPC placements.
+- Golden-hour ambient + fog.
+- 3 Yarn dialogue files written (not yet hooked to runner).
+- 3 tuning mini-game variants (generic — see below).
 
-## BACKLOG — BETA PRIORITIES 🎯
+### Building (in order)
+1. **Master bootstrap:** wire the 11 dormant `Moon1*.cs` systems via `Tartaria → MASTER: Bootstrap All Moon 1 Systems`.
+2. **Pipe organ centerpiece** inside the Cathedral — 3-note tuning puzzle (the canonical Moon 1 first restoration per docs/03 Days 6–12). Replaces or augments the generic slider as the Moon-1-specific puzzle.
+3. **Reset Scout enemy** — Victorian-costumed enemies with clipboards/jackhammers, distinct from Mud Golem.
+4. **Giant Mode** — 60-second 15-feet-tall burst (toss enemies, smash mud piles).
+5. **Rose window cymatic projection** on the floor after dome restoration.
+6. **Pure water font** — particle + audio trickle-back when fountain restored.
+7. **Spire placement ceremony** with blue-white sparks climbing at night.
+8. **Ley line mini-map** lighting up after first restoration.
+9. **17th-hour alignment** mechanic for cathedral light eruption.
+10. **Lirael 432 Hz lullaby** audio + animated appearance.
+11. **Skeleton hum first-prophecy fragment** (figure on star fort).
+12. **Giant skeleton key #1** of 8 collectible.
+13. **Dialogue runner** — hook the 3 Yarn files to in-game triggers.
 
-### Gameplay Polish
-- [ ] Player footstep audio (terrain-type driven, AudioManager integration)
-- [ ] Enemy hit-reaction animations (stagger, death FX) for all 5 enemy archetypes
-- [ ] Resonance Scanner visual polish (scan pulse radius, color by building tier)
-- [ ] Giant Mode screen-shake + chromatic aberration ramp
-
-### UI / UX
-- [ ] Minimap — Moon portal icons + zone boundary overlay
-- [ ] Journal / Archive — lore scroll unlock flow (DeathOverlay → AchievementToast pattern)
-- [ ] Save slot UI — show Moon progress per slot in MainMenuOverlay
-- [ ] Input rebinding — confirm InputRemappingUI saves to PlayerPrefs correctly
-
-### Audio
-- [ ] Compose placeholder SFX manifest (all `PlaySFX2D` keys across 13 moons)
-- [ ] AudioMixer groups: Master / Music / SFX / Voice — expose to SettingsOverlay
-- [ ] 432 Hz ambient base layer per biome
-
-### Integration / Wiring
-- [ ] MoonPortalSelector — unlock gate based on moon cleared flags
-- [ ] MoonRuntimeBootstrapper — ensure correct arc activates per loaded scene
-- [ ] Cross-moon forward seeds audit (all 13 FORWARD_SEEDS arrays → downstream consumers)
-
-### Performance
-- [ ] GPU Resident Drawer warm-up on scene load (avoid first-frame spike)
-- [ ] APV probe placement audit for Echohaven + Moon 2 Caverns
-- [ ] LOD bias settings for open-world Moon 5 White City
+### Moon 1 done = ready to start Moon 2.
 
 ---
 
-## CLOSED BETA DEFINITION OF DONE 🏁
+## Track: Moons 2 – 13
 
-All of the following must be true before tag `v0.1-beta`:
+Per `docs/03_CAMPAIGN_13_MOONS.md`. Build order is sequential — start each only after the prior Moon is fully delivered. Stub files exist for all of them but most are template-spawned and need to be replaced or upgraded.
 
-1. CS:0 build, EXIT:0, BatchReadinessValidator PASSED
-2. All 13 moon arcs playable (reach Beat 5 / Revelation without crash)
-3. GameCompleteOverlay shows on Moon 13 completion
-4. Save/load round-trip: quit mid-moon, reload, continue from correct beat
-5. DeathOverlay → respawn loop works 10× without error
-6. Settings panel: volume + quality changes survive restart (PlayerPrefs)
-7. No scene-load null-ref floods in Logs/
-8. Input: keyboard + gamepad both navigate all overlays
+| Moon | Theme | Companion | One-line scope |
+|---|---|---|---|
+| 2 | Lunar — Crystalline Caverns | Cassian | Micro-giant mode, dissonance crystals, fountain cleansing, first Mud Golem |
+| 3 | Electric — Orphan Train | Lirael | Resonance trains, junior architects (orphans), Lullaby Crystal |
+| 4 | Self-Existing — Settlement | Junior architects | Autonomous building, ley-line nodes |
+| 5 | Overtone — White City | Thorne | World's Fair holograms, Spire-fragment bloom, airship dock |
+| 6 | Rhythmic — Living Library | Milo | Pipe organ requiem, Milo's awakening |
+| 7 | Resonant — Resonant Spire | Korath | Aether beacon tower, Korath sacrifice |
+| 8 | Galactic — Airship Armada | Thorne | Aerial combat, fleet assembly |
+| 9 | Solar — Sun-Mirror Array | (mixed) | Mirror-array puzzle, solar Aether band |
+| 10 | Planetary — Continental Trains | (children) | Train logistics across the continent |
+| 11 | Spectral — Fountain Network | Lirael | Planetary cleansing |
+| 12 | Crystal — Planetary Bell Sync | Korath echo | Planetary scalar wave |
+| 13 | Cosmic — Convergence | All | Finale, full fleet, all bands |
+
+Each Moon's per-day breakdown lives in `docs/03_CAMPAIGN_13_MOONS.md`.
 
 ---
 
-## ARCHITECTURE NOTES
+## Track: Cross-cutting systems (touched by every Moon)
 
-### Asmdef Dependency Order (strict — no cycles)
-```
-Core → {Input, Audio, Camera} → Gameplay → AI
-UI    refs: Core, Gameplay, Input, Audio, Camera
-Integration refs: everything
-```
+These get fleshed out as the Moons that need them come online. Don't try to perfect them up-front.
 
-### Key Singleton Chain
-```
-SaveManager.Instance?.CurrentSave?.SetMoonFlag(moonNum, key, value)
-HUDController.Instance?.ShowObjective("text")
-AudioManager.Instance?.PlaySFX2D("sfx_key")
-ServiceLocator.MoonProgress?.MarkCleared(moonNum)
-ServiceLocator.MoonProgress?.MarkBeatCleared(moonNum, beatIndex)
-```
+- **Aether Field** — 3-band visualization, GPU compute shader, flow sim. Foundation lives in `Tartaria.Core`.
+- **Resonance Score (RS)** — DOTS ECS system, golden-ratio validator, threshold events at 25/50/75/100.
+- **Tuning Mini-Game** — 3 variants done at the generic level; per-Moon special variants (pipe organ, bell tower, scalar mirror, train rails) layer on top.
+- **Companion AI** — Milo follow + introduce wired. Trust arcs, voice, banter to add per Moon.
+- **Combat** — 3 player abilities (Resonance Pulse / Harmonic Strike / Frequency Shield) + Mud Golem AI exist. Enemy roster grows per Moon (Reset Scouts in M1, Dissonance Crystals in M2, etc.).
+- **Save / Load** — AES-256 encrypted JSON, schema v18. Already covers Moon flags + companion trust.
+- **Day / Night** — 17-hour Tartarian day mapped to ~17 minutes real-time. Visual cycle only at first; 17th-hour alignment is gameplay-critical from Moon 1 climax onward.
+- **HUD** — RS counter live, health bar, Aether meter, banners, interaction prompts all working. Mini-map needs to come online for Moon 1 ley-line reveal.
+- **Audio** — AudioManager singleton ready. ~50 SFX keys referenced but not all wired to clips. Drake Stafford 432 Hz ambient is the only confirmed music track.
+- **VFX** — RestoreSparkle, ScanPulse, Aurora prefabs exist. Mud dissolve shader needs runtime wiring for emergence animation.
 
-### Event Bus (GameEvents.cs)
-- `FireCriticalSaveTrigger("game_complete")` → GameCompleteOverlay.Show()
-- `FireCriticalSaveTrigger("fountain_restored")` → SaveManager auto-save
-- `FireMoon3FastTravelUnlocked()` → MoonPortalSelector unlock
+---
+
+## What we are NOT doing
+
+Per the 2026-05-30 mandate:
+
+- ❌ No itch.io release planning.
+- ❌ No Steam page work.
+- ❌ No demo / vertical-slice ship gates.
+- ❌ No marketing copy.
+- ❌ No "Track A vs Track B" branching of the work.
+
+We build the game. We talk about distribution after it plays end-to-end.
+
+---
+
+## Where to look for the truth
+
+- `STATUS.md` — current week-by-week state.
+- `CLAUDE.md` — instructions for future Claude sessions + the build-order mandate.
+- `docs/03_CAMPAIGN_13_MOONS.md` — Moon-by-Moon narrative + mechanics spec.
+- `docs/15_MVP_BUILD_SPEC.md` — system-level depth spec (treat as minimum for Moon 1, not maximum).
+- `docs/agent_reports/` — historical noise. Do not trust status claims from there.
+- This file (`ROADMAP.md`) — what's left, in order.
+
+*ROADMAP v2.0 · 2026-05-30 · Update when a Moon track ships.*

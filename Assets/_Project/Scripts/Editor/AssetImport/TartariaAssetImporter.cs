@@ -51,7 +51,7 @@ namespace Tartaria.Editor.AssetImport
             }
         }
 
-        [MenuItem("Tartaria/Import Assets/🚀 RUN FULL AUTOMATION", priority = 0)]
+        [MenuItem("Tartaria/9 Import/RUN FULL AUTOMATION", priority = 900)]
         public static void RunFullAutomation()
         {
             EditorUtility.DisplayProgressBar("TARTARIA Full Automation", "Starting automated workflow...", 0f);
@@ -114,7 +114,7 @@ namespace Tartaria.Editor.AssetImport
             }
         }
 
-        [MenuItem("Tartaria/Import Assets/🔄 Reset Automation Flags", priority = 100)]
+        [MenuItem("Tartaria/9 Import/Reset Automation Flags", priority = 940)]
         public static void ResetAutomationFlags()
         {
             EditorPrefs.DeleteKey(PREFS_KEY_IMPORT_COMPLETE);
@@ -172,7 +172,7 @@ namespace Tartaria.Editor.AssetImport
     /// </summary>
     public static class TartariaBuildingAutomation
     {
-        [MenuItem("Tartaria/Import Assets/1. Create Dungeon Prefabs")]
+        [MenuItem("Tartaria/9 Import/Create Dungeon Prefabs", priority = 910)]
         public static void CreateDungeonPrefabs()
         {
             string modelPath = "Assets/_Project/Models/Buildings/ModularDungeon2";
@@ -228,7 +228,7 @@ namespace Tartaria.Editor.AssetImport
             Debug.Log($"✓ Created {created} dungeon prefabs in: {prefabPath}");
         }
 
-        [MenuItem("Tartaria/Import Assets/2. Build Star Dome Test Scene")]
+        [MenuItem("Tartaria/9 Import/Build Star Dome Test Scene", priority = 920)]
         public static void BuildStarDomeTestScene()
         {
             // Create new scene
@@ -356,7 +356,7 @@ namespace Tartaria.Editor.AssetImport
             Debug.Log("Press Play to test! Use WASD to walk through the dome.");
         }
 
-        [MenuItem("Tartaria/Import Assets/3. Generate Import Report")]
+        [MenuItem("Tartaria/9 Import/Generate Import Report", priority = 930)]
         public static void GenerateImportReport()
         {
             var report = new System.Text.StringBuilder();

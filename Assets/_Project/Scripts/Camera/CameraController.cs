@@ -56,6 +56,7 @@ namespace Tartaria.Camera
         float _currentYaw;
         float _targetFOV;
         float _zoomOffset;
+        bool _rightStickLogged;  // diagnostic: log first right-stick read per session
 
         // M2: Live mouse sensitivity from Settings
         public static float MouseSensitivityMultiplier { get; private set; } = 1f;
@@ -131,7 +132,7 @@ namespace Tartaria.Camera
 
             _gamepadOrbitAction = new InputAction("GamepadOrbit", InputActionType.Value,
                 binding: "<Gamepad>/rightStick",
-                processors: "StickDeadzone(min=0.15)");
+                processors: "StickDeadzone(min=0.08)"); // Lowered from 0.15 — was eating valid input
             _gamepadOrbitAction.Enable();
         }
 
@@ -258,9 +259,21 @@ namespace Tartaria.Camera
             }
 
             // Gamepad orbit via Input System action (right stick with deadzone processor)
+            // FALLBACK: read direct from Gamepad.current if the action returns zero (action binding sometimes fails to register).
             Vector2 rightStick = _gamepadOrbitAction != null ? _gamepadOrbitAction.ReadValue<Vector2>() : Vector2.zero;
-            if (rightStick.sqrMagnitude > 0.02f)
+            if (rightStick.sqrMagnitude < 0.01f && Gamepad.current != null)
             {
+                Vector2 direct = Gamepad.current.rightStick.ReadValue();
+                if (direct.sqrMagnitude > 0.0064f) rightStick = direct; // manual 0.08 deadzone
+            }
+            if (rightStick.sqrMagnitude > 0.01f)
+            {
+                // One-shot diagnostic per Play session so we know the stick is being read
+                if (!_rightStickLogged)
+                {
+                    Debug.Log($"[CameraController] Right stick LIVE — first read: {rightStick}");
+                    _rightStickLogged = true;
+                }
                 // Apply inversion settings (default: not inverted = push up looks up, push right orbits right)
                 float yawInput = InvertCameraX ? -rightStick.x : rightStick.x;
                 float pitchInput = InvertCameraY ? -rightStick.y : rightStick.y;

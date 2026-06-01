@@ -297,6 +297,16 @@ namespace Tartaria.Save
         public bool[] discoveredPOIs = Array.Empty<bool>();
         public string[] playedDialogueIds = Array.Empty<string>();
         public EnemySpawnState[] enemySpawns = Array.Empty<EnemySpawnState>();
+
+        // --- Schema v15 additions (Moon 1 gap fix 2026-05-31, per spec docs/15 §6) ---
+        /// <summary>POI ids discovered (parallel to legacy bool[] for stable serialization).</summary>
+        public string[] discoveredPOIIds = Array.Empty<string>();
+        /// <summary>Last RS threshold crossed (-1 = none, otherwise 25/50/75/100). Drives music + sky resume on load.</summary>
+        public int lastCrossedRSThreshold = -1;
+        /// <summary>Lore artifact ids collected (6 total expected on Moon 1).</summary>
+        public string[] collectedLoreArtifacts = Array.Empty<string>();
+        /// <summary>Unix seconds when this WorldSaveData was last persisted.</summary>
+        public long lastSaveTimestamp;
     }
 
     [Serializable]

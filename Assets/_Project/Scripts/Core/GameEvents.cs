@@ -437,6 +437,27 @@ namespace Tartaria.Core
         public static event Action OnCombatEnded;
         public static event Action<string> OnTuningNodeActivated;
 
+        // --- Moon 1 gap-fix events (Agents 7 + 9, 2026-05-31) ---
+        /// <summary>Raised by PointOfInterest.cs on first player entry. Payload (poiId, rsReward, worldPos).</summary>
+        public static event Action<string, int, Vector3> OnPOIDiscovered;
+        public static void FirePOIDiscovered(string poiId, int rsReward, Vector3 worldPos) => OnPOIDiscovered?.Invoke(poiId, rsReward, worldPos);
+
+        /// <summary>Raised by TartarianHourCycle.cs once per 17-hour cycle.</summary>
+        public static event Action OnSeventeenthHour;
+        public static void FireSeventeenthHour() => OnSeventeenthHour?.Invoke();
+
+        /// <summary>Raised every hour transition. Payload: new hour 0-16.</summary>
+        public static event Action<int> OnTartarianHourChanged;
+        public static void FireTartarianHourChanged(int newHour) => OnTartarianHourChanged?.Invoke(newHour);
+
+        /// <summary>Raised by tuning mini-games per frame. Payload: unsigned offset (0=perfect).</summary>
+        public static event Action<float> OnTuningProgress;
+        public static void FireTuningProgress(float frequencyOffset) => OnTuningProgress?.Invoke(frequencyOffset);
+
+        /// <summary>Fire helpers for existing OnCombatStarted / OnCombatEnded events.</summary>
+        public static void FireCombatStarted() => OnCombatStarted?.Invoke();
+        public static void FireCombatEnded() => OnCombatEnded?.Invoke();
+
         // ═══════════════════════════════════════════════════════════════════
         // RAISE METHODS (Thread-safe with null-check + exception handling)
         // ═══════════════════════════════════════════════════════════════════

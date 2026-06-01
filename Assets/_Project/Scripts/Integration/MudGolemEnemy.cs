@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Tartaria.Core;
 using Tartaria.AI;
+using Tartaria.Gameplay;  // For real PlayerHealthController (vs Phase2Stubs version)
 using System.Collections;
 
 namespace Tartaria.Integration
@@ -212,8 +213,8 @@ namespace Tartaria.Integration
 
             Debug.Log("[MudGolem] DIED!");
 
-            // Fire event
-            GameEvents.OnEnemyKilled?.Invoke(new EnemyKilledEventArgs
+            // Fire event (must use RaiseEnemyKilled — events can only be invoked from declaring class)
+            GameEvents.RaiseEnemyKilled(new EnemyKilledEventArgs
             {
                 enemyType = "MudGolem",
                 position = transform.position,

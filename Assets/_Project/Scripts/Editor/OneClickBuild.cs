@@ -61,7 +61,7 @@ namespace Tartaria.Editor
         /// Main build entry point (called from batch mode).
         /// Performs script compilation validation and generates build report.
         /// </summary>
-        [MenuItem("Tartaria/Build/One-Click Build")]
+        [MenuItem("Tartaria/0 ★ MASTER/One-Click Build", priority = 70)]
         public static void RunBuild()
         {
             Debug.Log($"{BuildTag} ================================================");

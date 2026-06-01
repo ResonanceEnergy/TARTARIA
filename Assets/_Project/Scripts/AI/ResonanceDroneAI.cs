@@ -198,7 +198,7 @@ namespace Tartaria.AI
             // Visual feedback
             if (_renderer != null)
             {
-                _renderer.material.color = Color.red;
+                { var __m = _renderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", Color.red); else __m.color = Color.red; }
             }
             Invoke(nameof(ResetColor), 0.15f);
 
@@ -214,7 +214,7 @@ namespace Tartaria.AI
         {
             if (_renderer != null && _state != DroneState.Dead)
             {
-                _renderer.material.color = _originalColor;
+                { var __m = _renderer.material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", _originalColor); else __m.color = _originalColor; }
             }
         }
 
@@ -252,7 +252,7 @@ namespace Tartaria.AI
             core.transform.SetParent(root.transform, false);
             core.transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
             var coreMat = core.GetComponent<Renderer>().material;
-            coreMat.color = new Color(0.9f, 0.4f, 0.4f); // red glow
+            { if (coreMat.HasProperty("_BaseColor")) coreMat.SetColor("_BaseColor", new Color(0.9f, 0.4f, 0.4f)); else coreMat.color = new Color(0.9f, 0.4f, 0.4f); } // red glow
 
             // Wings/Rotors (cylinders)
             for (int i = 0; i < 4; i++)
@@ -264,7 +264,7 @@ namespace Tartaria.AI
                 float rad = angle * Mathf.Deg2Rad;
                 wing.transform.localPosition = new Vector3(Mathf.Cos(rad) * 0.6f, 0f, Mathf.Sin(rad) * 0.6f);
                 wing.transform.localScale = new Vector3(0.1f, 0.4f, 0.1f);
-                wing.GetComponent<Renderer>().material.color = new Color(0.5f, 0.5f, 0.5f);
+                { var __m = wing.GetComponent<Renderer>().material; if (__m.HasProperty("_BaseColor")) __m.SetColor("_BaseColor", new Color(0.5f, 0.5f, 0.5f)); else __m.color = new Color(0.5f, 0.5f, 0.5f); }
                 Destroy(wing.GetComponent<Collider>());
             }
 

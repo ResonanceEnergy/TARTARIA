@@ -43,7 +43,7 @@ namespace Tartaria.Editor
         private Vector2 scrollPosition;
         private Dictionary<string, bool> results = new Dictionary<string, bool>();
 
-        [MenuItem("Tartaria/Character Wiring/Wire All Characters to KayKit Models")]
+        [MenuItem("Tartaria/3 Wire/Characters → KayKit Models", priority = 350)]
         public static void ShowWindow()
         {
             GetWindow<KayKitCharacterWiringTool>("KayKit Wiring");
@@ -198,7 +198,7 @@ namespace Tartaria.Editor
             }
         }
 
-        [MenuItem("Tartaria/Character Wiring/Create Missing Character Prefabs")]
+        [MenuItem("Tartaria/3 Wire/Create Missing Character Prefabs", priority = 360)]
         public static void CreateMissingPrefabs()
         {
             int created = 0;

@@ -61,8 +61,18 @@ namespace Tartaria.UI
         void Update()
         {
             if (_state == State.GameOver) return;
-            if (UnityEngine.InputSystem.Keyboard.current != null
-                && UnityEngine.InputSystem.Keyboard.current.escapeKey.wasPressedThisFrame)
+
+            // 2026-05-30 playtest fix: Input System Esc was sometimes missed during
+            // playtest (window focus / Time.timeScale=0 / multiple pause overlays
+            // competing). Read BOTH the new Input System AND legacy Input as a
+            // defensive fallback — whichever fires first wins.
+            bool escPressed = false;
+            var kb = UnityEngine.InputSystem.Keyboard.current;
+            if (kb != null && kb.escapeKey.wasPressedThisFrame) escPressed = true;
+#if ENABLE_LEGACY_INPUT_MANAGER
+            if (UnityEngine.Input.GetKeyDown(KeyCode.Escape)) escPressed = true;
+#endif
+            if (escPressed)
             {
                 if (_state == State.Hidden) Pause();
                 else if (_state == State.Paused) Resume();
@@ -146,7 +156,6 @@ namespace Tartaria.UI
                 _state == State.GameOver ? "Respawn (Restart Scene)" : "Restart Scene", btnStyle))
                 RestartScene();
             by += BH + 10;
-
             if (GUI.Button(new Rect(bx, by, BW, BH), "Return to Echohaven", btnStyle)) GoToEchohaven();
             by += BH + 10;
 

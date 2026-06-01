@@ -1,4 +1,5 @@
 using UnityEngine;
+using Tartaria.Input;
 
 namespace Tartaria.Gameplay
 {

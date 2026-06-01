@@ -21,7 +21,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class FullStartupDiagnostics
     {
-        [UnityEditor.MenuItem("Tartaria/DIAGNOSE: Full Startup Audit")]
+        [UnityEditor.MenuItem("Tartaria/7 Diagnose/Full Startup Audit", priority = 740)]
         static void DiagnoseFullStartup()
         {
             if (!Application.isPlaying)

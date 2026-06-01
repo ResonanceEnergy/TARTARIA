@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 using TMPro;
+using Tartaria.Input;
 
 namespace Tartaria.UI
 {

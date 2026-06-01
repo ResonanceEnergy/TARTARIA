@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
-using Tartaria.Input;
 using Tartaria.Audio;
+using Tartaria.Input;
 
 namespace Tartaria.Gameplay
 {

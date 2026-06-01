@@ -86,12 +86,40 @@ namespace Tartaria.Integration
             spawnedPlayer.name = "Player";
             playerSpawned = true;
 
+            // SAFETY: ensure movement components exist even if the prefab is incomplete.
+            // 2026-05-30: was finding Player capsules with no PlayerInputHandler → couldn't walk.
+            if (spawnedPlayer.GetComponent<UnityEngine.CharacterController>() == null)
+            {
+                var cc = spawnedPlayer.AddComponent<UnityEngine.CharacterController>();
+                cc.center = new Vector3(0f, 1f, 0f);
+                cc.radius = 0.5f;
+                cc.height = 2f;
+                Debug.Log("[PlayerSpawner] Auto-added missing CharacterController");
+            }
+            if (spawnedPlayer.GetComponent<Tartaria.Input.PlayerInputHandler>() == null)
+            {
+                spawnedPlayer.AddComponent<Tartaria.Input.PlayerInputHandler>();
+                Debug.Log("[PlayerSpawner] Auto-added missing PlayerInputHandler (left stick + WASD now work)");
+            }
+            if (spawnedPlayer.GetComponent<Tartaria.Gameplay.GiantMode>() == null)
+            {
+                spawnedPlayer.AddComponent<Tartaria.Gameplay.GiantMode>();
+                Debug.Log("[PlayerSpawner] Auto-added GiantMode (press G or RT to activate)");
+            }
+            if (spawnedPlayer.tag != "Player") spawnedPlayer.tag = "Player";
+
             // Notify systems
-            GameEvents.FirePlayerSpawned(spawnedPlayer);
+            GameEvents.FirePlayerSpawned(spawnedPlayer.transform.position);
 
             Debug.Log("[PlayerSpawner] ✅ Player spawned successfully!");
             return spawnedPlayer;
         }
+
+        /// <summary>
+        /// Lookup helpers used by other systems (e.g. MudGolemEnemy).
+        /// </summary>
+        public bool IsPlayerSpawned() => playerSpawned && spawnedPlayer != null;
+        public GameObject GetPlayer() => spawnedPlayer;
 
         /// <summary>
         /// Despawn current player (for scene transitions).
@@ -104,21 +132,7 @@ namespace Tartaria.Integration
                 spawnedPlayer = null;
             }
             playerSpawned = false;
-
             Debug.Log("[PlayerSpawner] Player despawned");
         }
-
-        /// <summary>
-        /// Respawn player at current spawn position (after death).
-        /// </summary>
-        public void RespawnPlayer()
-        {
-            DespawnPlayer();
-            SpawnPlayer();
-            Debug.Log("[PlayerSpawner] Player respawned");
-        }
-
-        public GameObject GetPlayer() => spawnedPlayer;
-        public bool IsPlayerSpawned() => playerSpawned && spawnedPlayer != null;
     }
 }

@@ -76,6 +76,7 @@ namespace Tartaria.Audio
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChanged += HandleStateChange;
             StartAllLayers();
+            BindLayer2Events();
         }
 
         void OnDestroy()
@@ -83,6 +84,7 @@ namespace Tartaria.Audio
             if (Instance == this) Instance = null;
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChanged -= HandleStateChange;
+            UnbindLayer2Events();
         }
 
         void Update()
@@ -91,6 +93,7 @@ namespace Tartaria.Audio
             UpdateLayerVolumes();
             UpdateCombatOverlay();
             UpdateBossOverlay();
+            UpdateLayer2Reactive();
         }
 
         // ─── Public API — RS ─────────────────────────
@@ -404,6 +407,131 @@ namespace Tartaria.Audio
         }
 
         enum WaveShape { Sine, Triangle, Square }
+        // --- Layer 2 (Reactive) — Moon 1 gap fix 2026-05-31 ---
+        // POI discovery arpeggio, real-time tuning tone, combat percussive bed, restoration swell.
+        // Wired to Tartaria.Core.GameEvents.
+        AudioSource _l2OneShot, _l2TuningTone, _l2Percussive;
+        AudioClip _clipDiscoveryArp, _clipTuningTone, _clipCombatPercussive, _clipRestorationSwell;
+        float _l2TuningOffset = 1f, _l2TuningFade, _l2PercussiveFade;
+        bool _l2CombatActive, _l2Bound;
+
+        void BindLayer2Events()
+        {
+            if (_l2Bound) return;
+            _l2Bound = true;
+            _l2OneShot     = CreateLayer2Source("L2_OneShot",     0f);
+            _l2TuningTone  = CreateLayer2Source("L2_TuningTone",  0f);
+            _l2Percussive  = CreateLayer2Source("L2_Percussive",  0f);
+            _clipDiscoveryArp     = GenDiscoveryArpeggio();
+            _clipTuningTone       = GenTuningTone();
+            _clipCombatPercussive = GenCombatPercussive();
+            _clipRestorationSwell = GenRestorationSwell();
+            _l2TuningTone.clip = _clipTuningTone; _l2TuningTone.loop = true; _l2TuningTone.Play();
+            _l2Percussive.clip = _clipCombatPercussive; _l2Percussive.loop = true; _l2Percussive.Play();
+            try { Tartaria.Core.GameEvents.OnPOIDiscovered    += HandlePOIDiscovered;    } catch { }
+            try { Tartaria.Core.GameEvents.OnTuningProgress   += HandleTuningProgress;   } catch { }
+            try { Tartaria.Core.GameEvents.OnCombatStarted    += HandleCombatEnter;      } catch { }
+            try { Tartaria.Core.GameEvents.OnCombatEnded      += HandleCombatExit;       } catch { }
+            try { Tartaria.Core.GameEvents.OnBuildingRestored += HandleBuildingRestored; } catch { }
+        }
+
+        void UnbindLayer2Events()
+        {
+            if (!_l2Bound) return;
+            _l2Bound = false;
+            try { Tartaria.Core.GameEvents.OnPOIDiscovered    -= HandlePOIDiscovered;    } catch { }
+            try { Tartaria.Core.GameEvents.OnTuningProgress   -= HandleTuningProgress;   } catch { }
+            try { Tartaria.Core.GameEvents.OnCombatStarted    -= HandleCombatEnter;      } catch { }
+            try { Tartaria.Core.GameEvents.OnCombatEnded      -= HandleCombatExit;       } catch { }
+            try { Tartaria.Core.GameEvents.OnBuildingRestored -= HandleBuildingRestored; } catch { }
+        }
+
+        AudioSource CreateLayer2Source(string n, float vol)
+        {
+            var go = new GameObject(n);
+            go.transform.SetParent(transform);
+            var src = go.AddComponent<AudioSource>();
+            src.playOnAwake = false; src.spatialBlend = 0f; src.volume = vol;
+            return src;
+        }
+
+        void HandlePOIDiscovered(string poiId, int rsReward, Vector3 worldPos)
+        {
+            if (_l2OneShot != null && _clipDiscoveryArp != null) _l2OneShot.PlayOneShot(_clipDiscoveryArp, 0.85f);
+        }
+
+        void HandleTuningProgress(float frequencyOffset)
+        {
+            _l2TuningOffset = Mathf.Clamp01(frequencyOffset);
+            _l2TuningFade = 1f;
+        }
+
+        void HandleCombatEnter() { _l2CombatActive = true; }
+        void HandleCombatExit()  { _l2CombatActive = false; }
+
+        void HandleBuildingRestored(string buildingId)
+        {
+            if (_l2OneShot != null && _clipRestorationSwell != null) _l2OneShot.PlayOneShot(_clipRestorationSwell, 0.9f);
+        }
+
+        void UpdateLayer2Reactive()
+        {
+            if (!_l2Bound) return;
+            _l2TuningFade = Mathf.Lerp(_l2TuningFade, 0f, Time.deltaTime * 0.6f);
+            if (_l2TuningTone != null)
+            {
+                float vol = Mathf.Clamp01(_l2TuningFade * (1f - _l2TuningOffset));
+                _l2TuningTone.volume = vol * 0.5f;
+                _l2TuningTone.pitch = Mathf.Lerp(0.85f, 1.15f, 1f - _l2TuningOffset);
+            }
+            float targetPerc = _l2CombatActive ? 0.55f : 0f;
+            _l2PercussiveFade = Mathf.Lerp(_l2PercussiveFade, targetPerc, Time.deltaTime * 1.5f);
+            if (_l2Percussive != null) _l2Percussive.volume = _l2PercussiveFade;
+        }
+
+        AudioClip GenSine(string name, float duration, System.Func<float, float> sampler)
+        {
+            const int sr = 44100;
+            int count = Mathf.Max(1, Mathf.RoundToInt(sr * duration));
+            var samples = new float[count];
+            for (int i = 0; i < count; i++) samples[i] = sampler((float)i / count);
+            var clip = AudioClip.Create(name, count, 1, sr, false);
+            clip.SetData(samples, 0);
+            return clip;
+        }
+
+        AudioClip GenDiscoveryArpeggio()
+        {
+            float[] notes = { 261.63f, 329.63f, 392f, 523.25f, 659.25f };
+            return GenSine("L2_DiscoveryArp", 1.5f, t =>
+            {
+                int idx = Mathf.Min(notes.Length - 1, Mathf.FloorToInt(t * notes.Length));
+                float local = (t * notes.Length) - idx;
+                float env = Mathf.Exp(-local * 4f);
+                return Mathf.Sin(2f * Mathf.PI * notes[idx] * t * 1.5f) * env * 0.45f;
+            });
+        }
+
+        AudioClip GenTuningTone() => GenSine("L2_TuningTone", 1f, t => Mathf.Sin(2f * Mathf.PI * 432f * t) * 0.35f);
+
+        AudioClip GenCombatPercussive() => GenSine("L2_CombatPercussive", 4f, t =>
+        {
+            float beat = (t * 4f) % 1f;
+            float kick = Mathf.Exp(-beat * 12f) * Mathf.Sin(2f * Mathf.PI * 60f * t * 4f);
+            float diss = Mathf.Sin(2f * Mathf.PI * 220f * t) * 0.15f + Mathf.Sin(2f * Mathf.PI * 311f * t) * 0.15f;
+            return (kick * 0.6f + diss * 0.25f);
+        });
+
+        AudioClip GenRestorationSwell() => GenSine("L2_RestorationSwell", 2.5f, t =>
+        {
+            float env = Mathf.SmoothStep(0f, 1f, t < 0.5f ? t * 2f : (1f - t) * 2f);
+            float a = Mathf.Sin(2f * Mathf.PI * 261.63f * t);
+            float b = Mathf.Sin(2f * Mathf.PI * 329.63f * t);
+            float c = Mathf.Sin(2f * Mathf.PI * 392f * t);
+            float d = Mathf.Sin(2f * Mathf.PI * 523.25f * t);
+            return (a + b + c + d) * 0.18f * env;
+        });
+
     }
 
     public enum StingerType : byte
@@ -416,5 +544,7 @@ namespace Tartaria.Audio
         BossDefeat = 5,
         ZoneComplete = 6,
         LevelUp = 7
+
+
     }
 }

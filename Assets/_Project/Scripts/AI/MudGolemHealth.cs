@@ -14,7 +14,9 @@ namespace Tartaria.AI
     public class MudGolemHealth : MonoBehaviour
     {
         [Header("Health Configuration")]
-        [SerializeField] private float _maxHealth = 300f;
+        // 2026-05-31: docs/15 §4 sets Mud Golem HP at 100. EchohavenContentSpawner overrides
+        // via SetMaxHealth(100, true) for safety, but this default matches the spec too.
+        [SerializeField] private float _maxHealth = 100f;
         [SerializeField] private float _currentHealth;
 
         [Header("Damage Feedback")]
@@ -36,6 +38,9 @@ namespace Tartaria.AI
         public event Action<float, float> OnDamaged; // (damageAmount, remainingHealth)
         public event Action OnDeath;
         public event Action<float> OnHealthChanged; // (newHealthPercent)
+
+        // Static fanout for arena/encounter listeners
+        public static event System.Action<MudGolemHealth> OnAnyGolemDied;
 
         // Cached components
         private Renderer _renderer;
@@ -60,7 +65,7 @@ namespace Tartaria.AI
                 _flashTimer -= Time.deltaTime;
                 if (_flashTimer <= 0f && _renderer != null)
                 {
-                    _renderer.material.color = _originalColor;
+                    SetRendererColor(_renderer, _originalColor);
                 }
             }
         }
@@ -80,7 +85,7 @@ namespace Tartaria.AI
             // Visual feedback
             if (_renderer != null)
             {
-                _renderer.material.color = _damageFlashColor;
+                SetRendererColor(_renderer, _damageFlashColor);
                 _flashTimer = _damageFlashDuration;
             }
 
@@ -134,6 +139,7 @@ namespace Tartaria.AI
 
             // Fire death event (Moon content spawners subscribe to this)
             OnDeath?.Invoke();
+            OnAnyGolemDied?.Invoke(this);
 
             // Drop loot (random aether shards or moon-specific materials)
             int lootCount = 0;
@@ -175,6 +181,7 @@ namespace Tartaria.AI
 
             // Play death VFX and audio
             Tartaria.Audio.AudioManager.Instance?.PlaySFX2D("golem_death");
+            Tartaria.Audio.HapticBridge.Call("PlayGolemDeath"); // Tartaria.AI doesn't ref Tartaria.Input — use bridge
             Tartaria.Core.ParticleEffectPool.Instance?.Spawn("GolemDeathExplosion", transform.position, Quaternion.identity, 2f);
 
             // Play death animation if Animator exists
@@ -212,10 +219,21 @@ namespace Tartaria.AI
 
             if (_renderer != null)
             {
-                _renderer.material.color = _originalColor;
+                SetRendererColor(_renderer, _originalColor);
             }
 
             _flashTimer = 0f;
+        }
+
+        // 2026-05-30 playtest fix: URP requires _BaseColor; .color silently
+        // misses on URP/Lit. This helper picks the right property.
+        static void SetRendererColor(Renderer r, Color c)
+        {
+            if (r == null) return;
+            var m = r.material; // instantiates per-renderer copy on first access
+            if (m == null) return;
+            if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", c);
+            else m.color = c;
         }
 
 #if UNITY_EDITOR
@@ -233,15 +251,15 @@ namespace Tartaria.AI
             Vector3 barPos = transform.position + Vector3.up * 3f;
             Vector3 barSize = new Vector3(2f, 0.2f, 0.05f);
 
-            // Background (red)
+            // Background bar
             Gizmos.color = Color.red;
             Gizmos.DrawCube(barPos, barSize);
 
-            // Foreground (green, scaled by health percent)
+            // Foreground bar (filled to health percent)
             Gizmos.color = Color.green;
-            Vector3 healthBarSize = new Vector3(barSize.x * HealthPercent, barSize.y, barSize.z);
-            Vector3 healthBarPos = barPos - Vector3.right * (barSize.x * (1f - HealthPercent) * 0.5f);
-            Gizmos.DrawCube(healthBarPos, healthBarSize);
+            Vector3 fgSize = new Vector3(barSize.x * HealthPercent, barSize.y, barSize.z);
+            Vector3 fgPos = barPos - new Vector3((barSize.x - fgSize.x) * 0.5f, 0f, 0f);
+            Gizmos.DrawCube(fgPos, fgSize);
         }
 #endif
     }

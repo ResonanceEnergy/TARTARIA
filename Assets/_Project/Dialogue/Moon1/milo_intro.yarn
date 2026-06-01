@@ -1,0 +1,268 @@
+title: milo_intro
+tags:
+position: 0,0
+---
+<<set $milo_met = true>>
+Milo: You can hear it, can't you? The frequency beneath the mud.
+Milo: Walk close enough to those buried domes and the song gets louder. Press E.
+Milo: I'll be following. Don't get yourself killed before I learn your name.
+-> Player: "Who are you?"
+    Milo: Milo. Mapmaker, mud-slinger, occasional thief.
+    Milo: I read frequencies. You restore. We're going to make a hell of a team.
+-> Player: "What are these buildings?"
+    Milo: Tartarian. Old. Older than the maps say they should be.
+    Milo: They hum at 432 Hz when intact. Most of these have been silent for a hundred years.
+-> Player: [Stay silent]
+    Milo: Fair. Words are cheaper than mud. Move when you're ready.
+===
+
+title: milo_warming_up
+---
+Milo: You're not bad at this. Two more domes and I might actually trust you.
+===
+
+title: milo_sincere
+---
+Milo: I've been alone out here a long time.
+Milo: You showed up and started fixing things. Just... fixing them.
+Milo: Thanks. For real this time.
+===
+
+// ============================================================
+// TUTORIAL NODES — Milo guides early interactions
+// ============================================================
+
+title: milo_tutorial_tune_stone
+---
+Milo: That stone's humming wrong. Hold the tuning prompt and slide the dial — you'll feel when it lands.
+Milo: D-pad left and right, or the trigger if you're being fancy.
+===
+
+title: milo_tutorial_aether_vision
+---
+Milo: Press Y. Go on.
+Milo: See those threads in the air? That's the song, made visible. Don't ask me how. I just know it works.
+===
+
+title: milo_tutorial_brazier
+---
+Milo: Brazier's cold. Won't light itself — never does.
+Milo: Match its frequency and it'll catch. Watch your ears.
+===
+
+title: milo_tutorial_sprint
+---
+Milo: You walk like a man wading through treacle. Hold LB and pick up the pace.
+===
+
+title: milo_tutorial_scan
+---
+Milo: D-pad up. Tells you what's worth fixing and what's just rubble.
+Milo: Most of it's rubble. But sometimes — fancy that — sometimes it isn't.
+===
+
+title: milo_tutorial_camera_recenter
+---
+Milo: Click the right stick. Camera snaps behind you. Saves a lot of squinting.
+===
+
+title: milo_tutorial_first_restore
+---
+Milo: Hold the resonance. Don't flinch when it pushes back — it always pushes back.
+Milo: There. Building remembers itself. Bit of dust in your hair, mind.
+===
+
+// ============================================================
+// DISCOVERY NODES — Milo reacts to POI / collectible finds
+// ============================================================
+
+title: milo_discovery_first_poi
+---
+Milo: Hello. That dome wasn't on any map I drew.
+Milo: Which means either I'm a poor mapmaker, or someone wanted it forgotten.
+Milo: I prefer the second option. Less insulting.
+===
+
+title: milo_discovery_first_crystal
+---
+Milo: Crystal. Aether-charged, by the look of it.
+Milo: Don't pocket it bare-handed if you value your fingernails — actually, too late, you already did.
+===
+
+title: milo_discovery_first_lore_stone
+---
+Milo: Carvings. Old script. I can read about a third of it.
+Milo: The rest is either prayer or shopping list. With this lot, could be either.
+===
+
+title: milo_discovery_skeleton
+---
+Milo: Bones. Big ones. Bigger than a man's got business being.
+Milo: Don't touch the skull. Don't — right, you touched it.
+===
+
+title: milo_discovery_buried_dome
+---
+Milo: There. Under the silt. Tell me you feel that hum.
+Milo: Whole building down there, holding its breath.
+===
+
+title: milo_discovery_pipe_organ
+---
+Milo: An organ. Out here. Of course there's an organ.
+Milo: If you play it wrong it'll wake something. If you play it right, also something. Choose carefully.
+===
+
+title: milo_discovery_artifact_scroll
+---
+Milo: Vellum. Real vellum, not the printed muck.
+Milo: Someone hid this and meant it to be found. Just — not by us, probably.
+===
+
+title: milo_discovery_mud_pool
+---
+Milo: That pool's not water. Don't drink it. Don't bathe in it. Don't look at it for too long.
+Milo: I've said my piece.
+===
+
+// ============================================================
+// LORE NODES — Milo speculates about Tartaria
+// ============================================================
+
+title: milo_lore_who_built
+---
+Milo: Who built it? Buggered if I know.
+Milo: The maps call them Tartarians but the maps are wrong about most things.
+Milo: Whoever they were, they built in resonance. Stone that sings. Glass that thinks.
+===
+
+title: milo_lore_the_flood
+---
+Milo: Mud came up overnight, the stories say. One generation, two — and the cities were gone.
+Milo: I don't believe it was natural. Floods don't bury cathedrals to the spire.
+===
+
+title: milo_lore_reset_agents
+---
+Milo: There are people who don't want this dug up. Call themselves caretakers. They aren't.
+Milo: If you see one — pale coats, hollow eyes — you run or you ring them like a bell.
+===
+
+title: milo_lore_frequency
+---
+Milo: Everything sings. Stone, bone, the bloody weather.
+Milo: The old ones knew the notes. We're just — hearing them again. Slowly.
+===
+
+title: milo_lore_cathedrals
+---
+Milo: Cathedrals weren't churches. Not really. Antennae, I reckon.
+Milo: Pointed at something. Listening for something. Could be God. Could be — well. Could be worse.
+===
+
+title: milo_lore_anastasia
+---
+Milo: You'll meet a girl. Calls herself a princess. Don't laugh.
+Milo: She remembers things she shouldn't be old enough to remember. That's all I'll say.
+===
+
+title: milo_lore_the_song
+---
+Milo: There's a song under everything. Older than language.
+Milo: I hum a few bars when I'm scared. Don't tell anyone.
+===
+
+title: milo_lore_giants
+---
+Milo: The bones aren't a hoax. I've measured them.
+Milo: Either people used to be larger, or we used to share the world with something that pretended to be people.
+Milo: Sleep on that one.
+===
+
+// ============================================================
+// AMBIENT NODES — idle remarks, curious / distracted
+// ============================================================
+
+title: milo_ambient_1
+---
+Milo: Mud's quiet today. Suspicious.
+===
+
+title: milo_ambient_2
+---
+Milo: Did you hear that? No? Probably nothing. Probably.
+===
+
+title: milo_ambient_3
+---
+Milo: I had a hat like that once. Lost it to a goat. Long story.
+===
+
+title: milo_ambient_4
+---
+Milo: Wind's off the east. Smells of copper. Don't like it.
+===
+
+title: milo_ambient_5
+---
+Milo: Sometimes I think the buildings are watching us back.
+Milo: Then I have a drink and I think it again, but louder.
+===
+
+title: milo_ambient_6
+---
+Milo: Blimey. Look at the light on those tiles.
+===
+
+title: milo_ambient_7
+---
+Milo: You ever notice the birds won't fly over the cathedral? Just — go round.
+===
+
+title: milo_ambient_8
+---
+Milo: I'm hungry. Ignore me. Carry on.
+===
+
+// ============================================================
+// COMBAT NODES — encounter reactions
+// ============================================================
+
+title: milo_combat_mud_golem
+---
+Milo: Mud golem. Big lad. Hit it with a clean tone, not a loud one.
+Milo: Loud just annoys it. Clean — clean unmakes it.
+===
+
+title: milo_combat_reset_scout
+---
+Milo: That's one of them. Reset scout. Don't let it finish that signal.
+Milo: Whatever it's calling, we don't want to meet.
+===
+
+title: milo_combat_player_hit
+---
+Milo: Up. Get up. I'm not carrying you back, you weigh a ton and I've got a bad knee.
+===
+
+title: milo_combat_victory
+---
+Milo: Well struck. Bit messy at the end but — well struck.
+===
+
+// ============================================================
+// CELEBRATION NODES — restoration milestones
+// ============================================================
+
+title: milo_celebration_first_restoration
+---
+Milo: Look at it. Look at it.
+Milo: Hundred years of silence, and you just — gave it back its voice. Fancy that.
+===
+
+title: milo_celebration_cathedral_light
+---
+Milo: Oh. Oh, my.
+Milo: The whole valley's singing. You did that. You — well I never.
+Milo: Don't say anything. Just stand here a moment. With me.
+===

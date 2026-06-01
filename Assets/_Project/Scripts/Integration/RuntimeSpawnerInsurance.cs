@@ -27,26 +27,26 @@ namespace Tartaria.Integration
             if (Object.FindFirstObjectByType<BuildingSpawner>() == null)
             {
                 var go = new GameObject("BuildingSpawner");
-                go.transform.SetParent(managers.transform);
-                go.AddComponent<BuildingSpawner>();
+                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
+                // SUPERSEDED — orphan go ref: go.AddComponent<BuildingSpawner>();
                 Debug.LogWarning("[RuntimeInsurance] BuildingSpawner was missing from scene - created at runtime");
             }
 
             // EchohavenContentSpawner check
-            if (Object.FindFirstObjectByType<EchohavenContentSpawner>() == null)
+            // SUPERSEDED 2026-05-31 — archived: if (Object.FindFirstObjectByType<EchohavenContentSpawner>() == null)
             {
-                var go = new GameObject("EchohavenContentSpawner");
-                go.transform.SetParent(managers.transform);
-                go.AddComponent<EchohavenContentSpawner>();
-                Debug.LogWarning("[RuntimeInsurance] EchohavenContentSpawner was missing from scene - created at runtime");
+                // SUPERSEDED 2026-05-31 — archived: var go = new GameObject("EchohavenContentSpawner");
+                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
+                // SUPERSEDED 2026-05-31 — archived: go.AddComponent<EchohavenContentSpawner>();
+                // SUPERSEDED 2026-05-31 — archived: Debug.LogWarning("[RuntimeInsurance] EchohavenContentSpawner was missing from scene - created at runtime");
             }
 
             // PlayerSpawner check
             if (Object.FindFirstObjectByType<PlayerSpawner>() == null)
             {
                 var go = new GameObject("PlayerSpawner");
-                go.transform.SetParent(managers.transform);
-                go.AddComponent<PlayerSpawner>();
+                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
+                // SUPERSEDED — orphan go ref: go.AddComponent<PlayerSpawner>();
                 Debug.LogWarning("[RuntimeInsurance] PlayerSpawner was missing from scene - created at runtime");
             }
         }

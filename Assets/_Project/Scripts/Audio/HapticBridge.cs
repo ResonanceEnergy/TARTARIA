@@ -17,7 +17,7 @@ namespace Tartaria.Audio
     /// parses them against the target parameter type the first time, then memoizes.
     /// Failures logged to CrashReporter for production monitoring.
     /// </summary>
-    internal static class HapticBridge
+    public static class HapticBridge
     {
         static Type   _type;
         static object _instance;

@@ -98,9 +98,10 @@ namespace Tartaria.Integration
         /// </summary>
         public void EnableDepthOfField(bool enable)
         {
-            if (profile.Has<DepthOfField>())
+            // URP API: TryGet<T>(out T) replaces older Get<T>()
+            if (profile.TryGet<DepthOfField>(out var dof))
             {
-                profile.Get<DepthOfField>().active = enable;
+                dof.active = enable;
             }
         }
 
@@ -109,9 +110,9 @@ namespace Tartaria.Integration
         /// </summary>
         public void SetBloomIntensity(float intensity)
         {
-            if (profile.Has<Bloom>())
+            if (profile.TryGet<Bloom>(out var bloom))
             {
-                profile.Get<Bloom>().intensity.value = intensity;
+                bloom.intensity.value = intensity;
             }
         }
     }

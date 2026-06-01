@@ -10,6 +10,7 @@
     "Tartaria.Localization",
     "Tartaria.UI",
     "Tartaria.Integration",
+    "Tartaria.Camera",
     "Tartaria.Input",
     "Unity.TextMeshPro",
     "Unity.InputSystem"

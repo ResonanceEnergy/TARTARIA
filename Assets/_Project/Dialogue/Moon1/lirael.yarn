@@ -1,0 +1,76 @@
+title: lirael_first_meet
+tags:
+position: 0,0
+---
+<<set $lirael_met = true>>
+Lirael: (humming softly, a slow lullaby that hangs in the air at 432)
+Lirael: Oh. You can see me. Most of them only see the hum.
+Lirael: My mama sang this one when the lamps still worked. The lamps were the same colour as the song.
+Lirael: ...Why do grown-ups build houses, then live in the attic?
+===
+
+title: lirael_lullaby_request
+---
+Lirael: You want to hear it again? Nobody asks twice.
+Lirael: (she hums — three notes, then a fourth that bends downward, then quiet)
+Lirael: It's not really my song. I'm only borrowing it until someone older comes back for it.
+===
+
+title: lirael_about_tartaria
+---
+Lirael: It wasn't a country. That's what the grown-ups always get wrong.
+Lirael: It was a way of building. You put a stone down and you listened to it, and if it sang back you put another stone next to it.
+Lirael: Then the houses sang to each other, and then the cities, and then the whole world had one big slow voice.
+Lirael: I think the voice got tired. Or scared. I'm not sure which one comes first.
+Lirael: My mama said the mud came after the silence, not the other way round. Most people remember it backwards.
+===
+
+title: lirael_aether_band
+---
+Lirael: There are three colours, did you know?
+Lirael: A brown one that lives in the ground and hums very low. That's the going-to-sleep song.
+Lirael: A green-gold one in the middle that feels like a held breath. That's the one I hum.
+Lirael: And a bright one, almost white, that nobody can hold for long. That one is for waking up.
+Lirael: You're learning the middle one first. That's the kind way round.
+===
+
+title: lirael_about_blueprints
+---
+Lirael: When you tune a thing just right, I can show you what it used to be.
+Lirael: It comes out of my hands like cold light. Lines and arches and little notes for the builders.
+Lirael: They're not mine — I just remember where they were kept.
+Lirael: If you ever see one flicker, don't grab at it. It only stays for people who are looking sideways.
+===
+
+title: lirael_ambient_1
+---
+Lirael: The stones here are awake again. They keep trying to tell me something but they're shy.
+===
+
+title: lirael_ambient_2
+---
+Lirael: I left my shoes by the fountain. I don't know which century.
+===
+
+title: lirael_ambient_3
+---
+Lirael: (humming the lullaby again, quieter this time, almost to herself)
+Lirael: ...sorry. It helps the air remember which shape to be.
+===
+
+title: lirael_celebration
+---
+Lirael: Oh — oh, look. Look up.
+Lirael: That's the first proper light this place has made since before my mama.
+Lirael: It's the colour of the middle song. I told you. I told you it was kind.
+Lirael: (she laughs, and the hum threads through the laugh)
+===
+
+title: lirael_farewell
+---
+Lirael: The light is wide enough now. I don't have to hold the corners anymore.
+Lirael: I'm going to go and find my mama's lamp. I think it's been on this whole time and I just couldn't see it.
+Lirael: If you keep tuning, I'll hear you. The middle song carries.
+Lirael: ...you still haven't answered me, you know. About the attic.
+Lirael: (she fades, humming. The note lingers after she's gone.)
+===

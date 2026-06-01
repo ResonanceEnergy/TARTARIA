@@ -1,0 +1,28 @@
+title: anastasia_greeting
+tags:
+position: 0,0
+---
+<<set $anastasia_met = true>>
+Anastasia: You restored the Spire.
+Anastasia: I felt the first note ring all the way to the foundation. Do you know how long I have been listening for that sound?
+-> Player: "Who are you?"
+    Anastasia: Princess Anastasia. Or what is left of one.
+    Anastasia: I was the last to leave when the floods came. I never quite finished leaving.
+-> Player: "Why were you waiting?"
+    Anastasia: For someone who could tune. The Tartarians built this place to sing, and song needs voices.
+    Anastasia: You are the first voice to answer in a hundred years.
+-> Player: "What now?"
+    Anastasia: Two more domes. The Listeners' Hall and the Thread of Memory.
+    Anastasia: Restore them all, and the city remembers itself. Then we can talk about what comes next.
+===
+
+title: anastasia_dome_restored
+---
+Anastasia: The Listeners' Hall sings again. I can almost hear the choir.
+===
+
+title: anastasia_fountain_restored
+---
+Anastasia: The Thread of Memory flows. The water carries names back to us — including, I think, mine.
+Anastasia: You have done what no one has managed in a century. Stay close. The hard part is next.
+===

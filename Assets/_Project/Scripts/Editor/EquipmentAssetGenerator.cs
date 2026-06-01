@@ -22,7 +22,7 @@ namespace Tartaria.Editor
     {
         const string OUTPUT_PATH = "Assets/_Project/Resources/Equipment";
 
-        [MenuItem("Tartaria/Generate Equipment Assets")]
+        [MenuItem("Tartaria/4 Generate Art/Equipment Assets", priority = 485)]
         public static void GenerateEquipmentAssets()
         {
             // Ensure output directory exists

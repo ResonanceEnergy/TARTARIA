@@ -12,7 +12,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class CleanMissingScripts
     {
-        [MenuItem("Tartaria/Clean Missing Scripts")]
+        [MenuItem("Tartaria/6 Scene Tools/Clean Missing Scripts", priority = 680)]
         static void FindAndCleanAll()
         {
             int totalRemoved = 0;

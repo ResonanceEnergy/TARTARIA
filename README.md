@@ -2,169 +2,165 @@
 
 > *Tune the World. Light the Ley Lines. Reclaim the Golden Age.*
 
-## 🎮 BETA READY — Production Certification Complete
-
-**CURRENT BUILD:** v1.0.0-beta (Full 13-Moon Campaign)  
-**PLAYABLE SCOPE:** All 13 Moons complete (50+ hours gameplay)  
-**STATUS:** ✅ **BETA READY** — 10-Agent QA Certified, Score 100/100  
-**CERTIFICATION:** Production-ready for beta testing (see [MASTER_BETA_QUALITY_REPORT.md](MASTER_BETA_QUALITY_REPORT.md))
-
-**What's Included:**
-- ✅ All 13 Moons complete (390 quests, 630 dialogue lines)
-- ✅ Complete narrative (Echohaven → Cosmic Convergence + 3 endings)
-- ✅ Full controller support (Xbox, PlayStation, **Logitech F310/F510/F710**)
-- ✅ AAA UI/UX polish (hit-stop, damage numbers, screen shake, tooltips)
-- ✅ Save encryption (AES-256, anti-cheat, corruption recovery)
-- ✅ Performance optimized (68fps @ 1080p GTX 1060, target 60fps)
-- ✅ Accessibility (WCAG 2.1 AA 90% compliant, colorblind modes, screen reader)
-- ✅ Memory stable (289MB @ 10 hours, zero leaks)
-- ✅ E2E tested (79 integration tests + 5 player journey tests, 100% passing)
-
-**Quality Assurance:**
-- ✅ **10-Agent QA Swarm Complete** — Bug Hunter, Stress Tester, Polish, Stability, Endgame, Optimization, Accessibility, Security, E2E Testing, Launch Certification
-- ✅ **Zero P0/P1 bugs** (10 critical bugs fixed)
-- ✅ **100/100 readiness score** (see [MASTER_BETA_QUALITY_REPORT.md](MASTER_BETA_QUALITY_REPORT.md))
-
-**System Requirements:**
-- **Minimum:** Windows 10/11, GTX 1060 / RX 580, 8 GB RAM, 5 GB storage
-- **Recommended:** RTX 3060 / RX 6700 XT, 16 GB RAM, SSD
-- **Controllers:** Xbox (XInput), PlayStation (DS4/DualSense), **Logitech F310/F510/F710** (DirectInput + XInput)
-- **Optional:** FSR 2.2, DLSS 3.5, DualSense haptics, 1440p/4K support
+A session-based, open-world restoration RPG / light city-builder / harmonic puzzle hybrid for PC (Steam + itch.io). Players awaken as a Tartarian descendant in a post-Mud Flood world, excavating buried wonders, tuning atmospheric Aether through sacred-geometry architecture, and restoring a globe-spanning free-energy grid — one glowing dome at a time.
 
 ---
 
-## The Vision
+## Status
 
-**TARTARIA WORLD OF WONDER** is a session-based, open-world restoration RPG / light city-builder / harmonic puzzle-action hybrid for PC (Steam). Players awaken as a Tartarian descendant in a post-Mud Flood world, excavating buried wonders, tuning atmospheric Aether through sacred-geometry architecture, and restoring a globe-spanning free-energy grid — one glowing dome at a time.
+**Phase:** Alpha 0.4 — Moon 1 shell playable, Moon-1-specific gameplay still being built.
+**Target:** All 13 Moons fully built before any release discussion (per 2026-05-30 owner mandate). No itch.io / Steam timeline.
+**Build:** No public build yet — in development.
+**Engine:** Unity 6 LTS (6000.3.6f1) with URP Forward+.
 
-Every restored cathedral hums. Every connected star fort lights the sky. Every ringing bell tower sends scalar waves across continents. The empire never fell — it was only buried. And you are the one conducting its resurrection.
+For the honest current-state snapshot, see **[STATUS.md](STATUS.md)**.
+For the build order across all 13 Moons, see **[ROADMAP.md](ROADMAP.md)**.
+For guidance future Claude sessions need on the codebase, see **[CLAUDE.md](CLAUDE.md)**.
+For the full campaign design, see **[docs/03_CAMPAIGN_13_MOONS.md](docs/03_CAMPAIGN_13_MOONS.md)**.
+For the art production pipeline + plan, see **[docs/art/ART_PRODUCTION_PLAN.md](docs/art/ART_PRODUCTION_PLAN.md)**.
 
-## Core Fantasy
+## Art pipeline (Blender)
 
-> "Restore paradise on your desktop — immersive sessions that matter."
+This project includes a working headless-Blender pipeline. Run `Tartaria → Moon 1 → Run Blender Batch (Generate All Moon 1 Assets)` from within Unity to regenerate 12 hand-authored FBX models — brazier, pipe organ, mud pool basin, lore artifact, giant skeleton key, skeleton remains, rocking chair, Bob's Inn, tuning pedestal, 3 Aether crystals. Each model is defined in `tools/blender/gen_*.py` as parametric Python; edit the script, re-run the batch, the FBX + auto-generated URP/Lit prefab variant update in seconds. Verified working with Blender 4.5 LTS + 5.0.
+
+`PHASE_1_SCOPE.md` and `TARTARIA_MASTER_PLAN.md` are **archived** — they framed an itch.io-first vertical-slice ship that was reversed by the 2026-05-30 mandate.
+
+
+## Controller (Logitech F310)
+
+Primary dev controller is the Logitech F310, wired USB. The X/D switch on the back should be set to **X** (XInput mode). The button map is canonical in [docs/appendices/D_CONTROLS_F310.md](docs/appendices/D_CONTROLS_F310.md) — A=Interact/Pulse, B=Scan, X=Pulse, Y=Aether Vision, LB=Sprint, RB=Harmonic Strike, LT=Frequency Shield, RT=Sprint alt, Start=Pause, Back=Aether Vision alt, D-Pad ←/→=Frequency adjust, D-Pad ↑=Scan, L3=Sprint toggle, R3=Recenter camera. Every button has a real implementation in `PlayerInputHandler.HandleGamepadButtonFallbacks()` — no stubs.
+
+Verify in Play mode via the `InputProbeHUD` overlay (top-left of Game view) — it lists `Keyboard.current`, `Gamepad.current (XInput)`, `Joystick.current (DInput)`, device count, focus state, live left-stick values, and last button pressed.
+
+### What's actually working today
+
+- ~810 C# scripts, 23 assemblies, clean dependency graph, 0 compile errors.
+- DOTS ECS Resonance Score system, GameEvents pub/sub bus, AES-256-encrypted save (schema v18).
+- Echohaven scene playable end-to-end: player spawns, moves (left stick + WASD), camera follows, 3 hero buildings present + buried at correct depths, tuning mini-game (3 variants), HUD live (RS, Aether, objective, interaction prompt).
+- 12 structures + 6 POIs + 120 vegetation + 69 props + 4 named NPCs in Echohaven.
+- 12 Editor menus under `Tartaria/` for one-click scene composition (`MASTER: Bootstrap All Moon 1 Systems`, `Build Out Moon 1 Buildings/Environment/Vegetation/Village/Props/NPCs`, `Wire Echohaven Audio`, `Combat Verify`, `Ready Check`).
+- 110+ KayKit models, 80+ Hovl/Unity VFX prefabs, 33 Polyhaven PBR materials, Kenney UI audio, 25 RPG ambient tracks.
+
+### What's NOT yet built (Moon 1)
+
+Per `docs/03 Days 6–28` and `docs/15`:
+- Pipe organ centerpiece with 3-note tuning puzzle.
+- Rose window cymatic projection.
+- Pure water font particle + audio restore.
+- Spire placement ceremony.
+- Ley line mini-map reveal.
+- Reset Scout enemy (distinct from Mud Golem).
+- Giant Mode 60-sec burst.
+- 17th-hour cathedral light eruption.
+- Lirael's 432 Hz lullaby + animated appearance.
+- Skeleton hum first-prophecy fragment.
+- Giant skeleton key #1.
+- Dialogue runner hookup for the 3 existing Yarn files.
+
+### How to play the current build
+
+(Assuming a fresh clone — these are click-by-click in Unity 6.)
+
+1. Open `Assets/_Project/Scenes/Echohaven_VerticalSlice.unity`.
+2. Run, in order, the menus:
+   - `Tartaria → MASTER: Bootstrap All Moon 1 Systems` (wires 11 dormant subsystems)
+   - `Tartaria → Build Out Moon 1 Buildings (3 Hero)`
+   - `Tartaria → Build Out Moon 1 Environment (POIs + Mud)`
+   - `Tartaria → Build Out Moon 1 Vegetation (Grass+Bushes)`
+   - `Tartaria → Build Out Moon 1 Village (9 secondary structures)`
+   - `Tartaria → Build Out Moon 1 Props (Rocks + Lore Stones + Fallen Pillars)`
+   - `Tartaria → Build Out Moon 1 NPCs (Milo + Anastasia + Lirael + Cassian)`
+   - `Tartaria → Wire Echohaven Audio (Ambient + SFX)`
+   - `Tartaria → Combat Verify (Moon 1)`
+   - `Tartaria → Ready Check (Audit + Bake + Save)`
+3. Hit Play. WASD or left stick to walk forward toward the buildings. E or gamepad A to interact.
+- 3 building interactions wired (StarDome, HarmonicFountain, CrystalSpire)
+- One Resonance Score event captured on video
+
+### What needs ~12 weeks to ship as itch.io beta
+
+- 7 TODO systems from the MVP spec (HUD live data, audio feedback, VFX wiring, post-processing, inventory, quest activation, day/night cycle)
+- 3 Animator Controllers
+- 15 gameplay SFX (free or $35 paid)
+- Combat balance, tuning mini-game juice, NavMesh + AI polish
+- 60 FPS lock on min spec
+- itch.io page + 30-second trailer
+
+---
+
+## Repository map
+
+```
+TARTARIA_new/
+├── README.md                 # This file
+├── STATUS.md                 # Current state of play (single source of truth)
+├── PHASE_1_SCOPE.md          # Moon 1 scope lock — nothing outside this ships first
+├── TARTARIA_MASTER_PLAN.md   # Strategic plan (Track A ship + Track B platform)
+├── KNOWN_ISSUES.md           # Live bug tracker
+├── TROUBLESHOOTING.md        # Player support
+├── CONTRIBUTING.md           # Contributor guidelines
+├── CHANGELOG.md              # Version history
+├── ROADMAP.md                # System-level done-list (older, kept for reference)
+│
+├── Assets/                   # Unity project — models, audio, scenes, scripts
+│   └── _Project/Scripts/     # Game code (23 assemblies)
+│
+├── docs/                     # All design docs
+│   ├── 00_MASTER_GDD.md      # Master GDD
+│   ├── 01_LORE_BIBLE.md
+│   ├── 02_AETHER_ENERGY_SYSTEM.md
+│   ├── ...                   # (30 main docs + 10 appendices + 10 DLC docs)
+│   ├── agent_reports/        # Historical AI agent swarm reports (preserved, mostly invalid)
+│   └── archive/              # Superseded status, asset inventories, old README
+│
+├── scripts/                  # PowerShell build/test/dev automation
+├── Tools/                    # Editor automation tools
+├── Build/ Builds/            # Output (empty — no .exe built yet)
+└── memories/                 # Agent memory store
+```
+
+---
+
+## Vision (design pillars)
+
+These are the design pillars from `docs/00_MASTER_GDD.md`. They are stable — what's changing is the realistic *scope* and *timeline* to deliver them.
 
 - **Explore & Excavate** — Dig through physics-based mud layers to reveal Tartarian grandeur
 - **Tune & Align** — Play 3-6-9 harmonic sequences on pipe organs and cymatic puzzles
 - **Restore Architecture** — Snap sacred-geometry templates to golden-ratio grids
 - **Harvest Aether** — Watch wireless energy flow as glowing ley lines across the world map
-- **Defend & Expand** — Combat Reset agents with resonance weapons and giant-mode grapples
+- **Defend & Expand** — Combat dissonance entities with resonance weapons
 
-## Campaign: "The Eternal Resonance — Symphony of the 13th Moon"
-
-A 13-chapter epic aligned to the restored 13-Moon calendar. Each Moon unlocks a new storyline, zone, and cosmic event — from your first cathedral restoration through the final planetary convergence during the 13th Moon at the 17th Hour.
-
-## Project Structure
-
-```
-scripts/                           # Build, test & automation scripts (30 files)
-├── build-beta.ps1                # Standard beta build
-├── run-automated-tests.ps1       # Full test suite (79 integration + 5 E2E)
-├── run-e2e-tests.ps1             # End-to-end player journey tests
-└── ... (see scripts/README.md)
-
-docs/
-├── reports/                       # Historical development reports (221 files)
-│   ├── agents/                   # 30-agent swarm deliverables (120 reports)
-│   ├── beta_qa/                  # 10-agent QA certification (13 reports)
-│   ├── phases/                   # Sprint milestones (42 reports)
-│   └── audits/                   # Technical audits (53 reports)
-├── 00_MASTER_GDD.md              # Complete Game Design Document
-├── 01_LORE_BIBLE.md              # Tartarian history, cosmology, factions
-├── 02_AETHER_ENERGY_SYSTEM.md    # Full energy mechanics deep dive
-├── 03_CAMPAIGN_13_MOONS.md       # 13 Moon chronological storylines
-├── 03A_MAIN_STORYLINE_REWRITE.md # Vivid rewritten main storyline (Prologue–Epilogue)
-├── 03B_EXPANSION_PACKS.md        # 10 expansion DLC storylines
-├── 03C_MOON_MECHANICS_DETAILED.md # Granular Moon 1–13 mechanics & spectacles
-├── 04_ARCHITECTURE_GUIDE.md      # Zones, buildings, sacred geometry
-├── 05_CHARACTERS_DIALOGUE.md     # Characters, banter, dialogue trees
-├── 06_COMBAT_PROGRESSION.md      # Combat systems & skill progression
-├── 07_PC_UX.md                 # PC controls, session flow, UX
-├── 08_MONETIZATION.md            # F2P model, events, economy
-├── 09_TECHNICAL_SPEC.md          # Unity 6 PC architecture & optimization
-├── 10_ROADMAP.md                 # Phases, budget, timeline
-├── 11_SCRIPTED_CLIMAXES.md       # Beat-by-beat climax scripts
-├── 12_VIVID_VISUALS.md           # Key visual moments & cinematography
-├── 13_MINI_GAMES.md              # 6 interactive mini-games
-├── 14_HAPTIC_FEEDBACK.md         # Complete haptic design bible
-├── 15_MVP_BUILD_SPEC.md          # MVP build specification & scope
-├── 16_PLAYTHROUGH_PROTOTYPES.md  # 10 playtest scenarios & prototypes
-├── 17_DAY_OUT_OF_TIME.md         # Post-Moon 13 festival & live-ops event
-├── 18_PRINCESS_ANASTASIA.md      # Princess Anastasia character bible
-├── 19_ECONOMY_BALANCE.md         # Resource systems, crafting & balance
-├── 20_QUEST_DATABASE.md          # Complete quest catalog (184 quests)
-├── 21_PLAYER_PERSONAS.md         # Target audience archetypes & feature priority
-├── 22_DIALOGUE_BRANCHING.md      # Choice architecture & consequence tracking
-├── 23_LOCALIZATION.md            # Multi-language pipeline & cultural adaptation
-├── 24_ACCESSIBILITY.md           # WCAG 2.1 AA compliance & inclusive design
-├── 25_SAVE_SYSTEM.md             # Persistence, cloud sync & offline-first design
-├── 26_LEVEL_DESIGN.md            # Zone layout, traversal & encounter pacing
-├── 27_TUTORIAL_ONBOARDING.md     # First-session script & teaching systems
-├── 28_ACHIEVEMENTS.md            # Achievement taxonomy, rewards & Steam Achievements
-├── 29_PRODUCTION_PIPELINE.md     # Art/audio pipeline, outsource & tool chain
-├── 30_MARKETING_POSITIONING.md   # Competitive landscape & launch strategy
-├── appendices/
-│   ├── A_GLOSSARY.md             # Tartarian terms & concepts
-│   ├── B_ASSET_REFERENCE.md      # Art direction & visual guides
-│   ├── C_AUDIO_DESIGN.md         # Cymatic soundtrack & voice design
-│   ├── D_CONTROLS.md             # PC input reference & keybindings
-│   ├── E_METRICS.md              # KPI, analytics & performance budgets
-│   ├── F_MOON_INDEX.md           # Moon-by-Moon quick reference
-│   ├── G_NPC_INDEX.md            # NPC directory & dialogue hooks
-│   ├── H_MECHANIC_INDEX.md       # Core mechanic cross-reference
-│   ├── I_DLC_INDEX.md            # DLC dependency & unlock map
-│   └── J_ENEMY_INDEX.md          # Enemy bestiary & encounter data
-└── dlc/
-    └── (10 expansion DLC detail files)
-```
-
-## Tech Stack
-
-- **Engine:** Unity 6 LTS (DOTS/ECS, URP, Addressables, Burst + Jobs)
-- **Platform:** Windows 10/11 (Steam) — Min: GTX 1060 / 8 GB RAM; Recommended: RTX 3060 / 16 GB RAM
-- **Graphics:** Vulkan / DX12 + FSR 2 / DLSS Temporal Upscaling, baked lighting, BC7 compression
-- **Backend:** Firebase / PlayFab for cloud sync, live-ops, A/B testing; Steam Cloud for saves
-- **Audio:** Procedural 432 Hz adaptive soundtrack + cymatic sound design
-
-## Quick Navigation
-
-| Category | Docs | Description |
-|----------|------|-------------|
-| **Core Design** | [00](docs/00_MASTER_GDD.md) · [01](docs/01_LORE_BIBLE.md) · [02](docs/02_AETHER_ENERGY_SYSTEM.md) | Master GDD, lore, Aether energy |
-| **Campaign** | [03](docs/03_CAMPAIGN_13_MOONS.md) · [03A](docs/03A_MAIN_STORYLINE_REWRITE.md) · [03B](docs/03B_EXPANSION_PACKS.md) · [03C](docs/03C_MOON_MECHANICS_DETAILED.md) | 13 Moons, storyline, expansions |
-| **World** | [04](docs/04_ARCHITECTURE_GUIDE.md) · [26](docs/26_LEVEL_DESIGN.md) · [12](docs/12_VIVID_VISUALS.md) | Architecture, zones, visuals |
-| **Characters** | [05](docs/05_CHARACTERS_DIALOGUE.md) · [18](docs/18_PRINCESS_ANASTASIA.md) · [22](docs/22_DIALOGUE_BRANCHING.md) | NPCs, Anastasia, dialogue trees |
-| **Systems** | [06](docs/06_COMBAT_PROGRESSION.md) · [13](docs/13_MINI_GAMES.md) · [19](docs/19_ECONOMY_BALANCE.md) · [20](docs/20_QUEST_DATABASE.md) | Combat, mini-games, economy, quests |
-| **PC Experience** | [07](docs/07_PC_UX.md) · [14](docs/14_HAPTIC_FEEDBACK.md) · [25](docs/25_SAVE_SYSTEM.md) · [27](docs/27_TUTORIAL_ONBOARDING.md) | UX, haptics, saves, onboarding |
-| **Business** | [08](docs/08_MONETIZATION.md) · [21](docs/21_PLAYER_PERSONAS.md) · [30](docs/30_MARKETING_POSITIONING.md) | Monetization, personas, marketing |
-| **Production** | [09](docs/09_TECHNICAL_SPEC.md) · [10](docs/10_ROADMAP.md) · [15](docs/15_MVP_BUILD_SPEC.md) · [29](docs/29_PRODUCTION_PIPELINE.md) | Tech spec, roadmap, MVP, pipeline |
-| **Polish** | [11](docs/11_SCRIPTED_CLIMAXES.md) · [16](docs/16_PLAYTHROUGH_PROTOTYPES.md) · [17](docs/17_DAY_OUT_OF_TIME.md) · [28](docs/28_ACHIEVEMENTS.md) | Climaxes, prototypes, events, achievements |
-| **Standards** | [23](docs/23_LOCALIZATION.md) · [24](docs/24_ACCESSIBILITY.md) | Localization, accessibility |
-| **Appendices** | [A](docs/appendices/A_GLOSSARY.md) · [B](docs/appendices/B_ASSET_REFERENCE.md) · [C](docs/appendices/C_AUDIO_DESIGN.md) · [D](docs/appendices/D_CONTROLS.md) · [E](docs/appendices/E_METRICS.md) · [F](docs/appendices/F_MOON_INDEX.md) · [G](docs/appendices/G_NPC_INDEX.md) · [H](docs/appendices/H_MECHANIC_INDEX.md) · [I](docs/appendices/I_DLC_INDEX.md) · [J](docs/appendices/J_ENEMY_INDEX.md) | Glossary, assets, audio, controls, metrics, indices |
-| **DLC** | [01](docs/dlc/DLC_01_BURIED_BEACON.md)–[10](docs/dlc/DLC_10_TRUE_TIMELINE.md) | 10 expansion deep-dives |
-
-## Documentation Stats
-
-| Metric | Count |
-|--------|-------|
-| Total documents | 54 |
-| Main GDD docs | 30 |
-| Appendices | 10 |
-| DLC deep-dives | 10 |
-| Support files | 4 (README, CHANGELOG, _toc_audit.py, .gitignore) |
-| Quests catalogued | 184 |
-| Campaign chapters | 13 Moons |
-| Anastasia dialogue lines | 112 |
-| Cross-references validated | 200+ links, 32 § refs |
-| TOC audit status | **54 PASS / 0 FAIL** |
-
-## Status
-
-**Phase:** Pre-Production / Game Design Documentation — **COMPLETE**  
-**Version:** 1.0.0  
-**Date:** March 25, 2026
-
-See [CHANGELOG.md](CHANGELOG.md) for full version history.
+Moon 1 (Echohaven) ships first. Moons 2–13 + 10 DLCs are roadmap, not commitment.
 
 ---
 
-*The Aether is pocket-sized and ready to awaken.*
+## Tech stack
+
+- **Engine:** Unity 6 LTS (6000.3.6f1) — DOTS/ECS, URP, Addressables, Burst + Jobs
+- **Platform:** Windows 10/11 — Min: GTX 1070 / 8 GB RAM; Recommended: RTX 3060 / 16 GB RAM
+- **Graphics:** Vulkan / DX12 + FSR 2 / DLSS, baked lighting, BC7 compression
+- **Audio:** 432 Hz adaptive soundtrack + cymatic sound design
+- **Distribution:** itch.io first (free / pay-what-you-want), Steam later (premium with paid DLC)
+
+---
+
+## Quick navigation — design docs
+
+| Category | Docs |
+|----------|------|
+| **Core Design** | [00 Master GDD](docs/00_MASTER_GDD.md) · [01 Lore Bible](docs/01_LORE_BIBLE.md) · [02 Aether System](docs/02_AETHER_ENERGY_SYSTEM.md) |
+| **Campaign** | [03 13 Moons](docs/03_CAMPAIGN_13_MOONS.md) · [03A Storyline](docs/03A_MAIN_STORYLINE_REWRITE.md) · [03B Expansions](docs/03B_EXPANSION_PACKS.md) · [03C Moon Mechanics](docs/03C_MOON_MECHANICS_DETAILED.md) |
+| **World** | [04 Architecture](docs/04_ARCHITECTURE_GUIDE.md) · [26 Level Design](docs/26_LEVEL_DESIGN.md) · [12 Visuals](docs/12_VIVID_VISUALS.md) |
+| **Characters** | [05 Characters](docs/05_CHARACTERS_DIALOGUE.md) · [18 Anastasia](docs/18_PRINCESS_ANASTASIA.md) · [22 Dialogue Branching](docs/22_DIALOGUE_BRANCHING.md) |
+| **Systems** | [06 Combat](docs/06_COMBAT_PROGRESSION.md) · [13 Mini-Games](docs/13_MINI_GAMES.md) · [19 Economy](docs/19_ECONOMY_BALANCE.md) · [20 Quests](docs/20_QUEST_DATABASE.md) |
+| **PC Experience** | [07 PC UX](docs/07_PC_UX.md) · [14 Haptics](docs/14_HAPTIC_FEEDBACK.md) · [25 Save System](docs/25_SAVE_SYSTEM.md) · [27 Tutorial](docs/27_TUTORIAL_ONBOARDING.md) |
+| **Production** | [09 Tech Spec](docs/09_TECHNICAL_SPEC.md) · [10 Roadmap](docs/10_ROADMAP.md) · [15 MVP Build Spec](docs/15_MVP_BUILD_SPEC.md) · [29 Pipeline](docs/29_PRODUCTION_PIPELINE.md) |
+| **Appendices** | [A](docs/appendices/A_GLOSSARY.md) · [B](docs/appendices/B_ASSET_REFERENCE.md) · [C](docs/appendices/C_AUDIO_DESIGN.md) · [D](docs/appendices/D_CONTROLS.md) · [E](docs/appendices/E_METRICS.md) · [F](docs/appendices/F_MOON_INDEX.md) · [G](docs/appendices/G_NPC_INDEX.md) · [H](docs/appendices/H_MECHANIC_INDEX.md) · [I](docs/appendices/I_DLC_INDEX.md) · [J](docs/appendices/J_ENEMY_INDEX.md) |
+| **DLC** | [01](docs/dlc/DLC_01_BURIED_BEACON.md) – [10](docs/dlc/DLC_10_TRUE_TIMELINE.md) |
+
+---
+
+## A note on the older "BETA READY" claim
+
+E

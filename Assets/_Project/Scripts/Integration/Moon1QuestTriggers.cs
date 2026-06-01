@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Gameplay;
+using Tartaria.Core;
 
 namespace Tartaria.Integration
 {
@@ -12,7 +13,9 @@ namespace Tartaria.Integration
     public class Moon1QuestTriggers : MonoBehaviour
     {
         [Header("Quest Trigger Zones")]
-        [SerializeField] Vector3 miloZoneCenter = new Vector3(-40f, 0f, 20f);
+        // 2026-05-31: was (-40, 0, 20), 14m from actual Milo at (-26, 0, 26).
+        // Moved closer to the live Milo position so the trigger zone overlaps him.
+        [SerializeField] Vector3 miloZoneCenter = new Vector3(-30f, 0f, 24f);
         [SerializeField] Vector3 cathedralZoneCenter = new Vector3(0f, 0f, 80f);
         [SerializeField] Vector3 spireZoneCenter = new Vector3(60f, 0f, 40f);
         [SerializeField] float triggerRadius = 8f;
@@ -77,6 +80,9 @@ namespace Tartaria.Integration
                 QuestSystem.Instance.ActivateQuest(miloQuestId);
             }
 
+            // Spec alias — design docs reference "AwakenStarDome" as the canonical ID.
+            TryFireSpecQuest("AwakenStarDome");
+
             // Show notification
             ShowQuestNotification("New Quest", "Talk to Milo the Mapmaker");
         }
@@ -89,6 +95,9 @@ namespace Tartaria.Integration
             {
                 QuestSystem.Instance.ActivateQuest(excavationQuestId);
             }
+
+            // Spec alias — design docs reference "AwakenFountain" for cathedral/fountain restoration beat.
+            TryFireSpecQuest("AwakenFountain");
 
             ShowQuestNotification("New Quest", "Restore Echohaven Cathedral");
         }
@@ -103,12 +112,24 @@ namespace Tartaria.Integration
                 QuestSystem.Instance.CompleteObjective(shardQuestId, 0);
             }
 
+            // Spec alias — design docs reference "RaiseTheSpire" for the third hero restoration.
+            TryFireSpecQuest("RaiseTheSpire");
+
             ShowQuestNotification("Objective Complete", "Aether Shards collected!");
+        }
+
+        void TryFireSpecQuest(string specId)
+        {
+            try { GameEvents.FireQuestActivated(specId); }
+            catch (System.Exception ex) { Debug.Log($"[Moon1QuestTriggers] Spec alias '{specId}' fallback log (no fire): {ex.Message}"); }
         }
 
         void ShowQuestNotification(string title, string message)
         {
-            // TODO: Integrate with NotificationSystem when available
+            // Route through the canonical HUD objective channel (Day-2: GameEvents.OnHUDShowObjective
+            // is subscribed to by RuntimeHUDBuilder / objective banner). Pre-format so subscribers
+            // get both the title and the body in one line.
+            GameEvents.RaiseHUDShowObjective($"{title} — {message}");
             Debug.Log($"[QUEST] {title}: {message}");
         }
     }
