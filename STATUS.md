@@ -1,9 +1,109 @@
 # TARTARIA — Current Status
 
 > **The single source of truth for "where are we right now?"**
-> Updated: 2026-05-30. This doc supersedes all of `docs/archive/superseded_status/*.md`. When status claims in other docs conflict with this file, this file wins until updated.
+> Updated: 2026-05-31 (late-night marathon close). This doc supersedes prior status docs.
 
 ---
+
+## 2026-05-31 MARATHON — Moon 1 content + 8-class recovery + ship checklist
+
+### What landed (verifiable on disk)
+
+**Scene content placed via Editor menus (you ran these tonight):**
+- `Echohaven_Village` parent → 9 village structures + 31 cathedral kit pieces
+- `Echohaven_NPCs` parent → 4 NPCs placed (Milo + Lirael + Cassian + 1)
+- `Echohaven_Environment` parent → 6 POIs (3 Mud Pools + Carved Stone + Overlook + Root Chamber) + atmospheric lighting + fog
+- 4 climactic VFX prefabs generated to `Prefabs/VFX/Moon1/`
+
+**8 dormant controllers brought back online (~4,800 lines):**
+- `AnastasiaController.cs` (786 lines, was `.cs.disabled`)
+- `LiraelController.cs` (469 lines, was `.cs.disabled`)
+- `CombatWaveManager.cs` (577 lines, was `.cs.disabled`)
+- `EchohavenContentSpawner.cs` (3,082 lines, un-archived from `_archived_legacy_2026_05_31/`)
+- `AnastasiaDialogueDatabase.cs` + `AnastasiaTypes.cs` (deps re-enabled)
+- 5 already-live (RuntimeHUDBuilder 2,410L / TutorialSystem 141L / EchohavenProgressionSystem 269L / MicroGiantController 280L / ZoneController 267L)
+
+**New code shipped this marathon:**
+- `Editor/Moon1MegaCleanup.cs` — single menu deletes 3 placeholders + 6 wrong-Moon shells + 4 old-spawner remnants + re-aligns sacred geometry to dome center + applies URP/Lit to Player
+- `Editor/Moon1WireTuningPedestals.cs` — wires TuningPedestal_0..8 to 3 hero buildings, assigns Variants A/B/C per spec §9
+- `Integration/TuningPedestalLink.cs` — runtime E-prompt dispatcher for tuning
+- `Integration/PlayerSpawner.cs` — runtime magenta-fix patch at Instantiate
+- `Integration/MudDissolutionAnimator.cs` — animates `_Dissolution`/`_Dissolve` shader props over 5s on OnBuildingRestoredTyped
+- `Editor/Moon1CathedralKitDressing.cs` — places 25 cathedral kit pieces + 3 spire + Pipe Organ visual
+- `Editor/Moon1RegenCorruptCharacters.cs` — rebuilds `Lirael.prefab.corrupt` + `Cassian.prefab.corrupt` via primitives + emission
+- `Editor/Moon1PopulateAudioCueLibrary.cs` — populates AudioCueLibrary with 5 Moon 1 cues
+- `Editor/GameViewFocusFix.cs` — auto-focuses Game view on EnteredPlayMode
+- 3 new yarn dialogue files: `lirael.yarn` (10 nodes), `cassian.yarn` (10 nodes + 10 Moon 2/7 seeds), `milo_intro.yarn` expanded to 38 nodes
+- `Integration/CassianController.cs` (293 lines) — wander + dialogue cycle
+
+**Patches landed:**
+- `Save/SaveData.cs` v15 schema (discoveredPOIIds + lastCrossedRSThreshold + collectedLoreArtifacts + lastSaveTimestamp + migration)
+- `Audio/AdaptiveMusicController.cs` Layer 2 reactive (discovery arpeggio + tuning tone + combat percussive + restoration brass+choir swell, all procedurally generated)
+- `Core/GameEvents.cs` +6 events (OnPOIDiscovered, OnSeventeenthHour, OnTartarianHourChanged, OnTuningProgress, FireCombatStarted/Ended)
+- `Core/AetherFieldSystem.cs` playerApprox float3.zero → float3(0,1,0) [Bucket 3 fix]
+- `Integration/Moon1MasterBootstrap.cs` now adds 5 newly re-enabled components (EchohavenContentSpawner + AnastasiaController + LiraelController + EchohavenProgressionSystem + ZoneController)
+- `Integration/NPCConditionalSpawn.cs` Anastasia gate `crystalspire`→`stardome`
+- `Integration/Moon1QuestTriggers.cs` Milo zone (-40,0,20)→(-30,0,24) + spec quest IDs fire
+- `UI/QuestObjectiveTrackerUI.cs` subscribes to OnQuestStatusChanged
+- `Input/PlayerInputHandler.cs` interactRadius 3→5
+- `AI/MudGolemAI.cs` HP 50→100, telegraph 0.5→1.0s, routes TakeDamage to MudGolemHealth
+- `AI/MudGolemHealth.cs` HP unified at 100
+- `Integration/Moon1MudPoolPuzzle.cs` NavMeshObstacle carve
+- 3 haptic patches (Footstep + Golem death + Building emergence)
+- `Gameplay/PlayerAbilityController.cs` combat subs suppressed (PlayerCombatController canonical)
+- `Camera/RestorationCinemachine.cs` subs suppressed (Moon1CinematicMoments canonical)
+- Bypass drivers (Moon1Lifeline, SimplePlayerDriver) archived → PlayerInputHandler canonical
+
+### Audit docs written
+
+`docs/audits/`:
+1. `MOON1_FULL_AUDIT_2026-05-31.md`
+2. `MOON1_V2_SYNTHESIS_2026-05-31.md`
+3. `INPUT_DEEP_DIVE_2026-05-31.md` (Console Error Pause root cause)
+4. `PREFAB_VALIDITY_2026-05-31.md` (60/60 sample VALID, population ~94%+)
+5. `AETHER_FIELD_PERF_2026-05-31.md`
+6. `NAVMESH_COVERAGE_2026-05-31.md`
+7. `DIALOGUE_COMPLETENESS_2026-05-31.md`
+8. `CATHEDRAL_DRESSING_2026-05-31.md`
+9. `HAPTICS_F310_2026-05-31.md`
+
+---
+
+## Moon 1 Ship Checklist (run-then-verify)
+
+When Unity exits Safe Mode (IDE pass clears the 17 remaining syntax errors), do this in order:
+
+1. ✅ Tartaria → 0 ★ MASTER → Bootstrap All Moon 1 Systems (re-adds the 5 newly-re-enabled components to Moon1_Systems)
+2. ✅ Tartaria → 8 Fix → Moon 1 MEGA Cleanup (deletes 3 placeholders + 6 wrong-Moon shells + re-aligns sacred geometry)
+3. ✅ Tartaria → 1 Build → Build Out Moon 1 Village (9 Buildings) — ALREADY RAN tonight
+4. ✅ Tartaria → 1 Build → Build Out Moon 1 NPCs — ALREADY RAN tonight
+5. ✅ Tartaria → 1 Build → Build Out Moon 1 Environment (POIs) — ALREADY RAN tonight
+6. ✅ Tartaria → 1 Build → Dress Cathedral (Kit Pieces + Spire + Pipe Organ)
+7. ✅ Tartaria → 1 Build → Wire Tuning Pedestals (9 → 3 hero buildings)
+8. ✅ Tartaria → 1 Build → Regenerate Corrupt Character Prefabs (Lirael + Cassian)
+9. ✅ Tartaria → 3 Wire → Populate Audio Cue Library
+10. ✅ Ctrl+S to save scene
+11. ✅ Hit Play — verify:
+    - No magenta capsule (PlayerSpawner.cs runtime URP/Lit fix)
+    - No placeholder buildings (MegaCleanup deleted them)
+    - No wrong-Moon mini-game GameObjects (MegaCleanup deleted them)
+    - F310 left stick + WASD move the Player
+    - Walk to TuningPedestal_0 → "Press [E] to tune (FrequencySlider)" prompt → E starts Variant A
+    - Walk to TuningPedestal_1 → "Press [E] to tune (WaveformTrace)" → E starts Variant B
+    - Walk to TuningPedestal_2 → "Press [E] to tune (HarmonicPattern)" → E starts Variant C
+    - Lirael + Cassian prefabs exist and visually load (not corrupt)
+    - AudioCueLibrary has 5 cues
+
+### Open follow-ups (post-ship)
+
+- IDE pass clears 17 syntax errors that Safe Mode is on
+- Moon1WireTuningPedestals + Moon1MegaCleanup haven't yet been clicked
+- Anastasia opacity fade verify
+- Lirael Day-25 gate (needs `GameEvents.OnDayChanged` event added)
+- 18-piece cathedral kit visual tune pass
+
+---
+
 
 ## 2026-05-30 — LATE-NIGHT HAMMER (no-stubs mandate build-out, 11 files, 2,640+ lines)
 

@@ -12,6 +12,7 @@
     "Tartaria.Integration",
     "Tartaria.Camera",
     "Tartaria.Input",
+    "Tartaria.Audio",
     "Unity.TextMeshPro",
     "Unity.InputSystem"
   ],

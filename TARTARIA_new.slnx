@@ -1,11 +1,11 @@
 ﻿<Solution>
+  <Project Path="Tartaria.Integration.csproj" />
   <Project Path="Tartaria.Editor.csproj" />
   <Project Path="Tartaria.Data.csproj" />
   <Project Path="Tartaria.Gameplay.csproj" />
   <Project Path="Tartaria.Core.csproj" />
   <Project Path="Tartaria.UI.csproj" />
   <Project Path="Tartaria.Scripts.Editor.csproj" />
-  <Project Path="Tartaria.Integration.csproj" />
   <Project Path="PrimeTween.Demo.csproj" />
   <Project Path="Tartaria.Camera.csproj" />
   <Project Path="LeanTween.csproj" />

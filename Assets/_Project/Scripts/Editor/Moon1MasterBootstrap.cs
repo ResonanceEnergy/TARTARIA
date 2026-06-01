@@ -56,15 +56,33 @@ namespace Tartaria.Editor
             added += AddIfMissing<TartarianHourCycle>(parent, ref reused);          // 17-hour day, drives lighting + fires OnSeventeenthHour
             added += AddIfMissing<Moon1NarrativeBeats>(parent, ref reused);          // Cathedral eruption + skeleton hum prophecy + Giant skeleton key #1
             added += AddIfMissing<Moon1DialogueBindings>(parent, ref reused);        // Wires 3 yarn files to in-game events
+            added += AddIfMissing<EchohavenContentSpawner>(parent, ref reused);     // Un-archived 2026-05-31 — populates zone content
+            added += AddIfMissing<AnastasiaController>(parent, ref reused);          // Re-enabled — gates Anastasia reveal on dome restoration
+            added += AddIfMissing<LiraelController>(parent, ref reused);             // Re-enabled — Day 25-28 Lirael reveal
+            added += AddIfMissing<EchohavenProgressionSystem>(parent, ref reused);   // Phase tracking
+            added += AddIfMissing<ZoneController>(parent, ref reused);               // Restoration count + zone state
 
             EditorSceneManager.MarkSceneDirty(scene);
             Selection.activeGameObject = parent;
+
+            // 2026-05-31 — auto-chain the prefab-wire sweep so Bootstrap leaves a fully-wired scene.
+            // Without this, EchohavenContentSpawner + BuildingSpawner + VFX/Combat components have
+            // null refs and the spawners fall back to magenta primitives at runtime.
+            try
+            {
+                Moon1WireSpawnerPrefabs.RunAll();
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogWarning($"[Moon1MasterBootstrap] Prefab-wire sweep failed: {ex.Message}");
+            }
 
             string summary =
                 $"Moon1_Systems bootstrapped.\n" +
                 $"  Components added this run: {added}\n" +
                 $"  Components already present: {reused}\n\n" +
                 "Pruned per audit: 7 stub/conflicting auto-attaches removed.\n" +
+                "Followed by automatic 'Wire ALL Scene Prefab Refs' sweep — see dialog above.\n" +
                 "Run the 'Build Out Moon 1 *' menus + 'Place Blender Prefabs' + 'Place New Assets' for the canonical scene build.";
             EditorUtility.DisplayDialog("Bootstrap All Moon 1 Systems",
                 summary + "\n\nNext: Tartaria → Ready Check (Audit + Bake + Save), then Play.",
