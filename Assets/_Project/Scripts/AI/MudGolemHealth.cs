@@ -51,9 +51,13 @@ namespace Tartaria.AI
         {
             _currentHealth = _maxHealth;
             _renderer = GetComponentInChildren<Renderer>();
-            if (_renderer != null && _renderer.material != null)
+            if (_renderer != null && _renderer.sharedMaterial != null)
             {
-                _originalColor = _renderer.material.color;
+                // 2026-06-01 [ai] mudgolem-cleanup: read from sharedMaterial to
+                // avoid the per-instance clone that r.material.color would trigger.
+                var sm = _renderer.sharedMaterial;
+                if (sm.HasProperty("_BaseColor")) _originalColor = sm.GetColor("_BaseColor");
+                else _originalColor = sm.color;
             }
         }
 
@@ -227,13 +231,13 @@ namespace Tartaria.AI
 
         // 2026-05-30 playtest fix: URP requires _BaseColor; .color silently
         // misses on URP/Lit. This helper picks the right property.
+        // 2026-06-01 [ai] mudgolem-cleanup: route through MaterialBank so we set
+        // colors via a shared MaterialPropertyBlock instead of cloning the
+        // material per-renderer on first .material access (was producing
+        // "Suboptimal memory type used for buffer" warnings in URP under wave loads).
         static void SetRendererColor(Renderer r, Color c)
         {
-            if (r == null) return;
-            var m = r.material; // instantiates per-renderer copy on first access
-            if (m == null) return;
-            if (m.HasProperty("_BaseColor")) m.SetColor("_BaseColor", c);
-            else m.color = c;
+            MaterialBank.ApplyColor(r, c);
         }
 
 #if UNITY_EDITOR
