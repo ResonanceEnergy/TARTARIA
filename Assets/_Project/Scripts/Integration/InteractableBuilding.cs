@@ -96,7 +96,7 @@ namespace Tartaria.Integration
                 ? LayerMask.NameToLayer("Building") : 0;
 
             UpdateVisuals();
-                    // SUPERSEDED 2026-05-31 — missing symbol: if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
             RestoreFromSave();
             RegisterWithScanner();
             TryRegisterExcavationCallbacks();
@@ -176,14 +176,14 @@ namespace Tartaria.Integration
                         break;
 
                     // Fully restored — enter micro mode if available, otherwise show lore
-                    // SUPERSEDED 2026-05-31 — missing symbol: if (MicroGiantController.Instance != null && !MicroGiantController.Instance.IsMicro)
+                    if (MicroGiantController.Instance != null && !MicroGiantController.Instance.IsMicro)
                     {
                         float aether = EconomySystem.Instance != null
                             ? EconomySystem.Instance.GetBalance(Core.CurrencyType.AetherShards)
                             : 0f;
                         if (aether > 0f)
                         {
-                            // SUPERSEDED 2026-05-31 — missing symbol: MicroGiantController.Instance.EnterMicroMode(
+                            MicroGiantController.Instance.EnterMicroMode(
                                 buildingId, transform.position, aether);
                             break;
                         }
@@ -237,7 +237,7 @@ namespace Tartaria.Integration
                 GameEvents.RaiseHUDShowInteractionPrompt($"{GetDisplayName()} site identified. Press [E] to dig.");
 
             // SUPERSEDED 2026-05-31 — missing symbol: GameLoopController.Instance?.OnBuildingDiscovered(
-                GetDisplayName(), transform.position);
+            //     GetDisplayName(), transform.position);
             Save.SaveManager.Instance?.MarkDirty();
         }
 
@@ -297,7 +297,7 @@ namespace Tartaria.Integration
             Input.HapticFeedbackManager.Instance?.PlayBuildingEmergence();
             GameEvents.RaiseHUDShowInteractionPrompt($"The mud crumbles! {GetDisplayName()} is revealed!");
             UpdateVisuals();
-                    // SUPERSEDED 2026-05-31 — missing symbol: if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
             Save.SaveManager.Instance?.MarkDirty();
         }
 
@@ -383,7 +383,7 @@ namespace Tartaria.Integration
             // SUPERSEDED 2026-05-31 — missing symbol: GameLoopController.Instance?.OnTuningNodeComplete(buildingId, _nodesCompleted - 1, accuracy);
 
             // Tutorial: first tuning completion
-            // SUPERSEDED 2026-05-31 — missing symbol: TutorialSystem.Instance?.ForceComplete(TutorialStep.Tuning);
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.Tuning);
             // SUPERSEDED 2026-05-31 — missing symbol: QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompleteTuning, buildingId);
 
             // All nodes done?
@@ -393,7 +393,7 @@ namespace Tartaria.Integration
                 GameStateManager.Instance?.TransitionTo(GameState.Exploration);
 
             UpdateVisuals();
-                    // SUPERSEDED 2026-05-31 — missing symbol: if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
         }
 
         void OnTuningFailed()
@@ -411,7 +411,7 @@ namespace Tartaria.Integration
         {
             _state = BuildingRestorationState.Emerging;
             UpdateVisuals();
-                    // SUPERSEDED 2026-05-31 — missing symbol: if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
 
             // Play restoration SFX
             Audio.AudioManager.Instance?.PlaySFX2D("restore_success");
@@ -444,7 +444,7 @@ namespace Tartaria.Integration
 
             // Camera shake + discovery flash at sequence start
             FindAnyObjectByType<Tartaria.Camera.CameraController>()?.TriggerShake(0.35f, 0.5f);
-            // SUPERSEDED 2026-05-31 — missing symbol: RuntimeHUDBuilder.Instance?.FlashDiscovery();
+            RuntimeHUDBuilder.Instance?.FlashDiscovery();
 
             while (elapsed < duration)
             {
@@ -519,7 +519,7 @@ namespace Tartaria.Integration
                 Instantiate(restoreSparkleVFX, transform.position, Quaternion.identity);
 
             UpdateVisuals();
-                    // SUPERSEDED 2026-05-31 — missing symbol: if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
 
             // Register building for passive income
             EconomySystem.Instance?.RegisterBuilding(
@@ -546,12 +546,12 @@ namespace Tartaria.Integration
 
             // Legacy GameLoopController call (backward compat)
             // SUPERSEDED 2026-05-31 — missing symbol: GameLoopController.Instance?.OnBuildingRestored(
-                GetDisplayName(), transform.position, allPerfect);
+            //     GetDisplayName(), transform.position, allPerfect);
 
             // Tutorial: first building fully restored
-            // SUPERSEDED 2026-05-31 — missing symbol: TutorialSystem.Instance?.ForceComplete(TutorialStep.BuildingRestore);
-            // SUPERSEDED 2026-05-31 — missing symbol: AchievementSystem.Instance?.CheckBuildingRestored(
-                // SUPERSEDED 2026-05-31 — missing symbol: ZoneController.Instance?.GetRestoredBuildingCount() ?? 1, allPerfect);
+            TutorialSystem.Instance?.ForceComplete(TutorialStep.BuildingRestore);
+            AchievementSystem.Instance?.CheckBuildingRestored(
+                ZoneController.Instance?.GetRestoredBuildingCount() ?? 1, allPerfect);
         }
 
         // ─── Visuals ─────────────────────────────────
@@ -652,9 +652,9 @@ namespace Tartaria.Integration
                     }
                     _isDiscovered = _state != BuildingRestorationState.Buried;
                     if (_state == BuildingRestorationState.Active)
-                        // SUPERSEDED 2026-05-31 — missing symbol: EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
+                        EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
                     UpdateVisuals();
-                    // SUPERSEDED 2026-05-31 — missing symbol: if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
+                    if (_state == BuildingRestorationState.Active) EchohavenProgressionSystem.Instance?.NotifyBuildingRestoredFromLoad(buildingId);
                     return;
                 }
             }
