@@ -1,6 +1,7 @@
 // PHASE 2 STUBS — Minimal implementations to satisfy Integration layer compilation
 // These will be replaced with full implementations in Phase 2
 // Rebuilt 2026-05-30 by Claude after Edit-tool CRLF truncation incident
+using System.Collections.Generic;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Save;
@@ -114,6 +115,8 @@ namespace Tartaria.Integration
         public static event System.Action<TuningNodeEventArgs> OnTuningNodeActivated;
 
         public static void FireCollectibleGathered(string id, float rs) => OnCollectibleGathered?.Invoke(new CollectibleEventArgs { collectibleID = id, rsReward = rs });
+        public static void FireCombatStarted() => OnCombatStarted?.Invoke();
+        public static void FireCombatEnded() => OnCombatEnded?.Invoke();
         public static void FireAchievementUnlocked(string id) => Debug.Log($"[Stub] Achievement unlocked: {id}");
         public static void FireCompanionTrustChanged(string companionName, int trust) => Debug.Log($"[Stub] {companionName} trust: {trust}");
         public static void FireLeverPulled(string leverId) => Debug.Log($"[Stub] Lever pulled: {leverId}");
@@ -141,55 +144,63 @@ namespace Tartaria.Integration
     // Phase 2 when real systems are restored.
     // ─────────────────────────────────────────────────────────────────────
 
-    public enum BossType { None, MudGolem, ResetCaptain, Cassian, Korath, Veritas, Zereth, Anastasia }
+    // BossType / BossResult / BossDefinition moved to BossEncounterSystem.cs (real impl).
+    // Stubs removed 2026-06-01.
 
-    public class BossResult
-    {
-        public string bossName;
-        public float performanceScore;
-        public int rsAwarded;
-    }
+    // WaveEncounterDef moved to CombatWaveManager.cs (real impl). Duplicate stub removed 2026-06-01.
 
-    public class BossDefinition
-    {
-        public string bossName;
-        public BossType bossType;
-        public int maxHealth;
-    }
+    // TutorialStep moved to TutorialSystem.cs (real impl). Duplicate stub removed 2026-06-01.
 
-    public class WaveEncounterDef
+    public class AchievementSystem : MonoBehaviour
     {
-        public string encounterId;
-        public int waveCount;
-        public float rsThreshold;
-    }
+        public static AchievementSystem Instance { get; private set; }
+        void Awake() { if (Instance == null) { Instance = this; DontDestroyOnLoad(gameObject); } }
 
-    public enum TutorialStep
-    {
-        None,
-        Movement,
-        Discovery,
-        ResonanceVision,
-        FirstTuning,
-        Combat,
-        Restoration,
-        Complete
-    }
-
-    public class AchievementSystem
-    {
         public class AchievementDef
         {
             public string id;
             public string title;
             public string description;
         }
+
+        readonly HashSet<string> _unlocked = new HashSet<string>();
+
+        public void Unlock(string id)
+        {
+            if (string.IsNullOrEmpty(id) || !_unlocked.Add(id)) return;
+            Debug.Log($"[Achievement] Unlocked: {id}");
+        }
+
+        public void CheckBuildingRestored(int totalRestored, bool allPerfect)
+        {
+            if (totalRestored >= 1) Unlock("first_restoration");
+            if (totalRestored >= 3) Unlock("three_buildings_restored");
+            if (totalRestored >= 12) Unlock("echohaven_fully_restored");
+            if (allPerfect) Unlock("perfect_restoration");
+        }
+
+        public void CheckMoonCompleted(int moonIndex)
+        {
+            Unlock($"moon_{moonIndex + 1}_complete");
+        }
+
+        public void CheckEnemyDefeated(string enemyId)
+        {
+            if (string.IsNullOrEmpty(enemyId)) return;
+            Unlock($"defeat_{enemyId}");
+        }
+
+        public void CheckEnemyDefeated(int waveIndex, string enemyTag, bool wasBoss)
+        {
+            Unlock($"wave_{waveIndex}_{enemyTag}{(wasBoss ? "_boss" : "")}");
+        }
+
+        public void CheckSolidification() => Unlock("solidification");
+        public void CheckDayOutOfTime() => Unlock("day_out_of_time");
+        public void CheckZerethRedeemed() => Unlock("zereth_redeemed");
     }
 
-    public class CampaignFlowController
-    {
-        public enum EndingPath { None, Restoration, Transcendence, Echo, Reset, TrueName }
-    }
+    // CampaignFlowController moved to its own file (real impl). Duplicate stub removed 2026-06-01.
 
     public class AirshipFleetManager
     {
@@ -209,18 +220,23 @@ namespace Tartaria.Integration
         public static GameLoopController Instance { get; private set; }
         void Awake() { if (Instance == null) Instance = this; }
 
+        float _currentRS;
+
         public void AwardRS(float amount, string reason = "stub")
         {
-            Debug.Log($"[GameLoopController STUB] AwardRS({amount}, {reason})");
-            // Route through Core RS event so HUD/Music/VFX still see it
+            _currentRS += amount;
+            Debug.Log($"[GameLoopController STUB] AwardRS({amount}, {reason}) total={_currentRS}");
             GameEvents.FireRSChange(amount);
         }
 
         public void QueueRSReward(float amount, string reason = "stub")
         {
-            Debug.Log($"[GameLoopController STUB] QueueRSReward({amount}, {reason})");
+            _currentRS += amount;
+            Debug.Log($"[GameLoopController STUB] QueueRSReward({amount}, {reason}) total={_currentRS}");
             GameEvents.FireRSChange(amount);
         }
+
+        public float GetCurrentRS() => _currentRS;
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -238,10 +254,39 @@ namespace Tartaria.Integration
         public static MoonProgressTracker Instance { get; private set; }
         public const int MoonCount = 13;
         public int ClearedCount { get; private set; } = 0;
+
+        public static event System.Action<int> OnMoonCleared;
+
+        readonly HashSet<string> _clearedBeats = new HashSet<string>();
+        bool _moon3ContinentalRailUnlocked;
+
         void Awake() { if (Instance == null) Instance = this; }
 
         public bool IsCleared(int moonIndex) => false;
-        public void ResetAll() { ClearedCount = 0; Debug.Log("[MoonProgressTracker STUB] ResetAll"); }
+        public void ResetAll() { ClearedCount = 0; _clearedBeats.Clear(); _moon3ContinentalRailUnlocked = false; Debug.Log("[MoonProgressTracker STUB] ResetAll"); }
+
+        public void MarkMoonCleared(int moonIndex)
+        {
+            ClearedCount++;
+            Debug.Log($"[MoonProgressTracker STUB] Cleared moon {moonIndex}");
+            OnMoonCleared?.Invoke(moonIndex);
+        }
+
+        public void MarkBeatCleared(int moonIndex, int beatIndex)
+        {
+            string key = $"{moonIndex}:{beatIndex}";
+            if (_clearedBeats.Add(key)) Debug.Log($"[MoonProgressTracker STUB] Beat cleared moon={moonIndex} beat={beatIndex}");
+        }
+
+        public bool IsBeatCleared(int moonIndex, int beatIndex) =>
+            _clearedBeats.Contains($"{moonIndex}:{beatIndex}");
+
+        public void MarkMoon3ContinentalRailUnlocked()
+        {
+            if (_moon3ContinentalRailUnlocked) return;
+            _moon3ContinentalRailUnlocked = true;
+            Debug.Log("[MoonProgressTracker STUB] Moon3 Continental Rail unlocked");
+        }
     }
 
     // VFXManager STUB

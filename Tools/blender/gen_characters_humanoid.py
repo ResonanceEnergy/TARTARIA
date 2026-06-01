@@ -8,7 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from _common import reset_scene, make_material, export_current_as, cube, cyl, sphere
 import bpy
 
-def humanoid(name, skin_color, shirt_color, pants_color, hat_color=None, hair_color=None, height_scale=1.0, moon="Moon1"):
+def humanoid(name, skin_color, shirt_color, pants_color, hat_color=None, hair_color=None, height_scale=1.75, moon="Moon1"):
     reset_scene()
     skin = make_material(name+"_skin", skin_color, roughness=0.55)
     shirt = make_material(name+"_shirt", shirt_color, roughness=0.7)
@@ -53,7 +53,7 @@ humanoid("MiloBoy",
          shirt_color=(0.42, 0.55, 0.30),
          pants_color=(0.28, 0.20, 0.15),
          hair_color=(0.40, 0.25, 0.12),
-         height_scale=0.85)
+         height_scale=1.30)  # child — was 0.85, bumped per NATRIX scale audit 2026-05-31
 
 # 2. Anastasia — princess (Moon 1)
 humanoid("AnastasiaPrincess",
@@ -61,7 +61,7 @@ humanoid("AnastasiaPrincess",
          shirt_color=(0.52, 0.20, 0.35),
          pants_color=(0.30, 0.10, 0.20),
          hair_color=(0.80, 0.65, 0.35),
-         height_scale=1.0)
+         height_scale=1.75)
 
 # 3. Lirael — echo guardian (Moon 1, 432 Hz)
 humanoid("LiraelGuardian",
@@ -69,7 +69,7 @@ humanoid("LiraelGuardian",
          shirt_color=(0.20, 0.30, 0.65),
          pants_color=(0.12, 0.15, 0.40),
          hair_color=(0.30, 0.45, 0.80),
-         height_scale=1.05)
+         height_scale=1.755)
 
 # 4. Cassian — carter / wagon master (Moon 1)
 humanoid("CassianCarter",
@@ -77,7 +77,7 @@ humanoid("CassianCarter",
          shirt_color=(0.60, 0.40, 0.20),
          pants_color=(0.30, 0.20, 0.10),
          hat_color=(0.35, 0.20, 0.10),
-         height_scale=1.08)
+         height_scale=1.758)
 
 # 5. Bob — innkeeper (Moon 1, transition to Moon 2)
 humanoid("BobInnkeeper",
@@ -93,7 +93,7 @@ humanoid("Villager_GenericA",
          shirt_color=(0.40, 0.35, 0.25),
          pants_color=(0.25, 0.20, 0.12),
          hat_color=(0.55, 0.40, 0.20),
-         height_scale=1.0,
+         height_scale=1.75,
          moon="Shared")
 
 print("done gen_characters_humanoid: 6 figures")

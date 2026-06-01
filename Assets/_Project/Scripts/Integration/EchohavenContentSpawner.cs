@@ -471,7 +471,7 @@ namespace Tartaria.Integration
 
         void EnsureAnastasiaPresence()
         {
-            // SUPERSEDED 2026-05-31 — AnastasiaController class doesn't exist; refer to Anastasia.prefab instead. // if (AnastasiaController.Instance == null)
+            if (AnastasiaController.Instance == null)
             {
                 SpawnAnastasia();
                 TriggerAnastasiaFirstAppearance();
@@ -481,7 +481,7 @@ namespace Tartaria.Integration
             if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");
             var player = _cachedPlayer;
             if (player == null) return;
-            // SUPERSEDED 2026-05-31 — AnastasiaController class doesn't exist; refer to Anastasia.prefab instead. // var a = AnastasiaController.Instance.transform;
+            var a = AnastasiaController.Instance.transform;
             if (Vector3.Distance(a.position, player.transform.position) > 60f)
                 a.position = player.transform.position + new Vector3(4f, 1.2f, 3f);
         }
@@ -1930,7 +1930,7 @@ namespace Tartaria.Integration
 
         void SetupEnemyWaveEncounters()
         {
-            // SUPERSEDED 2026-05-31 — CombatWaveManager stub: var waveManager = CombatWaveManager.Instance;
+            var waveManager = CombatWaveManager.Instance;
             if (waveManager == null) return;
 
             // Build wave encounter definitions that ProximityTrigger can reference
@@ -1954,7 +1954,7 @@ namespace Tartaria.Integration
 
         void HandleRSChangedForEncounters(float newRS)
         {
-            // SUPERSEDED 2026-05-31 — CombatWaveManager stub: var waveManager = CombatWaveManager.Instance;
+            var waveManager = CombatWaveManager.Instance;
             if (waveManager == null) return;
 
             if (_cachedPlayer == null) _cachedPlayer = GameObject.FindWithTag("Player");

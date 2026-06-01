@@ -43,17 +43,17 @@ namespace Tartaria.Editor
         // east; signpost at the southern entrance.
         static readonly Placement[] PLACEMENTS = new Placement[]
         {
-            new Placement("TownHall",         new Vector3(  0f, 0f, 50f), faceCenter: false),
+            new Placement("TownHall",         new Vector3(  0f, 0f, 50f), face: false),
             new Placement("VillageInn",       new Vector3(-25f, 0f, 35f)),
             new Placement("VillageBakery",    new Vector3( 25f, 0f, 35f)),
-            new Placement("VillageWell",      new Vector3(  0f, 0f, 40f), faceCenter: false),
+            new Placement("VillageWell",      new Vector3(  0f, 0f, 40f), face: false),
             new Placement("VillageMill",      new Vector3(-30f, 0f, 65f)),
             new Placement("VillageSmithy",    new Vector3( 30f, 0f, 65f)),
             new Placement("VillageCottageA",  new Vector3(-20f, 0f, 80f)),
             new Placement("VillageCottageB",  new Vector3(  0f, 0f, 80f)),
             new Placement("VillageCottageC",  new Vector3( 20f, 0f, 80f)),
             new Placement("Watchtower",       new Vector3( 40f, 0f, 55f)),
-            new Placement("VillagerSignpost", new Vector3(  0f, 0f, 25f), faceCenter: true),
+            new Placement("VillagerSignpost", new Vector3(  0f, 0f, 25f), face: true),
         };
 
         [MenuItem("Tartaria/1 Build/Build Out Moon 1 Village (9 Buildings)", priority = 102)]

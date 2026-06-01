@@ -42,7 +42,8 @@ namespace Tartaria.Core
                 var sources = new NativeList<SourceData>(32, Allocator.TempJob);
                 var sinks = new NativeList<SinkData>(16, Allocator.TempJob);
 
-                float3 playerApprox = float3.zero; // could pull from PlayerTag for center
+                float3 playerApprox = new float3(0f, 1f, 0f); // Bucket 3 fix: was float3.zero (world origin), now sane fallback near spawn
+                // TODO: when GameLoopController tracks Player transform, switch to live read
                 const float MAX_INFLUENCE_RADIUS = 180f; // R6: cull far sources for 50%+ less work on large grids
 
                 foreach (var (source, transform) in
