@@ -18,10 +18,10 @@ namespace Tartaria.Integration
     public class Moon1CameraFollowPlayer : MonoBehaviour
     {
         [Header("Follow offset (camera position relative to player)")]
-        public Vector3 offset = new Vector3(0f, 6f, -10f);
+        public Vector3 offset = new Vector3(0f, 7f, -9f);
 
-        [Header("Look-at offset (point above player to focus on)")]
-        public Vector3 lookOffset = new Vector3(0f, 1.2f, 0f);
+        [Header("Look-at offset (forward-biased so village dominates frame)")]
+        public Vector3 lookOffset = new Vector3(0f, 1.5f, 12f);
 
         [Header("Smoothing")]
         [Range(0f, 1f)] public float positionLerp = 0.15f;
