@@ -21,8 +21,14 @@ namespace Tartaria.Integration
     public class Moon1PlayerSetup : MonoBehaviour
     {
         [Header("Spawn Configuration")]
-        [SerializeField] Vector3 spawnPosition = new Vector3(0f, 2f, -100f); // South of village
-        [SerializeField] Quaternion spawnRotation = Quaternion.Euler(0f, 0f, 0f); // Facing north
+        // 2026-06-01 ship-checklist fix: spawn 10m south of origin so StarDome (30,0,20) +
+        // HarmonicFountain (-20,0,35) are visible within 5s of pressing Play.
+        // Camera follow component (Moon1CameraFollowPlayer) tracks from behind+above with
+        // forward-biased lookOffset so village dominates frame.
+        // 2026-06-01 22:07 spawn-override-fix: aligned default with PlayerSpawner.defaultSpawnPosition
+        // (Z=15). Previous Z=-10 yanked player back behind spawn at execution order -78, hiding village.
+        [SerializeField] Vector3 spawnPosition = new Vector3(0f, 2f, 15f);
+        [SerializeField] Quaternion spawnRotation = Quaternion.Euler(0f, 0f, 0f); // Facing north toward village
 
         [Header("Movement Settings (Echohaven)")]
         [SerializeField] float walkSpeed = 5f;
