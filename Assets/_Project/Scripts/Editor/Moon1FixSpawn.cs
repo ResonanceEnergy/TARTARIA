@@ -21,13 +21,11 @@ namespace Tartaria.Editor
                 return;
             }
 
-            // 2026-05-30 update: moved spawn south of the building triangle so the player
-            // awakens facing the half-buried structures (matches docs/15 §1 demo arc
-            // "0:00 player awakens... 2:00 discovery of buried dome"). Buildings sit
-            // around (-30..+35, 20..50); placing spawn at (0, 2, -10) puts them all to
-            // the north (forward at default rotation). 14×14 brown platform anchors
-            // the spawn so the player can't fall through the terrain at start.
-            Vector3 chosenPos = new Vector3(0f, 2f, -10f);
+            // 2026-06-01 update: pulled spawn 25 units closer (was Z=-10, now Z=+15).
+            // Signpost sits at Z=+25, town hall at Z=+50. New position puts the village
+            // squarely in frame from t=0 — player sees at least 4 buildings + signpost
+            // within 5 seconds of pressing Play, no walk required. Director ship-gate.
+            Vector3 chosenPos = new Vector3(0f, 2f, 15f);
 
             // Always create a guaranteed platform directly under the spawn — no relying on existing geometry.
             string platformName = "_SpawnPlatform";

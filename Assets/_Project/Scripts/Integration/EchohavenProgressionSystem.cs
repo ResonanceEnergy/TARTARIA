@@ -28,7 +28,7 @@ namespace Tartaria.Integration
     /// Zero scope creep beyond Moon 1 Echohaven starting area progression + save compatibility.
     /// </summary>
     [DisallowMultipleComponent]
-    public class EchohavenProgressionSystem : MonoBehaviour
+    public class EchohavenProgressionSystem : MonoBehaviour, Tartaria.Save.ISaveDataProvider
     {
         const string PP_GIANT_TUTORIAL_SEEN = "TARTARIA_GiantModeTutorialSeen_v1";
 
@@ -57,12 +57,46 @@ namespace Tartaria.Integration
 
             // Hook building restores for Echohaven hub progression (idempotent)
             GameEvents.OnBuildingRestored += HandleBuildingRestored;
+
+            // Save round-trip: register as provider so F5/F9/quit-save persist hub state.
+            // SaveManager.Awake runs BeforeSceneLoad so it's already up.
+            SaveManager.Instance?.RegisterProvider(this);
         }
 
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
             GameEvents.OnBuildingRestored -= HandleBuildingRestored;
+            SaveManager.Instance?.UnregisterProvider(this);
+        }
+
+        // ─── ISaveDataProvider ──────────────────────────────────
+
+        public string GetProviderKey() => "EchohavenProgression";
+
+        object Tartaria.Save.ISaveDataProvider.GetSaveData()
+        {
+            return new EchohavenSaveBlock
+            {
+                fountainRestored = _fountainRestored,
+                domeRestored = _domeRestored,
+                spireRestored = _spireRestored,
+                hubFullyRestored = _hubFullyRestored,
+                hubRestorations = _hubRestorations
+            };
+        }
+
+        public void RestoreSaveData(object data)
+        {
+            if (data == null) return;
+            EchohavenSaveBlock block = data as EchohavenSaveBlock;
+            if (block == null && data is string json && !string.IsNullOrEmpty(json))
+            {
+                try { block = JsonUtility.FromJson<EchohavenSaveBlock>(json); }
+                catch (System.Exception ex) { Debug.LogError($"[EchohavenProg] RestoreSaveData JSON parse failed: {ex.Message}"); return; }
+            }
+            if (block == null) return;
+            RestoreFromSaveBlock(block);
         }
 
         void HandleBuildingRestored(string buildingIdOrName)
@@ -112,6 +146,24 @@ namespace Tartaria.Integration
                 AetherFieldManager.Instance?.AddResonanceScore(30f);
                 Debug.Log("[EchohavenProg] HUB FULLY RESTORED — E_HubAwakened capstone +30 RS surge. Permanent +8% RS multiplier active for entire journey. Early progression complete; world permanently changed.");
                 GameEvents.FireCriticalSaveTrigger("echohaven_hub_restored");
+
+                // SHIP GATE: fire Moon 1 win condition. Listened to by Moon1WinScreen (HUD card + freeze).
+                float elapsed = Time.timeSinceLevelLoad;
+                try
+                {
+                    GameEvents.RaiseMoonCompleted(new MoonCompletedEventArgs
+                    {
+                        moonIndex = 1,
+                        moonName = "Echohaven",
+                        rsReward = 500,
+                        completionTime = elapsed
+                    });
+                    Debug.Log($"[EchohavenProg] >>> MOON 1 COMPLETE <<< raised at t={elapsed:F1}s — 3/3 hero buildings restored.");
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogError($"[EchohavenProg] Failed to raise MoonCompleted: {ex}");
+                }
             }
 
             if (granted)
