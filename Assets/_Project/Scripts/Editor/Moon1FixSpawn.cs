@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -66,14 +67,144 @@ namespace Tartaria.Editor
 
             EditorUtility.SetDirty(spawner.gameObject);
             EditorUtility.SetDirty(platform);
+
+            // 2026-06-01 22:07 spawn-override-fix: also patch any Moon1PlayerSetup in the scene.
+            // It runs at DefaultExecutionOrder(-78) AFTER PlayerSpawner and re-yanks the player to
+            // its own serialized spawnPosition. If that field still holds (0,2,-10) the village
+            // is 25m behind the player on frame 1. Force its serialized default to match.
+            int playerSetupPatched = 0;
+            var playerSetup = UnityEngine.Object.FindFirstObjectByType<Moon1PlayerSetup>(FindObjectsInactive.Include);
+            if (playerSetup != null)
+            {
+                var psSo = new SerializedObject(playerSetup);
+                var psProp = psSo.FindProperty("spawnPosition");
+                if (psProp != null)
+                {
+                    psProp.vector3Value = chosenPos;
+                    psSo.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(playerSetup);
+                    playerSetupPatched = 1;
+                    Debug.Log($"[Moon1FixSpawn] Patched Moon1PlayerSetup.spawnPosition → {chosenPos}");
+                }
+            }
+
             EditorSceneManager.MarkSceneDirty(spawner.gameObject.scene);
             EditorSceneManager.SaveScene(spawner.gameObject.scene);
 
             string msg = $"PlayerSpawner moved to {chosenPos}, facing north.\n" +
-                         $"Created 14×14 brown platform under spawn at y={chosenPos.y - 1.5f}.\n\n" +
-                         $"Exit Play Mode if running, then re-enter to spawn on solid ground with the buildings ahead.";
+                         $"Created 14×14 brown platform under spawn at y={chosenPos.y - 1.5f}.\n" +
+                         (playerSetupPatched > 0
+                             ? $"Moon1PlayerSetup.spawnPosition serialized override → {chosenPos}.\n"
+                             : "No Moon1PlayerSetup in scene (skipped override patch).\n") +
+                         $"\nExit Play Mode if running, then re-enter to spawn on solid ground with the buildings ahead.";
             Debug.Log("[Moon1FixSpawn] " + msg);
             EditorUtility.DisplayDialog("Spawn Fix", msg, "OK");
+        }
+
+        [MenuItem("Tartaria/8 Fix/Force All Spawn Refs To (0,2,15)", false, 53)]
+        public static void ForceAllSpawnRefs()
+        {
+            // Idempotent sweep — patches every known reference that controls Moon 1 spawn location.
+            // Use this after pulling a branch that may have stale serialized values, or any time
+            // the player is appearing in the wrong place at frame 1.
+            Vector3 spawnPos       = new Vector3(0f, 2f, 15f);
+            Vector3 platformPos    = new Vector3(0f, 0.5f, 15f);
+            const float platformY  = 0.5f;
+
+            var sb = new StringBuilder();
+            int patched = 0;
+            UnityEngine.SceneManagement.Scene targetScene = default;
+            bool haveScene = false;
+
+            // 1. PlayerSpawner GO + defaultSpawnPosition serialized field
+            var spawner = UnityEngine.Object.FindFirstObjectByType<PlayerSpawner>(FindObjectsInactive.Include);
+            if (spawner != null)
+            {
+                Undo.RecordObject(spawner.transform, "Force Spawn Refs — PlayerSpawner transform");
+                spawner.transform.position = spawnPos;
+                spawner.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                var so = new SerializedObject(spawner);
+                var defProp = so.FindProperty("defaultSpawnPosition");
+                if (defProp != null)
+                {
+                    defProp.vector3Value = spawnPos;
+                    so.ApplyModifiedProperties();
+                }
+                EditorUtility.SetDirty(spawner.gameObject);
+                targetScene = spawner.gameObject.scene;
+                haveScene = true;
+                sb.AppendLine($"✓ PlayerSpawner.transform + defaultSpawnPosition → {spawnPos}");
+                Debug.Log($"[ForceAllSpawnRefs] PlayerSpawner → {spawnPos}");
+                patched++;
+            }
+            else
+            {
+                sb.AppendLine("– PlayerSpawner: not found");
+            }
+
+            // 2. Moon1PlayerSetup.spawnPosition serialized override
+            var playerSetup = UnityEngine.Object.FindFirstObjectByType<Moon1PlayerSetup>(FindObjectsInactive.Include);
+            if (playerSetup != null)
+            {
+                var so = new SerializedObject(playerSetup);
+                var prop = so.FindProperty("spawnPosition");
+                if (prop != null)
+                {
+                    prop.vector3Value = spawnPos;
+                    so.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(playerSetup);
+                    if (!haveScene) { targetScene = playerSetup.gameObject.scene; haveScene = true; }
+                    sb.AppendLine($"✓ Moon1PlayerSetup.spawnPosition → {spawnPos}");
+                    Debug.Log($"[ForceAllSpawnRefs] Moon1PlayerSetup.spawnPosition → {spawnPos}");
+                    patched++;
+                }
+                else
+                {
+                    sb.AppendLine("– Moon1PlayerSetup: spawnPosition field not found");
+                }
+            }
+            else
+            {
+                sb.AppendLine("– Moon1PlayerSetup: not in scene");
+            }
+
+            // 3. _SpawnPlatform position
+            var platform = GameObject.Find("_SpawnPlatform");
+            if (platform != null)
+            {
+                Undo.RecordObject(platform.transform, "Force Spawn Refs — platform");
+                platform.transform.position = platformPos;
+                EditorUtility.SetDirty(platform);
+                if (!haveScene) { targetScene = platform.scene; haveScene = true; }
+                sb.AppendLine($"✓ _SpawnPlatform.position → {platformPos}");
+                Debug.Log($"[ForceAllSpawnRefs] _SpawnPlatform → {platformPos}");
+                patched++;
+            }
+            else
+            {
+                sb.AppendLine("– _SpawnPlatform: not in scene (use 'PlayerSpawner Position' menu to create)");
+            }
+
+            // 4. _FallSafetyFloor — untouched per spec (already correct at y=-20)
+            var safety = GameObject.Find("_FallSafetyFloor");
+            sb.AppendLine(safety != null
+                ? "= _FallSafetyFloor: untouched (already correct)"
+                : "– _FallSafetyFloor: not in scene (use 'Add Fall-Through Safety Net' menu)");
+
+            if (haveScene)
+            {
+                EditorSceneManager.MarkSceneDirty(targetScene);
+                EditorSceneManager.SaveScene(targetScene);
+                sb.AppendLine($"\nScene saved: {targetScene.name}");
+            }
+            else
+            {
+                sb.AppendLine("\nNo scene dirtied (nothing to patch).");
+            }
+
+            string summary = $"Patched {patched} spawn ref(s) → (0, 2, 15):\n\n{sb}";
+            Debug.Log("[ForceAllSpawnRefs]\n" + summary);
+            EditorUtility.DisplayDialog("Force All Spawn Refs", summary, "OK");
         }
 
         [MenuItem("Tartaria/8 Fix/Add Fall-Through Safety Net", false, 52)]
