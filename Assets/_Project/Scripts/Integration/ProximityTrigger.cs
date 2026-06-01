@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Gameplay;
+using Tartaria.Input;
 
 namespace Tartaria.Integration
 {
@@ -101,16 +102,9 @@ namespace Tartaria.Integration
         {
             if (enemyPrefab == null)
             {
-                var waveManager = CombatWaveManager.Instance;
-                if (waveManager == null)
-                {
-                    Debug.LogWarning("[ProximityTrigger] No enemy prefab assigned and no CombatWaveManager found.");
-                    return;
-                }
-
-                var encounter = CombatWaveManager.BuildZoneEncounter(1, $"proximity_{Mathf.RoundToInt(transform.position.x)}_{Mathf.RoundToInt(transform.position.z)}");
-                waveManager.StartEncounter(encounter, transform.position);
-                Debug.Log("[ProximityTrigger] Started fallback enemy encounter via CombatWaveManager.");
+                // Phase 1 quarantine: CombatWaveManager disabled (Moon 2+ wave system).
+                // For Moon 1, assign enemyPrefab directly in inspector. No fallback.
+                Debug.LogWarning("[ProximityTrigger] No enemy prefab assigned (CombatWaveManager fallback deferred to Phase 2).");
                 return;
             }
 
@@ -128,13 +122,8 @@ namespace Tartaria.Integration
             var scanner = ResonanceScannerSystem.Instance;
             if (scanner != null)
             {
-                scanner.RegisterPOI(new ScanPOI
-                {
-                    poiId = poiId,
-                    position = transform.position,
-                    poiType = ScanPOIType.BuriedStructure,
-                    isRevealed = true
-                });
+                // Phase2Stubs signature — full ScanPOI binding restored when stubs are deleted
+                scanner.RegisterPOI(transform.position, poiId, "Buried Structure");
                 Tartaria.Input.HapticFeedbackManager.Instance?.PlayDiscovery();
                 Debug.Log($"[ProximityTrigger] POI revealed: {poiId}");
             }

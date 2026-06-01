@@ -1,0 +1,9 @@
+// Placeholder — real content pending local-LLM regen via HTTP API runner.
+namespace Tartaria.Integration
+{
+    using UnityEngine;
+    public class Moon1CompletionTracker : MonoBehaviour
+    {
+        // Stub: Moon 1 completion tracker pending regen.
+    }
+}

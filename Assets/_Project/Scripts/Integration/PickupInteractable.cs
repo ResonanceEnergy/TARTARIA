@@ -73,7 +73,8 @@ namespace Tartaria.Integration
 
         public bool CanInteract(GameObject interactor)
         {
-            return !_pickedUp && InventorySystem.Instance.GetAllItems().Count < 100; // DISABLED: InventorySystem.MaxSlots (hardcoded)
+            // Use the actual InventorySystem API (IsFull) — GetAllItems doesn't exist
+            return !_pickedUp && (InventorySystem.Instance == null || !InventorySystem.Instance.IsFull());
         }
     }
 }

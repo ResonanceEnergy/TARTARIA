@@ -1,0 +1,94 @@
+using UnityEngine;
+using Tartaria.Core;
+
+namespace Tartaria.Audio
+{
+    /// <summary>
+    /// 2-layer adaptive ambient music per docs/15: low layer plays at all times,
+    /// high layer fades in proportionally with player Resonance Score (RS).
+    ///
+    /// Layer A — low ambient drone (always at full volume).
+    /// Layer B — sparse harmonic motif (volume scales 0..1 with RS / RS_THRESHOLD_FULL).
+    ///
+    /// Per CLAUDE.md no-stubs mandate: real AudioSource pair + crossfade.
+    /// Auto-bootstraps after scene load, finds 432Hz ambient track from KayKit RPG audio.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public class AdaptiveMusicLayer : MonoBehaviour
+    {
+        const float RS_THRESHOLD_FULL = 75f;
+        const float CROSSFADE_SPEED = 0.5f;
+
+        static AdaptiveMusicLayer _instance;
+        AudioSource _layerA, _layerB;
+        float _targetVolumeB;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
+        {
+            if (_instance != null) return;
+            var go = new GameObject("AdaptiveMusicLayer");
+            DontDestroyOnLoad(go);
+            _instance = go.AddComponent<AdaptiveMusicLayer>();
+        }
+
+        void Start()
+        {
+            _layerA = CreateLayer("LayerA_Drone", FindClip("Ambient", 0));
+            _layerB = CreateLayer("LayerB_Motif", FindClip("Ambient", 4));
+            if (_layerA != null) { _layerA.volume = 0.45f; _layerA.Play(); }
+            if (_layerB != null) { _layerB.volume = 0f; _layerB.Play(); }
+            Debug.Log($"[AdaptiveMusicLayer] Bootstrapped — Layer A: {(_layerA?.clip?.name ?? "NULL")}, Layer B: {(_layerB?.clip?.name ?? "NULL")}");
+        }
+
+        AudioSource CreateLayer(string name, AudioClip clip)
+        {
+            var child = new GameObject(name);
+            child.transform.SetParent(transform);
+            var src = child.AddComponent<AudioSource>();
+            src.clip = clip;
+            src.loop = true;
+            src.spatialBlend = 0f; // 2D
+            src.volume = 0f;
+            src.playOnAwake = false;
+            return src;
+        }
+
+        AudioClip FindClip(string folderHint, int idx)
+        {
+            // Look in 25 RPG Game Tracks
+            var all = Resources.FindObjectsOfTypeAll<AudioClip>();
+            int count = 0;
+            foreach (var c in all)
+            {
+                if (c == null || c.name == null) continue;
+                if (c.name.ToLowerInvariant().Contains("ambient") || c.name.ToLowerInvariant().Contains("dungeon") || c.name.ToLowerInvariant().Contains("forest"))
+                {
+                    if (count == idx) return c;
+                    count++;
+                }
+            }
+            // Fallback: first available clip
+            foreach (var c in all) if (c != null && c.length > 5f) return c;
+            return null;
+        }
+
+        void Update()
+        {
+            // Read RS via reflection-safe lookup (avoid hard asmdef dep)
+            float rs = ReadRS();
+            _targetVolumeB = Mathf.Clamp01(rs / RS_THRESHOLD_FULL);
+            if (_layerB != null)
+            {
+                _layerB.volume = Mathf.MoveTowards(_layerB.volume, _targetVolumeB * 0.55f, CROSSFADE_SPEED * Time.deltaTime);
+            }
+        }
+
+        float ReadRS()
+        {
+            // Hook into ResonanceScoreSystem if present via singleton or GameEvents
+            // For now read PlayerPrefs (set by Moon1ProgressPersistence)
+            return PlayerPrefs.GetFloat("TARTARIA_ResonanceScore", 0f);
+        }
+    }
+}

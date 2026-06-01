@@ -5,7 +5,7 @@ namespace Tartaria.Editor
 {
     public static class ManualPlayMode
     {
-        [MenuItem("Tartaria/ENTER PLAY MODE %#p", priority = 0)]
+        [MenuItem("Tartaria/▶ ENTER PLAY MODE %#p", priority = 1)]
         public static void EnterPlayMode()
         {
             if (!EditorApplication.isPlaying)

@@ -17,7 +17,7 @@ namespace Tartaria.Editor
         const string RecipePath = "Assets/_Project/Resources/Recipes";
         const string DatabasePath = "Assets/_Project/Resources";
 
-        [MenuItem("Tartaria/Crafting/Generate Example Recipes", false, 100)]
+        [MenuItem("Tartaria/4 Generate Art/Crafting Recipes", false, 100)]
         public static void GenerateExampleRecipes()
         {
             // Ensure directories exist

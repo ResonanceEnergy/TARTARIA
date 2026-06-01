@@ -109,7 +109,7 @@ namespace Tartaria.Integration
             }
             else if (clip != null)
             {
-                AudioSource.PlayClipAtPoint(clip, position ?? Camera.main.transform.position);
+                AudioSource.PlayClipAtPoint(clip, position ?? UnityEngine.Camera.main.transform.position);
             }
         }
     }

@@ -12,7 +12,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class DiagnoseRuntime
     {
-        [MenuItem("Tartaria/DIAGNOSE: Check Runtime State")]
+        [MenuItem("Tartaria/7 Diagnose/Runtime State", priority = 730)]
         static void CheckRuntimeState()
         {
             if (!Application.isPlaying)

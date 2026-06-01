@@ -1,0 +1,5 @@
+# Local-LLM outputs are review-only. Don't commit raw model output —
+# copy the good bits into Assets/ first, then commit those targeted files.
+# This .gitignore stays so the folder exists.
+*
+!.gitignore

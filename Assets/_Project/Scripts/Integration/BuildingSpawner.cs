@@ -146,17 +146,12 @@ namespace Tartaria.Integration
                 trigger.Configure(ProximityTrigger.TriggerAction.DiscoverBuilding, discoveryRadius, interactable);
             }
 
-            // Register as scanner POI
+            // Register as scanner POI (Phase2Stubs signature: position, id, label)
+            // The full ScanPOI struct binding is restored when Phase2Stubs.cs is deleted in Phase 2
             var scanner = ResonanceScannerSystem.Instance;
             if (scanner != null)
             {
-                scanner.RegisterPOI(new ScanPOI
-                {
-                    poiId = buildingId,
-                    poiType = ScanPOIType.BuriedStructure,
-                    position = position,
-                    isRevealed = false
-                });
+                scanner.RegisterPOI(position, buildingId, "Buried Structure");
             }
 
             // Register excavation site (Gap 2)

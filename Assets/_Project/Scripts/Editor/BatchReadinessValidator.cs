@@ -11,7 +11,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class BatchReadinessValidator
     {
-        [MenuItem("Tartaria/Validate Build Readiness")]
+        [MenuItem("Tartaria/0 ★ MASTER/Validate Build Readiness", priority = 60)]
         public static void ValidateFromMenu()
         {
             Debug.Log("[BatchReadinessValidator] Starting validation from menu...");

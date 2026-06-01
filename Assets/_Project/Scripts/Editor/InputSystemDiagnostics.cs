@@ -20,7 +20,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class InputSystemDiagnostics
     {
-        [UnityEditor.MenuItem("Tartaria/DIAGNOSE: Input System")]
+        [UnityEditor.MenuItem("Tartaria/7 Diagnose/Input System", priority = 720)]
         static void DiagnoseInputSystem()
         {
             if (!Application.isPlaying)

@@ -11,7 +11,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class CreateMissingAssetsMenu
     {
-        [MenuItem("Tartaria/Create Missing Assets/Performance Profile")]
+        [MenuItem("Tartaria/5 Asset Database/Performance Profile", priority = 530)]
         static void CreatePerformanceProfile()
         {
             string path = "Assets/_Project/Resources";
@@ -30,7 +30,7 @@ namespace Tartaria.Editor
             Debug.Log($"Created {assetPath}");
         }
 
-        [MenuItem("Tartaria/Create Missing Assets/Crafting Recipe Database")]
+        [MenuItem("Tartaria/5 Asset Database/Crafting Recipe Database", priority = 520)]
         static void CreateCraftingRecipeDatabase()
         {
             string path = "Assets/_Project/Resources";
@@ -49,7 +49,7 @@ namespace Tartaria.Editor
             Debug.Log($"Created {assetPath}");
         }
 
-        [MenuItem("Tartaria/Create Missing Assets/Archive Database")]
+        [MenuItem("Tartaria/5 Asset Database/Archive Database", priority = 510)]
         static void CreateArchiveDatabase()
         {
             string path = "Assets/_Project/Resources";
@@ -68,7 +68,7 @@ namespace Tartaria.Editor
             Debug.Log($"Created {assetPath}");
         }
 
-        [MenuItem("Tartaria/Create Missing Assets/All Missing Assets")]
+        [MenuItem("Tartaria/5 Asset Database/Create All Missing", priority = 500)]
         static void CreateAllMissingAssets()
         {
             CreatePerformanceProfile();

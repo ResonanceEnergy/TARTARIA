@@ -197,11 +197,11 @@ namespace Tartaria.Integration
                 transform.position = positionOnTrain + offset;
                 transform.forward = Vector3.Lerp(transform.forward, Vector3.forward, 0.8f);
             }
-            // Round 6 PRODUCTION BRIDGE: real DOTS sync for escort (consumed in CompanionBehaviorSystem UpdateEscort)
-            CompanionManager.Instance?.SyncCompanionToDOTS(0, true, positionOnTrain + offset, false, 0, false, is17thHour, 5);
-            if (is17thHour)
-                CompanionManager.Instance?.Trigger17thHourCompanionEscort(0, positionOnTrain);
-            Debug.Log($"[Milo] BoardTrain escort → DOTS bridge (17th={is17thHour}). Full physical + VFX + redemption paths ready.");
+            // Phase 1 quarantine: CompanionManager disabled (multi-companion, Moon 2+). Restore in Phase 2.
+            // CompanionManager.Instance?.SyncCompanionToDOTS(0, true, positionOnTrain + offset, false, 0, false, is17thHour, 5);
+            // if (is17thHour)
+            //     CompanionManager.Instance?.Trigger17thHourCompanionEscort(0, positionOnTrain);
+            Debug.Log($"[Milo] BoardTrain escort (CompanionManager DOTS bridge deferred to Phase 2; 17th={is17thHour}).");
         }
 
         /// <summary>Moon 5: Milo's outburst at White City demolition.</summary>

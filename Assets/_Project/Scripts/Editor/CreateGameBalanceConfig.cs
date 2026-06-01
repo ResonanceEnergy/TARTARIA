@@ -10,7 +10,7 @@ namespace Tartaria.Editor
     /// </summary>
     public static class CreateGameBalanceConfig
     {
-        [MenuItem("Tartaria/Create Game Balance Config")]
+        [MenuItem("Tartaria/5 Asset Database/Game Balance Config", priority = 540)]
         static void CreateAsset()
         {
             // Check if already exists

@@ -33,7 +33,7 @@ namespace Tartaria.Editor
         private bool createVariants = true;
         private Vector2 scrollPos;
         
-        [MenuItem("Tartaria/Prefab Generator")]
+        [MenuItem("Tartaria/5 Asset Database/Prefab Generator", priority = 550)]
         static void ShowWindow()
         {
             var window = GetWindow<PrefabGeneratorTool>("Prefab Generator");
@@ -304,8 +304,8 @@ namespace Tartaria.Editor
                 // Add rigidbody
                 var rb = character.AddComponent<Rigidbody>();
                 rb.mass = 70f;
-                rb.drag = 0.5f;
-                rb.angularDrag = 0.05f;
+                rb.linearDamping = 0.5f;
+                rb.angularDamping = 0.05f;
                 rb.constraints = RigidbodyConstraints.FreezeRotation;
                 
                 if (tag == "Player")

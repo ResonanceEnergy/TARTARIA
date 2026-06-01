@@ -26,7 +26,10 @@ namespace Tartaria.AI
         static readonly ProfilerMarker s_AttackMarker = new ProfilerMarker("MudGolemAI.UpdateAttack");
 
         [Header("Stats")]
-        [SerializeField] int maxHealth = 50;
+        // 2026-05-31: per docs/15 §4 Mud Golem HP is 100. MudGolemHealth (same assembly) is
+        // the canonical HP holder when present — TakeDamage below routes to it. The local
+        // _currentHealth is the fallback path for golems spawned without MudGolemHealth.
+        [SerializeField] int maxHealth = 100;
         [SerializeField] int meleeDamage = 10;
 
         [Header("Behavior")]
@@ -42,7 +45,8 @@ namespace Tartaria.AI
         [SerializeField] float lostTargetSearchDuration = 8f;
 
         [Header("Sprint Batch 3: Attack Telegraph")]
-        [SerializeField] float telegraphDuration = 0.5f;
+        // 2026-05-31: spec §4 calls for a 1.0s readable wind-up before the swing lands.
+        [SerializeField] float telegraphDuration = 1.0f;
 
         [Header("Movement (fallback if no NavMesh)")]
         [SerializeField] float moveSpeed = 3f;
@@ -115,15 +119,21 @@ namespace Tartaria.AI
             var root = new GameObject("MudGolem");
             root.transform.SetPositionAndRotation(position, rotation);
 
-            // Materials
+            // Materials — 2026-05-30 URP magenta fix re-applied after local-LLM
+            // ticket 09 accidentally gutted the file. URP needs _BaseColor, the
+            // Built-in `.color` setter is silently ignored.
             var mudShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
             var mudMat = new Material(mudShader) { name = "MudGolem_Body" };
-            mudMat.color = new Color(0.32f, 0.24f, 0.16f);
+            var mudColor = new Color(0.32f, 0.24f, 0.16f);
+            if (mudMat.HasProperty("_BaseColor")) mudMat.SetColor("_BaseColor", mudColor);
+            else mudMat.color = mudColor;
             if (mudMat.HasProperty("_Smoothness")) mudMat.SetFloat("_Smoothness", 0.15f);
             if (mudMat.HasProperty("_Metallic"))   mudMat.SetFloat("_Metallic", 0.05f);
 
             var eyeMat = new Material(mudShader) { name = "MudGolem_Eye" };
-            eyeMat.color = new Color(1.0f, 0.45f, 0.10f);
+            var eyeColor = new Color(1.0f, 0.45f, 0.10f);
+            if (eyeMat.HasProperty("_BaseColor")) eyeMat.SetColor("_BaseColor", eyeColor);
+            else eyeMat.color = eyeColor;
             if (eyeMat.HasProperty("_EmissionColor"))
             {
                 eyeMat.EnableKeyword("_EMISSION");
@@ -491,6 +501,22 @@ namespace Tartaria.AI
         {
             if (_state == GolemState.Dead) return;
 
+            // 2026-05-31 Fix 6: when MudGolemHealth (same assembly) is present, it is the single
+            // source of truth for HP. Route damage there and bail — its Die() path will then
+            // fire OnAnyGolemDied (arenas, wave tracking) and run pooled cleanup.
+            if (TryGetComponent<MudGolemHealth>(out var health))
+            {
+                health.TakeDamage(damage, _player != null ? _player.gameObject : null);
+                Gameplay.DamageNumberPool.Spawn(damage, transform.position);
+                StartCoroutine(HitFlash());
+                if (_player != null)
+                {
+                    Vector3 dir = (transform.position - _player.position).normalized;
+                    OnHit(dir, damage * 0.1f);
+                }
+                return;
+            }
+
             _currentHealth -= damage;
             Debug.Log($"[MudGolem] Took {damage} damage, HP={_currentHealth}");
 
@@ -564,10 +590,14 @@ namespace Tartaria.AI
             // Award RS via GameEvents
             GameEvents.FireRSChange(5f);
 
-            // Notify combat arena / moon activator wave-tracking via the
-            // MudGolemHealth bridge (Integration assembly) using SendMessage
-            // to avoid an asmdef cycle (AI must NOT reference Integration).
-            SendMessage("KillFromAI", SendMessageOptions.DontRequireReceiver);
+            // 2026-05-31: MudGolemHealth is now in the same (AI) assembly. Call Kill directly
+            // so OnAnyGolemDied fires, loot drops, and pooling lifecycle runs. The old
+            // SendMessage("KillFromAI") bridge targeted the deleted nested duplicate in
+            // EchohavenContentSpawner — gone now.
+            if (TryGetComponent<MudGolemHealth>(out var healthBridge) && healthBridge.IsAlive)
+            {
+                healthBridge.Kill(_player != null ? _player.gameObject : null);
+            }
 
             // Round 5: Health owns death cleanup (KillFromAI -> Die) for full pooling lifecycle.
             // AI no longer schedules its own Destroy — prevents race with pool return.

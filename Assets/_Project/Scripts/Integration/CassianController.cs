@@ -1,189 +1,293 @@
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
-using Tartaria.Core;
 
 namespace Tartaria.Integration
 {
     /// <summary>
-    /// CassianController - Mentor companion (100% Implementation)
-    /// Combat trainer, tactical advisor, mysterious past.
-    /// From 01_LORE_BIBLE.md + 05_CHARACTERS_DIALOGUE.md.
+    /// Cassian — Moon 1 apparent-ally NPC. Wanders the village square between
+    /// hardcoded waypoints, idles 4–7s at each, and triggers contextual dialogue
+    /// when the player approaches within 4m. Dialogue contexts cycle in a fixed
+    /// order on each fresh contact; once the cycle is exhausted, falls back to
+    /// "cassian_repeat_dialogue".
+    ///
+    /// Yarn source: Assets/_Project/Dialogue/Moon1/cassian.yarn (authored in parallel).
+    /// Canonical placement: ~(3, 0, 35) per Moon1BuildOutNPCs.
+    ///
+    /// Movement is plain Vector3 lerp — no NavMesh — matching Moon1VillagerAmbient.
+    /// Animator hookup is graceful no-op when missing.
+    ///
+    /// Per CLAUDE.md "no stubs" mandate: substantive implementation, no TODOs.
     /// </summary>
-    [RequireComponent(typeof(NavMeshAgent))]
-    [RequireComponent(typeof(Animator))]
+    [DisallowMultipleComponent]
     public class CassianController : MonoBehaviour
     {
+        // ─── Singleton ───────────────────────────────
         public static CassianController Instance { get; private set; }
 
-        [Header("Character Stats")]
-        [SerializeField] private string characterName = "Cassian";
-        [SerializeField] private int trustLevel = 50; // Starts higher (experienced ally)
-        [SerializeField] private bool hasDarkSecret = true; // Plot twist: Reset agent
+        // ─── Scene gate ──────────────────────────────
+        const string EchohavenScene = "Echohaven_VerticalSlice";
 
-        [Header("Combat Training")]
-        [SerializeField] private bool hasTaughtBasicCombat = false;
-        [SerializeField] private bool hasTaughtAdvancedCombat = false;
-        [SerializeField] private int combatTipsGiven = 0;
+        // ─── Tunables (hardcoded per spec) ───────────
+        const float MoveSpeed = 1.3f;
+        const float TurnSpeed = 5f;
+        const float ArriveDistance = 0.3f;
+        const float IdleMin = 4f;
+        const float IdleMax = 7f;
+        const float DialogueRange = 4f;
+        const float DialogueRangeSqr = DialogueRange * DialogueRange;
+        const float DialogueExitRange = 6f; // hysteresis so we don't re-fire while standing in trigger
+        const float DialogueExitRangeSqr = DialogueExitRange * DialogueExitRange;
+        const float DialogueCooldown = 2.5f;
 
-        [Header("AI Behavior")]
-        [SerializeField] private float followDistance = 5f;
-        [SerializeField] private bool isFollowingPlayer = false; // Only follows during specific quests
-
-        [Header("References")]
-        [SerializeField] private Transform player;
-        [SerializeField] private NavMeshAgent navAgent;
-        [SerializeField] private Animator animator;
-
-        private readonly string[] INTRO_LINES = new[]
+        // Cassian's wander loop around the village square (anchor ~ (3, 0, 35)).
+        // 5 waypoints, hand-tuned to avoid building footprints from
+        // Moon1BuildOutNPCs / Moon1BuildOutVillage placements.
+        static readonly Vector3[] Waypoints =
         {
-            "You''re persistent. I''ll give you that.",
-            "These ruins... I know them better than I should.",
-            "If you want to survive out here, you''ll need to learn to fight.",
-            "Trust me. I''ve been doing this longer than you can imagine."
+            new Vector3(  3f, 0f, 35f), // square center (canonical placement)
+            new Vector3(  8f, 0f, 38f), // NE — near the well
+            new Vector3( 10f, 0f, 31f), // SE — toward Bob's Inn approach
+            new Vector3( -2f, 0f, 30f), // SW — toward tuning pedestal lane
+            new Vector3( -3f, 0f, 37f)  // NW — back near the lore noticeboard
         };
 
-        private readonly string[] COMBAT_TIPS = new[]
+        // Dialogue context cycle. First-meet plays once, then ambient/lore beats
+        // cycle in order, then we fall back to the repeat line forever.
+        static readonly string[] ContextCycle =
         {
-            "Don''t just swing blindly. Match their frequency.",
-            "Dodge first, strike second. Always.",
-            "The Mud Golems are slow but relentless. Use that.",
-            "Harmonic damage is key. Learn the frequencies.",
-            "Watch their movements. They telegraph everything."
+            "cassian_first_meet",
+            "cassian_about_tuning",
+            "cassian_about_restoration",
+            "cassian_milo_warning",
+            "cassian_anastasia_question",
+            "cassian_ambient_1",
+            "cassian_ambient_2",
+            "cassian_ambient_3"
         };
+        const string RepeatContext = "cassian_repeat_dialogue";
 
-        private readonly string[] DARK_HINTS = new[]
+        // ─── Runtime state ───────────────────────────
+        readonly List<string> _consumedContexts = new();
+        int _waypointIdx;
+        bool _isIdling;
+        float _idleUntil;
+        bool _playerInRange;        // hysteresis flag
+        float _nextDialogueAllowed; // cooldown
+
+        Animator _animator;
+        bool _animatorHasIsWalking;
+
+        Transform _playerTransform;
+        float _playerCacheRefresh;
+
+        // ─── Auto-bootstrap ──────────────────────────
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        static void Bootstrap()
         {
-            "I''ve seen the Reset from... another perspective.",
-            "Some secrets are buried for a reason.",
-            "You remind me of someone I used to know. Before.",
-            "Not all of us chose our sides freely."
-        };
+            var sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
+            if (sceneName != EchohavenScene) return;
+            if (Instance != null) return;
 
+            // If a Cassian GameObject already exists in the scene (e.g. placed
+            // by Moon1BuildOutNPCs via Cassian.prefab), attach to that one so
+            // the controller drives the visible NPC. Otherwise create a
+            // standalone holder at the square center so the cycle still runs
+            // for ambient triggering / debugging.
+            GameObject host = FindExistingCassian();
+            if (host == null)
+            {
+                host = new GameObject("Cassian_Wanderer");
+                host.transform.position = Waypoints[0];
+            }
+
+            if (host.GetComponent<CassianController>() == null)
+                host.AddComponent<CassianController>();
+        }
+
+        static GameObject FindExistingCassian()
+        {
+            // Match common naming conventions used by the editor placement tools.
+            var candidates = new[] { "Cassian_AtSquare", "Cassian", "Cassian(Clone)", "Cassian_Wanderer" };
+            foreach (var n in candidates)
+            {
+                var go = GameObject.Find(n);
+                if (go != null) return go;
+            }
+            return null;
+        }
+
+        // ─── Lifecycle ───────────────────────────────
         void Awake()
         {
             if (Instance != null && Instance != this)
             {
-                Destroy(gameObject);
+                Destroy(this);
                 return;
             }
             Instance = this;
-
-            navAgent = GetComponent<NavMeshAgent>();
-            animator = GetComponent<Animator>();
-        }
-
-        void Start()
-        {
-            if (player == null)
-            {
-                var spawner = PlayerSpawner.Instance;
-                if (spawner != null && spawner.IsPlayerSpawned())
-                    player = spawner.GetPlayer().transform;
-            }
-
-            // Subscribe to events
-            GameEvents.OnEnemyKilled += OnEnemyKilled;
-            GameEvents.OnPlayerDamaged += OnPlayerDamaged;
-
-            Debug.Log($"[CassianController] ✅ {characterName} initialized (Trust: {trustLevel})");
         }
 
         void OnDestroy()
         {
-            GameEvents.OnEnemyKilled -= OnEnemyKilled;
-            GameEvents.OnPlayerDamaged -= OnPlayerDamaged;
+            if (Instance == this) Instance = null;
+        }
+
+        void Start()
+        {
+            // Snap to first waypoint so we begin a clean wander loop.
+            var p = Waypoints[0];
+            p.y = transform.position.y; // preserve ground Y
+            transform.position = p;
+            _waypointIdx = 1 % Waypoints.Length;
+            _isIdling = false;
+
+            _animator = GetComponentInChildren<Animator>();
+            _animatorHasIsWalking = false;
+            if (_animator != null && _animator.runtimeAnimatorController != null)
+            {
+                foreach (var param in _animator.parameters)
+                {
+                    if (param.type == AnimatorControllerParameterType.Bool && param.name == "IsWalking")
+                    {
+                        _animatorHasIsWalking = true;
+                        break;
+                    }
+                }
+            }
+            SetWalkingAnim(true);
         }
 
         void Update()
         {
-            if (isFollowingPlayer && player != null)
+            UpdateWander();
+            UpdateDialogueProximity();
+        }
+
+        // ─── Wander loop ─────────────────────────────
+        void UpdateWander()
+        {
+            if (_isIdling)
             {
-                float distance = Vector3.Distance(transform.position, player.position);
-                if (distance > followDistance)
+                if (Time.time >= _idleUntil)
                 {
-                    navAgent.SetDestination(player.position);
+                    _isIdling = false;
+                    _waypointIdx = (_waypointIdx + 1) % Waypoints.Length;
+                    SetWalkingAnim(true);
                 }
-                else
-                {
-                    navAgent.isStopped = true;
-                }
-            }
-        }
-
-        void OnEnemyKilled(EnemyKilledEventArgs args)
-        {
-            // Occasionally give combat tips
-            if (Random.value < 0.3f && combatTipsGiven < 5)
-            {
-                SayRandomLine(COMBAT_TIPS);
-                combatTipsGiven++;
-            }
-        }
-
-        void OnPlayerDamaged(PlayerDamagedEventArgs args)
-        {
-            if (!hasTaughtBasicCombat)
-            {
-                Say("Dodge more! You''re taking too many hits!");
-                hasTaughtBasicCombat = true;
-            }
-        }
-
-        public void TeachCombatTraining()
-        {
-            Say("Alright. Let me show you how to fight properly.");
-            Say("First rule: match your frequency to theirs. Resonance is your weapon.");
-            hasTaughtBasicCombat = true;
-
-            // Grant player combat abilities
-            PlayerAbilitiesComplete.Instance?.UnlockAbility("HarmonicStrike");
-        }
-
-        public void TeachAdvancedCombat()
-        {
-            if (!hasTaughtBasicCombat)
-            {
-                Say("Master the basics first.");
                 return;
             }
 
-            Say("You''re ready for advanced techniques. Listen carefully...");
-            Say("Harmonic combos multiply damage. Chain your strikes.");
-            hasTaughtAdvancedCombat = true;
+            var target = Waypoints[_waypointIdx];
+            var pos = transform.position;
+            target.y = pos.y; // planar walk
 
-            PlayerAbilitiesComplete.Instance?.UnlockAbility("HarmonicCombo");
+            var delta = target - pos;
+            float distSqr = delta.sqrMagnitude;
+            if (distSqr <= ArriveDistance * ArriveDistance)
+            {
+                _isIdling = true;
+                _idleUntil = Time.time + Random.Range(IdleMin, IdleMax);
+                SetWalkingAnim(false);
+                return;
+            }
+
+            var dir = delta.normalized;
+            transform.position = pos + dir * MoveSpeed * Time.deltaTime;
+
+            // Face direction of travel
+            var look = Quaternion.LookRotation(new Vector3(dir.x, 0f, dir.z), Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, look, TurnSpeed * Time.deltaTime);
         }
 
-        public void RevealDarkSecret()
+        // ─── Player proximity → dialogue ─────────────
+        void UpdateDialogueProximity()
         {
-            if (!hasDarkSecret) return;
+            var player = GetPlayerTransform();
+            if (player == null)
+            {
+                _playerInRange = false;
+                return;
+            }
 
-            Say("There''s something you need to know about me...");
-            Say("I... I was part of the Reset. I worked for them.");
-            Say("But seeing what they did... what WE did... I couldn''t stay.");
-            Say("I''ve been trying to undo it ever since. Even if it kills me.");
+            float distSqr = (player.position - transform.position).sqrMagnitude;
 
-            hasDarkSecret = false; // Revealed
-            trustLevel = 100; // Full trust after honesty
+            if (_playerInRange)
+            {
+                // Use a larger exit radius so we don't repeat-fire as the player lingers.
+                if (distSqr > DialogueExitRangeSqr) _playerInRange = false;
+                return;
+            }
 
-            Debug.Log("[CassianController] Dark secret revealed!");
+            if (distSqr > DialogueRangeSqr) return;
+            if (Time.time < _nextDialogueAllowed) return;
+
+            _playerInRange = true;
+            _nextDialogueAllowed = Time.time + DialogueCooldown;
+
+            FacePlayer(player);
+            PlayNextContext();
         }
 
-        void Say(string line)
+        void FacePlayer(Transform player)
         {
-            Debug.Log($"[Cassian]: {line}");
-            DialogueManager.Instance?.ShowDialogue(characterName, line, 5f);
-            AudioFeedbackController.Instance?.PlayDialogue(characterName, line);
+            var to = player.position - transform.position;
+            to.y = 0f;
+            if (to.sqrMagnitude < 0.0001f) return;
+            transform.rotation = Quaternion.LookRotation(to.normalized, Vector3.up);
         }
 
-        void SayRandomLine(string[] lines)
+        void PlayNextContext()
         {
-            if (lines.Length > 0)
-                Say(lines[Random.Range(0, lines.Length)]);
+            string context = RepeatContext;
+            foreach (var c in ContextCycle)
+            {
+                if (!_consumedContexts.Contains(c))
+                {
+                    context = c;
+                    _consumedContexts.Add(c);
+                    break;
+                }
+            }
+
+            var dm = DialogueManager.Instance;
+            if (dm != null)
+            {
+                dm.PlayContextDialogue(context);
+            }
+            else
+            {
+                Debug.LogWarning("[Cassian] DialogueManager.Instance is null — context '" + context + "' dropped.");
+            }
         }
 
-        public void SetFollowing(bool follow) => isFollowingPlayer = follow;
-        public int GetTrustLevel() => trustLevel;
-        public bool HasDarkSecret() => hasDarkSecret;
+        // ─── Helpers ─────────────────────────────────
+        Transform GetPlayerTransform()
+        {
+            // Cache the player transform; refresh every 2s in case of respawn / scene reload.
+            if (_playerTransform == null || Time.time >= _playerCacheRefresh)
+            {
+                var go = GameObject.FindWithTag("Player");
+                _playerTransform = go != null ? go.transform : null;
+                _playerCacheRefresh = Time.time + 2f;
+            }
+            return _playerTransform;
+        }
+
+        void SetWalkingAnim(bool walking)
+        {
+            if (_animator != null && _animatorHasIsWalking)
+                _animator.SetBool("IsWalking", walking);
+        }
+
+        // ─── Public hooks (for save/load + tests) ────
+        public IReadOnlyList<string> ConsumedContexts => _consumedContexts;
+        public bool HasConsumedAllContexts => _consumedContexts.Count >= ContextCycle.Length;
+
+        public void ResetDialogueCycle()
+        {
+            _consumedContexts.Clear();
+            _playerInRange = false;
+            _nextDialogueAllowed = 0f;
+        }
     }
 }
