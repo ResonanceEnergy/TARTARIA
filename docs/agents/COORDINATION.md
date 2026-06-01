@@ -161,7 +161,7 @@ The pattern only works when tasks are independent. **Sequence (don't parallelize
 - Both touch the same scene
 - Both touch the same prefab
 
-**Director's job:** Read the queue and decide what parallelizes safely. Default to sequential when in doubt. 3 parallel agents max.
+**Director's job:** Read the queue and decide what parallelizes safely. Per NATRIX 2026-06-01: **default to PARALLEL, not sequential.** 9-10 concurrent lanes is normal when path ownership doesn't overlap. Only sequence when files genuinely conflict (same .cs, same scene, same prefab).
 
 ---
 
@@ -189,7 +189,8 @@ The pattern only works when tasks are independent. **Sequence (don't parallelize
 - ❌ PR with no runtime artifact
 - ❌ Agent self-merges
 - ❌ Director writes code (they direct, not implement)
-- ❌ NATRIX bypasses Director and assigns 10 tasks at once (defeats coordination)
+- ❌ Director drip-feeds N prompts one-by-one when one batched dispatch was warranted (violates parallel mandate)
+- ❌ Sibling agent waits on another agent's PR before starting code work — append HANDOFFS.md and keep working
 - ❌ Force push to shared branches
 - ❌ Editing `main` outside a release tag
 
