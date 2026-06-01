@@ -504,6 +504,9 @@ namespace Tartaria.Input
                 }
             }
 
+            // [anim/walk-blendtree] feed Speed into the EchohavenHumanoid Locomotion BlendTree.
+            if (GetComponent<Animator>() is Animator a && a != null) a.SetFloat("Speed", _moveInput.magnitude);
+
             // Apply movement
             Vector3 move = new Vector3(_moveInput.y, 0, -_moveInput.x); // Fixed: Joystick was rotated 90° CW
             if (move.sqrMagnitude > 0.01f)
