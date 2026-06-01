@@ -80,9 +80,12 @@ namespace Tartaria.Editor
         const string SpireSparksPath    = "Assets/_Project/Prefabs/VFX/Moon1/VFX_SpirePlacementSparks.prefab";
 
         // Blender-only scan folders for arrays (rocks/foliage/trees/bushes)
+        // KayKit folders also scanned IFF KayKitPrefabBatch has been run (idempotent).
         static readonly string[] BlenderScanFolders = {
             "Assets/_Project/Prefabs/Moon1/Blender",
             "Assets/_Project/Prefabs/Shared/Blender",
+            "Assets/_Project/Prefabs/KayKit/KayKit_Forest_Nature_Pack_1.0_FREE",
+            "Assets/_Project/Prefabs/KayKit/KayKit_RPGToolsBits_1.0_FREE",
         };
 
         // ════════════════════════════════════════════════════════════════════════
