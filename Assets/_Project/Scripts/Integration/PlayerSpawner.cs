@@ -83,6 +83,30 @@ namespace Tartaria.Integration
             Debug.Log($"[PlayerSpawner] Spawning player at {_currentSpawnPosition}");
 
             spawnedPlayer = Instantiate(playerPrefab, _currentSpawnPosition, Quaternion.Euler(_currentSpawnRotation));
+            // Magenta-fix: convert any default/error material on the spawned Player to URP/Lit
+            try
+            {
+                var urpLit = Shader.Find("Universal Render Pipeline/Lit");
+                if (urpLit != null)
+                {
+                    foreach (var r in spawnedPlayer.GetComponentsInChildren<Renderer>(true))
+                    {
+                        var mats = r.sharedMaterials;
+                        bool changed = false;
+                        for (int i = 0; i < mats.Length; i++)
+                        {
+                            if (mats[i] == null || mats[i].shader == null || mats[i].shader.name.Contains("Hidden/InternalErrorShader"))
+                            {
+                                mats[i] = new Material(urpLit) { name = "Player_URPLit_Fallback" };
+                                mats[i].SetColor("_BaseColor", new Color(0.85f, 0.78f, 0.65f, 1f));
+                                changed = true;
+                            }
+                        }
+                        if (changed) r.sharedMaterials = mats;
+                    }
+                }
+            }
+            catch (System.Exception ex) { Debug.LogWarning($"[PlayerSpawner] Magenta-fix failed: {ex.Message}"); }
             spawnedPlayer.name = "Player";
             playerSpawned = true;
 

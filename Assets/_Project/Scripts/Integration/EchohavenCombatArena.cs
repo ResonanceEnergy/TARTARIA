@@ -48,7 +48,7 @@ namespace Tartaria.Integration
             // Wait for player + spawner to be alive
             float waited = 0f;
             while ((GameObject.FindWithTag("Player") == null
-                    // SUPERSEDED 2026-05-31 — missing symbol: || EchohavenContentSpawner.Instance == null) && waited < 20f)
+                    || EchohavenContentSpawner.Instance == null) && waited < 20f)
             {
                 waited += 0.5f;
                 yield return new WaitForSeconds(0.5f);
@@ -106,7 +106,7 @@ namespace Tartaria.Integration
 
         void SpawnWave(int count)
         {
-            // SUPERSEDED 2026-05-31 — missing symbol: var spawner = EchohavenContentSpawner.Instance;
+            var spawner = EchohavenContentSpawner.Instance;
             if (spawner == null) return;
 
             var p = GameObject.FindWithTag("Player");
