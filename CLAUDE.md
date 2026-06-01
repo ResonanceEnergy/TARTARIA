@@ -4,7 +4,15 @@
 
 ---
 
-## ⚡⚡ 2026-05-30 LATE-NIGHT MANDATE (latest, supersedes everything below)
+## ⚡⚡⚡ 2026-06-01 PARALLEL MANDATE (latest, supersedes everything below)
+
+**SWARM RUNS IN PARALLEL — NEVER SERIAL.** Per NATRIX: *"ENSURE THE SUBAGENTS ARE WORKING IN PARRELLE TO MAXIMIZE VALUE AND TIME"*
+
+When N independent tasks exist, spin up all N agents in one batch — no serial queue. Sibling agents don't block on each other (append to `docs/HANDOFFS.md` and keep working). Cowork drives runtime QA in parallel with VS Code authoring. One batched dispatch prompt per round, not N drip-fed prompts.
+
+---
+
+## ⚡⚡ 2026-05-30 LATE-NIGHT MANDATE
 
 **NO STUBS. NO PLACEHOLDERS. BUILD EVERYTHING OUT.**
 
