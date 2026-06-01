@@ -24,7 +24,10 @@ namespace Tartaria.Gameplay
         public float CurrentAccuracy { get; private set; }
 
         [Header("Difficulty")]
-        [SerializeField] private float duration = 20f;
+        // 2026-06-01 variant-polish: was 20f. Spec (mini-game-variant-polish) requires
+        // success-with-input in <8s. Player can't shortcut the timer in this variant,
+        // so the timer itself must complete inside the window.
+        [SerializeField] private float duration = 7.5f;
         [SerializeField] private float tolerance = 0.10f;       // fraction of half-height that's "on-line"
         [SerializeField] private float scrollSpeed = 1.4f;      // wave phase per second
         [SerializeField] private float waveFrequency = 1.0f;    // wavelengths visible
