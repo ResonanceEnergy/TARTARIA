@@ -1,0 +1,79 @@
+title: Bram_Greeting
+tags: character:Bram moon:1 beat:village role:smith
+---
+<<tag character:Bram>>
+Bram: The bellows wake slow these days — the air's not Mended.
+-> Continue
+    <<jump Bram_Exit>>
+===
+
+title: Bram_Exit
+tags: character:Bram moon:1 beat:village
+---
+<<tag character:Bram>>
+Bram: Mind the embers, traveler.
+===
+
+title: Marisol_Greeting
+tags: character:Marisol moon:1 beat:village role:weaver
+---
+<<tag character:Marisol>>
+Marisol: I'd weave longer if the light held — bring back the dome and I'll teach you the cymatic warp.
+-> Continue
+    <<jump Marisol_Exit>>
+===
+
+title: Marisol_Exit
+tags: character:Marisol moon:1 beat:village
+---
+<<tag character:Marisol>>
+Marisol: The loom will still be here.
+===
+
+title: Tobias_Greeting
+tags: character:Tobias moon:1 beat:village role:elder
+---
+<<tag character:Tobias>>
+Tobias: Heard the bells once, when I was small. They'll ring again.
+-> Continue
+    <<jump Tobias_Exit>>
+===
+
+title: Tobias_Exit
+tags: character:Tobias moon:1 beat:village
+---
+<<tag character:Tobias>>
+Tobias: Sit a spell, when your work's done.
+===
+
+title: Wren_Greeting
+tags: character:Wren moon:1 beat:village role:apprentice
+---
+<<tag character:Wren>>
+Wren: Are you the one Milo said would come? Are you?
+-> Continue
+    <<jump Wren_Exit>>
+===
+
+title: Wren_Exit
+tags: character:Wren moon:1 beat:village
+---
+<<tag character:Wren>>
+Wren: I'll tell Milo I saw you first!
+===
+
+title: Caelum_Greeting
+tags: character:Caelum moon:1 beat:village role:priest
+---
+<<tag character:Caelum>>
+Caelum: Pilgrim. The litanies remember. Light the braziers and they will sing.
+-> Continue
+    <<jump Caelum_Exit>>
+===
+
+title: Caelum_Exit
+tags: character:Caelum moon:1 beat:village
+---
+<<tag character:Caelum>>
+Caelum: Walk in measure, child.
+===

@@ -24,14 +24,21 @@ namespace Tartaria.Integration
     {
         private const string BootstrapObjectName = "[YarnTutorialBinding]";
 
-        // Seeded speaker -> Yarn node lookup (Sprint 7 Lane 6 spec).
+        // Seeded speaker -> Yarn node lookup (Sprint 7 Lane 6 spec,
+        // extended by Sprint 9 Lane 8 with the 5 named Moon 1 villagers).
         private static readonly Dictionary<string, string> DefaultSpeakerToNode =
             new Dictionary<string, string>
             {
-                { "Milo Brightway", "Milo_TutorialIntro" },
-                { "Lirael",         "Lirael_Lullaby"     },
-                { "Anastasia",      "Anastasia_Greeting" },
-                { "Cassian",        "Cassian_BossIntro"  },
+                { "Milo Brightway",      "Milo_TutorialIntro" },
+                { "Lirael",              "Lirael_Lullaby"     },
+                { "Anastasia",           "Anastasia_Greeting" },
+                { "Cassian",             "Cassian_BossIntro"  },
+                // Sprint 9 Lane 8 — Echohaven named villagers (see named_villagers.yarn).
+                { "Bram the Smith",      "Bram_Greeting"      },
+                { "Marisol the Weaver",  "Marisol_Greeting"   },
+                { "Old Tobias",          "Tobias_Greeting"    },
+                { "Wren the Apprentice", "Wren_Greeting"      },
+                { "Father Caelum",       "Caelum_Greeting"    },
             };
 
         private readonly Dictionary<string, string> _speakerToNode =
