@@ -2,7 +2,9 @@
     "name": "Tartaria.Combat",
     "rootNamespace": "Tartaria.Gameplay.Combat",
     "references": [
-        "Tartaria.Core"
+        "Tartaria.Core",
+        "Unity.TextMeshPro",
+        "Unity.InputSystem"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

@@ -24,7 +24,7 @@ namespace Tartaria.Save
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void AutoAttach()
         {
-            var existing = Object.FindFirstObjectByType<PlayerTransformSaveProvider>(FindObjectsInactive.Include);
+            var existing = UnityEngine.Object.FindFirstObjectByType<PlayerTransformSaveProvider>(FindObjectsInactive.Include);
             if (existing != null) return;
             var player = GameObject.FindGameObjectWithTag(PlayerTag);
             if (player == null) return;
