@@ -4,7 +4,47 @@
 
 ---
 
-## ⚡⚡⚡ 2026-06-01 PARALLEL MANDATE (latest, supersedes everything below)
+## ⚡⚡⚡⚡⚡ 2026-06-02 SPRINT 11 HONEST RESET — MOON 1 NOT SHIPPABLE (latest, supersedes everything below)
+
+**Sprint 11's full-scope audit shipped 10 grep-cited branches and produced a brutal verdict: Moon 1 is NOT shippable today. Prior audits ("v2 — 70/15/3 ✓/⚠/❌", "SHIPPABLE pending 2-4 hr") measured *file presence*. Sprint 11 measured *runtime feature behavior*. Divergent results.**
+
+### What Sprint 11 actually found (origin branches, all grep-cited)
+
+| Surface | Reality |
+|---|---|
+| Prefabs | **0 of 390 healthy at runtime.** Every FBX is a 130-byte Git LFS pointer (not pulled). Cathedral kit uses Unity primitives + invalid 16-char material GUID → magenta. Player.prefab is a capsule with **zero MonoBehaviours**. Lirael/Anastasia/Cassian/Milo are unanimated capsules. (L6 `e9bbc612`) |
+| Dialogue | **0 of 4 default speaker chains work.** YarnTutorialBinding map uses PascalCase ("Milo Brightway") but MiloTutorialFlow passes "Milo" and Yarn nodes are snake_case. NodeExists is case-sensitive. Entire tutorial dies silently. (L7 `cec511a9`) |
+| GameEvents | 35 healthy / 4 unused / **25 BROKEN one-sided**. CLAUDE.md canonical-facts table claims `OnBrazierLit / OnBrazierRingComplete / OnDayChanged` exist — **they don't.** Lirael Day-25, brazier ring, day cycle blocked. (L9 `72457de3`) |
+| Silent fails | 38 empty catches. Top 5 ALL on Moon 1 happy path (Moon1NarrativeBeats, Moon1CinematicMoments, TuningPedestalLink, QuestObjectiveTrackerUI, AdaptiveMusicController). (L2 `b33eb621`) |
+| Stubs | 9 ship-blockers: PickupInteractable hardcoded fail, CymaticWaterTuningMiniGame is 7 empty methods, HUD shows hardcoded `RS:0 / Aether:75%` every frame, PlayerAbility RS economy decorative, AetherFieldSystem hardcoded player pos. (L1 `1fb03541`) |
+| Commented-out wiring | 5 active-path bugs: PlayerAbilityController/Manager combat economy commented, PlayerWeaponSwitcher Awake body commented, DayNightCycle.UpdateAetherBoost discards result, AutomatedPrefabWiring NavMesh bake commented. (L3 `1587acab`) |
+| Workarounds | RuntimeSpawnerInsurance papers over missing scene authoring. Moon1RescueDriver uses banned legacy `Input.GetKey` bypassing PlayerInputHandler. PlayerInputHandler has `// EMERGENCY BYPASS` that removes pause/dialogue gate. PlayerSpawner adds CharacterController + PlayerInputHandler at runtime because Player.prefab ships incomplete. (L4 `f30f9a29`) |
+| Moon1_Systems orphan spam | **ROOT CAUSE FOUND**: 4 inline `!u!115 MonoScript` stub blocks at scene YAML lines 305/1252/3090/3364 pointing at deleted classes (Moon1NPCSpawner, Moon1AmbientCreatures, Moon1MaterialSetup, Moon1HeroBuildingSpawner). `RemoveMonoBehavioursWithMissingScript` can't see inline `!u!115`. New `Tartaria/8 Fix/Deep-Clean Moon1_Systems Prefab` menu does YAML surgery. (L5 `9500ccfe`) |
+| Scene authoring | Scene has 48 GameObjects. Boot chain creates **134+ at runtime**. 95% of Echohaven rebuilt every Play. 4-layer player spawn redundancy. EchohavenContentSpawner fires `new GameObject` 70+ times. (L8 `50ff78ea`) |
+
+### The plan
+
+**Read `docs/plans/MOON1_TO_100_PLAN.md`** — the phased roadmap, every step grep-cited, every estimate honest.
+
+**Read `docs/best-practices/UNITY_6_PATTERNS.md`** — Unity 6 manual best practices distilled for our patterns (LFS, Singleton bootstrap, Prefab variants, Mecanim humanoid, Input System, URP materials, Build pipeline, Scene management).
+
+**Read `docs/audits/SPRINT11_FULL_SCOPE_PUNCHLIST_2026-06-02.md`** (on `agent/audit/sprint11-synthesis` `6fe7ffef`) — the master punch list synthesized from the 10 audit lanes.
+
+### Mandates carried forward
+
+- **PARALLEL MANDATE** (2026-06-01) — swarms run in parallel, never serial. Director creates N worktrees up front.
+- **WORKTREE MANDATE** (`docs/agents/WORKTREE_MANDATE.md`) — one agent, one worktree, one branch. Zero `.git/config` corruption in 30+ lanes since adopted.
+- **API_CONTRACT** (`docs/agents/API_CONTRACT.md` v2) — grep every event/method before invoking, cite file:line in PR summary, no invented names.
+- **NO-DEBT** — no silent catches, no fabricated runtime artifacts, no `EmergencyDriver`/`GodMode`/`Override` bypass patterns. Workarounds must have a documented root-cause-fix backlog.
+- **NO-STUBS** — no `// TODO: implement`, no method bodies that only log "not implemented", no primitive `GameObject.CreatePrimitive` without URP-safe shader fallback.
+
+### Honest reset on prior CLAUDE.md claims
+
+The earlier "Sprint 9/10 — Moon 1 SHIPPABLE" assessment is **rescinded**. It was based on static file-presence audits. Sprint 11 measured runtime behavior and found pervasive fake features. The phased plan is the path to a real Moon 1.
+
+---
+
+## ⚡⚡⚡ 2026-06-01 PARALLEL MANDATE (supersedes everything below)
 
 **SWARM RUNS IN PARALLEL — NEVER SERIAL.** Per NATRIX: *"ENSURE THE SUBAGENTS ARE WORKING IN PARRELLE TO MAXIMIZE VALUE AND TIME"*
 
