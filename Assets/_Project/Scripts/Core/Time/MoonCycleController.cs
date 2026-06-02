@@ -1,7 +1,7 @@
 using UnityEngine;
 using Tartaria.Core;
 
-namespace Tartaria.Core.Time
+namespace Tartaria.Core.GameTime
 {
     /// <summary>
     /// Drives the in-game 24-hour cycle for Moon 1 (and beyond).
