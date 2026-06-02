@@ -1,10 +1,59 @@
 # TARTARIA — Current Status
 
-> **The single source of truth for "where are we right now?"**
-> Updated: 2026-06-02 (10-lane hammer sprint close). This doc supersedes prior status docs.
+> **The single source of truth for `where are we right now?`**
+> Updated: 2026-06-02 (Sprint 9 close · audit v3 — Lane 10 final pass). This doc supersedes prior status docs.
 
 ---
 
+## 2026-06-02 SPRINT 9 CLOSE — Moon 1 ship-status block
+
+**Sprint count:** 9 sprints. ~90 lanes shipped across hammer + Sprint 6 + 7 + 8 + 9 (estimated 75-90 actual implementing branches; 5-15 audit / docs / no-op lanes).
+
+**Sprint 9 lane dispatch result (10 lanes):**
+
+| # | Lane | Status | Branch |
+|---|------|--------|--------|
+| 1 | integration / feature-merge | PUSHED `2ea11442` | `agent/integration/sprint9-feature-merge` (bundles S6+7+8 + per-node-variant rescue) |
+| 2 | fix / pipe-organ-dup-delete | PUSHED `b7e937ce` (no-op, already resolved 2026-05-31) | `agent/fix/pipe-organ-dup-delete` |
+| 3 | gameplay / onday-event | **STALLED — local worktree only, no commits** | `agent/gameplay/onday-event` |
+| 4 | tools / butler-upload | PUSHED `38925669` (real butler push wired) | `agent/tools/butler-upload` |
+| 5 | content / npc-fbx-render | PUSHED `01e0034d` (3 FBX binaries shipped) | `agent/content/npc-fbx-render` |
+| 6 | content / npc-prefab-rebind | PUSHED `566ebdaf` (Editor rebind menu) | `agent/content/npc-prefab-rebind` |
+| 7 | gameplay / brazier-ritual | PUSHED `963fc750` (BrazierRitual + events) | `agent/gameplay/brazier-ritual` |
+| 8 | content / named-villagers | PUSHED `0eeceeea` (5 named villagers + yarn) | `agent/content/named-villagers` |
+| 9 | audio / cymatic-naming | **STALLED — local worktree only, no commits** | `agent/audio/cymatic-naming` |
+| 10 | qa / moon1-acceptance-v3 | PUSHED — this branch | `agent/qa/moon1-acceptance-v3` |
+
+**Audit tally (v3):** **77 ✓ / 12 ⚠ / 2 ❌** over 91 items (85% pass rate). Up from v2's 70 ✓ / 15 ⚠ / 3 ❌ (80%).
+
+**Ship verdict:** **SHIPPABLE PENDING ~4 H OF FINAL WORK.**
+- 2.5 h: land 7 Sprint 9 branches + 7 Sprint 6/7/8 follow-on branches into `feature/consolidate-moon-architecture` (with SaveSlotPanel triple-implementation triage).
+- 45 min: pick up S9 L3 (OnDayChanged event + Lirael Day-25 subscriber).
+- 30 min: resolve S9 L9 (CymaticEngine — rename spec OR build shim).
+- 15 min: Cowork in-Editor click of `Tartaria/Content/Rebind Moon 1 NPC Prefabs` to materialize NPC prefab variants in the scene.
+- Remaining 12 ⚠ items are content-tuning that can land post-alpha.
+
+**Latest integration branch:** `agent/integration/sprint9-feature-merge` HEAD `2ea11442` — **MERGE-INTO-feature/consolidate-moon-architecture PENDING.** Trunk is still at `6094136c` (the 10-lane hammer-sprint merge). Every ✓ in audit v3 is branch-only until this merge happens.
+
+### Open blockers
+
+1. **Trunk merge backlog** — 7 Sprint 9 branches + ~7 Sprint 6/7/8 follow-ons need PR review against `feature/consolidate-moon-architecture`. Cleanest path: land sprint9-feature-merge first, then layer L4/L5/L6/L7/L8 individually.
+2. **S9 L3 stalled** — Lirael Day-25 gate (no `GameEvents.OnDayChanged` event). Worktree exists at `C:/dev/_wt_s9_l3_onday_event`; agent never produced commits. Re-dispatch or hand to Cowork.
+3. **S9 L9 stalled** — CymaticEngine class never named or shimmed. Spec-mismatch awaiting doc decision.
+4. **§6.7 Cowork in-Editor rebind click** — FBX + rebind menu ready on origin; scene file still references primitive prefabs.
+5. **Save-slot UI triple-implementation** — S6 L3 (613 lines), S7 L4 (766 lines), S8 L6 (275 lines) all on origin. Pre-merge triage required.
+
+### Where to look
+
+- **Canonical audit (v3):** `docs/audits/MOON1_ACCEPTANCE_2026-06-02_v3.md` — 91-item §1–§15 scorecard with branch/SHA evidence for every ✓/⚠/❌.
+- **Prior audit (v2):** `docs/audits/MOON1_ACCEPTANCE_2026-06-02_v2.md` — Sprint 8 close, baseline for v3 deltas.
+- **Integration trunk for review:** `origin/agent/integration/sprint9-feature-merge` `2ea11442` (vs trunk `8ef925d6` = +1558/-87 across 19 files).
+- **Real-trunk reference:** `feature/consolidate-moon-architecture` `6094136c` (still the 10-lane hammer-sprint merge — has NOT absorbed Sprints 6/7/8/9 yet).
+- **Sprint 9 lane branches:** see lane table above.
+- **Per-Moon spec depth:** `docs/15_MVP_BUILD_SPEC.md` (Moon 1 source of truth).
+- **Mandate:** `CLAUDE.md` 2026-06-01 PARALLEL MANDATE + 2026-05-30 NO-STUBS + 2026-05-30 NATRIX FULL-BUILD ordering.
+
+---
 ## 2026-06-02 HAMMER SPRINT — 10 PRs open against `feature/consolidate-moon-architecture`
 
 All ten lanes shipped as isolated branches with compile-clean proof. Runtime QA owned by Cowork.
