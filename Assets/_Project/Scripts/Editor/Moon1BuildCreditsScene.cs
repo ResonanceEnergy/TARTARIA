@@ -69,8 +69,9 @@ namespace Tartaria.Editor
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
 
             // -- Camera (orthographic UI cam, dark background)
+            // global::UnityEngine.Camera fully qualified — the Tartaria.Camera namespace shadows the type otherwise.
             var camGo = new GameObject("Credits Camera");
-            var cam = camGo.AddComponent<Camera>();
+            var cam = camGo.AddComponent<global::UnityEngine.Camera>();
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.02f, 0.02f, 0.04f, 1f);
             cam.orthographic = true;
