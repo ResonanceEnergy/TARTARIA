@@ -108,6 +108,11 @@ namespace Tartaria.Integration
             }
             catch (System.Exception ex) { Debug.LogWarning($"[PlayerSpawner] Magenta-fix failed: {ex.Message}"); }
             spawnedPlayer.name = "Player";
+            // 2026-06-02 runtime-gap fix: Milo tutorial waypoint + many systems look up by
+            // GameObject.FindGameObjectWithTag("Player"). Name alone isn't enough.
+            try { spawnedPlayer.tag = "Player"; }
+            catch (UnityEngine.UnityException ex) { UnityEngine.Debug.LogWarning($"[PlayerSpawner] Could not set Player tag ({ex.Message}). Add the 'Player' tag in TagManager.asset."); }
+
             playerSpawned = true;
 
             // SAFETY: ensure movement components exist even if the prefab is incomplete.

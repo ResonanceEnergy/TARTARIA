@@ -876,7 +876,20 @@ namespace Tartaria.Integration
             // TODO Phase 2: Wire to UI dialogue panel
             Debug.Log($"[DialogueManager] {characterName}: {line}");
         }
-    }
+    
+
+        [UnityEngine.RuntimeInitializeOnLoadMethod(UnityEngine.RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void AutoBootstrap()
+        {
+            if (Instance != null) return;
+            var existing = UnityEngine.Object.FindFirstObjectByType<DialogueManager>(UnityEngine.FindObjectsInactive.Include);
+            if (existing != null) { Instance = existing; return; }
+            var go = new UnityEngine.GameObject("[DialogueManager]");
+            UnityEngine.Object.DontDestroyOnLoad(go);
+            Instance = go.AddComponent<DialogueManager>();
+            UnityEngine.Debug.Log("[DialogueManager] AutoBootstrap created singleton (no scene instance found).");
+        }
+}
 
     // ROUND 4: Full set of Milo/Lirael/Korath + Anastasia/Cassian bond, Moon3 rail vertical, Moons4-6 5-beat diary, permanent world payoff (W7/W8/W9 real-time comments), 17th Hour reactivity, giant resonance harmony narrative lines added in the catalogue init (trust milestone block).
 }
