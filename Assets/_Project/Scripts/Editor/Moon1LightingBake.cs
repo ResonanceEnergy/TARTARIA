@@ -9,6 +9,11 @@ namespace Tartaria.Editor
     /// Tartaria/Build Out Moon 1 Lighting Bake (Golden-Hour Preset)
     /// One-click lighting bake at the golden-hour preset per docs/15 §13.
     /// Configures Lightmapping settings + triggers async bake.
+    ///
+    /// Unity 6 migration (Sprint 10 Lane 2): the deprecated
+    /// `LightmapEditorSettings.*` static API and `Lightmapping.giWorkflowMode`
+    /// enum were replaced with the `LightingSettings` ScriptableObject
+    /// pattern. See docs/agents/API_CONTRACT.md §5.
     /// </summary>
     public static class Moon1LightingBake
     {
@@ -43,14 +48,23 @@ namespace Tartaria.Editor
             }
             sun.transform.rotation = Quaternion.Euler(28f, -25f, 0f); // Low golden-hour angle
 
-            // Lightmap settings
-            LightmapEditorSettings.bakeResolution = 20f;
-            LightmapEditorSettings.padding = 4;
-            LightmapEditorSettings.lightmapper = LightmapEditorSettings.Lightmapper.ProgressiveGPU;
-            LightmapEditorSettings.maxAtlasSize = 1024;
-            LightmapEditorSettings.directSampleCount = 32;
-            LightmapEditorSettings.indirectSampleCount = 256;
-            LightmapEditorSettings.bounces = 2;
+            // Lightmap settings — Unity 6 LightingSettings ScriptableObject pattern.
+            // Replaces deprecated static `LightmapEditorSettings.*` accessors and
+            // the removed `Lightmapping.giWorkflowMode` enum (CS0618 cleanup).
+            var settings = new LightingSettings
+            {
+                name = "Moon1_GoldenHour",
+                lightmapResolution = 20f,
+                lightmapPadding = 4,
+                lightmapper = LightingSettings.Lightmapper.ProgressiveGPU,
+                lightmapMaxSize = 1024,
+                directSampleCount = 32,
+                indirectSampleCount = 256,
+                maxBounces = 2,
+                bakedGI = true,
+                realtimeGI = false,
+            };
+            Lightmapping.lightingSettings = settings;
 
             // Save scene first
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
@@ -64,9 +78,6 @@ namespace Tartaria.Editor
                 return;
             }
 
-            Lightmapping.bakedGI = true;
-            Lightmapping.realtimeGI = false;
-            Lightmapping.giWorkflowMode = Lightmapping.GIWorkflowMode.OnDemand;
             Lightmapping.BakeAsync();
             Debug.Log("[Moon1LightingBake] Bake started — check Lighting window for progress.");
             EditorUtility.DisplayDialog("Baking",
