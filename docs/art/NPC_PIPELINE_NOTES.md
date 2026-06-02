@@ -116,3 +116,40 @@ blender --background --python tools/blender/gen_npc_cassian.py
   the existing idle/talk/walk animation clips.
 - Replace eye spheres with face decals so the camera doesn't need to push
   in close to read facial direction.
+
+
+---
+
+## Sprint 9 Lane 5 — Render Report (2026-06-02 12:18 MST)
+
+The three NPC FBX files were rendered headlessly from the Sprint 8 Lane 8 generator scripts.
+
+**Blender version detected:** 5.0.1 (hash a3db93c5b259, built 2025-12-16) at `C:\Program Files\Blender Foundation\Blender 5.0\blender.exe`
+
+**Pipeline invocation (per asset):**
+```
+& "C:\Program Files\Blender Foundation\Blender 5.0\blender.exe" 
+  --background --python "Tools\blender\gen_npc_<name>.py"
+```
+with `TARTARIA_ROOT` env-var set to the worktree path (`C:\dev\_wt_s9_l5_npc_fbx`) so `_common.export_current_as` lands the FBX under the worktree's `Assets\_Project\Models\Blender\Moon1\` rather than the canonical project root.
+
+**Output FBX (Kaydara FBX Binary, axis -Z forward / Y up, scale 1.0):**
+
+| Asset       | Path                                                            | Size     | Render time |
+|-------------|-----------------------------------------------------------------|----------|-------------|
+| Lirael      | Assets/_Project/Models/Blender/Moon1/Lirael.fbx                 | 57.2 KB  | 0.079 s     |
+| Anastasia   | Assets/_Project/Models/Blender/Moon1/Anastasia.fbx              | 66.5 KB  | 0.024 s     |
+| Cassian     | Assets/_Project/Models/Blender/Moon1/Cassian.fbx                | 65.6 KB  | 0.029 s     |
+
+All three meet the >=30 KB primitive-vs-real-mesh sanity threshold (primitive prefab baseline is 10.8 KB; these are 5-6x that — confirms multi-mesh humanoid bodies actually exported, not just an empty scene).
+
+**Verification:**
+- File magic confirmed: bytes 0..19 == `Kaydara FBX Binary`.
+- Blender exited cleanly (status 0) for all three runs.
+- No `_common` import errors (PROJECT_ROOT picked up via `TARTARIA_ROOT` env-var).
+- Single benign add-on warning: `Add-on not loaded: "Capsule"` (user-installed Blender plugin missing — unrelated to NPC generation).
+
+**Full Blender stdout logs:** `Logs/blender_npc/{lirael,anastasia,cassian}.log` (not committed — local-only diagnostic).
+
+**Next handoff (Sprint 9 Lane 6 / NPC prefab rebind):**
+On Unity import, `BlenderImportPostprocessor.cs` will auto-generate URP/Lit materials and prefab variants at `Assets/_Project/Prefabs/Moon1/Blender/Lirael.prefab` etc. The downstream rebind lane (`agent/content/npc-prefab-rebind`) can then swap the primitive `Char_Lirael` / `Char_Anastasia` / `Char_Cassian` references in Echohaven_VerticalSlice to the new Blender variants.
