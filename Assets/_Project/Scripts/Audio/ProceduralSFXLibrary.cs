@@ -16,11 +16,14 @@ namespace Tartaria.Audio
         static bool _initialized;
         static int _sampleRate;
 
-        // ─── Tartarian frequency palette ───
-        const float F_TELLURIC  = 7.83f;
-        const float F_HARMONIC  = 432f;
-        const float F_HEALING   = 528f;
-        const float F_CELESTIAL = 1296f;
+        // ─── Tartarian frequency palette (canonical per CLAUDE.md 2026-05-29) ───
+        // Three Aether bands: Telluric 7.83 / Harmonic 432 / Celestial 528.
+        // F_OVERTONE_HIGH (1296 = 3x432) is a sound-design overtone, NOT a band label.
+        const float F_TELLURIC      = 7.83f;
+        const float F_HARMONIC      = 432f;
+        const float F_CELESTIAL     = 528f;   // canonical 3rd Aether band
+        const float F_OVERTONE_HIGH = 1296f;  // 3x432 musical overtone (shimmer / crystal ping)
+        const float F_HEALING       = 528f;   // back-compat alias of F_CELESTIAL
         const float PHI = GoldenRatioValidator.PHI;
 
         // Moon 2 Lunar Moon (from C_AUDIO_DESIGN.md) — keynote E4 for melancholy purification
@@ -375,7 +378,7 @@ namespace Tartaria.Audio
                 data[i] = env * 0.25f * (
                     Sine(i, F_HARMONIC) +
                     0.7f * Sine(i, F_HEALING) +
-                    0.4f * Sine(i, F_CELESTIAL * 0.5f) +
+                    0.4f * Sine(i, F_OVERTONE_HIGH * 0.5f) +
                     0.15f * Sine(i, F_HARMONIC * 2f));
             }
             return MakeClip("SFX_BuildingActive", data);
@@ -626,7 +629,7 @@ namespace Tartaria.Audio
             {
                 float t = (float)i / len;
                 float env = Mathf.Exp(-3f * t) * 0.5f + Mathf.Sin(t * Mathf.PI) * 0.3f;
-                data[i] = env * (Sine(i, F_HEALING) + 0.5f * Sine(i, F_CELESTIAL * 0.5f) + 0.2f * Sine(i, F_HARMONIC * 2f));
+                data[i] = env * (Sine(i, F_HEALING) + 0.5f * Sine(i, F_OVERTONE_HIGH * 0.5f) + 0.2f * Sine(i, F_HARMONIC * 2f));
             }
             return MakeClip("SFX_AchievementPop", data);
         }
@@ -711,7 +714,7 @@ namespace Tartaria.Audio
         {
             int len = Samples(0.6f);
             var data = new float[len];
-            float[] sweep = { F_HARMONIC, F_HEALING, F_HARMONIC * 2f, F_CELESTIAL * 0.5f };
+            float[] sweep = { F_HARMONIC, F_HEALING, F_HARMONIC * 2f, F_OVERTONE_HIGH * 0.5f };
             for (int i = 0; i < len; i++)
             {
                 float t = (float)i / len;
@@ -1909,7 +1912,7 @@ namespace Tartaria.Audio
             float bRoot  = F_HARMONIC;          // 432
             float bPHI   = bRoot * PHI;         // ~699
             float bHeal  = F_HEALING;            // 528
-            float bCel   = F_CELESTIAL * 0.5f;  // 648
+            float bCel   = F_OVERTONE_HIGH * 0.5f;  // 648 (3x432/2)
             float bOct   = bRoot * 2f;          // 864
             for (int i = 0; i < len; i++)
             {
@@ -2099,9 +2102,9 @@ namespace Tartaria.Audio
             {
                 float t = (float)i / len;
                 float decay = Mathf.Exp(-t * 3.5f);
-                float chime = Sine(i, F_CELESTIAL) * 0.45f
-                            + Sine(i, F_CELESTIAL * 1.5f) * 0.22f
-                            + Sine(i, F_CELESTIAL * 2f) * 0.12f;
+                float chime = Sine(i, F_OVERTONE_HIGH) * 0.45f
+                            + Sine(i, F_OVERTONE_HIGH * 1.5f) * 0.22f
+                            + Sine(i, F_OVERTONE_HIGH * 2f) * 0.12f;
                 float shimmer = FilteredNoise(i, 4200f) * 0.08f * decay;
                 data[i] = (chime + shimmer) * decay * 0.58f;
             }
@@ -2299,7 +2302,7 @@ namespace Tartaria.Audio
             {
                 float t = (float)i / len;
                 float swell = Mathf.Clamp01(t * 3f) * (1f - Mathf.Pow(Mathf.Max(0f, t - 0.6f) / 0.4f, 1.8f));
-                float golden = Sine(i, F_CELESTIAL) * 0.45f * swell
+                float golden = Sine(i, F_OVERTONE_HIGH) * 0.45f * swell
                              + Sine(i, F_HEALING) * 0.32f * swell
                              + Sine(i, F_HARMONIC * 2f) * 0.22f * swell;
                 float giant = Sine(i, 60f) * 0.28f * (1f - t * 0.8f);
@@ -2332,7 +2335,7 @@ namespace Tartaria.Audio
         {
             int len = Samples(3.2f);
             var data = new float[len];
-            float[] cascade = { F_HARMONIC * PHI * PHI, F_HEALING * PHI, F_CELESTIAL * 0.8f, 1620f };
+            float[] cascade = { F_HARMONIC * PHI * PHI, F_HEALING * PHI, F_OVERTONE_HIGH * 0.8f, 1620f };
             for (int i = 0; i < len; i++)
             {
                 float t = (float)i / len;
@@ -2443,7 +2446,7 @@ namespace Tartaria.Audio
             {
                 float t = (float)i / len;
                 float chime = Sine(i, F_HEALING) * 0.35f + Sine(i, F_HEALING * PHI) * 0.2f;
-                float shimmer = Sine(i, F_CELESTIAL * 0.5f) * 0.15f;
+                float shimmer = Sine(i, F_OVERTONE_HIGH * 0.5f) * 0.15f;
                 float env = Mathf.Exp(-2f * t);
                 data[i] = (chime + shimmer) * env * 0.45f;
             }
@@ -2550,7 +2553,7 @@ namespace Tartaria.Audio
                 float t = (float)i / len;
                 float chime1 = Sine(i, F_HARMONIC) * 0.3f;
                 float chime2 = Sine(i, F_HEALING) * 0.25f;
-                float cascade = Sine(i, F_CELESTIAL * 0.5f) * 0.2f * Mathf.Clamp01(t * 3f);
+                float cascade = Sine(i, F_OVERTONE_HIGH * 0.5f) * 0.2f * Mathf.Clamp01(t * 3f);
                 float env = 1f - Mathf.Pow(t, 1.5f);
                 data[i] = (chime1 + chime2 + cascade) * env * 0.45f;
             }

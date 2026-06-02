@@ -6,13 +6,18 @@ namespace Tartaria.Core
     // ─────────────────────────────────────────────
     //  Aether Harmonic Bands (3-6-9)
     // ─────────────────────────────────────────────
+    // Canonical Aether bands per CLAUDE.md (2026-05-29):
+    //   Telluric  = 7.83 Hz, Harmonic = 432 Hz, Celestial = 528 Hz.
+    // The Ethereal/Resonant entries below are post-canon extension bands
+    // (12-band 3888 Hz, 15-band 5832 Hz). They are NOT part of the 3
+    // canonical bands and should only be unlocked in post-Moon-13 content.
     public enum HarmonicBand : byte
     {
         Telluric  = 3,  // 7.83 Hz — Schumann Resonance — deep amber
-        Harmonic  = 6,  // 432 Hz  — universal healing  — bright gold
-        Celestial = 9,  // 1296 Hz — 3×432             — white-gold
-        Ethereal  = 12, // 3888 Hz — transcendent       — violet-white
-        Resonant  = 15  // 5832 Hz — planetary resonance — deep violet
+        Harmonic  = 6,  // 432 Hz  — Verdi tuning       — bright gold
+        Celestial = 9,  // 528 Hz  — solfeggio "love"   — white-gold (was mis-spec'd as 1296)
+        Ethereal  = 12, // 3888 Hz — transcendent       — violet-white (extension band, post-canon)
+        Resonant  = 15  // 5832 Hz — planetary          — deep violet  (extension band, post-canon)
     }
 
     // ─────────────────────────────────────────────

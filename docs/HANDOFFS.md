@@ -39,3 +39,25 @@ Top of file = most recent. Append entries with timestamp + lane + status.
 **Verification (Cowork required):** Play `Test_PlayerOnly` scene (Tartaria → 9 QA), press W → forward; A → strafe-left; D → strafe-right; S → backward. Same for gamepad left stick.
 
 ---
+
+
+## 2026-06-02 — Sprint 9 Lane 9 (Cymatic Naming)
+
+**Branch:** `agent/audio/cymatic-naming`
+**Audit item resolved:** v2 #9.4 — CymaticEngine naming decision.
+
+**Decision:** Branch C (scattered ad-hoc names unified under canon).
+`CymaticMusicEngine` engine name retained (cymatic = visual phenomenon, not a
+4th band). Canon enforced: Telluric 7.83 / Harmonic 432 / Celestial 528.
+
+**Files modified:**
+- `Assets/_Project/Scripts/Core/TartariaConstants.cs` — celestialFrequencyHz 1296->528; band9Frequency 1296->528; band3Frequency 129.6->7.83; added harmonicFrequencyHz, overtoneHighHz; kept healingFrequencyHz as 528 back-compat alias.
+- `Assets/_Project/Scripts/Core/AetherComponents.cs` — Celestial = 9 enum comment fixed (1296 -> 528); flagged Ethereal/Resonant as post-canon extension bands.
+- `Assets/_Project/Scripts/Audio/ProceduralSFXLibrary.cs` — F_CELESTIAL = 528 (was 1296); added F_OVERTONE_HIGH = 1296; 9 sound-design call sites moved from F_CELESTIAL -> F_OVERTONE_HIGH so playback frequencies are preserved.
+- `Assets/_Project/Scripts/Audio/AudioManager.cs` — header comment now lists canonical 3 bands.
+- `Assets/_Project/Scripts/UI/WorldMapUI.cs` — tech_frequency_healing codex, freq_528 codex, freq_1296 codex all rewritten to match canon.
+
+**Doc:** `docs/audits/2026-06-02-cymatic-naming-resolution.md`
+
+**No behavior change for audio playback** — every site that previously played
+1296 Hz still plays 1296 Hz (now via F_OVERTONE_HIGH). Only labels moved.

@@ -426,7 +426,7 @@ namespace Tartaria.UI
             Add("tech_golden_ratio", CodexCategory.Technology, "The Golden Ratio in Architecture",
                 "φ (1.618...) appears throughout Tartarian buildings. Door heights, window spacing, dome curvature — all follow golden proportions. This wasn't aesthetic preference; it was functional engineering for Aether conductivity.");
             Add("tech_frequency_healing", CodexCategory.Technology, "Frequency-Based Restoration",
-                "Specific frequencies interact with Tartarian materials: 432 Hz (harmonic alignment), 528 Hz (transformation), 7.83 Hz (Earth resonance), 1296 Hz (celestial connection). Tuning to these frequencies activates dormant Aether circuits.");
+                "Specific frequencies interact with Tartarian materials. The three canonical Aether bands: 7.83 Hz Telluric (Earth resonance), 432 Hz Harmonic (Verdi tuning), 528 Hz Celestial (solfeggio transformation). Tuning to these frequencies activates dormant Aether circuits. Higher overtones such as 1296 Hz (3x432) sound design layers add shimmer without being band frequencies themselves.");
             Add("tech_tesla_369", CodexCategory.Technology, "Tesla's 3-6-9 Pattern",
                 "'If you only knew the magnificence of 3, 6, and 9...' - Nikola Tesla. The ley line network follows this geometry. Three primary nodes form triangles, six secondary nodes hexagons, nine tertiary nodes complete the grid.");
             Add("tech_ley_lines", CodexCategory.Technology, "Ley Line Network",
@@ -449,12 +449,12 @@ namespace Tartaria.UI
             // ── Frequencies ──
             Add("freq_432", CodexCategory.Frequencies, "432 Hz — Universal Harmony",
                 "The 'Verdi tuning.' Pre-20th century music used 432 Hz as standard A. The shift to 440 Hz was deliberate — disconnecting the population from natural resonance. Tartarian instruments and buildings all tuned to 432.");
-            Add("freq_528", CodexCategory.Frequencies, "528 Hz — Transformation",
-                "The 'miracle frequency.' Part of the Solfeggio scale, 528 Hz is associated with DNA repair and cellular regeneration in cymatics research. Korath awakens when this frequency is sustained.");
+            Add("freq_528", CodexCategory.Frequencies, "528 Hz — Celestial (Transformation)",
+                "The 'miracle frequency.' Part of the Solfeggio scale, 528 Hz is associated with DNA repair and cellular regeneration in cymatics research. This is the canonical Celestial band of the Aether (per the 3-6-9 system). Korath awakens when this frequency is sustained.");
             Add("freq_783", CodexCategory.Frequencies, "7.83 Hz — Schumann Resonance",
                 "Earth's electromagnetic heartbeat. The gap between Earth's surface and ionosphere resonates at 7.83 Hz. Tartarian buildings were designed to amplify this frequency, keeping occupants in harmony with the planet.");
-            Add("freq_1296", CodexCategory.Frequencies, "1296 Hz — Celestial Connection",
-                "The highest frequency in the Tartarian system. 1296 = 6^4 = 1296. At this frequency, the boundary between dimensions becomes permeable. The Day Out of Time occurs when this frequency peaks globally.");
+            Add("freq_1296", CodexCategory.Frequencies, "1296 Hz — Harmonic Overtone (3x432)",
+                "A high musical overtone — three times the Harmonic carrier of 432 Hz. Used in sound design for shimmer, crystal pings, and the Day Out of Time aural crescendo. It is NOT one of the three canonical Aether bands (those are Telluric 7.83 / Harmonic 432 / Celestial 528) — earlier lore mislabeled it as a Celestial connection frequency.");
 
             // ── Locations ──
             Add("loc_echohaven", CodexCategory.Locations, "Echohaven",

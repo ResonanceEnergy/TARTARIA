@@ -9,8 +9,10 @@ namespace Tartaria.Audio
     /// and coordinates between adaptive music and gameplay events.
     ///
     /// All musical content uses A4 = 432 Hz tuning.
-    /// Key frequencies: 7.83 Hz (Telluric), 432 Hz (Harmonic),
-    ///                  528 Hz (Healing), 1296 Hz (Celestial)
+    /// Canonical Aether bands (per CLAUDE.md 2026-05-29):
+    ///   7.83 Hz (Telluric), 432 Hz (Harmonic), 528 Hz (Celestial).
+    /// 1296 Hz survives only as a 3x432 musical overtone for sound design,
+    /// not as a band frequency.
     ///
     /// Mixer-aware: pool sources can be routed to AudioMixerGroups so player
     /// volume sliders work via Mixer.SetFloat. Cue library lookup via Play(cueId).
