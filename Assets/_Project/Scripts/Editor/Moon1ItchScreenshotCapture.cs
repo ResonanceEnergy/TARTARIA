@@ -147,11 +147,12 @@ namespace Tartaria.Editor
                 camGO = new GameObject(captureCamName);
                 camGO.hideFlags = HideFlags.DontSave;
             }
-            var cam = camGO.GetComponent<Camera>();
-            if (cam == null) cam = camGO.AddComponent<Camera>();
+            var cam = camGO.GetComponent<global::UnityEngine.Camera>();
+            if (cam == null) cam = camGO.AddComponent<global::UnityEngine.Camera>();
 
             // Mirror MainCamera's clear flags / culling / skybox so URP renders normally.
-            var mainCam = Camera.main;
+            // global::UnityEngine.Camera fully qualified — the Tartaria.Camera namespace shadows the type otherwise.
+            var mainCam = global::UnityEngine.Camera.main;
             if (mainCam != null)
             {
                 cam.clearFlags = mainCam.clearFlags;
