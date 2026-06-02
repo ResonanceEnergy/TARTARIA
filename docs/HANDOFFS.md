@@ -4,6 +4,22 @@ Top of file = most recent. Append entries with timestamp + lane + status.
 
 ---
 
+## 2026-06-02 — Sprint 9 Lane 2 (pipe-organ-dup-delete) — NO-OP / ALREADY RESOLVED
+
+**Lane prompt:** Delete duplicate `Assets/_Project/Scripts/Integration/PipeOrganMiniGame.cs` stub to clear CS0101 ambush identified by Sprint 8 Lane 4.
+
+**Finding:** The CS0101 collision does not exist on this branch tip (8ef925d6). The Integration/ stub was archived on 2026-05-31 (commit 652e0813) and is on disk only as `Assets/_Project/Scripts/Integration/_archived_duplicates_2026_05_31/PipeOrganMiniGame.cs.archived` — the `.archived` extension means Unity's compiler does not include it. There is no second `.cs` file declaring `Tartaria.Gameplay.PipeOrganMiniGame`.
+
+**Evidence gathered:**
+- `Get-ChildItem -Recurse -Filter "*PipeOrgan*.cs"` returns exactly one match for `PipeOrganMiniGame`: `Assets/_Project/Scripts/Gameplay/PipeOrganMiniGame.cs` (256 lines, real impl, namespace `Tartaria.Gameplay`).
+- The archived stub (57 lines) also declared `namespace Tartaria.Gameplay` — folder name `Integration/` was misleading. There is no live or historical `Tartaria.Integration.PipeOrganMiniGame` type anywhere in the tree (`rg "Tartaria\.Integration\.PipeOrganMiniGame"` -> 0 hits).
+- Only external caller: `Assets/_Project/Scripts/Integration/InteractableBuilding.cs:314` does `EnsureMiniGameComponent<PipeOrganMiniGame>().StartOrgan();`. The file has `using Tartaria.Gameplay;` on line 4 -> resolves to the real class. The real class has `public void StartOrgan(PipeOrganConfig config = null)` at line 85, so the no-arg call site compiles cleanly.
+
+**Action taken:** None. No files deleted, no code changed. Branch pushed unchanged so the orchestrator sees a closed lane.
+
+**Recommendation for Director:** Sprint 8 Lane 4's audit was likely against pre-2026-05-31 state. Future audits should verify against `git ls-files` filtered to `*.cs` (not just folder presence) before queueing a delete lane.
+
+---
 ## 2026-06-02 — UI (main-menu-scene) Sprint 6 Lane 1 — DONE / 2 follow-ups
 
 **Delivered:**
