@@ -1,7 +1,58 @@
 # TARTARIA — Current Status
 
 > **The single source of truth for "where are we right now?"**
-> Updated: 2026-06-02 (10-lane hammer sprint close). This doc supersedes prior status docs.
+> Updated: 2026-06-02 (Sprint 10 close — Moon 1 ship-candidate cut). This doc supersedes prior status docs.
+
+---
+
+## ⚡ 2026-06-02 — MOON 1 SHIP CANDIDATE
+
+Ten sprints landed against `feature/consolidate-moon-architecture`. Moon 1 (Echohaven) is the first slice of the game considered shippable to a closed external channel. This is a **ship candidate**, not a "100% done" claim — see punch list below.
+
+### Sprint roll-up (all on origin)
+
+| Sprint | Theme | Status |
+|--------|-------|--------|
+| 1 | Repo hygiene + scope lock + GameEvents.cs reconstruction | landed |
+| 2 | Moon 1 environment + 3 hero buildings + atmosphere | landed |
+| 3 | Tuning mini-game A + pedestal wiring + URP fixes | landed |
+| 4 | Save/Load schema v15 + AdaptiveMusic Layer 2 + F310 input fixes | landed |
+| 5 | Blender art pipeline (12 assets generated headless) | landed |
+| 6 | SHIP POLISH — Main Menu, Settings, SaveSlot UI, ambient zones, hit feedback, tutorial, difficulty, credits | landed |
+| 7 | PR LANDING + content fill — hit feedback wired at 8 strike sites, difficulty apply-sites | landed |
+| 8 | SHIP-GATE BLITZ — compile clean, Pipe Organ routing fix, named villager scaffold | landed |
+| 9 | SHIP THE GATE — OnDayChanged + Lirael Day-25 gate, real Blender FBX NPCs (Lirael/Anastasia/Cassian), 5 named villagers, brazier ritual, Celestial=528Hz canon | landed |
+| 10 | RELEASE CUT — STATUS update, release notes, tag script, butler runbook, post-merge hotfixes | in flight (this sprint) |
+
+### Branch SHA
+
+- `feature/consolidate-moon-architecture` HEAD as of Sprint 10 cut: **`8cb50d64`** (hotfix #3: `global::UnityEngine.Camera` fully qualified in Editor scripts — Tartaria.Camera namespace shadow).
+- Sprint 10's own commits will bump this SHA — the ship-candidate tag points at whatever HEAD is at the moment NATRIX runs `scripts/release/tag-moon1-ship-candidate.ps1`.
+
+### Acceptance audit v3 — 77 ✓ / 12 ⚠ / 2 ❌
+
+Closest on-disk artifact: `docs/audits/MOON1_ACCEPTANCE_2026-06-02_v2.md` (Sprint 8 close, 70 ✓ / 15 ⚠ / 3 ❌). v3 tally is the post-Sprint-9 delta documented inline in `docs/release/PR_DRAFT_sprint9_to_feature.md` § "Acceptance audit deltas" — Pipe Organ routing landed (5.6 ⚠→✓), `OnDayChanged`/Lirael gate landed, 5 named villagers landed (2.5 ❌→✓), Celestial=528Hz canon landed across 6 files. The remaining 2 ❌ and 12 ⚠ are non-ship-gating polish (see punch list).
+
+### Final punch list (post-ship polish — none ship-gating)
+
+1. `Moon1BuildOutEnvironment.cs` add CarvedStone placement (v3 §3.2 ⚠).
+2. Vegetation count bump from 120 → spec ~5000 instances (v3 §4.1 ⚠).
+3. 17 deprecation warnings — non-functional compiler noise (called out in `docs/release/RELEASE_NOTES_moon1.md` known issues).
+4. Triage 3 SaveSlotPanel implementations down to 1 canonical (Sprint 6 left two siblings; Sprint 7 added a third).
+
+### Distribution
+
+- **Channel:** itch.io, pay-what-you-want pricing (per `TARTARIA_MASTER_PLAN.md` Track A and `CLAUDE.md` "Things decided and shouldn't be re-litigated").
+- **Butler channel:** `moon1-windows`.
+- **Build script:** `scripts/build-itch.ps1` (Unity build → screenshot smoke → butler push). Setup: `docs/release/BUTLER_SETUP.md`.
+- **Release notes:** `docs/release/RELEASE_NOTES_moon1.md` (this sprint).
+- **Tag script:** `scripts/release/tag-moon1-ship-candidate.ps1` (NATRIX runs manually after Sprint 10 merges to trunk).
+- No Steam, no mobile, no F2P. itch.io single-channel cut.
+
+### Next
+
+- **Moon 2 design + content sprint pipeline reset.** Reuse the worktree/dispatch mandate (`docs/agents/WORKTREE_MANDATE.md`) and the Sprint 9 dispatch template (`docs/agents/SPRINT_7_DISPATCH.md`).
+- Per the 2026-05-30 NATRIX mandate at the top of `CLAUDE.md`: Moons 2 → 3 → 4 → … → 13, each built fully (buildings → props → environment → mini-games → NPCs → combat → quests → audio/VFX → done), before re-opening distribution conversations beyond the closed `moon1-windows` channel.
 
 ---
 
