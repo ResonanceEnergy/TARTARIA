@@ -458,6 +458,15 @@ namespace Tartaria.Core
         public static void FireCombatStarted() => OnCombatStarted?.Invoke();
         public static void FireCombatEnded() => OnCombatEnded?.Invoke();
 
+        // --- Sprint 9 Lane 7: Brazier ritual events (audit v2 #8.1) ---
+        /// <summary>Raised by <c>Tartaria.Gameplay.BrazierRitual</c> when the player lights a brazier. Payload: brazierId.</summary>
+        public static event Action<string> OnBrazierLit;
+        public static void RaiseBrazierLit(string brazierName) => OnBrazierLit?.Invoke(brazierName);
+
+        /// <summary>Raised once when the brazier ring reaches BrazierRitual.RingCompleteThreshold (default 3). Subscribers: Anastasia idle-dialogue shift, ambient-music swell, quest beat.</summary>
+        public static event Action OnBrazierRingComplete;
+        public static void RaiseBrazierRingComplete() => OnBrazierRingComplete?.Invoke();
+
         // ═══════════════════════════════════════════════════════════════════
         // RAISE METHODS (Thread-safe with null-check + exception handling)
         // ═══════════════════════════════════════════════════════════════════

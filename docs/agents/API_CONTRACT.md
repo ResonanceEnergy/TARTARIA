@@ -63,6 +63,10 @@ These names **shadow `UnityEngine` types** at the language level. Picking any of
 | `RaiseHUDHideInteractionPrompt()` | `void` | `GameEvents.cs:665` | Sprint 6 Lane 6 |
 | `RaiseMoonCompleted(MoonCompletedEventArgs)` | `void` | `GameEvents.cs:584` | Sprint 6 Lane 9 |
 | `RaiseAetherVisionToggled(bool)` | `void` | `GameEvents.cs:596` | Sprint 5 |
+| `OnBrazierLit` | `Action<string>` | `GameEvents.cs:463` | Sprint 9 Lane 7 (audit v2 #8.1) |
+| `OnBrazierRingComplete` | `Action` | `GameEvents.cs:467` | Sprint 9 Lane 7 (audit v2 #8.1) |
+| `RaiseBrazierLit(string)` | `void` | `GameEvents.cs:464` | Sprint 9 Lane 7 (audit v2 #8.1) |
+| `RaiseBrazierRingComplete()` | `void` | `GameEvents.cs:468` | Sprint 9 Lane 7 (audit v2 #8.1) |
 
 ### 2.2 EventArgs classes
 
