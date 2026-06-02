@@ -232,6 +232,7 @@ namespace Tartaria.Gameplay
             _onComplete = onComplete;
             isPlaying = true;
             _timer = timeLimit;
+            ApplyDifficultyForgiveness();
 
             // Auto-build UI if not assigned in inspector
             EnsureUIBuilt();
@@ -277,6 +278,7 @@ namespace Tartaria.Gameplay
             timeLimit = config.timeLimitSeconds;
             // tolerancePercent is a 0-1 fraction of the ±100 Hz slider range.
             tolerance = Mathf.Max(0.5f, config.tolerancePercent * 100f);
+            ApplyDifficultyForgiveness();
 
             _onComplete = null;          // event-driven path — see OnTuningComplete/OnTuningFailed
             isPlaying = true;
@@ -388,6 +390,18 @@ namespace Tartaria.Gameplay
         void CleanupTuning()
         {
             if (tuningUI != null) tuningUI.SetActive(false);
+        }
+
+        /// <summary>Sprint 7 Lane 2 - applies MiniGameForgiveness multiplier from DifficultyController to the active tolerance window. Story raises tolerance, Hardened tightens it.</summary>
+        void ApplyDifficultyForgiveness()
+        {
+            float mul;
+            try { mul = Tartaria.Gameplay.DifficultyController.MiniGameForgiveness; }
+            catch (System.Exception e) { Debug.LogWarning("[DifficultyApply] TuningMiniGame.ApplyDifficultyForgiveness: lookup threw " + e.GetType().Name + ": " + e.Message + " - using 1.0"); mul = 1f; }
+            mul = Mathf.Clamp(mul, 0.1f, 5f);
+            float before = tolerance;
+            tolerance = Mathf.Max(0.5f, tolerance * mul);
+            Debug.Log("[DifficultyApply] tolerance=" + tolerance.ToString("F2") + " (multiplier=" + mul.ToString("F2") + ", was=" + before.ToString("F2") + ")");
         }
 
         public bool IsPlaying() => isPlaying;
