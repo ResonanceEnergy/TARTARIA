@@ -30,7 +30,7 @@ namespace Tartaria.Integration
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
         {
-            if (FindObjectOfType<Moon1InteractionPrompt>() != null) return;
+            if (Object.FindFirstObjectByType<Moon1InteractionPrompt>(FindObjectsInactive.Include) != null) return;
             var host = new GameObject(nameof(Moon1InteractionPrompt));
             DontDestroyOnLoad(host);
             host.AddComponent<Moon1InteractionPrompt>();

@@ -25,7 +25,7 @@ namespace Tartaria.Integration
         static void Bootstrap()
         {
             // Singleton — survives scene reload, idempotent.
-            if (FindObjectOfType<Moon1AudioOrchestra>() != null) return;
+            if (Object.FindFirstObjectByType<Moon1AudioOrchestra>(FindObjectsInactive.Include) != null) return;
             var go = new GameObject(nameof(Moon1AudioOrchestra));
             DontDestroyOnLoad(go);
             go.AddComponent<Moon1AudioOrchestra>();
