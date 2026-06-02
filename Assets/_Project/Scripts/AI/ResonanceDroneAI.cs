@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using System.Collections.Generic;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Gameplay.Combat;
 
 namespace Tartaria.AI
 {
@@ -153,6 +154,10 @@ namespace Tartaria.AI
                 if (damage > 0)
                 {
                     _player.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
+
+                    // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+                    try { HitFeedback.NotifyHit(_player.position, damage, false); }
+                    catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at ResonanceDroneAI.cs:DamagePlayerWithBeam"); }
                 }
             }
         }

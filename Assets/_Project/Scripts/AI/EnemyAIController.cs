@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using Tartaria.Gameplay.Combat;
 
 namespace Tartaria.AI
 {
@@ -158,6 +159,10 @@ namespace Tartaria.AI
             // Deal damage to player (SendMessage pattern - AI↔Gameplay circular dep broken)
             _player.SendMessage("TakeDamage", Mathf.RoundToInt(attackDamage), SendMessageOptions.DontRequireReceiver);
             Debug.Log($"[EnemyAI] {gameObject.name} attacked player for {attackDamage} damage");
+
+            // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+            try { HitFeedback.NotifyHit(_player.position, attackDamage, false); }
+            catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at EnemyAIController.cs:PerformAttack"); }
 
             // Play attack SFX (fully qualified to avoid assembly dependency)
             Tartaria.Audio.AudioManager.Instance?.PlaySFX("EnemyAttack", transform.position, 0.5f);
