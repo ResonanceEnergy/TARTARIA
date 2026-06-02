@@ -18,9 +18,11 @@ namespace Tartaria.Input
         static InputProbeHUD _instance;
         GUIStyle _style;
         int _frame;
+#if ENABLE_INPUT_SYSTEM
         float _lastStickMag;
         string _lastKey = "(none)";
         float _lastKeyT;
+#endif
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
