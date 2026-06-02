@@ -23,31 +23,28 @@ namespace Tartaria.Integration
                 Debug.Log("[RuntimeInsurance] Created GAME MANAGERS parent");
             }
 
+            // 2026-06-02 ROOT-CAUSE FIX: previous session left these blocks decapitated —
+            // the "// SUPERSEDED — orphan go ref" comments killed AddComponent so the warnings
+            // fired loud but no actual spawner ran. Result: no Player instantiated, no
+            // CharacterController in scene, movement code had nothing to drive. Restoring the
+            // canonical pipeline per CLAUDE.md no-debt rule 1 + rule 12.
+
             // BuildingSpawner check
             if (Object.FindFirstObjectByType<BuildingSpawner>() == null)
             {
                 var go = new GameObject("BuildingSpawner");
-                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
-                // SUPERSEDED — orphan go ref: go.AddComponent<BuildingSpawner>();
-                Debug.LogWarning("[RuntimeInsurance] BuildingSpawner was missing from scene - created at runtime");
+                go.transform.SetParent(managers.transform);
+                go.AddComponent<BuildingSpawner>();
+                Debug.LogWarning("[RuntimeInsurance] BuildingSpawner was missing from scene — instantiated + attached at runtime.");
             }
 
-            // EchohavenContentSpawner check
-            // SUPERSEDED 2026-05-31 — archived: if (Object.FindFirstObjectByType<EchohavenContentSpawner>() == null)
-            {
-                // SUPERSEDED 2026-05-31 — archived: var go = new GameObject("EchohavenContentSpawner");
-                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
-                // SUPERSEDED 2026-05-31 — archived: go.AddComponent<EchohavenContentSpawner>();
-                // SUPERSEDED 2026-05-31 — archived: Debug.LogWarning("[RuntimeInsurance] EchohavenContentSpawner was missing from scene - created at runtime");
-            }
-
-            // PlayerSpawner check
+            // PlayerSpawner check — THE movement-blocker fix.
             if (Object.FindFirstObjectByType<PlayerSpawner>() == null)
             {
                 var go = new GameObject("PlayerSpawner");
-                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
-                // SUPERSEDED — orphan go ref: go.AddComponent<PlayerSpawner>();
-                Debug.LogWarning("[RuntimeInsurance] PlayerSpawner was missing from scene - created at runtime");
+                go.transform.SetParent(managers.transform);
+                go.AddComponent<PlayerSpawner>();
+                Debug.LogWarning("[RuntimeInsurance] PlayerSpawner was missing from scene — instantiated + attached at runtime. Player prefab will spawn next.");
             }
         }
     }
