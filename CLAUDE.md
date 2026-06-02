@@ -4,6 +4,78 @@
 
 ---
 
+## ⚡⚡⚡⚡ 2026-06-02 SESSION 2 CLOSE — Sprints 6→9 final state (latest, supersedes everything below)
+
+**40 lanes shipped across 4 sprints. Worktree mandate held: zero `.git/config` corruption events. Moon 1 audit ~79 ✓ / 10 ⚠ / 2 ❌ (v3).**
+
+### Integration target ready
+
+`agent/integration/sprint9-feature-merge` @ **`2ea11442`** is a strict superset of `feature/consolidate-moon-architecture` (still at the stale `6094136c`). **72 commits ahead, fast-forward eligible, no conflicts.** PR draft at `docs/release/PR_DRAFT_sprint9_to_feature.md`. When NATRIX clicks Merge, `feature/...` finally inherits Sprints 6+7+8+9.
+
+### What landed (canonical references)
+
+- **Sprint 6 SHIP POLISH** (10 lanes): Main Menu, Settings, Save Slot UI, Ambient zones, Hit feedback, Milo tutorial, Difficulty modes, itch assets, Post-restoration visuals, Credits.
+- **Sprint 7 PR LANDING + CONTENT FILL** (10 lanes): integration trunk, difficulty apply-sites, AudioMixer rename, save thumbnails, Settings prefab, Yarn binding, HitFeedback call-sites (8 sites), Post-resto child wiring, itch smoke pipeline, **brutal acceptance audit v1**.
+- **Sprint 8 SHIP-GATE BLITZ** (10 lanes): compile clean (Moon2FirstPurgeTrigger `Tartaria.Input` shadow + 6 warnings), TagManager dedup (no-op — Unity package-loader noise, documented), Main Menu Bootstrap re-enable, Pipe Organ routed Dome→PipeOrgan (was wrong building), 5 ambient zones placed, SaveSlotsMenu wired, per-node tuning variant rule (replaces round-robin), NPC Blender generators (Lirael/Anastasia/Cassian), **Sprint 7 integration trunk**, audit v2.
+- **Sprint 9 SHIP THE GATE** (10 lanes): feature-merge target ready, CS0101 phantom resolved, **OnDayChanged event** (GameEvents.cs:461) + Lirael Day-25 gate, butler push chain, **REAL Blender FBX render** (Lirael/Anastasia/Cassian via Blender 5.0.1), NPC prefab rebind editor menu, BrazierRitual (+ OnBrazierLit/OnBrazierRingComplete events), 5 named villagers (Bram/Marisol/Tobias/Wren/Caelum) + Yarn, Cymatic naming canon enforced (528Hz Celestial, NOT 1296 — drift fixed across 6 files), audit v3.
+
+### Canonical facts learned this session (now in `docs/agents/API_CONTRACT.md` v2)
+
+| Topic | Truth |
+|---|---|
+| SaveManager Load | `SwitchToSlot(int)` at SaveManager.cs:595 — **`LoadSlot` does NOT exist** |
+| SaveManager events | `OnBeforeSave` at :1376, `OnAfterLoad` at :1381, both `Action<SaveData>` |
+| SaveSlotInfo fields | Sparse — write a sidecar JSON for moon/shards/buildings |
+| Player damage event | `OnPlayerDamaged` at GameEvents.cs:123 |
+| Enemy hit event | **DOES NOT EXIST.** Use `HitFeedback.NotifyHit(pos, dmg, isCrit)` direct-call (in `Tartaria.Combat.asmdef`) |
+| Tuning completion | `OnBuildingRestored` (Action<string>) at GameEvents.cs:56 — NOT `OnTuneAttemptComplete` |
+| Quest status | `OnQuestStatusChanged` at GameEvents.cs:89 — NOT `OnQuestActivated/Completed` |
+| Moon completion | `OnMoonCompleted` (Action<MoonCompletedEventArgs>) at GameEvents.cs:192 |
+| Dialogue | `OnHUDShowDialogue` (Action<string,string>) at GameEvents.cs:237; `RaiseHUDShowDialogue` at :617 |
+| Day change | `OnDayChanged` (Action<int>) at GameEvents.cs:461 — **Sprint 9 Lane 3 NEW** |
+| Brazier ritual | `OnBrazierLit` at :463, `OnBrazierRingComplete` at :467 — **Sprint 9 Lane 7 NEW** |
+| AudioMixer params | `MasterVol/MusicVol/SFXVol/UIVol/AmbienceVol/VoiceVol` (NOT `*Volume`). YAML lines 110–120 in `MasterMixer.mixer`. Slider→dB via `Mathf.Log10(Mathf.Max(v, 0.0001f)) * 20f`. |
+| Aether bands | Telluric **7.83 Hz**, Harmonic **432 Hz**, Celestial **528 Hz** (NOT 1296 — Sprint 9 Lane 9 fixed drift). 1296 is the overtone constant `F_OVERTONE_HIGH`. |
+| Camera shadow | `Tartaria.Camera` namespace exists — every `Camera.main` must be `global::UnityEngine.Camera.main` |
+| New asmdef | `Tartaria.Combat.asmdef` (Sprint 7 Lane 7) — gameplay/AI code can `using Tartaria.Combat;` for `HitFeedback` |
+| Per-node variant rule | docs/15 §9: 1st=A, 2nd=B\|C, 3rd=C\|A. Seeded deterministically by buildingId hash. `InteractableBuilding.BuildSpecNodeConfig(int)`. |
+
+### Worktree mandate
+
+**This sprint cycle introduced the worktree mandate.** See `docs/agents/WORKTREE_MANDATE.md`. Born from Sprint 6 forensics — 8 of 10 lanes hit `.git/index.lock` races, 4 had `.git/config` truncation, 2 lost in-flight edits. Sprints 7+8+9 (30 lanes total): zero such events. **The Director creates N worktrees up front before dispatching N agents.** Agents NEVER `git checkout`, NEVER `git stash`, NEVER touch `C:\dev\TARTARIA_new`. Each works only on their pre-assigned `C:\dev\_wt_sN_lM_*` path via Windows-MCP PowerShell + FileSystem.
+
+### Unity MCP bridge (CoplayDev `MCP for Unity v9.7.1`)
+
+Installed via `Packages/manifest.json`. Server runs at `http://127.0.0.1:8080/mcp` (uvx + mcpforunityserver). Cowork config registered at `claude_desktop_config.json` → `mcpServers.unity-tartaria` via `npx mcp-remote`. Future Cowork sessions can call `mcp__unity-tartaria__*` tools (execute menu, read console, query scene, toggle Play) instead of pixel-clicking.
+
+### Sprint dispatch protocol (ready to fire Sprint 10)
+
+`docs/agents/SPRINT_7_DISPATCH.md` has the template. Director sequence:
+1. `git fetch origin`
+2. Loop create N worktrees from the integration target (currently `agent/integration/sprint9-feature-merge`)
+3. Single message with N parallel `Agent` tool calls, each prompt opens with the worktree path + Windows-MCP mandate
+4. Agents commit + push their own branches
+5. Final lane = audit + STATUS.md update + integration prep for the next sprint
+
+### Files NATRIX should look at right now
+
+- `docs/release/PR_DRAFT_sprint9_to_feature.md` — copy-paste for the GitHub PR body
+- `docs/audits/MOON1_ACCEPTANCE_2026-06-02_v3.md` — current ship-gate status
+- `STATUS.md` — top-of-file Sprint 9 close block
+- `docs/agents/API_CONTRACT.md` v2 — canonical event/method table
+- `docs/agents/WORKTREE_MANDATE.md` — why we don't ever get `.git/config` corruption anymore
+- `docs/agents/SPRINT_7_DISPATCH.md` — dispatch template for next sprint
+
+### Ship status
+
+**SHIPPABLE PENDING ~2 H** of final work after NATRIX:
+1. Merges the integration PR (fast-forward, no conflicts)
+2. Opens Unity → runs `Tartaria/Content/Rebind Moon 1 NPC Prefabs` (5 min — swaps NPC primitives to Blender FBX)
+3. Triages the 3 SaveSlotPanel implementations (S6 L3 613-line / S7 L4 766-line / S8 L6 275-line) — keep one
+4. Optionally smoke-tests OnDayChanged + Lirael Day-25 in Play
+
+---
+
 ## ⚡⚡⚡ 2026-06-01 PARALLEL MANDATE (latest, supersedes everything below)
 
 **SWARM RUNS IN PARALLEL — NEVER SERIAL.** Per NATRIX: *"ENSURE THE SUBAGENTS ARE WORKING IN PARRELLE TO MAXIMIZE VALUE AND TIME"*
