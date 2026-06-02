@@ -1,0 +1,15 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  Tartaria.Localization -> C:\dev\TARTARIA_new\Temp\bin\Debug\Tartaria.Localization.dll
+C:\dev\TARTARIA_new\Assets\_Project\Scripts\Core\GameEvents.cs(438,44): warning CS0067: The event 'GameEvents.OnTuningNodeActivated' is never used [C:\dev\TARTARIA_new\Tartaria.Core.csproj]
+C:\dev\TARTARIA_new\Assets\_Project\Scripts\Core\GameEvents.cs(435,51): warning CS0067: The event 'GameEvents.OnCollectibleGathered' is never used [C:\dev\TARTARIA_new\Tartaria.Core.csproj]
+  Tartaria.Core -> C:\dev\TARTARIA_new\Temp\bin\Debug\Tartaria.Core.dll
+
+Build succeeded.
+
+C:\dev\TARTARIA_new\Assets\_Project\Scripts\Core\GameEvents.cs(438,44): warning CS0067: The event 'GameEvents.OnTuningNodeActivated' is never used [C:\dev\TARTARIA_new\Tartaria.Core.csproj]
+C:\dev\TARTARIA_new\Assets\_Project\Scripts\Core\GameEvents.cs(435,51): warning CS0067: The event 'GameEvents.OnCollectibleGathered' is never used [C:\dev\TARTARIA_new\Tartaria.Core.csproj]
+    2 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:21.08

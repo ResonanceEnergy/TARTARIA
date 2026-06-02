@@ -1,4 +1,6 @@
+using System.Collections;
 using UnityEngine;
+using UnityEngine.Audio;
 using Tartaria.Core;
 
 namespace Tartaria.Audio
@@ -53,10 +55,51 @@ namespace Tartaria.Audio
         int _currentZone = -1;
         float _zoneBaseFreq = 432f;
 
+        // ─── Moon 1 Zone Music (added 2026-06-01 per audio engineer task) ───
+        // Three authored AudioClips drive the zone-aware ambient bed for Moon 1.
+        // SetZoneAmbient crossfades between two AudioSources (A/B swap) over 2.0s.
+        // OnBuildingRestored / OnMoonCompleted stingers layer over the ambient bed
+        // via a third one-shot AudioSource so they don't replace the underlying loop.
+        [Header("Moon 1 — Zone Music Clips")]
+        [SerializeField, Tooltip("Default village ambient loop — drone bed for Echohaven exploration.")]
+        AudioClip village_ambient;
+        [SerializeField, Tooltip("Layered swell triggered when a building is restored. One-shot, layered over ambient.")]
+        AudioClip restoration_swell;
+        [SerializeField, Tooltip("Capstone stinger fired when the Moon completes. One-shot, ambient fades to silence after.")]
+        AudioClip win_capstone;
+
+        [Header("Moon 1 — Mixer Routing")]
+        // TODO: Resources-loaded EchohavenMaster mixer Music group should drive this.
+        // Wire from Inspector in Echohaven_VerticalSlice scene, or assign in code once the
+        // mixer asset is finalized (see MixerSnapshotController.cs comment block).
+        [SerializeField, Tooltip("Optional AudioMixerGroup → routes zone music + stingers through the Music bus.")]
+        AudioMixerGroup musicGroup;
+
+        // Public setters so QA tests (or HUD overrides) can swap clips at runtime.
+        public AudioClip VillageAmbient { get => village_ambient; set => village_ambient = value; }
+        public AudioClip RestorationSwell { get => restoration_swell; set => restoration_swell = value; }
+        public AudioClip WinCapstone { get => win_capstone; set => win_capstone = value; }
+        public AudioMixerGroup MusicGroup { get => musicGroup; set => musicGroup = value; }
+
+        // A/B crossfade pair + a dedicated zone-stinger one-shot source.
+        AudioSource _zoneAmbientA;
+        AudioSource _zoneAmbientB;
+        AudioSource _zoneStinger;
+        bool _zoneAmbientUseA = true;          // which source currently holds the live ambient
+        Coroutine _zoneCrossfadeRoutine;
+        const float ZONE_CROSSFADE_SECONDS = 2.0f;
+        const float ZONE_AMBIENT_TARGET_VOLUME = 0.55f;
+        AudioClip _zoneAmbientCurrentClip;
+
+        // GameEvents bind state — guarded so we never double-subscribe.
+        static bool s_zoneEventsBound;
+        AudioClip _pendingMoonCompleteCapstone;
+        Coroutine _moonCompleteFadeRoutine;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
         {
-            if (Instance != null) return;
+            if (Instance != null) { Instance.BindZoneMusicEvents(); return; }
             var go = new GameObject("AdaptiveMusicController");
             DontDestroyOnLoad(go);
             go.AddComponent<AdaptiveMusicController>();
@@ -69,6 +112,7 @@ namespace Tartaria.Audio
             transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
             CreateAudioLayers();
+            EnsureZoneAmbientSources();
         }
 
         void Start()
@@ -77,6 +121,10 @@ namespace Tartaria.Audio
                 GameStateManager.Instance.OnStateChanged += HandleStateChange;
             StartAllLayers();
             BindLayer2Events();
+            BindZoneMusicEvents();
+            // Auto-start village ambient if a clip is assigned and no zone is live yet.
+            if (_zoneAmbientCurrentClip == null && village_ambient != null)
+                SetZoneAmbient(village_ambient);
         }
 
         void OnDestroy()
@@ -85,6 +133,7 @@ namespace Tartaria.Audio
             if (GameStateManager.Instance != null)
                 GameStateManager.Instance.OnStateChanged -= HandleStateChange;
             UnbindLayer2Events();
+            UnbindZoneMusicEvents();
         }
 
         void Update()
@@ -532,6 +581,140 @@ namespace Tartaria.Audio
             return (a + b + c + d) * 0.18f * env;
         });
 
+        // ─── Moon 1 Zone Music — A/B crossfade ambient + layered stingers ──────
+
+        void EnsureZoneAmbientSources()
+        {
+            if (_zoneAmbientA == null) _zoneAmbientA = CreateZoneSource("ZoneAmbient_A", loop: true, volume: 0f);
+            if (_zoneAmbientB == null) _zoneAmbientB = CreateZoneSource("ZoneAmbient_B", loop: true, volume: 0f);
+            if (_zoneStinger   == null) _zoneStinger   = CreateZoneSource("ZoneStinger",   loop: false, volume: 1f);
+        }
+
+        AudioSource CreateZoneSource(string n, bool loop, float volume)
+        {
+            var go = new GameObject(n);
+            go.transform.SetParent(transform);
+            var src = go.AddComponent<AudioSource>();
+            src.playOnAwake = false;
+            src.loop = loop;
+            src.volume = volume;
+            src.spatialBlend = 0f;
+            if (musicGroup != null) src.outputAudioMixerGroup = musicGroup;
+            return src;
+        }
+
+        /// <summary>
+        /// Crossfade the live zone ambient over to <paramref name="clip"/> on the opposite A/B source
+        /// over 2.0 seconds. Safe to call repeatedly; cancels any in-flight crossfade.
+        /// Pass null to fade ambient to silence.
+        /// </summary>
+        public void SetZoneAmbient(AudioClip clip)
+        {
+            EnsureZoneAmbientSources();
+
+            // If the same clip is already playing on the live side, no-op (avoids restart pops).
+            var live = _zoneAmbientUseA ? _zoneAmbientA : _zoneAmbientB;
+            if (clip != null && live != null && live.clip == clip && live.isPlaying && _zoneAmbientCurrentClip == clip)
+                return;
+
+            _zoneAmbientCurrentClip = clip;
+
+            // Route to mixer group lazily in case Inspector assignment happened after Awake.
+            if (musicGroup != null)
+            {
+                if (_zoneAmbientA != null) _zoneAmbientA.outputAudioMixerGroup = musicGroup;
+                if (_zoneAmbientB != null) _zoneAmbientB.outputAudioMixerGroup = musicGroup;
+                if (_zoneStinger  != null) _zoneStinger.outputAudioMixerGroup  = musicGroup;
+            }
+
+            if (_zoneCrossfadeRoutine != null) StopCoroutine(_zoneCrossfadeRoutine);
+            _zoneCrossfadeRoutine = StartCoroutine(CrossfadeZoneAmbient(clip, ZONE_CROSSFADE_SECONDS));
+        }
+
+        IEnumerator CrossfadeZoneAmbient(AudioClip target, float duration)
+        {
+            var fromSrc = _zoneAmbientUseA ? _zoneAmbientA : _zoneAmbientB;
+            var toSrc   = _zoneAmbientUseA ? _zoneAmbientB : _zoneAmbientA;
+
+            float startFromVol = fromSrc != null ? fromSrc.volume : 0f;
+            float endTargetVol = target != null ? ZONE_AMBIENT_TARGET_VOLUME * masterVolume : 0f;
+
+            if (toSrc != null)
+            {
+                toSrc.clip = target;
+                toSrc.volume = 0f;
+                if (target != null) toSrc.Play();
+            }
+
+            float t = 0f;
+            duration = Mathf.Max(0.05f, duration);
+            while (t < duration)
+            {
+                t += Time.unscaledDeltaTime;
+                float k = Mathf.Clamp01(t / duration);
+                if (fromSrc != null) fromSrc.volume = Mathf.Lerp(startFromVol, 0f, k);
+                if (toSrc   != null) toSrc.volume   = Mathf.Lerp(0f, endTargetVol, k);
+                yield return null;
+            }
+
+            if (fromSrc != null) { fromSrc.volume = 0f; fromSrc.Stop(); fromSrc.clip = null; }
+            if (toSrc   != null) toSrc.volume = endTargetVol;
+
+            // Flip the live channel pointer so the next call fades the other direction.
+            _zoneAmbientUseA = !_zoneAmbientUseA;
+            _zoneCrossfadeRoutine = null;
+        }
+
+        /// <summary>
+        /// Play <paramref name="clip"/> as a one-shot layered OVER the current zone ambient
+        /// (does not replace the ambient bed). Used for restoration swell + win capstone.
+        /// </summary>
+        public void PlayStinger(AudioClip clip)
+        {
+            if (clip == null) return;
+            EnsureZoneAmbientSources();
+            if (musicGroup != null && _zoneStinger != null)
+                _zoneStinger.outputAudioMixerGroup = musicGroup;
+            if (_zoneStinger != null) _zoneStinger.PlayOneShot(clip, masterVolume);
+        }
+
+        void BindZoneMusicEvents()
+        {
+            if (s_zoneEventsBound) return;
+            s_zoneEventsBound = true;
+            try { GameEvents.OnBuildingRestored += HandleZoneBuildingRestored; } catch { }
+            try { GameEvents.OnMoonCompleted    += HandleZoneMoonCompleted;    } catch { }
+        }
+
+        void UnbindZoneMusicEvents()
+        {
+            if (!s_zoneEventsBound) return;
+            s_zoneEventsBound = false;
+            try { GameEvents.OnBuildingRestored -= HandleZoneBuildingRestored; } catch { }
+            try { GameEvents.OnMoonCompleted    -= HandleZoneMoonCompleted;    } catch { }
+        }
+
+        void HandleZoneBuildingRestored(string buildingId)
+        {
+            // Layered swell over the live ambient — do NOT swap zone clip.
+            if (restoration_swell != null) PlayStinger(restoration_swell);
+        }
+
+        void HandleZoneMoonCompleted(MoonCompletedEventArgs args)
+        {
+            // Capstone stinger now, then fade ambient to silence after 8s for a clean post-Moon outro.
+            if (win_capstone != null) PlayStinger(win_capstone);
+            if (_moonCompleteFadeRoutine != null) StopCoroutine(_moonCompleteFadeRoutine);
+            _moonCompleteFadeRoutine = StartCoroutine(MoonCompleteFadeOut(8f));
+        }
+
+        IEnumerator MoonCompleteFadeOut(float delaySeconds)
+        {
+            float t = 0f;
+            while (t < delaySeconds) { t += Time.unscaledDeltaTime; yield return null; }
+            SetZoneAmbient(null);
+            _moonCompleteFadeRoutine = null;
+        }
     }
 
     public enum StingerType : byte

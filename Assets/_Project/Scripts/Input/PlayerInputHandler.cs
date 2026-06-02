@@ -482,22 +482,40 @@ namespace Tartaria.Input
 
         void HandleMovementInput()
         {
-            _moveInput = _moveAction != null ? _moveAction.ReadValue<Vector2>() : Vector2.zero;
+            // 2026-06-02 echohaven-movement-fix:
+            // RUNTIME GUARD — read Keyboard.current FIRST, before the InputActionAsset.
+            // Cowork QA reported W registers in InputProbeHUD but the player capsule does
+            // not translate. The InputActionAsset can be missing, mis-bound, or its "Move"
+            // action can resolve to Vector2.zero in some Editor-restart conditions, which
+            // then short-circuited the keyboard fallback below (it only ran if asset
+            // returned zero — but if asset is bound and returns zero from a broken binding,
+            // the fallback still ran, so that's not the bug; the bug is the asset-bound
+            // value silently ZERO'd downstream consumers). Direct read FIRST, then let
+            // InputAction override only if non-zero — that way the path can never be dead.
+            if (UnityEngine.InputSystem.Keyboard.current != null)
+            {
+                var kb = UnityEngine.InputSystem.Keyboard.current;
+                Vector2 kbMove = new Vector2(
+                    (kb.dKey.isPressed || kb.rightArrowKey.isPressed ? 1f : 0f) - (kb.aKey.isPressed || kb.leftArrowKey.isPressed ? 1f : 0f),
+                    (kb.wKey.isPressed || kb.upArrowKey.isPressed ? 1f : 0f) - (kb.sKey.isPressed || kb.downArrowKey.isPressed ? 1f : 0f));
+                if (kbMove.sqrMagnitude > 0.01f) _moveInput = kbMove;
+            }
 
+            // InputAction-bound value can override the direct read if it returns non-zero
+            // (e.g. gamepad stick fed through the asset). If asset returns zero we keep the
+            // direct keyboard read above.
+            if (_moveAction != null)
+            {
+                Vector2 actionMove = _moveAction.ReadValue<Vector2>();
+                if (actionMove.sqrMagnitude > 0.01f) _moveInput = actionMove;
+            }
+
+            // Gamepad direct-read fallback — preserved for the case where neither asset nor
+            // keyboard supplies input (controller plugged in, no asset binding).
             if (_moveInput.sqrMagnitude < 0.01f)
             {
-                var kb = Keyboard.current;
-                if (kb != null)
-                {
-                    Vector2 direct = Vector2.zero;
-                    if (kb.wKey.isPressed) direct.y += 1f;
-                    if (kb.sKey.isPressed) direct.y -= 1f;
-                    if (kb.aKey.isPressed) direct.x -= 1f;
-                    if (kb.dKey.isPressed) direct.x += 1f;
-                    if (direct.sqrMagnitude > 0.01f) _moveInput = direct.normalized;
-                }
                 var pad = Gamepad.current;
-                if (pad != null && _moveInput.sqrMagnitude < 0.01f)
+                if (pad != null)
                 {
                     Vector2 stick = pad.leftStick.ReadValue();
                     if (stick.sqrMagnitude > 0.0225f) _moveInput = stick;

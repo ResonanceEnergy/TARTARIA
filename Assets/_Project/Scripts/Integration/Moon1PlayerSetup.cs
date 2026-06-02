@@ -71,6 +71,26 @@ namespace Tartaria.Integration
             }
 
             playerInstance = existingPlayer;
+
+            // 2026-06-02 echohaven-movement-fix:
+            // Recovery guard — if the player capsule is missing PlayerInputHandler,
+            // movement is dead (Update never reads sticks/WASD). Cowork QA flagged
+            // this as the likely root of the "W registers but capsule doesn't move"
+            // symptom in Echohaven. PlayerSpawner.SpawnPlayer() already auto-adds the
+            // component (PlayerSpawner.cs:123) but if some other code path created the
+            // player (Moon1MasterBootstrap manual placement, scene-baked Player object,
+            // etc.) the component can still be missing — this is the belt-and-braces
+            // safety net per the parallel-mandate "no stubs / build everything out" rule.
+            if (playerInstance.GetComponent<Tartaria.Input.PlayerInputHandler>() == null)
+            {
+                Debug.LogError("[Moon1PlayerSetup] Player has NO PlayerInputHandler component — input chain dead. Adding one as recovery.");
+                playerInstance.AddComponent<Tartaria.Input.PlayerInputHandler>();
+            }
+            else
+            {
+                Debug.Log("[Moon1PlayerSetup] PlayerInputHandler attached + ready.");
+            }
+
             ConfigureExistingPlayer();
             Debug.Log("[Moon1PlayerSetup] Configured player at " + spawnPosition);
         }

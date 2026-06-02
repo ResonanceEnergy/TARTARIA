@@ -1,6 +1,8 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using System.Collections;
 using Tartaria.Core;
+using Tartaria.UI;
 
 namespace Tartaria.Integration
 {
@@ -75,8 +77,11 @@ namespace Tartaria.Integration
                               new Color(1f, 0.95f, 0.65f));
             _subtitle = MakeText("Subtitle", new Vector2(0.5f, 0.50f), 36, FontStyle.Normal,
                                  new Color(0.92f, 0.92f, 0.92f));
-            _stats = MakeText("Stats", new Vector2(0.5f, 0.36f), 24, FontStyle.Italic,
-                              new Color(0.75f, 0.75f, 0.75f));
+            _stats = MakeText("Stats", new Vector2(0.5f, 0.32f), 26, FontStyle.Italic,
+                              new Color(0.78f, 0.78f, 0.78f));
+            // Left-align the multi-line stats block so columns line up.
+            _stats.alignment = TextAnchor.MiddleCenter;
+            _stats.lineSpacing = 1.25f;
         }
 
         UnityEngine.UI.Text MakeText(string name, Vector2 anchor, int size, FontStyle style, Color color)
@@ -109,13 +114,12 @@ namespace Tartaria.Integration
         {
             _title.text = "ECHOHAVEN AWAKENED";
             _subtitle.text = "Moon 1 Complete";
-            int min = Mathf.FloorToInt(args.completionTime / 60f);
-            int sec = Mathf.FloorToInt(args.completionTime % 60f);
-            _stats.text = $"3 / 3 Hero Buildings Restored   +{args.rsReward} RS   {min:00}:{sec:00}";
+            _stats.text = WinScreenStats.FormatStats();
 
-            // Fade in over 1.2 s, hold 6 s, fade out 1.5 s
+            // Fade in over 1.2 s, hold 6 s (skippable after 4 s), fade out 1.5 s
             float t = 0f;
             const float fadeIn = 1.2f, hold = 6f, fadeOut = 1.5f;
+            const float skipUnlockAfter = 4f;
 
             while (t < fadeIn)
             {
@@ -128,7 +132,25 @@ namespace Tartaria.Integration
             _group.alpha = 1f;
             _bg.color = new Color(0f, 0f, 0f, 0.85f);
 
-            yield return new WaitForSecondsRealtime(hold);
+            // Hold phase — skip-with-key after 4 s elapsed in hold.
+            float holdT = 0f;
+            string skipHint = null;
+            while (holdT < hold)
+            {
+                holdT += Time.unscaledDeltaTime;
+
+                if (holdT >= skipUnlockAfter)
+                {
+                    if (skipHint == null)
+                    {
+                        skipHint = _subtitle.text;
+                        _subtitle.text = "Moon 1 Complete   ·   Press any key to continue";
+                    }
+                    if (CheckSkipInput()) break;
+                }
+
+                yield return null;
+            }
 
             t = 0f;
             while (t < fadeOut)
@@ -141,6 +163,26 @@ namespace Tartaria.Integration
             }
             _group.alpha = 0f;
             _bg.color = new Color(0f, 0f, 0f, 0f);
+        }
+
+        /// <summary>
+        /// Returns true if a skip-press came in this frame from keyboard or
+        /// F310 gamepad. Wraps null-checks so headless/no-device scenarios are
+        /// safe.
+        /// </summary>
+        static bool CheckSkipInput()
+        {
+            var kb = Keyboard.current;
+            if (kb != null && kb.anyKey.wasPressedThisFrame) return true;
+
+            var gp = Gamepad.current;
+            if (gp != null)
+            {
+                if (gp.aButton.wasPressedThisFrame) return true;
+                if (gp.bButton.wasPressedThisFrame) return true;
+                if (gp.startButton.wasPressedThisFrame) return true;
+            }
+            return false;
         }
     }
 }
