@@ -40,15 +40,41 @@ namespace Tartaria.Integration
 
         void Start()
         {
-            // Auto-spawn player if not already spawned
-            if (!playerSpawned && playerPrefab != null)
+            // 2026-06-02 second-layer root-cause fix per CLAUDE.md no-debt mandate:
+            // when this component is added at runtime by RuntimeSpawnerInsurance, the
+            // [SerializeField] playerPrefab is null because there's no scene serialization
+            // path. Self-heal by loading from Resources. Loud on every attempted path
+            // per rule 4 (no silent fallback).
+            if (playerPrefab == null)
             {
-                SpawnPlayer();
+                string[] tried = {
+                    "Prefabs/Characters/Player",
+                    "Characters/Player",
+                    "Prefabs/Player",
+                    "Player",
+                };
+                foreach (var path in tried)
+                {
+                    playerPrefab = Resources.Load<GameObject>(path);
+                    if (playerPrefab != null)
+                    {
+                        Debug.LogWarning(
+                            $"[PlayerSpawner] Serialized playerPrefab was null — loaded from Resources path '{path}'. " +
+                            $"To make this canonical, drag Assets/_Project/Prefabs/Characters/Player.prefab into a Resources folder OR assign it on the scene PlayerSpawner inspector.");
+                        break;
+                    }
+                }
+                if (playerPrefab == null)
+                {
+                    Debug.LogError(
+                        "[PlayerSpawner] CRITICAL: No player prefab assigned AND none found in Resources at: " +
+                        string.Join(", ", tried) +
+                        ". Player cannot spawn. Either (a) assign playerPrefab in the scene PlayerSpawner inspector " +
+                        "or (b) copy Assets/_Project/Prefabs/Characters/Player.prefab into a Resources folder under one of those paths.");
+                    return;
+                }
             }
-            else if (playerPrefab == null)
-            {
-                Debug.LogError("[PlayerSpawner] CRITICAL: No player prefab assigned! Player cannot spawn.");
-            }
+            if (!playerSpawned) SpawnPlayer();
         }
 
         /// <summary>
