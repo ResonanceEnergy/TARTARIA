@@ -13,7 +13,9 @@ namespace Tartaria.UI
     [DisallowMultipleComponent]
     public class MainMenuOverlay : MonoBehaviour
     {
+#pragma warning disable CS0414 // Assigned in Bootstrap to keep the overlay GameObject alive across scene loads.
         static MainMenuOverlay _instance;
+#pragma warning restore CS0414
         bool _visible = true;
         int _selected = 0;            // currently highlighted button index
         const int BUTTON_COUNT = 4;   // NEW GAME / CONTINUE / SETTINGS / QUIT
@@ -22,17 +24,30 @@ namespace Tartaria.UI
         bool _showNewGameConfirm;     // overwrite-save confirmation modal
 #pragma warning restore CS0414
 
-        // DISABLED for controller testing - menu was blocking scene load
-        // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-        // static void Bootstrap()
-        // {
-        //     // Bypass for dev / replay sessions.
-        //     if (PlayerPrefs.GetInt("TARTARIA_SkipMainMenu", 0) == 1) return;
-        //     GameBootstrap.MainMenuActive = true;
-        //     var go = new GameObject("MainMenuOverlay");
-        //     DontDestroyOnLoad(go);
-        //     _instance = go.AddComponent<MainMenuOverlay>();
-        // }
+        // Sprint 8 Lane 3 (2026-06-02): Re-enabled per Moon 1 acceptance audit blocker #13.1.
+        // Was disabled during Sprint 7 controller-testing because the overlay drew on top of
+        // the Boot scene and made it look like input was dead (see CLAUDE.md F310 section —
+        // Error Pause + missing-script init errors made every Play session enter paused).
+        // Those root causes are now fixed (PlayerInputHandler focus fix + EchohavenSceneAudit),
+        // so the menu is safe to re-enable. Without this Bootstrap the game has no entry-point
+        // UI — Boot scene loads straight into gameplay with no New Game / Continue affordance.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        static void Bootstrap()
+        {
+            // Bypass for dev / replay sessions. Set PlayerPrefs key from a debug menu or via
+            //   PlayerPrefs.SetInt("TARTARIA_SkipMainMenu", 1); PlayerPrefs.Save();
+            // to skip the overlay and jump straight into the gameplay scene.
+            if (PlayerPrefs.GetInt("TARTARIA_SkipMainMenu", 0) == 1) return;
+
+            // Tell GameBootstrap to wait for an explicit New Game / Continue click before
+            // calling TriggerSceneLoad() (see GameBootstrap.cs:85 — the gate is
+            // if (autoStart || !MainMenuActive) TriggerSceneLoad();).
+            GameBootstrap.MainMenuActive = true;
+
+            var go = new GameObject("MainMenuOverlay");
+            DontDestroyOnLoad(go);
+            _instance = go.AddComponent<MainMenuOverlay>();
+        }
 
         void Update()
         {
