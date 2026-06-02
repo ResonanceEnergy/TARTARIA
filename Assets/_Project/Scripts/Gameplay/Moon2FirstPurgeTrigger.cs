@@ -102,8 +102,8 @@ namespace Tartaria.Gameplay
             actionPressed = (kb != null && kb.eKey.wasPressedThisFrame) || (gamepad != null && gamepad.xButton.wasPressedThisFrame);
             holding = (kb != null && kb.eKey.isPressed) || (gamepad != null && gamepad.xButton.isPressed);
 #else
-            actionPressed = Input.GetKeyDown(KeyCode.E) || Input.GetButtonDown("Fire1");
-            holding = Input.GetKey(KeyCode.E) || Input.GetButton("Fire1");
+            actionPressed = UnityEngine.Input.GetKeyDown(KeyCode.E) || UnityEngine.Input.GetButtonDown("Fire1");
+            holding = UnityEngine.Input.GetKey(KeyCode.E) || UnityEngine.Input.GetButton("Fire1");
 #endif
 
             // Handle scan phase transition (first press when not scanned)

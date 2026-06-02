@@ -432,10 +432,10 @@ namespace Tartaria.Core
         public static void FireTuningNodeActivated(string nodeId) { Debug.Log($"[GameEvents/Stub] Tuning node activated: {nodeId}"); }
 
         // Phase 2 events (stubs - will be wired in Phase 2)
-        public static event Action<string, float> OnCollectibleGathered;
+        public static Action<string, float> OnCollectibleGathered;
         public static event Action OnCombatStarted;
         public static event Action OnCombatEnded;
-        public static event Action<string> OnTuningNodeActivated;
+        public static Action<string> OnTuningNodeActivated;
 
         // --- Moon 1 gap-fix events (Agents 7 + 9, 2026-05-31) ---
         /// <summary>Raised by PointOfInterest.cs on first player entry. Payload (poiId, rsReward, worldPos).</summary>
