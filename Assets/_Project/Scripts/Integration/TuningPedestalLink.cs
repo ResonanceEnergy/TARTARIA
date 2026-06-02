@@ -45,7 +45,7 @@ namespace Tartaria.Integration
                            (pad != null && pad.buttonSouth.wasPressedThisFrame);
             if (!pressed) return;
 #else
-            if (!Input.GetKeyDown(KeyCode.E)) return;
+            if (!UnityEngine.Input.GetKeyDown(KeyCode.E)) return;
 #endif
             StartTuning();
         }
