@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Tartaria.Save;
 
 namespace Tartaria.UI
 {
     /// <summary>
-    /// Sprint 6 Lane 3: Manages 3 save-slot cards (slots 0/1/2) in a single panel.
+    /// Sprint 6 Lane 3 / Sprint 7 Lane 4: Manages 3 save-slot cards (slots 0/1/2) in a single panel.
     ///
     /// Responsibilities:
     ///   - Build 3 SaveSlotEntry cards at runtime
@@ -20,11 +21,16 @@ namespace Tartaria.UI
     ///     fallback to mtime poll if events somehow unavailable). Encode PNG, write to
     ///     {persistentDataPath}/saves/slot{N}.png. Also write slot{N}.meta.json sidecar
     ///     so card can render Moon name, shards, buildings without re-decrypting the save.
+    ///   - [S7 L4] Also capture on UnityEngine.SceneManagement.SceneManager.activeSceneChanged so the
+    ///     LAST FRAME of the outgoing scene is cached as the current slot's thumbnail before
+    ///     the new scene clobbers the framebuffer. Subscribed in Start, unsubscribed in OnDestroy.
+    ///   - [S7 L4] PNG size knob: if EncodeToPNG produces >256KB the texture is downscaled to half
+    ///     resolution via Graphics.Blit + RenderTexture and re-encoded. Loud log when triggered.
     ///
     /// Constraints honoured:
     ///   - Unity 6 API: uses FindFirstObjectByType + FindObjectsInactive
     ///   - No invented method names (grep evidence in this file + SaveSlotEntry.cs)
-    ///   - No silent catches: every catch logs file:line + the value that broke
+    ///   - No silent catches: every catch logs file:line + the value that broke + persistentDataPath
     ///   - Texture2D dispose pattern: cached and Destroy'd in OnDestroy
     /// </summary>
     public class SaveSlotPanel : MonoBehaviour
@@ -35,6 +41,10 @@ namespace Tartaria.UI
         [Header("Layout")]
         [SerializeField] Vector2 panelSize = new Vector2(1320f, 280f);
         [SerializeField] float slotSpacing = 12f;
+
+        // ── S7 L4: PNG size knob ────────────────────────────────────────────
+        // If EncodeToPNG exceeds this byte count, downscale to half-res and re-encode.
+        public const int MaxThumbnailBytes = 256 * 1024; // 256 KB
 
         readonly List<SaveSlotEntry> _entries = new();
         Texture2D[] _loadedThumbs;  // cached per slot, destroyed in OnDestroy
@@ -65,7 +75,7 @@ namespace Tartaria.UI
                 try { Directory.CreateDirectory(dir); }
                 catch (Exception e)
                 {
-                    Debug.LogError($"[SaveSlotPanel] Failed to create saves dir '{dir}': {e.GetType().Name}: {e.Message}");
+                    Debug.LogError($"[SaveSlotPanel] Failed to create saves dir '{dir}' (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
                 }
             }
             return dir;
@@ -87,12 +97,20 @@ namespace Tartaria.UI
         {
             _saveManager = ResolveSaveManager();
             HookSaveManagerEvents();
+
+            // [S7 L4] Cache last scene's screenshot before new scene loads.
+            SceneManager.activeSceneChanged += HandleActiveSceneChanged;
+            Debug.Log("[SaveSlotPanel] Subscribed to SceneManager.activeSceneChanged for pre-load thumbnail capture.");
+
             RefreshAllCards();
         }
 
         void OnDestroy()
         {
             UnhookSaveManagerEvents();
+
+            // [S7 L4] Unhook scene-change subscription to avoid leaks across reloads.
+            SceneManager.activeSceneChanged -= HandleActiveSceneChanged;
 
             // Texture2D cleanup — entries own their own copies, but we also cleared cached ones here.
             if (_loadedThumbs != null)
@@ -282,6 +300,28 @@ namespace Tartaria.UI
             RefreshAllCards();
         }
 
+        // ── S7 L4: Scene-change capture ─────────────────────────────────────
+
+        /// <summary>
+        /// Fires on UnityEngine.SceneManagement.SceneManager.activeSceneChanged. Captures the
+        /// last visible frame of the OUTGOING scene synchronously (no end-of-frame wait —
+        /// the new scene is already mid-load so we can't yield) and writes it to the
+        /// current slot's thumbnail path. This guarantees a thumbnail even if no save
+        /// happened between scene transitions.
+        /// </summary>
+        void HandleActiveSceneChanged(Scene outgoing, Scene incoming)
+        {
+            int slot = _saveManager != null ? _saveManager.GetCurrentSlot() : -1;
+            if (slot < 0)
+            {
+                Debug.LogWarning($"[SaveSlotPanel] activeSceneChanged ('{outgoing.name}' -> '{incoming.name}'): no SaveManager / slot, skipping cache thumb.");
+                return;
+            }
+
+            Debug.Log($"[SaveSlotPanel] activeSceneChanged ('{outgoing.name}' -> '{incoming.name}') — caching slot {slot} thumbnail before new scene clobbers framebuffer.");
+            CaptureAndWriteScreenshot(slot);
+        }
+
         // ── Update / poll fallback ──────────────────────────────────────────
 
         void Update()
@@ -334,7 +374,7 @@ namespace Tartaria.UI
                 try { ticks = File.GetLastWriteTimeUtc(p).Ticks; }
                 catch (Exception e)
                 {
-                    Debug.LogWarning($"[SaveSlotPanel] mtime read failed for '{p}' at SaveSlotPanel.PollSaveFileMtimesAndCaptureIfChanged: {e.GetType().Name}: {e.Message}");
+                    Debug.LogWarning($"[SaveSlotPanel] mtime read failed for '{p}' (persistentDataPath='{Application.persistentDataPath}') at SaveSlotPanel.PollSaveFileMtimesAndCaptureIfChanged: {e.GetType().Name}: {e.Message}");
                     continue;
                 }
 
@@ -370,29 +410,142 @@ namespace Tartaria.UI
                 shot = ScreenCapture.CaptureScreenshotAsTexture();
                 if (shot == null)
                 {
-                    Debug.LogError($"[SaveSlotPanel] ScreenCapture.CaptureScreenshotAsTexture returned null for slot {slot}.");
+                    Debug.LogError($"[SaveSlotPanel] ScreenCapture.CaptureScreenshotAsTexture returned null for slot {slot} (persistentDataPath='{Application.persistentDataPath}').");
                     return;
                 }
 
-                byte[] png = shot.EncodeToPNG();
-                if (png == null || png.Length == 0)
-                {
-                    Debug.LogError($"[SaveSlotPanel] EncodeToPNG returned empty bytes for slot {slot} (texture {shot.width}x{shot.height}).");
-                    return;
-                }
-
+                // Centralized PNG encode + size-knob downscale.
                 string path = GetThumbnailPath(slot);
-                File.WriteAllBytes(path, png);
-                Debug.Log($"[SaveSlotPanel] Wrote slot {slot} thumbnail ({png.Length} bytes) -> {path}");
+                int finalBytes = EncodeAndWritePngWithSizeKnob(shot, path, $"slot {slot}");
+                if (finalBytes <= 0)
+                {
+                    Debug.LogError($"[SaveSlotPanel] EncodeAndWritePngWithSizeKnob returned {finalBytes} for slot {slot} (persistentDataPath='{Application.persistentDataPath}').");
+                    return;
+                }
+
+                Debug.Log($"[SaveSlotPanel] Wrote slot {slot} thumbnail ({finalBytes} bytes) -> {path}");
             }
             catch (Exception e)
             {
-                Debug.LogError($"[SaveSlotPanel] Screenshot capture/write failed for slot {slot}: {e.GetType().Name}: {e.Message}\n{e.StackTrace}");
+                Debug.LogError($"[SaveSlotPanel] Screenshot capture/write failed for slot {slot} (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}\n{e.StackTrace}");
             }
             finally
             {
                 // Capture texture is owned here; destroy after encode so we don't leak.
                 if (shot != null) Destroy(shot);
+            }
+        }
+
+        /// <summary>
+        /// [S7 L4] Public so the Editor menu (SaveThumbnailMenu) can reuse the exact same
+        /// encode+size-knob logic. Returns final byte count written (or 0 on failure).
+        /// </summary>
+        public static int EncodeAndWritePngWithSizeKnob(Texture2D source, string outputPath, string contextLabel)
+        {
+            if (source == null)
+            {
+                Debug.LogError($"[SaveSlotPanel] EncodeAndWritePngWithSizeKnob({contextLabel}): source texture is null (persistentDataPath='{Application.persistentDataPath}').");
+                return 0;
+            }
+
+            byte[] png;
+            try { png = source.EncodeToPNG(); }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SaveSlotPanel] EncodeToPNG threw for {contextLabel} (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
+                return 0;
+            }
+
+            if (png == null || png.Length == 0)
+            {
+                Debug.LogError($"[SaveSlotPanel] EncodeToPNG returned empty for {contextLabel} ({source.width}x{source.height}) (persistentDataPath='{Application.persistentDataPath}').");
+                return 0;
+            }
+
+            bool downscaled = false;
+            if (png.Length > MaxThumbnailBytes)
+            {
+                // LOUD log so we can spot the threshold trigger in the console.
+                Debug.LogWarning($"[SaveSlotPanel] ==== PNG SIZE KNOB TRIGGERED ==== {contextLabel}: encoded PNG was {png.Length} bytes > {MaxThumbnailBytes} threshold. Downscaling to half-res via Graphics.Blit + RenderTexture and re-encoding.");
+                Texture2D half = DownscaleHalf(source, contextLabel);
+                if (half != null)
+                {
+                    try
+                    {
+                        byte[] halfPng = half.EncodeToPNG();
+                        if (halfPng != null && halfPng.Length > 0)
+                        {
+                            Debug.LogWarning($"[SaveSlotPanel] PNG SIZE KNOB result for {contextLabel}: {png.Length} bytes -> {halfPng.Length} bytes after half-res ({source.width}x{source.height} -> {half.width}x{half.height}).");
+                            png = halfPng;
+                            downscaled = true;
+                        }
+                        else
+                        {
+                            Debug.LogError($"[SaveSlotPanel] Downscaled EncodeToPNG returned empty for {contextLabel}; keeping original {png.Length}-byte PNG.");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"[SaveSlotPanel] Downscaled EncodeToPNG threw for {contextLabel} (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
+                    }
+                    finally
+                    {
+                        // Half-res texture is owned here.
+                        if (Application.isPlaying) UnityEngine.Object.Destroy(half);
+                        else UnityEngine.Object.DestroyImmediate(half);
+                    }
+                }
+            }
+
+            try
+            {
+                // Ensure parent dir exists.
+                string parent = Path.GetDirectoryName(outputPath);
+                if (!string.IsNullOrEmpty(parent) && !Directory.Exists(parent)) Directory.CreateDirectory(parent);
+                File.WriteAllBytes(outputPath, png);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SaveSlotPanel] WriteAllBytes failed for {contextLabel} -> '{outputPath}' (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
+                return 0;
+            }
+
+            Debug.Log($"[SaveSlotPanel] PNG write OK for {contextLabel}: {png.Length} bytes (downscaled={downscaled}) -> {outputPath}");
+            return png.Length;
+        }
+
+        /// <summary>
+        /// Downscale a Texture2D to half resolution using Graphics.Blit + RenderTexture.
+        /// Caller owns the returned texture and must Destroy() it.
+        /// </summary>
+        static Texture2D DownscaleHalf(Texture2D source, string contextLabel)
+        {
+            int w = Mathf.Max(1, source.width / 2);
+            int h = Mathf.Max(1, source.height / 2);
+
+            RenderTexture rt = null;
+            RenderTexture prevActive = RenderTexture.active;
+            try
+            {
+                rt = RenderTexture.GetTemporary(w, h, 0, RenderTextureFormat.ARGB32);
+                rt.filterMode = FilterMode.Bilinear;
+                Graphics.Blit(source, rt);
+                RenderTexture.active = rt;
+
+                var dst = new Texture2D(w, h, TextureFormat.RGBA32, false);
+                dst.ReadPixels(new Rect(0, 0, w, h), 0, 0, false);
+                dst.Apply(false, false);
+                return dst;
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"[SaveSlotPanel] DownscaleHalf failed for {contextLabel} (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
+                return null;
+            }
+            finally
+            {
+                RenderTexture.active = prevActive;
+                if (rt != null) RenderTexture.ReleaseTemporary(rt);
             }
         }
 
@@ -429,7 +582,7 @@ namespace Tartaria.UI
             }
             catch (Exception e)
             {
-                Debug.LogError($"[SaveSlotPanel] Metadata sidecar write failed for slot {slot} at '{GetMetadataPath(slot)}': {e.GetType().Name}: {e.Message}");
+                Debug.LogError($"[SaveSlotPanel] Metadata sidecar write failed for slot {slot} at '{GetMetadataPath(slot)}' (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
             }
         }
 
@@ -499,7 +652,7 @@ namespace Tartaria.UI
             }
             catch (Exception e)
             {
-                Debug.LogError($"[SaveSlotPanel] Metadata sidecar read failed for slot {slot} at '{path}': {e.GetType().Name}: {e.Message}");
+                Debug.LogError($"[SaveSlotPanel] Metadata sidecar read failed for slot {slot} at '{path}' (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
                 return null;
             }
         }
@@ -531,7 +684,7 @@ namespace Tartaria.UI
             }
             catch (Exception e)
             {
-                Debug.LogError($"[SaveSlotPanel] Thumbnail read failed for slot {slot} at '{path}': {e.GetType().Name}: {e.Message}");
+                Debug.LogError($"[SaveSlotPanel] Thumbnail read failed for slot {slot} at '{path}' (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
                 return null;
             }
         }
@@ -606,7 +759,7 @@ namespace Tartaria.UI
             }
             catch (Exception e)
             {
-                Debug.LogError($"[SaveSlotPanel] Failed to delete '{path}': {e.GetType().Name}: {e.Message}");
+                Debug.LogError($"[SaveSlotPanel] Failed to delete '{path}' (persistentDataPath='{Application.persistentDataPath}'): {e.GetType().Name}: {e.Message}");
             }
         }
     }
