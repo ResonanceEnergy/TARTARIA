@@ -135,6 +135,44 @@ function Find-UnityExe([string]$version) {
     return $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
 }
 
+function Get-ItchApiKey {
+    # Sprint 10 Lane 9 - single accessor for the itch.io API key.
+    #
+    # Lookup order:
+    #   1) $env:ITCH_API_KEY                                 (preferred)
+    #   2) <repoRoot>\.local-secrets\itch_key.txt            (fallback file - gitignored)
+    #   3) neither -> return $null and let butler's own creds cache handle it
+    #
+    # Returns a hashtable @{ Key = "...."; Source = "env:ITCH_API_KEY" | "file:..." | "none" }.
+    # NEVER logs the key value. Logs only the source for auditability.
+    #
+    # See docs/release/BUTLER_CREDS_SETUP.md for the security policy.
+
+    # (1) env var
+    if ($env:ITCH_API_KEY -and $env:ITCH_API_KEY.Trim().Length -gt 0) {
+        return @{ Key = $env:ITCH_API_KEY.Trim(); Source = "env:ITCH_API_KEY" }
+    }
+
+    # (2) fallback file - same pattern as .local-secrets/github_pat.txt
+    $secretFile = Join-Path $repoRoot ".local-secrets\itch_key.txt"
+    if (Test-Path $secretFile) {
+        try {
+            $raw = Get-Content -Path $secretFile -Raw -ErrorAction Stop
+            $trimmed = $raw.Trim()
+            if ($trimmed.Length -gt 0) {
+                return @{ Key = $trimmed; Source = "file:.local-secrets/itch_key.txt" }
+            } else {
+                Log-Warn "$secretFile exists but is empty - falling through to butler cache"
+            }
+        } catch {
+            # Loud, no silent catch.
+            Log-Warn "could not read $secretFile - $($_.Exception.GetType().Name): $($_.Exception.Message)"
+        }
+    }
+
+    return @{ Key = $null; Source = "none" }
+}
+
 function Find-ButlerExe {
     # 1) PATH
     $onPath = Get-Command butler -ErrorAction SilentlyContinue
@@ -294,6 +332,29 @@ try {
         }
     } else {
         Log-Ok "butler at $butlerExe"
+
+        # Sprint 10 Lane 9 - load ITCH_API_KEY before invoking butler.
+        # All credential reads go through Get-ItchApiKey for auditability.
+        $creds = Get-ItchApiKey
+        if ($creds.Key) {
+            $env:BUTLER_API_KEY = $creds.Key
+            Log-Ok "Loaded ITCH_API_KEY from $($creds.Source)"
+            Log-Info "(exported to `$env:BUTLER_API_KEY for child butler process - value never logged)"
+        } else {
+            if ($SkipPush -or $DryRun) {
+                Log-Warn "No ITCH_API_KEY in env or .local-secrets - relying on butler login cache (push is $(if($SkipPush){'skipped'}else{'dry-run'}), proceeding)"
+            } else {
+                Write-Host ""
+                Write-Host "ERROR: no ITCH_API_KEY found in env or .local-secrets/itch_key.txt." -ForegroundColor Red
+                Write-Host "       Either run 'butler login' (interactive, browser-based)," -ForegroundColor Red
+                Write-Host "       set the ITCH_API_KEY env var, or drop a key file at" -ForegroundColor Red
+                Write-Host "       <repo>\.local-secrets\itch_key.txt." -ForegroundColor Red
+                Write-Host "       Full instructions: docs/release/BUTLER_CREDS_SETUP.md" -ForegroundColor Red
+                Write-Host ""
+                Fail-Step 4 "no ITCH_API_KEY available - see docs/release/BUTLER_CREDS_SETUP.md"
+            }
+        }
+
         # Log butler version for the report
         try {
             $ver = & $butlerExe -V 2>&1
