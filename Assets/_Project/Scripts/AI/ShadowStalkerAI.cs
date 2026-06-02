@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Gameplay.Combat;
 
 namespace Tartaria.AI
 {
@@ -156,6 +157,10 @@ namespace Tartaria.AI
             if (playerHealth != null)
             {
                 playerHealth.TakeDamage(Mathf.RoundToInt(damage));
+
+                // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+                try { HitFeedback.NotifyHit(_player.position, damage, false); }
+                catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at ShadowStalkerAI.cs:DamagePlayer"); }
             }
         }
 

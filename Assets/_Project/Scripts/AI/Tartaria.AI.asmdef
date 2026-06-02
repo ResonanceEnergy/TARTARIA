@@ -5,6 +5,7 @@
         "Tartaria.Core",
         "Tartaria.Gameplay",
         "Tartaria.Audio",
+        "Tartaria.Combat",
         "Unity.Entities",
         "Unity.Burst",
         "Unity.Collections",

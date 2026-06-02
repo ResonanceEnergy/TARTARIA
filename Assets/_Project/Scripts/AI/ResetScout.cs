@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Gameplay.Combat;
 
 namespace Tartaria.AI
 {
@@ -116,6 +117,10 @@ namespace Tartaria.AI
             if (_player == null) return;
             if (Vector3.Distance(transform.position, _player.position) > attackRange + 1f) return;
             _player.SendMessage("TakeDamage", (int)attackDamage, SendMessageOptions.DontRequireReceiver);
+
+            // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+            try { HitFeedback.NotifyHit(_player.position, attackDamage, false); }
+            catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at ResetScout.cs:PerformAttack"); }
         }
 
         public void TakeDamage(float damage, GameObject instigator = null)

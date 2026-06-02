@@ -3,6 +3,7 @@ using UnityEngine.AI;
 using Unity.Profiling;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Gameplay.Combat;
 using System.Collections;
 
 namespace Tartaria.AI
@@ -460,6 +461,10 @@ namespace Tartaria.AI
                     // Deal damage via SendMessage (PlayerHealthController not in current assembly)
                     hit.collider.SendMessage("TakeDamage", meleeDamage, SendMessageOptions.DontRequireReceiver);
                     Debug.Log($"[MudGolem] Hit player for {meleeDamage} damage");
+
+                    // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+                    try { HitFeedback.NotifyHit(hit.collider.transform.position, meleeDamage, false); }
+                    catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at MudGolemAI.cs:PerformMeleeAttack"); }
 
                     // SFX via GameEvents (no direct Audio dependency)
                     // VFX handled elsewhere
