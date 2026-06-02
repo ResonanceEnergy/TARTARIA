@@ -144,16 +144,34 @@ namespace Tartaria.Editor
         [InitializeOnLoadMethod]
         static void AutoCleanOnLoad()
         {
-            EditorApplication.delayCall += () =>
+            // 2026-06-02 permanent fix per Unity Manual on EditorSceneManager:
+            // The previous delayCall-only path called SaveOpenScenes() but the active
+            // scene was sometimes not yet marked dirty, so the clean didn't persist
+            // and the same warnings reappeared each session. Hardening to:
+            // - Hook delayCall (startup) + sceneOpened (every subsequent open)
+            // - Explicit MarkSceneDirty + SaveScene + SaveAssets to flush to disk
+            EditorApplication.delayCall += () => CleanAndSave("startup");
+            EditorSceneManager.sceneOpened -= OnSceneOpenedClean;
+            EditorSceneManager.sceneOpened += OnSceneOpenedClean;
+        }
+
+        static void OnSceneOpenedClean(Scene scene, OpenSceneMode mode)
+        {
+            CleanAndSave($"sceneOpened:{scene.name}");
+        }
+
+        static void CleanAndSave(string trigger)
+        {
+            int removed = CleanCurrentScene();
+            if (removed <= 0) return;
+            Debug.Log($"[CleanMissingScripts] ({trigger}) Auto-cleaned {removed} missing scripts. Forcing scene persist to disk.");
+            var scene = SceneManager.GetActiveScene();
+            if (scene.IsValid())
             {
-                // Auto-clean on Unity startup (silent)
-                int removed = CleanCurrentScene();
-                if (removed > 0)
-                {
-                    Debug.Log($"[CleanMissingScripts] Auto-cleaned {removed} missing scripts from scene");
-                    EditorSceneManager.SaveOpenScenes();
-                }
-            };
+                EditorSceneManager.MarkSceneDirty(scene);
+                EditorSceneManager.SaveScene(scene);
+            }
+            AssetDatabase.SaveAssets();
         }
     }
 }
