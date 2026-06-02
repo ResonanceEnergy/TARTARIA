@@ -58,7 +58,10 @@ namespace Tartaria.UI
         private static void Bootstrap()
         {
             // Idempotent: if another scene load already spawned a minimap, skip.
-            if (FindObjectOfType<LeyLineMinimapUI>() != null)
+            // Per Unity 6 Scripting Reference: FindObjectOfType is deprecated; the
+            // canonical API is FindFirstObjectByType<T>(FindObjectsInactive) — explicit
+            // semantics, non-allocating in the inactive-excluded path.
+            if (FindFirstObjectByType<LeyLineMinimapUI>(FindObjectsInactive.Include) != null)
             {
                 return;
             }
@@ -137,7 +140,6 @@ namespace Tartaria.UI
             // Convert normalized 0..1 to local anchored position centred on the
             // minimap. With pivot (0.5,0.5) on the dot, offset range is
             // [-MinimapSize/2, +MinimapSize/2].
-            float half = MinimapSize * 0.5f;
             _playerDotRect.anchoredPosition = new Vector2(
                 (norm.x - 0.5f) * MinimapSize,
                 (norm.y - 0.5f) * MinimapSize);
@@ -207,7 +209,6 @@ namespace Tartaria.UI
 
         private void PlaceHeroMarkersOnce()
         {
-            float half = MinimapSize * 0.5f;
             int count = Mathf.Min(LeyLineMinimap.HeroPositions.Length, _heroRects.Count);
             for (int i = 0; i < count; i++)
             {

@@ -132,19 +132,20 @@ namespace Tartaria.UI
 
         void SubscribeEvents()
         {
-            // GameEvents.OnQuestActivated / OnQuestCompleted are static Action<string>
-            // declared in Tartaria.Core.GameEvents. We reach them by full name so this
-            // file doesn't need to take a hard `using` on Core (keeps the asmdef dep
-            // surface implicit through existing references).
+            // 2026-06-02 no-debt fix per CLAUDE.md rule 1 + rule 11: the canonical
+            // GameEvents API exposes ONE event for quest lifecycle —
+            // OnQuestStatusChanged(QuestStatusChangedEventArgs) at GameEvents.cs:89.
+            // FireQuestActivated/FireQuestCompleted are convenience invokers that
+            // dispatch through that same event with newStatus = Active/Completed.
+            // Subscribe to the real event and dispatch by newStatus.
             try
             {
-                Tartaria.Core.GameEvents.OnQuestActivated += HandleQuestActivated;
-                Tartaria.Core.GameEvents.OnQuestCompleted += HandleQuestCompleted;
+                Tartaria.Core.GameEvents.OnQuestStatusChanged += HandleQuestStatusChanged;
             }
             catch (Exception ex)
             {
                 // Per no-debt rule 3: log loud, then rethrow. Never swallow.
-                Debug.LogError($"[QuestLogPanel] Failed to subscribe to GameEvents quest events: {ex.GetType().Name}: {ex.Message}");
+                Debug.LogError($"[QuestLogPanel] Failed to subscribe to GameEvents.OnQuestStatusChanged: {ex.GetType().Name}: {ex.Message}");
                 throw;
             }
 
@@ -175,12 +176,11 @@ namespace Tartaria.UI
         {
             try
             {
-                Tartaria.Core.GameEvents.OnQuestActivated -= HandleQuestActivated;
-                Tartaria.Core.GameEvents.OnQuestCompleted -= HandleQuestCompleted;
+                Tartaria.Core.GameEvents.OnQuestStatusChanged -= HandleQuestStatusChanged;
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[QuestLogPanel] Failed to unsubscribe from GameEvents on teardown ({ex.GetType().Name}: {ex.Message}) — continuing teardown.");
+                Debug.LogWarning($"[QuestLogPanel] Failed to unsubscribe from GameEvents.OnQuestStatusChanged on teardown ({ex.GetType().Name}: {ex.Message}) — continuing teardown.");
             }
 
             try
@@ -199,6 +199,32 @@ namespace Tartaria.UI
         }
 
         // ─────────────── Event handlers ───────────────
+
+        /// <summary>
+        /// Canonical router: GameEvents.OnQuestStatusChanged fires with a status enum.
+        /// Branch to the existing Active/Completed handlers. Any unhandled status
+        /// (Locked, Failed, etc) gets a loud warning per no-debt rule 4.
+        /// </summary>
+        void HandleQuestStatusChanged(Tartaria.Core.QuestStatusChangedEventArgs args)
+        {
+            if (args == null || string.IsNullOrEmpty(args.questId))
+            {
+                Debug.LogWarning($"[QuestLogPanel] OnQuestStatusChanged fired with null args or empty questId. Active count: {_active.Count}");
+                return;
+            }
+            switch (args.newStatus)
+            {
+                case Tartaria.Core.Enums.QuestStatus.Active:
+                    HandleQuestActivated(args.questId);
+                    break;
+                case Tartaria.Core.Enums.QuestStatus.Completed:
+                    HandleQuestCompleted(args.questId);
+                    break;
+                default:
+                    Debug.LogWarning($"[QuestLogPanel] OnQuestStatusChanged received unhandled newStatus '{args.newStatus}' for questId '{args.questId}'. UI panel ignores — extend the switch when these states need to render.");
+                    break;
+            }
+        }
 
         void HandleQuestActivated(string questId)
         {
