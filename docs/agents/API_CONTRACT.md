@@ -57,6 +57,8 @@ These names **shadow `UnityEngine` types** at the language level. Picking any of
 | `OnMoonCompleted` | `Action<MoonCompletedEventArgs>` | `GameEvents.cs:192` | Sprint 6 Lane 9 |
 | `OnSeventeenthHour` | `Action` | (verify before use) | - |
 | `OnAetherVisionToggled` | `Action<bool>` | (verify before use) | - |
+| `OnDayChanged` | `Action<int>` | `GameEvents.cs:461` | Sprint 9 Lane 3 |
+| `RaiseDayChanged(int dayIndex)` | `void` | `GameEvents.cs:462` | Sprint 9 Lane 3 |
 | `RaiseHUDShowBanner(title, sub, dur)` | `void` | `GameEvents.cs:623` | Sprint 6 Lane 6 |
 | `RaiseHUDShowDialogue(speaker, msg)` | `void` | `GameEvents.cs:617` | Sprint 6 Lane 6 |
 | `RaiseHUDShowInteractionPrompt(msg)` | `void` | `GameEvents.cs:659` | Sprint 6 Lane 6 |

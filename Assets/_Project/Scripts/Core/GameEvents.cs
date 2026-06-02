@@ -450,6 +450,17 @@ namespace Tartaria.Core
         public static event Action<int> OnTartarianHourChanged;
         public static void FireTartarianHourChanged(int newHour) => OnTartarianHourChanged?.Invoke(newHour);
 
+        /// <summary>
+        /// Raised by the day-cycle authority (TartarianCalendar) when the moon-day counter advances.
+        /// Payload: the NEW day index within the current Moon (1..28).
+        /// Subscribers: Moon 1 Lirael Day-25 gate, NPC-arrival schedulers, world's-fair openers, beat triggers.
+        ///
+        /// FIELD (not event-keyword) per Sprint 8 Lane 1 CS0067 fix - cross-assembly subscribers occasionally need to
+        /// access the multicast itself; the Raise helper is the canonical write path.
+        /// </summary>
+        public static Action<int> OnDayChanged;
+        public static void RaiseDayChanged(int dayIndex) { OnDayChanged?.Invoke(dayIndex); }
+
         /// <summary>Raised by tuning mini-games per frame. Payload: unsigned offset (0=perfect).</summary>
         public static event Action<float> OnTuningProgress;
         public static void FireTuningProgress(float frequencyOffset) => OnTuningProgress?.Invoke(frequencyOffset);

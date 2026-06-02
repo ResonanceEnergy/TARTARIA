@@ -82,18 +82,32 @@ namespace Tartaria.Core
 
         void AdvanceDay()
         {
+            int oldDay = _currentMoonDay;
             _currentMoonDay++;
             if (_currentMoonDay > 28)
             {
                 _currentMoonDay = 1;
                 // _currentMoon ++; keep at 1 for slice
             }
-            OnDayAdvanced?.Invoke(_currentMoonDay);
+            int newDay = _currentMoonDay;
 
-            var beat = GetBeatForDay(_currentMoonDay);
+            OnDayAdvanced?.Invoke(newDay);
+
+            var beat = GetBeatForDay(newDay);
             OnBeatAdvanced?.Invoke(beat);
 
-            Debug.Log($"[Calendar] Day advanced to {_currentMoonDay} (beat: {beat})");
+            // Loud canonical fire (Sprint 9 Lane 3) — drives Moon1LiraelDay25Gate + future schedulers.
+            Debug.Log($"[MoonCycle] Day {oldDay} -> {newDay}");
+            try
+            {
+                Tartaria.Core.GameEvents.RaiseDayChanged(newDay);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[TartarianCalendar] OnDayChanged subscriber threw: {ex.GetType().Name}: {ex.Message} (newDay={newDay})");
+            }
+
+            Debug.Log($"[Calendar] Day advanced to {newDay} (beat: {beat})");
         }
 
         public MoonBeat CurrentBeat => GetBeatForDay(_currentMoonDay);
