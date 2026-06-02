@@ -76,6 +76,7 @@ namespace Tartaria.AI
 
         void Awake()
         {
+            ApplyDifficultyScaling();
             _currentHealth = maxHealth;
             _spawnPosition = transform.position;
             _agent = GetComponent<NavMeshAgent>();
@@ -655,6 +656,18 @@ namespace Tartaria.AI
             }
 
             Debug.Log("[MudGolem] Ragdoll enabled");
+        }
+
+        /// <summary>Sprint 7 Lane 2 - applies enemyDamageMultiplier from DifficultyController to meleeDamage. Called from Awake before _currentHealth init.</summary>
+        void ApplyDifficultyScaling()
+        {
+            float mul;
+            try { mul = Tartaria.Gameplay.DifficultyController.EnemyDamageMultiplier; }
+            catch (System.Exception e) { Debug.LogWarning("[DifficultyApply] MudGolemAI.ApplyDifficultyScaling: lookup threw " + e.GetType().Name + ": " + e.Message + " - using 1.0"); mul = 1f; }
+            mul = Mathf.Clamp(mul, 0.1f, 5f);
+            int before = meleeDamage;
+            meleeDamage = Mathf.Max(1, Mathf.RoundToInt(meleeDamage * mul));
+            Debug.Log("[DifficultyApply] meleeDamage=" + meleeDamage + " (multiplier=" + mul.ToString("F2") + ", was=" + before + ")");
         }
     }
 }
