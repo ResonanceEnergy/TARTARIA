@@ -8,6 +8,13 @@ TagManager:
   - Building
   - Enemy
   - NPC
+  - Anastasia
+  - Cassian
+  - Milo
+  - Lirael
+  - Villager
+  - HeroBuilding
+  - PipeOrgan
   layers:
   - Default
   - TransparentFX

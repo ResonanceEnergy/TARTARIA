@@ -87,6 +87,20 @@ namespace Tartaria.Integration
                 {
                     building = CreateGreyboxBuilding(buildingId, position, fallbackShape, fallbackScale);
                 }
+                // 2026-06-02 no-debt fix per rule 4: if the modular path returns null
+                // (Resources not imported, primitive fallback path skipped, etc), drop
+                // to canonical greybox so the building still appears. Loud log so the
+                // missing-asset condition is visible.
+                if (building == null)
+                {
+                    Debug.LogError($"[BuildingSpawner] CreateModularDungeonStarDome returned null for buildingId='{buildingId}'. Falling back to canonical greybox. Check Resources/Prefabs/Buildings/ModularDungeon2/* import status.");
+                    building = CreateGreyboxBuilding(buildingId, position, fallbackShape, fallbackScale);
+                }
+                if (building == null)
+                {
+                    Debug.LogError($"[BuildingSpawner] Both modular and greybox creation returned null for '{buildingId}'. Skipping wire — building will be absent from scene.");
+                    return;
+                }
                 building.name = $"Building_{buildingId}";
             }
 

@@ -1,0 +1,12 @@
+title: lore_cathedral_tallymarks
+tags:
+position: 0,0
+---
+<<tag character:Narrator>>
+<<tag lore_id:lore_cathedral_tallymarks>>
+Narrator: The basement wall is scored with tally marks, scratched in clusters of five, then crossed.
+Narrator: Sixteen full clusters. The seventeenth is incomplete — four marks, no slash.
+Narrator: Underneath, in a less steady hand: "Hour seventeen. Then the door."
+Narrator: A candle stub waits on the floor below, its wick fresh, the wax still warm to the touch.
+Narrator: Someone has been counting down here. Someone has not yet finished.
+===

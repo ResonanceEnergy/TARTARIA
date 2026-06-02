@@ -69,3 +69,78 @@ public void PlayStinger(AudioClip clip);      // layered one-shot over ambient
 ```
 
 — Audio Engineer agent, 2026-06-01
+
+---
+
+## Cymatic Music Engine — three-band Aether drone bed
+
+> Added 2026-06-02. Lives at `Scripts/Audio/CymaticMusicEngine.cs`. Runs in
+> parallel with `AdaptiveMusicController` — this is the *resonance physics*
+> layer, not the *narrative authored* layer.
+
+`CymaticMusicEngine` generates three sine-wave drones procedurally at runtime
+(no .wav files required, no Resources lookups). Each drone is one Aether
+band per the canonical mapping in `CLAUDE.md`:
+
+| Band | Frequency | Element | Restoration trigger (buildingId substring, case-insensitive) |
+|---|---|---|---|
+| Telluric  | 7.83 Hz | Earth | `spire`, `cathedral` |
+| Harmonic  | 432 Hz  | Water | `fountain` |
+| Celestial | 528 Hz  | Light | `dome`, `stardome` |
+
+### What happens at runtime
+
+1. `[RuntimeInitializeOnLoadMethod(AfterSceneLoad)]` auto-creates a
+   `CymaticMusicEngine (auto)` GameObject in `DontDestroyOnLoad` if no
+   authored instance exists.
+2. `Awake()` builds three `Band` records, each with two `AudioSource` children
+   (carrier + 2nd-order overtone). All sources start playing immediately at
+   `volume = 0` so phase is continuous when they fade in.
+3. Each `AudioSource.clip` is an `AudioClip.Create(stream:true)` with a
+   `PCMReaderCallback` that synthesizes `Math.Sin(phase)` into the buffer.
+   Phase is captured via closure refs so loop-boundary samples are
+   click-free.
+4. `GameEvents.OnBuildingRestored` (canonical `Action<string>` per
+   `docs/agents/API_CONTRACT.md`) routes through `MatchBand()` and fades the
+   matched carrier from 0 → 0.4 over 3 seconds.
+5. `GameEvents.OnMoonCompleted` with `args.moonIndex == 1` is the **capstone**:
+   all three carriers ramp to 0.55 and all three 2nd-order overtones (carrier
+   * 2 Hz) ramp to 0.22 over 5.5 seconds — full Moon 1 mix.
+
+### Logging contract (per CLAUDE.md no-debt mandate rules 3 + 4)
+
+Every layer activation logs the building id, target volume, and full mix
+state in this format (so a future bug "the music didn't change" can be
+diagnosed by reading console output alone):
+
+```
+[CymaticMusicEngine] LAYER-ACTIVATE id='Harmonic' carrierHz=432 targetVol=0.40 trigger='echohaven_fountain' mixBefore=[T=0.00/o0.00|H=0.00/o0.00|C=0.40/o0.00]
+[CymaticMusicEngine] LAYER-ACTIVE-COMPLETE id='Harmonic' atVol=0.40 mixAfter=[T=0.00/o0.00|H=0.40/o0.00|C=0.40/o0.00]
+```
+
+Unmatched buildingIds also log (not a silent fallback):
+
+```
+[CymaticMusicEngine] OnBuildingRestored('echohaven_well') — no band matches substring rules (fountain|dome|stardome|spire|cathedral). Mix unchanged: [...].
+```
+
+### Debug hooks for QA
+
+```csharp
+CymaticMusicEngine.Instance.DebugActivateTelluric();
+CymaticMusicEngine.Instance.DebugActivateHarmonic();
+CymaticMusicEngine.Instance.DebugActivateCelestial();
+CymaticMusicEngine.Instance.DebugCapstone();
+string mix = CymaticMusicEngine.Instance.PublicMixSnapshot();
+```
+
+### Relationship to `AdaptiveMusicController`
+
+`AdaptiveMusicController` plays *authored* clips (village ambient, restoration
+swell, win capstone). `CymaticMusicEngine` plays *procedural* drones tied to
+the Aether physics model. They are independent — both subscribe to
+`OnBuildingRestored` and `OnMoonCompleted`, neither blocks the other. Mix
+both through the `Music` AudioMixerGroup if you need snapshot-controlled
+ducking; currently `CymaticMusicEngine` runs on the master bus.
+
+— Audio Engineer agent, 2026-06-02

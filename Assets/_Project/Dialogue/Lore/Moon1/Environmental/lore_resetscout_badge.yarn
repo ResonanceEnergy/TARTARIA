@@ -1,0 +1,12 @@
+title: lore_resetscout_badge
+tags:
+position: 0,0
+---
+<<tag character:Narrator>>
+<<tag lore_id:lore_resetscout_badge>>
+Narrator: A brass badge lies half-sunk in the silt at the lip of the mud pool, hammered out of shape by something heavier than a boot.
+Narrator: The crest is still legible: a hollow eye inside a broken wheel. Bureau of Continuance.
+Narrator: The pin is bent. Dried blood — not mud — flecks the rim.
+Narrator: Someone fought here recently, and someone lost. The badge's owner left no body, only this.
+Narrator: A scrap of paper clings to the back, stamped: "Subject Lirael — quarantine pending. Hour 17 priority."
+===

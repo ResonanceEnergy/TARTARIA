@@ -1,0 +1,12 @@
+title: lore_skeleton_key_fragments
+tags:
+position: 0,0
+---
+<<tag character:Narrator>>
+<<tag lore_id:lore_skeleton_key_fragments>>
+Narrator: A heap of metal pieces, each as long as a forearm, lies stacked against the cathedral's broken altar.
+Narrator: Examined together, they form fragments of a single colossal key — the shaft sheared into thirteen segments.
+Narrator: Each segment bears a moon glyph: waxing, waning, eclipsed, blood, harvest, all the phases the year remembers.
+Narrator: Only the first segment — Moon One, the new moon — fits cleanly into the others. The rest wait.
+Narrator: A note pinned beneath the pile reads: "One moon, one piece. Do not force the door."
+===

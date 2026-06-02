@@ -1,0 +1,12 @@
+title: lore_inn_painting
+tags:
+position: 0,0
+---
+<<tag character:Narrator>>
+<<tag lore_id:lore_inn_painting>>
+Narrator: A painting hangs crooked above the hearth, varnish gone amber with smoke and decades.
+Narrator: Echohaven in its prime — copper-domed, glass-throated, the river running silver under three white bridges.
+Narrator: No mud. No pit. The cathedral spire pierces a sky the colour of struck flint.
+Narrator: A faded brass plate reads: "Echohaven, the year before the silence."
+Narrator: Someone — Bob, perhaps — has tucked a sprig of dried heather behind the frame. A small act of remembering.
+===

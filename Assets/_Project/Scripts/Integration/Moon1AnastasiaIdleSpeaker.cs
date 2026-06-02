@@ -15,7 +15,17 @@ namespace Tartaria.Integration {
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void AutoAttach() {
-            foreach (var go in GameObject.FindGameObjectsWithTag("Anastasia")) {
+            // Per Unity Manual on Tags & Layers: FindGameObjectsWithTag throws UnityException
+            // if the tag isn't registered in TagManager. Defensive wrap + loud log per
+            // CLAUDE.md no-debt rule 3 (never silent catch) + rule 4 (warning carries the tag name).
+            GameObject[] hits;
+            try {
+                hits = GameObject.FindGameObjectsWithTag("Anastasia");
+            } catch (UnityException ex) {
+                Debug.LogWarning($"[Moon1AnastasiaIdleSpeaker] Tag 'Anastasia' is not defined in TagManager — skipping auto-attach. ({ex.Message}) Add the tag via Project Settings → Tags and Layers.");
+                return;
+            }
+            foreach (var go in hits) {
                 if (go.GetComponent<Moon1AnastasiaIdleSpeaker>() == null) {
                     go.AddComponent<Moon1AnastasiaIdleSpeaker>();
                     Debug.Log($"[Moon1AnastasiaIdleSpeaker] Attached to '{go.name}'");

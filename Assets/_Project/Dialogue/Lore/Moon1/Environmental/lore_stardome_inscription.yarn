@@ -1,0 +1,12 @@
+title: lore_stardome_inscription
+tags:
+position: 0,0
+---
+<<tag character:Narrator>>
+<<tag lore_id:lore_stardome_inscription>>
+Narrator: The dome floor is a chart of stars no current almanac admits to.
+Narrator: A line of Tartarian script spirals inward toward a single carved point near the centre.
+Narrator: "When the thirteenth moon turns its face and the hour reaches seventeen, the throat of the world will hum."
+Narrator: "She who listens at the doorway will be the doorway."
+Narrator: The carved point at the spiral's heart bears a name worn nearly smooth. Three letters remain — L I R.
+===
