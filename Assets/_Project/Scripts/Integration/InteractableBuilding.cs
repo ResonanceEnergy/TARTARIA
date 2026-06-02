@@ -351,15 +351,15 @@ namespace Tartaria.Integration
             if (definition == null || definition.nodePuzzles == null ||
                 _nodesCompleted >= definition.nodePuzzles.Length)
             {
-                // Fallback default config
-                _tuningController.StartTuning(new TuningPuzzleConfig
-                {
-                    variant = (TuningVariant)(_nodesCompleted % 3),
-                    targetFrequency = 432f,
-                    timeLimitSeconds = 15f,
-                    tolerancePercent = 0.08f,
-                    difficultySpeed = 0.3f + _nodesCompleted * 0.1f
-                });
+                // Per-node fallback per docs/15_MVP_BUILD_SPEC.md §9 "Difficulty Scaling":
+                //   | Node | Variant         | Speed  | Tolerance | Time |
+                //   | 1st  | A (Slider)      | Slow   | ±8%       | 15s  |
+                //   | 2nd  | B or C (random) | Medium | ±5%       | 20s  |
+                //   | 3rd  | C or A (random) | Fast   | ±3%       | 10s  |
+                // Random picks are seeded by buildingId so the same
+                // (buildingId, nodeIndex) ALWAYS yields the same variant
+                // across saves/reloads. NO round-robin fallback.
+                _tuningController.StartTuning(BuildSpecNodeConfig(_nodesCompleted));
             }
             else
             {
@@ -367,6 +367,95 @@ namespace Tartaria.Integration
             }
 
             _state = BuildingRestorationState.Tuning;
+        }
+
+        /// <summary>
+        /// Per-node tuning fallback configuration honoring docs/15_MVP_BUILD_SPEC.md §9
+        /// "Difficulty Scaling" table:
+        ///   1st (any building): A (Slider),       Slow,   ±8%, 15s
+        ///   2nd               : B or C (random),  Medium, ±5%, 20s
+        ///   3rd               : C or A (random),  Fast,   ±3%, 10s
+        ///
+        /// "Speed" maps to TuningPuzzleConfig.difficultySpeed (Slow=0.30,
+        /// Medium=0.55, Fast=0.85). Random picks are deterministic — seeded
+        /// by buildingId — so the same (buildingId, nodeIndex) always returns
+        /// the same variant across saves, reloads, and sessions.
+        ///
+        /// Returns a freshly-allocated config per call (callers may mutate).
+        /// </summary>
+        TuningPuzzleConfig BuildSpecNodeConfig(int nodeIndex)
+        {
+            // Clamp into the spec's defined range (1st/2nd/3rd).
+            int idx = Mathf.Clamp(nodeIndex, 0, 2);
+
+            TuningVariant variant;
+            float tolerance;
+            float timeLimit;
+            float speed;
+
+            switch (idx)
+            {
+                case 0: // 1st node — always A (FrequencySlider)
+                    variant   = TuningVariant.FrequencySlider;
+                    tolerance = 0.08f;
+                    timeLimit = 15f;
+                    speed     = 0.30f; // Slow
+                    break;
+                case 1: // 2nd node — B (WaveformTrace) or C (HarmonicPattern), deterministic
+                    variant   = PickFromPool(idx,
+                                    TuningVariant.WaveformTrace,
+                                    TuningVariant.HarmonicPattern);
+                    tolerance = 0.05f;
+                    timeLimit = 20f;
+                    speed     = 0.55f; // Medium
+                    break;
+                default: // 3rd node — C (HarmonicPattern) or A (FrequencySlider), deterministic
+                    variant   = PickFromPool(idx,
+                                    TuningVariant.HarmonicPattern,
+                                    TuningVariant.FrequencySlider);
+                    tolerance = 0.03f;
+                    timeLimit = 10f;
+                    speed     = 0.85f; // Fast
+                    break;
+            }
+
+            return new TuningPuzzleConfig
+            {
+                variant            = variant,
+                targetFrequency    = 432f, // §13 "432 Hz Foundation"
+                timeLimitSeconds   = timeLimit,
+                tolerancePercent   = tolerance,
+                difficultySpeed    = speed
+            };
+        }
+
+        /// <summary>
+        /// Deterministic pick from a 2-variant pool. Hash of (buildingId, nodeIndex)
+        /// selects which element. Falls back to nodeIndex parity if buildingId
+        /// is null/empty so behavior is still deterministic and stable.
+        /// </summary>
+        TuningVariant PickFromPool(int nodeIndex, TuningVariant optionA, TuningVariant optionB)
+        {
+            int hash;
+            if (string.IsNullOrEmpty(buildingId))
+            {
+                hash = nodeIndex;
+            }
+            else
+            {
+                // Mix buildingId chars with nodeIndex via FNV-1a-style folding.
+                // Stable across .NET versions (unlike string.GetHashCode which
+                // is randomized per-process in some runtimes).
+                unchecked
+                {
+                    hash = (int)2166136261u;
+                    for (int i = 0; i < buildingId.Length; i++)
+                        hash = (hash ^ buildingId[i]) * 16777619;
+                    hash = (hash ^ nodeIndex) * 16777619;
+                    hash &= 0x7fffffff; // force non-negative
+                }
+            }
+            return (hash % 2 == 0) ? optionA : optionB;
         }
 
         void OnTuningComplete(float accuracy)
