@@ -27,8 +27,8 @@ namespace Tartaria.Integration
             if (Object.FindFirstObjectByType<BuildingSpawner>() == null)
             {
                 var go = new GameObject("BuildingSpawner");
-                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
-                // SUPERSEDED — orphan go ref: go.AddComponent<BuildingSpawner>();
+                go.transform.SetParent(managers.transform);
+                go.AddComponent<BuildingSpawner>();
                 Debug.LogWarning("[RuntimeInsurance] BuildingSpawner was missing from scene - created at runtime");
             }
 
@@ -45,8 +45,8 @@ namespace Tartaria.Integration
             if (Object.FindFirstObjectByType<PlayerSpawner>() == null)
             {
                 var go = new GameObject("PlayerSpawner");
-                // SUPERSEDED — orphan go ref: go.transform.SetParent(managers.transform);
-                // SUPERSEDED — orphan go ref: go.AddComponent<PlayerSpawner>();
+                go.transform.SetParent(managers.transform);
+                go.AddComponent<PlayerSpawner>();
                 Debug.LogWarning("[RuntimeInsurance] PlayerSpawner was missing from scene - created at runtime");
             }
         }
