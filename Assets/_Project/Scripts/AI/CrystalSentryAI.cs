@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Gameplay.Combat;
 
 namespace Tartaria.AI
 {
@@ -272,6 +273,11 @@ namespace Tartaria.AI
                 // SendMessage pattern - AI↔Gameplay circular dep broken (Phase 16)
                 other.SendMessage("TakeDamage", Mathf.RoundToInt(_damage), SendMessageOptions.DontRequireReceiver);
                 // VFXController.Instance  // B1: Cross-assembly call commented (VFXController in Integration)?.PlayEffect(VFXEffect.Spark, transform.position);
+
+                // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+                try { HitFeedback.NotifyHit(other.transform.position, _damage, false); }
+                catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at CrystalSentryAI.cs:CrystalProjectile.OnTriggerEnter"); }
+
                 Destroy(gameObject);
             }
             else if (!other.isTrigger)

@@ -1,6 +1,7 @@
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
+using Tartaria.Gameplay.Combat;
 
 namespace Tartaria.AI
 {
@@ -153,6 +154,10 @@ namespace Tartaria.AI
                 playerHealth.TakeDamage(Mathf.RoundToInt(attackDamage));
                 VFXEventSystem.RequestVFX(VFXEffect.Spark, _player.position);
                 Debug.Log($"[VoidPhantom] Attack dealt {attackDamage} damage");
+
+                // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+                try { HitFeedback.NotifyHit(_player.position, attackDamage, false); }
+                catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at VoidPhantomAI.cs:PerformAttack"); }
             }
         }
 

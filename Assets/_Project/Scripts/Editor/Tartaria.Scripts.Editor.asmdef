@@ -5,6 +5,7 @@
     "Tartaria.Core",
     "Tartaria.Data",
     "Tartaria.Gameplay",
+    "Tartaria.Combat",
     "Tartaria.AI",
     "Tartaria.Save",
     "Tartaria.Localization",
