@@ -4,7 +4,52 @@
 
 ---
 
-## ⚡⚡⚡⚡⚡ 2026-06-02 API CONTRACT MANDATE (latest, supersedes everything below)
+## ⚡⚡⚡⚡⚡⚡ 2026-06-02 SESSION SNAPSHOT (latest — what's actually in the repo right now)
+
+**5 sprints landed this session (~50 lanes total) via parallel agent dispatch:**
+
+- **Sprint 1 (ce8a3546, by VS Code Copilot Director)**: spawn-override + MoonCompleted event + Moon1WinScreen + EchohavenProgressionSystem.ISaveDataProvider.
+- **Sprint 2 (10 PRs #11-#20)**: itch build pipeline, mini-game polish, wave spawner, pause menu, audio mixer, walk blendtree, MoonConfig SO, Milo onboarding, Addressables baseline, profiler baseline.
+- **Sprint 3 (Cowork swarm)**: PlayerInputHandler canonical kbd-read, AddressableContentLoader log paths, ResetScout patrol, WinScreenStats, AdaptiveMusicController 3-zone, NPCWalkAnimator, Moon1CathedralRestore piecewise, lirael_17th_hour.yarn, Moon1ItchBuild, Soak30Min.
+- **Sprint 4 (Cowork swarm)**: Click-To-Tune editor menu, QuestLogPanel, PauseMenu real wiring, MoonCycleController (FIRES OnSeventeenthHour at hour 17), CassianBossIntro, RoseWindowCymatic, Moon1PipeOrganController, LeyLineMinimapUI, anastasia_idle_4.yarn, Moon1DevBoot.
+- **Sprint 5 — CREATIVE (Cowork swarm)**: Moon 2 cold open (Tideheart, Harmonic 432Hz), MudLordBoss 3-phase state machine, CymaticMusicEngine (Telluric 7.83Hz / Harmonic 432Hz / Celestial 528Hz layered drones), Moon1LiraelLullabyCinematic 30s, LorebookPanel + Tab toggle, Moon1HiddenGrotto behind Spire, AetherVisionOverlay + URPFeature stub, AetherResonanceTree 12-node, gen_victorian_costume.py (4 presets), Moon1EnvironmentalLoreNodes + 8 yarn beats.
+
+**Permanent fixes landed this session:**
+
+- `RuntimeSpawnerInsurance.cs` — restored `AddComponent<PlayerSpawner>()` (was `// SUPERSEDED — orphan go ref`, a silent no-op)
+- `PlayerSpawner.cs` — Resources fallback for runtime-attached spawner (canonical Player prefab at `Assets/_Project/Prefabs/Characters/Player.prefab`)
+- `PlayerInputHandler.cs:526` — canonical `(_moveInput.x, 0, _moveInput.y)` axis mapping
+- `Tartaria.Core.Time` → `Tartaria.Core.GameTime` (UnityEngine.Time namespace shadow)
+- `Moon1ItchBuild.cs:300` — `System.IO.Compression.CompressionLevel` fully qualified
+- `Moon1LightingBake.cs` — `LightingSettings` (Unity 6) replacing 9 obsolete `LightmapEditorSettings.*` + `giWorkflowMode`
+- `Moon1NavMeshBake.cs` — scoped `#pragma warning disable CS0618` with file-header migration plan for NavMeshSurface
+- `Soak30Min.cs`, `LeyLineMinimapUI.cs` — `FindFirstObjectByType(FindObjectsInactive)` per Unity 6
+- `QuestLogPanel.cs` — subscribes to canonical `OnQuestStatusChanged(QuestStatusChangedEventArgs)` and branches on `newStatus`
+- `ProjectSettings/TagManager.asset` — added Anastasia / Cassian / Milo / Lirael / Villager / HeroBuilding / PipeOrgan tags
+- `Moon1AnastasiaIdleSpeaker.cs` — defensive try/catch on `FindGameObjectsWithTag` per UnityException pattern
+- `BuildingSpawner.cs` — null-guard fallback chain after CreateModularDungeonStarDome returns null
+- `CleanMissingScripts.cs` — `EditorSceneManager.sceneOpened` hook + `MarkSceneDirty + SaveScene + SaveAssets` so cleans persist permanently
+- `SaveManager.Save()` — explicit guards on `_currentSave.header` / `_serializer` + `e.StackTrace` in catch (was masking real NRE site)
+
+**Open ship-gate items (still blocking honest "shippable" claim):**
+
+1. WASD movement runtime verification in Echohaven (axis fix + spawner restore landed; never seen end-to-end in Play)
+2. E-key chain → mini-game → win card runtime walkthrough
+3. F5 / F9 save round-trip runtime
+4. 30-min uninterrupted playtest (Soak30Min.cs scaffold exists)
+5. itch.io build run (Moon1ItchBuild.cs scaffolded with profiler gate)
+
+**Unity AI Assistant MCP install — 1 of 3 steps complete:**
+
+- ✅ `com.unity.ai.assistant 2.0.0-pre.1` added to `Packages/manifest.json`
+- ❌ NATRIX must focus Unity → wait for resolve → `Edit → Preferences → AI Assistant → MCP Server` → toggle ON → note port
+- ❌ NATRIX must register that port in Cowork's MCP client config + restart Cowork so `mcp__unity__*` tools appear in deferred list
+
+Until both remaining steps land, Cowork still drives Unity via computer-use mouse clicks. After they land, future sessions use structured `unity_execute_menu` / `unity_read_console` / `unity_toggle_play` calls — zero pixel choreography.
+
+---
+
+## ⚡⚡⚡⚡⚡ 2026-06-02 API CONTRACT MANDATE (supersedes everything below)
 
 **Every agent reads `docs/agents/API_CONTRACT.md` BEFORE editing any code.**
 
@@ -132,12 +177,14 @@ Doc references that still apply: `docs/15_MVP_BUILD_SPEC.md` for Moon 1 content 
 
 ## Read these first (in this order)
 
-1. **`STATUS.md`** — the single source of truth for current state.
-2. **`PHASE_1_SCOPE.md`** — the scope lock. If a task isn't in this file, it's deferred.
-3. **`TARTARIA_MASTER_PLAN.md`** — the strategic plan (Track A ship the game, Track B build the platform).
-4. **`KNOWN_ISSUES.md`** — open bugs with file:line cites.
-5. **`docs/15_MVP_BUILD_SPEC.md`** — the canonical MVP design spec.
-6. **`docs/09_TECHNICAL_SPEC.md`** — Unity architecture spec.
+1. **`docs/agents/API_CONTRACT.md`** — banned namespace names, canonical GameEvents table, Unity 6 deprecation gates. **Read BEFORE editing any code.**
+2. **`docs/agents/COORDINATION.md`** — multi-agent path ownership + parallel mandate.
+3. **`docs/agents/DIRECTOR.md`** — Director playbook (batched dispatch, no drip-feed).
+4. **`STATUS.md`** — current state of play.
+5. **`docs/integration/UNITY_MCP_SETUP.md`** — Unity AI Assistant MCP bridge install + client config (replaces computer-use mouse choreography once wired).
+6. **`docs/HANDOFFS.md`** — cross-agent hand-off queue (newest entries last).
+7. **`docs/15_MVP_BUILD_SPEC.md`** — canonical MVP design spec.
+8. **`docs/09_TECHNICAL_SPEC.md`** — Unity architecture spec.
 
 If you only have time for one, read `STATUS.md`. It cites the others.
 
