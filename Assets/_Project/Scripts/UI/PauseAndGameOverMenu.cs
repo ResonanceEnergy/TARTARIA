@@ -152,6 +152,13 @@ namespace Tartaria.UI
             if (_state == State.Paused && GUI.Button(new Rect(bx, by, BW, BH), "Resume", btnStyle)) Resume();
             by += BH + 10;
 
+            // Sprint 8 Lane 6 (audit blocker #4): open SaveSlotsMenu so the player can pick a slot.
+            // SaveSlotPanel routes the chosen slot to SaveManager.SwitchToSlot(int) at
+            // Assets/_Project/Scripts/Save/SaveManager.cs:595 (canonical per API_CONTRACT.md section 3).
+            if (_state == State.Paused && GUI.Button(new Rect(bx, by, BW, BH), "Load", btnStyle))
+                SaveSlotsMenu.Open();
+            by += BH + 10;
+
             if (GUI.Button(new Rect(bx, by, BW, BH),
                 _state == State.GameOver ? "Respawn (Restart Scene)" : "Restart Scene", btnStyle))
                 RestartScene();

@@ -23,9 +23,9 @@ namespace Tartaria.UI
     /// API CONTRACT compliance notes:
     /// - No namespace shadow of UnityEngine identifiers (uses Tartaria.UI only).
     /// - No deprecated Unity 6 API (no FindObjectOfType).
-    /// - Continue button uses reflection against <see cref="Tartaria.Save.SaveManager"/>.QuickLoad
-    ///   (verified canonical method at Assets/_Project/Scripts/Save/SaveManager.cs:246 —
-    ///   there is NO LoadSlot(int) method on SaveManager; QuickLoad() is the canonical reload API).
+    /// - Continue button opens SaveSlotsMenu overlay (Sprint 8 Lane 6) which routes Load
+    ///   to SaveManager.SwitchToSlot(int) at Assets/_Project/Scripts/Save/SaveManager.cs:595,
+    ///   per docs/agents/API_CONTRACT.md section 3 (NOT a non-existent LoadSlot(int)).
     /// - Settings opens <see cref="SettingsOverlay"/>.Open() — verified at SettingsOverlay.cs:104.
     /// - No silent catches: every catch logs file:line + the offending value.
     /// - No stubs: every button handler does the real thing.
@@ -139,66 +139,20 @@ namespace Tartaria.UI
 
         void OnContinue()
         {
-            Debug.Log("[MainMenuController] Continue pressed — invoking SaveManager.QuickLoad via reflection.");
+            // Sprint 8 Lane 6 (audit blocker #4 wire-up): the Continue button now opens
+            // the SaveSlotsMenu overlay so the player can pick which slot to load.
+            // The overlay's individual slot cards then call SaveManager.SwitchToSlot(int)
+            // (canonical at Assets/_Project/Scripts/Save/SaveManager.cs:595) per
+            // docs/agents/API_CONTRACT.md section 3. We no longer reflection-call QuickLoad here.
+            Debug.Log("[MainMenuController] Continue pressed - opening SaveSlotsMenu overlay (SaveSlotsMenu.Open).");
             try
             {
-                // SaveManager lives in Tartaria.Save assembly which Tartaria.UI already references,
-                // but per the lane spec we reflection-call to stay loose-coupled against future
-                // signature changes. Resolves Tartaria.Save.SaveManager + reads the Instance singleton,
-                // then invokes QuickLoad().
-                Type saveManagerType = Type.GetType("Tartaria.Save.SaveManager, Tartaria.Save");
-                if (saveManagerType == null)
-                {
-                    Debug.LogError(
-                        "[MainMenuController] OnContinue (MainMenuController.cs:OnContinue) — could not resolve Type 'Tartaria.Save.SaveManager, Tartaria.Save'. " +
-                        "Did the Save assembly rename? Check Assets/_Project/Scripts/Save/Tartaria.Save.asmdef.");
-                    return;
-                }
-
-                PropertyInfo instanceProp = saveManagerType.GetProperty("Instance", BindingFlags.Public | BindingFlags.Static);
-                if (instanceProp == null)
-                {
-                    Debug.LogError(
-                        "[MainMenuController] OnContinue (MainMenuController.cs:OnContinue) — SaveManager.Instance static property not found. " +
-                        "Expected at SaveManager.cs:36 (public static SaveManager Instance { get; private set; }).");
-                    return;
-                }
-
-                object instance = instanceProp.GetValue(null);
-                if (instance == null)
-                {
-                    Debug.LogWarning(
-                        "[MainMenuController] OnContinue (MainMenuController.cs:OnContinue) — SaveManager.Instance is null. " +
-                        "Save subsystem not bootstrapped yet — falling through to New Game flow so the player isn't blocked.");
-                    SceneManager.LoadScene(GAMEPLAY_SCENE_NAME);
-                    return;
-                }
-
-                MethodInfo quickLoad = saveManagerType.GetMethod("QuickLoad", BindingFlags.Public | BindingFlags.Instance);
-                if (quickLoad == null)
-                {
-                    Debug.LogError(
-                        "[MainMenuController] OnContinue (MainMenuController.cs:OnContinue) — SaveManager.QuickLoad() method not found. " +
-                        "Expected canonical signature 'public void QuickLoad()' at SaveManager.cs:246.");
-                    return;
-                }
-
-                quickLoad.Invoke(instance, null);
-
-                // QuickLoad re-reads disk + broadcasts OnAfterLoad — load the gameplay scene so we're
-                // actually inside the game instead of staring at the main menu.
-                SceneManager.LoadScene(GAMEPLAY_SCENE_NAME);
-            }
-            catch (TargetInvocationException tie)
-            {
-                Exception inner = tie.InnerException ?? tie;
-                Debug.LogError(
-                    $"[MainMenuController] OnContinue threw inside SaveManager.QuickLoad (MainMenuController.cs:OnContinue) — inner={inner.GetType().Name}: {inner.Message}\n{inner.StackTrace}");
+                SaveSlotsMenu.Open();
             }
             catch (Exception ex)
             {
                 Debug.LogError(
-                    $"[MainMenuController] OnContinue failed (MainMenuController.cs:OnContinue) — ex={ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+                    $"[MainMenuController] OnContinue failed to open SaveSlotsMenu (MainMenuController.cs:OnContinue) - ex={ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
             }
         }
 
