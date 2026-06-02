@@ -303,16 +303,35 @@ namespace Tartaria.Integration
 
         bool TryStartBuildingMiniGame()
         {
+            // Hero-building → mini-game routing.
+            //
+            // Sources of truth (do not "fix" without re-reading):
+            //   - docs/02_AETHER_ENERGY_SYSTEM.md §6.1 — "Pipe Organ Console (Cathedrals)".
+            //     The Moon 1 Dome IS the Listeners' Hall / cathedral that houses the pipe organ.
+            //   - docs/01_LORE_BIBLE.md §5.6 — domes are the structures that house the
+            //     "Massive Pipe Organs (Sonic Power Plants)".
+            //   - docs/audits/MOON1_BUILD_AUDIT_2026-05-31.md L24 — "Pipe organ centerpiece
+            //     inside the Dome (3-note sequence, canonical first-restoration puzzle)".
+            //   - docs/audits/MOON1_MINIGAMES_2026-05-31_v2.md L38, L62 — explicitly directs
+            //     "wire PipeOrgan into the Dome's InteractableBuilding".
+            //   - docs/02_AETHER_ENERGY_SYSTEM.md §6.2 — Cymatic Garden Puzzle = water /
+            //     fountain mechanic, matching CymaticWaterTuningMiniGame.
+            //   - ChoirHarmonicsMiniGame.cs header — class is Moon 6 (Rhythmic Moon /
+            //     Pipe Organ Requiem), NOT Moon 1. Removing it from the Moon 1 routing.
+            //
+            // Prior (incorrect) mapping routed Dome → ChoirHarmonics and Fountain → PipeOrgan;
+            // that put the Moon 6 choir conduction on the canonical first-restoration target
+            // and stranded the pipe organ on the wrong structure. Audit blocker #2.
             string key = string.IsNullOrEmpty(buildingId) ? string.Empty : buildingId.ToLowerInvariant();
             switch (key)
             {
                 case "dome":
-                    EnsureMiniGameComponent<ChoirHarmonicsMiniGame>().StartPerformance();
-                    GameEvents.RaiseHUDShowInteractionPrompt("Choir Harmonics challenge started.");
-                    return true;
-                case "fountain":
                     EnsureMiniGameComponent<PipeOrganMiniGame>().StartOrgan();
                     GameEvents.RaiseHUDShowInteractionPrompt("Pipe Organ challenge started.");
+                    return true;
+                case "fountain":
+                    EnsureMiniGameComponent<CymaticWaterTuningMiniGame>().StartMiniGame();
+                    GameEvents.RaiseHUDShowInteractionPrompt("Cymatic Water Tuning challenge started.");
                     return true;
                 case "spire":
                     EnsureMiniGameComponent<AetherConduitMiniGame>().StartPuzzle();
