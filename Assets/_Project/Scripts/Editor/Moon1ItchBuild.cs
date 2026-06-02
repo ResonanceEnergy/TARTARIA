@@ -297,7 +297,7 @@ namespace Tartaria.Editor
                 Directory.CreateDirectory(tempStage);
                 CopyDirectory(sourceDir, tempStage, excludeFullPath: Path.GetFullPath(zipPath));
                 if (File.Exists(zipPath)) File.Delete(zipPath);
-                ZipFile.CreateFromDirectory(tempStage, zipPath, CompressionLevel.Optimal, includeBaseDirectory: false);
+                ZipFile.CreateFromDirectory(tempStage, zipPath, System.IO.Compression.CompressionLevel.Optimal, includeBaseDirectory: false);
             }
             finally
             {

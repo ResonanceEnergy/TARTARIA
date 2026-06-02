@@ -4,7 +4,54 @@
 
 ---
 
-## ⚡⚡⚡ 2026-06-01 PARALLEL MANDATE (latest, supersedes everything below)
+## ⚡⚡⚡⚡ 2026-06-02 NO-DEBT MANDATE (latest, supersedes everything below)
+
+**FIND AND FIX BUGS AT THE ACTUAL ROOT CAUSE. NO DEBT, NO WORKAROUNDS, NO BYPASSES, NO SILENT FAILS.**
+
+Per NATRIX, verbatim: *"WRITE THIS IN TO CLAUDE.MD FIND AND FIX BUGS ENOUGH DEBT AND FUTURE WORK AND SECRETS AND SILET FAILS AND BYPASSES AND WORKAROUNDS.. PROFESSIONAL CODE DONT BE LAZY"*
+
+Hard rules for every line of code shipped from now on:
+
+1. **Find the actual root cause.** When a system misbehaves, trace it to the exact file:line where the wrong value is computed or the wrong branch is taken. Do not patch downstream symptoms. Do not infer from logs alone — open the source, grep for the relevant identifiers, read the surrounding lines.
+
+2. **No new workaround drivers.** No `EmergencyPlayerDriver`, `GodMode`, `HardOverrideDriver`, `Lifeline`, `Rescue`, or any sibling that bypasses the canonical pipeline. If the canonical pipeline is wrong, FIX the canonical pipeline. The existing fleet of override drivers from prior sessions (Moon1HardOverrideDriver, Moon1GodMode v1, Moon1GodMode v2, SimplePlayerDriver) is the warning, not the template.
+
+3. **No silent fails.** Every catch block must do one of: rethrow, log loud with file:line and the value that broke, or document IN THE SAME COMMIT why swallowing is correct. `catch { }` is a ship-blocker. `catch (Exception) { /* ignore */ }` is a ship-blocker.
+
+4. **No silent fallbacks.** If `Resources.Load` falls back from Addressables, log a warning with the id and the path tried. If a prefab ref is null, log error with the GameObject's hierarchy path. If a serialized field defaults because the scene didn't override, log warning on first read. Players notice broken games; logs catch them before players do.
+
+5. **No "future work" deferrals on the active milestone.** If Moon 1 is the active milestone, every bug found inside Moon 1's code path gets fixed THIS session, not "next sprint." Carry only items that genuinely belong to a later milestone (Moons 2–13, post-ship polish).
+
+6. **No secrets in code, no secrets in chat, no secrets in commits.** PATs, API keys, passwords, OAuth tokens — never in .cs, .md, .json, .yaml, .ps1 checked into git. Use `.local-secrets/` (gitignored) or environment variables. If a secret has touched git history, rotate it.
+
+7. **No `// TODO: implement` in the canonical pipeline.** No empty method bodies. No `Debug.Log("not implemented yet")` returning. (Restates the 2026-05-30 no-stubs mandate; it stays binding.)
+
+8. **No "compile clean" claims without verifying tundra.log.json.** A passing dotnet build means nothing — Unity owns the real compile. The `Library/Bee/tundra.log.json` check is authoritative. Cite the file:line of any CS error before declaring victory.
+
+9. **No fabricated runtime artifacts.** Screenshots, console excerpts, "verified in Play" claims must come from Cowork driving Unity. VS Code agents and Cowork CLI work produce CODE artifacts (diffs, file:line citations, tundra log). Runtime claims without Cowork's Unity drive are theater.
+
+10. **No "good enough for now" on input, save, win condition, or any ship-gate item.** These are the 10 items in the Phase 1 ship checklist. Each must work end-to-end in Echohaven Play mode before claimed done. Half-working is broken.
+
+11. **Read before you write.** When fixing a bug, READ the file fully — not just the function. Adjacent code often holds the actual cause. The 2026-06-02 movement bug was a single line at `PlayerInputHandler.cs:526` (`new Vector3(_moveInput.y, 0, -_moveInput.x)`) that contradicted the HANDOFFS claim of a canonical fix; reading the function once would have caught it in one pass instead of three.
+
+12. **Delete dead code on sight.** Archive folders, `.disabled` files, override drivers, candidate files — these are debt. If a session encounters them and they aren't the active fix, file a HANDOFFS.md entry to delete them, then move on.
+
+Anti-patterns this mandate rejects on sight:
+
+- ❌ Writing a new "Emergency*", "Hard*", "GodMode*", "Override*" driver instead of fixing the real one
+- ❌ Adding `if (whatever == null) return;` to suppress an NRE without identifying which caller passed null
+- ❌ "Compiles clean" without showing the tundra.log.json query
+- ❌ "Should work" claims without Cowork running Unity
+- ❌ TODO comments on the ship-gate path
+- ❌ Logging warnings with no value attached — `Debug.LogWarning("Missing")` is useless; `Debug.LogWarning($"Missing prefab '{id}' at path '{path}' — fallback to {fallbackId}")` is useful
+- ❌ Committing a fix without running the failure case again to verify
+- ❌ Bypassing path ownership "just this once" to ship faster
+
+When in doubt, ship one less line of code and read 100 more lines of existing source.
+
+---
+
+## ⚡⚡⚡ 2026-06-01 PARALLEL MANDATE (supersedes everything below)
 
 **SWARM RUNS IN PARALLEL — NEVER SERIAL.** Per NATRIX: *"ENSURE THE SUBAGENTS ARE WORKING IN PARRELLE TO MAXIMIZE VALUE AND TIME"*
 

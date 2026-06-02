@@ -16,6 +16,69 @@ namespace Tartaria.UI
     [DisallowMultipleComponent]
     public class LeyLineMinimap : MonoBehaviour
     {
+        // ------------------------------------------------------------------
+        // Static data + projection helpers (consumed by LeyLineMinimapUI.cs).
+        // Added 2026-06-01 (Level Designer agent). Coexists with the original
+        // golden-thread widget logic below; same class avoids a duplicate
+        // type-name compile error.
+        //
+        // Mandate refs (CLAUDE.md 2026-06-02 NO-DEBT):
+        //   Rule 1 - canonical positions live HERE; if a scene re-bake moves a
+        //            hero anchor, update the entry in the same commit.
+        //   Rule 7 - no TODO stubs; values committed even if a sibling later
+        //            corrects them via PR.
+        // ------------------------------------------------------------------
+
+        /// <summary>
+        /// Canonical building ids for the three Moon 1 hero buildings. These
+        /// strings are matched (case-insensitive substring) against the id
+        /// payload of <c>GameEvents.OnBuildingRestored</c>.
+        /// </summary>
+        public static readonly string[] HeroIds = new string[]
+        {
+            "StarDome",
+            "HarmonicFountain",
+            "CrystalSpire",
+        };
+
+        /// <summary>
+        /// World-space anchor positions for the three hero buildings. Index
+        /// matches <see cref="HeroIds"/>. Sourced from the Echohaven vertical
+        /// slice placements; if Cowork repositions a building in-scene, the
+        /// matching entry must be updated here in the same commit.
+        /// </summary>
+        public static readonly Vector3[] HeroPositions = new Vector3[]
+        {
+            new Vector3( 30f, 0f, 20f), // StarDome
+            new Vector3(-20f, 0f, 35f), // HarmonicFountain
+            new Vector3( 60f, 0f, 40f), // CrystalSpire
+        };
+
+        /// <summary>
+        /// Half-extent (in world metres) of the area shown on the minimap.
+        /// 80m covers Echohaven's playable disc + a margin around the hero
+        /// buildings without clipping. Out-of-range markers clamp to the edge.
+        /// </summary>
+        public const float WorldRadius = 80f;
+
+        /// <summary>
+        /// Project a world-space position onto the minimap as a normalized
+        /// 0..1 coordinate. (0.5, 0.5) is the centre of the minimap, (0,0) is
+        /// the south-west corner, (1,1) is the north-east corner. The Y axis
+        /// of the returned <see cref="Vector2"/> maps to world Z so up-on-the
+        /// -minimap means +Z (north) in the scene.
+        /// </summary>
+        public static Vector2 WorldToMinimap(Vector3 worldPos)
+        {
+            float nx = Mathf.Clamp01((worldPos.x + WorldRadius) / (WorldRadius * 2f));
+            float ny = Mathf.Clamp01((worldPos.z + WorldRadius) / (WorldRadius * 2f));
+            return new Vector2(nx, ny);
+        }
+
+        // ------------------------------------------------------------------
+        // Original golden-thread widget logic (unchanged).
+        // ------------------------------------------------------------------
+
         static LeyLineMinimap _instance;
         Canvas _canvas;
         Image _ring, _firstVein, _veinHead;
