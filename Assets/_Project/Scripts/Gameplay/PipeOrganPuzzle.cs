@@ -32,7 +32,9 @@ namespace Tartaria.Gameplay
     {
         public event Action<float> OnTuningComplete;
         public event Action OnTuningFailed;
+#pragma warning disable 67 // event declared to satisfy ITuningVariant; PipeOrgan uses discrete keypress not continuous frequency
         public event Action<float> OnFrequencyChanged;
+#pragma warning restore 67
 
         public bool IsActive => _isPlaying;
         public float CurrentAccuracy { get; private set; }
