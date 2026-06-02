@@ -4,7 +4,24 @@
 
 ---
 
-## ⚡⚡⚡⚡ 2026-06-02 NO-DEBT MANDATE (latest, supersedes everything below)
+## ⚡⚡⚡⚡⚡ 2026-06-02 API CONTRACT MANDATE (latest, supersedes everything below)
+
+**Every agent reads `docs/agents/API_CONTRACT.md` BEFORE editing any code.**
+
+Per NATRIX after sprint-4 shipped four predictable regressions (namespace shadow, invented event names, ambiguous type, deprecated Unity 6 API): *"YOU ARE PROJECT CO DIRECTOR WITH ME I NEED TO BE ABLE TO RELY ON YOU"*
+
+`docs/agents/API_CONTRACT.md` contains:
+- Banned namespace names that shadow `UnityEngine` classes (Time, Input, Camera, Animation, Random, Color, Object, etc)
+- The canonical GameEvents API table — DO NOT invent event names; grep first
+- Unity 6 deprecation gates — banned obsolete identifiers with their replacements
+- Ambiguous-type qualification rules (CompressionLevel, Random, Object, Debug)
+- Pre-edit + post-edit checklists Director enforces on every PR
+
+The Director (Cowork or VS Code) MUST surface relevant entries from API_CONTRACT.md in every dispatch prompt and reject any PR that violates them. Sprint-4 shipped because I (Cowork co-director) skipped the preflight. Never again.
+
+---
+
+## ⚡⚡⚡⚡ 2026-06-02 NO-DEBT MANDATE (supersedes everything below)
 
 **FIND AND FIX BUGS AT THE ACTUAL ROOT CAUSE. NO DEBT, NO WORKAROUNDS, NO BYPASSES, NO SILENT FAILS.**
 
