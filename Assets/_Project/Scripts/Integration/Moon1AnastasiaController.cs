@@ -31,7 +31,7 @@ namespace Tartaria.Integration
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
         {
-            if (FindObjectOfType<Moon1AnastasiaController>() != null) return;
+            if (Object.FindFirstObjectByType<Moon1AnastasiaController>(FindObjectsInactive.Include) != null) return;
             var go = new GameObject(nameof(Moon1AnastasiaController));
             DontDestroyOnLoad(go);
             go.AddComponent<Moon1AnastasiaController>();
