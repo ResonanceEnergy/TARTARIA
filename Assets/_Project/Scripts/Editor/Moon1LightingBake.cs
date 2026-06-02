@@ -43,30 +43,39 @@ namespace Tartaria.Editor
             }
             sun.transform.rotation = Quaternion.Euler(28f, -25f, 0f); // Low golden-hour angle
 
-            // Lightmap settings
-            LightmapEditorSettings.bakeResolution = 20f;
-            LightmapEditorSettings.padding = 4;
-            LightmapEditorSettings.lightmapper = LightmapEditorSettings.Lightmapper.ProgressiveGPU;
-            LightmapEditorSettings.maxAtlasSize = 1024;
-            LightmapEditorSettings.directSampleCount = 32;
-            LightmapEditorSettings.indirectSampleCount = 256;
-            LightmapEditorSettings.bounces = 2;
+            // 2026-06-02 Unity 6 API migration per docs/agents/API_CONTRACT.md § "Unity 6 API replacements":
+            // LightmapEditorSettings + Lightmapping.giWorkflowMode are obsolete. Canonical
+            // replacement is LightingSettings (ScriptableObject) assigned via
+            // Lightmapping.lightingSettings. See Unity Manual "Lighting Settings Asset".
+            var settings = new LightingSettings
+            {
+                name                  = "Echohaven_GoldenHour",
+                lightmapResolution    = 20f,
+                lightmapPadding       = 4,
+                lightmapper           = LightingSettings.Lightmapper.ProgressiveGPU,
+                lightmapMaxSize       = 1024,
+                directSampleCount     = 32,
+                indirectSampleCount   = 256,
+                maxBounces            = 2,
+                bakedGI               = true,
+                realtimeGI            = false,
+            };
+            Lightmapping.lightingSettings = settings;
 
             // Save scene first
             EditorSceneManager.SaveScene(EditorSceneManager.GetActiveScene());
 
             if (!EditorUtility.DisplayDialog("Begin lighting bake?",
                 "Golden-hour ambient + fog applied. Sun set to low angle.\n\n" +
-                "Lightmap settings configured. Bake now? (May take 1-5 minutes.)",
+                "Lightmap settings configured (Unity 6 LightingSettings). Bake now? (May take 1-5 minutes.)",
                 "Bake", "Skip bake"))
             {
                 Debug.Log("[Moon1LightingBake] Settings applied, bake skipped.");
                 return;
             }
 
-            Lightmapping.bakedGI = true;
-            Lightmapping.realtimeGI = false;
-            Lightmapping.giWorkflowMode = Lightmapping.GIWorkflowMode.OnDemand;
+            // Note: Lightmapping.giWorkflowMode is obsolete in Unity 6 (Auto mode removed).
+            // BakeAsync is the canonical on-demand bake entry point.
             Lightmapping.BakeAsync();
             Debug.Log("[Moon1LightingBake] Bake started — check Lighting window for progress.");
             EditorUtility.DisplayDialog("Baking",

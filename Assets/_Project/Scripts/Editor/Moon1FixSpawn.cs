@@ -109,7 +109,6 @@ namespace Tartaria.Editor
             // the player is appearing in the wrong place at frame 1.
             Vector3 spawnPos       = new Vector3(0f, 2f, 15f);
             Vector3 platformPos    = new Vector3(0f, 0.5f, 15f);
-            const float platformY  = 0.5f;
 
             var sb = new StringBuilder();
             int patched = 0;

@@ -1,8 +1,14 @@
 #if UNITY_EDITOR
 using UnityEngine;
 using UnityEditor;
-using UnityEditor.AI;
 using UnityEditor.SceneManagement;
+// 2026-06-02 Unity 6 API migration per docs/agents/API_CONTRACT.md:
+// UnityEditor.AI.NavMeshBuilder is obsolete in Unity 6. The canonical replacement
+// is the AI Navigation package's NavMeshSurface component (per-surface baking).
+// Until the scene gains NavMeshSurface GameObjects (separate scene-authoring lane),
+// we intentionally use the still-functional legacy editor entry points and
+// SCOPE-SUPPRESS the warning with file:line + rationale per no-debt rule 4.
+using LegacyNavMeshBuilder = UnityEditor.AI.NavMeshBuilder;
 
 namespace Tartaria.Editor
 {
@@ -10,8 +16,11 @@ namespace Tartaria.Editor
     /// Moon1NavMeshBake — one-click NavMesh bake + Save Scene + Save Project,
     /// so NATRIX can skip Window→AI→Navigation→Bake clicks.
     ///
-    /// Bake uses the legacy NavMeshBuilder.BuildNavMeshAsync() entry point,
-    /// which respects the current scene's NavMeshObstacles and bake settings.
+    /// MIGRATION NOTE: Uses legacy UnityEditor.AI.NavMeshBuilder pending scene
+    /// migration to NavMeshSurface (AI Navigation package). Tracked in HANDOFFS.md
+    /// as "Level → Tools: NavMeshSurface migration". Until that lands, the legacy
+    /// API is the only entry point that bakes without requiring per-surface
+    /// components — and Unity 6 still SHIPS it (deprecated but functional).
     /// </summary>
     public static class Moon1NavMeshBake
     {
@@ -25,9 +34,11 @@ namespace Tartaria.Editor
                 return;
             }
 
-            Debug.Log("[Moon1NavMeshBake] Starting NavMesh bake...");
-            NavMeshBuilder.ClearAllNavMeshes();
-            NavMeshBuilder.BuildNavMesh();
+            Debug.Log("[Moon1NavMeshBake] Starting NavMesh bake (legacy entry point — see file header for Unity 6 migration plan)...");
+#pragma warning disable CS0618 // legacy NavMeshBuilder — see file-header migration plan
+            LegacyNavMeshBuilder.ClearAllNavMeshes();
+            LegacyNavMeshBuilder.BuildNavMesh();
+#pragma warning restore CS0618
             Debug.Log("[Moon1NavMeshBake] NavMesh bake complete.");
 
             EditorSceneManager.MarkSceneDirty(scene);

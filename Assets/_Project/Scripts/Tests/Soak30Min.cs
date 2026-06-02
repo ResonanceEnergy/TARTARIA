@@ -100,7 +100,9 @@ namespace Tartaria.Tests
         /// </summary>
         public static void RunFromMenu()
         {
-            var existing = UnityEngine.Object.FindObjectOfType<Soak30Min>();
+            // Per docs/agents/API_CONTRACT.md § "Unity 6 API replacements":
+            // FindObjectOfType is obsolete. FindFirstObjectByType is the canonical replacement.
+            var existing = UnityEngine.Object.FindFirstObjectByType<Soak30Min>(FindObjectsInactive.Include);
             if (existing != null)
             {
                 Debug.LogWarning("[Soak30Min] A soak controller is already running. Ignoring duplicate start.");
