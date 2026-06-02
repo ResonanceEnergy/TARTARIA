@@ -437,7 +437,7 @@ namespace Tartaria.Audio
         const float MinDb = -80f;
         const float MaxDb = 0f;
 
-        /// <summary>Set a normalized [0..1] volume on a mixer-exposed parameter (e.g. "MusicVolume").</summary>
+        /// <summary>Set a normalized [0..1] volume on a mixer-exposed parameter (e.g. "MusicVol").</summary>
         public void SetMixerVolume(string exposedParam, float normalized01)
         {
             if (mixer == null || string.IsNullOrEmpty(exposedParam)) return;

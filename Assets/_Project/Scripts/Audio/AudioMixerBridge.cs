@@ -9,10 +9,10 @@ namespace Tartaria.Audio
     /// Integrates with Settings UI for Master/Music/SFX/Voice volume controls.
     /// 
     /// Exposed Parameters (must match AudioMixer):
-    /// - MasterVolume (-80 to 0 dB)
-    /// - MusicVolume (-80 to 0 dB)
-    /// - SFXVolume (-80 to 0 dB)
-    /// - VoiceVolume (-80 to 0 dB)
+    /// - MasterVol (-80 to 0 dB)
+    /// - MusicVol (-80 to 0 dB)
+    /// - SFXVol (-80 to 0 dB)
+    /// - VoiceVol (-80 to 0 dB)
     /// - ReverbWet (0 to 1)
     /// - LowPassCutoff (Hz)
     /// 
@@ -32,10 +32,10 @@ namespace Tartaria.Audio
         [SerializeField] AudioMixer masterMixer;
 
         [Header("Exposed Parameters (must match AudioMixer)")]
-        [SerializeField] string masterVolumeParam = "MasterVolume";
-        [SerializeField] string musicVolumeParam = "MusicVolume";
-        [SerializeField] string sfxVolumeParam = "SFXVolume";
-        [SerializeField] string voiceVolumeParam = "VoiceVolume";
+        [SerializeField] string masterVolumeParam = "MasterVol";
+        [SerializeField] string musicVolumeParam = "MusicVol";
+        [SerializeField] string sfxVolumeParam = "SFXVol";
+        [SerializeField] string voiceVolumeParam = "VoiceVol";
 
         [Header("Snapshots")]
         [SerializeField] AudioMixerSnapshot defaultSnapshot;
