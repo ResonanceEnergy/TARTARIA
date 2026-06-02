@@ -1,0 +1,54 @@
+title: milo_tutorial_step_1_brazier
+tags: character:Milo moon:1 beat:tutorial step:1
+---
+<<tag character:Milo>>
+Milo: Look toward the firelight, traveler.
+Milo: That brazier was lit for you. Walk where the embers point.
+===
+
+title: milo_tutorial_step_2_interact
+tags: character:Milo moon:1 beat:tutorial step:2
+---
+<<tag character:Milo>>
+Milo: Press E to interact with the world.
+Milo: Anything that hums, anything that shines — it wants a hand. Yours will do.
+===
+
+title: milo_tutorial_step_3_waypoint
+tags: character:Milo moon:1 beat:tutorial step:3
+---
+<<tag character:Milo>>
+Milo: Follow the arrow. The buried cathedral is closer than it looks.
+Milo: Mud's been over it a hundred years. Today, you and I lift the lid.
+===
+
+title: milo_tutorial_step_4_tune
+tags: character:Milo moon:1 beat:tutorial step:4
+---
+<<tag character:Milo>>
+Milo: Press E at the green light.
+Milo: That's a tuning node. Match its note and the stone remembers itself.
+===
+
+title: milo_tutorial_step_5_restored
+tags: character:Milo moon:1 beat:tutorial step:5
+---
+<<tag character:Milo>>
+Milo: Look at it. Look at what you just did.
+Milo: One building back from the silence. Eleven moons left, but you've got the knack now.
+===
+
+title: milo_tutorial_step_6_free
+tags: character:Milo moon:1 beat:tutorial step:6
+---
+<<tag character:Milo>>
+Milo: Explore. You have buildings to wake.
+Milo: I'll be near. Holler if the mud hollers back.
+===
+
+title: milo_tutorial_skipped
+tags: character:Milo moon:1 beat:tutorial step:skip
+---
+<<tag character:Milo>>
+Milo: Suit yourself. The valley's yours to read.
+===
