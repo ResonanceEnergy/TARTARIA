@@ -302,21 +302,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 368708517}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!115 &255430906
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: Moon1AmbientCreatures
-  m_Namespace: Tartaria.Integration
-  m_AssemblyName: Tartaria.Integration
 --- !u!1 &272748660
 GameObject:
   m_ObjectHideFlags: 0
@@ -1249,21 +1234,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!115 &831608850
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: Moon1HeroBuildingSpawner
-  m_Namespace: Tartaria.Integration
-  m_AssemblyName: Tartaria.Integration
 --- !u!1 &874797506
 GameObject:
   m_ObjectHideFlags: 0
@@ -2976,10 +2946,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1505120408}
-  - component: {fileID: 1505120407}
-  - component: {fileID: 1505120405}
-  - component: {fileID: 1505120403}
-  - component: {fileID: 1505120398}
   m_Layer: 0
   m_Name: Moon1_Systems
   m_TagString: Untagged
@@ -2987,79 +2953,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1505120398
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1505120383}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1693639792}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.Moon1NPCSpawner
-  npcPrefab: {fileID: 0}
-  excavationWorkers: 5
-  scholars: 3
-  merchants: 2
-  miloSpawnPoint: {x: -40, y: 0, z: 20}
-  cathedralEntrance: {x: 0, y: 0, z: 72}
-  marketArea: {x: 30, y: 0, z: 30}
-  patrolRadius: 15
-  waypointsPerRoute: 4
---- !u!114 &1505120403
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1505120383}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 255430906}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.Moon1AmbientCreatures
-  isActive: 1
---- !u!114 &1505120405
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1505120383}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1523568284}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.Moon1MaterialSetup
-  isActive: 1
---- !u!114 &1505120407
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1505120383}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 831608850}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.Moon1HeroBuildingSpawner
-  cathedralPosition: {x: 0, y: 0, z: 80}
-  fountainPosition: {x: -60, y: 0, z: 40}
-  spirePosition: {x: 60, y: 0, z: 40}
-  largePillarRocks: []
-  foundationRocks: []
-  domeRocks: []
-  decorativeRocks: []
-  marbleMaterial: {fileID: 0}
-  goldTrimMaterial: {fileID: 0}
-  crystalMaterial: {fileID: 0}
-  waterMaterial: {fileID: 0}
-  cathedralDefinition: {fileID: 0}
-  fountainDefinition: {fileID: 0}
-  spireDefinition: {fileID: 0}
 --- !u!4 &1505120408
 Transform:
   m_ObjectHideFlags: 0
@@ -3075,21 +2968,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!115 &1523568284
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: Moon1MaterialSetup
-  m_Namespace: Tartaria.Integration
-  m_AssemblyName: Tartaria.Integration
 --- !u!1001 &1547293303
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3361,21 +3239,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1647019713}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
---- !u!115 &1693639792
-MonoScript:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: 
-  serializedVersion: 7
-  m_DefaultReferences: {}
-  m_Icon: {fileID: 0}
-  m_Type: 0
-  m_ExecutionOrder: 0
-  m_ClassName: Moon1NPCSpawner
-  m_Namespace: Tartaria.Integration
-  m_AssemblyName: Tartaria.Integration
 --- !u!1001 &1727835753
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4279,3 +4142,4 @@ SceneRoots:
   - {fileID: 1505120408}
   - {fileID: 1324087096}
   - {fileID: 1345521578}
+
