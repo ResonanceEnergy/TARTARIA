@@ -177,6 +177,19 @@ namespace Tartaria.UI
             ServiceLocator.Quest?.ProgressByType(QuestObjectiveType.HiddenDiscovery, "ley_line_first");
         }
 
+        // H2.L7 save/load integration — Moon1SaveCoordinator reads IsActivated on save +
+        // calls RestoreActivatedFromSave on load. (Re-applied after L6 partial-checkout overwrote them.)
+        public bool IsActivated => _activated;
+        public void RestoreActivatedFromSave(bool wasActivated)
+        {
+            if (wasActivated && !_activated)
+            {
+                _activated = true;
+                // No need to re-fire quest progression — quest state is restored by QuestManager separately.
+                Debug.Log("[LeyLineMap] Restored activated=true from save (skipping quest progression replay).");
+            }
+        }
+
         void AddOrUpdateBuildingDot(string id, Vector3 worldPos)
         {
             var dotGO = new GameObject("Building_" + id);
