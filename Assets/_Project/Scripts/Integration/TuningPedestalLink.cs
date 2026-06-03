@@ -88,16 +88,65 @@ namespace Tartaria.Integration
             {
                 if (b.BuildingId == buildingId)
                 {
-                    var mini = b.GetComponentInChildren<TuningMiniGame>(true);
-                    if (mini == null) mini = b.gameObject.AddComponent<TuningMiniGame>();
-                    mini.StartTuning(config);
+                    DispatchToBuildingVariant(b, config);
                     return;
                 }
             }
-            // Fallback: spawn a standalone TuningMiniGame anchored on this pedestal
-            var solo = gameObject.AddComponent<TuningMiniGame>();
-            solo.StartTuning(config);
+            // Fallback: spawn a standalone variant component anchored on this pedestal.
+            DispatchSoloVariant(config);
             Invoke(nameof(ReleaseBusy), 30f);
+        }
+
+        /// <summary>
+        /// Pick the right variant component on the target building and dispatch the config.
+        /// Matches InteractableBuilding.DispatchTuningByVariant routing per docs/15 §9.
+        /// </summary>
+        void DispatchToBuildingVariant(InteractableBuilding b, TuningPuzzleConfig config)
+        {
+            switch (config.variant)
+            {
+                case TuningVariant.WaveformTrace:
+                {
+                    var v = b.GetComponentInChildren<TuningVariantB_Waveform>(true);
+                    if (v == null) v = b.gameObject.AddComponent<TuningVariantB_Waveform>();
+                    v.StartTuning(config);
+                    return;
+                }
+                case TuningVariant.HarmonicPattern:
+                {
+                    var v = b.GetComponentInChildren<TuningVariantC_Pattern>(true);
+                    if (v == null) v = b.gameObject.AddComponent<TuningVariantC_Pattern>();
+                    v.StartTuning(config);
+                    return;
+                }
+                default:
+                {
+                    var v = b.GetComponentInChildren<TuningMiniGame>(true);
+                    if (v == null) v = b.gameObject.AddComponent<TuningMiniGame>();
+                    v.StartTuning(config);
+                    return;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fallback when no InteractableBuilding matched buildingId — spawn standalone
+        /// variant component on this pedestal so the player still gets a playable mini-game.
+        /// </summary>
+        void DispatchSoloVariant(TuningPuzzleConfig config)
+        {
+            switch (config.variant)
+            {
+                case TuningVariant.WaveformTrace:
+                    gameObject.AddComponent<TuningVariantB_Waveform>().StartTuning(config);
+                    break;
+                case TuningVariant.HarmonicPattern:
+                    gameObject.AddComponent<TuningVariantC_Pattern>().StartTuning(config);
+                    break;
+                default:
+                    gameObject.AddComponent<TuningMiniGame>().StartTuning(config);
+                    break;
+            }
         }
 
         void ReleaseBusy() { _busy = false; }

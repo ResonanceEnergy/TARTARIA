@@ -65,6 +65,28 @@ namespace Tartaria.Gameplay
             Debug.Log("[TuningVariantC] Started (harmonic pattern).");
         }
 
+        /// <summary>
+        /// Config-driven entry point matching <see cref="TuningMiniGame.StartTuning(TuningPuzzleConfig)"/>
+        /// so InteractableBuilding and TuningPedestalLink can dispatch to Variant C by config alone.
+        /// Maps docs/15 §9 per-node fields:
+        ///   timeLimitSeconds → duration
+        ///   difficultySpeed (0.30/0.55/0.85) → beatInterval (1.8s slow → 0.9s fast)
+        /// tolerancePercent is unused — Variant C accuracy comes from ±ms timing windows, not slider precision.
+        /// </summary>
+        public void StartTuning(TuningPuzzleConfig config)
+        {
+            if (config != null)
+            {
+                duration     = config.timeLimitSeconds > 0f ? config.timeLimitSeconds : duration;
+                float diff   = Mathf.Clamp01(config.difficultySpeed);
+                beatInterval = Mathf.Lerp(1.8f, 0.9f, diff);
+                // Re-fit the beat count so beats span (duration - firstBeatDelay) cleanly.
+                int fittedBeats = Mathf.Max(3, Mathf.FloorToInt((duration - firstBeatDelay) / Mathf.Max(0.4f, beatInterval)));
+                beatCount = Mathf.Min(8, fittedBeats);
+            }
+            StartTuning(transform.position, null);
+        }
+
         void EnsureUI()
         {
             if (_panel != null) return;
