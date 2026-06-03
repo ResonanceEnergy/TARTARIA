@@ -63,6 +63,29 @@ namespace Tartaria.Gameplay
             Debug.Log("[TuningVariantB] Started (waveform trace).");
         }
 
+        /// <summary>
+        /// Config-driven entry point matching <see cref="TuningMiniGame.StartTuning(TuningPuzzleConfig)"/>
+        /// so InteractableBuilding and TuningPedestalLink can dispatch to Variant B by config alone.
+        /// Maps docs/15 §9 per-node fields:
+        ///   timeLimitSeconds → duration
+        ///   tolerancePercent → tolerance (scaled ×2.5 to match waveform half-height fraction)
+        ///   difficultySpeed (0.30/0.55/0.85)  → scrollSpeed (1.0–2.0) + cursorSpeed (1.2 → 0.7)
+        /// </summary>
+        public void StartTuning(TuningPuzzleConfig config)
+        {
+            if (config != null)
+            {
+                duration       = config.timeLimitSeconds > 0f ? config.timeLimitSeconds : duration;
+                // tolerancePercent is the docs/15 §9 "±5%" fraction; waveform half-height tolerance
+                // needs a wider window — scale ×2.5 so the player has a realistic margin.
+                tolerance      = Mathf.Clamp(config.tolerancePercent * 2.5f, 0.04f, 0.30f);
+                float diff     = Mathf.Clamp01(config.difficultySpeed);
+                scrollSpeed    = Mathf.Lerp(1.0f, 2.0f, diff);
+                cursorSpeed    = Mathf.Lerp(1.2f, 0.7f, diff);
+            }
+            StartTuning(transform.position, null);
+        }
+
         void EnsureUI()
         {
             if (_panel != null) return;

@@ -41,6 +41,10 @@ namespace Tartaria.Integration
         float[] _nodeAccuracies = new float[3];
         bool _isDiscovered;
         TuningMiniGame _tuningController;
+        // Variant routing per docs/15 §9 — lazy-add Variant A/B/C on first use, hook handlers once.
+        Tartaria.Gameplay.TuningVariantB_Waveform _variantB;
+        Tartaria.Gameplay.TuningVariantC_Pattern _variantC;
+        bool _variantBHooked, _variantCHooked;
         static readonly int DissolveProgressId = Shader.PropertyToID("_DissolveProgress");
         static readonly int BaseColorId = Shader.PropertyToID("_BaseColor");
         static readonly int ColorId = Shader.PropertyToID("_Color");
@@ -109,6 +113,18 @@ namespace Tartaria.Integration
             {
                 _tuningController.OnTuningComplete -= OnTuningComplete;
                 _tuningController.OnTuningFailed -= OnTuningFailed;
+            }
+            if (_variantB != null && _variantBHooked)
+            {
+                _variantB.OnTuningComplete -= OnTuningComplete;
+                _variantB.OnTuningFailed -= OnTuningFailed;
+                _variantBHooked = false;
+            }
+            if (_variantC != null && _variantCHooked)
+            {
+                _variantC.OnTuningComplete -= OnTuningComplete;
+                _variantC.OnTuningFailed -= OnTuningFailed;
+                _variantCHooked = false;
             }
             if (_excavationHooked && ExcavationSystem.Instance != null)
             {
@@ -378,14 +394,61 @@ namespace Tartaria.Integration
                 // Random picks are seeded by buildingId so the same
                 // (buildingId, nodeIndex) ALWAYS yields the same variant
                 // across saves/reloads. NO round-robin fallback.
-                _tuningController.StartTuning(BuildSpecNodeConfig(_nodesCompleted));
+                DispatchTuningByVariant(BuildSpecNodeConfig(_nodesCompleted));
             }
             else
             {
-                _tuningController.StartTuning(definition.nodePuzzles[_nodesCompleted]);
+                DispatchTuningByVariant(definition.nodePuzzles[_nodesCompleted]);
             }
 
             _state = BuildingRestorationState.Tuning;
+        }
+
+        /// <summary>
+        /// Route the per-node TuningPuzzleConfig to the correct variant component
+        /// per docs/15_MVP_BUILD_SPEC.md §9. Variant A (FrequencySlider) uses the
+        /// existing _tuningController; Variant B/C are lazy-instantiated as siblings
+        /// the first time each is requested. Handler subscriptions are guarded by
+        /// hook-once bools so re-dispatch never double-subscribes.
+        /// </summary>
+        void DispatchTuningByVariant(TuningPuzzleConfig config)
+        {
+            if (config == null)
+            {
+                _tuningController.StartTuning(null);
+                return;
+            }
+
+            switch (config.variant)
+            {
+                case Tartaria.Gameplay.TuningVariant.WaveformTrace:
+                    if (_variantB == null)
+                        _variantB = GetComponent<Tartaria.Gameplay.TuningVariantB_Waveform>()
+                                    ?? gameObject.AddComponent<Tartaria.Gameplay.TuningVariantB_Waveform>();
+                    if (!_variantBHooked)
+                    {
+                        _variantB.OnTuningComplete += OnTuningComplete;
+                        _variantB.OnTuningFailed   += OnTuningFailed;
+                        _variantBHooked = true;
+                    }
+                    _variantB.StartTuning(config);
+                    break;
+                case Tartaria.Gameplay.TuningVariant.HarmonicPattern:
+                    if (_variantC == null)
+                        _variantC = GetComponent<Tartaria.Gameplay.TuningVariantC_Pattern>()
+                                    ?? gameObject.AddComponent<Tartaria.Gameplay.TuningVariantC_Pattern>();
+                    if (!_variantCHooked)
+                    {
+                        _variantC.OnTuningComplete += OnTuningComplete;
+                        _variantC.OnTuningFailed   += OnTuningFailed;
+                        _variantCHooked = true;
+                    }
+                    _variantC.StartTuning(config);
+                    break;
+                default: // FrequencySlider (Variant A) — existing controller already hooked in Start()
+                    _tuningController.StartTuning(config);
+                    break;
+            }
         }
 
         /// <summary>
