@@ -118,6 +118,16 @@ namespace Tartaria.Input
 
         void EnsureSafetyFloor()
         {
+            // H.L1 NRE-hunt: defensive guard. _controller is GetComponent<CharacterController>()
+            // in Awake; if Player.prefab ever ships without one (regression), the unconditional
+            // _controller.enabled access here was an NRE source on Play start. Log and bail.
+            if (_controller == null)
+            {
+                Debug.LogError($"[PlayerInputHandler] EnsureSafetyFloor: CharacterController missing on '{name}'. " +
+                               "Player.prefab must include CharacterController (Sprint 11 L6 / P4.L2 bake). Skipping safety-floor raycast.");
+                _groundHeight = 0f;
+                return;
+            }
             int groundMask = GetGroundMask();
             _controller.enabled = false;
             Vector3 origin = new Vector3(transform.position.x, 100f, transform.position.z);
