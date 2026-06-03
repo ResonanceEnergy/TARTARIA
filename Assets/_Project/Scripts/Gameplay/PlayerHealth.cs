@@ -1,5 +1,6 @@
 using UnityEngine;
 using Tartaria.Input;
+using Tartaria.Core;
 
 namespace Tartaria.Gameplay
 {
@@ -45,6 +46,9 @@ namespace Tartaria.Gameplay
             _spawnPosition = transform.position;
             _spawnRotation = transform.rotation;
             _spawnRecorded = true;
+            // P2.L2: prime HUD with initial HP so the bar isn't stuck at 0 before first damage.
+            // GameEvents.cs:143, 561 — Action<float,float>(current, max).
+            GameEvents.RaisePlayerHealthChanged((float)_currentHealth, (float)maxHealth);
         }
 
         /// <summary>Day-14: reset checkpoint to current position (call from Checkpoint trigger).</summary>
@@ -124,6 +128,8 @@ namespace Tartaria.Gameplay
             }
 
             OnHealthChanged?.Invoke(_currentHealth, maxHealth);
+            // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561 — Action<float,float> current,max).
+            GameEvents.RaisePlayerHealthChanged((float)_currentHealth, (float)maxHealth);
             Debug.Log($"[PlayerHealth] Took {amount} damage, HP={_currentHealth}/{maxHealth}");
         }
 
@@ -133,6 +139,8 @@ namespace Tartaria.Gameplay
 
             _currentHealth = Mathf.Min(_currentHealth + amount, maxHealth);
             OnHealthChanged?.Invoke(_currentHealth, maxHealth);
+            // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561).
+            GameEvents.RaisePlayerHealthChanged((float)_currentHealth, (float)maxHealth);
         }
 
         void Die()
@@ -161,6 +169,8 @@ namespace Tartaria.Gameplay
                 if (cc != null) cc.enabled = true;
             }
             OnHealthChanged?.Invoke(_currentHealth, maxHealth);
+            // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561) — refill on respawn.
+            GameEvents.RaisePlayerHealthChanged((float)_currentHealth, (float)maxHealth);
             Debug.Log($"[PlayerHealth] Player respawned at {_spawnPosition}");
         }
     }
