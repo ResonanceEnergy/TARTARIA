@@ -48,6 +48,7 @@ namespace Tartaria.Editor
             new Placement("TownHall",         "Architecture", new Vector3(  0f, 0f, 50f), face: false),
             new Placement("VillageInn",       "Architecture", new Vector3(-25f, 0f, 35f)),
             new Placement("VillageBakery",    "Architecture", new Vector3( 25f, 0f, 35f)),
+            new Placement("Apothecary",       "Architecture", new Vector3(-40f, 0f, 45f)),
             new Placement("VillageWell",      "Architecture", new Vector3(  0f, 0f, 40f), face: false),
             new Placement("VillageMill",      "Architecture", new Vector3(-30f, 0f, 65f)),
             new Placement("VillageSmithy",    "Architecture", new Vector3( 30f, 0f, 65f)),
