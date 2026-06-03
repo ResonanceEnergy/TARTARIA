@@ -45,21 +45,34 @@ Treat the spec's "vertical slice" sections as the **minimum** for Moon 1. Real M
 
 When all of that is real (the agent can grep + run a play-through to demonstrate it), Moon 1 is 100%. Then Moon 2 starts.
 
-### Where Moon 1 actually stands at HEAD `~519d0c52` (honest punch list)
+### Where Moon 1 actually stands at HEAD `~cc5b0a09` (honest punch list)
 
-| # | Gap | Status @ 2026-06-03 | Where / SHA |
+**Round 1 + Round 2 (HAMMER) closed in this session — 13 lanes shipped, 6 deferred to manual Unity:**
+
+| # | Gap | Status | SHA |
 |---|---|---|---|
-| 1 | `Prefabs/Moon1/AnastasiaRocker.prefab` missing — Editor menu exists but never fired | **DEFERRED** — MCP bridge transport unstable during long bakes | Run `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` in Unity manually |
-| 2 | Hero buildings still composed of 60-88 `Detail_*` primitive clusters | **DEFERRED** — same MCP issue | Run `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` |
-| 3 | 347 flat `Prefabs/Moon1/Blender/*.prefab` need migration into category subfolders | ✅ **SHIPPED C.L1 `69f99cb1`** — Architecture 111 / Audio 23 / NPCs 33 / Plates 8 / Props 162 / VFX 10 = 347. 6 path consumers updated with array-walk legacy fallback. Zero ambiguous. |
-| 4 | 11 remaining silent-fail empty `catch {}` blocks | ✅ **SHIPPED C.L2 `290e74a0`** — IntegrationBridge.cs ×4, SteamCloudBridge.cs ×5, SaveManager.cs ×1, OneClickBuild.cs ×1. Verification grep returns 0. |
-| 5 | `RuntimeHUDBuilder.cs` still spawns 64 `new GameObject` at runtime | DEFERRED — surgical event wiring shipped MS.L1; full prefab bake awaits manual Unity session | H.L2 deferral note |
-| 6 | `RuntimeSpawnerInsurance.cs` dead-weight file | ✅ **SHIPPED `9739a91d`** — file + .meta deleted, FullStartupDiagnostics.cs:238 caller message updated |
-| 7 | Tuning Variant routing — TuningPedestalLink + InteractableBuilding hardcoded TuningMiniGame regardless of `assignedVariant` | ✅ **SHIPPED C.L5 `519d0c52`** — DispatchTuningByVariant + DispatchToBuildingVariant switch on config.variant; Variant B/C lazy-add; OnTuningComplete/Failed hooked once per component |
-| 8 | Quest tree end-to-end (Yarn → tracker → completion banner) | ✅ **SHIPPED C.L4 `2c8c9c96`** — 5 Moon 1 quests registered (echohaven_awakening main + anastasia_lullaby + giant_skeleton_key + ley_line_map_discovery + lirael_calendar_echo); EchohavenContentSpawner activates side quests at startup |
-| 9 | Variant B (Waveform Trace) status — audit if real or stub | ✅ **AUDITED C.L3 `b44df79d`** — 237 LOC real impl, ITuningVariant complete, just needed routing fix (now done in C.L5). See `docs/audits/TUNING_VARIANT_B_STATUS_2026-06-03.md` |
-| 10 | Real play-through Moon 1 end-to-end | **PENDING** — needs Unity Play session with controller |
-| 11 | 1 ProbeVolume URP shutdown NRE on editor exit | DEFERRED to URP vendor patch | rendering |
+| 3 | 347 flat Blender prefabs → category subfolders | ✅ C.L1 (zero ambiguous) | `69f99cb1` |
+| 4 | 11 silent fails outside top-5 | ✅ C.L2 (count→0) | `290e74a0` |
+| 6 | RuntimeSpawnerInsurance.cs dead file | ✅ deleted | `9739a91d` |
+| 7 | Variant routing — Tuning A/B/C dispatch by config.variant | ✅ C.L5 | `519d0c52` |
+| 8 | Quest tree end-to-end (5 Moon 1 quests) | ✅ C.L4 | `2c8c9c96` |
+| 9 | Variant B real-or-stub audit (real, 237 LOC) | ✅ C.L3 | `b44df79d` |
+| A | 9 village buildings + props vs docs/15 (Apothecary added; 31 props) | ✅ H2.L1 | `263235f2` |
+| B | Yarn dialogue tree (5 Moon 1 NPCs; Bob.yarn + trigger added) | ✅ H2.L2 | `f78d1ba9` |
+| C | Combat — ResetScout.Die parity w/ MudGolem (EnemyKilled+loot) | ✅ H2.L3 | `b61df552` |
+| D | Audio matrix — covered by zone/tuning/restoration shipped pre-session + H2.L5 cinematic cue | ✅ | (rolled into L5) |
+| E | 17th-hour beat — skeleton hum + first prophecy fragment unlock | ✅ H2.L5 | `c9607ed5` |
+| F | Ley line mini-map post-restoration + duplicate archived | ✅ H2.L6 (re-applied manually — original branch was partial-checkout that nuked 19k root files in first merge attempt; reset to dda7d460 + cherry-picked actual changes) | `cc5b0a09` |
+| G | Save/load round-trip — Moon1SaveCoordinator.cs (277 LOC) bridges all systems | ✅ H2.L7 | `81de1088` |
+
+**Deferred to manual Unity session:**
+| # | Gap | Where |
+|---|---|---|
+| 1 | AnastasiaRocker.prefab bake | `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` |
+| 2 | Hero buildings — Detail_* primitive cluster mesh replace | `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` |
+| 5 | RuntimeHUDBuilder.cs prefab bake (64 new GameObject at runtime) | H.L2 deferral, surgical event wiring shipped MS.L1 |
+| 10 | Real Moon 1 end-to-end play-through with controller | Hit Play in Unity |
+| 11 | 1 ProbeVolume URP shutdown NRE on editor exit | URP vendor patch |
 | 12 | 4 Cathedral kit obsolete API warnings + Mecanim param spam | DEFERRED non-blocking warnings | warnings |
 
 ### Carry-forward from this session (mechanics that are useful)
@@ -68,12 +81,16 @@ When all of that is real (the agent can grep + run a play-through to demonstrate
 - **`docs/PREFAB_LAYOUT.md`** — canonical prefab convention + 347-prefab migration runbook
 - **Worktree mandate + API_CONTRACT + NO-DEBT + NO-STUBS** still in force from earlier mandates below
 
+### Worktree lesson learned (re-add to WORKTREE_MANDATE)
+
+H2.L6 agent's worktree at `C:\dev\_wt_c_leyline_map` was a **partial checkout** — only `LeyLineMap.cs` was materialized; the rest of the 19k-file repo tree appeared "deleted" in the agent's commit. When merged, those deletions propagated to `feature/consolidate-moon-architecture` and nuked everything at root (CLAUDE.md, README.md, STATUS.md, .gitignore, Assets/.../many subdirs). **Future:** before agent commits, confirm worktree has full file tree (`git status --short` should show normal additions/modifications only, NOT 100+ deletes). Always `--force-with-lease` push after recovery resets, not vanilla force.
+
 ### Next session lane priorities — pure CONTENT BUILD, no audits
 
 1. Fire the 2 deferred bake menus from inside Unity (Anastasia Rocker, Hero Building Mesh Replace) — MCP transport unstable for long bakes, manual Unity GUI invocation recommended
-2. Real play-through Moon 1 end-to-end — confirm 5 quest registrations populate tracker, 17th-hour beat fires, giant key #1 collectible spawns, ley line map appears post-restoration
+2. Real play-through Moon 1 end-to-end — confirm 5 quest registrations populate tracker, 17th-hour beat fires (skeleton hum + prophecy banner), giant key #1 collectible spawns, ley line map appears post-restoration, F5 save + F9 load round-trips clean via Moon1SaveCoordinator
 3. Verify the 3 hero buildings actually trigger Variant B (Waveform) on node 2 and Variant C (Pattern) on node 3 per the deterministic-by-buildingId pool picker
-4. Build the missing village buildings + props (any gaps vs `docs/15_MVP_BUILD_SPEC.md`) — re-verify post Prefab Hygiene + C.L1 migration
+4. Verify Bob innkeeper dialogue triggers + 5 NPC chains all reach their nodes
 5. **Do NOT touch any release/build/audit/itch/win64 file. Do NOT run any build pipeline. Do NOT produce a "verdict".**
 
 ---
