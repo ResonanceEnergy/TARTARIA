@@ -20,9 +20,9 @@
 // .meta), so any scene references to these prefabs remain intact.
 //
 // Files written:
-//   Assets/_Project/Prefabs/Buildings/Echohaven_CrystalSpire.prefab
-//   Assets/_Project/Prefabs/Buildings/Echohaven_StarDome.prefab
-//   Assets/_Project/Prefabs/Buildings/Echohaven_HarmonicFountain.prefab
+//   Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_CrystalSpire.prefab
+//   Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_StarDome.prefab
+//   Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_HarmonicFountain.prefab
 //
 // Menu: Tartaria/8 Fix/Convert Hero Prefabs to Text Mode (priority 850)
 //
@@ -41,9 +41,9 @@ namespace TartariaEditor.Sprint11
 {
     public static class Moon1HeroPrefabsToText
     {
-        const string CrystalSpirePath     = "Assets/_Project/Prefabs/Buildings/Echohaven_CrystalSpire.prefab";
-        const string StarDomePath         = "Assets/_Project/Prefabs/Buildings/Echohaven_StarDome.prefab";
-        const string HarmonicFountainPath = "Assets/_Project/Prefabs/Buildings/Echohaven_HarmonicFountain.prefab";
+        const string CrystalSpirePath     = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_CrystalSpire.prefab";
+        const string StarDomePath         = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_StarDome.prefab";
+        const string HarmonicFountainPath = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_HarmonicFountain.prefab";
 
         static readonly (string path, string rootName)[] Targets = new (string, string)[]
         {
@@ -167,8 +167,4 @@ namespace TartariaEditor.Sprint11
             }
             catch
             {
-                return false;
-            }
-        }
-    }
-}
+                return fal

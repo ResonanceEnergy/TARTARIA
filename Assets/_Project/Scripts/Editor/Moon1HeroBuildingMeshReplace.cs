@@ -47,9 +47,9 @@ namespace Tartaria.Editor
     public static class Moon1HeroBuildingMeshReplace
     {
         // ── Prefab paths ─────────────────────────────────────────────────────
-        const string CrystalSpirePath    = "Assets/_Project/Prefabs/Buildings/Echohaven_CrystalSpire.prefab";
-        const string StarDomePath        = "Assets/_Project/Prefabs/Buildings/Echohaven_StarDome.prefab";
-        const string HarmonicFountainPath = "Assets/_Project/Prefabs/Buildings/Echohaven_HarmonicFountain.prefab";
+        const string CrystalSpirePath    = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_CrystalSpire.prefab";
+        const string StarDomePath        = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_StarDome.prefab";
+        const string HarmonicFountainPath = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_HarmonicFountain.prefab";
 
         const string KitRoot     = "Assets/_Project/Prefabs/Moon1/Cathedral/";
         const string BlenderRoot = "Assets/_Project/Prefabs/Moon1/Blender/";
@@ -360,7 +360,4 @@ namespace Tartaria.Editor
             inst.transform.localRotation = localRot;
             inst.transform.localScale = localScale;
             counter++;
-        }
-    }
-}
-#endif
+       

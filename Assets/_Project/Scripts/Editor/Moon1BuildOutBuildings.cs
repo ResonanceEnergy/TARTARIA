@@ -27,9 +27,9 @@ namespace Tartaria.Editor
     /// </summary>
     public static class Moon1BuildOutBuildings
     {
-        const string CRYSTAL_SPIRE_PREFAB = "Assets/_Project/Prefabs/Buildings/Echohaven_CrystalSpire.prefab";
-        const string STAR_DOME_PREFAB    = "Assets/_Project/Prefabs/Buildings/Echohaven_StarDome.prefab";
-        const string HARMONIC_FOUNTAIN_PREFAB = "Assets/_Project/Prefabs/Buildings/Echohaven_HarmonicFountain.prefab";
+        const string CRYSTAL_SPIRE_PREFAB = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_CrystalSpire.prefab";
+        const string STAR_DOME_PREFAB    = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_StarDome.prefab";
+        const string HARMONIC_FOUNTAIN_PREFAB = "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_HarmonicFountain.prefab";
 
         const string MUD_MAT_PATH   = "Assets/_Project/Materials/M_Mud_Fresh.mat";
         const string STONE_MAT_PATH = "Assets/_Project/Materials/M_Building_Stone.mat";
@@ -237,7 +237,4 @@ namespace Tartaria.Editor
         {
             var p = so.FindProperty(name);
             if (p != null) p.objectReferenceValue = val;
-        }
-    }
-}
-#endif
+       
