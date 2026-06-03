@@ -196,6 +196,19 @@ If a swarm completes and the only output is markdown files, you've failed. Insis
 - `Assets/_Project/Scripts/Editor/EchohavenSceneAudit.cs` — Unity menu: `Tartaria → Scene Audit: Echohaven`. Editor-mode audit that checks the scene for blockers (PlayerSpawner, NavMesh, building presence, prefab refs, missing scripts) WITHOUT entering Play mode. Pair with `scripts/dev/audit-echohaven-scene.ps1` for batchmode invocation that exits 1 on blocker.
 - Other diagnostic tools: `BatchReadinessValidator.cs`, `DiagnoseRuntime.cs`, `CleanMissingScripts.cs`, `FixEchohavenMissingScripts.cs`.
 
+#### `Tartaria/0 ★ MASTER/` — canonical bootstrap (Hammer Lane 6, 2026-06-02, Sprint 11 L8 `50ff78ea`)
+
+The `Tartaria/0 ★ MASTER/` submenu previously had three overlapping "run-everything" entries. They were consolidated; the canonical scene bootstrap is now:
+
+- **`Assets/_Project/Scripts/Editor/Moon1MasterBootstrap.cs`** — Unity menu: `Tartaria → 0 ★ MASTER → Bootstrap All Moon 1 Systems` (priority 30). Idempotent. Creates / reuses the `Moon1_Systems` GameObject in the active scene, attaches the Moon1 Integration MonoBehaviours (TartarianHourCycle, Moon1NarrativeBeats, Moon1DialogueBindings, EchohavenContentSpawner, AnastasiaController, LiraelController, EchohavenProgressionSystem, ZoneController, etc.), then auto-chains `Moon1WireSpawnerPrefabs.RunAll()` so prefab refs are wired in one click. This is what you fire before Play.
+
+Superseded (menu hidden, run logic preserved for direct invocation):
+
+- `Moon1Tier1Master.cs` — was `Tier 1 — FBX + Terrain + Splats + Lighting`. Asset-pipeline sequencer, not a scene bootstrap. Call `Moon1Tier1Master.Run()` directly if you need it.
+- `Moon1AllTiersMaster.cs` — was `Run ALL Tiers (Everything)`. Asset-pipeline + VFX/Audio superset, also fired the now-hidden Tier 1 menu. Call `Moon1AllTiersMaster.Run()` directly if needed.
+
+See `docs/agents/MASTER_BOOTSTRAP_CANONICAL.md` for the consolidation rationale.
+
 ---
 
 ## Common tasks and how to do them

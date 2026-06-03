@@ -20,7 +20,11 @@ namespace Tartaria.Editor
     /// </summary>
     public static class Moon1AllTiersMaster
     {
-        [MenuItem("Tartaria/0 ★ MASTER/Run ALL Tiers (Everything)", priority = 10)]
+        // SUPERSEDED by Moon1MasterBootstrap per Sprint 11 L8 50ff78ea (Hammer Lane 6 consolidation 2026-06-02).
+        // "Run ALL Tiers" is an asset-pipeline + VFX/Audio gen sequencer, not a scene bootstrap. It also fired the
+        // superseded "Tier 1 — FBX + Terrain + Splats + Lighting" menu (now hidden), so this menu would silently
+        // fail its first step. Run logic preserved; menu hidden. Re-fire via Moon1AllTiersMaster.Run() if needed.
+        // [MenuItem("Tartaria/0 ★ MASTER/Run ALL Tiers (Everything)", priority = 10)]
         public static void Run()
         {
             if (!EditorUtility.DisplayDialog("Moon 1 — Run ALL Tiers",
