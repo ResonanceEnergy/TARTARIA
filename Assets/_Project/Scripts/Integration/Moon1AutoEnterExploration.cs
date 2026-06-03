@@ -90,14 +90,19 @@ namespace Tartaria.Integration
                 cam.SendMessage("SetFollowTarget", player.transform, SendMessageOptions.DontRequireReceiver);
                 cam.SendMessage("SetPlayer", player.transform, SendMessageOptions.DontRequireReceiver);
 
-                // Fallback: if nothing exists on the camera to follow, position the camera behind
-                // the player so it's at least pointing at them at startup. This makes the player
-                // VISIBLE even if a real follow controller isn't present.
+                // Fallback: if nothing exists on the camera to follow, attach a persistent
+                // Moon1RuntimeCameraFollow component so it tracks the player every LateUpdate.
+                // (Previously this was a one-shot snap that left the camera stranded the moment
+                // the player walked anywhere.)
                 if (cam.GetComponent("CameraController") == null && cam.GetComponent("CameraFollow") == null)
                 {
-                    cam.transform.position = player.transform.position + new Vector3(0f, 4f, -8f);
-                    cam.transform.LookAt(player.transform.position + Vector3.up * 1.5f);
-                    Debug.Log($"[Moon1AutoEnterExploration] No follow controller on Main Camera — positioned camera behind player at {cam.transform.position}.");
+                    var follow = cam.GetComponent<Moon1RuntimeCameraFollow>();
+                    if (follow == null) follow = cam.gameObject.AddComponent<Moon1RuntimeCameraFollow>();
+                    follow.target = player.transform;
+                    // Snap-on-attach so the camera doesn't lerp from wherever it was sitting.
+                    cam.transform.position = player.transform.position + follow.offset;
+                    cam.transform.LookAt(player.transform.position + follow.lookAtOffset);
+                    Debug.Log($"[Moon1AutoEnterExploration] No follow controller on Main Camera — attached Moon1RuntimeCameraFollow. cam={cam.transform.position} target={player.transform.position}");
                 }
                 else
                 {
