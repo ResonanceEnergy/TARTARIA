@@ -52,21 +52,47 @@ namespace Tartaria.Integration
         {
             if (_pickedUp) return;
 
-            bool added = false; // DISABLED: InventorySystem.Instance.Add(itemId, itemCount)
+            // Sprint 11 L1 fix (origin 1fb03541): real inventory add via Tartaria.Integration.InventorySystem.AddItem.
+            // Both PickupInteractable and InventorySystem live in Tartaria.Integration.asmdef — direct singleton call is in-asmdef, no boundary leak.
+            var inventory = InventorySystem.Instance;
+            if (inventory == null)
+            {
+                Debug.LogError($"[Pickup] InventorySystem.Instance is NULL — cannot pick up '{itemId}' x{itemCount} on '{gameObject.name}'. Inventory bootstrap missing from scene. Pickup left in world.");
+                return;
+            }
+
+            bool added;
+            try
+            {
+                added = inventory.AddItem(itemId, itemCount);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[Pickup] InventorySystem.AddItem threw {ex.GetType().Name}: {ex.Message} (itemId='{itemId}', count={itemCount}, pickup='{gameObject.name}'). Pickup left in world.");
+                return;
+            }
+
             if (added)
             {
                 _pickedUp = true;
                 Debug.Log($"[Pickup] {interactor.name} picked up {itemCount}x {itemId}");
 
                 // Play pickup SFX + VFX
-                Audio.AudioManager.Instance?.PlaySFX2D("pickup");
+                try
+                {
+                    Audio.AudioManager.Instance?.PlaySFX2D("pickup");
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogWarning($"[Pickup] AudioManager.PlaySFX2D threw {ex.GetType().Name}: {ex.Message} (clip='pickup'). Item already added, continuing.");
+                }
                 // TODO: Instantiate(pickupVFX, transform.position, Quaternion.identity);
 
                 Destroy(gameObject);
             }
             else
             {
-                Debug.LogWarning($"[Pickup] Inventory full, couldn't pick up {itemId}");
+                Debug.LogWarning($"[Pickup] Inventory full, couldn't pick up {itemCount}x {itemId} on '{gameObject.name}'. Pickup left in world for retry.");
                 // TODO: Show "Inventory Full" UI message
             }
         }
