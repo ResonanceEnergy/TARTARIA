@@ -4,6 +4,8 @@ using UnityEngine.SceneManagement;
 using UnityEditor.SceneManagement;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UnityEngine.AI;
 
 namespace Tartaria.Editor
 {
@@ -145,8 +147,7 @@ namespace Tartaria.Editor
             // Optional: Bake NavMesh
             if (bakeNavMesh)
             {
-                Debug.Log($"[AutoWiring] Baking NavMesh for Moon {moonNum}...");
-                // UnityEditor.AI.NavMeshBuilder.BuildNavMesh();
+                BakeMoonNavMesh(moonNum);
             }
             
             // Save scene
@@ -154,7 +155,94 @@ namespace Tartaria.Editor
             
             Debug.Log($"[AutoWiring] ✅ Moon {moonNum} wiring complete!");
         }
-        
+
+        // Sprint 12 #2 fix: NavMesh bake live
+        // Replaces obsolete UnityEditor.AI.NavMeshBuilder.BuildNavMesh() (Unity 6 removed legacy bake).
+        // Uses reflection on Unity.AI.Navigation.NavMeshSurface so this assembly doesn't need to
+        // reference the Navigation package (mirrors the pattern in FullStartupDiagnostics.cs:392).
+        void BakeMoonNavMesh(int moonNum)
+        {
+            Debug.Log($"[AutoWiring] Baking NavMesh for Moon {moonNum}...");
+
+            // Locate NavMeshSurface type via reflection (Unity.AI.Navigation package).
+            System.Type surfaceType = null;
+            foreach (var asm in System.AppDomain.CurrentDomain.GetAssemblies())
+            {
+                surfaceType = asm.GetType("Unity.AI.Navigation.NavMeshSurface");
+                if (surfaceType != null) break;
+            }
+            if (surfaceType == null)
+            {
+                Debug.LogError($"[AutoWiring] NavMesh bake FAILED for Moon {moonNum}: " +
+                    "Unity.AI.Navigation.NavMeshSurface type not found. " +
+                    "Install 'AI Navigation' package via Package Manager.");
+                return;
+            }
+
+            // Find an existing NavMeshSurface in the scene, or attach one to the scene root.
+            Component surface = null;
+            var allMonos = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+            foreach (var comp in allMonos)
+            {
+                if (comp != null && comp.GetType() == surfaceType)
+                {
+                    surface = comp;
+                    break;
+                }
+            }
+            if (surface == null)
+            {
+                // Prefer a project-specific root if present (matches NavMeshBaker.cs.disabled convention).
+                var root = GameObject.Find("EchohavenTerrain")
+                        ?? GameObject.Find($"Moon{moonNum}_Terrain")
+                        ?? GameObject.Find($"Moon{moonNum}_Root");
+                if (root == null)
+                {
+                    root = new GameObject($"Moon{moonNum}_NavMeshSurface");
+                    Debug.LogWarning($"[AutoWiring] No terrain root found for Moon {moonNum}; " +
+                        $"created '{root.name}' to host NavMeshSurface.");
+                }
+                surface = root.AddComponent(surfaceType);
+                Debug.Log($"[AutoWiring] Added NavMeshSurface to '{root.name}'.");
+            }
+
+            // Invoke surface.BuildNavMesh() via reflection.
+            var buildMethod = surfaceType.GetMethod("BuildNavMesh",
+                BindingFlags.Public | BindingFlags.Instance);
+            if (buildMethod == null)
+            {
+                Debug.LogError($"[AutoWiring] NavMesh bake FAILED for Moon {moonNum}: " +
+                    "NavMeshSurface.BuildNavMesh method not found via reflection.");
+                return;
+            }
+
+            try
+            {
+                buildMethod.Invoke(surface, null);
+            }
+            catch (System.Exception ex)
+            {
+                Debug.LogError($"[AutoWiring] NavMesh bake threw for Moon {moonNum}: " +
+                    $"{ex.GetType().Name}: {ex.Message}");
+                return;
+            }
+
+            // Verify the bake produced triangles.
+            var triangulation = NavMesh.CalculateTriangulation();
+            int triCount = triangulation.indices != null ? triangulation.indices.Length / 3 : 0;
+            int vertCount = triangulation.vertices != null ? triangulation.vertices.Length : 0;
+            if (triCount > 0)
+            {
+                Debug.Log($"[AutoWiring] ✅ NavMesh baked for Moon {moonNum}: " +
+                    $"{triCount} triangles, {vertCount} vertices on '{surface.gameObject.name}'.");
+            }
+            else
+            {
+                Debug.LogWarning($"[AutoWiring] NavMesh bake ran for Moon {moonNum} but produced 0 triangles. " +
+                    "Check that walkable geometry exists in the scene and has matching layers.");
+            }
+        }
+
         void WireEnemySpawners(int moonNum)
         {
             string componentName = $"Moon{moonNum}EnemySpawners";
