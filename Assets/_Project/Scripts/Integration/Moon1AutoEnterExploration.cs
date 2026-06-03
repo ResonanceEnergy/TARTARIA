@@ -81,7 +81,7 @@ namespace Tartaria.Integration
                 var player = GameObject.FindGameObjectWithTag("Player");
                 if (player == null) player = GameObject.Find("Player");
                 if (player == null) return;
-                var cam = Camera.main;
+                var cam = UnityEngine.Camera.main;
                 if (cam == null) return;
 
                 // Look for any "camera follow" style component on the camera and bind it via SendMessage.
