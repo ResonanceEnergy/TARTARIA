@@ -18,6 +18,20 @@ namespace Tartaria.UI
     ///
     /// Auto-spawned on scene load via [RuntimeInitializeOnLoadMethod] so no menu
     /// or scene wiring needed.
+    ///
+    /// CANONICAL — H2.L6 (2026-06-03) verified producer→event→subscriber→render→quest
+    /// chain end-to-end:
+    ///   producer: InteractableBuilding.cs:710 + CymaticWaterTuningMiniGame.cs:575 +
+    ///             CathedralRestorationSystem.cs:187 (etc.) call
+    ///             Core/GameEvents.cs:495 RaiseBuildingRestored → :499 OnBuildingRestoredTyped
+    ///   subscriber: this.Awake → HandleBuildingRestored → first-time-only Activate()
+    ///   render: BuildUI() (Awake) creates Canvas + ring + dots; thread fades in Update
+    ///   quest: Activate() → ServiceLocator.Quest.ProgressByType(HiddenDiscovery,
+    ///          "ley_line_first") completes moon1_ley_line_map_discovery (activated by
+    ///          EchohavenContentSpawner.cs:905, authored QuestDatabaseBuilder.cs:63)
+    /// The earlier `LeyLineMinimap.cs` (legacy fixed-northeast vein, no quest hook,
+    /// rendered top-left at sortingOrder 150 — would have conflicted onscreen) was
+    /// archived to UI/_archive_2026_06_01/LeyLineMinimap.cs.disabled.
     /// </summary>
     public class LeyLineMap : MonoBehaviour
     {
@@ -43,21 +57,6 @@ namespace Tartaria.UI
         private Transform _playerXform;
         private HashSet<string> _restoredIds = new();
         private bool _activated;
-
-        /// <summary>Public flag for save coordinator — whether the ley-line thread has been awakened.</summary>
-        public static bool IsActivated => _instance != null && _instance._activated;
-
-        /// <summary>
-        /// Save-round-trip restore: re-activate the map without requiring an OnBuildingRestored event
-        /// to fire again on F9. Idempotent.
-        /// </summary>
-        public static void RestoreActivatedFromSave()
-        {
-            if (_instance == null) return;
-            if (_instance._activated) return;
-            _instance._activated = true;
-            _instance.Activate();
-        }
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void BootstrapOnLoad()
