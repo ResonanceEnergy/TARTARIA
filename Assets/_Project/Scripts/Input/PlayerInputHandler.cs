@@ -139,11 +139,33 @@ namespace Tartaria.Input
         void OnEnable()
         {
             SetupInputActions();
+            // P2.L3: Death/Respawn input gate — disable input on death, re-enable on respawn.
+            GameEvents.OnPlayerDeath += HandlePlayerDeath;
+            GameEvents.OnPlayerRespawned += HandlePlayerRespawned;
         }
 
         void OnDisable()
         {
+            GameEvents.OnPlayerDeath -= HandlePlayerDeath;
+            GameEvents.OnPlayerRespawned -= HandlePlayerRespawned;
             CleanupInputActions();
+        }
+
+        // P2.L3: Death disables player input fully (movement, actions, fallbacks).
+        // Respawn re-enables and clears pending velocity so the player doesn't fall through floor.
+        bool _isDeadInputGated;
+        void HandlePlayerDeath()
+        {
+            _isDeadInputGated = true;
+            _moveInput = Vector2.zero;
+            _velocity = Vector3.zero;
+            _isSprinting = false;
+        }
+        void HandlePlayerRespawned()
+        {
+            _isDeadInputGated = false;
+            _moveInput = Vector2.zero;
+            _velocity = Vector3.zero;
         }
 
         void SetupInputActions()
@@ -213,18 +235,16 @@ namespace Tartaria.Input
 
         void Update()
         {
-            // EMERGENCY BYPASS: Always allow movement for debugging
-            // Original check: if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
+            // P4.L3: Restore Sprint 11 L4 IsPlaying gate. Player must NOT walk during
+            // Boot/Loading/Menu/Paused/Cinematic/Dialogue, and must NOT walk while dead.
+            // IsPlaying => Exploration || Tuning || Combat (see GameStateManager.cs:62-65).
+            if (_isDeadInputGated) return;
+            if (GameStateManager.Instance == null || !GameStateManager.Instance.IsPlaying) return;
 
             HandleMovementInput();
-
-            // Only do other stuff if actually playing
-            if (GameStateManager.Instance != null && GameStateManager.Instance.IsPlaying)
-            {
-                HandleContinuousActions();
-                HandleActionFallbacks();
-                HandleGiantAdvancedInput();
-            }
+            HandleContinuousActions();
+            HandleActionFallbacks();
+            HandleGiantAdvancedInput();
         }
 
         void HandleContinuousActions()
