@@ -32,6 +32,7 @@ namespace Tartaria.Editor
                 bool useHttpBefore   = EditorPrefs.GetBool(UseHttpKey, false);
                 string scopeBefore   = EditorPrefs.GetString(ScopeKey, "");
 
+                bool needFlip = !autoStartBefore || !useHttpBefore || scopeBefore != "local";
                 if (!autoStartBefore) EditorPrefs.SetBool(AutoStartKey, true);
                 if (!useHttpBefore)   EditorPrefs.SetBool(UseHttpKey, true);
                 if (scopeBefore != "local") EditorPrefs.SetString(ScopeKey, "local");
@@ -41,8 +42,26 @@ namespace Tartaria.Editor
                     $"AutoStartOnLoad: {autoStartBefore}->true. " +
                     $"UseHttpTransport: {useHttpBefore}->true. " +
                     $"Scope: '{scopeBefore}'->'local'. " +
-                    $"Next domain reload will trigger HttpAutoStartHandler to start the bridge " +
-                    $"on http://127.0.0.1:8080/mcp.");
+                    $"Need flip: {needFlip}.");
+
+                if (needFlip)
+                {
+                    // HttpAutoStartHandler already read the OLD pref value during this same
+                    // [InitializeOnLoad] pass. Request a script reload so it runs again with
+                    // AutoStartOnLoad=true and actually starts the HTTP bridge.
+                    EditorApplication.delayCall += () =>
+                    {
+                        try
+                        {
+                            Debug.Log("[Moon1MCPAutoStart] Requesting script reload so HttpAutoStartHandler picks up new prefs.");
+                            EditorUtility.RequestScriptReload();
+                        }
+                        catch (Exception ex2)
+                        {
+                            Debug.LogError($"[Moon1MCPAutoStart] RequestScriptReload failed: {ex2.GetType().Name}: {ex2.Message}");
+                        }
+                    };
+                }
             }
             catch (Exception ex)
             {
