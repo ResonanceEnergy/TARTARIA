@@ -1,11 +1,59 @@
 # TARTARIA — Current Status
 
 > **The single source of truth for "where are we right now?"**
-> Updated: 2026-06-02 (Sprint 10 close — Moon 1 ship-candidate cut). This doc supersedes prior status docs.
+> Updated: 2026-06-03 (NATRIX mandate — no release framing). This doc supersedes prior status docs.
 
 ---
 
-## ⚡ 2026-06-02 — MOON 1 SHIP CANDIDATE
+## 🛑 2026-06-03 — NATRIX MANDATE: NO RELEASE FRAMING
+
+**Everything below labelled "ship candidate", "release cut", "ship-gate", "butler", "ship verdict" etc. is HISTORICAL and SUPERSEDED.** Per NATRIX (verbatim 2026-06-03): *"remove win64 build from your mind we arent doing that until 13 moons are complete.. lets focus on moon 1 then once 100% complete we will move on to moon 2 .. no itch no win64.. stop short cutting being lazy and railraoding the ajenda"*
+
+### Current truth (HEAD `~48b1d621` on `feature/consolidate-moon-architecture`)
+
+**Moon 1 is NOT 100% complete. We are not shipping anything. We are building.**
+
+What landed today (35 lanes across Phase 0 → Hammer → MicroSprint → Prefab Hygiene):
+- Phase 0: LFS pulled, `Moon1_Systems` `!u!115` orphans excised from scene YAML
+- Phase 1 (5 lanes): Yarn snake_case map, Pickup→Inventory, PlayerAbility RS economy, HUD stopped lying, CymaticWater mini-game built (7 methods, 897 LOC)
+- Phase 2 (4 lanes): GameEvents `OnDayChanged/OnBrazierLit/OnBrazierRingComplete` declared + wired; HP/Aether publishers; Death/Respawn subscribers; boss UI publishers
+- Phase 4 (5 lanes): scene-baked PlayerSpawner+BuildingSpawner, Player.prefab full bake, gate restored, ResetScout real visual, stub editor files deleted
+- Phase 5 (4 lanes): NPC humanoid variants (Lirael/Anastasia/Cassian/Milo), Cathedral kit material GUID fix, hero buildings real meshes path unblocked, Player.prefab combined
+- Hammer (10 lanes): NRE diagnostic logger, EchohavenContentBaker, StarDome built variant, AnastasiaRocker prefab path, Master menu consolidation, top-5 silent fails fixed, hero binary→text, 38 catches→11
+- MicroSprint (5 lanes): HUD live event wiring, NavMesh bake live, DayNight boost restored, PlayerWeaponSwitcher Awake wired, AetherFieldSystem reads live player pos
+- Prefab Hygiene: Moon 2-13 buckets scaffolded, `Resources/` shadows killed, `Echohaven_*` moved into `Prefabs/Moon1/Buildings/`, `docs/PREFAB_LAYOUT.md` authored
+
+### What Moon 1 still needs to be 100% (per `docs/15_MVP_BUILD_SPEC.md` minimum)
+
+Per `CLAUDE.md` § "What Moon 1 100% actually means". Punch list at HEAD `~48b1d621`:
+
+1. **`Prefabs/Moon1/AnastasiaRocker.prefab`** — Editor bake menu exists, not invoked. Fire `Tartaria/6 Bake/Bake Anastasia Rocker Prefab`.
+2. **Hero buildings still `Detail_*` clusters** — `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` is now unblocked, not invoked.
+3. **347 flat Blender prefabs** — `Prefabs/Moon1/Blender/*` need categorical migration (`docs/PREFAB_LAYOUT.md § Pending migration`).
+4. **11 silent-fail catches** outside Moon 1 happy path still empty.
+5. **`RuntimeHUDBuilder.cs`** — 64 `new GameObject` calls at runtime (HUD_Root.prefab bake honest-bailed by H.L2).
+6. **`RuntimeSpawnerInsurance.cs`** dead-weight file still on disk.
+7. **Real Moon 1 play-through** — never end-to-end verified in this session. Quest tree / 17th-hour / skeleton hum prophecy / giant key #1 collectible all coded but unwitnessed.
+8. **Per `docs/15` § 9 mini-game variants A/B/C/D** — A + C + D shipped; B (Waveform Trace) status unknown.
+9. **9 village buildings + props** — Sprint 2 listed them as done, but post-hygiene prefab move + flat-Blender catch-all need re-verification.
+10. **17th-hour cathedral light eruption + skeleton hum + first prophecy fragment + giant skeleton key #1 collectible** — built earlier, never walked in this session.
+
+When 1-10 are real (greppable + walkable), Moon 1 is 100%. **Then we start Moon 2.**
+
+### Quarantined (do NOT touch, do NOT generate more)
+
+- `scripts/dev/build-moon1-win64-smoke.ps1`
+- `docs/release/WIN64_BUILD_SMOKE.md`
+- `docs/release/BETA_TEST_GUIDE.md`
+- `docs/release/BETA_FEEDBACK_TEMPLATE.md`
+- `docs/release/PR_DRAFT_sprint9_to_feature.md`
+- `Assets/_Project/Scripts/Editor/Moon1ItchBuild.cs`
+- `Assets/_Project/Scripts/Editor/Moon1ItchScreenshotCapture.cs`
+- Any future "MOON1_ACCEPTANCE_SPRINT*.md" verdict doc
+
+---
+
+## ⚡ 2026-06-02 — MOON 1 SHIP CANDIDATE (HISTORICAL — superseded by mandate above)
 
 Ten sprints landed against `feature/consolidate-moon-architecture`. Moon 1 (Echohaven) is the first slice of the game considered shippable to a closed external channel. This is a **ship candidate**, not a "100% done" claim — see punch list below.
 

@@ -4,53 +4,77 @@
 
 ---
 
-## ⚡⚡⚡⚡⚡⚡ 2026-06-03 SPRINT 13 VERDICT — MOON 1 SHIPPABLE (post-MicroSprint, supersedes Sprint 11)
+## 🛑🛑🛑 2026-06-03 NATRIX MANDATE — NO RELEASE TALK UNTIL ALL 13 MOONS BUILT (supersedes any prior "shippable" framing)
 
-**Sprint 11's NOT-SHIPPABLE verdict has been honored and worked through.** 33 lanes shipped across Phase 0 → Hammer → MicroSprint. Sprint 13 audit (HEAD `c2756942`, doc `docs/audits/MOON1_ACCEPTANCE_SPRINT13_2026-06-02.md`) measures 5 of 9 dimensions GREEN, 2 YELLOW, 2 PARTIAL — verdict **SHIPPABLE**.
+**Per NATRIX, verbatim:** *"remove win64 build from your mind we arent doing that until 13 moons are complete.. lets focus on moon 1 then once 100% complete we will move on to moon 2 .. no itch no win64.. stop short cutting being lazy and railraoding the ajenda update claude.md and .md files to reflect this enough hassle get building"*
 
-### Where Moon 1 stands at HEAD `~1ed80d2e`
+### Hard rules for every future session
 
-| # | Dimension | Sprint 11 baseline | Sprint 13 | Status |
-|---|---|---|---|---|
-| 1 | Stubs | 9 ship-blockers | 0 ship-blockers (M2-13 OOS) | GREEN |
-| 2 | Silent fails | 38 | 1 (intentional UnityException) | GREEN |
-| 3 | Commented wiring | 5 active-path bugs | **0** (MS.L2-L5 fixed) | GREEN |
-| 4 | Workarounds | 5 incl. EmergencyBypass | RuntimeSpawnerInsurance only; gate restored | YELLOW |
-| 5 | `!u!115` orphans in scene | 4 | 0 | GREEN |
-| 6 | Prefab integrity | 0/390 healthy | 70 FBX healthy, Cathedral fixed, Player.prefab + NPC variants real | GREEN |
-| 7 | Dialogue speaker map | 0/4 chains worked | 4/4 snake_case resolve | GREEN |
-| 8 | Scene authoring | ECS 70+, Rocker 275 LOC | ECS 5 #if gates, Rocker 133 LOC; HUDBuilder still 64 (deferred) | YELLOW |
-| 9 | GameEvents pairs | 25 broken one-sided | 3 missing events declared + publishers + subscribers wired | GREEN |
+1. **NO Win64 builds. NO itch.io discussion. NO Steam discussion. NO release framing of any kind.** Not even "smoke test", not even "build pipeline ready". The word "ship" is reserved for `we have built all 13 Moons fully and the entire game is content-complete`.
+2. **Audits do NOT produce a "shippable" verdict.** They produce a "what's still missing from this Moon" punch list. Rename any future verdict accordingly.
+3. **The only valid forward motion is BUILD.** Buildings, props, environment, mini-game variants, NPCs, combat polish, quest beats, audio, VFX. In that order, per the 2026-05-30 mandate below.
+4. **When a Moon hits 100%, move to the next Moon.** Moon 1 → Moon 2 → Moon 3 → … → Moon 13. No skipping. No "let's do a quick beta" detours.
+5. **Sprint/audit lanes that "verify a Moon ships" are zero-value.** Replace them with lanes that "fill the next missing piece of content".
+6. **Files / scripts that exist solely for release/build flow should NOT be expanded or polished.** They stay where they are, dormant. Do not commit new ones.
 
-### Sprint 13 dirty-worktree caveat (carried forward as note, not blocker)
+### Files quarantined under this mandate (do not touch unless deleting)
 
-`C:/dev/_wt_sprint13` worktree had 12 dirty files during audit, including `DayNightCycleController.cs` truncated at line 125 mid-method. **Committed HEAD `c2756942` was intact (159 lines)** — the dirt was working-tree-only. Next session: `git checkout -- .` on any agent worktree before resuming.
+- `scripts/dev/build-moon1-win64-smoke.ps1` — dormant
+- `docs/release/WIN64_BUILD_SMOKE.md` — dormant
+- `docs/release/BETA_TEST_GUIDE.md` — dormant
+- `docs/release/BETA_FEEDBACK_TEMPLATE.md` — dormant
+- `docs/release/PR_DRAFT_sprint9_to_feature.md` — dormant
+- `Assets/_Project/Scripts/Editor/Moon1ItchBuild.cs` — dormant
+- `Assets/_Project/Scripts/Editor/Moon1ItchScreenshotCapture.cs` — dormant
+- Any `docs/audits/MOON1_ACCEPTANCE_SPRINT*.md` "verdict" framing — historical, do not generate more
 
-### Unity MCP bridge auto-start (new this session)
+### What "Moon 1 100%" actually means per `docs/15_MVP_BUILD_SPEC.md` (minimum, not maximum)
 
-`Assets/_Project/Scripts/Editor/Moon1MCPAutoStart.cs` flips 3 EditorPrefs (`MCPForUnity.AutoStartOnLoad=true`, `UseHttpTransport=true`, `HttpTransportScope=local`) on first compile after install + requests a script reload so `HttpAutoStartHandler` picks up the new state. **Future Unity launches bring the HTTP MCP bridge up on `http://127.0.0.1:8080/mcp` with zero GUI clicks.** Documented in `docs/integration/UNITY_MCP_SETUP.md` § "Per-Unity-boot startup".
+Treat the spec's "vertical slice" sections as the **minimum** for Moon 1. Real Moon 1 done = all of:
 
-### Manual bake menus deferred (MCP transport flaked on long-running calls)
+- ALL **3 hero buildings** (Cathedral, StarDome, CrystalSpire) AND all **9 village buildings** (Apothecary, Bakery, Cottage A/B/C, Inn, Mill, Smithy, TownHall, Watchtower) — real meshes, not primitives, not `Detail_*` cluster placeholders
+- ALL props/interactable objects (benches, lanterns, chests, sacks, barrels, etc) scattered in real positions
+- Full environment detail (vegetation, terrain splats, atmospheric lighting, fog) per docs/15 §7
+- ALL **3 tuning mini-game variants** (A: Frequency Slider, B: Waveform Trace, C: Harmonic Pattern, D: Cymatic Water) playable per docs/15 §9
+- ALL 4 Moon 1 characters (Milo, Anastasia, Lirael, Cassian) with real models + idle/walk animations + 6-step Yarn tutorial reachable + Anastasia Rocker beat firing
+- Combat polish: Mud Golem waves on tune, Reset Scout patrols, real loot drops, real VFX (not magenta primitives), giant mode burst working
+- Full Yarn dialogue tree authored, hooked to in-game triggers
+- Audio: ambient zone hum + tuning SFX + restoration stinger orchestra + 17th-hour cinematic music
+- 17th-hour cathedral light eruption + skeleton hum + first prophecy fragment + giant skeleton key #1 collectible
+- Ley line mini-map appears post-restoration; quest objective tracker populates; save/load round-trip works
 
-These 5 Editor menus exist on disk and are runnable from `Tartaria/...` menu in Unity. They were NOT run by Cowork due to MCP WebSocket transport disconnects on long calls. NATRIX can fire them manually:
+When all of that is real (the agent can grep + run a play-through to demonstrate it), Moon 1 is 100%. Then Moon 2 starts.
 
-1. `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` — creates `Assets/_Project/Prefabs/Moon1/AnastasiaRocker.prefab`
-2. `Tartaria/6 Bake/Bake Echohaven Content Into Scene` — already fired (scene mtime confirms)
-3. `Tartaria/6 Bake/Bake StarDome Built Variant` — `Echohaven_StarDome_Built.prefab` already exists from H.L4
-4. `Tartaria/8 Fix/Convert Hero Prefabs to Text Mode` — already done by H.L8 (idempotent)
-5. `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` — now unblocked by H.L8
+### Where Moon 1 actually stands at HEAD `~48b1d621` (honest punch list)
 
-### Win64 build path
+These items remain visible-to-the-player gaps:
 
-`scripts/dev/build-moon1-win64-smoke.ps1` is the smoke runner. Close Unity first (its Library lock blocks batchmode build). Outputs to `Builds/itch_assets/TARTARIA_Moon1.zip`.
+| # | Gap | Severity | Where |
+|---|---|---|---|
+| 1 | `Prefabs/Moon1/AnastasiaRocker.prefab` missing — Editor menu exists but never fired | content | Run `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` in Unity |
+| 2 | Hero buildings still composed of 60-88 `Detail_*` primitive clusters; mesh replace menu unblocked but not invoked | content | Run `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` |
+| 3 | 347 flat `Prefabs/Moon1/Blender/*.prefab` need migration into category subfolders + 6 hardcoded path consumers updated in lockstep | hygiene | `docs/PREFAB_LAYOUT.md` § "Pending migration" |
+| 4 | 11 remaining silent-fail empty `catch {}` blocks (top 5 done, 11 outside Moon-1-happy-path remain) | code quality | grep `catch\s*\([^)]*\)\s*\{\s*\}` in `Assets/_Project/Scripts/` |
+| 5 | `RuntimeHUDBuilder.cs` still spawns 64 `new GameObject` at runtime — full HUD_Root.prefab bake honest-bailed by H.L2; surgical event wiring shipped by MS.L1 | scene authoring | H.L2 deferral note |
+| 6 | `RuntimeSpawnerInsurance.cs` still exists (scene now has spawners; insurance is a no-op but file is dead weight) | workaround | Delete file + remove asmdef reference, verify nothing still calls it |
+| 7 | 1 ProbeVolume URP shutdown NRE on editor exit | rendering | URP cleanup race, deferred to vendor patch |
+| 8 | 4 Cathedral kit obsolete API warnings + 1 unused var warning + 1 stale Mecanim Animator param spam | warnings | Non-blocking but should clear |
+| 9 | Quest tree / 17th-hour cinematic / skeleton hum prophecy fragment / giant key #1 collectible — built in earlier sessions but never end-to-end verified in a real play-through | QA | Real play-through needed |
 
-### Session 2026-06-03 final state
+### Carry-forward from this session (mechanics that are useful)
 
-- 35 lanes shipped (P0 → P1 → P2 → P4 → P5 → Hammer → MicroSprint → Prefab Hygiene → 5 Editor script restorations → MCP bridge auto-start)
-- HEAD `1ed80d2e` on `feature/consolidate-moon-architecture`
-- 0 compile errors (10 obsolete-API warnings + 1 unused var warning remain, non-blocking)
-- 625 prefabs reorganized into per-Moon buckets + Moon2-13 scaffolded + `docs/PREFAB_LAYOUT.md` authored
-- 1 ProbeVolume URP shutdown NRE remains (rendering cleanup race, non-blocking)
+- **MCP bridge auto-start** — `Assets/_Project/Scripts/Editor/Moon1MCPAutoStart.cs` flips 3 EditorPrefs on first compile + requests reload so `HttpAutoStartHandler` brings up `http://127.0.0.1:8080/mcp`. Future Unity launches → bridge live, zero GUI clicks. (Use this to drive content building, NOT release flow.)
+- **`docs/PREFAB_LAYOUT.md`** — canonical prefab convention + 347-prefab migration runbook
+- **Worktree mandate + API_CONTRACT + NO-DEBT + NO-STUBS** still in force from earlier mandates below
+
+### Next session lane priorities — pure CONTENT BUILD, no audits
+
+1. Fire the 2 deferred bake menus from inside Unity (Anastasia Rocker, Hero Building Mesh Replace)
+2. Migrate 347 flat Blender prefabs to category subfolders + update 6 hardcoded path consumers
+3. Real play-through Moon 1 end-to-end — log every visual/audio/interaction gap, fix as you find
+4. Build the missing village buildings + props (any gaps vs `docs/15_MVP_BUILD_SPEC.md`)
+5. Build the missing mini-game variants (if any of A/B/C/D are stubbed)
+6. **Do NOT touch any release/build/audit/itch/win64 file. Do NOT run any build pipeline. Do NOT produce a "verdict".**
 
 ---
 
