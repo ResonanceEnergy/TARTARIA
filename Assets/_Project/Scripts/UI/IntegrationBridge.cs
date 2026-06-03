@@ -81,7 +81,11 @@ namespace Tartaria.UI
                 if (p != null && p.PropertyType == typeof(float))
                     return (float)p.GetValue(inst);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(IntegrationBridge)}] {nameof(BossCurrentTargetFrequency)} failed: {ex.GetType().Name}: {ex.Message}\n  context: bossType={inst?.GetType().FullName}\n{ex.StackTrace}");
+                // Fallback: return 0f sentinel (boss target unknown).
+            }
             return 0f;
         }
 
@@ -95,7 +99,11 @@ namespace Tartaria.UI
                 if (p != null && p.PropertyType == typeof(float))
                     return Mathf.Clamp01((float)p.GetValue(inst));
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(IntegrationBridge)}] {nameof(BossHealthFraction)} failed: {ex.GetType().Name}: {ex.Message}\n  context: bossType={inst?.GetType().FullName}\n{ex.StackTrace}");
+                // Fallback: return 0f sentinel (HUD will show empty boss bar).
+            }
             return 0f;
         }
 
@@ -109,7 +117,11 @@ namespace Tartaria.UI
                 if (p != null && p.PropertyType == typeof(string))
                     return (string)p.GetValue(inst) ?? string.Empty;
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(IntegrationBridge)}] {nameof(BossDisplayName)} failed: {ex.GetType().Name}: {ex.Message}\n  context: bossType={inst?.GetType().FullName}\n{ex.StackTrace}");
+                // Fallback: return empty string (HUD will show no boss name).
+            }
             return string.Empty;
         }
 
@@ -138,7 +150,11 @@ namespace Tartaria.UI
                 if (p != null && p.PropertyType == typeof(float))
                     return (float)p.GetValue(inst);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(IntegrationBridge)}] {nameof(GiantReadiness)} failed: {ex.GetType().Name}: {ex.Message}\n  context: giantType={inst?.GetType().FullName}\n{ex.StackTrace}");
+                // Fallback: return 0f sentinel (giant mode not ready).
+            }
             return 0f;
         }
 
