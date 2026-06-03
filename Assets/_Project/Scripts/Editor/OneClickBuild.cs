@@ -30,8 +30,15 @@ namespace Tartaria.Editor
             {
                 Debug.Log($"{BuildTag} SENTINEL DETECTED -- Auto-triggering build pipeline");
 
-                // Delete sentinel so it doesn't trigger again
-                try { File.Delete(SentinelPath); } catch { }
+                // Delete sentinel so it doesn't trigger again.
+                // Documented swallow: sentinel cleanup race is harmless — file may
+                // already be gone if tartaria-play.ps1 deleted it first, or may be
+                // locked briefly on Windows. Next InitializeOnLoad will retry.
+                try { File.Delete(SentinelPath); }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning($"{BuildTag} sentinel cleanup non-fatal: {ex.GetType().Name}: {ex.Message} (path={SentinelPath})");
+                }
 
                 // Delay to ensure Unity is fully initialized
                 EditorApplication.delayCall += () =>

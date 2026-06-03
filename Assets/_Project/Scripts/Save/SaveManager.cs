@@ -1721,7 +1721,13 @@ namespace Tartaria.Save
                     string qjson = JsonUtility.ToJson(wrapper, true);
                     WriteFileSafe(_pendingPath, qjson);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[SaveManager] SavePendingQueue failed: {ex.GetType().Name}: {ex.Message}
+  context: pendingPath={_pendingPath} pendingCount={_pending?.Count}
+{ex.StackTrace}");
+                    // Fallback: pending queue not persisted; uploads will be retried next session if memory holds.
+                }
             }
 
             [Serializable]
