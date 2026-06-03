@@ -34,18 +34,35 @@ namespace Tartaria.Integration
             {
                 float a = (i / 8f) * Mathf.PI * 2f;
                 var pos = new Vector3(Mathf.Cos(a) * 50f, 0f, Mathf.Sin(a) * 50f);
-                BuildBrazier(root.transform, "Brazier_Perimeter_" + i, pos, 1.0f);
+                string id = "Brazier_Perimeter_" + i;
+                BuildBrazier(root.transform, id, pos, 1.0f);
+                GameEvents.RaiseBrazierLit(id);  // P2.L1 publisher
             }
 
             // 3 hero-building entrance braziers (pair at each)
             BuildBrazier(root.transform, "Brazier_Cathedral_L", new Vector3(-4f, 0f, 24f), 1.1f);
+            GameEvents.RaiseBrazierLit("Brazier_Cathedral_L");
             BuildBrazier(root.transform, "Brazier_Cathedral_R", new Vector3( 4f, 0f, 24f), 1.1f);
+            GameEvents.RaiseBrazierLit("Brazier_Cathedral_R");
             BuildBrazier(root.transform, "Brazier_Fountain_L",  new Vector3(-24f, 0f, -3f), 1.1f);
+            GameEvents.RaiseBrazierLit("Brazier_Fountain_L");
             BuildBrazier(root.transform, "Brazier_Fountain_R",  new Vector3(-24f, 0f,  3f), 1.1f);
+            GameEvents.RaiseBrazierLit("Brazier_Fountain_R");
             BuildBrazier(root.transform, "Brazier_Spire_L",     new Vector3( 24f, 0f, -3f), 1.1f);
+            GameEvents.RaiseBrazierLit("Brazier_Spire_L");
             BuildBrazier(root.transform, "Brazier_Spire_R",     new Vector3( 24f, 0f,  3f), 1.1f);
+            GameEvents.RaiseBrazierLit("Brazier_Spire_R");
 
-            Debug.Log("[Moon1Braziers] Lit 14 braziers (8 perimeter + 6 hero-entrance).");
+            // P2.L1 — all 14 ring members are lit. Sprint 11 L9 (72457de3) called
+            // OnBrazierRingComplete "canonical but missing"; this is the closing fire.
+            // Sprint 12+ publisher needed: when a real interactable Brazier component
+            // is authored (currently every brazier is permanently lit at scene start),
+            // gate this RingComplete behind per-brazier ignition tracking instead of
+            // firing immediately in Start. Grep target: Integration/Moon1Braziers.cs
+            // BuildBrazier (and any future BrazierInteractable IInteractable).
+            GameEvents.RaiseBrazierRingComplete();
+
+            Debug.Log("[Moon1Braziers] Lit 14 braziers (8 perimeter + 6 hero-entrance) — fired OnBrazierLit x14 + OnBrazierRingComplete.");
         }
 
         void BuildBrazier(Transform parent, string name, Vector3 worldPos, float scale)
