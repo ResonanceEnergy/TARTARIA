@@ -1,0 +1,69 @@
+title: bob_first_meet
+tags:
+position: 0,0
+---
+<<set $bob_met = true>>
+Bob: Heyup. Mind the lintel — old beam, older head.
+Bob: Bob. I run the Inn, what's left of it. You'll be the one tuning the domes, I take it?
+Bob: News travels, even out here. The mud carries it. Slowly.
+-> Player: "How long has the Inn stood?"
+    Bob: Longer than the maps say. The frame's Tartarian. I just patched the roof.
+    Bob: Wood remembers. Walls remember. I try not to ask them what.
+-> Player: "Can I rest here?"
+    Bob: Aye, when the work's done. Restore the village and the bed's yours.
+    Bob: A night's rest moves the world a moon onward. Earn it first.
+-> Player: "Have you seen the others?"
+    Bob: Milo comes through for stew. Lirael hums by the well. Anastasia I've only heard about.
+    Bob: Cassian buys candles by the dozen, never explains why. Make of that what you will.
+===
+
+title: bob_inn_about
+tags:
+---
+Bob: This Inn's been here through three floods and two silences.
+Bob: The kettle's older than my grandfather and it still sings on cue.
+Bob: People come, people go. The fire stays. That's the trade.
+===
+
+title: bob_rest_ready
+tags:
+---
+Bob: Work's done, by the look of you. Dust on the boots, hum in the bones.
+Bob: Bed's upstairs, second door. Sleep deep — the moon turns while you do.
+Bob: When you wake, it won't be this moon anymore. That's how rest works, out here.
+===
+
+title: bob_warning_17th_hour
+tags:
+---
+Bob: You feel it too, then. Around the seventeenth hour. The Inn creaks differently.
+Bob: I keep the lamps trimmed those nights. Bad time for shadows to find an unfilled wick.
+Bob: Tell Lirael, if you see her. She'll know what to do. She always does.
+===
+
+title: bob_lore_tartarians
+tags:
+---
+Bob: I don't claim to know what the old folk built or why.
+Bob: But I'll tell you this — the cellar floor's a single slab of stone, and it hums when the kettle hits the right note.
+Bob: I don't go down there much. Cellar can keep its secrets.
+===
+
+title: bob_ambient_1
+tags:
+---
+Bob: Stew's on. Always is. Don't ask what's in it.
+===
+
+title: bob_ambient_2
+tags:
+---
+Bob: The wind's off the east tonight. Always brings stories the lamps don't like.
+===
+
+title: bob_farewell
+tags:
+---
+Bob: Mind how you go. The mud's been quiet, which means it's listening.
+Bob: Fire'll be lit when you're back. Always is.
+===
