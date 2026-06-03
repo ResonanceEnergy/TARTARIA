@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using Tartaria.Core;
@@ -29,14 +30,34 @@ namespace Tartaria.Integration
 
         void OnEnable()
         {
-            try { GameEvents.OnBuildingRestoredTyped += HandleRestored; } catch { }
-            try { TartarianHourCycle.OnSeventeenthHour += HandleSeventeenthHour; } catch { }
+            try { GameEvents.OnBuildingRestoredTyped += HandleRestored; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1CinematicMoments)}] {nameof(OnEnable)} failed to subscribe to GameEvents.OnBuildingRestoredTyped: {ex.GetType().Name}: {ex.Message}\n  context: restoration dolly camera will not trigger\n{ex.StackTrace}");
+                // Non-fatal: 4-second restoration dolly is skipped this session; rest of cinematic chain intact.
+            }
+            try { TartarianHourCycle.OnSeventeenthHour += HandleSeventeenthHour; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1CinematicMoments)}] {nameof(OnEnable)} failed to subscribe to TartarianHourCycle.OnSeventeenthHour: {ex.GetType().Name}: {ex.Message}\n  context: 17th-hour cinematic pan will not trigger\n{ex.StackTrace}");
+                // Non-fatal: 17th-hour wide pan + beam VFX is skipped this session.
+            }
         }
 
         void OnDisable()
         {
-            try { GameEvents.OnBuildingRestoredTyped -= HandleRestored; } catch { }
-            try { TartarianHourCycle.OnSeventeenthHour -= HandleSeventeenthHour; } catch { }
+            try { GameEvents.OnBuildingRestoredTyped -= HandleRestored; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1CinematicMoments)}] {nameof(OnDisable)} failed to unsubscribe from GameEvents.OnBuildingRestoredTyped: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
+            try { TartarianHourCycle.OnSeventeenthHour -= HandleSeventeenthHour; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1CinematicMoments)}] {nameof(OnDisable)} failed to unsubscribe from TartarianHourCycle.OnSeventeenthHour: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
         }
 
         void HandleRestored(BuildingRestoredEventArgs args)

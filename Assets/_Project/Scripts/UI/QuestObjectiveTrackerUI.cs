@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Tartaria.Core;
 
@@ -30,14 +31,34 @@ namespace Tartaria.UI
 
         void OnEnable()
         {
-            try { GameEvents.OnBuildingRestored += HandleBuildingRestored; } catch { }
-            try { GameEvents.OnQuestStatusChanged += HandleQuestStatusChanged; } catch { }
+            try { GameEvents.OnBuildingRestored += HandleBuildingRestored; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(QuestObjectiveTrackerUI)}] {nameof(OnEnable)} failed to subscribe to GameEvents.OnBuildingRestored: {ex.GetType().Name}: {ex.Message}\n  context: tracker will not refresh on building restoration; periodic Update poll still runs every {REPAINT_PERIOD}s\n{ex.StackTrace}");
+                // Non-fatal: RecomputeFromState() polls PlayerPrefs every 2.5s, so the tracker still updates — just not instantly.
+            }
+            try { GameEvents.OnQuestStatusChanged += HandleQuestStatusChanged; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(QuestObjectiveTrackerUI)}] {nameof(OnEnable)} failed to subscribe to GameEvents.OnQuestStatusChanged: {ex.GetType().Name}: {ex.Message}\n  context: quest status changes will not push to tracker; falls back to restoration-count derived state\n{ex.StackTrace}");
+                // Non-fatal: tracker falls back to RecomputeFromState (hero-building restoration count) for objective text.
+            }
         }
 
         void OnDisable()
         {
-            try { GameEvents.OnBuildingRestored -= HandleBuildingRestored; } catch { }
-            try { GameEvents.OnQuestStatusChanged -= HandleQuestStatusChanged; } catch { }
+            try { GameEvents.OnBuildingRestored -= HandleBuildingRestored; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(QuestObjectiveTrackerUI)}] {nameof(OnDisable)} failed to unsubscribe from GameEvents.OnBuildingRestored: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
+            try { GameEvents.OnQuestStatusChanged -= HandleQuestStatusChanged; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(QuestObjectiveTrackerUI)}] {nameof(OnDisable)} failed to unsubscribe from GameEvents.OnQuestStatusChanged: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
         }
 
         void Update()
