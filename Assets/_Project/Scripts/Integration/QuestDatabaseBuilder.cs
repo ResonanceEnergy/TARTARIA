@@ -33,7 +33,37 @@ namespace Tartaria.Integration
             quests.Add(Build("r7_m1_lirael_calendar_echo", "Lirael's 17th Whisper",
                 "Trigger Lirael calendar echo during 17th Hour near restored dome.",
                 rsReward: 80f,
-                new Core.QuestObjective { description = "Lirael 17th Hour echo + state change", type = QuestObjectiveType.CompanionMilestone, targetId = "lirael", targetCount = 1 }));
+                // C.L4: use specific targetId "lirael_17th_m1" so this doesn't compete with
+                // generic CompanionMilestone+lirael progression after Moon 2 unlock.
+                new Core.QuestObjective { description = "Lirael 17th Hour echo + state change", type = QuestObjectiveType.CompanionMilestone, targetId = "lirael_17th_m1", targetCount = 1 }));
+
+            // C.L4 Moon 1 canonical side beats — surfaced from docs/03 Moon 1 § Discovery/Revelation +
+            // docs/03C § Moon 1 (Anastasia rocker emotional anchor, Giant Skeleton Key #1 of 8, Ley Line
+            // mini-map first-thread). Each one is wired to its existing trigger site below.
+
+            // Anastasia's Lullaby — side companion beat (rocker at cathedral entrance hums 432Hz).
+            // Trigger: player crosses Moon1AnastasiaRocker proximity zone -> NotifyPlayerNearby.
+            // Use specific targetId "anastasia_rocker_m1" so this doesn't collide with later Moon 7
+            // CompanionMilestone progression once Anastasia is unlocked via CompanionManager.
+            quests.Add(Build("moon1_anastasia_lullaby", "Anastasia's Lullaby",
+                "Find the figure rocking outside the cathedral. She hums at 432 Hz - listen.",
+                rsReward: 40f,
+                new Core.QuestObjective { description = "Approach Anastasia at the cathedral rocker", type = QuestObjectiveType.CompanionMilestone, targetId = "anastasia_rocker_m1", targetCount = 1 }));
+
+            // Giant Skeleton Key #1 - collectible beat (per docs/03 Crossover Seeds: "Giant skeleton
+            // key #1 (collect 8 total)"). Trigger: GiantSkeletonKeyPickup.OnTriggerEnter.
+            quests.Add(Build("moon1_giant_skeleton_key", "Giant Skeleton Key #1",
+                "A giant's bone-key juts from the mud near the cathedral. Claim it - seven more are buried across the world.",
+                rsReward: 30f,
+                new Core.QuestObjective { description = "Recover the first giant skeleton key", type = QuestObjectiveType.CollectItem, targetId = "giant_skeleton_key_1", targetCount = 1 }));
+
+            // Ley Line Mini-Map - discovery beat (per docs/03 Days 6-12: "First ley-line vein lights up
+            // on the mini-map - golden thread pointing toward... something vast in the distance").
+            // Trigger: LeyLineMap.Activate (first hero building restoration).
+            quests.Add(Build("moon1_ley_line_map_discovery", "The Golden Thread",
+                "The mini-map ignites with the first ley line. A golden thread points toward something vast in the distance.",
+                rsReward: 25f,
+                new Core.QuestObjective { description = "Witness the first ley line activate", type = QuestObjectiveType.HiddenDiscovery, targetId = "ley_line_first", targetCount = 1 }));
 
             // Moon 2 R7 physical combat + giant synergy hook
             quests.Add(Build("r7_m2_cassian_redemption_prep", "Cassian's Doubt Deepens",
