@@ -45,21 +45,22 @@ Treat the spec's "vertical slice" sections as the **minimum** for Moon 1. Real M
 
 When all of that is real (the agent can grep + run a play-through to demonstrate it), Moon 1 is 100%. Then Moon 2 starts.
 
-### Where Moon 1 actually stands at HEAD `~48b1d621` (honest punch list)
+### Where Moon 1 actually stands at HEAD `~519d0c52` (honest punch list)
 
-These items remain visible-to-the-player gaps:
-
-| # | Gap | Severity | Where |
+| # | Gap | Status @ 2026-06-03 | Where / SHA |
 |---|---|---|---|
-| 1 | `Prefabs/Moon1/AnastasiaRocker.prefab` missing — Editor menu exists but never fired | content | Run `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` in Unity |
-| 2 | Hero buildings still composed of 60-88 `Detail_*` primitive clusters; mesh replace menu unblocked but not invoked | content | Run `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` |
-| 3 | 347 flat `Prefabs/Moon1/Blender/*.prefab` need migration into category subfolders + 6 hardcoded path consumers updated in lockstep | hygiene | `docs/PREFAB_LAYOUT.md` § "Pending migration" |
-| 4 | 11 remaining silent-fail empty `catch {}` blocks (top 5 done, 11 outside Moon-1-happy-path remain) | code quality | grep `catch\s*\([^)]*\)\s*\{\s*\}` in `Assets/_Project/Scripts/` |
-| 5 | `RuntimeHUDBuilder.cs` still spawns 64 `new GameObject` at runtime — full HUD_Root.prefab bake honest-bailed by H.L2; surgical event wiring shipped by MS.L1 | scene authoring | H.L2 deferral note |
-| 6 | `RuntimeSpawnerInsurance.cs` still exists (scene now has spawners; insurance is a no-op but file is dead weight) | workaround | Delete file + remove asmdef reference, verify nothing still calls it |
-| 7 | 1 ProbeVolume URP shutdown NRE on editor exit | rendering | URP cleanup race, deferred to vendor patch |
-| 8 | 4 Cathedral kit obsolete API warnings + 1 unused var warning + 1 stale Mecanim Animator param spam | warnings | Non-blocking but should clear |
-| 9 | Quest tree / 17th-hour cinematic / skeleton hum prophecy fragment / giant key #1 collectible — built in earlier sessions but never end-to-end verified in a real play-through | QA | Real play-through needed |
+| 1 | `Prefabs/Moon1/AnastasiaRocker.prefab` missing — Editor menu exists but never fired | **DEFERRED** — MCP bridge transport unstable during long bakes | Run `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` in Unity manually |
+| 2 | Hero buildings still composed of 60-88 `Detail_*` primitive clusters | **DEFERRED** — same MCP issue | Run `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` |
+| 3 | 347 flat `Prefabs/Moon1/Blender/*.prefab` need migration into category subfolders | ✅ **SHIPPED C.L1 `69f99cb1`** — Architecture 111 / Audio 23 / NPCs 33 / Plates 8 / Props 162 / VFX 10 = 347. 6 path consumers updated with array-walk legacy fallback. Zero ambiguous. |
+| 4 | 11 remaining silent-fail empty `catch {}` blocks | ✅ **SHIPPED C.L2 `290e74a0`** — IntegrationBridge.cs ×4, SteamCloudBridge.cs ×5, SaveManager.cs ×1, OneClickBuild.cs ×1. Verification grep returns 0. |
+| 5 | `RuntimeHUDBuilder.cs` still spawns 64 `new GameObject` at runtime | DEFERRED — surgical event wiring shipped MS.L1; full prefab bake awaits manual Unity session | H.L2 deferral note |
+| 6 | `RuntimeSpawnerInsurance.cs` dead-weight file | ✅ **SHIPPED `9739a91d`** — file + .meta deleted, FullStartupDiagnostics.cs:238 caller message updated |
+| 7 | Tuning Variant routing — TuningPedestalLink + InteractableBuilding hardcoded TuningMiniGame regardless of `assignedVariant` | ✅ **SHIPPED C.L5 `519d0c52`** — DispatchTuningByVariant + DispatchToBuildingVariant switch on config.variant; Variant B/C lazy-add; OnTuningComplete/Failed hooked once per component |
+| 8 | Quest tree end-to-end (Yarn → tracker → completion banner) | ✅ **SHIPPED C.L4 `2c8c9c96`** — 5 Moon 1 quests registered (echohaven_awakening main + anastasia_lullaby + giant_skeleton_key + ley_line_map_discovery + lirael_calendar_echo); EchohavenContentSpawner activates side quests at startup |
+| 9 | Variant B (Waveform Trace) status — audit if real or stub | ✅ **AUDITED C.L3 `b44df79d`** — 237 LOC real impl, ITuningVariant complete, just needed routing fix (now done in C.L5). See `docs/audits/TUNING_VARIANT_B_STATUS_2026-06-03.md` |
+| 10 | Real play-through Moon 1 end-to-end | **PENDING** — needs Unity Play session with controller |
+| 11 | 1 ProbeVolume URP shutdown NRE on editor exit | DEFERRED to URP vendor patch | rendering |
+| 12 | 4 Cathedral kit obsolete API warnings + Mecanim param spam | DEFERRED non-blocking warnings | warnings |
 
 ### Carry-forward from this session (mechanics that are useful)
 
@@ -69,12 +70,11 @@ These items remain visible-to-the-player gaps:
 
 ### Next session lane priorities — pure CONTENT BUILD, no audits
 
-1. Fire the 2 deferred bake menus from inside Unity (Anastasia Rocker, Hero Building Mesh Replace)
-2. Migrate 347 flat Blender prefabs to category subfolders + update 6 hardcoded path consumers
-3. Real play-through Moon 1 end-to-end — log every visual/audio/interaction gap, fix as you find
-4. Build the missing village buildings + props (any gaps vs `docs/15_MVP_BUILD_SPEC.md`)
-5. Build the missing mini-game variants (if any of A/B/C/D are stubbed)
-6. **Do NOT touch any release/build/audit/itch/win64 file. Do NOT run any build pipeline. Do NOT produce a "verdict".**
+1. Fire the 2 deferred bake menus from inside Unity (Anastasia Rocker, Hero Building Mesh Replace) — MCP transport unstable for long bakes, manual Unity GUI invocation recommended
+2. Real play-through Moon 1 end-to-end — confirm 5 quest registrations populate tracker, 17th-hour beat fires, giant key #1 collectible spawns, ley line map appears post-restoration
+3. Verify the 3 hero buildings actually trigger Variant B (Waveform) on node 2 and Variant C (Pattern) on node 3 per the deterministic-by-buildingId pool picker
+4. Build the missing village buildings + props (any gaps vs `docs/15_MVP_BUILD_SPEC.md`) — re-verify post Prefab Hygiene + C.L1 migration
+5. **Do NOT touch any release/build/audit/itch/win64 file. Do NOT run any build pipeline. Do NOT produce a "verdict".**
 
 ---
 
