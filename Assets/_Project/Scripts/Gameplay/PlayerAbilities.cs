@@ -46,8 +46,26 @@ namespace Tartaria.Gameplay
             float maxThisFrame = channelRatePerSecond * deltaTime;
             float actualAmount = Mathf.Min(amount, maxThisFrame);
 
-            // TODO: Integrate with ResonanceScoreSystem (ECS)
-            // For now, just return the requested amount capped by channel rate
+            // P1.L3: route channel cost through canonical AetherFieldManager (Core/AetherFieldManager.cs:26)
+            // so the RS bar actually depletes while the player channels. Clamp to available RS so we don't
+            // overdraw and so the returned amount reflects what was really spent.
+            var aether = AetherFieldManager.Instance;
+            if (aether != null)
+            {
+                float available = aether.ResonanceScore;
+                if (available <= 0f)
+                {
+                    return 0f;
+                }
+                actualAmount = Mathf.Min(actualAmount, available);
+                aether.DeductRS(actualAmount);
+                // Broadcast via GameEvents.FireRSChange (Core/GameEvents.cs:323) so HUD + AdaptiveMusic update.
+                GameEvents.FireRSChange(-actualAmount);
+            }
+            else
+            {
+                Debug.LogWarning($"[PlayerAbilities] ChannelResonance: AetherFieldManager.Instance is null — channeled {actualAmount:F1} RS will not deplete the global RS bar.");
+            }
 
             return actualAmount;
         }

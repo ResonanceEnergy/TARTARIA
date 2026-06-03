@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Tartaria.Core;
 using Tartaria.Input;
 
 namespace Tartaria.Integration
@@ -111,9 +112,26 @@ namespace Tartaria.Integration
                 return false;
             }
 
-            // Check RS cost
-            // Get current RS from ResonanceScoreTracker (integration wired)
-            // if (currentRS < ability.rsCost) return false;
+            // P1.L3: Check RS cost via canonical AetherFieldManager (Core/AetherFieldManager.cs:26).
+            // RunProgressTracker is a per-run stat aggregator (not the RS holder); the live RS economy
+            // is on AetherFieldManager.Instance which is what HUD, AdaptiveMusic and Combat all read.
+            var aether = AetherFieldManager.Instance;
+            if (aether == null)
+            {
+                Debug.LogWarning($"[PlayerAbility] CastAbility '{ability.abilityName}': AetherFieldManager.Instance is null — cannot read RS. Aborting cast.");
+                return false;
+            }
+            if (aether.ResonanceScore < ability.rsCost)
+            {
+                Debug.Log($"[PlayerAbility] Not enough RS for '{ability.abilityName}' (need {ability.rsCost}, have {aether.ResonanceScore:F1})");
+                return false;
+            }
+
+            // P1.L3: Spend RS via canonical AetherFieldManager.DeductRS (Core/AetherFieldManager.cs:59)
+            // and broadcast through GameEvents.FireRSChange so HUDLiveDataWiring and AdaptiveMusicController
+            // see the delta (Core/GameEvents.cs:323, UI/HUDLiveDataWiring.cs:25).
+            aether.DeductRS(ability.rsCost);
+            GameEvents.FireRSChange(-(float)ability.rsCost);
 
             // Cast ability
             ExecuteAbility(slotIndex, ability);
@@ -121,15 +139,6 @@ namespace Tartaria.Integration
             // Start cooldown
             float adjustedCooldown = ability.cooldown * cooldownReductionMultiplier;
             _cooldownTimers[slotIndex] = adjustedCooldown;
-
-            // Consume RS
-            // Consume RS via ResonanceScoreTracker
-            var rsTracker = Integration.RunProgressTracker.Instance;
-            if (rsTracker != null)
-            {
-                // Note: ConsumeRS() API pending in ResonanceScoreTracker
-                Debug.Log($"[PlayerAbility] Would consume {ability.rsCost} RS here");
-            }
 
             OnAbilityCast?.Invoke(slotIndex);
 
