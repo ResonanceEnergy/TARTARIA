@@ -39,7 +39,7 @@ namespace Tartaria.Editor
         private static readonly string PathSpireBase = KitRoot + "Spire_Base_2x2m.prefab";
         private static readonly string PathSpireMid = KitRoot + "Spire_Mid_Taper.prefab";
         private static readonly string PathSpireTop = KitRoot + "Spire_Top_MercuryBall.prefab";
-        private static readonly string PathPipeOrgan = BlenderRoot + "PipeOrganCathedral.prefab";
+        private static readonly string PathPipeOrgan = BlenderRoot + "Architecture/PipeOrganCathedral.prefab";
 
         private static readonly string[] DomeSegmentNames =
         {

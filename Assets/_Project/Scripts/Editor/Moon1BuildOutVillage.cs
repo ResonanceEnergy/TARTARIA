@@ -27,11 +27,13 @@ namespace Tartaria.Editor
         struct Placement
         {
             public string prefabName;     // file base name (no .prefab)
+            public string category;       // Blender sub-folder (Architecture, NPCs, Props, etc.) — post 2026-06-03 migration
             public Vector3 position;      // world XYZ (Y will be terrain-snapped if possible)
             public bool faceCenter;       // rotate to look toward VILLAGE_CENTER
-            public Placement(string name, Vector3 pos, bool face = true)
+            public Placement(string name, string cat, Vector3 pos, bool face = true)
             {
                 prefabName = name;
+                category = cat;
                 position = pos;
                 faceCenter = face;
             }
@@ -43,17 +45,17 @@ namespace Tartaria.Editor
         // east; signpost at the southern entrance.
         static readonly Placement[] PLACEMENTS = new Placement[]
         {
-            new Placement("TownHall",         new Vector3(  0f, 0f, 50f), face: false),
-            new Placement("VillageInn",       new Vector3(-25f, 0f, 35f)),
-            new Placement("VillageBakery",    new Vector3( 25f, 0f, 35f)),
-            new Placement("VillageWell",      new Vector3(  0f, 0f, 40f), face: false),
-            new Placement("VillageMill",      new Vector3(-30f, 0f, 65f)),
-            new Placement("VillageSmithy",    new Vector3( 30f, 0f, 65f)),
-            new Placement("VillageCottageA",  new Vector3(-20f, 0f, 80f)),
-            new Placement("VillageCottageB",  new Vector3(  0f, 0f, 80f)),
-            new Placement("VillageCottageC",  new Vector3( 20f, 0f, 80f)),
-            new Placement("Watchtower",       new Vector3( 40f, 0f, 55f)),
-            new Placement("VillagerSignpost", new Vector3(  0f, 0f, 25f), face: true),
+            new Placement("TownHall",         "Architecture", new Vector3(  0f, 0f, 50f), face: false),
+            new Placement("VillageInn",       "Architecture", new Vector3(-25f, 0f, 35f)),
+            new Placement("VillageBakery",    "Architecture", new Vector3( 25f, 0f, 35f)),
+            new Placement("VillageWell",      "Architecture", new Vector3(  0f, 0f, 40f), face: false),
+            new Placement("VillageMill",      "Architecture", new Vector3(-30f, 0f, 65f)),
+            new Placement("VillageSmithy",    "Architecture", new Vector3( 30f, 0f, 65f)),
+            new Placement("VillageCottageA",  "Architecture", new Vector3(-20f, 0f, 80f)),
+            new Placement("VillageCottageB",  "Architecture", new Vector3(  0f, 0f, 80f)),
+            new Placement("VillageCottageC",  "Architecture", new Vector3( 20f, 0f, 80f)),
+            new Placement("Watchtower",       "Architecture", new Vector3( 40f, 0f, 55f)),
+            new Placement("VillagerSignpost", "NPCs",         new Vector3(  0f, 0f, 25f), face: true),
         };
 
         [MenuItem("Tartaria/1 Build/Build Out Moon 1 Village (9 Buildings)", priority = 102)]
@@ -91,7 +93,7 @@ namespace Tartaria.Editor
                     continue;
                 }
 
-                string assetPath = PREFAB_DIR + p.prefabName + ".prefab";
+                string assetPath = PREFAB_DIR + p.category + "/" + p.prefabName + ".prefab";
                 var prefab = AssetDatabase.LoadAssetAtPath<GameObject>(assetPath);
                 if (prefab == null)
                 {

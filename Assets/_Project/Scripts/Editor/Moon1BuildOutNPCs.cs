@@ -72,7 +72,7 @@ namespace Tartaria.Editor
 
             placed += PlaceOrUpdate(ref repositioned, ref missing, parent,
                 "Bob_AtInn",
-                "Assets/_Project/Prefabs/Moon1/Blender/BobInnkeeper.prefab",
+                "Assets/_Project/Prefabs/Moon1/Blender/NPCs/BobInnkeeper.prefab",
                 new Vector3(12f, 0f, -10f),
                 Quaternion.Euler(0f, 180f, 0f),
                 activeAtStart: true,

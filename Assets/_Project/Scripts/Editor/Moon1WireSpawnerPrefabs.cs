@@ -37,17 +37,24 @@ namespace Tartaria.Editor
         // Each character has an array of candidate paths — the FIRST one that exists wins.
         // Order: Moon1 Blender variant → Shared Blender variant → legacy Characters/ → KayKit fallback (none used post-purge).
 
-        static readonly string[] MiloSearch        = { "Assets/_Project/Prefabs/Moon1/Blender/MiloBoy.prefab",
+        static readonly string[] MiloSearch        = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/MiloBoy.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/MiloBoy.prefab",
                                                        "Assets/_Project/Prefabs/Moon1/Blender/Milo.prefab" };
-        static readonly string[] CassianSearch     = { "Assets/_Project/Prefabs/Moon1/Blender/CassianCarter.prefab",
+        static readonly string[] CassianSearch     = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/CassianCarter.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/CassianCarter.prefab",
                                                        "Assets/_Project/Prefabs/Moon1/Blender/Cassian.prefab" };
-        static readonly string[] AnastasiaSearch   = { "Assets/_Project/Prefabs/Moon1/Blender/AnastasiaPrincess.prefab",
+        static readonly string[] AnastasiaSearch   = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/AnastasiaPrincess.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/AnastasiaPrincess.prefab",
                                                        "Assets/_Project/Prefabs/Moon1/Blender/Anastasia.prefab" };
-        static readonly string[] LiraelSearch      = { "Assets/_Project/Prefabs/Moon1/Blender/LiraelGuardian.prefab" };
-        static readonly string[] BobSearch         = { "Assets/_Project/Prefabs/Moon1/Blender/BobInnkeeper.prefab" };
-        static readonly string[] MudGolemSearch    = { "Assets/_Project/Prefabs/Moon1/Blender/MudGolem.prefab",
+        static readonly string[] LiraelSearch      = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/LiraelGuardian.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/LiraelGuardian.prefab" };
+        static readonly string[] BobSearch         = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/BobInnkeeper.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/BobInnkeeper.prefab" };
+        static readonly string[] MudGolemSearch    = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/MudGolem.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/MudGolem.prefab",
                                                        "Assets/_Project/Prefabs/Shared/Blender/MudGolem.prefab" };
-        static readonly string[] ShovelSearch      = { "Assets/_Project/Prefabs/Moon1/Blender/Shovel.prefab",
+        static readonly string[] ShovelSearch      = { "Assets/_Project/Prefabs/Moon1/Blender/Props/Shovel.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/Shovel.prefab",
                                                        "Assets/_Project/Prefabs/Shared/Blender/Shovel.prefab" };
 
         // Player + bosses + enemies (Blender-built per gen_characters_complete.py)
@@ -58,18 +65,26 @@ namespace Tartaria.Editor
                                                        "Assets/_Project/Prefabs/Moon1/Blender/GiantGolem.prefab" };
         static readonly string[] VoidPhantomSearch = { "Assets/_Project/Prefabs/Shared/Blender/VoidPhantom.prefab" };
         static readonly string[] WraithSearch      = { "Assets/_Project/Prefabs/Shared/Blender/TemporalWraith.prefab" };
-        static readonly string[] ResetScoutSearch  = { "Assets/_Project/Prefabs/Moon1/Blender/ResetScout.prefab",
+        static readonly string[] ResetScoutSearch  = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/ResetScout.prefab",
+                                                       "Assets/_Project/Prefabs/Moon1/Blender/ResetScout.prefab",
                                                        "Assets/_Project/Prefabs/Shared/Blender/ResetScout.prefab" };
-        static readonly string[] ShadowStalkerSearch = { "Assets/_Project/Prefabs/Moon1/Blender/ShadowStalker.prefab",
+        static readonly string[] ShadowStalkerSearch = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/ShadowStalker.prefab",
+                                                         "Assets/_Project/Prefabs/Moon1/Blender/ShadowStalker.prefab",
                                                          "Assets/_Project/Prefabs/Shared/Blender/ShadowStalker.prefab" };
-        static readonly string[] CrystalSentrySearch = { "Assets/_Project/Prefabs/Moon1/Blender/CrystalSentry.prefab",
+        static readonly string[] CrystalSentrySearch = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/CrystalSentry.prefab",
+                                                         "Assets/_Project/Prefabs/Moon1/Blender/CrystalSentry.prefab",
                                                          "Assets/_Project/Prefabs/Moon2/Blender/CrystalSentry.prefab" };
-        static readonly string[] ResonanceDroneSearch = { "Assets/_Project/Prefabs/Moon1/Blender/ResonanceDrone.prefab" };
-        static readonly string[] DissonanceCrystalSearch = { "Assets/_Project/Prefabs/Moon1/Blender/DissonanceCrystal.prefab",
+        static readonly string[] ResonanceDroneSearch = { "Assets/_Project/Prefabs/Moon1/Blender/NPCs/ResonanceDrone.prefab",
+                                                          "Assets/_Project/Prefabs/Moon1/Blender/ResonanceDrone.prefab" };
+        static readonly string[] DissonanceCrystalSearch = { "Assets/_Project/Prefabs/Moon1/Blender/Props/DissonanceCrystal.prefab",
+                                                             "Assets/_Project/Prefabs/Moon1/Blender/DissonanceCrystal.prefab",
                                                              "Assets/_Project/Prefabs/Moon2/Blender/DissonanceCrystal.prefab" };
-        static readonly string[] AetherShardSearch   = { "Assets/_Project/Prefabs/Moon1/Blender/Aether_A3_Crystal_Amber.prefab",
+        static readonly string[] AetherShardSearch   = { "Assets/_Project/Prefabs/Moon1/Blender/Props/Aether_A3_Crystal_Amber.prefab",
+                                                         "Assets/_Project/Prefabs/Moon1/Blender/Aether_A3_Crystal_Amber.prefab",
                                                          "Assets/_Project/Prefabs/Collectibles/AetherShard/AetherShard.prefab" };
-        static readonly string[] MudMoundSearch      = { "Assets/_Project/Prefabs/Moon1/Blender/MudPoolBasin.prefab",
+        static readonly string[] MudMoundSearch      = { "Assets/_Project/Prefabs/Moon1/Blender/Plates/MudPoolBasin.prefab",
+                                                         "Assets/_Project/Prefabs/Moon1/Blender/MudPoolBasin.prefab",
+                                                         "Assets/_Project/Prefabs/Moon1/Blender/Props/CrystalCluster.prefab",
                                                          "Assets/_Project/Prefabs/Moon1/Blender/CrystalCluster.prefab" };
 
         // VFX prefab paths (kept as-is — they're not character art)
@@ -340,7 +355,7 @@ namespace Tartaria.Editor
             n += WireField("HitVFXController", "_shieldVfxPrefab", SpireSparksPath,    report);
             n += WireField("CombatHitReactor", "hitParticlePrefab", ScanPulsePath,     report);
             // Arrow — keep canonical for now (TODO: wire a Blender ArrowBundle when ready)
-            n += WireField("PlayerRanged", "arrowPrefab", "Assets/_Project/Prefabs/Moon1/Blender/ArrowBundle.prefab", report);
+            n += WireField("PlayerRanged", "arrowPrefab", "Assets/_Project/Prefabs/Moon1/Blender/Props/ArrowBundle.prefab", report);
             return n;
         }
 
