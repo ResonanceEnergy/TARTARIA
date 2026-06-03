@@ -25,28 +25,28 @@ namespace Tartaria.Integration
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void AutoBootstrap()
         {
-            // Only fire in the Moon 1 gameplay scene. Main menu / loading / Moon 2-13 scenes
-            // should run their own boot chain.
-            var active = SceneManager.GetActiveScene();
-            if (active == null || !active.IsValid()) return;
-            string name = active.name;
-            if (string.IsNullOrEmpty(name)) return;
-            if (!(name.Contains("Echohaven") || name.Contains("Moon1") || name.Contains("VerticalSlice"))) return;
-
-            // Create a host GameObject so we can schedule the delayed transition via coroutine.
+            // Fire UNCONDITIONALLY — earlier scene-name guard didn't match when the active
+            // scene's name was "Untitled" or some bootloader stand-in. Host.EnsureExplorationState
+            // is safe in any scene: it only flips Boot/Loading → Exploration, no-ops otherwise.
             var go = new GameObject("Moon1AutoEnterExploration");
             UnityEngine.Object.DontDestroyOnLoad(go);
             go.hideFlags = HideFlags.HideInHierarchy | HideFlags.DontSaveInEditor | HideFlags.DontSaveInBuild;
             go.AddComponent<Host>();
+            Debug.Log("[Moon1AutoEnterExploration] Bootstrapped (any scene). Will check state in " + Host.GRACE_SECONDS + "s.");
         }
 
-        private class Host : MonoBehaviour
+        internal class Host : MonoBehaviour
         {
-            const float GRACE_SECONDS = 1.0f;
+            internal const float GRACE_SECONDS = 1.0f;
 
             void Start()
             {
                 Invoke(nameof(EnsureExplorationState), GRACE_SECONDS);
+                // Re-check every 2s in case some system re-transitions back to Loading.
+                InvokeRepeating(nameof(EnsureExplorationState), GRACE_SECONDS + 2f, 2f);
+                // Camera-follow safety net — if Main Camera isn't following the player,
+                // bind it once a player exists in scene.
+                InvokeRepeating(nameof(EnsureCameraFollowsPlayer), GRACE_SECONDS + 0.5f, 1.5f);
             }
 
             void EnsureExplorationState()
@@ -54,28 +54,56 @@ namespace Tartaria.Integration
                 var mgr = GameStateManager.Instance;
                 if (mgr == null)
                 {
-                    Debug.LogWarning("[Moon1AutoEnterExploration] GameStateManager.Instance was null after grace period; cannot transition. Player input will stay gated.");
+                    Debug.LogWarning("[Moon1AutoEnterExploration] GameStateManager.Instance was null; cannot transition. Player input will stay gated.");
                     return;
                 }
 
                 var current = mgr.CurrentState;
                 if (current == GameState.Exploration || current == GameState.Combat || current == GameState.Tuning)
                 {
-                    Debug.Log($"[Moon1AutoEnterExploration] State already advanced to {current}; no transition needed.");
-                    return;
+                    return; // already in a playing state; quietly no-op (don't spam log)
                 }
 
                 if (current == GameState.Boot || current == GameState.Loading)
                 {
-                    Debug.Log($"[Moon1AutoEnterExploration] State stuck in {current} after {GRACE_SECONDS:F1}s — auto-transitioning to Exploration so PlayerInputHandler.Update can run.");
+                    Debug.Log($"[Moon1AutoEnterExploration] State stuck in {current} — auto-transitioning to Exploration so PlayerInputHandler.Update can run.");
                     mgr.TransitionTo(GameState.Exploration);
+                }
+                // Paused / Menu / Cinematic / Dialogue / Dead — quietly skip; those are
+                // legitimate non-playing states that systems or the player have opted into.
+            }
+
+            // Track whether we've already bound a follow target so we don't re-bind every tick.
+            bool _cameraBound;
+            void EnsureCameraFollowsPlayer()
+            {
+                if (_cameraBound) return;
+                var player = GameObject.FindGameObjectWithTag("Player");
+                if (player == null) player = GameObject.Find("Player");
+                if (player == null) return;
+                var cam = Camera.main;
+                if (cam == null) return;
+
+                // Look for any "camera follow" style component on the camera and bind it via SendMessage.
+                // Use SendMessage so we don't need a hard reference to Tartaria.Camera.CameraController.
+                cam.SendMessage("SetTarget", player.transform, SendMessageOptions.DontRequireReceiver);
+                cam.SendMessage("SetFollowTarget", player.transform, SendMessageOptions.DontRequireReceiver);
+                cam.SendMessage("SetPlayer", player.transform, SendMessageOptions.DontRequireReceiver);
+
+                // Fallback: if nothing exists on the camera to follow, position the camera behind
+                // the player so it's at least pointing at them at startup. This makes the player
+                // VISIBLE even if a real follow controller isn't present.
+                if (cam.GetComponent("CameraController") == null && cam.GetComponent("CameraFollow") == null)
+                {
+                    cam.transform.position = player.transform.position + new Vector3(0f, 4f, -8f);
+                    cam.transform.LookAt(player.transform.position + Vector3.up * 1.5f);
+                    Debug.Log($"[Moon1AutoEnterExploration] No follow controller on Main Camera — positioned camera behind player at {cam.transform.position}.");
                 }
                 else
                 {
-                    // Paused / Menu / Cinematic / Dialogue / Dead — leave alone, those are
-                    // legitimate non-playing states the player or systems have opted into.
-                    Debug.Log($"[Moon1AutoEnterExploration] State is {current} (not Boot/Loading); leaving in place.");
+                    Debug.Log("[Moon1AutoEnterExploration] Bound Main Camera follow target → Player.");
                 }
+                _cameraBound = true;
             }
         }
     }
