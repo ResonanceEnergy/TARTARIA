@@ -101,6 +101,8 @@ namespace Tartaria.Integration
         void HandleMoonCompleted(MoonCompletedEventArgs args)
         {
             if (args == null || args.moonIndex != 1) return; // Moon 1 only for now
+            // P2.L4 Sprint 11 L9 - HUD trophy event (mirrors local UI for any external listener / banner queue)
+            GameEvents.RaiseHUDShowMoonTrophy("ECHOHAVEN AWAKENED", "Moon 1 Complete");
             StopAllCoroutines();
             StartCoroutine(ShowSequence(args));
         }
