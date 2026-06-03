@@ -67,6 +67,7 @@ namespace Tartaria.Integration
         //   lirael_first_meet     -> Assets/_Project/Dialogue/Moon1/lirael.yarn:1
         //   anastasia_greeting    -> Assets/_Project/Dialogue/Moon1/anastasia_greeting.yarn:1
         //   cassian_first_meet    -> Assets/_Project/Dialogue/Moon1/cassian.yarn:1
+        //   bob_first_meet        -> Assets/_Project/Dialogue/Moon1/bob_innkeeper.yarn:1
         // ----------------------------------------------------------------
         private static readonly Dictionary<string, string> DefaultSpeakerToNode =
             new Dictionary<string, string>(StringComparer.Ordinal)
@@ -75,6 +76,7 @@ namespace Tartaria.Integration
                 { "Lirael",    "lirael_first_meet"  },
                 { "Anastasia", "anastasia_greeting" },
                 { "Cassian",   "cassian_first_meet" },
+                { "Bob",       "bob_first_meet"     },
             };
 
         // Live runtime copies so RegisterSpeaker / RegisterSpeakerLine can extend without
