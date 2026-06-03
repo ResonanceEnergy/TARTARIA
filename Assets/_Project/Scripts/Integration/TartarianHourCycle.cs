@@ -103,6 +103,23 @@ namespace Tartaria.Integration
             UpdateSun();
         }
 
+        /// <summary>
+        /// Restore current hour + intra-hour phase from a save snapshot.
+        /// Called by Moon1SaveCoordinator OnAfterLoad. Clamps + re-arms the 17th-hour
+        /// fire flag so the beat fires correctly after a mid-cycle load.
+        /// </summary>
+        public void SetHourFromSave(int hour, float hourPhase01)
+        {
+            CurrentHour = Mathf.Clamp(hour, 0, HOURS_PER_DAY - 1);
+            CurrentHourPhase = Mathf.Clamp01(hourPhase01);
+            _accumSeconds = CurrentHourPhase * secondsPerHour;
+            // If we loaded into hour 0 again, the 17th-hour beat for the next wrap is fresh.
+            // If we loaded into hour 1+, the beat already fired this cycle.
+            _seventeenthFiredThisCycle = CurrentHour >= 1;
+            ResolveSunLight();
+            UpdateSun();
+        }
+
         void UpdateSun()
         {
             if (_sunLight == null) return;

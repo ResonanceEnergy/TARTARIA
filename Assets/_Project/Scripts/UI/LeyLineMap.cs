@@ -44,6 +44,21 @@ namespace Tartaria.UI
         private HashSet<string> _restoredIds = new();
         private bool _activated;
 
+        /// <summary>Public flag for save coordinator — whether the ley-line thread has been awakened.</summary>
+        public static bool IsActivated => _instance != null && _instance._activated;
+
+        /// <summary>
+        /// Save-round-trip restore: re-activate the map without requiring an OnBuildingRestored event
+        /// to fire again on F9. Idempotent.
+        /// </summary>
+        public static void RestoreActivatedFromSave()
+        {
+            if (_instance == null) return;
+            if (_instance._activated) return;
+            _instance._activated = true;
+            _instance.Activate();
+        }
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void BootstrapOnLoad()
         {
