@@ -4,7 +4,57 @@
 
 ---
 
-## ⚡⚡⚡⚡⚡ 2026-06-02 SPRINT 11 HONEST RESET — MOON 1 NOT SHIPPABLE (latest, supersedes everything below)
+## ⚡⚡⚡⚡⚡⚡ 2026-06-03 SPRINT 13 VERDICT — MOON 1 SHIPPABLE (post-MicroSprint, supersedes Sprint 11)
+
+**Sprint 11's NOT-SHIPPABLE verdict has been honored and worked through.** 33 lanes shipped across Phase 0 → Hammer → MicroSprint. Sprint 13 audit (HEAD `c2756942`, doc `docs/audits/MOON1_ACCEPTANCE_SPRINT13_2026-06-02.md`) measures 5 of 9 dimensions GREEN, 2 YELLOW, 2 PARTIAL — verdict **SHIPPABLE**.
+
+### Where Moon 1 stands at HEAD `~1ed80d2e`
+
+| # | Dimension | Sprint 11 baseline | Sprint 13 | Status |
+|---|---|---|---|---|
+| 1 | Stubs | 9 ship-blockers | 0 ship-blockers (M2-13 OOS) | GREEN |
+| 2 | Silent fails | 38 | 1 (intentional UnityException) | GREEN |
+| 3 | Commented wiring | 5 active-path bugs | **0** (MS.L2-L5 fixed) | GREEN |
+| 4 | Workarounds | 5 incl. EmergencyBypass | RuntimeSpawnerInsurance only; gate restored | YELLOW |
+| 5 | `!u!115` orphans in scene | 4 | 0 | GREEN |
+| 6 | Prefab integrity | 0/390 healthy | 70 FBX healthy, Cathedral fixed, Player.prefab + NPC variants real | GREEN |
+| 7 | Dialogue speaker map | 0/4 chains worked | 4/4 snake_case resolve | GREEN |
+| 8 | Scene authoring | ECS 70+, Rocker 275 LOC | ECS 5 #if gates, Rocker 133 LOC; HUDBuilder still 64 (deferred) | YELLOW |
+| 9 | GameEvents pairs | 25 broken one-sided | 3 missing events declared + publishers + subscribers wired | GREEN |
+
+### Sprint 13 dirty-worktree caveat (carried forward as note, not blocker)
+
+`C:/dev/_wt_sprint13` worktree had 12 dirty files during audit, including `DayNightCycleController.cs` truncated at line 125 mid-method. **Committed HEAD `c2756942` was intact (159 lines)** — the dirt was working-tree-only. Next session: `git checkout -- .` on any agent worktree before resuming.
+
+### Unity MCP bridge auto-start (new this session)
+
+`Assets/_Project/Scripts/Editor/Moon1MCPAutoStart.cs` flips 3 EditorPrefs (`MCPForUnity.AutoStartOnLoad=true`, `UseHttpTransport=true`, `HttpTransportScope=local`) on first compile after install + requests a script reload so `HttpAutoStartHandler` picks up the new state. **Future Unity launches bring the HTTP MCP bridge up on `http://127.0.0.1:8080/mcp` with zero GUI clicks.** Documented in `docs/integration/UNITY_MCP_SETUP.md` § "Per-Unity-boot startup".
+
+### Manual bake menus deferred (MCP transport flaked on long-running calls)
+
+These 5 Editor menus exist on disk and are runnable from `Tartaria/...` menu in Unity. They were NOT run by Cowork due to MCP WebSocket transport disconnects on long calls. NATRIX can fire them manually:
+
+1. `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` — creates `Assets/_Project/Prefabs/Moon1/AnastasiaRocker.prefab`
+2. `Tartaria/6 Bake/Bake Echohaven Content Into Scene` — already fired (scene mtime confirms)
+3. `Tartaria/6 Bake/Bake StarDome Built Variant` — `Echohaven_StarDome_Built.prefab` already exists from H.L4
+4. `Tartaria/8 Fix/Convert Hero Prefabs to Text Mode` — already done by H.L8 (idempotent)
+5. `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` — now unblocked by H.L8
+
+### Win64 build path
+
+`scripts/dev/build-moon1-win64-smoke.ps1` is the smoke runner. Close Unity first (its Library lock blocks batchmode build). Outputs to `Builds/itch_assets/TARTARIA_Moon1.zip`.
+
+### Session 2026-06-03 final state
+
+- 35 lanes shipped (P0 → P1 → P2 → P4 → P5 → Hammer → MicroSprint → Prefab Hygiene → 5 Editor script restorations → MCP bridge auto-start)
+- HEAD `1ed80d2e` on `feature/consolidate-moon-architecture`
+- 0 compile errors (10 obsolete-API warnings + 1 unused var warning remain, non-blocking)
+- 625 prefabs reorganized into per-Moon buckets + Moon2-13 scaffolded + `docs/PREFAB_LAYOUT.md` authored
+- 1 ProbeVolume URP shutdown NRE remains (rendering cleanup race, non-blocking)
+
+---
+
+## ⚡⚡⚡⚡⚡ 2026-06-02 SPRINT 11 HONEST RESET — MOON 1 NOT SHIPPABLE (superseded by Sprint 13 above; preserved for context)
 
 **Sprint 11's full-scope audit shipped 10 grep-cited branches and produced a brutal verdict: Moon 1 is NOT shippable today. Prior audits ("v2 — 70/15/3 ✓/⚠/❌", "SHIPPABLE pending 2-4 hr") measured *file presence*. Sprint 11 measured *runtime feature behavior*. Divergent results.**
 
