@@ -79,6 +79,9 @@ namespace Tartaria.Gameplay
         {
             // Initialize checkpoint to spawn position
             _lastCheckpointPosition = transform.position;
+            // P2.L2: prime HUD with initial HP so the bar isn't stuck at 0 before first damage.
+            // GameEvents.cs:143, 561 — Action<float,float>(current, max).
+            GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
         }
 
         void Update()
@@ -123,6 +126,8 @@ namespace Tartaria.Gameplay
 
             // Raise GameEvents for UI/systems
             GameEvents.RaisePlayerDamaged(amount, CurrentHealth);
+            // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561 — Action<float,float> current,max).
+            GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
 
             // Check for death
             if (CurrentHealth <= 0f && !_isDead)
@@ -145,6 +150,8 @@ namespace Tartaria.Gameplay
             {
                 OnHealed?.Invoke(amount);
                 OnHealthChanged?.Invoke(HealthPercent);
+                // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561).
+                GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
             }
         }
 
@@ -156,6 +163,8 @@ namespace Tartaria.Gameplay
             if (_isDead) return;
 
             CurrentHealth = 0f;
+            // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561).
+            GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
             Die(instigator);
         }
 
@@ -214,6 +223,8 @@ namespace Tartaria.Gameplay
             OnPlayerRespawned?.Invoke();
             OnHealthChanged?.Invoke(HealthPercent);
             GameEvents.RaisePlayerRespawned();
+            // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561) — refill from 0 to MaxHealth on respawn.
+            GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
 
             Debug.Log($"[PlayerHealth] Respawned with {CurrentHealth:F1}/{MaxHealth:F1} HP");
         }
@@ -246,6 +257,8 @@ namespace Tartaria.Gameplay
         {
             CurrentHealth = MaxHealth;
             OnHealthChanged?.Invoke(HealthPercent);
+            // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561).
+            GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
             Debug.Log("[PlayerHealth] Health restored to full.");
         }
 
@@ -277,6 +290,8 @@ namespace Tartaria.Gameplay
             {
                 CurrentHealth = MaxHealth;
                 _lastCheckpointPosition = Vector3.zero;
+                // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561).
+                GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
                 Debug.Log("[PlayerHealth] No saved data - initialized to defaults");
                 return;
             }
@@ -292,6 +307,8 @@ namespace Tartaria.Gameplay
                     IsInvulnerable = false;
 
                     OnHealthChanged?.Invoke(HealthPercent);
+                    // P2.L2: HUD health bar publisher (GameEvents.cs:143, 561) — sync HUD to loaded HP.
+                    GameEvents.RaisePlayerHealthChanged(CurrentHealth, MaxHealth);
                     Debug.Log($"[PlayerHealth] Loaded state: {CurrentHealth:F1}/{MaxHealth:F1} HP, Checkpoint: {_lastCheckpointPosition}");
                 }
                 catch (Exception e)
