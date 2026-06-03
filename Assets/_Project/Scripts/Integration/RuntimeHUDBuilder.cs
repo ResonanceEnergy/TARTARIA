@@ -57,6 +57,16 @@ namespace Tartaria.Integration
         bool _prevTuneKey;
         GameObject _tuningOverlayGO;
 
+        // MS.L1 (Sprint 12 fix) — cached TMP_Text refs for live-data subscribers.
+        // Defends against HUDController polling racing with null AetherFieldManager/PlayerHealth at scene-load.
+        // Sentinel strings ("RS --", "Aether --") replace the prior hardcoded "RS: 0" / "Aether: 0" lies.
+        TMPro.TextMeshProUGUI _rsText;          // RSGauge bottom-center label (WireHUD)
+        TMPro.TextMeshProUGUI _aetherText;      // AetherBar top-right label   (WireHUD)
+        TMPro.TextMeshProUGUI _rsDisplayText;   // Skill tree header RS readout (BuildSkillTreeUI)
+        System.Action<float> _onRSChangedHandler;
+        System.Action<float> _onAetherChangedHandler;
+        System.Action<float, float> _onPlayerHealthChangedHandler;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         static void Bootstrap()
         {
@@ -99,6 +109,11 @@ namespace Tartaria.Integration
             GameEvents.OnTogglePause -= HandleTogglePause;
             GameEvents.OnToggleAetherVision -= HandleAetherVisionToggle;
             GameEvents.OnBuildingRestored -= HandleBuildingRestored;
+
+            // MS.L1 — unsubscribe live-data handlers with the same delegate identity used in SubscribeLiveData().
+            if (_onRSChangedHandler != null) GameEvents.OnRSChanged -= _onRSChangedHandler;
+            if (_onAetherChangedHandler != null) GameEvents.OnAetherEnergyChanged -= _onAetherChangedHandler;
+            if (_onPlayerHealthChangedHandler != null) GameEvents.OnPlayerHealthChanged -= _onPlayerHealthChangedHandler;
         }
 
         void Update()
@@ -236,6 +251,36 @@ namespace Tartaria.Integration
             GameEvents.OnTogglePause += HandleTogglePause;
             GameEvents.OnToggleAetherVision += HandleAetherVisionToggle;
             GameEvents.OnBuildingRestored += HandleBuildingRestored;
+
+            // MS.L1 (Sprint 12 #1) — subscribe runtime-built HUD TMP_Text refs to live GameEvents.
+            // Replaces hardcoded "RS: 0" / "Aether: 0" lies. GameEvents.cs:321 (OnRSChanged),
+            // GameEvents.cs:149 (OnAetherEnergyChanged), GameEvents.cs:143 (OnPlayerHealthChanged).
+            // Handlers stored in fields so OnDestroy can unsubscribe with the same delegate identity.
+            SubscribeLiveData();
+        }
+
+        // MS.L1 — live-data subscribers for runtime-built HUD text refs.
+        void SubscribeLiveData()
+        {
+            _onRSChangedHandler = rs =>
+            {
+                if (_rsText != null) _rsText.text = $"RS {(int)rs}";
+                if (_rsDisplayText != null) _rsDisplayText.text = $"RS {(int)rs}";
+            };
+            _onAetherChangedHandler = aether =>
+            {
+                if (_aetherText != null) _aetherText.text = $"Aether {(int)aether}";
+            };
+            _onPlayerHealthChangedHandler = (cur, max) =>
+            {
+                // No dedicated player-health TMP_Text exists in this runtime builder yet
+                // (boss health panel is separate). Handler is still wired so future HP text
+                // can be cached in a field and updated here without re-touching subscription code.
+            };
+
+            GameEvents.OnRSChanged += _onRSChangedHandler;
+            GameEvents.OnAetherEnergyChanged += _onAetherChangedHandler;
+            GameEvents.OnPlayerHealthChanged += _onPlayerHealthChangedHandler;
         }
 
         void BuildControlsHint(RectTransform canvasRT)
@@ -496,11 +541,12 @@ namespace Tartaria.Integration
 
             var rsTextGO = CreateChild(rsGaugeRT, "RSText");
             var rsText = rsTextGO.AddComponent<TextMeshProUGUI>();
-            rsText.text = "RS: 0";
+            rsText.text = "RS --"; // MS.L1: sentinel — first OnRSChanged event fires the real value (see SubscribeLiveData)
             rsText.fontSize = 20;
             rsText.alignment = TextAlignmentOptions.Center;
             rsText.color = Color.white;
             SetStretchAll(rsTextGO.GetComponent<RectTransform>());
+            _rsText = rsText; // MS.L1: cache for OnRSChanged subscriber
 
             // Aether Charge Bar (top-right)
             var aetherRT = CreatePanel(canvasRT, "AetherBar", new Vector2(1f, 1f), new Vector2(1f, 1f),
@@ -512,11 +558,12 @@ namespace Tartaria.Integration
 
             var aetherTextGO = CreateChild(aetherRT, "AetherText");
             var aetherText = aetherTextGO.AddComponent<TextMeshProUGUI>();
-            aetherText.text = "Aether: 0";
+            aetherText.text = "Aether --"; // MS.L1: sentinel — first OnAetherEnergyChanged event fires the real value
             aetherText.fontSize = 20;
             aetherText.alignment = TextAlignmentOptions.Center;
             aetherText.color = Color.white;
             SetStretchAll(aetherTextGO.GetComponent<RectTransform>());
+            _aetherText = aetherText; // MS.L1: cache for OnAetherEnergyChanged subscriber
 
             // Interaction Prompt (center-bottom)
             var promptRT = CreatePanel(canvasRT, "InteractionPrompt", new Vector2(0.5f, 0.15f), new Vector2(0.5f, 0.15f),
@@ -1710,10 +1757,11 @@ namespace Tartaria.Integration
 
             var rsDisplayGO = CreateChild(headerRT, "RSDisplay");
             var rsDisplayText = rsDisplayGO.AddComponent<TextMeshProUGUI>();
-            rsDisplayText.text = "RS: 0";
+            rsDisplayText.text = "RS --"; // MS.L1: sentinel — first OnRSChanged event fires the real value
             rsDisplayText.fontSize = 16;
             rsDisplayText.alignment = TextAlignmentOptions.Right;
             rsDisplayText.color = new Color(0.9f, 0.85f, 0.3f);
+            _rsDisplayText = rsDisplayText; // MS.L1: cache for OnRSChanged subscriber (shared with WireHUD's _rsText)
             var rsDispRT = rsDisplayGO.GetComponent<RectTransform>();
             rsDispRT.anchorMin = new Vector2(0.82f, 0.1f);
             rsDispRT.anchorMax = new Vector2(0.98f, 0.9f);
