@@ -22,7 +22,11 @@ namespace Tartaria.Editor
     /// </summary>
     public static class Moon1Tier1Master
     {
-        [MenuItem("Tartaria/0 ★ MASTER/Tier 1 — FBX + Terrain + Splats + Lighting", priority = 20)]
+        // SUPERSEDED by Moon1MasterBootstrap per Sprint 11 L8 50ff78ea (Hammer Lane 6 consolidation 2026-06-02).
+        // Tier 1 was an asset-pipeline sequencer (Blender batches + Terrain + Splats + Lighting) — different scope
+        // from a scene-bootstrap. Run logic preserved; menu hidden so only the canonical Bootstrap menu remains
+        // under "Tartaria/0 ★ MASTER/". To re-fire the sequence, call Moon1Tier1Master.Run() from another menu/script.
+        // [MenuItem("Tartaria/0 ★ MASTER/Tier 1 — FBX + Terrain + Splats + Lighting", priority = 20)]
         public static void Run()
         {
             if (!EditorUtility.DisplayDialog("Tier 1 Master",
