@@ -9,7 +9,7 @@ namespace Tartaria.Editor
     /// Tartaria/Input/DEEP DIAGNOSE Player Setup
     ///
     /// Walks every CharacterController in the active scene + lists every component
-    /// on it + parents + scene-wide PlayerInputHandler / Moon1HardOverrideDriver /
+    /// on it + parents + scene-wide PlayerInputHandler /
     /// PlayerSpawner / Rigidbody count, plus Time.timeScale, InputSystem settings.
     /// Use BEFORE entering Play mode to spot what's competing with controller input.
     /// </summary>
@@ -62,23 +62,17 @@ namespace Tartaria.Editor
                 }
             }
 
-            // Find ALL PlayerInputHandler / Moon1HardOverrideDriver / SimplePlayerDriver instances
+            // Find ALL PlayerInputHandler instances (retired bypass drivers Moon1HardOverrideDriver/Moon1GodMode/SimplePlayerDriver no longer scanned -- deleted P4.L5)
             sb.AppendLine();
             var allMBs2 = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
-            int phiCount = 0, mhodCount = 0, spdCount = 0, godCount = 0;
+            int phiCount = 0;
             foreach (var m in allMBs2)
             {
                 if (m == null) continue;
                 string n = m.GetType().Name;
                 if (n == "PlayerInputHandler") phiCount++;
-                if (n == "Moon1HardOverrideDriver") mhodCount++;
-                if (n == "SimplePlayerDriver") spdCount++;
-                if (n == "Moon1GodMode") godCount++;
             }
             sb.AppendLine($"PlayerInputHandler instances: {phiCount}");
-            sb.AppendLine($"Moon1HardOverrideDriver instances: {mhodCount}");
-            sb.AppendLine($"SimplePlayerDriver instances: {spdCount}");
-            sb.AppendLine($"Moon1GodMode instances: {godCount}");
 
             // Player tag GameObject
             var pTag = GameObject.FindGameObjectWithTag("Player");
