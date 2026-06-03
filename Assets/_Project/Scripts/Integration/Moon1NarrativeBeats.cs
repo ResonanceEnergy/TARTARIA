@@ -2,12 +2,19 @@ using System;
 using System.Collections;
 using UnityEngine;
 using Tartaria.Core;
+using Tartaria.Audio;
 
 namespace Tartaria.Integration
 {
     [DefaultExecutionOrder(40)]
     public class Moon1NarrativeBeats : MonoBehaviour
     {
+        // PlayerPrefs key matching the GiantKeys pattern (line 98 of GiantSkeletonKeyPickup).
+        // Tracks first-prophecy-fragment unlock state so the beat is idempotent across save loads.
+        const string PROPHECY_FRAGMENT_PREF = "TARTARIA_M1_ProphecyFragment1";
+        // Cue ids registered by Moon1PopulateAudioCueLibrary.cs:65-67.
+        const string CUE_SKELETON_HUM = "moon1.skeleton.hum_prophecy";
+
         bool _eruptionFired;
         bool _giantKeySpawned;
 
@@ -55,6 +62,28 @@ namespace Tartaria.Integration
             // CompanionMilestone+targetId=="lirael_17th_m1"). 17th-hour beat is the canonical
             // trigger per docs/03 Days 25-28 + docs/03C Moon 1 Revelation.
             QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, "lirael_17th_m1");
+
+            // H2.L5 - First prophecy fragment unlock. PlayerPrefs flag mirrors the
+            // GiantKeys pattern (Moon1NarrativeBeats.cs:98) so the beat is idempotent
+            // across save loads.
+            UnlockFirstProphecyFragment();
+        }
+
+        /// <summary>
+        /// First prophecy fragment unlock — sets the persistent state flag and surfaces a HUD banner.
+        /// Idempotent: skips if already unlocked. Per docs/15 + docs/03 Moon 1 climactic moment.
+        /// </summary>
+        void UnlockFirstProphecyFragment()
+        {
+            if (PlayerPrefs.GetInt(PROPHECY_FRAGMENT_PREF, 0) >= 1) return;
+            PlayerPrefs.SetInt(PROPHECY_FRAGMENT_PREF, 1);
+            PlayerPrefs.Save();
+            try { GameEvents.RaiseHUDShowObjective("Prophecy Fragment unlocked — The Skeleton Hum reveals the first verse"); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1NarrativeBeats)}] {nameof(UnlockFirstProphecyFragment)} HUD banner failed: {ex.GetType().Name}: {ex.Message}\n  context: prophecy fragment 1 still unlocked in PlayerPrefs\n{ex.StackTrace}");
+                // Non-fatal: PlayerPrefs flag is already set above; only the banner is missed.
+            }
         }
 
         IEnumerator CathedralLightEruption()
@@ -64,6 +93,17 @@ namespace Tartaria.Integration
             GameObject vfx = null;
             var vfxPrefab = Resources.Load<GameObject>("VFX/Moon1/VFX_CathedralLightEruption");
             if (vfxPrefab != null) vfx = Instantiate(vfxPrefab, center + Vector3.up * 4f, Quaternion.identity);
+
+            // H2.L5 - Skeleton hum prophecy audio cue. The cue id is registered by
+            // Moon1PopulateAudioCueLibrary.cs:65-67 -> Skeleton_Hum_Prophecy.wav.
+            // 3D-positioned at the cathedral center so it lines up with the eruption VFX.
+            try { AudioManager.Instance?.PlayCue(CUE_SKELETON_HUM, center + Vector3.up * 2f); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1NarrativeBeats)}] {nameof(CathedralLightEruption)} skeleton hum PlayCue failed: {ex.GetType().Name}: {ex.Message}\n  context: cueId={CUE_SKELETON_HUM} center={center}\n{ex.StackTrace}");
+                // Non-fatal: VFX + objective banner still fire; only the prophecy hum is missed.
+            }
+
             try { GameEvents.RaiseHUDShowObjective("Cathedral Light Eruption!"); }
             catch (Exception ex)
             {
