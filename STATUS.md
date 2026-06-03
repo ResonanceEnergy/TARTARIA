@@ -5,6 +5,41 @@
 
 ---
 
+## 2026-06-03 (afternoon) — 13-lane HAMMER session shipped + MCP recovery
+
+**Content build, no release framing.** Punch list status at HEAD `~e0e1cc1e`:
+
+| Item | Status | SHA |
+|---|---|---|
+| 1. Anastasia Rocker.prefab bake | DEFERRED to manual Unity session | `Tartaria/6 Bake/Bake Anastasia Rocker Prefab` |
+| 2. Hero Detail_* primitive replace | DEFERRED to manual Unity session | `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` |
+| 3. 347 flat Blender prefabs | ✅ migrated to Architecture/Audio/NPCs/Plates/Props/VFX (111/23/33/8/162/10 = 347, 0 ambiguous) | C.L1 `69f99cb1` |
+| 4. 11 silent fails outside top-5 | ✅ context-logged (count→0) | C.L2 `290e74a0` |
+| 5. RuntimeHUDBuilder 64 new GameObject | DEFERRED — surgical event wiring shipped MS.L1 | H.L2 deferral |
+| 6. RuntimeSpawnerInsurance.cs dead file | ✅ deleted | `9739a91d` |
+| 7. Tuning variant routing (A/B/C dispatch by config.variant) | ✅ shipped | C.L5 `519d0c52` |
+| 8. Quest tree end-to-end (5 Moon 1 quests) | ✅ shipped | C.L4 `2c8c9c96` |
+| 9. Variant B Waveform real-or-stub | ✅ audited (237 LOC real, just needed routing) | C.L3 `b44df79d` |
+| A. 9 village buildings + props vs docs/15 | ✅ Apothecary added, 31 props verified | H2.L1 `263235f2` |
+| B. Yarn dialogue tree (5 NPCs) | ✅ Bob innkeeper.yarn + trigger added | H2.L2 `f78d1ba9` |
+| C. Combat — ResetScout death pipeline | ✅ EnemyKilled + InventoryManager added (MudGolem parity) | H2.L3 `b61df552` |
+| D. Audio matrix (zone/tuning/restoration/cinematic) | ✅ covered (cinematic via H2.L5 skeleton hum PlayCue) | rolled into L5 |
+| E. 17th-hour beat — skeleton hum + first prophecy fragment | ✅ shipped | H2.L5 `c9607ed5` |
+| F. Ley line mini-map chain + duplicate archived | ✅ shipped (recovered after partial-checkout disaster) | `cc5b0a09` |
+| G. Save/load round-trip Moon 1 | ✅ Moon1SaveCoordinator.cs (277 LOC) | H2.L7 `81de1088` |
+
+**End-of-session recovery:**
+- C.L2's silent-fails fix had 6 broken multi-line interpolated strings (CS1039) — fixed at `a4f8929f`
+- H2.L7 referenced LeyLineMap.IsActivated + RestoreActivatedFromSave that got clobbered by L6 partial-checkout recovery — restored as static accessors at `e0e1cc1e`
+- L6 partial-checkout disaster: agent's worktree had only LeyLineMap.cs materialized, first merge attempt nuked 19,428 root files. Reset to `dda7d460` + manual cherry-pick. Lesson added to CLAUDE.md.
+
+**MCP bridge recovery:**
+- Unity was stuck in SAFE MODE all day due to compile errors. Killed + relaunched.
+- UPM (Unity Package Manager) IPC startup was blocked by Windows Defender. Added exclusions via `scripts/dev/Add-Unity-Defender-Exclusion.ps1` (process + path exclusions for `UnityPackageManager.exe`, `Unity.exe`, project Library/Temp/obj, Unity caches).
+- Unity is currently in cold Library rebuild — port 8080 will auto-listen once import settles.
+
+---
+
 ## 🛑 2026-06-03 — NATRIX MANDATE: NO RELEASE FRAMING
 
 **Everything below labelled "ship candidate", "release cut", "ship-gate", "butler", "ship verdict" etc. is HISTORICAL and SUPERSEDED.** Per NATRIX (verbatim 2026-06-03): *"remove win64 build from your mind we arent doing that until 13 moons are complete.. lets focus on moon 1 then once 100% complete we will move on to moon 2 .. no itch no win64.. stop short cutting being lazy and railraoding the ajenda"*
