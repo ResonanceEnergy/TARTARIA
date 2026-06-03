@@ -105,10 +105,31 @@ namespace Tartaria.Integration
             };
             TartarianArchitectureBuilder.Decorate(building, kind, fallbackScale);
 
+            // Defensive guard — Decorate() or earlier paths may have destroyed `building`,
+            // or AddComponent may fail if [RequireComponent] dependencies aren't satisfied.
+            if (building == null)
+            {
+                Debug.LogError($"[BuildingSpawner] WireBuilding({buildingId}): `building` became null after fallback/decorate. " +
+                               $"Skipping InteractableBuilding wiring. position={position} sceneNames=[{string.Join(",", sceneNames)}]");
+                return;
+            }
+
             // Ensure InteractableBuilding component
             var interactable = building.GetComponent<InteractableBuilding>();
             if (interactable == null)
+            {
+                // [RequireComponent(typeof(Collider))] — make sure the prerequisite is there
+                // before AddComponent, so the call doesn't silently fail and return null.
+                if (building.GetComponent<Collider>() == null)
+                    building.AddComponent<BoxCollider>();
                 interactable = building.AddComponent<InteractableBuilding>();
+            }
+            if (interactable == null)
+            {
+                Debug.LogError($"[BuildingSpawner] WireBuilding({buildingId}): AddComponent<InteractableBuilding> returned null on '{building.name}'. " +
+                               $"This usually means [RequireComponent] dependencies couldn't be satisfied or the type failed to compile. Skipping wiring.");
+                return;
+            }
 
             // Inject buildingId and materials (AddComponent leaves SerializeFields null)
             interactable.SetBuildingId(buildingId);
