@@ -167,4 +167,8 @@ namespace TartariaEditor.Sprint11
             }
             catch
             {
-                return fal
+                return false;
+            }
+        }
+    }
+}

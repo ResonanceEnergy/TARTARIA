@@ -390,4 +390,7 @@ namespace Tartaria.Editor
             string full = Path.Combine(Directory.GetCurrentDirectory(), projectRelative);
             if (!Directory.Exists(full)) Directory.CreateDirectory(full);
             AssetDatabase.Refresh();
-       
+        }
+    }
+}
+#endif

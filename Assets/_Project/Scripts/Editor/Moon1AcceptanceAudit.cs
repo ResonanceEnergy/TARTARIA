@@ -137,4 +137,7 @@ namespace Tartaria.Editor
             string full = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), root);
             if (!System.IO.Directory.Exists(full)) return 0;
             return System.IO.Directory.GetFiles(full, "*" + ext, System.IO.SearchOption.AllDirectories).Length;
-       
+        }
+    }
+}
+#endif
