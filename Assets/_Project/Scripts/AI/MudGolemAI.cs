@@ -285,6 +285,8 @@ namespace Tartaria.AI
                     break;
                 case GolemState.Chase:
                     if (_hasNavMesh) _agent.speed = chaseSpeed;
+                    // P2.L4 Sprint 11 L9 - enemy bark on aggro acquisition (once per Chase entry)
+                    GameEvents.RaiseHUDShowEnemyBark("The mud stirs — it's seen you!", 2.5f);
                     break;
                 case GolemState.Attack:
                     if (_hasNavMesh) _agent.isStopped = true;
@@ -595,6 +597,7 @@ namespace Tartaria.AI
 
             // Award RS via GameEvents
             GameEvents.FireRSChange(5f);
+            GameEvents.RaiseHUDFlashRSGain(5f); // P2.L4 Sprint 11 L9 - golem kill RS flash
 
             // 2026-05-31: MudGolemHealth is now in the same (AI) assembly. Call Kill directly
             // so OnAnyGolemDied fires, loot drops, and pooling lifecycle runs. The old
