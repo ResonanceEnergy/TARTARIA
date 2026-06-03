@@ -178,13 +178,16 @@ namespace Tartaria.UI
         }
 
         // H2.L7 save/load integration — Moon1SaveCoordinator reads IsActivated on save +
-        // calls RestoreActivatedFromSave on load. (Re-applied after L6 partial-checkout overwrote them.)
-        public bool IsActivated => _activated;
-        public void RestoreActivatedFromSave(bool wasActivated)
+        // calls RestoreActivatedFromSave on load. STATIC accessors so the coordinator
+        // (which doesn't hold an instance handle) can read/write activation without a lookup.
+        // (Re-applied after L6 partial-checkout overwrote them.)
+        public static bool IsActivated => _instance != null && _instance._activated;
+        public static void RestoreActivatedFromSave()
         {
-            if (wasActivated && !_activated)
+            if (_instance == null) return;
+            if (!_instance._activated)
             {
-                _activated = true;
+                _instance._activated = true;
                 // No need to re-fire quest progression — quest state is restored by QuestManager separately.
                 Debug.Log("[LeyLineMap] Restored activated=true from save (skipping quest progression replay).");
             }
