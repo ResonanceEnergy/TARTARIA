@@ -134,16 +134,52 @@ namespace Tartaria.Camera
                 binding: "<Gamepad>/rightStick",
                 processors: "StickDeadzone(min=0.08)"); // Lowered from 0.15 — was eating valid input
             _gamepadOrbitAction.Enable();
+
+            // P2.L3 — Death/Respawn camera fade (Sprint 11 L9 fix).
+            GameEvents.OnPlayerDeath += HandlePlayerDeath;
+            GameEvents.OnPlayerRespawned += HandlePlayerRespawned;
         }
 
         void OnDisable()
         {
+            GameEvents.OnPlayerDeath -= HandlePlayerDeath;
+            GameEvents.OnPlayerRespawned -= HandlePlayerRespawned;
+
             _zoomAction?.Disable();
             _zoomAction?.Dispose();
             _zoomAction = null;
             _gamepadOrbitAction?.Disable();
             _gamepadOrbitAction?.Dispose();
             _gamepadOrbitAction = null;
+        }
+
+        // ─── P2.L3 Death/Respawn camera fade ───
+        bool _deathFadeActive;
+        float _deathFadeAmount; // 0 = normal, 1 = full grey
+        const float DeathFadeSpeed = 1.5f;
+
+        void HandlePlayerDeath()
+        {
+            _deathFadeActive = true;
+        }
+
+        void HandlePlayerRespawned()
+        {
+            _deathFadeActive = false;
+        }
+
+        void OnGUI()
+        {
+            // Drive grey fade target.
+            float target = _deathFadeActive ? 1f : 0f;
+            _deathFadeAmount = Mathf.MoveTowards(_deathFadeAmount, target, Time.unscaledDeltaTime * DeathFadeSpeed);
+            if (_deathFadeAmount <= 0.001f) return;
+
+            // Full-screen desaturated grey overlay (sits behind HUDController's death overlay due to script-order).
+            var prev = GUI.color;
+            GUI.color = new Color(0.18f, 0.18f, 0.2f, 0.65f * _deathFadeAmount);
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = prev;
         }
 
         void OnDestroy()
