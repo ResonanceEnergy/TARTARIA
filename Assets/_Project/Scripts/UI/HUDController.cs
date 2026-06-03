@@ -159,6 +159,10 @@ namespace Tartaria.UI
             GameEvents.OnHUDShowCorruptionWhisper += ShowCorruptionWhisper;
             GameEvents.OnHUDUpdateFrequencyWheel += UpdateFrequencyWheel;
 
+            // P2.L3 — Death/Respawn HUD wiring (Sprint 11 L9 fix).
+            GameEvents.OnPlayerDeath += HandlePlayerDeath;
+            GameEvents.OnPlayerRespawned += HandlePlayerRespawned;
+
             // Seed count from persistent tracker (survive reloads)
             _clearedMoonCount = ServiceLocator.MoonProgress?.ClearedCount ?? 0;
         }
@@ -194,6 +198,10 @@ namespace Tartaria.UI
             GameEvents.OnHUDShowEnemyBark -= ShowEnemyBark;
             GameEvents.OnHUDShowCorruptionWhisper -= ShowCorruptionWhisper;
             GameEvents.OnHUDUpdateFrequencyWheel -= UpdateFrequencyWheel;
+
+            // P2.L3 — Death/Respawn HUD wiring (Sprint 11 L9 fix).
+            GameEvents.OnPlayerDeath -= HandlePlayerDeath;
+            GameEvents.OnPlayerRespawned -= HandlePlayerRespawned;
         }
 
         void Update()
@@ -654,6 +662,63 @@ namespace Tartaria.UI
         {
             DrawMoonCounter();
             DrawPurgeHoldBar();
+            DrawDeathOverlay();
+        }
+
+        // ─── P2.L3 Death Overlay (Sprint 11 L9 fix) ───
+        // Shown when GameEvents.OnPlayerDeath fires; cleared on OnPlayerRespawned.
+        bool _deathOverlayVisible;
+        float _deathOverlayFadeIn;
+
+        void HandlePlayerDeath()
+        {
+            _deathOverlayVisible = true;
+            _deathOverlayFadeIn = 0f;
+            // Hide combat / synergy panels so the death frame reads cleanly.
+            if (frequencyWheelPanel != null) frequencyWheelPanel.gameObject.SetActive(false);
+            _frequencyWheelVisible = false;
+            if (synergyHintText != null) synergyHintText.gameObject.SetActive(false);
+            AccessibilityManager.Instance?.AnnounceForScreenReader("You have fallen. The Aether will return you to the last sanctuary.", true);
+            AccessibilityManager.Instance?.PostSFXCaption("Death", "The Aether dims. You have fallen.");
+        }
+
+        void HandlePlayerRespawned()
+        {
+            _deathOverlayVisible = false;
+            _deathOverlayFadeIn = 0f;
+            AccessibilityManager.Instance?.AnnounceForScreenReader("Restored at the last sanctuary. Continue the restoration.", true);
+            AccessibilityManager.Instance?.PostSFXCaption("Respawn", "Restored. The Aether holds you again.");
+        }
+
+        void DrawDeathOverlay()
+        {
+            if (!_deathOverlayVisible) return;
+            _deathOverlayFadeIn = Mathf.Min(1f, _deathOverlayFadeIn + Time.unscaledDeltaTime * 1.5f);
+
+            // Full-screen dim
+            GUI.color = new Color(0.04f, 0.0f, 0.05f, 0.78f * _deathOverlayFadeIn);
+            GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
+
+            // YOU HAVE FALLEN
+            GUI.color = new Color(0.95f, 0.88f, 0.65f, _deathOverlayFadeIn);
+            var title = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 48,
+                fontStyle = FontStyle.Bold
+            };
+            title.normal.textColor = new Color(0.95f, 0.88f, 0.65f, _deathOverlayFadeIn);
+            GUI.Label(new Rect(0, Screen.height * 0.42f, Screen.width, 80f), "YOU HAVE FALLEN", title);
+
+            var sub = new GUIStyle(GUI.skin.label)
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontSize = 18
+            };
+            sub.normal.textColor = new Color(0.8f, 0.85f, 0.95f, _deathOverlayFadeIn);
+            GUI.Label(new Rect(0, Screen.height * 0.52f, Screen.width, 30f), "The Aether returns you to the last sanctuary…", sub);
+
+            GUI.color = Color.white;
         }
 
         void DrawMoonCounter()
