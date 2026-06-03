@@ -14,18 +14,21 @@ namespace Tartaria.Gameplay
 
         [SerializeField] WeaponType currentWeapon = WeaponType.Melee;
 
-        // PlayerCombat/PlayerRanged disabled (Phase 12) — weapon switching deferred
-        // PlayerCombat _melee;
-        // PlayerRanged _ranged;
+        PlayerCombat _melee;
+        PlayerRanged _ranged;
 
         public WeaponType CurrentWeapon => currentWeapon;
         public static event System.Action<WeaponType> OnWeaponChanged;
 
         void Awake()
         {
-            // PlayerCombat/PlayerRanged disabled (Phase 12)
-            // _melee = GetComponent<PlayerCombat>();
-            // _ranged = GetComponent<PlayerRanged>();
+            _melee = GetComponent<PlayerCombat>();
+            if (_melee == null)
+                Debug.LogWarning($"[PlayerWeaponSwitcher] {nameof(_melee)} not found on this GameObject — melee combat path won't work.");
+
+            _ranged = GetComponent<PlayerRanged>();
+            if (_ranged == null)
+                Debug.LogWarning($"[PlayerWeaponSwitcher] {nameof(_ranged)} not found on this GameObject — ranged combat path won't work.");
         }
 
         void Start()
@@ -58,9 +61,8 @@ namespace Tartaria.Gameplay
 
         void ApplyWeaponState()
         {
-            // PlayerCombat/PlayerRanged disabled (Phase 12)
-            // if (_melee != null) _melee.enabled = currentWeapon == WeaponType.Melee;
-            // if (_ranged != null) _ranged.enabled = currentWeapon == WeaponType.Bow;
+            if (_melee != null) _melee.enabled = currentWeapon == WeaponType.Melee;
+            if (_ranged != null) _ranged.enabled = currentWeapon == WeaponType.Bow;
         }
     }
 }
