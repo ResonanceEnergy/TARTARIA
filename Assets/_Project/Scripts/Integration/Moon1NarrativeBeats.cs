@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UnityEngine;
 using Tartaria.Core;
@@ -21,8 +22,25 @@ namespace Tartaria.Integration
             go.AddComponent<Moon1NarrativeBeats>();
         }
 
-        void OnEnable() { try { TartarianHourCycle.OnSeventeenthHour += HandleSeventeenthHour; } catch { } }
-        void OnDisable() { try { TartarianHourCycle.OnSeventeenthHour -= HandleSeventeenthHour; } catch { } }
+        void OnEnable()
+        {
+            try { TartarianHourCycle.OnSeventeenthHour += HandleSeventeenthHour; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1NarrativeBeats)}] {nameof(OnEnable)} failed to subscribe to TartarianHourCycle.OnSeventeenthHour: {ex.GetType().Name}: {ex.Message}\n  context: scene=Echohaven_VerticalSlice\n{ex.StackTrace}");
+                // Non-fatal: 17th-hour cathedral eruption beat will not fire this session, but the rest of Moon 1 narrative continues.
+            }
+        }
+
+        void OnDisable()
+        {
+            try { TartarianHourCycle.OnSeventeenthHour -= HandleSeventeenthHour; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1NarrativeBeats)}] {nameof(OnDisable)} failed to unsubscribe from TartarianHourCycle.OnSeventeenthHour: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak across scene changes; logged for diagnosis.
+            }
+        }
 
         void Start() { if (!_giantKeySpawned) SpawnGiantSkeletonKey(new Vector3(-40f, 1.2f, -20f)); }
 
@@ -40,8 +58,18 @@ namespace Tartaria.Integration
             GameObject vfx = null;
             var vfxPrefab = Resources.Load<GameObject>("VFX/Moon1/VFX_CathedralLightEruption");
             if (vfxPrefab != null) vfx = Instantiate(vfxPrefab, center + Vector3.up * 4f, Quaternion.identity);
-            try { GameEvents.RaiseHUDShowObjective("Cathedral Light Eruption!"); } catch { }
-            try { GameEvents.FireRSChange(20f); } catch { }
+            try { GameEvents.RaiseHUDShowObjective("Cathedral Light Eruption!"); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1NarrativeBeats)}] {nameof(CathedralLightEruption)} HUD objective raise failed: {ex.GetType().Name}: {ex.Message}\n  context: stardomePresent={(stardome != null)} center={center}\n{ex.StackTrace}");
+                // Non-fatal: VFX still plays, but the player won't see the on-screen objective banner.
+            }
+            try { GameEvents.FireRSChange(20f); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(Moon1NarrativeBeats)}] {nameof(CathedralLightEruption)} FireRSChange(+20) failed: {ex.GetType().Name}: {ex.Message}\n  context: cathedral eruption RS reward\n{ex.StackTrace}");
+                // Non-fatal: player misses the +20 RS reward; rest of beat continues.
+            }
             yield return new WaitForSeconds(6f);
             if (vfx != null) Destroy(vfx, 2f);
         }
@@ -72,8 +100,18 @@ namespace Tartaria.Integration
             if (current >= _keyNumber) return;
             PlayerPrefs.SetInt(KEYS_PREF, _keyNumber);
             PlayerPrefs.Save();
-            try { GameEvents.RaiseHUDShowObjective($"Giant Skeleton Key #{_keyNumber} of 8 collected"); } catch { }
-            try { GameEvents.FireRSChange(15f); } catch { }
+            try { GameEvents.RaiseHUDShowObjective($"Giant Skeleton Key #{_keyNumber} of 8 collected"); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(GiantSkeletonKeyPickup)}] {nameof(OnTriggerEnter)} HUD objective raise failed: {ex.GetType().Name}: {ex.Message}\n  context: keyNumber={_keyNumber} other={other?.name}\n{ex.StackTrace}");
+                // Non-fatal: pickup is still credited to PlayerPrefs above; only the HUD banner is missed.
+            }
+            try { GameEvents.FireRSChange(15f); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(GiantSkeletonKeyPickup)}] {nameof(OnTriggerEnter)} FireRSChange(+15) failed: {ex.GetType().Name}: {ex.Message}\n  context: keyNumber={_keyNumber}\n{ex.StackTrace}");
+                // Non-fatal: player misses the +15 RS reward; key is still counted.
+            }
             Destroy(gameObject);
         }
     }

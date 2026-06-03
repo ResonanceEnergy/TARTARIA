@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Tartaria.Core;
 using Tartaria.Gameplay;
@@ -25,14 +26,24 @@ namespace Tartaria.Integration
         {
             if (!other.CompareTag("Player") && other.GetComponentInParent<CharacterController>() == null) return;
             _playerInside = true;
-            try { GameEvents.RaiseHUDShowInteractionPrompt("Press [E] to tune (" + assignedVariant + ")"); } catch { }
+            try { GameEvents.RaiseHUDShowInteractionPrompt("Press [E] to tune (" + assignedVariant + ")"); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(TuningPedestalLink)}] {nameof(OnTriggerEnter)} HUD interaction prompt raise failed: {ex.GetType().Name}: {ex.Message}\n  context: buildingId={buildingId} nodeIndex={nodeIndex} variant={assignedVariant} other={other?.name}\n{ex.StackTrace}");
+                // Non-fatal: player still inside trigger, can still press E; only the on-screen 'Press E to tune' prompt is missed.
+            }
         }
 
         void OnTriggerExit(Collider other)
         {
             if (!other.CompareTag("Player") && other.GetComponentInParent<CharacterController>() == null) return;
             _playerInside = false;
-            try { GameEvents.RaiseHUDHideInteractionPrompt(); } catch { }
+            try { GameEvents.RaiseHUDHideInteractionPrompt(); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(TuningPedestalLink)}] {nameof(OnTriggerExit)} HUD interaction prompt hide failed: {ex.GetType().Name}: {ex.Message}\n  context: buildingId={buildingId} nodeIndex={nodeIndex} other={other?.name}\n{ex.StackTrace}");
+                // Non-fatal: prompt may remain stuck on-screen until next show/hide cycle; gameplay state is correct.
+            }
         }
 
         void Update()
@@ -63,7 +74,12 @@ namespace Tartaria.Integration
                                   : assignedVariant == TuningVariant.WaveformTrace ? 0.05f : 0.03f,
                 difficultySpeed = 0.3f + nodeIndex * 0.15f
             };
-            try { GameEvents.RaiseHUDShowObjective("Tuning " + buildingId + " node " + (nodeIndex + 1) + "/3"); } catch { }
+            try { GameEvents.RaiseHUDShowObjective("Tuning " + buildingId + " node " + (nodeIndex + 1) + "/3"); }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(TuningPedestalLink)}] {nameof(StartTuning)} HUD objective raise failed: {ex.GetType().Name}: {ex.Message}\n  context: buildingId={buildingId} nodeIndex={nodeIndex} variant={assignedVariant} targetFreq={config.targetFrequency}\n{ex.StackTrace}");
+                // Non-fatal: tuning mini-game still launches below; only the 'Tuning <id> node N/3' objective banner is missed.
+            }
             Debug.Log("[TuningPedestalLink] Starting " + assignedVariant + " on " + buildingId + " node " + nodeIndex);
 
             // Find the InteractableBuilding and route through its tuning path
