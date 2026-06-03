@@ -27,9 +27,7 @@ namespace Tartaria.Save
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[Save.SteamBridge] Type resolve failed: {ex.GetType().Name}: {ex.Message}
-  context: AppDomain assembly scan for Tartaria.Integration.SteamBridge
-{ex.StackTrace}");
+                Debug.LogWarning($"[Save.SteamBridge] Type resolve failed: {ex.GetType().Name}: {ex.Message}\n  context: AppDomain assembly scan for Tartaria.Integration.SteamBridge\n{ex.StackTrace}");
                 // Fallback: _t stays null, Steam features will report unavailable.
             }
             return _t;
@@ -47,9 +45,7 @@ namespace Tartaria.Save
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogWarning($"[Save.SteamBridge] IsSteamAvailable reflection failed: {ex.GetType().Name}: {ex.Message}
-  context: type={t?.FullName}
-{ex.StackTrace}");
+                    Debug.LogWarning($"[Save.SteamBridge] IsSteamAvailable reflection failed: {ex.GetType().Name}: {ex.Message}\n  context: type={t?.FullName}\n{ex.StackTrace}");
                     // Fallback: report Steam unavailable on reflection failure.
                 }
                 return false;
@@ -78,9 +74,7 @@ namespace Tartaria.Save
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[Save.SteamBridge] LoadCloudSave reflection error: {ex.GetType().Name}: {ex.Message}
-  context: filename={filename}
-{ex.StackTrace}");
+                Debug.LogWarning($"[Save.SteamBridge] LoadCloudSave reflection error: {ex.GetType().Name}: {ex.Message}\n  context: filename={filename}\n{ex.StackTrace}");
                 // Fallback: return null (caller treats as not-in-cloud).
             }
             return null;
@@ -96,9 +90,7 @@ namespace Tartaria.Save
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[Save.SteamBridge] DeleteCloudFile reflection error: {ex.GetType().Name}: {ex.Message}
-  context: filename={filename}
-{ex.StackTrace}");
+                Debug.LogWarning($"[Save.SteamBridge] DeleteCloudFile reflection error: {ex.GetType().Name}: {ex.Message}\n  context: filename={filename}\n{ex.StackTrace}");
                 // Fallback: return false (delete reported as failed; caller may retry).
             }
             return false;
@@ -114,9 +106,7 @@ namespace Tartaria.Save
             }
             catch (Exception ex)
             {
-                Debug.LogWarning($"[Save.SteamBridge] IsCloudEnabledAndHasSpace reflection error: {ex.GetType().Name}: {ex.Message}
-  context: bytes={bytes}
-{ex.StackTrace}");
+                Debug.LogWarning($"[Save.SteamBridge] IsCloudEnabledAndHasSpace reflection error: {ex.GetType().Name}: {ex.Message}\n  context: bytes={bytes}\n{ex.StackTrace}");
                 // Fallback: return false (caller will skip cloud upload).
             }
             return false;

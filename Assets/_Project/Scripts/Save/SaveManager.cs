@@ -1723,9 +1723,7 @@ namespace Tartaria.Save
                 }
                 catch (Exception ex)
                 {
-                    Debug.LogError($"[SaveManager] SavePendingQueue failed: {ex.GetType().Name}: {ex.Message}
-  context: pendingPath={_pendingPath} pendingCount={_pending?.Count}
-{ex.StackTrace}");
+                    Debug.LogError($"[SaveManager] SavePendingQueue failed: {ex.GetType().Name}: {ex.Message}\n  context: pendingPath={_pendingPath} pendingCount={_pending?.Count}\n{ex.StackTrace}");
                     // Fallback: pending queue not persisted; uploads will be retried next session if memory holds.
                 }
             }
