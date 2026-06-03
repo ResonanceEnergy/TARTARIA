@@ -29,6 +29,16 @@ namespace Tartaria.Integration
         [SerializeField] private float nighttimeAetherBoost = 1.2f; // +20% at night
 
         private float _timeSpeed;
+        private bool _wasNight;
+        private float _lastAppliedBoost = 1f;
+
+        /// <summary>
+        /// Current Aether yield multiplier driven by the day/night cycle.
+        /// Mirrors <see cref="Tartaria.Gameplay.DayNightController.AetherYieldMultiplier"/>
+        /// so ExcavationSystem / AetherFieldSystem can read the boost regardless of
+        /// which day-night controller is active in the scene.
+        /// </summary>
+        public static float AetherYieldMultiplier { get; private set; } = 1f;
 
         void Awake()
         {
@@ -73,7 +83,12 @@ namespace Tartaria.Integration
                 sunIntensityCurve = AnimationCurve.EaseInOut(0f, 0.3f, 1f, 0.3f);
             }
 
-            Debug.Log("[DayNightCycleController] ✅ 17-hour cycle initialized");
+            // Seed transition state so first day<->night flip fires the log
+            _wasNight = currentTime < 0.25f || currentTime > 0.75f;
+            AetherYieldMultiplier = _wasNight ? nighttimeAetherBoost : 1f;
+            _lastAppliedBoost = AetherYieldMultiplier;
+
+            Debug.Log($"[DayNightCycleController] ✅ 17-hour cycle initialized (night={_wasNight}, boost={_lastAppliedBoost:F2})");
         }
 
         void Update()
@@ -120,8 +135,20 @@ namespace Tartaria.Integration
             bool isNight = currentTime < 0.25f || currentTime > 0.75f;
             float boost = isNight ? nighttimeAetherBoost : 1f;
 
-            // TODO: Wire to AetherFieldSystem or ExcavationSystem
-            // ExcavationSystem.AetherYieldMultiplier = boost;
+            // Sprint 12 #3: previously commented out, restored.
+            // Static field consumed by ExcavationSystem / AetherFieldSystem.
+            // Mirrors the convention already in Tartaria.Gameplay.DayNightController.
+            float previousBoost = AetherYieldMultiplier;
+            AetherYieldMultiplier = boost;
+
+            // Log only on day<->night transition so we can see the boost firing
+            // without spamming Update.
+            if (isNight != _wasNight)
+            {
+                Debug.Log($"[DayNightCycle] aether boost applied: {previousBoost:F2} → {boost:F2} (night={isNight})");
+                _wasNight = isNight;
+                _lastAppliedBoost = boost;
+            }
         }
 
         public float GetCurrentTimeOfDay() => currentTime;
