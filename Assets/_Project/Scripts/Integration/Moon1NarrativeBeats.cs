@@ -49,6 +49,12 @@ namespace Tartaria.Integration
             if (_eruptionFired) return;
             _eruptionFired = true;
             StartCoroutine(CathedralLightEruption());
+
+            // C.L4 - Progress canonical Moon 1 "Lirael's 17th Whisper" companion side quest
+            // (QuestDatabaseBuilder.cs r7_m1_lirael_calendar_echo, objective type
+            // CompanionMilestone+targetId=="lirael_17th_m1"). 17th-hour beat is the canonical
+            // trigger per docs/03 Days 25-28 + docs/03C Moon 1 Revelation.
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, "lirael_17th_m1");
         }
 
         IEnumerator CathedralLightEruption()
@@ -112,6 +118,14 @@ namespace Tartaria.Integration
                 Debug.LogError($"[{nameof(GiantSkeletonKeyPickup)}] {nameof(OnTriggerEnter)} FireRSChange(+15) failed: {ex.GetType().Name}: {ex.Message}\n  context: keyNumber={_keyNumber}\n{ex.StackTrace}");
                 // Non-fatal: player misses the +15 RS reward; key is still counted.
             }
+
+            // C.L4 - Progress canonical Moon 1 "Giant Skeleton Key #1" collectible quest
+            // (QuestDatabaseBuilder moon1_giant_skeleton_key, CollectItem+targetId="giant_skeleton_key_1").
+            // QuestManager.ProgressByType (QuestManager.cs:360) fires RaiseQuestStatusChanged on
+            // completion -> QuestObjectiveTrackerUI.HandleQuestStatusChanged (UI/QuestObjectiveTrackerUI.cs:78).
+            if (_keyNumber == 1)
+                QuestManager.Instance?.ProgressByType(QuestObjectiveType.CollectItem, "giant_skeleton_key_1");
+
             Destroy(gameObject);
         }
     }
