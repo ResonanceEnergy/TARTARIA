@@ -237,4 +237,7 @@ namespace Tartaria.Editor
         {
             var p = so.FindProperty(name);
             if (p != null) p.objectReferenceValue = val;
-       
+        }
+    }
+}
+#endif
