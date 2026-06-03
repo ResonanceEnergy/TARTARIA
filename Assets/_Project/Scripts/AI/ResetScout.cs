@@ -18,6 +18,12 @@ namespace Tartaria.AI
         [Header("Rewards on kill")]
         [SerializeField] private float rsReward = 8f;
 
+        [Header("Visual")]
+        [Tooltip("Optional: assign a Victorian-coded humanoid prefab. If null, falls back to Resources.Load(_visualResourcePath), then to a URP-safe primitive stand-in.")]
+        [SerializeField] private GameObject _visualPrefab;
+        [Tooltip("Resources-relative path used when _visualPrefab is null. Default points at the hooded KayKit rogue — closest match to a Bureau scout.")]
+        [SerializeField] private string _visualResourcePath = "Prefabs/Characters/KayKit/Char_Rogue_Hooded";
+
         private float _hp;
         private Transform _player;
         private CharacterController _cc;
@@ -43,9 +49,55 @@ namespace Tartaria.AI
         void EnsureVisual()
         {
             if (transform.childCount > 0) return;
+
+            // 1) Inspector-assigned prefab wins.
+            GameObject source = _visualPrefab;
+
+            // 2) Resources.Load fallback (runtime-safe, no AssetDatabase dependency).
+            if (source == null && !string.IsNullOrEmpty(_visualResourcePath))
+            {
+                source = Resources.Load<GameObject>(_visualResourcePath);
+            }
+
+            if (source != null)
+            {
+                var visual = Instantiate(source, transform);
+                visual.name = "Visual";
+                visual.transform.localPosition = Vector3.zero;
+                visual.transform.localRotation = Quaternion.identity;
+                // Strip colliders on the visual rig — the CharacterController on the root owns collision.
+                foreach (var col in visual.GetComponentsInChildren<Collider>(true))
+                {
+                    Destroy(col);
+                }
+                // Tint a "scout uniform" accent on any URP/Lit renderer so the silhouette reads as Bureau.
+                var urpLitTint = Shader.Find("Universal Render Pipeline/Lit");
+                var accent = new Color(0.18f, 0.16f, 0.20f);
+                foreach (var rend in visual.GetComponentsInChildren<Renderer>(true))
+                {
+                    if (rend.sharedMaterial != null && rend.sharedMaterial.HasProperty("_BaseColor"))
+                    {
+                        var tinted = new Material(rend.sharedMaterial);
+                        Color current = tinted.GetColor("_BaseColor");
+                        tinted.SetColor("_BaseColor", Color.Lerp(current, accent, 0.35f));
+                        rend.sharedMaterial = tinted;
+                    }
+                    else if (urpLitTint != null)
+                    {
+                        var mat = new Material(urpLitTint);
+                        mat.SetColor("_BaseColor", accent);
+                        rend.sharedMaterial = mat;
+                    }
+                }
+                return;
+            }
+
+            Debug.LogWarning($"[ResetScout] No visual prefab assigned and Resources.Load('{_visualResourcePath}') returned null — building URP-safe primitive stand-in.");
+
+            // URP-safe fallback if no asset found.
             var urpLit = Shader.Find("Universal Render Pipeline/Lit");
 
-            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+            var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); // URP-safe
             body.name = "Body";
             body.transform.SetParent(transform);
             body.transform.localPosition = new Vector3(0f, 1f, 0f);
@@ -53,7 +105,7 @@ namespace Tartaria.AI
             Destroy(body.GetComponent<Collider>());
             ApplyURP(body, urpLit, new Color(0.18f, 0.16f, 0.20f));
 
-            var hat = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var hat = GameObject.CreatePrimitive(PrimitiveType.Cube); // URP-safe
             hat.name = "TopHat";
             hat.transform.SetParent(transform);
             hat.transform.localPosition = new Vector3(0f, 2.1f, 0f);
@@ -61,7 +113,7 @@ namespace Tartaria.AI
             Destroy(hat.GetComponent<Collider>());
             ApplyURP(hat, urpLit, new Color(0.06f, 0.06f, 0.08f));
 
-            var clipboard = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            var clipboard = GameObject.CreatePrimitive(PrimitiveType.Cube); // URP-safe
             clipboard.name = "Clipboard";
             clipboard.transform.SetParent(transform);
             clipboard.transform.localPosition = new Vector3(0.35f, 1.1f, 0.3f);
@@ -75,7 +127,15 @@ namespace Tartaria.AI
         {
             var rend = go.GetComponent<Renderer>();
             if (rend == null) return;
-            if (urpLit == null) { rend.material.color = color; return; }
+            if (urpLit == null)
+            {
+                // No URP shader present — set _BaseColor on whatever default material is attached
+                // (URP/Lit and most SRP shaders expose _BaseColor; legacy Standard exposes _Color).
+                var fallback = rend.material;
+                if (fallback.HasProperty("_BaseColor")) fallback.SetColor("_BaseColor", color);
+                else if (fallback.HasProperty("_Color")) fallback.SetColor("_Color", color);
+                return;
+            }
             var mat = new Material(urpLit);
             mat.SetColor("_BaseColor", color);
             rend.sharedMaterial = mat;
