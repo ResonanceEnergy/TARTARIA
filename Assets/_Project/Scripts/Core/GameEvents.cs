@@ -459,6 +459,36 @@ namespace Tartaria.Core
         public static void FireCombatEnded() => OnCombatEnded?.Invoke();
 
         // ═══════════════════════════════════════════════════════════════════
+        // SPRINT 12 CANONICAL EVENTS — Day cycle + brazier ring
+        // Phase 2 Lane 1 (P2.L1). Added 2026-06-02 per Sprint 11 L9 (72457de3)
+        // which proved CLAUDE.md canonical-facts table referenced these but
+        // they did not exist. Subscribers (Moon1LiraelDay25Gate at line 49,
+        // Moon1DaySmokeMenus at line 44/66/128, MiloTutorialFlow brazier
+        // gating) can now bind through the canonical GameEvents surface.
+        // ═══════════════════════════════════════════════════════════════════
+
+        /// <summary>
+        /// Raised by TartarianCalendar.AdvanceDay when the in-game day advances.
+        /// Payload: new day number (1-28 in Moon 1).
+        /// Subscribers: Moon1LiraelDay25Gate (Day-25 narrative gate), narrative beat managers.
+        /// </summary>
+        public static Action<int> OnDayChanged;
+
+        /// <summary>
+        /// Raised when a single brazier is lit. Payload: brazier identifier
+        /// (e.g. "Brazier_Cathedral_L" — see Moon1Braziers.cs:41-46 for canonical names).
+        /// Subscribers: MiloTutorialFlow (step 2 advance), brazier ring tracker, audio FX.
+        /// </summary>
+        public static Action<string> OnBrazierLit;
+
+        /// <summary>
+        /// Raised when the full Echohaven brazier ring (8 perimeter + 6 hero-entrance)
+        /// has been lit. Subscribers: Day-cycle phase change, EchohavenContentSpawner
+        /// post-ring beats, QuestObjectiveTracker.
+        /// </summary>
+        public static Action OnBrazierRingComplete;
+
+        // ═══════════════════════════════════════════════════════════════════
         // RAISE METHODS (Thread-safe with null-check + exception handling)
         // ═══════════════════════════════════════════════════════════════════
 
@@ -602,6 +632,46 @@ namespace Tartaria.Core
                 if (enabled) OnToggleAetherVision?.Invoke();
             }
             catch (Exception ex) { Debug.LogError($"[GameEvents] Exception in OnAetherVisionToggled: {ex}"); }
+        }
+
+        // ─── Sprint 12 canonical Raise methods (P2.L1, 2026-06-02) ───
+        // Pattern matches the gameplay Raise helpers above: try/Invoke/catch with
+        // full ex.GetType().Name + ex.Message context per CLAUDE.md NO-DEBT rule.
+
+        public static void RaiseDayChanged(int day)
+        {
+            try
+            {
+                OnDayChanged?.Invoke(day);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[GameEvents] Exception in OnDayChanged (day={day}): {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
+        public static void RaiseBrazierLit(string brazierId)
+        {
+            try
+            {
+                OnBrazierLit?.Invoke(brazierId);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[GameEvents] Exception in OnBrazierLit (brazierId='{brazierId}'): {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+            }
+        }
+
+        public static void RaiseBrazierRingComplete()
+        {
+            try
+            {
+                OnBrazierRingComplete?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[GameEvents] Exception in OnBrazierRingComplete: {ex.GetType().Name}: {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
         // ═══════════════════════════════════════════════════════════════════
