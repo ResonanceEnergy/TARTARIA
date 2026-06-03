@@ -15,13 +15,13 @@ namespace Tartaria.Gameplay
         [SerializeField] float harmonicDamage = 50f;
         [SerializeField] float harmonicRadius = 5f;
         [SerializeField] float harmonicCooldown = 8f;
-        // [SerializeField] int harmonicRSCost = 20; // Phase 22: Economy integration pending
+        [SerializeField] float harmonicRSCost = 20f; // P1.L3: real RS economy via AetherFieldManager
         [SerializeField] LayerMask enemyLayerMask = -1; // Default to all layers
 
         [Header("Frequency Shield (Q)")]
         [SerializeField] float shieldDuration = 5f;
         [SerializeField] float shieldCooldown = 12f;
-        // [SerializeField] int shieldRSCost = 15; // Phase 22: Economy integration pending
+        [SerializeField] float shieldRSCost = 15f; // P1.L3: real RS economy via AetherFieldManager
 
         [Header("Aether Vision (V)")]
         [SerializeField] bool aetherVisionEnabled = false;
@@ -90,15 +90,23 @@ namespace Tartaria.Gameplay
                 return;
             }
 
-            // Check RS cost (EconomySystem.ResonanceScore disabled - Phase 22)
-            // if (EconomySystem.Instance == null || EconomySystem.Instance.ResonanceScore < harmonicRSCost)
-            // {
-            //     Debug.Log($"Not enough RS for Harmonic Strike (need {harmonicRSCost})");
-            //     return;
-            // }
+            // P1.L3: Check RS cost via canonical AetherFieldManager (Core/AetherFieldManager.cs:26)
+            var aether = AetherFieldManager.Instance;
+            if (aether == null)
+            {
+                Debug.LogWarning("[PlayerAbilityController] Harmonic Strike: AetherFieldManager.Instance is null — cannot read RS. Aborting cast.");
+                return;
+            }
+            if (aether.ResonanceScore < harmonicRSCost)
+            {
+                Debug.Log($"[PlayerAbilityController] Not enough RS for Harmonic Strike (need {harmonicRSCost}, have {aether.ResonanceScore:F1})");
+                return;
+            }
 
-            // Spend RS (disabled - Phase 22)
-            // EconomySystem.Instance.SpendResonanceScore(harmonicRSCost);
+            // P1.L3: Spend RS via canonical AetherFieldManager.DeductRS (Core/AetherFieldManager.cs:59)
+            // and broadcast via GameEvents.FireRSChange so HUD/Music/economy monitor see the delta (Core/GameEvents.cs:323).
+            aether.DeductRS(harmonicRSCost);
+            GameEvents.FireRSChange(-harmonicRSCost);
 
             // AOE damage
             Collider[] hits = Physics.OverlapSphere(transform.position, harmonicRadius, enemyLayerMask);
@@ -131,15 +139,23 @@ namespace Tartaria.Gameplay
                 return;
             }
 
-            // Check RS cost (EconomySystem.ResonanceScore disabled - Phase 22)
-            // if (EconomySystem.Instance == null || EconomySystem.Instance.ResonanceScore < shieldRSCost)
-            // {
-            //     Debug.Log($"Not enough RS for Frequency Shield (need {shieldRSCost})");
-            //     return;
-            // }
+            // P1.L3: Check RS cost via canonical AetherFieldManager (Core/AetherFieldManager.cs:26)
+            var aether = AetherFieldManager.Instance;
+            if (aether == null)
+            {
+                Debug.LogWarning("[PlayerAbilityController] Frequency Shield: AetherFieldManager.Instance is null — cannot read RS. Aborting cast.");
+                return;
+            }
+            if (aether.ResonanceScore < shieldRSCost)
+            {
+                Debug.Log($"[PlayerAbilityController] Not enough RS for Frequency Shield (need {shieldRSCost}, have {aether.ResonanceScore:F1})");
+                return;
+            }
 
-            // Spend RS (disabled - Phase 22)
-            // EconomySystem.Instance.SpendResonanceScore(shieldRSCost);
+            // P1.L3: Spend RS via canonical AetherFieldManager.DeductRS (Core/AetherFieldManager.cs:59)
+            // and broadcast via GameEvents.FireRSChange so HUD/Music/economy monitor see the delta (Core/GameEvents.cs:323).
+            aether.DeductRS(shieldRSCost);
+            GameEvents.FireRSChange(-shieldRSCost);
 
             // Activate shield
             _shieldEndTime = Time.time + shieldDuration;
