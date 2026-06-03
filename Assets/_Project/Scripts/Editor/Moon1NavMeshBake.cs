@@ -26,8 +26,14 @@ namespace Tartaria.Editor
             }
 
             Debug.Log("[Moon1NavMeshBake] Starting NavMesh bake...");
+            // CS0618 suppression: `UnityEditor.AI.NavMeshBuilder` is the legacy global-NavMesh API.
+            // Unity 6 prefers `Unity.AI.Navigation.NavMeshSurface.BuildNavMesh()` per scene-attached
+            // surface, but this dev tooling targets the global-bake path the scene was authored against.
+            // Migration to NavMeshSurface deferred until scene authoring switches.
+#pragma warning disable CS0618
             NavMeshBuilder.ClearAllNavMeshes();
             NavMeshBuilder.BuildNavMesh();
+#pragma warning restore CS0618
             Debug.Log("[Moon1NavMeshBake] NavMesh bake complete.");
 
             EditorSceneManager.MarkSceneDirty(scene);
