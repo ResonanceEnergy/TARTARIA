@@ -2,16 +2,22 @@
 using UnityEngine.UI;
 using TMPro;
 using Tartaria.Core;
-using Tartaria.Gameplay;
 
 namespace Tartaria.UI
 {
     /// <summary>
-    /// HUDLiveDataWiring — Binds HUD to live game data.
-    /// TODO from REALITY_CHECK Phase 2.
+    /// HUDLiveDataWiring — Binds HUD to live game data via GameEvents.
+    /// Event-driven only. No polling, no hardcoded fallbacks.
+    /// Publishers: GameEvents.FireRSChange / FirePlayerHealthChange / FireAetherEnergyChange
+    /// (see GameEvents.cs:321-323, 563-564, 569-570).
     /// </summary>
     public class HUDLiveDataWiring : MonoBehaviour
     {
+        // Sentinel string for "no data yet" — dimmed/empty state before any event fires.
+        private const string EmptyRsLabel = "RS: --";
+        private const string EmptyHealthLabel = "--/--";
+        private const string EmptyAetherLabel = "Aether: --";
+
         [Header("UI Elements")]
         [SerializeField] private TextMeshProUGUI rsCounterText;
         [SerializeField] private Slider healthBar;
@@ -21,15 +27,20 @@ namespace Tartaria.UI
 
         void Start()
         {
-            // Subscribe to game events
+            // Subscribe to game events — these are the ONLY source of HUD values.
             GameEvents.OnResonanceScoreChanged += UpdateRSCounter;
             GameEvents.OnPlayerHealthChanged += UpdateHealthBar;
             GameEvents.OnAetherEnergyChanged += UpdateAetherMeter;
 
-            // Initial update
-            UpdateAllDisplays();
+            // Initialize to explicit "no data yet" state — NOT a fake value.
+            // The first matching GameEvents.Fire* call will replace these.
+            if (rsCounterText != null) rsCounterText.text = EmptyRsLabel;
+            if (healthBar != null) healthBar.value = 0f;
+            if (healthText != null) healthText.text = EmptyHealthLabel;
+            if (aetherMeter != null) aetherMeter.value = 0f;
+            if (aetherText != null) aetherText.text = EmptyAetherLabel;
 
-            Debug.Log("[HUDLiveDataWiring] ✅ HUD wired to live data");
+            Debug.Log("[HUDLiveDataWiring] HUD subscribed to GameEvents (event-driven, no polling).");
         }
 
         void OnDestroy()
@@ -37,40 +48,6 @@ namespace Tartaria.UI
             GameEvents.OnResonanceScoreChanged -= UpdateRSCounter;
             GameEvents.OnPlayerHealthChanged -= UpdateHealthBar;
             GameEvents.OnAetherEnergyChanged -= UpdateAetherMeter;
-        }
-
-        void Update()
-        {
-            // Fallback polling for systems without events
-            UpdateAllDisplays();
-        }
-
-        void UpdateAllDisplays()
-        {
-            // RS Counter
-            if (rsCounterText != null)
-            {
-                rsCounterText.text = "RS: 0"; // Placeholder until ServiceLocator.GameLoop wired
-            }
-
-            // Health Bar
-            var player = FindFirstObjectByType<PlayerHealthController>();
-            if (player != null && healthBar != null)
-            {
-                float currentHealth = player.CurrentHealth;
-                float maxHealth = player.MaxHealth;
-                healthBar.value = currentHealth / maxHealth;
-                if (healthText != null)
-                    healthText.text = $"{currentHealth:F0}/{maxHealth:F0}";
-            }
-
-            // Aether Meter (placeholder - needs AetherFieldSystem integration)
-            if (aetherMeter != null)
-            {
-                aetherMeter.value = 0.75f; // Placeholder
-                if (aetherText != null)
-                    aetherText.text = "Aether: 75%";
-            }
         }
 
         void UpdateRSCounter(float rsValue)
@@ -83,7 +60,7 @@ namespace Tartaria.UI
         {
             if (healthBar != null)
             {
-                healthBar.value = currentHealth / maxHealth;
+                healthBar.value = maxHealth > 0f ? currentHealth / maxHealth : 0f;
                 if (healthText != null)
                     healthText.text = $"{currentHealth:F0}/{maxHealth:F0}";
             }
