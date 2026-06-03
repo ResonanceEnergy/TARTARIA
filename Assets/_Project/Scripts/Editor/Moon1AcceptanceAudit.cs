@@ -25,9 +25,9 @@ namespace Tartaria.Editor
 
             // 1. Hero buildings — real prefabs on disk
             Check(report, ref total, ref passed, "3 hero building prefabs on disk",
-                AssetExists("Assets/_Project/Prefabs/Buildings/Echohaven_StarDome.prefab") &&
-                AssetExists("Assets/_Project/Prefabs/Buildings/Echohaven_HarmonicFountain.prefab") &&
-                AssetExists("Assets/_Project/Prefabs/Buildings/Echohaven_CrystalSpire.prefab"));
+                AssetExists("Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_StarDome.prefab") &&
+                AssetExists("Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_HarmonicFountain.prefab") &&
+                AssetExists("Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_CrystalSpire.prefab"));
 
             // 2. Cathedral kit pieces on disk
             Check(report, ref total, ref passed, "Cathedral kit pieces on disk",
@@ -137,7 +137,4 @@ namespace Tartaria.Editor
             string full = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), root);
             if (!System.IO.Directory.Exists(full)) return 0;
             return System.IO.Directory.GetFiles(full, "*" + ext, System.IO.SearchOption.AllDirectories).Length;
-        }
-    }
-}
-#endif
+       
