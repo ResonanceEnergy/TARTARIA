@@ -40,6 +40,13 @@ namespace Tartaria.Core
             _resonanceScore = startingRS;
         }
 
+        void Start()
+        {
+            // P2.L2: prime HUD with initial Aether so the meter isn't empty until first event.
+            // GameEvents.cs:149, 567 — Action<float> aetherValue (0-100).
+            GameEvents.RaiseAetherEnergyChanged(_aetherCharge);
+        }
+
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
@@ -65,6 +72,9 @@ namespace Tartaria.Core
         {
             _aetherCharge = Mathf.Clamp(_aetherCharge + amount, 0f, maxAetherCharge);
             OnAetherChargeChanged?.Invoke(_aetherCharge);
+            // P2.L2: publish to global HUD bus (Sprint 11 L9 finding — bar was static at 75% because nothing fired).
+            // OnAetherEnergyChanged signature: Action<float> aetherValue (0-100). See GameEvents.cs:149, 567.
+            GameEvents.RaiseAetherEnergyChanged(_aetherCharge);
         }
 
         public void DeductAetherCharge(float amount)
