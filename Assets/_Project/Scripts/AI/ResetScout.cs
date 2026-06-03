@@ -194,6 +194,28 @@ namespace Tartaria.AI
         {
             _dead = true;
             GameEvents.FireRSChange(rsReward);
+
+            // H2.L3: publish unified EnemyKilled event so PlayerProgression (XP),
+            // AudioFeedbackController (death sting), VFXWiringController (dissolve VFX),
+            // and any future loot subscribers fire the same way as MudGolem deaths.
+            int lootCount = 1;
+            string lootItem = "clipboard_fragment";
+            var inventory = Tartaria.Gameplay.InventoryManager.Instance;
+            if (inventory != null)
+            {
+                inventory.AddItem(lootItem, lootCount);
+            }
+
+            GameEvents.RaiseEnemyKilled(new EnemyKilledEventArgs
+            {
+                enemyType = "reset_scout",
+                xpReward = 15,
+                lootItemId = lootItem,
+                lootCount = lootCount,
+                position = transform.position,
+                killedBy = instigator
+            });
+
             ServiceLocator.HUD?.ShowBanner("Clipboard fragment",
                 "Per Bureau directive 3-9: all anomalies to be cataloged for demolition.", 3.5f);
             Destroy(gameObject, 1.2f);
