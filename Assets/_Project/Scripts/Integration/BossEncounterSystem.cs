@@ -262,6 +262,7 @@ namespace Tartaria.Integration
             GameStateManager.Instance?.TransitionTo(GameState.Combat);
             OnBossSpawned?.Invoke(_currentBoss);
             OnBossDialogue?.Invoke(_currentBoss.phases[0].entranceDialogue);
+            RaiseBossHUDOnSpawn(); // P2.L4 Sprint 11 L9: HUD nameplate + health bar
 
             Debug.Log($"[Boss] R7 {_currentBoss.bossName} spawned — variant path (freq puzzle + dedicated AI)");
         }
@@ -321,6 +322,7 @@ namespace Tartaria.Integration
             GameStateManager.Instance?.TransitionTo(GameState.Combat);
             OnBossSpawned?.Invoke(_currentBoss);
             OnBossDialogue?.Invoke(_currentBoss.phases[0].entranceDialogue);
+            RaiseBossHUDOnSpawn(); // P2.L4 Sprint 11 L9: HUD nameplate + health bar
 
             Debug.Log($"[Boss] {_currentBoss.bossName} spawned — {_currentBoss.phases.Count} phases, {_bossMaxHP} HP (R7: deepened AIs + FrequencyWraith + ley harmony)");
         }
@@ -367,6 +369,7 @@ namespace Tartaria.Integration
             GameStateManager.Instance?.TransitionTo(GameState.Combat);
             OnBossSpawned?.Invoke(_currentBoss);
             OnBossDialogue?.Invoke(_currentBoss.phases[0].entranceDialogue);
+            RaiseBossHUDOnSpawn(); // P2.L4 Sprint 11 L9: HUD nameplate + health bar
 
             Debug.Log($"[Boss] MOON 2 SPECIAL: {_currentBoss.bossName} spawned — cavern guardian/elite with vein freq + micro-giant synergy (Moon2BossEncounters.cs)");
         }
@@ -376,6 +379,7 @@ namespace Tartaria.Integration
         {
             _isActive = false;
             CleanupBossVisualProxies();
+            GameEvents.RaiseHUDHideBossHealth(); // P2.L4 Sprint 11 L9
             OnBossFailed?.Invoke();
             GameStateManager.Instance?.ReturnToPrevious();
             Debug.Log("[Boss] Encounter aborted gracefully (player retreat / manual).");
@@ -389,11 +393,24 @@ namespace Tartaria.Integration
             if (!_isActive) return;
             _isActive = false;
             CleanupBossVisualProxies();
+            GameEvents.RaiseHUDHideBossHealth(); // P2.L4 Sprint 11 L9
             OnBossDialogue?.Invoke($"The encounter ends... {reason}");
             OnBossFailed?.Invoke();
             GameStateManager.Instance?.ReturnToPrevious();
             Debug.Log($"[Boss] Encounter failed gracefully: {reason}");
             VFXController.Instance?.PlayEffect(VFXEffect.Spark, transform.position);
+        }
+
+        // --- Sprint 11 L9 / P2.L4: HUD event publishers for boss UI (declared but unfired pre-Sprint 12) ---
+        // OnHUDShowBossNameplate + OnHUDShowBossHealth fire once on every spawn path.
+        // OnHUDHideBossHealth fires on every encounter end path (defeat, abort, fail).
+        void RaiseBossHUDOnSpawn()
+        {
+            if (_currentBoss == null) return;
+            // BossDefinition has no dedicated title field — derive from bossType enum for nameplate subtitle.
+            string bossTitle = _currentBoss.bossType.ToString();
+            GameEvents.RaiseHUDShowBossNameplate(_currentBoss.bossName, bossTitle);
+            GameEvents.RaiseHUDShowBossHealth(_currentBoss.bossName, BossHPNormalized);
         }
 
         void CleanupBossVisualProxies()
@@ -527,6 +544,7 @@ namespace Tartaria.Integration
             }
 
             OnBossHealthChanged?.Invoke(BossHPNormalized);
+            GameEvents.RaiseHUDUpdateBossHealth(BossHPNormalized); // P2.L4 Sprint 11 L9 - sync HUD after save restore
             Debug.Log($"[Boss] PERSISTENCE R7: Resumed '{_currentBoss?.bossName}' phase {_currentPhase} target~{_currentTargetFrequency:F0}Hz | swarmT{_railWraithSwarmTier} synergyStreak={_leviathanLullabyStreak:F1} dives={_skyReaverDiveCount} cascades={_cascadeCount} worldHarmony={s_worldSingsBackHarmony:F2}");
         }
 
@@ -1010,6 +1028,7 @@ namespace Tartaria.Integration
                     else if (IsFrequencyWraith()) desperationLine = "The wraith fractures the mirror — retune the echo!";
                     else if (IsAnyMoon2Boss()) desperationLine = "The caverns themselves fight back — retune the living veins!";
                     OnBossDialogue?.Invoke(desperationLine);
+                    GameEvents.RaiseHUDShowCorruptionWhisper(desperationLine, 7.2f); // P2.L4 Sprint 11 L9 - boss desperation/whisper layer
                 }
             }
         }
@@ -1023,6 +1042,7 @@ namespace Tartaria.Integration
 
             _bossHP -= damage;
             OnBossHealthChanged?.Invoke(BossHPNormalized);
+            GameEvents.RaiseHUDUpdateBossHealth(BossHPNormalized); // P2.L4 Sprint 11 L9
 
             // Round 4: Dynamic health sync for Mud Colossus visuals (scale + emission intensity)
             if (_currentBoss != null && _currentBoss.bossName.Contains("Mud") && _currentBoss.bossName.Contains("Colossus"))
@@ -1206,6 +1226,7 @@ namespace Tartaria.Integration
             LootDropper.SpawnTieredLoot(transform.position, playerLevel, _currentBoss.bossType);
 
             CleanupBossVisualProxies();
+            GameEvents.RaiseHUDHideBossHealth(); // P2.L4 Sprint 11 L9
             OnBossDefeated?.Invoke(result);
             GameStateManager.Instance?.ReturnToPrevious();
 
