@@ -235,7 +235,7 @@ namespace Tartaria.Editor
             if (buildingSpawner == null)
             {
                 report.AppendLine("  [WARNING] BuildingSpawner NOT FOUND");
-                report.AppendLine("            RuntimeSpawnerInsurance should have created it");
+                report.AppendLine("            Bake one into the scene (Tartaria/0 ★ MASTER/Bootstrap All Moon 1 Systems)");
                 warnings++;
             }
             else
