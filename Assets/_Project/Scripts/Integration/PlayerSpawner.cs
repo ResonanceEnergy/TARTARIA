@@ -115,27 +115,9 @@ namespace Tartaria.Integration
 
             playerSpawned = true;
 
-            // SAFETY: ensure movement components exist even if the prefab is incomplete.
-            // 2026-05-30: was finding Player capsules with no PlayerInputHandler → couldn't walk.
-            if (spawnedPlayer.GetComponent<UnityEngine.CharacterController>() == null)
-            {
-                var cc = spawnedPlayer.AddComponent<UnityEngine.CharacterController>();
-                cc.center = new Vector3(0f, 1f, 0f);
-                cc.radius = 0.5f;
-                cc.height = 2f;
-                Debug.Log("[PlayerSpawner] Auto-added missing CharacterController");
-            }
-            if (spawnedPlayer.GetComponent<Tartaria.Input.PlayerInputHandler>() == null)
-            {
-                spawnedPlayer.AddComponent<Tartaria.Input.PlayerInputHandler>();
-                Debug.Log("[PlayerSpawner] Auto-added missing PlayerInputHandler (left stick + WASD now work)");
-            }
-            if (spawnedPlayer.GetComponent<Tartaria.Gameplay.GiantMode>() == null)
-            {
-                spawnedPlayer.AddComponent<Tartaria.Gameplay.GiantMode>();
-                Debug.Log("[PlayerSpawner] Auto-added GiantMode (press G or RT to activate)");
-            }
-            if (spawnedPlayer.tag != "Player") spawnedPlayer.tag = "Player";
+            // P4.L2+P5.L4 (Sprint 11 L6 e9bbc612): Player.prefab now ships with CharacterController + PlayerInputHandler
+            // + GiantMode + Animator + NavMeshAgent + MeshFilter/Renderer + Player tag + Player layer.
+            // Runtime AddComponent block removed — prefab is the canonical source of truth.
 
             // Notify systems
             GameEvents.FirePlayerSpawned(spawnedPlayer.transform.position);
