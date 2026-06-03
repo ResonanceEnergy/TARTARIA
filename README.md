@@ -2,15 +2,15 @@
 
 > *Tune the World. Light the Ley Lines. Reclaim the Golden Age.*
 
-A session-based, open-world restoration RPG / light city-builder / harmonic puzzle hybrid for PC (Steam + itch.io). Players awaken as a Tartarian descendant in a post-Mud Flood world, excavating buried wonders, tuning atmospheric Aether through sacred-geometry architecture, and restoring a globe-spanning free-energy grid — one glowing dome at a time.
+A session-based, open-world restoration RPG / light city-builder / harmonic puzzle hybrid for PC. Players awaken as a Tartarian descendant in a post-Mud Flood world, excavating buried wonders, tuning atmospheric Aether through sacred-geometry architecture, and restoring a globe-spanning free-energy grid — one glowing dome at a time.
 
 ---
 
 ## Status
 
-**Phase:** Alpha 0.4 — Moon 1 shell playable, Moon-1-specific gameplay still being built.
-**Target:** All 13 Moons fully built before any release discussion (per 2026-05-30 owner mandate). No itch.io / Steam timeline.
-**Build:** No public build yet — in development.
+**Phase:** Alpha 0.4 — Moon 1 shell playable, Moon-1-specific content still being built.
+**Target:** All 13 Moons content-complete before any distribution decision (per 2026-05-30 + 2026-06-03 owner mandates). No release framing of any kind. No Win64 build pipeline. No beta program.
+**Build:** No public build yet — in development. No public build is planned for any Moon individually.
 **Engine:** Unity 6 LTS (6000.3.6f1) with URP Forward+.
 
 For the honest current-state snapshot, see **[STATUS.md](STATUS.md)**.
@@ -23,7 +23,7 @@ For the art production pipeline + plan, see **[docs/art/ART_PRODUCTION_PLAN.md](
 
 This project includes a working headless-Blender pipeline. Run `Tartaria → Moon 1 → Run Blender Batch (Generate All Moon 1 Assets)` from within Unity to regenerate 12 hand-authored FBX models — brazier, pipe organ, mud pool basin, lore artifact, giant skeleton key, skeleton remains, rocking chair, Bob's Inn, tuning pedestal, 3 Aether crystals. Each model is defined in `tools/blender/gen_*.py` as parametric Python; edit the script, re-run the batch, the FBX + auto-generated URP/Lit prefab variant update in seconds. Verified working with Blender 4.5 LTS + 5.0.
 
-`PHASE_1_SCOPE.md` and `TARTARIA_MASTER_PLAN.md` are **archived** — they framed an itch.io-first vertical-slice ship that was reversed by the 2026-05-30 mandate.
+`PHASE_1_SCOPE.md` and `TARTARIA_MASTER_PLAN.md` are **archived** — they framed a vertical-slice / release-first agenda that was reversed by the 2026-05-30 mandate and re-confirmed by the 2026-06-03 mandate. Any reference to "ship Moon 1", "Win64 build", "itch.io", "Steam", "beta program" in those archived docs is historical only.
 
 
 ## Controller (Logitech F310)
@@ -77,14 +77,21 @@ Per `docs/03 Days 6–28` and `docs/15`:
 - 3 building interactions wired (StarDome, HarmonicFountain, CrystalSpire)
 - One Resonance Score event captured on video
 
-### What needs ~12 weeks to ship as itch.io beta
+### What's still missing for Moon 1 to be 100% (then Moon 2 begins)
 
-- 7 TODO systems from the MVP spec (HUD live data, audio feedback, VFX wiring, post-processing, inventory, quest activation, day/night cycle)
-- 3 Animator Controllers
-- 15 gameplay SFX (free or $35 paid)
-- Combat balance, tuning mini-game juice, NavMesh + AI polish
-- 60 FPS lock on min spec
-- itch.io page + 30-second trailer
+Per `CLAUDE.md` § "What Moon 1 100% actually means" + `STATUS.md` punch list:
+
+- `Prefabs/Moon1/AnastasiaRocker.prefab` — Editor bake menu exists, never invoked
+- Hero buildings still composed of `Detail_*` primitive clusters (mesh replace menu unblocked, not invoked)
+- 347 flat `Prefabs/Moon1/Blender/*.prefab` need categorical migration
+- 11 silent-fail empty `catch {}` blocks outside Moon 1 happy path
+- `RuntimeHUDBuilder.cs` 64 runtime `new GameObject` calls (full HUD_Root prefab bake deferred)
+- `RuntimeSpawnerInsurance.cs` dead-weight file
+- Real end-to-end Moon 1 play-through to witness the 17th-hour beat, skeleton hum, giant key #1, restored ley line mini-map
+- Per-Moon-1 mini-game variants A/B/C/D all playable + randomly assigned per `docs/15 §9`
+- 9 village buildings + props re-verified post Prefab Hygiene path moves
+
+**Per 2026-06-03 NATRIX mandate: no itch.io, no Steam, no Win64 build, no beta — until all 13 Moons are content-complete.**
 
 ---
 
@@ -131,7 +138,7 @@ These are the design pillars from `docs/00_MASTER_GDD.md`. They are stable — w
 - **Harvest Aether** — Watch wireless energy flow as glowing ley lines across the world map
 - **Defend & Expand** — Combat dissonance entities with resonance weapons
 
-Moon 1 (Echohaven) ships first. Moons 2–13 + 10 DLCs are roadmap, not commitment.
+All 13 Moons are built fully in order — Moon 1 → Moon 2 → … → Moon 13 — before any release discussion. No "Moon 1 ships first" detour. The 10 DLCs are post-base-game scope, not on the active flight path.
 
 ---
 
@@ -141,7 +148,7 @@ Moon 1 (Echohaven) ships first. Moons 2–13 + 10 DLCs are roadmap, not commitme
 - **Platform:** Windows 10/11 — Min: GTX 1070 / 8 GB RAM; Recommended: RTX 3060 / 16 GB RAM
 - **Graphics:** Vulkan / DX12 + FSR 2 / DLSS, baked lighting, BC7 compression
 - **Audio:** 432 Hz adaptive soundtrack + cymatic sound design
-- **Distribution:** itch.io first (free / pay-what-you-want), Steam later (premium with paid DLC)
+- **Distribution:** TBD post-build. Per 2026-06-03 NATRIX mandate, no distribution channel decision is being made until all 13 Moons are content-complete.
 
 ---
 
