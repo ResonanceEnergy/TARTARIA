@@ -35,6 +35,11 @@ namespace Tartaria.Integration
         [SerializeField, Tooltip("RestoreSparkle VFX for building discovery markers")]
         GameObject restoreSparkleVFX;
 
+        [Header("Built Variants (post-restoration prefabs)")]
+        [SerializeField, Tooltip("Echohaven_StarDome_Built.prefab — composed Cathedral kit, " +
+                                  "swapped in on GameEvents.OnBuildingRestored(\"dome\"). Sprint 11 L8 fix.")]
+        GameObject starDomeBuiltVariantPrefab;
+
         // Scene object names from EchohavenScenePopulator
         static readonly string[] DomeNames = { "StarDome_Placeholder", "Echohaven_StarDome" };
         static readonly string[] FountainNames = { "HarmonicFountain_Placeholder", "Echohaven_HarmonicFountain" };
@@ -336,38 +341,42 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
-        /// Create Star Dome using Modular Dungeon 2 assets - circular Gothic hall (2026 AAA quality).
-        /// Builds 40m diameter structure with curved walls, stone floors, corner pillars, and torch lighting.
+        /// Create Star Dome — Hammer Lane 4 (Sprint 11 L8 50ff78ea) rewrite.
+        ///
+        /// Replaced the 30+ runtime Instantiate calls (12 walls + 25 floor tiles + 4 pillars
+        /// + 8 torches) with a single Instantiate of the authored prefab variant
+        /// `Assets/_Project/Prefabs/Moon1/Echohaven_StarDome_Built.prefab`, composed from
+        /// the Cathedral kit (foundation/walls/columns/dome segments/spire/ornaments) and
+        /// shipped as text-mode YAML so it survives merges and diffs cleanly.
+        ///
+        /// The built variant starts HIDDEN — the pre-restoration ruin/mound stays visible
+        /// at game-start. It swaps in when GameEvents.OnBuildingRestored fires for the
+        /// "dome" building id (grep-verified: GameEvents.cs:56 declares the canonical
+        /// `public static event Action&lt;string&gt; OnBuildingRestored`).
         /// </summary>
         GameObject CreateModularDungeonStarDome(Vector3 basePosition)
         {
             var domeRoot = new GameObject("StarDome_ModularComposite");
             domeRoot.transform.position = basePosition;
 
-            // Try to load modular dungeon prefabs from Resources
-            GameObject wallCurvedPrefab = Resources.Load<GameObject>("Prefabs/Buildings/ModularDungeon2/struct_wall_curved_main");
-            GameObject floorNormalPrefab = Resources.Load<GameObject>("Prefabs/Buildings/ModularDungeon2/struct_floor_curved");
-            GameObject pillarCornerPrefab = Resources.Load<GameObject>("Prefabs/Buildings/ModularDungeon2/struct_pillar_corner_main");
-            GameObject torchPrefab = Resources.Load<GameObject>("Prefabs/Buildings/ModularDungeon2/prop_wall_torch");
-
-            // If prefabs not ready yet (Unity still importing), load OBJ models directly
-            bool useFallback = wallCurvedPrefab == null;
-
-            if (useFallback)
+            // Authored built variant — single Instantiate replaces the 30+ runtime calls.
+            // Resolution order: serialized inspector ref -> Resources.Load fallback ->
+            // Editor-only AssetDatabase fallback so Editor smoke tests work without scene wiring.
+            GameObject builtVariantPrefab = starDomeBuiltVariantPrefab;
+            if (builtVariantPrefab == null)
+                builtVariantPrefab = Resources.Load<GameObject>("Prefabs/Moon1/Echohaven_StarDome_Built");
+#if UNITY_EDITOR
+            if (builtVariantPrefab == null)
+                builtVariantPrefab = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>(
+                    "Assets/_Project/Prefabs/Moon1/Echohaven_StarDome_Built.prefab");
+#endif
+            if (builtVariantPrefab == null)
             {
-                Debug.LogWarning("[BuildingSpawner] Modular dungeon prefabs not found in Resources. Using direct OBJ load fallback.");
-
-                // Try direct model load from Models folder (Unity auto-converts OBJ on import)
-                wallCurvedPrefab = Resources.Load<GameObject>("Models/Buildings/ModularDungeon2/struct_wall_curved_main");
-                floorNormalPrefab = Resources.Load<GameObject>("Models/Buildings/ModularDungeon2/struct_floor_curved");
-                pillarCornerPrefab = Resources.Load<GameObject>("Models/Buildings/ModularDungeon2/struct_pillar_corner_main");
-                torchPrefab = Resources.Load<GameObject>("Models/Buildings/ModularDungeon2/prop_wall_torch");
-            }
-
-            // Final fallback: primitive sphere if assets still not imported
-            if (wallCurvedPrefab == null)
-            {
-                Debug.LogWarning("[BuildingSpawner] Modular dungeon assets not yet imported. Using primitive sphere fallback. Run Unity automation menu after import completes.");
+                // Final fallback only when the authored prefab is genuinely missing (which
+                // would only happen in a stripped build). Surfaces the issue loudly rather
+                // than silently shipping a magenta sphere.
+                Debug.LogError("[BuildingSpawner] Echohaven_StarDome_Built.prefab missing. " +
+                               "Run Tartaria/6 Bake/Bake StarDome Built Variant in the Editor.");
 
                 var fallback = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                 fallback.name = "StarDome_Fallback";
@@ -375,132 +384,29 @@ namespace Tartaria.Integration
                 fallback.transform.localScale = new Vector3(8f, 6f, 8f);
                 fallback.transform.SetParent(domeRoot.transform);
 
-                // Apply mud material
                 var renderer = fallback.GetComponent<MeshRenderer>();
                 if (renderer != null)
                 {
                     var mat = new Material(Shader.Find("Universal Render Pipeline/Lit"));
-                    mat.color = new Color(0.45f, 0.35f, 0.25f);
+                    mat.SetColor("_BaseColor", new Color(0.45f, 0.35f, 0.25f)); // URP-safe
                     renderer.material = mat;
                 }
-
                 return domeRoot;
             }
 
-            // ============================================================================
-            // CIRCULAR WALL (12 segments, 40m diameter)
-            // ============================================================================
+            var built = Instantiate(builtVariantPrefab, basePosition, Quaternion.identity, domeRoot.transform);
+            built.name = "StarDome_Built";
 
-            const int wallSegments = 12;
-            const float radius = 20f; // 40m diameter = 20m radius
+            // Pre-restoration: built variant is hidden so the ruin/excavation state stays.
+            built.SetActive(false);
 
-            for (int i = 0; i < wallSegments; i++)
-            {
-                float angle = i * 30f; // 360° / 12 segments = 30° each
-                float angleRad = angle * Mathf.Deg2Rad;
+            // Attach the listener that swaps the visible state on OnBuildingRestored("dome").
+            var visibility = domeRoot.AddComponent<StarDomeBuiltVisibility>();
+            visibility.Configure(built, buildingId: "dome");
 
-                float x = radius * Mathf.Cos(angleRad);
-                float z = radius * Mathf.Sin(angleRad);
-
-                Vector3 wallPos = new Vector3(x, 0f, z);
-                Quaternion wallRot = Quaternion.Euler(0f, angle + 90f, 0f); // Face inward
-
-                var wall = Instantiate(wallCurvedPrefab, basePosition + wallPos, wallRot, domeRoot.transform);
-                wall.name = $"Wall_Curved_{i:D2}";
-
-                // Ensure collider
-                if (wall.GetComponent<Collider>() == null)
-                {
-                    var box = wall.AddComponent<BoxCollider>();
-                    box.size = new Vector3(10f, 10f, 2f); // Approximate wall dimensions
-                }
-            }
-
-            // ============================================================================
-            // STONE FLOOR (5×5 grid, 25 tiles, inside circle only)
-            // ============================================================================
-
-            if (floorNormalPrefab != null)
-            {
-                for (int x = -2; x <= 2; x++)
-                {
-                    for (int z = -2; z <= 2; z++)
-                    {
-                        // Only place tiles inside the 40m diameter circle
-                        float dist = Mathf.Sqrt(x * x + z * z);
-                        if (dist <= 2.5f) // Slightly larger than 2 to fill corners
-                        {
-                            Vector3 floorPos = new Vector3(x * 10f, 0f, z * 10f);
-                            var floor = Instantiate(floorNormalPrefab, basePosition + floorPos, Quaternion.identity, domeRoot.transform);
-                            floor.name = $"Floor_Normal_{x + 2}_{z + 2}";
-                        }
-                    }
-                }
-            }
-
-            // ============================================================================
-            // CORNER PILLARS (4 cardinal points)
-            // ============================================================================
-
-            if (pillarCornerPrefab != null)
-            {
-                Vector3[] pillarPositions = new Vector3[]
-                {
-                    new Vector3(15f, 0f, 15f),   // Northeast
-                    new Vector3(-15f, 0f, 15f),  // Northwest
-                    new Vector3(15f, 0f, -15f),  // Southeast
-                    new Vector3(-15f, 0f, -15f)  // Southwest
-                };
-
-                for (int i = 0; i < pillarPositions.Length; i++)
-                {
-                    var pillar = Instantiate(pillarCornerPrefab, basePosition + pillarPositions[i], Quaternion.identity, domeRoot.transform);
-                    pillar.name = $"Pillar_Corner_{i}";
-                }
-            }
-
-            // ============================================================================
-            // TORCHES WITH LIGHTING (8 around perimeter)
-            // ============================================================================
-
-            for (int i = 0; i < 8; i++)
-            {
-                float angle = i * 45f; // 360° / 8 torches = 45° each
-                float angleRad = angle * Mathf.Deg2Rad;
-                float torchRadius = 18f; // Slightly inside wall circle
-
-                float x = torchRadius * Mathf.Cos(angleRad);
-                float z = torchRadius * Mathf.Sin(angleRad);
-
-                Vector3 torchPos = new Vector3(x, 3f, z); // 3m above ground
-                Quaternion torchRot = Quaternion.Euler(0f, angle + 180f, 0f); // Face inward
-
-                GameObject torch;
-                if (torchPrefab != null)
-                {
-                    torch = Instantiate(torchPrefab, basePosition + torchPos, torchRot, domeRoot.transform);
-                }
-                else
-                {
-                    // Fallback procedural torch
-                    torch = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
-                    torch.transform.position = basePosition + torchPos;
-                    torch.transform.rotation = torchRot;
-                    torch.transform.localScale = new Vector3(0.2f, 1.5f, 0.2f);
-                    torch.transform.SetParent(domeRoot.transform);
-                }
-                torch.name = $"Torch_{i}";
-
-                // Add Point Light for flame effect
-                var light = torch.AddComponent<Light>();
-                light.type = LightType.Point;
-                light.color = new Color(1f, 0.6f, 0.3f); // Orange flame color
-                light.intensity = 2.0f;
-                light.range = 15f;
-                light.shadows = LightShadows.Soft; // Soft shadows for atmosphere
-            }
-
-            Debug.Log($"[BuildingSpawner] Star Dome created: {wallSegments} curved walls, 25 floor tiles, 4 pillars, 8 torches (40m diameter Gothic hall)");
+            Debug.Log($"[BuildingSpawner] Star Dome composed from Echohaven_StarDome_Built.prefab " +
+                      $"(36 kit children — 1 foundation / 12 walls / 8 columns / 8 dome / 4 ornaments / 3 spire). " +
+                      $"Hidden until OnBuildingRestored(\"dome\").");
 
             return domeRoot;
         }
