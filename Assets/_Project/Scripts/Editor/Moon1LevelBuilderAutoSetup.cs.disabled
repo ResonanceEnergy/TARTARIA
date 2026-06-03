@@ -80,9 +80,9 @@ namespace Tartaria.Editor
             AssignPrefabArray(serializedObject, "grassPrefabs", grassPrefabs);
 
             // Assign Hero Building Prefabs
-            AssignPrefab(serializedObject, "starDomePrefab", "Assets/_Project/Prefabs/Buildings/Echohaven_StarDome.prefab");
-            AssignPrefab(serializedObject, "fountainPrefab", "Assets/_Project/Prefabs/Buildings/Echohaven_HarmonicFountain.prefab");
-            AssignPrefab(serializedObject, "spirePrefab", "Assets/_Project/Prefabs/Buildings/Echohaven_CrystalSpire.prefab");
+            AssignPrefab(serializedObject, "starDomePrefab", "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_StarDome.prefab");
+            AssignPrefab(serializedObject, "fountainPrefab", "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_HarmonicFountain.prefab");
+            AssignPrefab(serializedObject, "spirePrefab", "Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_CrystalSpire.prefab");
 
             // Apply changes
             serializedObject.ApplyModifiedProperties();
@@ -234,6 +234,4 @@ namespace Tartaria.Editor
             }
 
             return prefabs;
-        }
-    }
-}
+   

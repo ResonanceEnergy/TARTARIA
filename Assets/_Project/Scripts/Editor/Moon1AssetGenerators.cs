@@ -330,11 +330,11 @@ namespace Tartaria.Editor
         public static void AddHeroPostStateMarkers()
         {
             int updated = 0;
-            updated += AddMarker("Assets/_Project/Prefabs/Buildings/Echohaven_StarDome.prefab",
+            updated += AddMarker("Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_StarDome.prefab",
                 "RoseWindowCymaticProjection",  new Color(0.95f, 0.78f, 0.30f), 4f);
-            updated += AddMarker("Assets/_Project/Prefabs/Buildings/Echohaven_HarmonicFountain.prefab",
+            updated += AddMarker("Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_HarmonicFountain.prefab",
                 "PureWaterColumn",              new Color(0.55f, 0.85f, 0.95f), 5f);
-            updated += AddMarker("Assets/_Project/Prefabs/Buildings/Echohaven_CrystalSpire.prefab",
+            updated += AddMarker("Assets/_Project/Prefabs/Moon1/Buildings/Echohaven_CrystalSpire.prefab",
                 "MercuryBallRotor",             new Color(0.85f, 0.85f, 0.90f), 6f);
             EditorUtility.DisplayDialog("Post-State Markers",
                 "Added persistent post-restoration child markers to " + updated + " hero buildings.", "OK");
@@ -390,7 +390,4 @@ namespace Tartaria.Editor
             string full = Path.Combine(Directory.GetCurrentDirectory(), projectRelative);
             if (!Directory.Exists(full)) Directory.CreateDirectory(full);
             AssetDatabase.Refresh();
-        }
-    }
-}
-#endif
+       
