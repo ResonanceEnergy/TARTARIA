@@ -90,6 +90,12 @@ namespace Tartaria.Core
             }
             OnDayAdvanced?.Invoke(_currentMoonDay);
 
+            // Sprint 12 P2.L1 — canonical day-change event for cross-assembly subscribers
+            // (Moon1LiraelDay25Gate-style consumers that bind through GameEvents instead
+            // of the calendar singleton). Mirrors the local OnDayAdvanced fan-out so a
+            // future migration can deprecate the calendar event without losing coverage.
+            GameEvents.RaiseDayChanged(_currentMoonDay);
+
             var beat = GetBeatForDay(_currentMoonDay);
             OnBeatAdvanced?.Invoke(beat);
 
