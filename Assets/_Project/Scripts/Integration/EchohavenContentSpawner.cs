@@ -897,6 +897,14 @@ namespace Tartaria.Integration
             // Activate the first Echohaven quest so player sees it on HUD immediately
             qm.ActivateQuest("echohaven_awakening");
 
+            // C.L4 - Activate Moon 1 side / discovery / collectible quests so the tracker
+            // populates and trigger sites can ProgressByType against them. These were added
+            // to QuestDatabaseBuilder per docs/03 + docs/03C Moon 1 canonical beats.
+            qm.ActivateQuest("moon1_anastasia_lullaby");
+            qm.ActivateQuest("moon1_giant_skeleton_key");
+            qm.ActivateQuest("moon1_ley_line_map_discovery");
+            qm.ActivateQuest("r7_m1_lirael_calendar_echo");
+
             // Populate the HUD objective panel with the active quest title
             var def = qm.GetQuestDefinition("echohaven_awakening");
             if (def != null)

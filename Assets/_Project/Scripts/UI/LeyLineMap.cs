@@ -155,6 +155,12 @@ namespace Tartaria.UI
         {
             Debug.Log("[LeyLineMap] First ley line activated — golden thread visible");
             // Fade thread in (we tick in Update)
+
+            // C.L4 - Progress canonical Moon 1 "The Golden Thread" discovery quest
+            // (QuestDatabaseBuilder moon1_ley_line_map_discovery, HiddenDiscovery+targetId="ley_line_first").
+            // Use ServiceLocator.Quest (Core/ServiceLocator.cs:128 IQuestService) because Tartaria.UI
+            // does NOT reference Tartaria.Integration where QuestManager lives.
+            ServiceLocator.Quest?.ProgressByType(QuestObjectiveType.HiddenDiscovery, "ley_line_first");
         }
 
         void AddOrUpdateBuildingDot(string id, Vector3 worldPos)

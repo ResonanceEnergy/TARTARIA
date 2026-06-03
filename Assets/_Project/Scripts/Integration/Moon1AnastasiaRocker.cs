@@ -86,6 +86,13 @@ namespace Tartaria.Integration
             ServiceLocator.HUD?.ShowBanner("Anastasia", "The buildings remember. Listen — they hum at 432.", 7f);
             // After 8s — second line
             StartCoroutine(QueueLine("Anastasia", "I'm not who I was. None of us are. Tune them anyway.", 8f, 7f));
+
+            // C.L4 - Progress the canonical Moon 1 "Anastasia's Lullaby" side quest.
+            // QuestManager.ProgressByType matches CompanionMilestone+targetId=="anastasia_rocker_m1"
+            // (QuestManager.cs:360 - fires RaiseQuestStatusChanged on completion). Specific targetId
+            // avoids colliding with CompanionManager trust-milestone progression once Anastasia
+            // is unlocked in Moon 7 (CompanionManager.cs:96).
+            QuestManager.Instance?.ProgressByType(QuestObjectiveType.CompanionMilestone, "anastasia_rocker_m1");
         }
 
         System.Collections.IEnumerator QueueLine(string speaker, string line, float delay, float showFor)
