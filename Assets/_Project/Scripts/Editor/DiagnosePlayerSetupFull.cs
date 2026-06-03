@@ -105,7 +105,7 @@ namespace Tartaria.Editor
                 counts[n] = counts.TryGetValue(n, out int c) ? c + 1 : 1;
             }
             string[] interest = { "PlayerInputHandler",
-                                  "Moon1GodMode", "PlayerSpawner", "Moon1PlayerSetup", "InputProbeHUD",
+                                  "PlayerSpawner", "Moon1PlayerSetup", "InputProbeHUD",
                                   "RunInBackgroundGuard", "CameraController" };
             foreach (var n in interest)
                 sb.AppendLine($"  {n}: {(counts.TryGetValue(n, out int c) ? c : 0)}");
