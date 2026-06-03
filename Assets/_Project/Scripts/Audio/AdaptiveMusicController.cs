@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Tartaria.Core;
 
@@ -428,22 +429,72 @@ namespace Tartaria.Audio
             _clipRestorationSwell = GenRestorationSwell();
             _l2TuningTone.clip = _clipTuningTone; _l2TuningTone.loop = true; _l2TuningTone.Play();
             _l2Percussive.clip = _clipCombatPercussive; _l2Percussive.loop = true; _l2Percussive.Play();
-            try { Tartaria.Core.GameEvents.OnPOIDiscovered    += HandlePOIDiscovered;    } catch { }
-            try { Tartaria.Core.GameEvents.OnTuningProgress   += HandleTuningProgress;   } catch { }
-            try { Tartaria.Core.GameEvents.OnCombatStarted    += HandleCombatEnter;      } catch { }
-            try { Tartaria.Core.GameEvents.OnCombatEnded      += HandleCombatExit;       } catch { }
-            try { Tartaria.Core.GameEvents.OnBuildingRestored += HandleBuildingRestored; } catch { }
+            try { Tartaria.Core.GameEvents.OnPOIDiscovered    += HandlePOIDiscovered;    }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(BindLayer2Events)} failed to subscribe to GameEvents.OnPOIDiscovered: {ex.GetType().Name}: {ex.Message}\n  context: Layer 2 POI discovery arpeggio will not play\n{ex.StackTrace}");
+                // Non-fatal: discovery arpeggio is silent this session; other L2 reactive layers still wire below.
+            }
+            try { Tartaria.Core.GameEvents.OnTuningProgress   += HandleTuningProgress;   }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(BindLayer2Events)} failed to subscribe to GameEvents.OnTuningProgress: {ex.GetType().Name}: {ex.Message}\n  context: Layer 2 tuning tone pitch/volume will not track puzzle progress\n{ex.StackTrace}");
+                // Non-fatal: tuning tone stays at default pitch/volume; mini-game still playable without the audio feedback layer.
+            }
+            try { Tartaria.Core.GameEvents.OnCombatStarted    += HandleCombatEnter;      }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(BindLayer2Events)} failed to subscribe to GameEvents.OnCombatStarted: {ex.GetType().Name}: {ex.Message}\n  context: Layer 2 combat percussive bed will not fade in\n{ex.StackTrace}");
+                // Non-fatal: combat percussive layer stays muted; gameplay still functions.
+            }
+            try { Tartaria.Core.GameEvents.OnCombatEnded      += HandleCombatExit;       }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(BindLayer2Events)} failed to subscribe to GameEvents.OnCombatEnded: {ex.GetType().Name}: {ex.Message}\n  context: Layer 2 combat percussive bed will not fade out if OnCombatStarted somehow fires\n{ex.StackTrace}");
+                // Non-fatal: combat layer may stay active longer than intended; only matters if combat-enter subscription succeeded.
+            }
+            try { Tartaria.Core.GameEvents.OnBuildingRestored += HandleBuildingRestored; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(BindLayer2Events)} failed to subscribe to GameEvents.OnBuildingRestored: {ex.GetType().Name}: {ex.Message}\n  context: Layer 2 restoration swell one-shot will not play\n{ex.StackTrace}");
+                // Non-fatal: restoration swell one-shot is silent; visual restoration cinematic still plays via Moon1CinematicMoments.
+            }
         }
 
         void UnbindLayer2Events()
         {
             if (!_l2Bound) return;
             _l2Bound = false;
-            try { Tartaria.Core.GameEvents.OnPOIDiscovered    -= HandlePOIDiscovered;    } catch { }
-            try { Tartaria.Core.GameEvents.OnTuningProgress   -= HandleTuningProgress;   } catch { }
-            try { Tartaria.Core.GameEvents.OnCombatStarted    -= HandleCombatEnter;      } catch { }
-            try { Tartaria.Core.GameEvents.OnCombatEnded      -= HandleCombatExit;       } catch { }
-            try { Tartaria.Core.GameEvents.OnBuildingRestored -= HandleBuildingRestored; } catch { }
+            try { Tartaria.Core.GameEvents.OnPOIDiscovered    -= HandlePOIDiscovered;    }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(UnbindLayer2Events)} failed to unsubscribe from GameEvents.OnPOIDiscovered: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown / controller destroy\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak across scene loads; logged for diagnosis.
+            }
+            try { Tartaria.Core.GameEvents.OnTuningProgress   -= HandleTuningProgress;   }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(UnbindLayer2Events)} failed to unsubscribe from GameEvents.OnTuningProgress: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown / controller destroy\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
+            try { Tartaria.Core.GameEvents.OnCombatStarted    -= HandleCombatEnter;      }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(UnbindLayer2Events)} failed to unsubscribe from GameEvents.OnCombatStarted: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown / controller destroy\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
+            try { Tartaria.Core.GameEvents.OnCombatEnded      -= HandleCombatExit;       }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(UnbindLayer2Events)} failed to unsubscribe from GameEvents.OnCombatEnded: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown / controller destroy\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
+            try { Tartaria.Core.GameEvents.OnBuildingRestored -= HandleBuildingRestored; }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[{nameof(AdaptiveMusicController)}] {nameof(UnbindLayer2Events)} failed to unsubscribe from GameEvents.OnBuildingRestored: {ex.GetType().Name}: {ex.Message}\n  context: scene teardown / controller destroy\n{ex.StackTrace}");
+                // Non-fatal: stale subscription may leak; logged for diagnosis.
+            }
         }
 
         AudioSource CreateLayer2Source(string n, float vol)
