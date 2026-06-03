@@ -304,6 +304,7 @@ namespace Tartaria.Integration
             }
             else
             {
+#if !TARTARIA_ECHOHAVEN_BAKED // // Sprint 11 L8 50ff78ea: procedural new GameObject fallback baked into scene via EchohavenContentBaker.cs.
                 // Fallback: procedural shovel if prefab missing
                 root = new GameObject("ShovelPickup");
                 root.transform.position = spawn;
@@ -372,6 +373,11 @@ namespace Tartaria.Integration
                 bladeSideR.AddComponent<MeshFilter>();
                 bladeSideR.AddComponent<MeshRenderer>();
                 SetEmissiveMaterial(bladeSideR, new Color(0.85f, 0.80f, 0.60f), 0.4f);
+#else
+                // Hammer L3 baked path: locate pre-instantiated ShovelPickup.
+                root = GameObject.Find("ShovelPickup") ?? new GameObject("ShovelPickup_BakedFallback");
+                root.transform.position = spawn;
+#endif
             }
 
             var c = root.GetComponent<SphereCollider>();
@@ -1008,6 +1014,7 @@ namespace Tartaria.Integration
 
         GameObject CreateMiloFallback(Vector3 pos)
         {
+#if !TARTARIA_ECHOHAVEN_BAKED // // Sprint 11 L8 50ff78ea: procedural new GameObject fallback baked into scene via EchohavenContentBaker.cs.
             var root = new GameObject("Milo");
             root.transform.position = pos;
 
@@ -1113,6 +1120,9 @@ namespace Tartaria.Integration
             AddNameplate(root, Tartaria.Input.InputPromptHelper.Localize("[E] Talk to Milo"), new Color(0.5f, 0.8f, 1f));
 
             return root;
+#else
+            return GameObject.Find("Milo") ?? new GameObject("Milo_BakedFallback");
+#endif
         }
 
         void SetMiloPrimitiveMaterial(GameObject go)
@@ -1157,8 +1167,15 @@ namespace Tartaria.Integration
                 else
                 {
                     Debug.LogError("[EchohavenContentSpawner] CRITICAL: Char_Rogue_Hooded prefab missing");
+#if !TARTARIA_ECHOHAVEN_BAKED
+                    // Sprint 11 L8 50ff78ea: procedural fallback (baked into scene via EchohavenContentBaker.cs).
                     cassianGO = new GameObject("Cassian_MISSING_PREFAB");
                     cassianGO.transform.position = cassianPosition;
+#else
+                    // Hammer L3 baked path: locate pre-instantiated Cassian.
+                    cassianGO = GameObject.Find("Cassian") ?? new GameObject("Cassian_BakedFallback");
+                    cassianGO.transform.position = cassianPosition;
+#endif
                 }
 
             // NPC interaction collider
@@ -2064,6 +2081,7 @@ namespace Tartaria.Integration
 
         GameObject CreateMudGolemFallback(Vector3 pos)
         {
+#if !TARTARIA_ECHOHAVEN_BAKED // // Sprint 11 L8 50ff78ea: procedural new GameObject fallback baked into scene via EchohavenContentBaker.cs.
             var root = new GameObject("MudGolem");
             root.transform.position = pos;
 
@@ -2179,6 +2197,9 @@ namespace Tartaria.Integration
             rb.useGravity = false;
 
             return root;
+#else
+            return GameObject.Find("MudGolem_Baked") ?? GameObject.Find("MudGolem") ?? new GameObject("MudGolem_BakedFallback");
+#endif
         }
 
         void SetGolemMaterial(GameObject go)
@@ -2629,7 +2650,12 @@ namespace Tartaria.Integration
             else
             {
                 Debug.LogError("[EchohavenContentSpawner] CRITICAL: Char_Mage prefab missing for Anastasia");
+#if !TARTARIA_ECHOHAVEN_BAKED
+                // Sprint 11 L8 50ff78ea: procedural fallback (baked into scene via EchohavenContentBaker.cs).
                 var root = new GameObject("Anastasia_MISSING_PREFAB");
+#else
+                var root = GameObject.Find("Anastasia") ?? new GameObject("Anastasia_BakedFallback");
+#endif
                 return root;
             }
         }
