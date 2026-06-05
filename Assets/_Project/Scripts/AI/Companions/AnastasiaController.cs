@@ -487,8 +487,16 @@ namespace Tartaria.Integration
         }
 
         /// <summary>
-        /// Deliver a line by its exact ID (for scripted story triggers).
-        /// Bypasses context matching but still respects bitmask.
+        /// Deliver a line by its exact ID (for scripted story triggers — narrative beats,
+        /// Yarn nodes, cinematic moments that need to fire a *specific* Anastasia line
+        /// regardless of the player's current context/category state).
+        ///
+        /// Bypasses the context-matching priority loop in TryDeliverLineByContext()
+        /// because the call site has already decided WHICH line should play (it knows
+        /// the storyline ID). Still respects the delivered-bitmask (IsLineDelivered)
+        /// so a line cannot fire twice in the same save — scripted triggers stay
+        /// idempotent across reloads. Returns false if Anastasia has not yet manifested,
+        /// if the line is already delivered, or if the ID is not in the database.
         /// </summary>
         public bool TryDeliverLineById(int lineId)
         {
