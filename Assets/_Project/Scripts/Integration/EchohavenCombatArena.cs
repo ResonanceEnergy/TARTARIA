@@ -21,7 +21,7 @@ namespace Tartaria.Integration
         public float startDelay = 4f;
         public float interWaveDelay = 4f;
         public int[] waveSizes = { 3, 5, 7 };
-        public float spawnRadius = 9f;
+        public float spawnRadius = 25f; // 2026-06-05: was 9f — too close, eclipsed Cassian at spawn. AI chases toward player anyway.
 
         readonly List<MudGolemHealth> _alive = new();
         int _wave;
@@ -152,8 +152,4 @@ namespace Tartaria.Integration
 
         void ShowObjective(string text)
         {
-            var hud = HUDController.Instance;
-            if (hud != null) hud.ShowObjective(text);
-        }
-    }
-}
+            var hud =

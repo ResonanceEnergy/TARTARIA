@@ -27,11 +27,12 @@ namespace Tartaria.Editor
         // short "name" form and the Sprint 9 Lane 5 "RoleSuffix" forms are
         // listed so either set imports correctly.
         //
-        // Sprint 11 TODO: once the Blender NPC scripts emit a real armature
-        // (hips/spine/head/limbs hierarchy with weighted skin), flip these
-        // from Generic to Humanoid + autoconfigure the AvatarMask. The
-        // current Blender gen_* scripts produce static joined meshes with
-        // no bones, so Humanoid mapping would silently fail.
+        // 2026-06-04 STAGE A CLOSED: Blender NPC scripts now emit a 21-bone
+        // humanoid armature with Unity HumanBodyBones canonical names. The
+        // animationType is upgraded to Humanoid in ConfigureNpcImporter()
+        // below. Auto-mapping is fed by autoGenerateAvatarMappingIfUnspecified
+        // in the .meta files. Stage B will refine vertex weights + add
+        // humanDescription mass/center metadata.
         static readonly string[] NPC_FILENAMES = new[]
         {
             "Lirael.fbx",
@@ -42,6 +43,7 @@ namespace Tartaria.Editor
             "AnastasiaPrincess.fbx",
             "CassianCarter.fbx",
             "MiloBoy.fbx",
+            "BobInnkeeper.fbx",
         };
 
         void OnPreprocessModel()
@@ -93,13 +95,18 @@ namespace Tartaria.Editor
 
         static void ConfigureNpcImporter(ModelImporter importer)
         {
-            // Generic rig — safer first pass than Humanoid because the Sprint 9
-            // Blender NPC scripts join all meshes and do not emit a bone
-            // hierarchy. Humanoid retargeting needs Hips/Spine/Head and the
-            // limb chain; without bones Unity would log "AvatarBuilder failed"
-            // and leave the avatar invalid. Sprint 11 will upgrade to
-            // Humanoid once the Blender pipeline emits a real armature.
-            importer.animationType  = ModelImporterAnimationType.Generic;
+            // 2026-06-04 NPC armature pipeline Stage A: the Blender NPC scripts
+            // now emit a 21-bone Unity-canonical humanoid armature (Hips/Spine/
+            // Chest/Neck/Head + 4-bone arms + 3-bone legs) bound via auto-weights.
+            // Set animationType = Humanoid so Unity's AvatarBuilder runs against
+            // the canonical bone names. The .meta files already carry
+            // autoGenerateAvatarMappingIfUnspecified=1, so the Avatar
+            // sub-asset materializes on reimport without manual mapping.
+            //
+            // Stage B will introduce proper humanDescription mass/centerOfMass
+            // and per-bone twist limits. For now the auto-mapping is acceptable.
+            importer.animationType  = ModelImporterAnimationType.Human;
+            importer.avatarSetup    = ModelImporterAvatarSetup.CreateFromThisModel;
             importer.globalScale    = 1.0f;
             importer.useFileScale   = false;
             importer.bakeAxisConversion = true;
@@ -107,7 +114,16 @@ namespace Tartaria.Editor
             importer.importVisibility   = false;   // hidden Blender objects shouldn't carry over
             importer.materialImportMode = ModelImporterMaterialImportMode.ImportStandard;
 
-            Debug.Log("[BlenderImport] Configured NPC humanoid presets for " + importer.assetPath);
+            // 2026-06-05 ROOT-CAUSE MAGENTA FIX: URP/Lit's skinned-mesh variant requires the
+            // Standard (4-bones-per-vertex) skin weight pipeline. Default `OneBone` ships a
+            // shader keyword combo that no project URP variant collection compiles, so the
+            // skinned mesh renders magenta even though the material/shader look correct.
+            // Per Unity 6 manual: ModelImporter.maxBonesPerVertex + skinWeights together
+            // determine which URP skinning variant is required. Standard = 4 = URP default.
+            importer.skinWeights      = ModelImporterSkinWeights.Standard;
+            importer.maxBonesPerVertex = 4;
+
+            Debug.Log("[BlenderImport] Configured NPC as Humanoid (Stage A armature) for " + importer.assetPath);
         }
 
         // After import, convert materials to URP/Lit
@@ -117,6 +133,32 @@ namespace Tartaria.Editor
             var urp = Shader.Find("Universal Render Pipeline/Lit");
             if (urp == null) return;
             material.shader = urp;
+
+            // 2026-06-05 ALBEDO BRIGHTEN: Blender's default export produces _BaseColor in
+            // 0.05–0.10 linear range for "black" materials (e.g. CassianCarter_robe = (0.08,
+            // 0.06, 0.05)). At runtime with 1.0 sun intensity that yields a near-black render
+            // — Cassian appears as silhouette. Auto-brighten any non-skin/iris material whose
+            // RGB is all below 0.30 so the player character is legible in screenshots.
+            if (material.HasProperty("_BaseColor"))
+            {
+                string n = material.name.ToLower();
+                bool skipBrighten = n.Contains("skin") || n.Contains("iris") || n.Contains("eye") || n.Contains("hair");
+                if (!skipBrighten)
+                {
+                    var c = material.GetColor("_BaseColor");
+                    if (c.r < 0.30f && c.g < 0.30f && c.b < 0.30f)
+                    {
+                        // Preserve hue, lift luminance to ~0.55
+                        var bright = new Color(
+                            Mathf.Max(c.r * 3.5f, 0.40f),
+                            Mathf.Max(c.g * 3.5f, 0.38f),
+                            Mathf.Max(c.b * 3.5f, 0.35f), c.a);
+                        material.SetColor("_BaseColor", bright);
+                        Debug.Log($"[BlenderImport] Brightened {material.name}: {c} → {bright}");
+                    }
+                }
+            }
+
             Debug.Log("[BlenderImportPostprocessor] " + material.name + " -> URP/Lit");
         }
 
@@ -144,46 +186,11 @@ namespace Tartaria.Editor
             // Skip if prefab already exists (so we don't overwrite manual tweaks)
             if (File.Exists(prefabPath)) return;
 
-            var instance = (GameObject)PrefabUtility.InstantiatePrefab(fbx);
-            PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
-            Object.DestroyImmediate(instance);
-            AssetDatabase.SaveAssets();
-            Debug.Log("[BlenderImportPostprocessor] Created prefab variant: " + prefabPath);
-        }
-
-        // ----- Editor menu: force-reimport the Moon 1 NPC FBX set -----
-        // Used after the Sprint 10 import-config change to re-run
-        // OnPreprocessModel with the new Generic-rig settings.
-        [MenuItem("Tartaria/Content/Reimport Moon 1 NPC FBX")]
-        public static void ReimportMoon1NpcFbx()
-        {
-            int found = 0;
-            int missing = 0;
-            AssetDatabase.StartAssetEditing();
-            try
+            // 2026-06-04 REORG-5: also skip if the prefab exists in any category subfolder
+            // (post-C.L1 migration moved 347 prefabs into Architecture/Audio/NPCs/Plates/Props/VFX).
+            // Without this guard, every FBX re-import regenerates a duplicate root copy with a
+            // fresh GUID, leaving the original tracked subfolder copy plus an untracked shadow.
+            string[] categories = { "Architecture", "Audio", "NPCs", "Plates", "Props", "VFX" };
+            foreach (var cat in categories)
             {
-                foreach (var fileName in NPC_FILENAMES)
-                {
-                    string assetPath = MOON1_FBX_ROOT + "/" + fileName;
-                    string absolute  = Path.Combine(Directory.GetCurrentDirectory(), assetPath);
-                    if (!File.Exists(absolute))
-                    {
-                        Debug.LogWarning("[BlenderImport] Reimport skipped — not on disk: " + assetPath);
-                        missing++;
-                        continue;
-                    }
-                    AssetDatabase.ImportAsset(assetPath, ImportAssetOptions.ForceUpdate);
-                    Debug.Log("[BlenderImport] Force-reimported NPC FBX: " + assetPath);
-                    found++;
-                }
-            }
-            finally
-            {
-                AssetDatabase.StopAssetEditing();
-                AssetDatabase.Refresh();
-            }
-            Debug.Log($"[BlenderImport] Reimport Moon 1 NPC FBX complete. Reimported={found} Missing={missing}");
-        }
-    }
-}
-#endif
+                string subPath = prefabDir + "/" + c
