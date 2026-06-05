@@ -1,73 +1,681 @@
-// File: Assets/_Project/Scripts/AI/MudGolemAI.cs
-using System;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.AI;
+using Unity.Profiling;
+using Tartaria.Core;
+using Tartaria.Gameplay;
+using Tartaria.Gameplay.Combat;
+using System.Collections;
 
 namespace Tartaria.AI
 {
+    /// <summary>
+    /// Mud Golem AI — hostile enemy that spawns when Resonance Score exceeds
+    /// thresholds. Patrols randomly, chases player on sight, melee attacks
+    /// within range, drops Aether shard on death.
+    ///
+    /// States: Patrol → Chase → Attack → Dead
+    ///
+    /// NavMesh-aware: attempts to use NavMeshAgent for navigation. If NavMesh
+    /// is not baked, falls back to CharacterController-style direct movement.
+    /// </summary>
+    [DisallowMultipleComponent]
     public class MudGolemAI : MonoBehaviour
     {
-        public float MaxHealth = 100f;
-        public float CurrentHealth = 100f;
-        public bool IsAlive { get { return CurrentHealth > 0; } }
+        static readonly ProfilerMarker s_UpdateMarker = new ProfilerMarker("MudGolemAI.Update");
+        static readonly ProfilerMarker s_PatrolMarker = new ProfilerMarker("MudGolemAI.UpdatePatrol");
+        static readonly ProfilerMarker s_ChaseMarker = new ProfilerMarker("MudGolemAI.UpdateChase");
+        static readonly ProfilerMarker s_AttackMarker = new ProfilerMarker("MudGolemAI.UpdateAttack");
 
-        private void Awake()
+        [Header("Stats")]
+        // 2026-05-31: per docs/15 §4 Mud Golem HP is 100. MudGolemHealth (same assembly) is
+        // the canonical HP holder when present — TakeDamage below routes to it. The local
+        // _currentHealth is the fallback path for golems spawned without MudGolemHealth.
+        [SerializeField] int maxHealth = 100;
+        [SerializeField] int meleeDamage = 10;
+
+        [Header("Behavior")]
+        [SerializeField] float patrolRadius = 20f;
+        [SerializeField] float chaseRange = 15f;
+        [SerializeField] float attackRange = 3f;
+        [SerializeField] float attackCooldown = 1.5f;
+        [SerializeField] float patrolWaitTime = 5f;
+
+        [Header("Sprint Batch 3: Perception")]
+        [SerializeField] float sightRange = 18f;
+        [SerializeField] float sightFOV = 90f;
+        [SerializeField] float lostTargetSearchDuration = 8f;
+
+        [Header("Sprint Batch 3: Attack Telegraph")]
+        // 2026-05-31: spec §4 calls for a 1.0s readable wind-up before the swing lands.
+        [SerializeField] float telegraphDuration = 1.0f;
+
+        [Header("Movement (fallback if no NavMesh)")]
+        [SerializeField] float moveSpeed = 3f;
+        [SerializeField] float chaseSpeed = 5f;
+
+        [Header("Loot")]
+        [SerializeField] GameObject aetherShardPrefab;
+
+        NavMeshAgent _agent;
+        Transform _player;
+        int _currentHealth;
+        GolemState _state;
+        float _stateEnterTime;
+        float _lastAttackTime;
+        Vector3 _spawnPosition;
+        Vector3 _patrolTarget;
+        bool _hasNavMesh;
+        MaterialPropertyBlock _propBlock;
+        Renderer[] _renderers;
+        CharacterController _controller;
+        Vector3 _knockbackVelocity;
+        Vector3 _lastKnownPlayerPosition;
+        float _lostTargetTime;
+        bool _telegraphing;
+
+        enum GolemState { Patrol, Chase, Attack, Dead }
+
+        void Awake()
         {
-            if (transform.childCount == 0)
+            ApplyDifficultyScaling();
+            _currentHealth = maxHealth;
+            _spawnPosition = transform.position;
+            _agent = GetComponent<NavMeshAgent>();
+            _controller = GetComponent<CharacterController>();
+            _propBlock = new MaterialPropertyBlock();
+            _renderers = GetComponentsInChildren<Renderer>();
+
+            // Check if NavMesh is baked
+            if (_agent != null && NavMesh.SamplePosition(transform.position, out _, 2f, NavMesh.AllAreas))
             {
-                var prefab = LoadMudGolemPrefab();
-                if (prefab != null)
+                _hasNavMesh = true;
+                _agent.speed = moveSpeed;
+            }
+            else
+            {
+                _hasNavMesh = false;
+                if (_agent != null) _agent.enabled = false;
+            }
+        }
+
+        void Start()
+        {
+            var playerGO = GameObject.FindGameObjectWithTag("Player");
+            if (playerGO != null)
+                _player = playerGO.transform;
+
+            TransitionTo(GolemState.Patrol);
+            Debug.Log($"[MudGolem] Spawned at {transform.position}, HP={_currentHealth}, NavMesh={_hasNavMesh}");
+        }
+
+        // ─── Procedural visual builder ───────────────
+        /// <summary>
+        /// Builds a fully-formed Mud Golem GameObject from primitives:
+        /// torso, head, two arms, two legs, glowing eyes, and a muddy material.
+        /// Adds NavMeshAgent + CapsuleCollider + Rigidbody + MudGolemAI so the
+        /// returned object is gameplay-ready. Used by both the runtime spawn
+        /// fallback and the editor RuntimeSetupWizard.
+        /// </summary>
+        public static GameObject BuildProcedural(Vector3 position, Quaternion rotation)
+        {
+            var root = new GameObject("MudGolem");
+            root.transform.SetPositionAndRotation(position, rotation);
+
+            // Materials — 2026-05-30 URP magenta fix re-applied after local-LLM
+            // ticket 09 accidentally gutted the file. URP needs _BaseColor, the
+            // Built-in `.color` setter is silently ignored.
+            var mudShader = Shader.Find("Universal Render Pipeline/Lit") ?? Shader.Find("Standard");
+            var mudMat = new Material(mudShader) { name = "MudGolem_Body" };
+            var mudColor = new Color(0.32f, 0.24f, 0.16f);
+            if (mudMat.HasProperty("_BaseColor")) mudMat.SetColor("_BaseColor", mudColor);
+            else mudMat.color = mudColor;
+            if (mudMat.HasProperty("_Smoothness")) mudMat.SetFloat("_Smoothness", 0.15f);
+            if (mudMat.HasProperty("_Metallic"))   mudMat.SetFloat("_Metallic", 0.05f);
+
+            var eyeMat = new Material(mudShader) { name = "MudGolem_Eye" };
+            var eyeColor = new Color(1.0f, 0.45f, 0.10f);
+            if (eyeMat.HasProperty("_BaseColor")) eyeMat.SetColor("_BaseColor", eyeColor);
+            else eyeMat.color = eyeColor;
+            if (eyeMat.HasProperty("_EmissionColor"))
+            {
+                eyeMat.EnableKeyword("_EMISSION");
+                eyeMat.SetColor("_EmissionColor", new Color(2.4f, 1.0f, 0.2f));
+            }
+
+            // Torso (squashed sphere)
+            var torso = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            torso.name = "Torso";
+            torso.transform.SetParent(root.transform, false);
+            torso.transform.localPosition = new Vector3(0f, 1.0f, 0f);
+            torso.transform.localScale = new Vector3(1.4f, 1.6f, 1.0f);
+            torso.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+            Object.Destroy(torso.GetComponent<Collider>());
+
+            // Head (cube)
+            var head = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            head.name = "Head";
+            head.transform.SetParent(root.transform, false);
+            head.transform.localPosition = new Vector3(0f, 2.05f, 0f);
+            head.transform.localScale = new Vector3(0.9f, 0.9f, 0.9f);
+            head.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+            Object.Destroy(head.GetComponent<Collider>());
+
+            // Eyes
+            for (int i = 0; i < 2; i++)
+            {
+                var eye = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                eye.name = i == 0 ? "Eye_L" : "Eye_R";
+                eye.transform.SetParent(head.transform, false);
+                eye.transform.localPosition = new Vector3(i == 0 ? -0.22f : 0.22f, 0.05f, -0.46f);
+                eye.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                eye.GetComponent<MeshRenderer>().sharedMaterial = eyeMat;
+                Object.Destroy(eye.GetComponent<Collider>());
+            }
+
+            // Arms (cylinders)
+            for (int i = 0; i < 2; i++)
+            {
+                var arm = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+                arm.name = i == 0 ? "Arm_L" : "Arm_R";
+                arm.transform.SetParent(root.transform, false);
+                arm.transform.localPosition = new Vector3(i == 0 ? -0.95f : 0.95f, 1.0f, 0f);
+                arm.transform.localScale = new Vector3(0.32f, 0.7f, 0.32f);
+                arm.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+                Object.Destroy(arm.GetComponent<Collider>());
+
+                // Fist
+                var fist = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                fist.name = "Fist";
+                fist.transform.SetParent(arm.transform, false);
+                fist.transform.localPosition = new Vector3(0f, -1.05f, 0f);
+                fist.transform.localScale = new Vector3(1.6f, 0.7f, 1.6f);
+                fist.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+                Object.Destroy(fist.GetComponent<Collider>());
+            }
+
+            // Legs (cubes)
+            for (int i = 0; i < 2; i++)
+            {
+                var leg = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                leg.name = i == 0 ? "Leg_L" : "Leg_R";
+                leg.transform.SetParent(root.transform, false);
+                leg.transform.localPosition = new Vector3(i == 0 ? -0.4f : 0.4f, 0.0f, 0f);
+                leg.transform.localScale = new Vector3(0.55f, 1.0f, 0.55f);
+                leg.GetComponent<MeshRenderer>().sharedMaterial = mudMat;
+                Object.Destroy(leg.GetComponent<Collider>());
+            }
+
+            // Gameplay components
+            var collider = root.AddComponent<CapsuleCollider>();
+            collider.height = 2.6f;
+            collider.radius = 0.85f;
+            collider.center = new Vector3(0f, 1.0f, 0f);
+
+            var rb = root.AddComponent<Rigidbody>();
+            rb.mass = 80f;
+            rb.constraints = RigidbodyConstraints.FreezeRotation;
+            rb.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+            var agent = root.AddComponent<NavMeshAgent>();
+            agent.speed = 3.5f;
+            agent.angularSpeed = 240f;
+            agent.acceleration = 10f;
+            agent.stoppingDistance = 2.5f;
+            agent.radius = 0.85f;
+            agent.height = 2.6f;
+
+            // Layer
+            int enemyLayer = LayerMask.NameToLayer("Enemy");
+            root.layer = enemyLayer >= 0 ? enemyLayer : 12;
+            root.tag = "Enemy";
+
+            root.AddComponent<MudGolemAI>();
+            return root;
+        }
+
+        void Update()
+        {
+            using (PerformanceGuard.Profile(SystemTag.MudGolem))
+            using (s_UpdateMarker.Auto())
+            {
+                if (_state == GolemState.Dead) return;
+
+                // Sprint Batch 2: Apply knockback velocity
+                if (_knockbackVelocity.sqrMagnitude > 0.01f)
                 {
-                    Instantiate(prefab, transform);
+                    if (_controller != null)
+                        _controller.Move(_knockbackVelocity * Time.deltaTime);
+                    _knockbackVelocity = Vector3.Lerp(_knockbackVelocity, Vector3.zero, Time.deltaTime * 5f);
+                }
+
+                float distToPlayer = _player != null
+                    ? Vector3.Distance(transform.position, _player.position)
+                    : float.MaxValue;
+
+                switch (_state)
+                {
+                    case GolemState.Patrol:
+                        UpdatePatrol(distToPlayer);
+                        break;
+                    case GolemState.Chase:
+                        UpdateChase(distToPlayer);
+                        break;
+                    case GolemState.Attack:
+                        UpdateAttack(distToPlayer);
+                        break;
+                }
+            }
+        }
+
+        // ─── State Machine ───────────────────────────
+
+        void TransitionTo(GolemState newState)
+        {
+            if (_state == newState) return;
+
+            _state = newState;
+            _stateEnterTime = Time.time;
+
+            Debug.Log($"[MudGolem] State: {newState}, HP={_currentHealth}");
+
+            switch (newState)
+            {
+                case GolemState.Patrol:
+                    SetNewPatrolTarget();
+                    break;
+                case GolemState.Chase:
+                    if (_hasNavMesh) _agent.speed = chaseSpeed;
+                    // P2.L4 Sprint 11 L9 - enemy bark on aggro acquisition (once per Chase entry)
+                    GameEvents.RaiseHUDShowEnemyBark("The mud stirs — it's seen you!", 2.5f);
+                    break;
+                case GolemState.Attack:
+                    if (_hasNavMesh) _agent.isStopped = true;
+                    break;
+            }
+        }
+
+        void UpdatePatrol(float distToPlayer)
+        {
+            using (s_PatrolMarker.Auto())
+            {
+                // Sprint Batch 3: Perception cone check
+                if (_player != null && CanSeePlayer())
+                {
+                    _lastKnownPlayerPosition = _player.position;
+                    TransitionTo(GolemState.Chase);
+                    return;
+                }
+
+                if (_hasNavMesh)
+                {
+                    if (!_agent.pathPending && _agent.remainingDistance <= _agent.stoppingDistance)
+                    {
+                        // Reached patrol point, wait then pick new target
+                        if (Time.time - _stateEnterTime >= patrolWaitTime)
+                            SetNewPatrolTarget();
+                    }
                 }
                 else
                 {
-                    EnsureFallbackVisual();
+                    // Fallback: walk toward patrol target
+                    Vector3 dir = (_patrolTarget - transform.position).normalized;
+                    dir.y = 0f;
+                    transform.position += dir * moveSpeed * Time.deltaTime;
+                    transform.forward = dir;
+
+                    if (Vector3.Distance(transform.position, _patrolTarget) < 1f)
+                    {
+                        if (Time.time - _stateEnterTime >= patrolWaitTime)
+                            SetNewPatrolTarget();
+                    }
                 }
             }
         }
 
-        private void TakeDamage(float damage, GameObject instigator = null)
+        /// <summary>Sprint Batch 3: Perception cone with LineOfSight raycast</summary>
+        bool CanSeePlayer()
         {
-            CurrentHealth -= damage;
-            Debug.Log($"[MudGolemAI] Player {instigator?.name ?? "Unknown"} dealt {damage} damage to Mud Golem. Health remaining: {CurrentHealth}");
-            if (!IsAlive)
+            if (_player == null) return false;
+
+            Vector3 toPlayer = _player.position - transform.position;
+            float angle = Vector3.Angle(transform.forward, toPlayer);
+
+            if (angle > sightFOV * 0.5f) return false;
+            if (toPlayer.sqrMagnitude > sightRange * sightRange) return false;
+
+            // LineOfSight raycast
+            if (Physics.Raycast(transform.position + Vector3.up, toPlayer.normalized, out RaycastHit hit, sightRange))
             {
-                Die(instigator);
+                if (hit.collider.CompareTag("Player"))
+                    return true;
+            }
+
+            return false;
+        }
+
+        void UpdateChase(float distToPlayer)
+        {
+            using (s_ChaseMarker.Auto())
+            {
+                // Sprint Batch 3: Track last known position
+                if (_player != null && CanSeePlayer())
+                {
+                    _lastKnownPlayerPosition = _player.position;
+                    _lostTargetTime = 0f;
+                }
+                else
+                {
+                    // Lost line of sight — continue to last known position
+                    _lostTargetTime += Time.deltaTime;
+                    if (_lostTargetTime >= lostTargetSearchDuration || distToPlayer > chaseRange)
+                    {
+                        Debug.Log($"[MudGolem] Lost player (search={_lostTargetTime:F1}s, dist={distToPlayer:F1}m), returning to patrol");
+                        TransitionTo(GolemState.Patrol);
+                        return;
+                    }
+                }
+
+                if (distToPlayer <= attackRange)
+                {
+                    TransitionTo(GolemState.Attack);
+                    return;
+                }
+
+                if (_player == null) return;
+
+                Vector3 targetPos = _lostTargetTime > 0f ? _lastKnownPlayerPosition : _player.position;
+
+                if (_hasNavMesh)
+                {
+                    _agent.SetDestination(targetPos);
+                }
+                else
+                {
+                    Vector3 dir = (targetPos - transform.position).normalized;
+                    dir.y = 0f;
+                    transform.position += dir * chaseSpeed * Time.deltaTime;
+                    transform.forward = dir;
+                }
             }
         }
 
-        private void Die(GameObject instigator = null)
+        void UpdateAttack(float distToPlayer)
         {
-            Debug.Log($"[MudGolemAI] Mud Golem died. Instigator: {instigator?.name ?? "Unknown"}");
-            // Additional cleanup or AI logic here
+            using (s_AttackMarker.Auto())
+            {
+                if (distToPlayer > attackRange)
+                {
+                    TransitionTo(GolemState.Chase);
+                    return;
+                }
+
+                if (_player == null) return;
+
+                // Face player
+                Vector3 lookDir = (_player.position - transform.position).normalized;
+                lookDir.y = 0f;
+                transform.forward = lookDir;
+
+                // Attack on cooldown
+                if (Time.time - _lastAttackTime >= attackCooldown)
+                {
+                    _lastAttackTime = Time.time;
+                    PerformMeleeAttack();
+                }
+            }
         }
 
-        private GameObject LoadMudGolemPrefab()
+        void SetNewPatrolTarget()
         {
-#if UNITY_EDITOR
-    var p = UnityEditor.AssetDatabase.LoadAssetAtPath<GameObject>("Assets/_Project/Prefabs/Characters/MudGolem.prefab");
-    if (p != null) return p;
-#endif
-    return Resources.Load<GameObject>("MudGolem");
-}
+            Vector2 randomCircle = Random.insideUnitCircle * patrolRadius;
+            Vector3 target = _spawnPosition + new Vector3(randomCircle.x, 0f, randomCircle.y);
 
-        private void EnsureFallbackVisual()
-        {
-            var urpLit = Shader.Find("Universal Render Pipeline/Lit");
-            var marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            marker.name = "FallbackVisual_MudGolem";
-            marker.transform.SetParent(transform);
-            marker.transform.localPosition = new Vector3(0f, 0.6f, 0f);
-            marker.transform.localScale = Vector3.one * 0.9f;
-            Destroy(marker.GetComponent<Collider>());
-            if (urpLit != null)
+            if (_hasNavMesh)
             {
-                var mat = new Material(urpLit);
-                mat.SetColor("_BaseColor", new Color(0.32f, 0.22f, 0.14f));
-                marker.GetComponent<Renderer>().sharedMaterial = mat;
+                // Sample nearest valid NavMesh position
+                if (NavMesh.SamplePosition(target, out NavMeshHit hit, patrolRadius, NavMesh.AllAreas))
+                {
+                    _agent.SetDestination(hit.position);
+                    _patrolTarget = hit.position;
+                }
             }
-            Debug.LogWarning("[MudGolemAI] Prefab load failed — using fallback sphere marker. Check Assets/_Project/Prefabs/Characters/MudGolem.prefab");
+            else
+            {
+                _patrolTarget = target;
+            }
+
+            _stateEnterTime = Time.time;
+        }
+
+        void PerformMeleeAttack()
+        {
+            // Sprint Batch 3: Telegraph attack
+            if (!_telegraphing)
+            {
+                StartCoroutine(TelegraphAttack());
+                return;
+            }
+
+            // Raycast forward to check for player hit
+            if (Physics.Raycast(transform.position + Vector3.up, transform.forward, out RaycastHit hit, attackRange))
+            {
+                if (hit.collider.CompareTag("Player"))
+                {
+                    // Deal damage via SendMessage (PlayerHealthController not in current assembly)
+                    hit.collider.SendMessage("TakeDamage", meleeDamage, SendMessageOptions.DontRequireReceiver);
+                    Debug.Log($"[MudGolem] Hit player for {meleeDamage} damage");
+
+                    // Sprint 7 Lane 7: HitFeedback feedback (popup + hitstop + shake)
+                    try { HitFeedback.NotifyHit(hit.collider.transform.position, meleeDamage, false); }
+                    catch (System.NullReferenceException) { Debug.LogWarning("[HitCallSite] HitFeedback not initialized at MudGolemAI.cs:PerformMeleeAttack"); }
+
+                    // SFX via GameEvents (no direct Audio dependency)
+                    // VFX handled elsewhere
+                }
+            }
+        }
+
+        /// <summary>Sprint Batch 3: 0.5s wind-up with red emission flash</summary>
+        IEnumerator TelegraphAttack()
+        {
+            _telegraphing = true;
+
+            // Red emission flash
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.red * 1.5f);
+                r.SetPropertyBlock(_propBlock);
+            }
+
+            yield return new WaitForSeconds(telegraphDuration);
+
+            // Restore emission
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.black);
+                r.SetPropertyBlock(_propBlock);
+            }
+
+            _telegraphing = false;
+        }
+
+        // ─── Public API ──────────────────────────────
+
+        public void TakeDamage(int damage)
+        {
+            if (_state == GolemState.Dead) return;
+
+            // 2026-05-31 Fix 6: when MudGolemHealth (same assembly) is present, it is the single
+            // source of truth for HP. Route damage there and bail — its Die() path will then
+            // fire OnAnyGolemDied (arenas, wave tracking) and run pooled cleanup.
+            if (TryGetComponent<MudGolemHealth>(out var health))
+            {
+                health.TakeDamage(damage, _player != null ? _player.gameObject : null);
+                Gameplay.DamageNumberPool.Spawn(damage, transform.position);
+                StartCoroutine(HitFlash());
+                if (_player != null)
+                {
+                    Vector3 dir = (transform.position - _player.position).normalized;
+                    OnHit(dir, damage * 0.1f);
+                }
+                return;
+            }
+
+            _currentHealth -= damage;
+            Debug.Log($"[MudGolem] Took {damage} damage, HP={_currentHealth}");
+
+            Gameplay.DamageNumberPool.Spawn(damage, transform.position);
+
+            // Sprint: Hit-flash (white emission for 0.08s)
+            StartCoroutine(HitFlash());
+
+            // Sprint Batch 2: Apply knockback from player direction
+            if (_player != null)
+            {
+                Vector3 dir = (transform.position - _player.position).normalized;
+                OnHit(dir, damage * 0.1f);
+            }
+
+            if (_currentHealth <= 0)
+                Die();
+        }
+
+        /// <summary>Sprint Batch 2: Knockback on hit</summary>
+        public void OnHit(Vector3 direction, float force)
+        {
+            _knockbackVelocity = direction * force;
+            Debug.Log($"[MudGolem] Knockback applied: {force:F1}");
+        }
+
+        IEnumerator HitFlash()
+        {
+            // Set white emission
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.white * 2f);
+                r.SetPropertyBlock(_propBlock);
+            }
+
+            yield return new WaitForSeconds(0.08f);
+
+            // Restore original emission
+            foreach (var r in _renderers)
+            {
+                if (r == null) continue;
+                r.GetPropertyBlock(_propBlock);
+                _propBlock.SetColor("_EmissionColor", Color.black);
+                r.SetPropertyBlock(_propBlock);
+            }
+        }
+
+        void Die()
+        {
+            TransitionTo(GolemState.Dead);
+
+            Gameplay.DecalHitPool.Spawn(transform.position, Vector3.up);
+
+            if (_hasNavMesh && _agent != null)
+                _agent.enabled = false;
+
+            // Sprint Batch 2: Ragdoll on death
+            EnableRagdoll();
+
+            // Death handled by GameLoopController.OnEnemyDefeated via GameEvents
+            // Drop loot, VFX, SFX all handled there
+
+            // Drop Aether shard
+            if (aetherShardPrefab != null)
+            {
+                Instantiate(aetherShardPrefab, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+            }
+
+            // Award RS via GameEvents
+            GameEvents.FireRSChange(5f);
+            GameEvents.RaiseHUDFlashRSGain(5f); // P2.L4 Sprint 11 L9 - golem kill RS flash
+
+            // 2026-05-31: MudGolemHealth is now in the same (AI) assembly. Call Kill directly
+            // so OnAnyGolemDied fires, loot drops, and pooling lifecycle runs. The old
+            // SendMessage("KillFromAI") bridge targeted the deleted nested duplicate in
+            // EchohavenContentSpawner — gone now.
+            if (TryGetComponent<MudGolemHealth>(out var healthBridge) && healthBridge.IsAlive)
+            {
+                healthBridge.Kill(_player != null ? _player.gameObject : null);
+            }
+
+            // Round 5: Health owns death cleanup (KillFromAI -> Die) for full pooling lifecycle.
+            // AI no longer schedules its own Destroy — prevents race with pool return.
+            // (Health will ReturnToPool or fallback Destroy.)
+
+            Debug.Log("[MudGolem] Dead (health-managed lifecycle for pooling)");
+        }
+
+        /// <summary>
+        /// Round 5 Production: Reset AI FSM/state when re-pooled and re-activated from EchohavenContentSpawner.
+        /// Ensures clean Patrol state, fresh health sync, no stale timers/targets. Full lifecycle pooling.
+        /// </summary>
+        public void ResetForPoolReuse()
+        {
+            _currentHealth = maxHealth;
+            _state = GolemState.Patrol;
+            _stateEnterTime = Time.time;
+            _lastAttackTime = 0f;
+            _knockbackVelocity = Vector3.zero;
+            _lostTargetTime = 0f;
+            _telegraphing = false;
+            _lastKnownPlayerPosition = Vector3.zero;
+            if (_player == null)
+            {
+                var p = GameObject.FindGameObjectWithTag("Player");
+                if (p != null) _player = p.transform;
+            }
+            TransitionTo(GolemState.Patrol);
+            Debug.Log("[MudGolemAI] Reset for pool reuse (Round 5 lifecycle)");
+        }
+
+        /// <summary>Sprint Batch 2: Enable ragdoll on death</summary>
+        void EnableRagdoll()
+        {
+            // Disable Animator and CharacterController
+            var animator = GetComponent<Animator>();
+            if (animator != null) animator.enabled = false;
+            if (_controller != null) _controller.enabled = false;
+
+            // Enable Rigidbody and apply death impulse
+            var rb = GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.isKinematic = false;
+                rb.useGravity = true;
+                rb.constraints = RigidbodyConstraints.None;
+
+                // Death impulse (backward from player)
+                if (_player != null)
+                {
+                    Vector3 dir = (transform.position - _player.position).normalized;
+                    rb.AddForce(dir * 5f + Vector3.up * 3f, ForceMode.Impulse);
+                    rb.AddTorque(Random.insideUnitSphere * 2f, ForceMode.Impulse);
+                }
+            }
+
+            Debug.Log("[MudGolem] Ragdoll enabled");
+        }
+
+        /// <summary>Sprint 7 Lane 2 - applies enemyDamageMultiplier from DifficultyController to meleeDamage. Called from Awake before _currentHealth init.</summary>
+        void ApplyDifficultyScaling()
+        {
+            float mul;
+            try { mul = Tartaria.Gameplay.DifficultyController.EnemyDamageMultiplier; }
+            catch (System.Exception e) { Debug.LogWarning("[DifficultyApply] MudGolemAI.ApplyDifficultyScaling: lookup threw " + e.GetType().Name + ": " + e.Message + " - using 1.0"); mul = 1f; }
+            mul = Mathf.Clamp(mul, 0.1f, 5f);
+            int before = meleeDamage;
+            meleeDamage = Mathf.Max(1, Mathf.RoundToInt(meleeDamage * mul));
+            Debug.Log("[DifficultyApply] meleeDamage=" + meleeDamage + " (multiplier=" + mul.ToString("F2") + ", was=" + before + ")");
         }
     }
 }

@@ -1,65 +1,133 @@
-// File: Assets/_Project/Scripts/Gameplay/PlayerRanged.cs
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace Tartaria.Gameplay
 {
+    /// <summary>
+    /// Player ranged weapon: bow mechanics.
+    /// RMB or LT to aim (slows camera, shows reticle), release to fire arrow.
+    /// Pools 16 arrow instances.
+    /// Auto-attached by CharacterPrefabFactory.
+    /// </summary>
     public class PlayerRanged : MonoBehaviour
     {
-        erializeField] private float projectileSpeed = 18f;
-        erializeField] private float projectileLifetime = 4f;
-        erializeField] private float damage = 12f;
+        [Header("Bow")]
+        [SerializeField] GameObject arrowPrefab;
+        [SerializeField] Transform firePoint;
+        [SerializeField] int poolSize = 16;
+        [SerializeField] float aimFOVMultiplier = 0.7f;
+        // Note: Aim sensitivity adjustment should be implemented in CameraController (Tartaria.Camera)
+        // via ICameraShakeService.SetSensitivityMultiplier() — PlayerRanged handles bow mechanics only.
 
-        public void Fire(Vector3 origin, Vector3 direction)
+        GameObject[] _arrowPool;
+        int _nextArrowIndex;
+        bool _isAiming;
+        float _originalFOV;
+        UnityEngine.Camera _camera;
+
+        void Awake()
         {
-            // 1. Try Hovl VFX first
-            var fx = Tartaria.Integration.HovlVFXBindings.Spawn(
-                "crystal_attack", origin, parent: null, autoDestroyAfterSeconds: projectileLifetime);
+            _camera = UnityEngine.Camera.main;
+            if (_camera != null)
+                _originalFOV = _camera.fieldOfView;
 
-            GameObject projectile = fx;
-            if (projectile == null)
+            // Create arrow pool
+            _arrowPool = new GameObject[poolSize];
+            for (int i = 0; i < poolSize; i++)
             {
-                // 2. Fallback to a small URP-safe sphere
-                projectile = GameObject.CreatePrimitive(PrimitiveType.Sphere); // URP-safe
-                projectile.transform.localScale = Vector3.one * 0.3f;
-                projectile.transform.position = origin;
-                var sh = Shader.Find("Universal Render Pipeline/Lit");
-                if (sh != null)
-                {
-                    var mat = new Material(sh);
-                    mat.SetColor("_BaseColor", new Color(0.4f, 0.7f, 1f));
-                    mat.EnableKeyword("_EMISSION");
-                    mat.SetColor("_EmissionColor", new Color(0.4f, 0.7f, 1f) * 1.4f);
-                    projectile.GetComponent<Renderer>().sharedMaterial = mat;
-                }
-                Destroy(projectile, projectileLifetime);
+                var arrow = CreateArrow();
+                arrow.SetActive(false);
+                _arrowPool[i] = arrow;
             }
-
-            // 3. Add motion via Rigidbody
-            var rb = projectile.GetComponent<Rigidbody>() ?? projectile.AddComponent<Rigidbody>();
-            rb.useGravity = false;
-            rb.linearVelocity = direction.normalized * projectileSpeed;
-
-            // 4. Damage on contact
-            var hitter = projectile.AddComponent<_RangedHit>();
-            hitter.damage = (int)damage;
-
-            // 5. Trigger collider if missing
-            var col = projectile.GetComponent<SphereCollider>() ?? projectile.AddComponent<SphereCollider>();
-            col.isTrigger = true;
-            col.radius = 0.5f;
         }
-    }
 
-    public class _RangedHit : MonoBehaviour
-    {
-        public int damage = 12;
-        void OnTriggerEnter(Collider other)
+        GameObject CreateArrow()
         {
-            if (!other.CompareTag("Enemy")) return;
-            other.SendMessage("TakeDamage", damage, SendMessageOptions.DontRequireReceiver);
-            Destroy(gameObject);
+            // Procedural arrow: cylinder shaft + cone tip
+            var root = new GameObject("Arrow");
+            root.transform.SetParent(transform, false);
+
+            var shaft = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            shaft.name = "Shaft";
+            shaft.transform.SetParent(root.transform, false);
+            shaft.transform.localScale = new Vector3(0.05f, 0.5f, 0.05f);
+            shaft.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            Object.Destroy(shaft.GetComponent<Collider>());
+
+            var tip = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            tip.name = "Tip";
+            tip.transform.SetParent(root.transform, false);
+            tip.transform.localPosition = new Vector3(0f, 0f, 0.55f);
+            tip.transform.localScale = new Vector3(0.08f, 0.08f, 0.15f);
+            Object.Destroy(tip.GetComponent<Collider>());
+
+            var rb = root.AddComponent<Rigidbody>();
+            rb.useGravity = false;
+            rb.isKinematic = true;
+
+            var capsule = root.AddComponent<CapsuleCollider>();
+            capsule.radius = 0.05f;
+            capsule.height = 1.2f;
+            capsule.direction = 2; // Z-axis
+            capsule.isTrigger = true;
+
+            root.AddComponent<ArrowProjectile>();
+            return root;
+        }
+
+        void Update()
+        {
+            // Check aim input
+            bool aimInput = false;
+            var mouse = Mouse.current;
+            if (mouse != null && mouse.rightButton.isPressed) aimInput = true;
+            var pad = Gamepad.current;
+            if (pad != null && pad.leftTrigger.isPressed) aimInput = true;
+
+            if (aimInput && !_isAiming)
+                StartAim();
+            else if (!aimInput && _isAiming)
+                ReleaseArrow();
+        }
+
+        void StartAim()
+        {
+            _isAiming = true;
+            if (_camera != null)
+                _camera.fieldOfView = _originalFOV * aimFOVMultiplier;
+            Debug.Log("[PlayerRanged] Aiming...");
+        }
+
+        void ReleaseArrow()
+        {
+            _isAiming = false;
+            if (_camera != null)
+                _camera.fieldOfView = _originalFOV;
+
+            FireArrow();
+        }
+
+        void FireArrow()
+        {
+            var arrow = _arrowPool[_nextArrowIndex];
+            _nextArrowIndex = (_nextArrowIndex + 1) % poolSize;
+
+            // Position at fire point (or player chest if no fire point)
+            Vector3 spawnPos = firePoint != null 
+                ? firePoint.position 
+                : transform.position + Vector3.up * 1.5f + transform.forward * 0.5f;
+            
+            arrow.transform.position = spawnPos;
+            arrow.transform.rotation = transform.rotation;
+            arrow.transform.SetParent(null, true);
+            arrow.SetActive(true);
+
+            // Launch forward
+            var projectile = arrow.GetComponent<ArrowProjectile>();
+            if (projectile != null)
+                projectile.Launch(transform.forward);
+
+            Debug.Log("[PlayerRanged] Arrow fired!");
         }
     }
 }
