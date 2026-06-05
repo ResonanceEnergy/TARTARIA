@@ -2,8 +2,36 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
-**Last supervisor check-in:** 2026-06-05 16:30 — v2.0 gates run. reconciled=0 reverted=0 flagged=0 queue=5 done=21 failed=2
-**Prior check-in:** 2026-06-05 22:03 — escalated stall; recovery actioned by Windows MCP this turn (see above).
+**Last supervisor check-in:** 2026-06-05 16:52 — v2.0 gates run. reconciled=0 reverted=0 flagged=0 queue=5 done=21 failed=2
+**Prior check-in:** 2026-06-05 22:34 — NO-OP. done=21 failed=2 unchanged since 16:30. Loop STOPPED (run_loop.log last entry 14:50). Worktree mid-checkout → held off queueing to avoid hallucination-bait tickets. P1: restart run_loop + stabilize git tree.
+
+<!-- DASHBOARD:BEGIN -->
+### Loop dashboard — last 24 h (refreshed 16:52:06)
+
+| Metric | Value |
+|---|---|
+| Tickets processed | **23** |
+| Applied | 21 |
+| Failed | 2 |
+| Success rate | **91.3%** |
+| Avg gen time | 14000 ms |
+| Avg apply time | 200 ms |
+| Avg output size | 3115 chars |
+| Total compute | 322s |
+| Auto-branches on origin | 2 |
+**By model:**
+
+| model | count | applied |
+|---|---|---|
+| qwen-tartaria | 23 | 21 |
+
+**Top errors:**
+
+| count | error |
+|---|---|
+| 2 | apply_outputs.py exit 1 |
+
+<!-- DASHBOARD:END -->
 **Last updated:** 2026-06-05 13:28 (DEEP HAMMER R435 — 6 new Blender prefabs (Fountain/Cart/MarketStall/Fence/Lantern/Bell) + Windmill + 17th-hour music + AnastasiaRocker = 9 new content prefabs, 41 placements in scene. v22 shows real village.)
 **Current Moon:** Moon 1 — Echohaven
 **Phase:** disk-side 22/22 + 7/8 steps disk-ready · console 0 errors · awaiting NATRIX Play for step-2 visual verify
@@ -394,9 +422,4 @@ Fires on next FBX import. To apply retroactively to Cassian's currently-embedded
 | Post mushrooms | `v11_cinematic_122815.png` | Cleanest village shot |
 | Cassian closeup | `v12_cassian_lit_122854.png` | Cassian visible light-grey, some MudGolem cluster remains |
 
-**NATRIX-callout still valid**: Moon 1 not "one step away" — needs more polish, but the gates are clearing. Step 2 visually re-verified in v12. Screenshot-driven verification is the right loop going forward.
-
----
-
-*STATUS.md v2.0 · 2026-06-05*
-
+**NATRI
