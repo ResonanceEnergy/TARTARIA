@@ -1,0 +1,220 @@
+using System.Collections;
+using UnityEngine;
+using Tartaria.Camera;
+using Tartaria.Input;
+
+namespace Tartaria.Integration
+{
+    /// <summary>
+    /// Moon 1 Player Setup — Post-spawn configuration for the Echohaven player.
+    ///
+    /// 2026-05-31 Task A3 dedupe: this component NO LONGER spawns the player.
+    /// PlayerSpawner is the canonical spawner (see CLAUDE.md + Integration/PlayerSpawner.cs).
+    /// This component now only:
+    ///   - Locates the spawned player (by tag "Player")
+    ///   - Repositions it to the Echohaven entrance
+    ///   - Configures camera follow + interaction radius
+    /// If the player hasn't spawned yet, we poll/wait until PlayerSpawner finishes
+    /// (FirePlayerSpawned in GameEvents is currently a log-only stub, so we can't subscribe).
+    /// </summary>
+    [DefaultExecutionOrder(-78)] // After excavation sites (-79)
+    public class Moon1PlayerSetup : MonoBehaviour
+    {
+        // 2026-06-04: Self-bootstrap on Echohaven scene load so this MonoBehaviour
+        // doesn't depend on being pre-attached to a scene GameObject. This is
+        // architectural bootstrap (matches Moon1MudGolemRSSpawnTrigger pattern) —
+        // NOT a daemon patch. The component does real player+camera authoring
+        // that needs an Update/Coroutine lifecycle to run.
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        private static void Bootstrap()
+        {
+            var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
+            if (scene.name != "Echohaven_VerticalSlice") return;
+            // Reuse Moon1_Systems if present, else create host.
+            var host = GameObject.Find("Moon1_Systems");
+            if (host == null) host = new GameObject("Moon1_Systems");
+            if (host.GetComponent<Moon1PlayerSetup>() == null)
+            {
+                host.AddComponent<Moon1PlayerSetup>();
+                Debug.Log("[Moon1PlayerSetup] Bootstrapped on Moon1_Systems for Echohaven scene.");
+            }
+        }
+
+        [Header("Spawn Configuration")]
+        // 2026-06-01 ship-checklist fix: spawn 10m south of origin so StarDome (30,0,20) +
+        // HarmonicFountain (-20,0,35) are visible within 5s of pressing Play.
+        // Camera follow component (Moon1CameraFollowPlayer) tracks from behind+above with
+        // forward-biased lookOffset so village dominates frame.
+        // 2026-06-01 22:07 spawn-override-fix: aligned default with PlayerSpawner.defaultSpawnPosition
+        // (Z=15). Previous Z=-10 yanked player back behind spawn at execution order -78, hiding village.
+        // 2026-06-03 fix: Player.prefab now has transform.y=0 + CharacterController.center.y=1
+        // (proper 2m human capsule sitting on ground). Spawn Y must be 0 — feet at world Y=0
+        // sit on terrain at Y=0. Old Y=2 was a hack to compensate for prefab bug now fixed.
+        [SerializeField] Vector3 spawnPosition = new Vector3(0f, 0f, 15f);
+        [SerializeField] Quaternion spawnRotation = Quaternion.Euler(0f, 0f, 0f); // Facing north toward village
+
+        [Header("Movement Settings (Echohaven)")]
+        [SerializeField] float walkSpeed = 5f;
+        [SerializeField] float runSpeed = 8f;
+        [SerializeField] float interactionRadius = 4f;
+
+        [Header("Camera Settings")]
+        [SerializeField] float cameraDistance = 12f;
+        [SerializeField] float cameraHeight = 8f;
+        [SerializeField] float cameraAngle = 35f;
+
+        [Header("Wait Settings")]
+        [SerializeField] float playerWaitTimeoutSeconds = 5f;
+
+        private GameObject playerInstance;
+
+        void Start()
+        {
+            StartCoroutine(WaitForPlayerAndConfigure());
+        }
+
+        IEnumerator WaitForPlayerAndConfigure()
+        {
+            float elapsed = 0f;
+            GameObject existingPlayer = GameObject.FindGameObjectWithTag("Player");
+
+            while (existingPlayer == null && elapsed < playerWaitTimeoutSeconds)
+            {
+                yield return null;
+                elapsed += Time.unscaledDeltaTime;
+                existingPlayer = GameObject.FindGameObjectWithTag("Player");
+            }
+
+            if (existingPlayer == null)
+            {
+                Debug.LogError(
+                    "[Moon1PlayerSetup] No Player found after " + playerWaitTimeoutSeconds +
+                    "s. PlayerSpawner should have spawned one. Skipping Moon 1 player config.");
+                yield break;
+            }
+
+            playerInstance = existingPlayer;
+            ConfigureExistingPlayer();
+            Debug.Log("[Moon1PlayerSetup] Configured player at " + spawnPosition);
+        }
+
+        void ConfigurePlayer()
+        {
+            if (playerInstance == null) return;
+
+            // PlayerInputHandler is the canonical Player input/movement entry — it
+            // self-configures via Awake (focus fix + F310 setup + action map bind).
+            // We log presence here so failures (e.g., capsule Player.prefab without
+            // the component) surface in the console instead of the player just sitting still.
+            var movement = playerInstance.GetComponent<PlayerInputHandler>();
+            if (movement != null)
+            {
+                Debug.Log("  ✓ PlayerInputHandler present — Player input pipeline is live.");
+            }
+            else
+            {
+                Debug.LogWarning("  ⚠ PlayerInputHandler missing on Player — input gate will not advance. PlayerSpawner is expected to add this at runtime per CLAUDE.md.");
+            }
+
+            // Configure camera
+            SetupCamera();
+
+            // Add interaction trigger
+            var interactionTrigger = playerInstance.GetComponent<SphereCollider>();
+            if (interactionTrigger == null)
+            {
+                interactionTrigger = playerInstance.AddComponent<SphereCollider>();
+                interactionTrigger.isTrigger = true;
+                interactionTrigger.radius = interactionRadius;
+                interactionTrigger.center = new Vector3(0f, 1f, 0f);
+            }
+        }
+
+        void ConfigureExistingPlayer()
+        {
+            // Move player to Echohaven spawn position
+            if (playerInstance != null)
+            {
+                // CharacterController disables direct transform writes — toggle if present.
+                var cc = playerInstance.GetComponent<UnityEngine.CharacterController>();
+                if (cc != null) cc.enabled = false;
+
+                playerInstance.transform.position = spawnPosition;
+                playerInstance.transform.rotation = spawnRotation;
+
+                if (cc != null) cc.enabled = true;
+
+                ConfigurePlayer();
+            }
+        }
+
+        void SetupCamera()
+        {
+            // Find or create main camera
+            var mainCam = UnityEngine.Camera.main;
+            if (mainCam == null)
+            {
+                var camObj = new GameObject("Main Camera");
+                mainCam = camObj.AddComponent<UnityEngine.Camera>();
+                camObj.tag = "MainCamera";
+            }
+
+            // Position camera behind and above player
+            Vector3 cameraOffset = new Vector3(0f, cameraHeight, -cameraDistance);
+            mainCam.transform.position = playerInstance.transform.position + cameraOffset;
+            mainCam.transform.LookAt(playerInstance.transform.position + Vector3.up * 1.5f);
+
+            // Attach the canonical Tartaria.Camera.CameraController. It auto-discovers
+            // Player by tag (CameraController.cs:213) and uses the CameraTarget child
+            // for look position (CameraController.cs:215). One follow component on the
+            // camera — no SimpleCameraFollow fallback (that was a workaround for the
+            // historical /* DISABLED: */ broken-comment bug).
+            var cameraController = mainCam.GetComponent<Tartaria.Camera.CameraController>();
+            if (cameraController == null)
+            {
+                cameraController = mainCam.gameObject.AddComponent<Tartaria.Camera.CameraController>();
+            }
+            Debug.Log("  ✓ Tartaria.Camera.CameraController attached + will auto-find Player tag.");
+
+            Debug.Log($"  ✓ Camera positioned: distance={cameraDistance}m, height={cameraHeight}m, angle={cameraAngle}°");
+        }
+    }
+
+    /// <summary>
+    /// Simple Camera Follow — Fallback camera controller for basic follow behavior
+    /// </summary>
+    public class SimpleCameraFollow : MonoBehaviour
+    {
+        public Transform target;
+        public float distance = 12f;
+        public float height = 8f;
+        public float smoothSpeed = 5f;
+        public float rotationSpeed = 3f;
+
+        private Vector3 offset;
+
+        void Start()
+        {
+            if (target != null)
+            {
+                offset = new Vector3(0f, height, -distance);
+            }
+        }
+
+        void LateUpdate()
+        {
+            if (target == null) return;
+
+            // Calculate desired position
+            Vector3 desiredPosition = target.position + target.TransformDirection(offset);
+
+            // Smooth follow
+            transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+
+            // Look at target
+            Vector3 lookTarget = target.position + Vector3.up * 1.5f;
+            Quaternion desiredRotation = Quaternion.LookRotation(lookTarget - transform.position);
+            transform.rotation = Quaternion.Slerp(transform.rotation, desiredRotation, rotationSpeed * Time.deltaTime);
+        }
+    }
+}

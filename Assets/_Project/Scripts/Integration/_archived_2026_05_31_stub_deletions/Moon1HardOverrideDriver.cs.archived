@@ -1,0 +1,14 @@
+// Moon1HardOverrideDriver - SUPERSEDED 2026-05-31
+//
+// The canonical input driver is now Assets/_Project/Scripts/Input/PlayerInputHandler.cs.
+// PlayerInputHandler.Awake() applies the focus-loss fix (runInBackground=true,
+// InputSettings.BackgroundBehavior=IgnoreFocus, EditorInputBehaviorInPlayMode=
+// AllDeviceInputAlwaysGoesToGameView), invokes LogitechControllerSupport.EnsureF310Setup(),
+// and always runs HandleGamepadButtonFallbacks() so every F310 button stays wired.
+//
+// The two diagnostic bypass drivers (SimplePlayerDriver, Moon1Lifeline) were archived to
+// Assets/_Project/Scripts/Input/_archived_bypass_drivers_2026_05_31/ once the real root
+// cause was identified: the Console "Error Pause" toggle was auto-pausing on init errors,
+// which the overlay misread as "input dead". See CLAUDE.md and
+// docs/audits/INPUT_DEEP_DIVE_2026-05-31.md for the diagnostic decision table.
+namespace Tartaria.Integration { internal static class _Moon1HardOverrideDriver_Disabled {} }

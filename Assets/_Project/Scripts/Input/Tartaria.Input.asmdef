@@ -1,0 +1,19 @@
+{
+    "name": "Tartaria.Input",
+    "rootNamespace": "Tartaria.Input",
+    "references": [
+        "Tartaria.Core",
+        "Tartaria.Audio",
+        "Tartaria.Camera",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

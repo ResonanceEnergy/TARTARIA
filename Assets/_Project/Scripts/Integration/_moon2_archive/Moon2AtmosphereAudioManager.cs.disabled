@@ -1,0 +1,612 @@
+using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+using Tartaria.Audio;
+using Tartaria.Core;
+using Tartaria.Input;
+
+namespace Tartaria.Integration
+{
+    /// <summary>
+    /// MOON 2 ATMOSPHERE, AUDIO & ENVIRONMENTAL POLISH MANAGER (R8)
+    /// Exclusive domain: Atmosphere, sound design, music integration, environmental storytelling, final atmospheric polish for Moon 2 ONLY.
+    /// Works hand-in-hand with R6/R7 Moon2CavernVisualManager + TartarianArchitectureBuilder (strong visuals: fractal veins, fuse-burn, dome breathing, 9 probes, godrays, GrassWind).
+    /// 
+    /// Delivers per C_AUDIO_DESIGN.md + 12_VIVID_VISUALS Moon 2 section:
+    /// - Unique ambiences per of the 5 crystal cathedral areas (Cathedral Dome, Bell Tower, Fountain, Crystal Hall, Ley Chamber)
+    /// - Reactive sound to restoration/purge (harmonic bloom vs tritone crackle/static, tied exactly to visual fuse events)
+    /// - Crystal resonance sounds (pulsing 324 Hz keynote clusters + overtones, spatial, event-driven)
+    /// - Wind through crystals, corruption audio layers (drones, whispers, static)
+    /// - Subtle music shifts (Moon2 E4 keynote stingers, AdaptiveMusicController layer emphasis, cello-like melancholy → purification)
+    /// - Environmental storytelling: ruins, fractured murals, abandoned sites, journals, broken instruments that deepen the "Day the Song Broke" / fractal corruption lore.
+    /// 
+    /// All audio 432 Hz derived, procedural via ProceduralSFXLibrary (no external assets).
+    /// Coexists cleanly with visual manager on same dressingRoot. Uses same GameEvents.
+    /// Absolute paths only. Git committed.
+    /// </summary>
+    [DisallowMultipleComponent]
+    public class Moon2AtmosphereAudioManager : MonoBehaviour
+    {
+        public static Moon2AtmosphereAudioManager Instance { get; private set; }
+
+        // Area roots (5 buildings) discovered for per-area audio
+        readonly Dictionary<string, GameObject> _areaRoots = new Dictionary<string, GameObject>();
+        readonly Dictionary<string, AudioSource> _baseAmbiences = new Dictionary<string, AudioSource>();
+        readonly Dictionary<string, AudioSource> _resonanceLayers = new Dictionary<string, AudioSource>();
+        readonly Dictionary<string, AudioSource> _corruptionLayers = new Dictionary<string, AudioSource>();
+        readonly Dictionary<string, AudioSource> _windLayers = new Dictionary<string, AudioSource>();
+        readonly List<AudioSource> _storytellingWhispers = new List<AudioSource>();
+
+        // State
+        bool _restored = false;
+        float _lastResonanceTime;
+        float _lastWindGustAudioTime;
+        float _musicShiftCooldown;
+
+        // Cached refs
+        AdaptiveMusicController _adaptiveMusic;
+        AudioManager _audioMgr;
+
+        void Awake()
+        {
+            if (Instance != null && Instance != this) { Destroy(gameObject); return; }
+            Instance = this;
+            
+            _audioMgr = AudioManager.Instance;
+            _adaptiveMusic = FindFirstObjectByType<AdaptiveMusicController>();
+            SubscribeToEvents();
+            Debug.Log("[Moon2 Audio R8] AtmosphereAudioManager initialized — unique per-area cathedral ambiences, reactive restore/purge, crystal resonance, wind/corruption, lore storytelling, subtle 324 Hz music shifts. Pairs with R7 visuals.");
+        }
+
+        void OnDestroy()
+        {
+            UnsubscribeFromEvents();
+            StopAllCoroutines();
+        }
+
+        void SubscribeToEvents()
+        {
+            GameEvents.OnBuildingRestored += HandleBuildingRestored;
+            GameEvents.OnRequestPurgeCorruption += HandlePurgeRequest;
+            GameEvents.OnRSChanged += HandleRSChanged;
+        }
+
+        void UnsubscribeFromEvents()
+        {
+            GameEvents.OnBuildingRestored -= HandleBuildingRestored;
+            GameEvents.OnRequestPurgeCorruption -= HandlePurgeRequest;
+            GameEvents.OnRSChanged -= HandleRSChanged;
+        }
+
+        void HandleBuildingRestored(string buildingId)
+        {
+            if (buildingId == null || !buildingId.Contains("moon2_")) return;
+
+            _restored = true;
+
+            string areaKey = GetAreaKeyFromBuildingId(buildingId);
+            StartCoroutine(TransitionAreaToRestored(areaKey, 2.8f));
+
+            // Crystal resonance bloom on restore (ties to visual "fuse burn" and "dome breathing")
+            PlayCrystalResonancePulse(areaKey, true);
+
+            // Subtle music shift — Moon 2 purification stinger + adaptive emphasis
+            if (Time.time - _musicShiftCooldown > 4.5f)
+            {
+                PlayMoon2PurificationStinger(areaKey);
+                _musicShiftCooldown = Time.time;
+            }
+
+            // Boost adaptive layers toward triumphant for Moon 2
+            if (_adaptiveMusic != null)
+            {
+                _adaptiveMusic.SetResonanceScore(72f); // pushes L2/L3
+                _adaptiveMusic.PlayStinger(StingerType.ZoneComplete); // reuses but now Moon2 flavored by context
+            }
+
+            Debug.Log($"[Moon2 Audio R8] {buildingId} restored — area ambience shifted to pure crystal hum + resonance bloom, music purification shift. {areaKey}");
+        }
+
+        void HandlePurgeRequest(string buildingId, float amount)
+        {
+            if (buildingId == null || !buildingId.Contains("moon2_")) return;
+
+            _restored = false;
+            string areaKey = GetAreaKeyFromBuildingId(buildingId);
+
+            StartCoroutine(TransitionAreaToCorrupted(areaKey, Mathf.Clamp01(amount)));
+
+            // Erratic corruption audio spike
+            PlayPurgeCrackle(areaKey);
+
+            if (_adaptiveMusic != null)
+            {
+                _adaptiveMusic.SetResonanceScore(18f);
+                _adaptiveMusic.EnterCombat(); // momentary tension layer
+            }
+
+            Debug.Log($"[Moon2 Audio R8] Purge on {buildingId} — corruption drone + crackle reasserted, music tension shift.");
+        }
+
+        void HandleRSChanged(float rs)
+        {
+            // Global subtle music breathing for the whole cavern
+            if (_adaptiveMusic != null && Time.frameCount % 9 == 0)
+            {
+                _adaptiveMusic.SetResonanceScore(Mathf.Clamp(rs, 0f, 100f));
+            }
+        }
+
+        string GetAreaKeyFromBuildingId(string id)
+        {
+            id = id.ToLowerInvariant();
+            if (id.Contains("cathedral") || id.Contains("dome")) return "Cathedral";
+            if (id.Contains("bell")) return "Bell";
+            if (id.Contains("fountain")) return "Fountain";
+            if (id.Contains("crystal_hall") || id.Contains("hall")) return "Hall";
+            if (id.Contains("ley")) return "Ley";
+            return "Cathedral";
+        }
+
+        // ─── Discovery & Setup (called by scaffold / ForceReDiscover) ─────────────────
+
+        public void DiscoverAndSetupMoon2Audio()
+        {
+            _areaRoots.Clear();
+            _baseAmbiences.Clear();
+            _resonanceLayers.Clear();
+            _corruptionLayers.Clear();
+            _windLayers.Clear();
+            _storytellingWhispers.Clear();
+
+            // Find the 5 building slots by name convention from scaffold
+            var allChildren = GetComponentsInChildren<Transform>(true);
+            foreach (var t in allChildren)
+            {
+                if (t == null) continue;
+                string n = t.name.ToLower();
+                string key = null;
+
+                if (n.Contains("cathedral") || n.Contains("dome")) key = "Cathedral";
+                else if (n.Contains("bell")) key = "Bell";
+                else if (n.Contains("fountain")) key = "Fountain";
+                else if (n.Contains("crystal_hall") || n.Contains("hall")) key = "Hall";
+                else if (n.Contains("ley")) key = "Ley";
+
+                if (key != null && !_areaRoots.ContainsKey(key))
+                {
+                    _areaRoots[key] = t.gameObject;
+                    CreatePerAreaAudioRig(t.gameObject, key);
+                }
+            }
+
+            // Environmental storytelling audio sources (whispers on ruins/murals)
+            SpawnStorytellingAudioLayers();
+
+            // Initial state — assume starting corrupted (matches R7 visuals default)
+            foreach (var kv in _areaRoots)
+            {
+                SetAreaInitialCorrupted(kv.Key);
+            }
+
+            // Prime adaptive music for Moon 2 keynote (E4 324 Hz melancholy)
+            if (_adaptiveMusic != null)
+            {
+                _adaptiveMusic.SetZone(1); // Moon 2 index per existing pattern
+                _adaptiveMusic.SetResonanceScore(22f);
+            }
+
+            Debug.Log($"[Moon2 Audio R8] Discover complete: {_areaRoots.Count} unique area ambiences (Cathedral/Bell/Fountain/Hall/Ley) + resonance + wind + corruption layers + {_storytellingWhispers.Count} lore whisper sources. Ready for reactive polish.");
+        }
+
+        void CreatePerAreaAudioRig(GameObject areaRoot, string key)
+        {
+            // Base ambience (long loop, low volume)
+            var baseGO = new GameObject($"Audio_Base_{key}");
+            baseGO.transform.SetParent(areaRoot.transform, false);
+            var baseSrc = baseGO.AddComponent<AudioSource>();
+            baseSrc.loop = true;
+            baseSrc.playOnAwake = false;
+            baseSrc.spatialBlend = 0.85f;
+            baseSrc.minDistance = 4f;
+            baseSrc.maxDistance = 38f;
+            baseSrc.volume = 0.0f; // start silent, set by state
+
+            string baseClipName = key switch
+            {
+                "Cathedral" => "Moon2_AreaCathedral",
+                "Bell" => "Moon2_AreaBell",
+                "Fountain" => "Moon2_AreaFountain",
+                "Hall" => "Moon2_AreaHall",
+                "Ley" => "Moon2_AreaLey",
+                _ => "Moon2_CrystalHum"
+            };
+            baseSrc.clip = ProceduralSFXLibrary.Get(baseClipName);
+            _baseAmbiences[key] = baseSrc;
+
+            // Resonance layer (pure crystal hum, higher, spatial)
+            var resGO = new GameObject($"Audio_Resonance_{key}");
+            resGO.transform.SetParent(areaRoot.transform, false);
+            var resSrc = resGO.AddComponent<AudioSource>();
+            resSrc.loop = true;
+            resSrc.playOnAwake = false;
+            resSrc.spatialBlend = 0.95f;
+            resSrc.minDistance = 2.5f;
+            resSrc.maxDistance = 22f;
+            resSrc.volume = 0f;
+            resSrc.clip = ProceduralSFXLibrary.Get("Moon2_CrystalHum");
+            _resonanceLayers[key] = resSrc;
+
+            // Corruption layer (drone + static, prominent when corrupted)
+            var corrGO = new GameObject($"Audio_Corruption_{key}");
+            corrGO.transform.SetParent(areaRoot.transform, false);
+            var corrSrc = corrGO.AddComponent<AudioSource>();
+            corrSrc.loop = true;
+            corrSrc.playOnAwake = false;
+            corrSrc.spatialBlend = 0.9f;
+            corrSrc.minDistance = 3f;
+            corrSrc.maxDistance = 31f;
+            corrSrc.volume = 0f;
+            corrSrc.clip = ProceduralSFXLibrary.Get("Moon2_CorruptionDrone");
+            _corruptionLayers[key] = corrSrc;
+
+            // Wind layer (high glassy gusts)
+            var windGO = new GameObject($"Audio_Wind_{key}");
+            windGO.transform.SetParent(areaRoot.transform, false);
+            var windSrc = windGO.AddComponent<AudioSource>();
+            windSrc.loop = true;
+            windSrc.playOnAwake = false;
+            windSrc.spatialBlend = 1.0f;
+            windSrc.minDistance = 5f;
+            windSrc.maxDistance = 29f;
+            windSrc.volume = 0.0f;
+            windSrc.clip = ProceduralSFXLibrary.Get("Moon2_WindCrystals");
+            _windLayers[key] = windSrc;
+
+            // Play all (volume 0 until state applied)
+            baseSrc.Play();
+            resSrc.Play();
+            corrSrc.Play();
+            windSrc.Play();
+        }
+
+        void SpawnStorytellingAudioLayers()
+        {
+            // Environmental storytelling — faint whispers, sighs, broken music fragments on lore props
+            // These are placed near ruins/murals/abandoned sites (scaffolded separately)
+            var storyPoints = new[] {
+                new { name = "Mural_TheFracture", pos = new Vector3(2, 1.8f, 41) },
+                new { name = "AbandonedSurveyorCamp", pos = new Vector3(-27, 0.6f, 19) },
+                new { name = "ShatteredResonanceVessel", pos = new Vector3(27, 0.9f, 28) },
+                new { name = "DustLacedJournal", pos = new Vector3(-8, 1.1f, 48) },
+                new { name = "BrokenCelloEcho", pos = new Vector3(13, 2.2f, 12) },
+                new { name = "RuinedAltar_OrphanMemory", pos = new Vector3(4, 0.4f, 55) }
+            };
+
+            foreach (var p in storyPoints)
+            {
+                var go = new GameObject($"Story_Whisper_{p.name}");
+                go.transform.SetParent(transform, false);
+                go.transform.localPosition = p.pos;
+
+                var src = go.AddComponent<AudioSource>();
+                src.loop = true;
+                src.playOnAwake = false;
+                src.spatialBlend = 1.0f;
+                src.minDistance = 1.8f;
+                src.maxDistance = 14f;
+                src.volume = 0.0f; // very subtle
+                src.clip = ProceduralSFXLibrary.Get("Moon2_MuralWhisper");
+                src.Play();
+                _storytellingWhispers.Add(src);
+
+                // Occasional soft one-shot resonance ping from the lore object
+                StartCoroutine(OccasionalLorePing(src, p.name));
+            }
+        }
+
+        IEnumerator OccasionalLorePing(AudioSource src, string loreName)
+        {
+            while (src != null)
+            {
+                yield return new WaitForSeconds(Random.Range(11f, 23f));
+                if (src != null && src.isPlaying && src.volume > 0.01f)
+                {
+                    // Tiny crystal chime stinger from abandoned site
+                    if (_audioMgr != null)
+                        _audioMgr.PlaySFX("Moon2_CrystalHum", src.transform.position, 0.09f);
+                }
+            }
+        }
+
+        void SetAreaInitialCorrupted(string key)
+        {
+            if (!_baseAmbiences.TryGetValue(key, out var baseSrc)) return;
+
+            // Start fully corrupted: high corruption drone, low everything else
+            if (_corruptionLayers.TryGetValue(key, out var c)) c.volume = 0.72f;
+            if (_baseAmbiences.TryGetValue(key, out var b)) b.volume = 0.19f;
+            if (_resonanceLayers.TryGetValue(key, out var r)) r.volume = 0.03f;
+            if (_windLayers.TryGetValue(key, out var w)) w.volume = 0.11f;
+        }
+
+        // ─── Reactive Transitions (tied to R7 visual fuse/purge) ─────────────────────
+
+        IEnumerator TransitionAreaToRestored(string key, float duration)
+        {
+            float t0 = Time.time;
+
+            AudioSource baseS = _baseAmbiences.GetValueOrDefault(key);
+            AudioSource resS = _resonanceLayers.GetValueOrDefault(key);
+            AudioSource corrS = _corruptionLayers.GetValueOrDefault(key);
+            AudioSource windS = _windLayers.GetValueOrDefault(key);
+
+            float startCorr = corrS ? corrS.volume : 0f;
+            float startRes = resS ? resS.volume : 0f;
+            float startBase = baseS ? baseS.volume : 0f;
+            float startWind = windS ? windS.volume : 0f;
+
+            while (Time.time - t0 < duration)
+            {
+                float u = Mathf.Clamp01((Time.time - t0) / duration);
+                float smooth = u * u * (3f - 2f * u);
+
+                if (corrS) corrS.volume = Mathf.Lerp(startCorr, 0.06f, smooth);
+                if (resS) resS.volume = Mathf.Lerp(startRes, 0.67f, smooth);
+                if (baseS) baseS.volume = Mathf.Lerp(startBase, 0.34f, smooth);
+                if (windS) windS.volume = Mathf.Lerp(startWind, 0.24f, smooth);
+
+                yield return null;
+            }
+
+            if (corrS) corrS.volume = 0.06f;
+            if (resS) resS.volume = 0.67f;
+            if (baseS) baseS.volume = 0.34f;
+            if (windS) windS.volume = 0.24f;
+
+            // Final harmonic bloom sting per area
+            if (baseS) PlayAreaSpecificRestoreAccent(key, baseS.transform.position);
+        }
+
+        IEnumerator TransitionAreaToCorrupted(string key, float intensity)
+        {
+            float t0 = Time.time;
+            float dur = 1.9f;
+
+            AudioSource baseS = _baseAmbiences.GetValueOrDefault(key);
+            AudioSource resS = _resonanceLayers.GetValueOrDefault(key);
+            AudioSource corrS = _corruptionLayers.GetValueOrDefault(key);
+            AudioSource windS = _windLayers.GetValueOrDefault(key);
+
+            while (Time.time - t0 < dur)
+            {
+                float u = Mathf.Clamp01((Time.time - t0) / dur);
+                float s = u * u;
+
+                if (corrS) corrS.volume = Mathf.Lerp(corrS.volume, 0.78f * intensity, s);
+                if (resS) resS.volume = Mathf.Lerp(resS.volume, 0.02f, s);
+                if (baseS) baseS.volume = Mathf.Lerp(baseS.volume, 0.14f, s);
+                if (windS) windS.volume = Mathf.Lerp(windS.volume, 0.33f, s);
+
+                yield return null;
+            }
+        }
+
+        void PlayCrystalResonancePulse(string areaKey, bool majestic)
+        {
+            if (Time.time - _lastResonanceTime < 0.9f) return;
+            _lastResonanceTime = Time.time;
+
+            if (!_areaRoots.TryGetValue(areaKey, out var root)) return;
+
+            Vector3 pos = root.transform.position + Vector3.up * 3.5f;
+
+            // Use AudioManager for spatial resonance (procedural)
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX(majestic ? "Moon2_RestoreHarmonic" : "Moon2_CrystalHum", pos, majestic ? 0.48f : 0.29f);
+                _audioMgr.PlaySFX("Moon2_CrystalResonanceTone", pos, majestic ? 0.39f : 0.24f);
+            }
+
+            // Extra spatial tone cluster for rich cathedral feel (324 Hz keynote family) + new resonance tone
+            StartCoroutine(DelayedResonanceTones(pos, majestic ? 0.6f : 0.35f));
+        }
+
+        IEnumerator DelayedResonanceTones(Vector3 pos, float vol)
+        {
+            yield return new WaitForSeconds(0.18f);
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlayTone(324f, 1.4f, vol * 0.6f); // keynote
+                yield return new WaitForSeconds(0.35f);
+                _audioMgr.PlayTone(405f, 1.1f, vol * 0.45f); // related 5th-ish
+            }
+        }
+
+        void PlayPurgeCrackle(string areaKey)
+        {
+            if (!_areaRoots.TryGetValue(areaKey, out var root)) return;
+            Vector3 pos = root.transform.position + Vector3.up * 2f;
+
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_PurgeCrackle", pos, 0.61f);
+                _audioMgr.PlaySFX("Moon2_CorruptionDrone", pos, 0.27f);
+            }
+        }
+
+        void PlayAreaSpecificRestoreAccent(string key, Vector3 pos)
+        {
+            string clip = key switch
+            {
+                "Bell" => "Moon2_BellOvertone",
+                "Fountain" => "Moon2_FountainChime",
+                "Ley" => "Moon2_LeyPulse",
+                _ => "Moon2_RestoreHarmonic"
+            };
+
+            if (_audioMgr != null)
+                _audioMgr.PlaySFX(clip, pos, 0.39f);
+        }
+
+        void PlayMoon2PurificationStinger(string areaKey)
+        {
+            // Subtle music shift — cello-like rising line in 324 Hz family + golden resolve
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlayTone(324f, 0.7f, 0.32f);
+                StartCoroutine(DelayedStingerTones());
+            }
+
+            // Occasional area-specific flavor
+            if (areaKey == "Bell" && _audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_BellOvertone", Vector3.zero, 0.18f);
+            }
+        }
+
+        // ─── New Expanded AVH Public API for Moon 2 (fountain storm, bell scalar, lullaby layers, dissonance, giant/tuning haptics) ───
+
+        public void PlayIonizedFountainStorm(Vector3 pos, bool withHaptic = true)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_IonizedFountainStorm", pos, 0.72f);
+                _audioMgr.PlaySFX("Moon2_FountainStorm", pos, 0.55f);
+                _audioMgr.PlaySFX("Moon2_CrystalResonanceTone", pos + Vector3.up * 4f, 0.41f);
+            }
+            if (withHaptic)
+            {
+                Input.HapticFeedbackManager.Instance?.PlayFountainStormRumble();
+                Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+            }
+            Debug.Log("[Moon2 Audio R8] Ionized fountain storm AVH triggered (climax dome).");
+        }
+
+        public void PlayBellScalarWave(Vector3 pos, bool heavy = false)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_BellScalarWave", pos, heavy ? 0.58f : 0.37f);
+                if (heavy) _audioMgr.PlaySFX("Moon2_BellOvertone", pos, 0.29f);
+            }
+            if (heavy)
+                Input.HapticFeedbackManager.Instance?.PlayBellScalarToll();
+            Debug.Log("[Moon2 Audio R8] Bell scalar wave played — phase interference for boss bell sever / tower phases.");
+        }
+
+        public void PlayDissonanceCorruptionBurst(Vector3 pos, float intensity = 0.7f)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX("Moon2_DissonanceCorruption", pos, intensity);
+                _audioMgr.PlaySFX("Moon2_PurgeCrackle", pos, intensity * 0.8f);
+            }
+            Input.HapticFeedbackManager.Instance?.PlayDissonanceCorruptionHit();
+            Debug.Log("[Moon2 Audio R8] Dissonance corruption burst AVH (boss desperation / re-ignite).");
+        }
+
+        public void Play432HzLullabyLayer(Vector3 pos, bool strong = false)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX2D("LiraelLullabyHum", strong ? 0.82f : 0.51f);
+                _audioMgr.PlaySFX2D("Moon2_432LullabyLayer", strong ? 0.61f : 0.38f);
+                if (strong) _audioMgr.PlaySFX("Moon2_CrystalResonanceTone", pos, 0.29f);
+            }
+            Input.HapticFeedbackManager.Instance?.PlayLullabyPulse();
+            Debug.Log("[Moon2 Audio R8] 432Hz lullaby layers + haptic for Lirael relief / revelation / Cassian arc.");
+        }
+
+        public void TriggerMicroGiantTuningAVH(Vector3 pos, bool success)
+        {
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlaySFX(success ? "Moon2_TuningResonance" : "Moon2_PurgeCrackle", pos, success ? 0.52f : 0.34f);
+                if (success) _audioMgr.PlayTone(432f, 0.9f, 0.28f);
+            }
+            if (success)
+            {
+                Input.HapticFeedbackManager.Instance?.PlayCrystalResonanceTuning();
+                Input.HapticFeedbackManager.Instance?.PlayMicroGiantCrystalTear();
+            }
+            else
+            {
+                Input.HapticFeedbackManager.Instance?.PlayTuningMiss();
+            }
+            Debug.Log($"[Moon2 Audio R8] Micro-giant crystal tuning AVH: success={success} (haptic + resonance wired).");
+        }
+
+        IEnumerator DelayedStingerTones()
+        {
+            yield return new WaitForSeconds(0.42f);
+            if (_audioMgr != null)
+            {
+                _audioMgr.PlayTone(405f, 0.9f, 0.27f);
+                yield return new WaitForSeconds(0.55f);
+                _audioMgr.PlayTone(486f, 1.6f, 0.19f); // resolves upward
+            }
+        }
+
+        // ─── Runtime Polish & Wind Gusts (tied to R7 visual wind gusts) ─────────────
+
+        void Update()
+        {
+            // Occasional crystal resonance pulses across the cathedral (even when idle)
+            if (_restored && Time.time - _lastResonanceTime > 7.4f && Random.value < 0.38f)
+            {
+                _lastResonanceTime = Time.time;
+                string rndKey = GetRandomAreaKey();
+                PlayCrystalResonancePulse(rndKey, false);
+            }
+
+            // Wind gust audio (pairs with SpawnWindGustParticles in visual manager)
+            if (Time.time - _lastWindGustAudioTime > 5.8f && Random.value < 0.44f)
+            {
+                _lastWindGustAudioTime = Time.time;
+                string rndKey = GetRandomAreaKey();
+                if (_windLayers.TryGetValue(rndKey, out var w) && w != null)
+                {
+                    // momentary swell on the wind layer
+                    StartCoroutine(SwellWindLayer(w, 0.7f));
+                }
+            }
+        }
+
+        string GetRandomAreaKey()
+        {
+            var keys = new List<string>(_areaRoots.Keys);
+            return keys.Count > 0 ? keys[Random.Range(0, keys.Count)] : "Cathedral";
+        }
+
+        IEnumerator SwellWindLayer(AudioSource windSrc, float peak)
+        {
+            if (windSrc == null) yield break;
+            float original = windSrc.volume;
+            float peakV = Mathf.Max(original, peak);
+            float t0 = Time.time;
+            while (Time.time - t0 < 1.6f)
+            {
+                float u = (Time.time - t0) / 1.6f;
+                windSrc.volume = Mathf.Lerp(original, peakV, Mathf.Sin(u * Mathf.PI));
+                yield return null;
+            }
+            windSrc.volume = original;
+        }
+
+        // ─── Public Polish API (for scaffold menu + parity) ─────────────────────────
+
+        public void ForceReDiscoverAudio()
+        {
+            DiscoverAndSetupMoon2Audio();
+            Debug.Log("[Moon2 Audio R8] ForceReDiscoverAudio complete — all 5 areas + storytelling re-wired.");
+        }
+
+        public void ApplySharedMoon2AudioPolishPattern(string targetMoon = "Moon2")
+        {
+            // Reusable parity hook for future Moon 3 audio agent (exact same pattern as visual R7)
+            DiscoverAndSetupMoon2Audio();
+            Debug.Log($"[Moon2 Audio R8] Shared audio polish pattern applied for {targetMoon} parity.");
+        }
+    }
+}
