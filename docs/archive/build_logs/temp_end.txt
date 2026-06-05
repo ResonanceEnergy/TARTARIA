@@ -1,5 +1,0 @@
-    public static void FireQuestObjectiveCompleted(string questId, int objectiveIndex) => OnQuestObjectiveCompleted?.Invoke(questId, objectiveIndex);
-
-    public static event System.Action<string> OnQuestCompleted;
-    public static void FireQuestCompleted(string questId) => OnQuestCompleted?.Invoke(questId);
-}
