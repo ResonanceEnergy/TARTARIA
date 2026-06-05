@@ -1,8 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: GitHub Discussions
-    url: https://github.com/ResonanceEnergy/TARTARIA/discussions
-    about: Ask questions, share feedback, and discuss game design
-  - name: Documentation
-    url: https://github.com/ResonanceEnergy/TARTARIA/blob/main/docs/00_MASTER_GDD.md
-    about: Read the full Game Design Document and technical specs
