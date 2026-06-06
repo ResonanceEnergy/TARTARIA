@@ -2,6 +2,25 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 AUTONOMOUS R28-R29 — Push pipeline unblocked + content fills
+
+**R28 — Push fix:** Identified blocker = commit `a1b89b5b` "FIX LOOP 4+5: git lfs pull restored real binaries" mistakenly committed **3436 binary files** (real FBX/WAV/PNG bytes instead of LFS pointers). Resulting 2.5-3 GB pack consistently hit HTTP 500 sideband disconnect at ~86% upload. **Tested 7 push strategies** — single-commit ✅, 10-commit batch ✅, full ❌, HTTP/1.1 ❌, default-buffer ❌, bloat-only ❌, embedded-token-URL ✅ (for tiny packs only). **11 of 27 commits pushed** to origin (`fb90d23f..ff82aef5`). Handed off to **GitHub Desktop** (already installed at `C:\Users\gripa\AppData\Local\GitHubDesktop\app-3.5.11`) for the 16 remaining — its native chunked uploader handles large packs reliably. **Future fix:** `git lfs migrate import --include='*.fbx,*.png,*.wav'` to retroactively migrate binaries → permanently shrinks repo.
+
+**R29 — Content fills + dedup (commit `7971ca70`):**
+- ✅ **BobInnkeeper dedup:** killed empty-Transform duplicate at (0, 0.5, -55), kept the one with MeshFilter+MeshRenderer+Animator
+- ✅ **WaveformTrace_Pedestal real geometry:** WF_Base (dark cube 1.2×0.8×1.2) + WF_Screen (cyan emissive cube 1.4×0.9×0.1 at y=1.4, EmissionColor 0,1.5,2) — replaces empty Cylinder primitive
+- ✅ **HarmonicPattern_Pedestal real geometry:** HP_Base (cylinder) + 3 HP_Ring0/1/2 concentric magenta-emissive rings, brightness ramps 0.5→1.5×, EmissionColor (2,0.5,1.5) — replaces empty Cube primitive
+- ✅ All URP-safe with `Universal Render Pipeline/Lit` shader
+
+**R29 audit findings — CLAUDE.md punch list 2-down (no code change needed):**
+- ✅ Punch #1 AnastasiaRocker.prefab EXISTS (13,373 bytes, verified live)
+- ✅ Punch #2 Detail_ refs in scene = 0 (mesh replace already ran)
+- ✅ Scene contains 16 Anastasia-named GameObjects, **0 missing scripts** across all of them — console "Anastasia missing script" log was stale
+
+**RIOLM audit (parallel agent dispatched):** identified 10 worst `[RuntimeInitializeOnLoadMethod]` offenders pointing to 134+ runtime-spawned GameObjects. Top fix: `Camera/DialogueCameraRig.cs:39` self-spawns Camera + AudioListener → explains recurring "2 AudioListeners" warning. Full punchlist in agent report for next round.
+
+---
+
 ## 2026-06-06 AUTONOMOUS R23-R27 — Full audit + 12 shipstoppers HAMMERED + push retry
 
 **4-parallel-agent audit** produced `docs/audits/R23_FULL_AUDIT_2026-06-06.md` with hard data:
