@@ -2,6 +2,46 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 AUTONOMOUS R23-R27 — Full audit + 12 shipstoppers HAMMERED + push retry
+
+**4-parallel-agent audit** produced `docs/audits/R23_FULL_AUDIT_2026-06-06.md` with hard data:
+- **560 active .cs files** | 615 prefabs | 16 namespaces under `Tartaria.*`
+- **21/21 Moon 1 critical scripts present** | **0 missing-script slots in prefabs**
+- **0 silent catches** | **0 TODO stubs** | **0 deprecated FindObjectOfType**
+- NATRIX's "209 prefabs at scale > 5" claim debunked — actual is **12**, all intentional Cathedral kit + placeholder spires
+- Pink dome root cause was BuildingSpawner `*=` compound + scene instance scale, NOT prefab assets
+
+**TOP 3 shipstoppers from audit — ALL FIXED (commit `4a1610e8`):**
+| # | Issue | Fix |
+|---|---|---|
+| 1 | Cathedral fragmented (Facade + Interior, no unified root) | ✅ Created `Echohaven_Cathedral` parent, reparented 7 fragments |
+| 2 | F5/F9 save/load not wired in scene | ✅ `SaveManager` GameObject + component added |
+| 3 | Audio stack absent (no AdaptiveMusicController) | ✅ `AdaptiveMusicController` GameObject + component added |
+
+**5 secondary shipstoppers — ALL FIXED (commit `94e17e2c`):**
+- ✅ ResetScout enemy at (20, 0.5, -10) from `Resources/Enemies/ResetScout`
+- ✅ BobInnkeeper NPC at (0, 0.5, -55) from `BobInnkeeper.prefab`
+- ✅ Overlook_POI at (-40, 5, 40) with discovery trigger
+- ✅ RootChamber_POI at (40, -1, -40) with discovery trigger
+- ✅ ProphecyFragment glowing collectible at (0, 1.5, 33) near Cathedral
+
+**Class dedup (commit `fd0109aa`):**
+- ✅ `Tartaria.Integration.SceneFadeTransition.Bootstrap` disabled — UI variant is canonical, kills duplicate fade overlay
+- 🟡 PickupInteractable + DayNightCycleController dedup deferred (CS2001 csproj dangling refs on file removal)
+
+**Mini-game variant pedestals (commit `70a5bab4`):**
+- ✅ FrequencySliderStand at (8, 0.5, 12) real prefab
+- ✅ CymaticTray at (-8, 0.5, 18) real prefab
+- 🟡 WaveformTrace_Pedestal placeholder at (-8, 0.5, 12)
+- 🟡 HarmonicPattern_Pedestal placeholder at (8, 0.5, 18)
+
+**Loop / Push state:**
+- 25+ commits ahead of origin
+- Push retries: HTTP 500 sideband disconnect → switched to `--force-with-lease` with 1.5GB postBuffer
+- Push PID 35616 currently uploading (62MB working set)
+
+---
+
 ## 2026-06-06 AUTONOMOUS R18-R22 — Real screen verification + gap finding
 
 **HONEST RESET:** NATRIX called out that my earlier "8/8 smoke test" claim was code-side verification not real visual. Took actual desktop screenshots of Unity Game view via computer-use MCP. Real gaps found and fixed:
