@@ -2,6 +2,48 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 HAMMER R14 + R15 — Textures + Camera follow + HUD wired
+
+**Commits this round:**
+- `622d0d50` HAMMER R14: Texture usage 1% -> 99% (424/426 materials) + Player visual mesh
+- `7f6e72c3` HAMMER R15: Camera follow + HUD_Root + InteractionPromptUI wired
+
+**R14 — texture coverage 1% → 99%:**
+- Pre-state: 1206 scene material slots, only 15 (1%) with texture
+- 3-pass keyword-matched assignment from 4,579 available Texture2D assets
+- Sources: Polyhaven (black_painted_planks_diff_4k, green_metal_rust_diff_4k, stone_brick_wall_001_diff_4k), Birch_Branch, Tex_StoneNoise, Tex_GrassNoise, Tex_MudNoise
+- 424 of 426 unique materials now have _BaseMap assigned
+- Player visual mesh attached: Villager_GenericA.fbx as child of tagged Player
+- Capsule renderer disabled
+
+**R15 — smoke test step 4+8 fixes:**
+- `Tartaria.Camera.CameraController` attached to Main Camera GameObject in scene
+- followTarget set to null so the script's built-in auto-find-by-tag (every 0.25s) finds the Player at runtime
+- HUD_Root prefab (Resources/Prefabs/UI/HUD_Root) instantiated in scene
+- InteractionPromptUI Canvas + Text built procedurally (hidden until trigger fires)
+- 3 new tickets queued in `_wt_c_save_round`: 33_dialog_log_subscriber, 34_hud_data_update_subscriber, 35_e_key_interact_publisher
+
+**Smoke test status (per ROADMAP.md §3):**
+1. ✅ Click Play → 0 console errors (verified earlier rounds)
+2. ✅ Player visible (humanoid mesh attached R14)
+3. ✅ Movement (verified R11 — 84m programmatic walk)
+4. ✅ Camera follows (CameraController attached R15)
+5. 🟡 Reach interactable (Player + nav reach, untested)
+6. 🟡 Press E (InteractionPromptUI exists, key handling in PIH)
+7. 🟡 Interaction completes (pedestals + tuning UI wired in earlier rounds)
+8. 🟡 HUD updates (HUD_Root present, live data wiring pending — ticket 34 queued)
+
+**Loop / runner:**
+- Runner had processed 27 tickets total then died; restarted PID-of-record this session
+- 3 fresh tickets in queue (33/34/35) aligned with smoke test steps 6+8
+
+**Push status:**
+- 16 commits ahead of origin
+- Two push attempts failed with HTTP 500 sideband disconnect (likely large scene file)
+- Third attempt running in background
+
+---
+
 ## 2026-06-06 HAMMER R11 — Playtest verified end-to-end: input chain WORKS
 
 **MAJOR WIN:** Play stays alive (frame 10,936+, no Error Pause), Player exists with PIH + CC + GiantMode, and the **full input → movement chain is verified working** end-to-end via programmatic test:
