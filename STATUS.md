@@ -2,6 +2,68 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 HAMMER R11 — Playtest verified end-to-end: input chain WORKS
+
+**MAJOR WIN:** Play stays alive (frame 10,936+, no Error Pause), Player exists with PIH + CC + GiantMode, and the **full input → movement chain is verified working** end-to-end via programmatic test:
+
+- Queued W via `UnityEngine.InputSystem.InputSystem.QueueStateEvent(kb, new KeyboardState(Key.W))`
+- `Keyboard.current.wKey.isPressed=True` observed
+- `PIH._moveInput = (0.00, 1.00)` populated correctly
+- `PlayerInputHandler` → `CharacterController.Move` chain fired
+- **Player physically moved from z=15.30 to z=98.92 = 83.6m forward** over the test window
+- moveSpeed=6 confirmed (~14s × 6m/s ≈ 84m)
+
+**Scene state @ frame 10,936:**
+- Player tagged correctly at (0, 1.56, 98.92) after traveling
+- All 4 NPCs alive in scene: Milo, Anastasia, Lirael, Cassian
+- Echohaven Obelisk, CentralPlaza, Moon1InnRestTrigger, _SpawnPlatform all present
+- Cathedral walls present but BURIED at y=-7.5 (Wall_06, Column_03/04, Archway_West)
+- _FallSafetyFloor catcher at y=-20
+
+**5 visual issues still to fix:**
+1. Camera spawn at (0, 5, 6.6) clips INSIDE Lirael NPC (at (0, 1.39, 6.0)) — move Lirael further from spawn OR shift player spawn
+2. Vegetation densely covers the player spawn radius — clear a 5m radius around (0, 0, 15)
+3. Cathedral kit walls buried y=-7.5 from prior burial pass — never came back up for the climactic restoration
+4. Hero buildings (Cathedral, StarDome, CrystalSpire) absent from scene by canonical name — were spawned under different GameObject names
+5. Player visual is still a 1m × 2m capsule (no character mesh attached)
+
+**Loop / Runner state:**
+- Runner PID 35644 alive, mem 116MB
+- Metrics file updating live (12:41:38)
+- 14 tickets queued including 3 new ones authored this session (31_npc_dialogue, 32_ambient_zone, 33_dialog_log)
+
+---
+
+## 2026-06-06 HAMMER R10 — Scale explosion fix + scene authoring audit
+
+**Commits:** `8465c9a8` (101 GOs reset) + `b62fa230` (22 mesh shrink) + lift pass on `feature/consolidate-moon-architecture`.
+
+**Fixed this round:**
+- 10 village buildings had `localScale` 18×-150× (TownHall=120, Mill=150, Watchtower=85) → reset to (1,1,1).
+- 6 duplicate `*_Fill` GameObjects deleted (BobsInn_Fill, TownHall_Fill, Lighthouse_Fill, etc).
+- 71 props at `scale=(100,100,100)` reset (Barrel/Cart/Basket/Candelabra/Chest/etc).
+- 30 more props at scale 5-50 reset (BannerPole, CartWheel, AnvilHorn, BrickPile, MudMound).
+- 22 oversized mesh assets shrunk uniformly to ~20m height (Cathedral/Mill/Inn/Beaker were authored at 100-264m).
+- 16 buildings lifted out of the ground (BobsInn was buried 21.6m, VillageMill 6m, VillageBakery 4.8m, TownHall 4m).
+
+**Bounds delta:**
+- Before: `1189m × 1097m × 1105m` (scene unplayable, 1.2km scale corruption)
+- After: `200m × 42m × 203m` (real village scale)
+
+**Bugs found, queued for later (not fixed this round):**
+1. **Cathedral / StarDome / CrystalSpire absent from scene by name.** The 3 hero buildings of Moon 1. Spawner ran but produced different GameObjects. Need re-run of `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes`.
+2. **TownHall mesh aspect ratio wrong** — final bounds (1.25 × 12.5 × 0.39) = 2.5m × 25m × 0.78m pancake. Source Blender script `gen_townhall.py` authored bad proportions. Re-bake required.
+3. **Beaker mesh assets** (BeakerLarge 264m, BeakerMed 180m) — Blender script authored at scale ~150×. Re-bake required.
+4. **Player despawns within ~10s of Play start.** `PlayerHealthController.Awake()` singleton calls `Destroy(gameObject)` if Instance exists. Suspect: two Player prefabs spawned by overlapping setup scripts.
+5. **Play mode silently stops.** Almost certainly Console **Error Pause** toggle still ON. Manual toggle-off required from user before next playtest.
+
+**Loop status:**
+- Runner PID 35644 alive, mem 115MB.
+- Metrics file active (last write 12:39).
+- 15 tickets in queue: 14, 15, 16, 17, 18, 19, 20, 21, 22, 28, 29, 30, 31, 32, 33.
+
+
+
 **Last supervisor check-in:** 2026-06-05 18:48 — v2.0 gates run. reconciled=0 reverted=3 flagged=0 queue=0 done=21 failed=7
 **Prior check-in:** 2026-06-05 23:33 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. loop DEAD (run_loop.log frozen at 14:50), git was clean.
 **Prior check-in:** 2026-06-05 23:18 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:03; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST).
