@@ -33,7 +33,7 @@ namespace Tartaria.Editor
                 // Open the canonical Moon 1 scene
                 EditorSceneManager.OpenScene(SCENE_PATH);
 
-                var cam = Camera.main ?? Object.FindAnyObjectByType<Camera>();
+                var cam = UnityEngine.Camera.main ?? Object.FindAnyObjectByType<UnityEngine.Camera>();
                 if (cam == null)
                 {
                     Debug.LogError("[AutoLoop] No camera in scene — cannot capture.");
