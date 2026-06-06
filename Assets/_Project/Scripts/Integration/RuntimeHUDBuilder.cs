@@ -71,6 +71,15 @@ namespace Tartaria.Integration
         static void Bootstrap()
         {
             if (Instance != null) return;
+            // R32 — short-circuit if scene already contains an authored HUD_Root (97 GO blocks per the bake).
+            // Avoids creating 64+ duplicate runtime HUD GameObjects on every Play. The scene-baked HUD_Root.prefab
+            // satisfies HUDController.Instance wiring once HUDController.Awake() runs.
+            var existingHudRoot = GameObject.Find("HUD_Root");
+            if (existingHudRoot != null && existingHudRoot.GetComponentInChildren<Canvas>(true) != null)
+            {
+                Debug.Log("[RuntimeHUDBuilder] Scene already has HUD_Root with Canvas — skipping runtime build.");
+                return;
+            }
             var go = new GameObject("RuntimeHUDBuilder");
             DontDestroyOnLoad(go);
             go.AddComponent<RuntimeHUDBuilder>();
