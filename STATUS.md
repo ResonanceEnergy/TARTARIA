@@ -2,6 +2,44 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 AUTONOMOUS R18-R22 — Real screen verification + gap finding
+
+**HONEST RESET:** NATRIX called out that my earlier "8/8 smoke test" claim was code-side verification not real visual. Took actual desktop screenshots of Unity Game view via computer-use MCP. Real gaps found and fixed:
+
+**R20-R21 — Pink magenta dome ROOT CAUSE FIXED (commit `3c7fd821`):**
+- Probed 72 renderers containing camera position → all 100-500m oversized
+- Bush_2 had scale (134, 134, 134) baked into prefab
+- Root cause: `Assets/_Project/Prefabs/Moon1/Blender/Props/BigMushroomTree.prefab` had `localScale=(100, 100, 100)` baked at source
+- Fix #1: Reset BigMushroomTree.prefab localScale to (1, 1, 1) at source
+- Fix #2: `Assets/_Project/Scripts/Integration/BuildingSpawner.cs:324,340,357` — changed `*= rng` to `= Vector3.one * rng` (the `*=` compounded with the 100x prefab scale to produce 134x)
+- Verified live: Bush_2 spawned at (1.34, 1.34, 1.34) after restart — pink dome gone permanently
+- Also: 209 OTHER prefabs at scale > 5 detected, most KayKit Props at 100x — deferred as separate sweep
+
+**R19 — Player.prefab humanoid visual (commit `3c7fd821`):**
+- Attached Villager_GenericA.fbx as child "PlayerVisual" of Player.prefab
+- Disabled capsule renderer on Player root
+- Now persists across Play sessions
+
+**Visible gaps from real screenshots (still open):**
+1. **Focus: False** in InputProbe HUD — Game view not focused on Play start, real input would fail
+2. **GroundPlane is tan/sand** — the M_Ground_Terrain material IS textured but visually a flat tan; needs grass diffuse instead of generic Tex_GrassNoise
+3. **Frame budget 140-290ms 1%-low** — perf dips suggest too many particles or overdraw; 27 particle systems were live
+4. **Cathedral/StarDome/CrystalSpire all small** — after multiple shrink passes these are 5-7m, hard to see from default camera. Earlier rounds may have over-corrected
+5. **MissionBriefing modal re-appears on every Play start** — runtime-built by RuntimeHUDBuilder.cs:248, line 451 says "auto-dismisses after 10 seconds or on any key" but it's still up at frame 30+
+6. **InteractionPromptCanvas shows "Press [A] to dig"** — gamepad-only label, keyboard player has no clue
+7. **Camera in tuning/top-down mode at Play start** even before main menu dismissed
+8. **209 prefabs at scale > 5** — KayKit Props at 100x, Cathedral kit walls at intentional 4-7m
+
+**Loop / push status:**
+- Branch 22 commits ahead of origin
+- Push attempts hit HTTP 500 (origin server limit)
+- Runner restart history: alive → dead → restart attempts in background
+- 3 grep-cited tickets queued (33/34/35) from R15
+
+**Real wins this session: 2 verified fixes from screen evidence, 6 documented gaps with grep-cited file locations.**
+
+---
+
 ## 2026-06-06 HAMMER R17 — Main menu + StartGame flow verified, gameplay HUD alive
 
 **MAJOR WIN:** Drove Play, found `Tartaria.UI.MainMenuOverlay.StartGame()` via reflection, invoked it. Main menu closed, gameplay HUD took over showing the full Moon 1 intro modal with tutorial text:
