@@ -2,7 +2,8 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
-**Last supervisor check-in:** 2026-06-05 23:48 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:33; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST). **NEW P1: .git/index is CORRUPT (`bad signature 0x00000000` — index file corrupt). All git ops + supervisor Gates A/C/F are blocked. Sandbox cannot repair (`.git/index` rm = permission denied). NATRIX must run locally: `del .git\index && git reset` (working tree is safe). Then restart run_loop.ps1 + re-roll 23-26.**
+**Last supervisor check-in:** 2026-06-06 00:03 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:48 (tickets 23-26 already failed @22:20). Loop STILL DEAD (run_loop.log frozen 14:50 on _MANIFEST — Qwen not processing). **GOOD NEWS: git index corruption RESOLVED — `git status` now runs clean, no bad-signature; Gates A/C/F unblocked once loop restarts.** NATRIX ACTION: restart `run_loop.ps1`, then re-roll 23-26 — they failed on INVENTED API (OnDayChanged / RaiseHUDShowObjective / GameEvents.instance.OnEnemyKilled do not exist; apply_outputs correctly rejected). GameEvents.cs unreadable this run (mount IO glitch) so corrected re-rolls deferred to next check-in.
+**Prior check-in:** 2026-06-05 23:48 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:33; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST). **NEW P1: .git/index is CORRUPT (`bad signature 0x00000000` — index file corrupt). All git ops + supervisor Gates A/C/F are blocked. Sandbox cannot repair (`.git/index` rm = permission denied). NATRIX must run locally: `del .git\index && git reset` (working tree is safe). Then restart run_loop.ps1 + re-roll 23-26.**
 **Prior check-in:** 2026-06-05 23:33 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. loop DEAD (run_loop.log frozen at 14:50), git was clean.
 **Prior check-in:** 2026-06-05 23:18 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:03; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST).
 
@@ -403,24 +404,4 @@ if (material.HasProperty("_BaseColor") && !skipBrighten) {
     var c = material.GetColor("_BaseColor");
     if (c.r < 0.30f && c.g < 0.30f && c.b < 0.30f) {
         material.SetColor("_BaseColor", new Color(
-            Mathf.Max(c.r * 3.5f, 0.40f),
-            Mathf.Max(c.g * 3.5f, 0.38f),
-            Mathf.Max(c.b * 3.5f, 0.35f), c.a));
-    }
-}
-```
-
-Fires on next FBX import. To apply retroactively to Cassian's currently-embedded materials, use `ModelImporter.ExtractMaterials()` to externalize them — deferred.
-
-### Visual evolution (all `Logs/screenshots/`)
-
-| Stage | File | Verdict |
-|---|---|---|
-| INITIAL | `spawn_120739.png` | Solid green wall |
-| Post rocks fix | `v4_behind_121529.png` | Cassian on platform, vegetation OK |
-| Post particles fix | `v6_postfix_fountain_122001.png` | No magenta dots, golden sky |
-| Cinematic | `v7_cinematic_122031.png` | Full village layout legible |
-| Post mushrooms | `v11_cinematic_122815.png` | Cleanest village shot |
-| Cassian closeup | `v12_cassian_lit_122854.png` | Cassian visible light-grey, some MudGolem cluster remains |
-
-**NATRI
+            Mathf.Max(c.
