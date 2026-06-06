@@ -2,34 +2,35 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
-**Last supervisor check-in:** 2026-06-05 16:52 — v2.0 gates run. reconciled=0 reverted=0 flagged=0 queue=5 done=21 failed=2
-**Prior check-in:** 2026-06-05 22:34 — NO-OP. done=21 failed=2 unchanged since 16:30. Loop STOPPED (run_loop.log last entry 14:50). Worktree mid-checkout → held off queueing to avoid hallucination-bait tickets. P1: restart run_loop + stabilize git tree.
+**Last supervisor check-in:** 2026-06-05 23:48 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:33; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST). **NEW P1: .git/index is CORRUPT (`bad signature 0x00000000` — index file corrupt). All git ops + supervisor Gates A/C/F are blocked. Sandbox cannot repair (`.git/index` rm = permission denied). NATRIX must run locally: `del .git\index && git reset` (working tree is safe). Then restart run_loop.ps1 + re-roll 23-26.**
+**Prior check-in:** 2026-06-05 23:33 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. loop DEAD (run_loop.log frozen at 14:50), git was clean.
+**Prior check-in:** 2026-06-05 23:18 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:03; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST).
 
 <!-- DASHBOARD:BEGIN -->
-### Loop dashboard — last 24 h (refreshed 16:52:06)
+### Loop dashboard — last 24 h (refreshed 16:56:59)
 
 | Metric | Value |
 |---|---|
-| Tickets processed | **23** |
+| Tickets processed | **26** |
 | Applied | 21 |
-| Failed | 2 |
-| Success rate | **91.3%** |
-| Avg gen time | 14000 ms |
-| Avg apply time | 200 ms |
-| Avg output size | 3115 chars |
-| Total compute | 322s |
-| Auto-branches on origin | 2 |
+| Failed | 5 |
+| Success rate | **80.8%** |
+| Avg gen time | 13680 ms |
+| Avg apply time | 240 ms |
+| Avg output size | 2859 chars |
+| Total compute | 356s |
+| Auto-branches on origin | 3 |
 **By model:**
 
 | model | count | applied |
 |---|---|---|
-| qwen-tartaria | 23 | 21 |
+| qwen-tartaria | 26 | 21 |
 
 **Top errors:**
 
 | count | error |
 |---|---|
-| 2 | apply_outputs.py exit 1 |
+| 5 | apply_outputs.py exit 1 |
 
 <!-- DASHBOARD:END -->
 **Last updated:** 2026-06-05 13:28 (DEEP HAMMER R435 — 6 new Blender prefabs (Fountain/Cart/MarketStall/Fence/Lantern/Bell) + Windmill + 17th-hour music + AnastasiaRocker = 9 new content prefabs, 41 placements in scene. v22 shows real village.)
