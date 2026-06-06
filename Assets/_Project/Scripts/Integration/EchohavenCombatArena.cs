@@ -152,4 +152,8 @@ namespace Tartaria.Integration
 
         void ShowObjective(string text)
         {
-            var hud =
+            var hud = HUDController.Instance;
+            if (hud != null) hud.ShowObjective(text);
+        }
+    }
+}
