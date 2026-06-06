@@ -13618,6 +13618,18 @@ PrefabInstance:
       propertyPath: m_Name
       value: AnastasiaRocker
       objectReference: {fileID: 0}
+    - target: {fileID: 8020389270622379789, guid: c597824f2c2da3d4f98609d17c6c6b3d, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8020389270622379789, guid: c597824f2c2da3d4f98609d17c6c6b3d, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8020389270622379789, guid: c597824f2c2da3d4f98609d17c6c6b3d, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 235883682377931650, guid: c597824f2c2da3d4f98609d17c6c6b3d, type: 3}
     - {fileID: 9084604363317218325, guid: c597824f2c2da3d4f98609d17c6c6b3d, type: 3}
@@ -16253,7 +16265,7 @@ MonoBehaviour:
   lowestSubdivLevelOverride: 0
   highestSubdivLevelOverride: 7
   overridesSubdivLevels: 0
-  mightNeedRebaking: 0
+  mightNeedRebaking: 1
   cachedTransform:
     e00: 0
     e01: 0
