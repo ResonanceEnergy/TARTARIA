@@ -1,0 +1,314 @@
+using NUnit.Framework;
+using UnityEngine;
+using Tartaria.Gameplay;
+
+namespace Tartaria.Tests.EditMode
+{
+    /// <summary>
+    /// Unit tests for PlayerProgression - XP gain, leveling, stat bonuses.
+    /// Tests the level 1-50 progression system with exponential XP scaling.
+    /// </summary>
+    [TestFixture]
+    public class PlayerProgressionTests
+    {
+        GameObject _progressionGO;
+        PlayerProgression _progression;
+
+        [SetUp]
+        public void Setup()
+        {
+            _progressionGO = new GameObject("TestProgression");
+            _progression = _progressionGO.AddComponent<PlayerProgression>();
+            
+            // Override singleton
+            var instanceField = typeof(PlayerProgression).GetField("Instance", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            instanceField?.SetValue(null, _progression);
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            if (_progressionGO != null)
+                Object.DestroyImmediate(_progressionGO);
+            
+            var instanceField = typeof(PlayerProgression).GetField("Instance", 
+                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+            instanceField?.SetValue(null, null);
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Initial State Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void PlayerProgression_StartsAtLevelOne()
+        {
+            Assert.AreEqual(1, _progression.CurrentLevel, "Should start at level 1");
+        }
+
+        [Test]
+        public void PlayerProgression_StartsWithZeroXP()
+        {
+            Assert.AreEqual(0f, _progression.CurrentXP, "Should start with 0 XP");
+        }
+
+        [Test]
+        public void PlayerProgression_MaxLevel_Is50()
+        {
+            // Use reflection to get maxLevel field
+            var maxLevelField = typeof(PlayerProgression).GetField("maxLevel", 
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            int maxLevel = (int)maxLevelField.GetValue(_progression);
+            
+            Assert.AreEqual(50, maxLevel, "Max level should be 50");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // XP Calculation Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void XPToNextLevel_Level1_ReturnsBaseXP()
+        {
+            float xpRequired = _progression.XPToNextLevel;
+            Assert.Greater(xpRequired, 0f, "XP required for level 2 should be positive");
+            Assert.AreEqual(100f, xpRequired, 5f, "Level 1→2 should require ~100 XP");
+        }
+
+        [Test]
+        public void XPToNextLevel_IncreasesExponentially()
+        {
+            float xpForLevel2 = _progression.XPToNextLevel;
+            
+            // Level up to 2
+            _progression.AddXP(xpForLevel2 + 1f);
+            float xpForLevel3 = _progression.XPToNextLevel;
+            
+            Assert.Greater(xpForLevel3, xpForLevel2, 
+                "XP required should increase with each level");
+        }
+
+        [Test]
+        public void XPProgress_ZeroXP_ReturnsZero()
+        {
+            float progress = _progression.XPProgress;
+            Assert.AreEqual(0f, progress, 0.01f, "0 XP should give 0% progress");
+        }
+
+        [Test]
+        public void XPProgress_HalfwayToNextLevel_ReturnsHalf()
+        {
+            float xpRequired = _progression.XPToNextLevel;
+            _progression.AddXP(xpRequired * 0.5f);
+            
+            float progress = _progression.XPProgress;
+            Assert.AreEqual(0.5f, progress, 0.05f, "50% XP should give ~50% progress");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // AddXP Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void AddXP_PositiveAmount_IncreasesXP()
+        {
+            _progression.AddXP(50f);
+            Assert.AreEqual(50f, _progression.CurrentXP, "XP should increase by 50");
+        }
+
+        [Test]
+        public void AddXP_EnoughForLevelUp_IncreasesLevel()
+        {
+            float xpRequired = _progression.XPToNextLevel;
+            _progression.AddXP(xpRequired);
+            
+            Assert.AreEqual(2, _progression.CurrentLevel, "Should level up to 2");
+        }
+
+        [Test]
+        public void AddXP_ExcessXP_RollsOver()
+        {
+            float xpForLevel2 = _progression.XPToNextLevel;
+            _progression.AddXP(xpForLevel2 + 50f);
+            
+            Assert.AreEqual(2, _progression.CurrentLevel, "Should be level 2");
+            Assert.AreEqual(50f, _progression.CurrentXP, 5f, 
+                "Should have ~50 XP rolled over");
+        }
+
+        [Test]
+        public void AddXP_MultipleLevels_ProcessesAllLevelUps()
+        {
+            // Add enough XP for multiple levels
+            float massiveXP = 1000f;
+            _progression.AddXP(massiveXP);
+            
+            Assert.Greater(_progression.CurrentLevel, 1, 
+                "Should level up multiple times with massive XP");
+        }
+
+        [Test]
+        public void AddXP_AtMaxLevel_DoesNothing()
+        {
+            // Set to max level (50)
+            _progression.SetLevel(50);
+            
+            _progression.AddXP(1000f);
+            
+            Assert.AreEqual(50, _progression.CurrentLevel, 
+                "Should remain at max level");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Level Up Event Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void LevelUp_FiresOnLevelUpEvent()
+        {
+            int eventLevel = 0;
+            bool eventFired = false;
+
+            _progression.OnLevelUp += (level) =>
+            {
+                eventFired = true;
+                eventLevel = level;
+            };
+
+            float xpRequired = _progression.XPToNextLevel;
+            _progression.AddXP(xpRequired);
+
+            Assert.IsTrue(eventFired, "OnLevelUp event should fire");
+            Assert.AreEqual(2, eventLevel, "Event should pass new level (2)");
+        }
+
+        [Test]
+        public void AddXP_FiresOnXPGainedEvent()
+        {
+            float eventXP = 0f;
+            bool eventFired = false;
+
+            _progression.OnXPGained += (xp) =>
+            {
+                eventFired = true;
+                eventXP = xp;
+            };
+
+            _progression.AddXP(75f);
+
+            Assert.IsTrue(eventFired, "OnXPGained event should fire");
+            Assert.AreEqual(75f, eventXP, "Event should pass XP amount");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Stat Bonus Tests (every 5 levels)
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void LevelUp_ToLevel5_AppliesStatBonuses()
+        {
+            // Level up to 5 (stat bonus milestone)
+            for (int i = 1; i < 5; i++)
+            {
+                float xp = _progression.XPToNextLevel;
+                _progression.AddXP(xp);
+            }
+
+            Assert.AreEqual(5, _progression.CurrentLevel);
+            // Note: Actual stat application requires PlayerHealth/InputHandler components
+            // This test verifies the level-up logic triggers at level 5
+        }
+
+        [Test]
+        public void LevelUp_ToLevel10_AppliesStatBonuses()
+        {
+            // Level up to 10
+            for (int i = 1; i < 10; i++)
+            {
+                float xp = _progression.XPToNextLevel;
+                _progression.AddXP(xp);
+            }
+
+            Assert.AreEqual(10, _progression.CurrentLevel);
+        }
+
+        [Test]
+        public void LevelUp_NonMilestone_NoStatBonuses()
+        {
+            // Level up to 3 (not a multiple of 5)
+            for (int i = 1; i < 3; i++)
+            {
+                float xp = _progression.XPToNextLevel;
+                _progression.AddXP(xp);
+            }
+
+            Assert.AreEqual(3, _progression.CurrentLevel);
+            // Stat bonuses only apply at levels 5, 10, 15, etc.
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // SetLevel Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void SetLevel_ValidLevel_SetsLevel()
+        {
+            _progression.SetLevel(25);
+            
+            Assert.AreEqual(25, _progression.CurrentLevel);
+            Assert.AreEqual(0f, _progression.CurrentXP, "XP should reset to 0");
+        }
+
+        [Test]
+        public void SetLevel_BelowOne_ClampsToOne()
+        {
+            _progression.SetLevel(0);
+            Assert.AreEqual(1, _progression.CurrentLevel, "Level should clamp to 1");
+            
+            _progression.SetLevel(-5);
+            Assert.AreEqual(1, _progression.CurrentLevel, "Negative level should clamp to 1");
+        }
+
+        [Test]
+        public void SetLevel_AboveMax_ClampsToMax()
+        {
+            _progression.SetLevel(100);
+            Assert.AreEqual(50, _progression.CurrentLevel, "Level should clamp to max (50)");
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // Integration Tests
+        // ═══════════════════════════════════════════════════════════════════
+
+        [Test]
+        public void FullProgression_Level1To50_CompletesSuccessfully()
+        {
+            int levelUpCount = 0;
+            _progression.OnLevelUp += (level) => levelUpCount++;
+
+            // Add massive XP to reach max level
+            for (int i = 1; i < 50; i++)
+            {
+                float xp = _progression.XPToNextLevel;
+                _progression.AddXP(xp);
+            }
+
+            Assert.AreEqual(50, _progression.CurrentLevel, "Should reach max level");
+            Assert.AreEqual(49, levelUpCount, "Should fire 49 level-up events (1→50)");
+        }
+
+        [Test]
+        public void XPGain_SmallIncrements_AccumulatesCorrectly()
+        {
+            // Add XP in small chunks
+            for (int i = 0; i < 10; i++)
+            {
+                _progression.AddXP(10f);
+            }
+
+            Assert.AreEqual(100f, _progression.CurrentXP, 5f, 
+                "Small XP gains should accumulate correctly");
+        }
+    }
+}

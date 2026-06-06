@@ -1,0 +1,57 @@
+# Milo VO Lines — docs/15 §10 Companion: Milo
+# Format: [State] body  (one line per row)
+# Tone: curious, hopeful, comic relief with hidden heart. Cynical humor as armor.
+# Refs: docs/01_LORE_BIBLE.md (Milo Mudslinger), docs/03A Main Storyline, GDD §05 Characters §2.2
+# 40 total lines: Follow 8, Idle 6, React 7, Speak 7, Hide 6, Celebrate 6
+
+# ─── FOLLOW (8 lines) — default tag-along, mild observations ───
+[Follow] You're really getting the hang of this restoration thing, you know.
+[Follow] Keep walking. I'm right behind you. Mostly.
+[Follow] Smell that? That's the smell of Aether. Or possibly damp moss. Hard to say.
+[Follow] If I knew the world looked this good cleaned up, I'd have started sooner.
+[Follow] Lead on, boss. I'm just the entertainment.
+[Follow] You walk fast for someone with no map.
+[Follow] These ruins keep humming. Used to ignore it. Can't anymore.
+[Follow] Right behind you — same place I've always been. Don't make it weird.
+
+# ─── IDLE (6 lines) — out of frame during tuning, patient quips ───
+[Idle] I'll be over here, pretending I understand frequencies.
+[Idle] Take your time. The mud isn't going anywhere.
+[Idle] Y'know, in the market we'd just hit it with a wrench. Just saying.
+[Idle] I'm gonna sit this one out. You're the maestro.
+[Idle] Don't mind me. Just admiring the scenery. The very still scenery.
+[Idle] If you need a second opinion, I'm full of bad ones.
+
+# ─── REACT (7 lines) — 1-second flash on RS milestones, surprise ───
+[React] Wait — did that just shimmer? Tell me that just shimmered.
+[React] Whoa! Did you see that? You did that!
+[React] Okay, okay — that's new. That's definitely new.
+[React] Hey! Something's lighting up. Possibly us. Possibly bad.
+[React] You felt that, right? Tell me you felt that.
+[React] That hum just changed. I felt it in my teeth.
+[React] Hold up — the air just got brighter. That a good sign?
+
+# ─── SPEAK (7 lines) — active dialogue lead-ins / interjections ───
+[Speak] Hey — got a second? I wanted to say something. Genuinely.
+[Speak] Listen. You and me, we should talk about what's happening here.
+[Speak] I've been thinking. Don't laugh. I have.
+[Speak] So… about earlier. I wasn't entirely truthful. Bear with me.
+[Speak] Can I tell you something? Without you making a face?
+[Speak] Real quick — there's a thing I noticed. Worth sharing.
+[Speak] Look. I joke. But this matters. So just — hear me out.
+
+# ─── HIDE (6 lines) — combat retreat, comic cowardice with loyalty ───
+[Hide] Cover, cover, cover! I'm just gonna — yeah, behind this rock. Good rock.
+[Hide] You handle the heroics. I'll handle the strategic squatting.
+[Hide] Tell me when it's over! Or sooner! Sooner is better!
+[Hide] I'm not running, I'm tactically relocating. Repeatedly.
+[Hide] Don't die. I mean it. I am not eulogizing anyone tonight.
+[Hide] I've got your back. Far back. Very, very far back.
+
+# ─── CELEBRATE (6 lines) — 3s post-restoration, hopeful, sincere ───
+[Celebrate] You did it. You actually did it. I'm — I'm a little choked up.
+[Celebrate] Look at it. Look at it! That's beautiful. That's ours.
+[Celebrate] Okay. Okay. Maybe the world's worth saving after all.
+[Celebrate] I owe you a drink. Two drinks. Whatever currency we're using here.
+[Celebrate] That sound — that hum? That's the building thanking you.
+[Celebrate] Hope. Yeah. That's what that is. Hope, of all things.

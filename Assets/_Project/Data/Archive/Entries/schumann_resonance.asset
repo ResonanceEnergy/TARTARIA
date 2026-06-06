@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: schumann_resonance
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: schumann_resonance
+  title: "Schumann Resonance \u2014 The Earth's Heartbeat"
+  category: 5
+  summary: "The Earth's electromagnetic cavity resonates at 7.83 Hz \u2014 exactly
+    matching the alpha brainwave frequency of human meditation. The old world tuned
+    its technology, buildings, and music to this frequency."
+  fullText: "In 1952, German physicist Winfried Otto Schumann mathematically predicted
+    that the space between the Earth's surface and the ionosphere would act as a
+    resonant cavity, with a fundamental frequency of approximately 7.83 Hz. Subsequent
+    measurements confirmed his prediction precisely.\r\n\r\n7.83 Hz is not merely
+    an interesting geophysical fact. It is the dominant frequency of the human alpha
+    brainwave \u2014 the state associated with relaxed alertness, creativity, and
+    healing. Humans deprived of exposure to this frequency (in shielded underground
+    laboratories) show disrupted circadian rhythms, increased anxiety, and impaired
+    immune function within days. The Schumann resonance is, in some measurable physiological
+    sense, a biological necessity.\r\n\r\nThe builders of Tartarian sacred spaces
+    understood this. Gothic cathedrals, resonantly designed ancient temples, and
+    old-world healing halls all have acoustic and geometric properties that create
+    standing waves at or near 7.83 Hz in their internal spaces. The low drone of
+    Tibetan singing bowls, the fundamental frequency of a Gregorian chant, and the
+    bass note of a properly tuned pipe organ all sit within the Schumann resonance
+    band.\r\n\r\nIn 2016 and again in 2020, the Schumann resonance experienced anomalous
+    spikes to frequencies above 40 Hz \u2014 in the gamma brainwave range, associated
+    with peak cognitive performance and states described as 'mystical' in various
+    traditions. The old world may have known how to induce these spikes deliberately."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - resonance_frequency_432
+  - aether_energy
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: 7.83. The number between heartbeats. The Earth has been waiting
+    for you to synchronise with it.

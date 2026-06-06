@@ -1,0 +1,16 @@
+key,en,es,fr,de,jp,cn,ru,pt
+# UI strings - common interface text
+button.continue,Continue,Continuar,Continuer,Fortfahren,続ける,继续,Продолжить,Continuar
+button.back,Back,Atrás,Retour,Zurück,戻る,返回,Назад,Voltar
+button.confirm,Confirm,Confirmar,Confirmer,Bestätigen,確認,确认,Подтвердить,Confirmar
+button.cancel,Cancel,Cancelar,Annuler,Abbrechen,キャンセル,取消,Отменить,Cancelar
+label.health,Health,Salud,Santé,Gesundheit,体力,生命值,Здоровье,Saúde
+label.resonance,Resonance Score,Puntuación de Resonancia,Score de Résonance,Resonanzpunktzahl,共鳴スコア,共振分数,Резонансный Счёт,Pontuação de Ressonância
+label.level,Level,Nivel,Niveau,Stufe,レベル,等级,Уровень,Nível
+label.inventory,Inventory,Inventario,Inventaire,Inventar,インベントリ,背包,Инвентарь,Inventário
+label.quest_log,Quest Log,Registro de Misiones,Journal de Quêtes,Questlog,クエストログ,任务日志,Журнал Заданий,Registro de Missões
+label.settings,Settings,Configuración,Paramètres,Einstellungen,設定,设置,Настройки,Configurações
+message.saving,Saving...,Guardando...,Sauvegarde...,Speichern...,保存中...,保存中...,Сохранение...,Salvando...
+message.loading,Loading...,Cargando...,Chargement...,Laden...,読み込み中...,加载中...,Загрузка...,Carregando...
+error.save_failed,Save Failed,Fallo al Guardar,Échec de la Sauvegarde,Speichern Fehlgeschlagen,保存失敗,保存失败,Сохранение Не Удалось,Falha ao Salvar
+error.load_failed,Load Failed,Fallo al Cargar,Échec du Chargement,Laden Fehlgeschlagen,読み込み失敗,加载失败,Загрузка Не Удалась,Falha ao Carregar

@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 339cf0f4843e7af47ab1c4af6fbbdd40, type: 3}
+  m_Name: Echohaven_CrystalSpire
+  m_EditorClassIdentifier: Tartaria.Gameplay::Tartaria.Gameplay.BuildingDefinition
+  buildingName: The Crystal Spire
+  loreDescription: A towering frequency antenna that connected Echohaven to the celestial
+    Aether band. Built from resonance-forged crystal, it hummed at 1296 Hz.
+  archetype: 2
+  width: 6
+  height: 40
+  goldenRatioTarget: 1.618
+  aetherSourceStrength: 25
+  aetherSourceRadius: 20
+  outputBand: 2
+  nodeCount: 3
+  nodePuzzles:
+  - variant: 0
+    targetFrequency: 432
+    timeLimitSeconds: 15
+    tolerancePercent: 5
+    difficultySpeed: 1
+  - variant: 1
+    targetFrequency: 432
+    timeLimitSeconds: 20
+    tolerancePercent: 10
+    difficultySpeed: 0.8
+  - variant: 2
+    targetFrequency: 432
+    timeLimitSeconds: 12
+    tolerancePercent: 8
+    difficultySpeed: 1.2
+  buriedPrefab: {fileID: 0}
+  revealedPrefab: {fileID: 0}
+  activePrefab: {fileID: 0}
+  emergenceSound: {fileID: 0}
+  ambientHum: {fileID: 0}
+  emergenceHapticDuration: 5
+  dissolutionDuration: 5

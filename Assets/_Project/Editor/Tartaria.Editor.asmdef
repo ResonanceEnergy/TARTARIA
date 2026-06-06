@@ -1,0 +1,45 @@
+{
+    "name": "Tartaria.Editor",
+    "rootNamespace": "Tartaria.Editor",
+    "references": [
+        "Tartaria.Core",
+        "Tartaria.Data",
+        "Tartaria.Gameplay",
+        "Tartaria.AI",
+        "Tartaria.Audio",
+        "Tartaria.Camera",
+        "Tartaria.Input",
+        "Tartaria.UI",
+        "Tartaria.Save",
+        "Tartaria.Integration",
+        "Tartaria.Localization",
+        "Unity.Entities",
+        "Unity.Mathematics",
+        "Unity.Collections",
+        "Unity.InputSystem",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Universal.Editor",
+        "Unity.Cinemachine",
+        "Unity.AI.Navigation",
+        "Unity.Addressables.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.ai.navigation",
+            "expression": "1.0.0",
+            "define": "UNITY_AI_NAVIGATION"
+        }
+    ],
+    "noEngineReferences": false
+}

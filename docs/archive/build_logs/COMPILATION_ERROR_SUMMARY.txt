@@ -1,0 +1,58 @@
+COMPILATION ERROR REPORT
+========================
+Total C# errors: 1 (repeated 3 times in log)
+Assembly load failures: 1 primary (Tartaria.Scripts.Editor.dll) + 2 dependent
+Specific missing scripts identified: 0 (log shows 149 generic "Unknown" messages without GameObject/script names)
+
+TOP 10 COMPILATION ERRORS:
+1. [SceneAnalysisOnLoad.cs line 123]: error CS0234: The type or namespace name 'SceneInfo' does not exist in the namespace 'UnityEditor.SceneManagement' (are you missing an assembly reference?)
+
+ASSEMBLY LOAD FAILURES:
+- Tartaria.Scripts.Editor.dll - COMPILATION FAILED (CS0234 error)
+- 2 dependent assemblies - COMPILATION BLOCKED (waiting for Tartaria.Scripts.Editor.dll)
+
+IDENTIFIED MISSING SCRIPTS (from Editor.log):
+Unity logged 149 generic "The referenced script (Unknown) on this Behaviour is missing!" messages.
+NO GameObject names or script GUIDs were recorded in Editor.log.
+
+Context: These messages appear immediately after "Refreshing native plugins" and BEFORE 
+the compilation error, suggesting they occur during initial asset load when assemblies 
+haven't compiled yet.
+
+ROOT CAUSE HYPOTHESIS:
+======================
+Single Point of Failure: ONE C# error is causing cascading assembly failures.
+
+The error: SceneAnalysisOnLoad.cs uses 'SceneInfo' type which doesn't exist in Unity 6.
+          Unity 6 renamed it to 'Scene' in UnityEditor.SceneManagement namespace.
+
+Impact Chain:
+  1. SceneAnalysisOnLoad.cs fails to compile (CS0234)
+  2. Tartaria.Scripts.Editor.dll fails to build
+  3. 2 dependent assemblies cannot compile (missing references)
+  4. Scripts in those assemblies appear as "missing" in scene
+  5. 308 missing script references are likely:
+     - Scripts from failed assemblies (majority)
+     - Cascading reference failures
+     - Possibly counted per-GameObject (inflating the count)
+
+FIX APPLIED:
+============
+File: Assets\_Project\Scripts\Editor\SceneAnalysisOnLoad.cs
+Line 123: Changed 'UnityEditor.SceneManagement.SceneInfo' to 'Scene'
+
+Expected Result: Once Unity recompiles (automatic within 30s), all assemblies 
+should build successfully and missing script references should resolve.
+
+VERIFICATION STEPS:
+===================
+1. Focus Unity Editor window (triggers automatic recompile)
+2. Wait for compilation to complete (~30 seconds)
+3. Check Console for compilation errors (should be zero)
+4. Open Echohaven_VerticalSlice.unity scene
+5. Check Inspector for missing scripts
+6. Run: TARTARIA > Analyze Echohaven Scene (menu command)
+7. Review: ECHOHAVEN_MISSING_SCRIPTS_REPORT.txt
+
+If missing scripts persist after successful compilation, then they are REAL 
+missing script references (moved/deleted files) rather than compilation artifacts.

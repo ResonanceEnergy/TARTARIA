@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fb11ccbddba1f924fa52578715bc8758, type: 3}
+  m_Name: Moon01_Echohaven_VerticalSlice
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.MoonDefinition
+  number: 1
+  sceneName: Echohaven_VerticalSlice
+  zoneName: Echohaven
+  headline: 'Magnetic Moon: Awakening'
+  aetherWhisper: The song was never lost. It was only buried.
+  companion: 0
+  mechanic: 0
+  fogColor: {r: 0.8, g: 0.75, b: 0.5, a: 1}
+  ambientHigh: {r: 0.6, g: 0.55, b: 0.4, a: 1}
+  ambientLow: {r: 0.15, g: 0.12, b: 0.1, a: 1}
+  fogDensity: 0.035
+  spawnPos: {x: 0, y: 1, z: 0}
+  rsRequirement: 0
+  questId: AwakenStarDome
+  beatHeadlines:
+  - "Discovery — The buried Star Dome calls from the mud."
+  - "Restoration — First resonance scan and dome tuning."
+  - "Conflict — Mud Golems rise. Defend the dig site."
+  - "Climax — The full harmonic chorus ignites the spire."
+  - "Revelation — Milo awakens. The song was always inside you."
+  beatDurations:
+  - 4
+  - 6
+  - 12
+  - 8
+  - 6
+  rewardRS: 0
+  unlockMoonId: 0
+  climaxPrefabKey:

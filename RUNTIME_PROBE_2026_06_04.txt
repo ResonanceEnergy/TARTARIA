@@ -1,0 +1,92 @@
+=== RUNTIME STATE PROBE 2026-06-04 ===
+Application.isPlaying: True
+EditorApplication.isPaused: False
+Time.frameCount: 1
+Time.deltaTime: 0.0200
+Time.realtimeSinceStartup: 18.42
+Time.timeScale: 1
+Application.isFocused: True
+
+--- PLAYER ---
+Player name: Player
+Player.position: (0.00, 0.78, 15.00)
+Player.eulerAngles: (0.00, 0.00, 0.00)
+Player.localScale: (1.00, 1.00, 1.00)
+Player.activeInHierarchy: True
+Player.layer: Player (10)
+Player.tag: Player
+CharacterController.enabled: True
+CharacterController.height: 2
+CharacterController.radius: 0.5
+CharacterController.center: (0.00, 1.00, 0.00)
+CharacterController.velocity: (0.00, 39.00, 0.00)
+CharacterController.isGrounded: True
+PlayerInputHandler.enabled: True
+PlayerInputHandler.IsMoving: False
+PlayerInputHandler.MoveDirection: (0.00, 0.00, 0.00)
+Player.Animator.enabled: True
+Player.Animator.controller: AC_KayKit_Medium
+Player.Animator.avatar: CassianCarterAvatar
+
+Player renderers (incl. children): 1
+  - CassianCarter_Body enabled=True worldPos=(0.00, 1.79, 15.00) bounds.center=(0.03, 1.61, 15.00) bounds.size=(0.94, 1.80, 0.86) mat=CassianCarter_robe shader=Universal Render Pipeline/Lit
+
+_CharacterVisual found:
+  activeInHierarchy: True
+  localPosition: (0.00, 0.00, 0.00)
+  localRotation.euler: (0.00, 0.00, 0.00)
+  localScale: (1.00, 1.00, 1.00)
+  worldPosition: (0.00, 0.78, 15.00)
+  worldRotation.euler: (0.00, 0.00, 0.00)
+  childCount: 1
+  child 0: PlayerVisual_Cassian
+    active: True
+    localPos: (0.00, 0.00, 0.00)
+    localEuler: (0.00, 0.00, 0.00)
+    localScale: (1.00, 1.00, 1.00)
+    worldPos: (0.00, 0.78, 15.00)
+    worldEuler: (0.00, 0.00, 0.00)
+    renderers nested: 1
+      renderer: CassianCarter_Body enabled=True worldPos=(0.00, 1.79, 15.00) bounds.size=(0.94, 1.80, 0.86) mat=CassianCarter_robe shader=Universal Render Pipeline/Lit
+
+--- CAMERA ---
+Camera count in scene: 1
+  - Main Camera enabled=True depth=0 pos=(0.00, 7.59, 4.22) euler=(26.21, 0.00, 0.00) fov=61.2 cullingMask=0xFFFFFFFF
+Camera.main: Main Camera
+Camera.main.position: (0.00, 7.59, 4.22)
+Camera.main.eulerAngles: (26.21, 0.00, 0.00)
+Camera.main.fov: 61.2
+Camera.main.enabled: True
+Camera→Player distance: 12.75
+Camera looking at Player? dot=0.99 (1.0=direct, 0=perpendicular, -1=behind)
+
+CameraController found on: Main Camera
+CameraController.enabled: True
+CameraController.CurrentMode: Exploration
+CameraController.followTarget: Player at (0.00, 0.78, 15.00)
+
+--- INPUT ---
+Gamepad.current: XInputControllerWindows (display=Xbox Controller)
+  leftStick.ReadValue(): (0.00, 0.00) mag=0.00
+  rightStick.ReadValue(): (0.00, 0.00) mag=0.00
+  rightStick.x.ReadValue(): 0.000
+  rightStick.y.ReadValue(): 0.000
+  A/South pressed: False
+Keyboard.current: Keyboard
+  W pressed: False
+  A pressed: False
+  S pressed: False
+  D pressed: False
+Mouse.current: Mouse
+InputSystem.settings.backgroundBehavior: IgnoreFocus
+InputSystem.settings.editorInputBehaviorInPlayMode: AllDeviceInputAlwaysGoesToGameView
+Application.runInBackground: True
+
+--- GAMESTATE ---
+GameStateManager.Instance.CurrentState: Exploration
+GameStateManager.Instance.IsPlaying: True
+GameStateManager.Instance.IsPaused: False
+
+--- SCENE SPAWNERS ---
+Tartaria.Integration.PlayerSpawner on PlayerSpawner enabled=True
+Tartaria.Integration.Moon1PlayerSetup on Moon1_Systems enabled=True

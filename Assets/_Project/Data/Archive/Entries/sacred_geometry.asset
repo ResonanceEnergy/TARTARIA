@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: sacred_geometry
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: sacred_geometry
+  title: "Sacred Geometry \u2014 The Language of Creation"
+  category: 5
+  summary: "All Tartarian architecture, music, and technology is expressed in the
+    same mathematical language: the Fibonacci sequence, the golden ratio \u03C6=1.618,
+    and the geometric relationships derived from them."
+  fullText: "Sacred geometry is the recognition that certain mathematical relationships
+    \u2014 the golden ratio \u03C6, the square root of 2, the Fibonacci sequence,
+    and the proportions of the Platonic solids \u2014 appear at every scale of nature,
+    from the spiral of a nautilus shell to the branching of a river delta to the
+    arrangement of seeds in a sunflower.\r\n\r\nThe golden ratio \u03C6 \u2248 1.618
+    is the most fundamental. It is the only number whose reciprocal differs from
+    itself by exactly 1 (1/\u03C6 = \u03C6 - 1). It describes the ratio between consecutive
+    Fibonacci numbers, the proportions of the human body, the spiral arms of galaxies,
+    and the branching angles of plant stems. Tartarian architects encoded it in every
+    building: the ratio of a building's height to its width, the spacing of columns,
+    the proportions of windows and doors.\r\n\r\nThe practical consequence is resonance.
+    A structure built in golden-ratio proportions has natural harmonic frequencies
+    that align with the Schumann resonance of the Earth's electromagnetic cavity.
+    It 'sings' at the frequencies the Earth sings at. Inhabitants of such buildings
+    benefit from a continuous, subtle form of electromagnetic tuning that keeps their
+    bioelectric systems in synchrony with the natural world.\r\n\r\nThe suppression
+    of sacred geometry from modern architecture and design education was not accidental.
+    Buildings without harmonic proportions create dissonant electromagnetic environments.
+    Research in environmental psychology consistently shows higher stress, aggression,
+    and cognitive impairment in the boxy, arbitrary proportions of modern construction
+    compared to classical or traditional building styles."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - aether_energy
+  - resonance_frequency_432
+  unlockTrigger: discovery
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: "2\u03C0 divided by \u03C6. That is the frequency of a heartbeat
+    that forgets it will stop."

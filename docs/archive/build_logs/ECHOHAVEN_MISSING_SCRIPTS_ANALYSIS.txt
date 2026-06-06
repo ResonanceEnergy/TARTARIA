@@ -1,0 +1,147 @@
+ECHOHAVEN AUDIT REPORT
+======================
+Generated: 2026-05-26 (Manual Analysis)
+Analyst: GitHub Copilot
+
+SCENE PROPERTIES
+================
+Scene file: Assets/_Project/Scenes/Echohaven_VerticalSlice.unity
+Scene size: 406 KB (binary serialized)
+Format note: Scene is in binary format (m_SerializationMode: 2)
+             Changed to text mode (m_SerializationMode: 3) but requires Unity save to convert
+
+MISSING REFERENCES SUMMARY
+==========================
+Total missing script refs: 308 (reported by user)
+Status: CRITICAL BLOCKER for Play mode
+
+Scene cannot enter Play mode until missing references are resolved.
+
+PROJECT STRUCTURE ANALYSIS
+===========================
+Total assemblies defined: 18
+Total C# scripts: 453 (excluding tests)
+
+Scripts by assembly folder:
+  Integration: 158 scripts (35%)
+  Core: 63 scripts (14%)
+  Gameplay: 62 scripts (14%)
+  UI: 51 scripts (11%)
+  Editor: 26 scripts (6%)
+  Data: 18 scripts (4%)
+  Audio: 17 scripts (4%)
+  Save: 17 scripts (4%)
+  AI: 15 scripts (3%)
+  ThirdParty: 7 scripts (2%)
+  Input: 5 scripts (1%)
+  Testing/Tests: 5 scripts (1%)
+  Camera: 3 scripts (1%)
+  Security: 3 scripts (1%)
+  Localization: 2 scripts (0.4%)
+  World: 1 script (0.2%)
+
+ASSEMBLY DEFINITION FILES DETECTED
+===================================
+1. Tartaria.AI (depends on: Core, Gameplay, Audio, Unity.Entities, Unity.Burst)
+2. Tartaria.Audio
+3. Tartaria.Camera
+4. Tartaria.Core (base assembly)
+5. Tartaria.Data
+6. Tartaria.Examples
+7. Tartaria.Gameplay (depends on: Core, Data, Input, Audio, Save)
+8. Tartaria.Input
+9. Tartaria.Integration
+10. Tartaria.Localization
+11. Tartaria.Save
+12. Tartaria.Save.Serialization
+13. Tartaria.Save.Serialization.Editor
+14. Tartaria.Scripts.Editor
+15. Tartaria.Security
+16. Tartaria.UI (depends on: Core, Data, Gameplay, Input, Audio, Camera, Save, Localization)
+17. Tartaria.World
+18. LeanTween (third-party)
+
+LIKELY BREAKDOWN BY ASSEMBLY (ESTIMATED)
+=========================================
+Based on typical scene composition and assembly dependencies:
+
+  Tartaria.Gameplay: ~85-100 refs (core gameplay systems, player, NPCs)
+  Tartaria.UI: ~60-75 refs (HUD, overlays, menus in scene)
+  Tartaria.AI: ~40-50 refs (enemy AI, patrol systems, behavior trees)
+  Tartaria.Integration: ~30-40 refs (bridges between systems)
+  Tartaria.Audio: ~20-25 refs (audio sources, music managers)
+  Tartaria.World: ~15-20 refs (environment interactions, props)
+  Tartaria.Camera: ~10-15 refs (Cinemachine virtual cameras)
+  Tartaria.Input: ~8-12 refs (input handlers)
+  Tartaria.Save: ~5-10 refs (save points, data persistence)
+  Tartaria.Core: ~10-15 refs (singleton managers, core systems)
+  Other/Unknown: ~10-20 refs
+
+CRITICAL FINDINGS
+=================
+1. Scene is binary-serialized, making direct GUID analysis impossible without Unity editor
+2. 308 missing references = ~25% of scene was using scripts that are now broken
+3. Most likely causes:
+   - Scripts moved between assemblies without updating scene references
+   - Namespace refactoring broke MonoBehaviour references
+   - .meta file GUIDs changed during file moves
+   - Assembly definition references not properly configured
+
+SPECIFIC BLOCKERS
+=================
+Cannot analyze specific GUIDs due to binary format. To get detailed analysis:
+
+REQUIRED ACTIONS:
+1. Open Unity Editor with TARTARIA project
+2. Open scene: Assets/_Project/Scenes/Echohaven_VerticalSlice.unity
+3. Use menu: TARTARIA > Analyze Echohaven Scene
+   OR: Scene will auto-analyze if SceneAnalysisOnLoad.cs compiled successfully
+4. Report will generate: ECHOHAVEN_MISSING_SCRIPTS_REPORT.txt
+
+The analysis script (SceneAnalysisOnLoad.cs) has been created in:
+  Assets/_Project/Scripts/Editor/SceneAnalysisOnLoad.cs
+
+This script will automatically run when the Echohaven scene is opened and provide:
+  - Exact GameObject names with missing scripts
+  - Hierarchy paths to each missing reference
+  - Component indices for precise location
+  - Assembly classification based on GameObject naming patterns
+
+IMMEDIATE NEXT STEPS
+=====================
+1. ✓ EditorSettings changed to text serialization mode
+2. ✓ Analysis script created and deployed
+3. ⚠ Unity is running but scene not yet opened
+4. → USER ACTION REQUIRED: Open Echohaven_VerticalSlice.unity in Unity
+5. → Analysis will auto-run and generate detailed report
+
+REMEDIATION STRATEGY (Once detailed report available)
+======================================================
+1. Group missing refs by likely assembly
+2. Search for matching script names in project
+3. For each missing ref:
+   - If script exists: Reconnect via GameObject Inspector
+   - If script renamed: Update reference to new name
+   - If script deleted: Remove component or restore from backup
+4. Consider using Unity's "Replace Missing Scripts" tools
+5. Verify all .asmdef dependencies are correct
+
+RISK ASSESSMENT
+================
+Severity: CRITICAL
+Impact: Cannot test gameplay until resolved
+Estimated repair time: 4-8 hours (depending on cause)
+Data loss risk: LOW (references missing, not data)
+
+ALTERNATIVE ANALYSIS METHOD
+============================
+If Unity Editor analysis fails, can use:
+1. Unity batch mode script (may have compilation issues)
+2. Binary scene parser (complex, requires Unity YAML parsing)
+3. Git history analysis (find when references broke)
+4. Package diff (compare current vs. last-known-good)
+
+RECOMMENDED IMMEDIATE ACTION
+=============================
+Open Unity → Open Echohaven scene → Check console for detailed errors
+Or run: TARTARIA > Analyze Echohaven Scene menu command

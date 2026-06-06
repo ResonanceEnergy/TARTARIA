@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a1c02b07d7da6624e809b630731fe649, type: 3}
+  m_Name: PerformanceProfile_Recommended
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.PerformanceProfile
+  targetFrameRate: 60
+  renderScale: 1
+  enableFSR: 1
+  enableDLSS: 0
+  shadowCascades: 4
+  shadowDistance: 100
+  aetherGridX: 64
+  aetherGridY: 64
+  aetherGridZ: 32
+  aetherCellSize: 2
+  aetherGPUCompute: 1
+  texturesBudget: 2048
+  meshesBudget: 600
+  audioBudget: 200
+  ecsBudget: 400
+  uiBudget: 200
+  lodBias: 1
+  maxDrawDistance: 500
+  maxActiveParticleSystems: 32
+  renderBudget: 8
+  aetherBudget: 2
+  physicsBudget: 1.5
+  aiBudget: 1
+  audioBudgetMs: 0.5
+  inputBudget: 0.3
+  uiFrameBudget: 0.5

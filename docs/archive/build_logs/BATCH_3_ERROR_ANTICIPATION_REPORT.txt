@@ -1,0 +1,176 @@
+## BATCH 3 ERROR ANTICIPATION REPORT
+## Generated: 2026-05-25 21:08:33
+
+═══════════════════════════════════════════════════════════════
+
+### BATCH 3 FILES ANALYZED (10 files, 21-30 by size):
+1. MoonProgressTracker.cs.disabled (6.9 KB) ✓ CLEAN
+2. EchohavenProgressionSystem.cs.disabled (7.5 KB) ⚠️ Minor issues
+3. Moon5AmplificationField.cs.disabled (7.7 KB) ⚠️ Minor issues  
+4. DebugOverlay.cs.disabled (7.7 KB) ✓ CLEAN (ECS)
+5. Moon4AquiferPurge.cs.disabled (8 KB) ⚠️ Minor issues
+6. MoonCompanionSpawner.cs.disabled (8 KB) ❌ BLOCKER
+7. Moon5Components.cs.disabled (8 KB) ❌ BLOCKER
+8. ArchiveManager.cs.disabled (8.3 KB) ❌ BLOCKER
+9. MoonPortalSelector.cs.disabled (8.7 KB) ✓ CLEAN
+10. RuntimeBootValidator.cs.disabled (8.7 KB) ❌ CRITICAL BLOCKER
+
+═══════════════════════════════════════════════════════════════
+
+### PATTERN 1: DISABLED TYPE REFERENCES (❌ HIGH SEVERITY)
+
+**DialogueManager.Instance** - TYPE STILL DISABLED
+Files affected:
+  • MoonCompanionSpawner.cs.disabled (line 166)
+    var dm = DialogueManager.Instance;
+  • Moon5Components.cs.disabled (line 211)
+    DialogueManager.Instance?.PlayContextDialogue(...)
+  • RuntimeBootValidator.cs.disabled (line 82)
+    Check(sb, ""DialogueManager"", DialogueManager.Instance != null);
+
+Impact: Compilation will FAIL - DialogueManager type not found
+Fix strategy: DialogueManager must be enabled BEFORE Batch 3
+
+═══════════════════════════════════════════════════════════════
+
+### PATTERN 2: MASSIVE DEPENDENCY BLOCKER (❌ CRITICAL)
+
+**RuntimeBootValidator.cs** references 20+ disabled types:
+  • CampaignFlowController.Instance
+  • ZoneTransitionSystem.Instance
+  • CombatWaveManager.Instance
+  • WorkshopSystem.Instance
+  • TutorialSystem.Instance
+  • QuestManager.Instance
+  • DialogueManager.Instance
+  • BuildingSpawner (FindAnyObjectByType)
+  • PlayerSpawner (FindAnyObjectByType)
+  • UI.HUDController.Instance
+  • Tartaria.Camera.CameraController (FindAnyObjectByType)
+
+This is a BOOT VALIDATION script that checks for ALL systems.
+Impact: Cannot compile until ALL dependent systems are enabled.
+Recommendation: **DEFER RuntimeBootValidator.cs until Phase 90+**
+
+═══════════════════════════════════════════════════════════════
+
+### PATTERN 3: AnastasiaController DEPENDENCY (❌ HIGH)
+
+**ArchiveManager.cs** (lines 61, 66-68):
+  • AnastasiaController.Instance (event subscription)
+  • AnastasiaController.Instance?.TryDeliverLine(...)
+
+Impact: Compilation FAIL if AnastasiaController not enabled
+Fix: Enable AnastasiaController before ArchiveManager OR
+     add null-safe guards (already present via ?., so minor)
+
+═══════════════════════════════════════════════════════════════
+
+### PATTERN 4: MISSING COMPONENT TYPES (⚠️ MEDIUM)
+
+Files with GetComponent<T> for potentially disabled types:
+
+**Moon5AmplificationField.cs**:
+  • PlayerAbilities (line 41)
+  • PlayerHealth (line 42)
+
+**Moon4AquiferPurge.cs**:
+  • (references Gameplay types via using directives)
+
+Impact: Runtime errors if components don't exist
+Mitigation: All GetComponent calls are null-checked ✓
+
+═══════════════════════════════════════════════════════════════
+
+### PATTERN 5: CAMERA NAMESPACE (✓ ALREADY FIXED)
+
+RuntimeBootValidator.cs lines 113, 188:
+  var cam = UnityEngine.Camera.main;
+
+Status: Already using full namespace qualifier ✓
+No fix needed.
+
+═══════════════════════════════════════════════════════════════
+
+### PATTERN 6: ECS/DOTS USAGE (✓ CLEAN)
+
+**DebugOverlay.cs**:
+  • Uses Unity.Entities, EntityManager, EntityQuery
+  • Properly tracked via ECSMonoBehaviour base
+  • No namespace conflicts
+
+Status: Clean, no issues detected ✓
+
+═══════════════════════════════════════════════════════════════
+
+### PATTERN 7: ASSEMBLY BOUNDARY CHECKS (✓ CLEAN)
+
+All files use appropriate namespaces:
+  • using Tartaria.Core;
+  • using Tartaria.Gameplay;
+  • using Tartaria.Save;
+  • using Tartaria.Audio;
+  • using Tartaria.Input;
+
+No cross-assembly violations detected.
+All Integration → (Core, Gameplay, Save, etc.) references valid ✓
+
+═══════════════════════════════════════════════════════════════
+
+## RED FLAG FILES (LIKELY BLOCKERS)
+
+### ❌ CRITICAL BLOCKER:
+**RuntimeBootValidator.cs.disabled**
+  • Reason: References 20+ systems, most still disabled
+  • Recommendation: SKIP in Batch 3, defer to Phase 90+
+  • Alternative: Create minimal stub version for early phases
+
+### ❌ HIGH BLOCKER:
+**MoonCompanionSpawner.cs.disabled**
+  • Reason: DialogueManager.Instance (line 166)
+  • Fix: Enable DialogueManager first OR comment out line 166-173
+
+**Moon5Components.cs.disabled**
+  • Reason: DialogueManager.Instance (line 211)
+  • Fix: Enable DialogueManager first OR add ?. null-check (already present ✓)
+
+**ArchiveManager.cs.disabled**
+  • Reason: AnastasiaController.Instance (lines 61, 66-68)
+  • Fix: Enable AnastasiaController first OR defer ArchiveManager
+  • Note: Already has null-safe operators, may compile but won't function
+
+### ⚠️ MEDIUM RISK:
+**EchohavenProgressionSystem.cs**
+  • Depends on: SkillTreeSystem, AetherFieldManager, SaveManager
+  • Status: These are Core/Gameplay - likely already enabled
+  • Risk: Low if Core assembly is active
+
+═══════════════════════════════════════════════════════════════
+
+## RECOMMENDED BATCH 3 STRATEGY
+
+### OPTION A: SAFE SUBSET (5 files)
+Enable ONLY files with no blockers:
+  ✓ MoonProgressTracker.cs.disabled
+  ✓ DebugOverlay.cs.disabled
+  ✓ MoonPortalSelector.cs.disabled
+  ✓ EchohavenProgressionSystem.cs.disabled
+  ✓ Moon5AmplificationField.cs.disabled
+
+Skip until dependencies resolved:
+  ⏸ MoonCompanionSpawner.cs.disabled (needs DialogueManager)
+  ⏸ Moon5Components.cs.disabled (needs DialogueManager)
+  ⏸ ArchiveManager.cs.disabled (needs AnastasiaController)
+  ⏸ Moon4AquiferPurge.cs.disabled (safe, but keep batch small)
+  ⏸ RuntimeBootValidator.cs.disabled (defer to Phase 90+)
+
+### OPTION B: AGGRESSIVE WITH STUBS
+1. Enable DialogueManager.cs (if not already)
+2. Enable AnastasiaController.cs (if not already)
+3. Enable all 10 Batch 3 files EXCEPT RuntimeBootValidator
+4. Compile and fix any remaining issues
+
+### OPTION C: COMMENT-OUT WORKAROUND
+Apply preemptive fixes (see below), then enable all except RuntimeBootValidator.
+
+═══════════════════════════════════════════════════════════════

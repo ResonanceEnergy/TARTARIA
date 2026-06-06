@@ -1,0 +1,18 @@
+{
+    "name": "Tartaria.Save",
+    "rootNamespace": "Tartaria.Save",
+    "references": [
+        "Tartaria.Core",
+        "Tartaria.Data",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

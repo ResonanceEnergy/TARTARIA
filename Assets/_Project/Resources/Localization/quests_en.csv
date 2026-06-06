@@ -1,0 +1,7 @@
+key,en,es,fr,de,jp,cn,ru,pt
+# Quest titles - auto-extracted from QuestData assets
+moon1_main,The Awakening,El Despertar,L'Éveil,Das Erwachen,目覚め,觉醒,Пробуждение,O Despertar
+moon1_side_crystals,Crystal Gathering,Recolección de Cristales,Collecte de Cristaux,Kristallsammlung,クリスタル収集,水晶收集,Сбор Кристаллов,Coleta de Cristais
+moon2_main,Echoes of the Grid,Ecos de la Red,Échos du Réseau,Echos des Netzes,グリッドの残響,网格回声,Эхо Сети,Ecos da Grade
+moon2_side_golem,Golem Hunt,Caza de Gólem,Chasse au Golem,Golem-Jagd,ゴーレム狩り,魔像狩猎,Охота на Голема,Caça ao Golem
+moon3_main,The First Tuning,La Primera Sintonización,Le Premier Accord,Die Erste Stimmung,最初のチューニング,第一次调谐,Первая Настройка,A Primeira Sintonia

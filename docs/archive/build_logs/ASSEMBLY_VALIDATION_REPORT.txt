@@ -1,0 +1,41 @@
+ASSEMBLY VALIDATION REPORT
+==========================
+Generated: 2026-05-26 22:58:08
+Total .asmdef files found: 22
+
+Tartaria DLLs compiled: 17
+
+COMPILATION STATUS:
+==================
+
+Core: OK (DLL: 05/26/2026 21:22:36)
+Data: OK (DLL: 05/26/2026 21:22:36)
+Gameplay: OK (DLL: 05/26/2026 21:22:37)
+World: OK (DLL: 05/26/2026 21:22:36)
+UI: OK (DLL: 05/26/2026 21:22:36)
+AI: OK (DLL: 05/26/2026 21:22:36)
+Audio: OK (DLL: 05/26/2026 21:22:37)
+Camera: OK (DLL: 05/26/2026 21:22:36)
+Input: OK (DLL: 05/26/2026 21:22:36)
+Save: OK (DLL: 05/26/2026 21:22:37)
+Security: OK (DLL: 05/26/2026 21:22:36)
+Localization: OK (DLL: 05/26/2026 21:22:36)
+Integration: OK (DLL: 05/26/2026 21:22:36)
+Examples: NO SOURCE FILES (Empty assembly)
+
+SUMMARY:
+Compiling successfully: 13
+Stale/outdated: 0
+Empty assemblies: 1
+
+
+
+NAMESPACE VALIDATION:
+==================================================
+
+Core: OK (sampled 63 files)
+Data: OK (sampled 18 files)
+Gameplay: OK (sampled 62 files)
+UI: OK (sampled 51 files)
+AI: OK (sampled 15 files)
+

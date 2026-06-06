@@ -1,0 +1,47 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6144cc54a2ea3924baa1c0a74e65e446, type: 3}
+  m_Name: mud_golem
+  m_EditorClassIdentifier: Tartaria.Data::Tartaria.Data.EnemyData
+  enemyID: mud_golem
+  displayName: Mud Golem
+  description: Corrupted earth elemental. Slow but durable. Weak to resonance attacks.
+  prefab: {fileID: 0}
+  icon: {fileID: 0}
+  maxHealth: 150
+  moveSpeed: 2.5
+  attackDamage: 15
+  attackRange: 3
+  attackCooldown: 2.5
+  detectionRange: 12
+  archetype: 2
+  specialAbilities: []
+  resistances:
+    physical: 0
+    resonance: 0
+    environmental: 0
+  rsReward: 10
+  xpReward: 50
+  lootTable:
+  - itemID: golem_core
+    dropChance: 0.3
+    minQuantity: 1
+    maxQuantity: 1
+  - itemID: aether_shard
+    dropChance: 0.1
+    minQuantity: 1
+    maxQuantity: 2
+  spawnMoons: 01000000
+  minPlayerLevel: 1
+  attackSound: {fileID: 0}
+  deathSound: {fileID: 0}
+  ambientSound: {fileID: 0}

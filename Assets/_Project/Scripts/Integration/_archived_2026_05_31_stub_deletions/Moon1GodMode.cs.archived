@@ -1,0 +1,6 @@
+// Moon1GodMode.cs - DISABLED
+// Background-input fix moved into the real PlayerInputHandler.cs (Tartaria.Input asmdef)
+// where it actually drives the production player. This file remained as a debug-mode
+// override but caused brace truncation issues; the focus fix is the actual win and
+// lives in PlayerInputHandler.Awake() now.
+namespace Tartaria.Integration { internal static class _Moon1GodMode_Disabled {} }

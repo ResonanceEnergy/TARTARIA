@@ -1,0 +1,74 @@
+# Unity generated
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/[Mm]emoryCaptures/
+
+# IDE
+/.idea/
+/.vs/
+/.vscode/
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Unity asset bundles
+*.unitypackage
+/AssetBundles/
+
+# Crashlytics
+crashlytics-build.properties
+
+# Addressables
+/[Aa]ssets/[Aa]ddressable[Aa]ssets[Dd]ata/*/*.bin*
+/[Aa]ssets/[Ss]treamingAssets/aa.meta
+/[Aa]ssets/[Ss]treamingAssets/aa/*
+
+# IL2CPP
+/[Aa]ssets/Plugins/*/libil2cpp-codegen*.a
+Assets/_Recovery/
+Assets/_Recovery.meta
+Assets/_Project/Logs/
+Assets/_Project/Logs.meta
+*.log
+
+# Cowork sandbox probe files
+.lfs-write-test
+Tools/automate-last-run.log
+Tools/migrate-last-run.log
+
+# Git LFS migration backups
+.git.backup-*
+
+# ─── PBR texture variants we don't use (DirectX normals, raw roughness, preview thumbs) ───
+# Keep NormalGL + Color + Displacement + AO + Metalness; reject the rest
+Assets/_Project/Textures/PBR/**/*_NormalDX.png
+Assets/_Project/Textures/PBR/**/*_Roughness.png
+Assets/_Project/Textures/PBR/**/*_NormalDX.png.meta
+Assets/_Project/Textures/PBR/**/*_Roughness.png.meta
+# AmbientCG preview thumbnails (root of each set)
+Assets/_Project/Textures/PBR/*/[A-Z]*[0-9].png
+Assets/_Project/Textures/PBR/*/[A-Z]*[0-9].png.meta
+
+
+memories/
+
+.local-secrets/

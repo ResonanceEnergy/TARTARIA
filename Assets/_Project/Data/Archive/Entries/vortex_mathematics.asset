@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4ba2460ca539d124d9cfc6c1dead50b8, type: 3}
+  m_Name: vortex_mathematics
+  m_EditorClassIdentifier: Tartaria.Core::Tartaria.Core.ArchiveEntry
+  entryId: vortex_mathematics
+  title: "Vortex Mathematics \u2014 The Pattern Behind All Numbers"
+  category: 5
+  summary: "Mathematician Marko Rodin discovered that the base-10 number system contains
+    a hidden geometric pattern \u2014 the doubling circuit \u2014 that predicts the
+    behaviour of electromagnetic systems and was known to old-world engineers."
+  fullText: "Vortex mathematics begins with a simple observation: if you take any
+    number and repeatedly double it, then reduce each result to a single digit by
+    summing its component digits, you get the sequence 1-2-4-8-7-5-1-2-4-8-7-5, cycling
+    endlessly. The numbers 3, 6, and 9 never appear in this doubling circuit \u2014
+    they form a separate family.\r\n\r\nNikola Tesla, who described 3, 6, and 9 as
+    'the key to the universe', was drawing on this same mathematical structure. The
+    three-six-nine family governs angular momentum, electromagnetic flux, and the
+    organisation of atomic orbitals. The 1-2-4-8-7-5 circuit governs linear force,
+    mass, and thermal dynamics.\r\n\r\nWhen mapped onto a circle, these two families
+    create the geometric basis for the torus \u2014 the donut-shaped energy field
+    that underlies every electromagnetic phenomenon from the electron to the galaxy.
+    Every living organism generates a toroidal bioelectric field. The heart's electrical
+    activity is toroidal. The Earth's magnetosphere is toroidal.\r\n\r\nTartarian
+    engineers used vortex mathematics as their design language. The proportional
+    systems of their buildings, the winding ratios of their electromagnetic devices,
+    and the frequency relationships in their music all derive from the 1-2-4-8-7-5
+    and 3-6-9 patterns. Modern engineers rediscover these ratios empirically and
+    call them 'optimised by experiment' \u2014 not knowing they are rediscovering
+    a complete theoretical framework that was understood millennia ago."
+  thumbnail: {fileID: 0}
+  relatedEntryIds:
+  - sacred_geometry
+  - aether_energy
+  unlockTrigger: rs_75
+  unlockedByDefault: 0
+  moonIndex: 0
+  anastasiaQuote: Three, six, nine. Everything else is counting. Those three numbers
+    are listening.

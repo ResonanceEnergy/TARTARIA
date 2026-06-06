@@ -1,0 +1,13 @@
+﻿<Solution>
+  <Project Path="Tartaria.Editor.csproj" />
+  <Project Path="PrimeTween.Demo.csproj" />
+  <Project Path="Tartaria.Vendor.csproj" />
+  <Project Path="sc.fae.runtime.csproj" />
+  <Project Path="sc.fae.editor.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="IngameDebugConsole.Runtime.csproj" />
+  <Project Path="PrimeTween.Debug.csproj" />
+  <Project Path="PrimeTween.Installer.csproj" />
+  <Project Path="IngameDebugConsole.Editor.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
+</Solution>

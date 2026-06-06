@@ -1,0 +1,326 @@
+{
+  "version": 1,
+  "description": "Tartaria dialogue database — Milo MVP lines (Phase 1 vertical slice)",
+  "lines": [
+    {
+      "id": "milo_disc_01",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "Do you feel that? The ground is humming... Something is buried here!",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_disc_02",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "Look at these proportions \u2014 the golden ratio! This was built with purpose.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_disc_03",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "*ears perk up* I can hear it resonating beneath the mud. A Tartarian structure!",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_disc_04",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "The Aether field is stronger here. Ancient builders knew where to place their cities.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_tune_01",
+      "speaker": "Milo",
+      "context": "tuning_start",
+      "text": "Match the frequency \u2014 432 Hz. The universal tone of healing.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tune_02",
+      "speaker": "Milo",
+      "context": "tuning_start",
+      "text": "Feel the vibration? When it resonates through your whole body, you're close.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_tunesuc_01",
+      "speaker": "Milo",
+      "context": "tuning_success",
+      "text": "Beautiful! The harmonic alignment is perfect. The building remembers!",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_tunesuc_02",
+      "speaker": "Milo",
+      "context": "tuning_success",
+      "text": "Did you feel that cascade? PHI times the base frequency. Pure resonance.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_tunefail_01",
+      "speaker": "Milo",
+      "context": "tuning_fail",
+      "text": "The frequency drifted. Take a breath, find center, and try again.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_tunefail_02",
+      "speaker": "Milo",
+      "context": "tuning_fail",
+      "text": "Almost! Remember \u2014 432 Hz. Not sharper, not flatter. The universe has one key.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_rest_01",
+      "speaker": "Milo",
+      "context": "restoration",
+      "text": "*tail wagging furiously* Look at it RISE! A thousand years of mud, gone! This is what we're fighting for!",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_rest_02",
+      "speaker": "Milo",
+      "context": "restoration",
+      "text": "The building is generating Aether again. Can you feel the field strengthening?",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_rest_03",
+      "speaker": "Milo",
+      "context": "restoration",
+      "text": "They tried to bury this civilization. But resonance doesn't die. It waits.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_cbt_01",
+      "speaker": "Milo",
+      "context": "combat_start",
+      "text": "*growls* Mud Golem! The corruption's fighting back. Use your Resonance Pulse!",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_cbt_02",
+      "speaker": "Milo",
+      "context": "combat_start",
+      "text": "This creature is pure dissonance. Retune it \u2014 don't destroy it. Purify the frequency!",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_cbtvic_01",
+      "speaker": "Milo",
+      "context": "combat_victory",
+      "text": "The Golem dissolved back into clean earth. That's not destruction \u2014 that's restoration.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_cbtvic_02",
+      "speaker": "Milo",
+      "context": "combat_victory",
+      "text": "*happy bark* The corruption weakens. Every Golem purified makes the Aether clearer.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_idle_01",
+      "speaker": "Milo",
+      "context": "exploration_idle",
+      "text": "This place was grand once. The World Fairs showed it to millions, then they buried it.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_idle_02",
+      "speaker": "Milo",
+      "context": "exploration_idle",
+      "text": "Can you feel the ley lines beneath us? 3-6-9... Tesla was onto something.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_idle_03",
+      "speaker": "Milo",
+      "context": "exploration_idle",
+      "text": "Echohaven. Echo of haven. Even the name tells you what was lost.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_idle_04",
+      "speaker": "Milo",
+      "context": "exploration_idle",
+      "text": "The old world ran on free energy. No wires, no bills. Just Aether.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_aw_01",
+      "speaker": "Milo",
+      "context": "aether_wake",
+      "text": "The Aether is flowing freely now! Look \u2014 golden mist! The field is waking up!",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_zs_01",
+      "speaker": "Milo",
+      "context": "zone_shift",
+      "text": "The whole zone is transforming! Color is returning! This is what Echohaven looked like!",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_zc_01",
+      "speaker": "Milo",
+      "context": "zone_complete",
+      "text": "*howling with joy* Echohaven is ALIVE again! Every building singing in harmony!",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_01",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "You can hear it, can't you? The frequency beneath the mud.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_02",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "Try scanning with the Aether lens. The dome should light up with connection points.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_03",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "There! Each glowing node is a tuning point. Match the frequency and the building remembers itself.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_04",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "Your Resonance Score is climbing. When it hits the golden threshold, the zone transforms.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_05",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "That humming is getting stronger. The dome is almost ready to emerge. Keep going!",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_06",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "The fountain! It was hidden beneath the plaza. The dome's resonance revealed it.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_07",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "Something's wrong. The corruption noticed us. Get ready -- I smell wet clay.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_08",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "Use your Resonance Pulse! It disrupts their frequency. Then follow up with a Harmonic Strike.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_09",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "Look at the spire on the southern ridge. That's the third building. The zone is almost whole.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_tutorial_10",
+      "speaker": "Milo",
+      "context": "tutorial",
+      "text": "This is just the beginning. Can you feel it? The world wants to come back.",
+      "oneShot": true,
+      "duration": 0
+    },
+    {
+      "id": "milo_disc_lore_01",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "The mud layer is exactly 1,000 years old. Somebody covered everything at once. Worldwide.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_disc_lore_02",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "Rose windows in every dome. Not for beauty -- for focusing frequency beams. Like satellite dishes.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_disc_lore_03",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "The copper spires weren't ornamental. They were antenna arrays. Harvesting atmospheric energy.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_disc_lore_04",
+      "speaker": "Milo",
+      "context": "discovery",
+      "text": "These floor tiles form a Fibonacci spiral. The whole building is a frequency amplifier.",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_celebration_01",
+      "speaker": "Milo",
+      "context": "zone_shift",
+      "text": "*leaps excitedly* The colors! The light! Every surface is resonating in harmony!",
+      "oneShot": false,
+      "duration": 0
+    },
+    {
+      "id": "milo_celebration_02",
+      "speaker": "Milo",
+      "context": "zone_complete",
+      "text": "We did it! *barks three times* Three buildings, three frequencies, one perfect chord!",
+      "oneShot": false,
+      "duration": 0
+    }
+  ]
+}

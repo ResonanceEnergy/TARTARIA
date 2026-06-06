@@ -1,0 +1,36 @@
+
+    public static class LeanTweenStub
+    {
+        // Empty stub for LeanTween calls - will be replaced by actual library in Phase 2
+    }
+
+    // ───────────────────────────────────────────────────────────────────────
+    // Phase 2 TYPE STUBS for disabled-system references
+    // Delete in Phase 2 when real systems are restored
+    // ───────────────────────────────────────────────────────────────────────
+
+    public enum BossType { None, MudGolem, ResetCaptain, Cassian, Korath, Veritas, Zereth, Anastasia }
+
+    public class BossResult { public string bossName; public float performanceScore; public int rsAwarded; }
+
+    public class BossDefinition { public string bossName; public BossType bossType; public int maxHealth; }
+
+    public class WaveEncounterDef { public string encounterId; public int waveCount; public float rsThreshold; }
+
+    public enum TutorialStep { None, Movement, Discovery, ResonanceVision, FirstTuning, Combat, Restoration, Complete }
+
+    public class AchievementSystem
+    {
+        public class AchievementDef { public string id; public string title; public string description; }
+    }
+
+    public class CampaignFlowController
+    {
+        public enum EndingPath { None, Restoration, Transcendence, Echo, Reset, TrueName }
+    }
+
+    public class AirshipFleetManager
+    {
+        public enum FleetFormation { None, Line, Wedge, Diamond, Cluster, Convoy }
+    }
+}

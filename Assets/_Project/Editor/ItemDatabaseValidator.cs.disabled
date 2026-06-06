@@ -1,0 +1,261 @@
+using UnityEngine;
+using UnityEditor;
+using System.Linq;
+using Tartaria.Data;
+using Tartaria.Core.Enums;
+
+namespace Tartaria.Editor
+{
+    /// <summary>
+    /// ItemDatabase Validator — Post-creation verification tool
+    /// 
+    /// Menu: Tartaria > Validate > Item Database
+    /// 
+    /// Checks:
+    /// - All 40 expected items created
+    /// - No duplicate IDs
+    /// - All items registered in database
+    /// - Category distribution correct (20 consumables, 10 equipment, 10 materials)
+    /// - Rarity distribution reasonable
+    /// - No missing icons/names
+    /// </summary>
+    public static class ItemDatabaseValidator
+    {
+        [MenuItem("Tartaria/Validate/Item Database", priority = 400)]
+        public static void ValidateDatabase()
+        {
+            Debug.Log("[ItemDatabaseValidator] Starting validation...");
+            
+            var db = ItemDatabase.LoadDatabase();
+            if (db == null)
+            {
+                Debug.LogError("[ItemDatabaseValidator] ✗ ItemDatabase not found at Resources/ItemDatabase.asset");
+                EditorUtility.DisplayDialog("Validation Failed", 
+                    "ItemDatabase.asset not found in Resources/\n\nCreate it first via:\nAssets > Create > Tartaria > Item Database", 
+                    "OK");
+                return;
+            }
+
+            int errors = 0;
+            int warnings = 0;
+
+            // Test 1: Item Count
+            var allItems = db.GetAllItems();
+            Debug.Log($"[ItemDatabaseValidator] Total items in database: {allItems.Count}");
+            
+            if (allItems.Count < 40)
+            {
+                Debug.LogWarning($"[ItemDatabaseValidator] ⚠️ Expected 40+ items, found {allItems.Count}");
+                warnings++;
+            }
+            else
+            {
+                Debug.Log($"[ItemDatabaseValidator] ✓ Item count OK ({allItems.Count} items)");
+            }
+
+            // Test 2: Category Distribution
+            var consumables = db.GetItemsByCategory(ItemCategory.Consumable);
+            var equipment = allItems.Where(i => i != null && i.category == ItemCategory.Equipment).ToList();
+            var materials = db.GetItemsByCategory(ItemCategory.Material);
+            
+            Debug.Log($"[ItemDatabaseValidator] Consumables: {consumables.Count} (expected 20+)");
+            Debug.Log($"[ItemDatabaseValidator] Equipment: {equipment.Count} (expected 10+)");
+            Debug.Log($"[ItemDatabaseValidator] Materials: {materials.Count} (expected 10+)");
+            
+            if (consumables.Count < 20) { Debug.LogWarning("[ItemDatabaseValidator] ⚠️ Low consumable count"); warnings++; }
+            if (equipment.Count < 10) { Debug.LogWarning("[ItemDatabaseValidator] ⚠️ Low equipment count"); warnings++; }
+            if (materials.Count < 10) { Debug.LogWarning("[ItemDatabaseValidator] ⚠️ Low material count"); warnings++; }
+
+            // Test 3: Duplicate IDs
+            var duplicates = allItems
+                .Where(i => i != null)
+                .GroupBy(i => i.itemID)
+                .Where(g => g.Count() > 1)
+                .ToList();
+            
+            if (duplicates.Any())
+            {
+                foreach (var dup in duplicates)
+                {
+                    Debug.LogError($"[ItemDatabaseValidator] ✗ Duplicate itemID: '{dup.Key}' ({dup.Count()} instances)");
+                    errors++;
+                }
+            }
+            else
+            {
+                Debug.Log("[ItemDatabaseValidator] ✓ No duplicate item IDs");
+            }
+
+            // Test 4: Missing Fields
+            int missingIcons = 0;
+            int missingNames = 0;
+            int emptyIDs = 0;
+
+            foreach (var item in allItems)
+            {
+                if (item == null) continue;
+
+                if (string.IsNullOrWhiteSpace(item.itemID))
+                {
+                    Debug.LogError($"[ItemDatabaseValidator] ✗ Item '{item.name}' has empty itemID", item);
+                    errors++;
+                    emptyIDs++;
+                }
+
+                if (string.IsNullOrWhiteSpace(item.displayName))
+                {
+                    Debug.LogWarning($"[ItemDatabaseValidator] ⚠️ Item '{item.itemID}' has empty displayName", item);
+                    warnings++;
+                    missingNames++;
+                }
+
+                if (item.icon == null)
+                {
+                    missingIcons++;
+                }
+            }
+
+            if (missingIcons > 0)
+            {
+                Debug.LogWarning($"[ItemDatabaseValidator] ⚠️ {missingIcons} items missing icons (expected for initial creation)");
+                warnings++;
+            }
+            else
+            {
+                Debug.Log("[ItemDatabaseValidator] ✓ All items have icons");
+            }
+
+            if (missingNames == 0)
+            {
+                Debug.Log("[ItemDatabaseValidator] ✓ All items have display names");
+            }
+
+            if (emptyIDs == 0)
+            {
+                Debug.Log("[ItemDatabaseValidator] ✓ All items have valid itemIDs");
+            }
+
+            // Test 5: Check Expected Items
+            string[] expectedNewItems = new[]
+            {
+                "health_potion_minor", "health_potion_greater",
+                "mana_crystal_minor", "mana_crystal", "mana_crystal_greater",
+                "resonance_boost_scroll", "defenders_tonic", "swiftness_elixir", "lucky_charm",
+                "crystal_berry", "smoked_fungus", "travelers_ration", "echohaven_bread", "resonant_stew",
+                "teleport_crystal", "lockpick", "resonance_detector", "camp_beacon",
+                "iron_blade", "resonant_staff",
+                "travelers_vest", "iron_chestplate", "crystal_robes", "echohaven_armor",
+                "bronze_ring", "berserker_belt",
+                "iron_ore", "leather_scrap", "wood_plank", "resonance_dust",
+                "echohaven_stone", "ancient_alloy", "pure_crystal", "resonant_core", "temporal_fragment"
+            };
+
+            int foundCount = 0;
+            foreach (var expectedID in expectedNewItems)
+            {
+                if (db.HasItem(expectedID))
+                {
+                    foundCount++;
+                }
+                else
+                {
+                    Debug.LogWarning($"[ItemDatabaseValidator] ⚠️ Expected item not found: '{expectedID}'");
+                    warnings++;
+                }
+            }
+
+            Debug.Log($"[ItemDatabaseValidator] Found {foundCount}/{expectedNewItems.Length} expected new items");
+
+            // Test 6: Rarity Distribution
+            var rarityGroups = allItems
+                .Where(i => i != null)
+                .GroupBy(i => i.rarity)
+                .OrderBy(g => g.Key)
+                .ToList();
+            
+            Debug.Log("[ItemDatabaseValidator] Rarity distribution:");
+            foreach (var group in rarityGroups)
+            {
+                Debug.Log($"  {group.Key}: {group.Count()} items");
+            }
+
+            // Test 7: Value Distribution (Economy Check)
+            var lowValue = allItems.Where(i => i != null && i.value < 20).Count();
+            var midValue = allItems.Where(i => i != null && i.value >= 20 && i.value < 100).Count();
+            var highValue = allItems.Where(i => i != null && i.value >= 100).Count();
+            
+            Debug.Log($"[ItemDatabaseValidator] Value distribution: Low (<20g): {lowValue}, Mid (20-100g): {midValue}, High (>100g): {highValue}");
+
+            // Test 8: Stack Size Check
+            var stackableItems = allItems.Where(i => i != null && i.stackSize > 1).Count();
+            var nonStackable = allItems.Where(i => i != null && i.stackSize == 1).Count();
+            
+            Debug.Log($"[ItemDatabaseValidator] Stack sizes: Stackable: {stackableItems}, Non-stackable: {nonStackable}");
+
+            // Final Summary
+            Debug.Log("═══════════════════════════════════════════════");
+            if (errors == 0 && warnings == 0)
+            {
+                Debug.Log("[ItemDatabaseValidator] ✅ VALIDATION PASSED — All checks OK!");
+                EditorUtility.DisplayDialog("Validation Passed", 
+                    $"ItemDatabase validation complete!\n\n" +
+                    $"✓ {allItems.Count} items registered\n" +
+                    $"✓ {foundCount}/{expectedNewItems.Length} expected items found\n" +
+                    $"✓ No errors detected\n\n" +
+                    $"Distribution:\n" +
+                    $"  Consumables: {consumables.Count}\n" +
+                    $"  Equipment: {equipment.Count}\n" +
+                    $"  Materials: {materials.Count}\n\n" +
+                    $"Ready for integration testing!",
+                    "OK");
+            }
+            else if (errors == 0)
+            {
+                Debug.LogWarning($"[ItemDatabaseValidator] ⚠️ VALIDATION PASSED WITH WARNINGS — {warnings} warnings found");
+                EditorUtility.DisplayDialog("Validation Passed (Warnings)", 
+                    $"ItemDatabase validation complete with warnings.\n\n" +
+                    $"Errors: 0\n" +
+                    $"Warnings: {warnings}\n\n" +
+                    $"Check Console for details.\n" +
+                    $"Most warnings are expected (e.g., missing icons).",
+                    "OK");
+            }
+            else
+            {
+                Debug.LogError($"[ItemDatabaseValidator] ✗ VALIDATION FAILED — {errors} errors, {warnings} warnings");
+                EditorUtility.DisplayDialog("Validation Failed", 
+                    $"ItemDatabase validation failed!\n\n" +
+                    $"Errors: {errors}\n" +
+                    $"Warnings: {warnings}\n\n" +
+                    $"Check Console for details.",
+                    "OK");
+            }
+        }
+
+        [MenuItem("Tartaria/Validate/Item Database (Quick)", priority = 401)]
+        public static void QuickValidate()
+        {
+            var db = ItemDatabase.LoadDatabase();
+            if (db == null)
+            {
+                Debug.LogError("[ItemDatabaseValidator] ItemDatabase not found");
+                return;
+            }
+
+            var count = db.GetAllItems().Count;
+            var consumables = db.GetItemsByCategory(ItemCategory.Consumable).Count;
+            var materials = db.GetItemsByCategory(ItemCategory.Material).Count;
+            
+            Debug.Log($"[ItemDatabaseValidator] Quick check: {count} total, {consumables} consumables, {materials} materials");
+            
+            if (count >= 40)
+            {
+                Debug.Log("[ItemDatabaseValidator] ✓ Item count OK");
+            }
+            else
+            {
+                Debug.LogWarning($"[ItemDatabaseValidator] ⚠️ Expected 40+ items, found {count}");
+            }
+        }
+    }
+}

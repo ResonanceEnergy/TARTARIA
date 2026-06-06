@@ -1,0 +1,32 @@
+TARTARIA Spring Sale Purchase Tracking
+Generated: 2026-04-29 14:37:07
+──────────────────────────────────────────────────────────
+
+ITEMS TO PURCHASE (6 total):
+
+[ ] Fantasy Adventure Environment -- $2.25
+[ ] Modular Fantasy Kingdom -- $150.00
+[ ] Polygon Character Pack -- $25.00
+[ ] Realistic Water VFX -- $22.49
+[ ] Feel -- $25.00
+[ ] Motion Library -- $10.00
+
+Expected Total: $234.74
+
+──────────────────────────────────────────────────────────
+CHECKLIST:
+[ ] All items added to cart
+[ ] Cart total matches expected
+[ ] Promo code applied (if available)
+[ ] Payment completed
+[ ] Receipt email saved
+[ ] Assets appear in 'My Assets'
+[ ] Imported into Unity project
+[ ] No Console errors after import
+[ ] Build pipeline GREEN after import
+
+──────────────────────────────────────────────────────────
+NOTES:
+
+(Add any price discrepancies, issues, or observations here)
+

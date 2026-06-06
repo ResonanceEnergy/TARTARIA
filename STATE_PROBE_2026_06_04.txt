@@ -1,0 +1,24 @@
+=== STATE PROBE 2026-06-04 ===
+Player _CharacterVisual children: 1
+  - PlayerVisual_Cassian (renderers: 1)
+
+--- NPC Animator wiring ---
+Milo: ctrl=AC_KayKit_Medium avatar=null collider=h=0.40 r=0.25 c=0.20
+Anastasia: ctrl=AC_KayKit_Medium avatar=null collider=h=2.00 r=0.40 c=1.00
+Lirael: ctrl=AC_KayKit_Medium avatar=null collider=h=2.00 r=0.40 c=1.00
+Cassian: ctrl=AC_KayKit_Medium avatar=null collider=h=2.00 r=0.40 c=1.00
+
+--- MudGolem prefab ---
+MudGolem tag=Enemy renderers=1 MBs=3
+  MB: Tartaria.AI.MudGolemAI
+  MB: Tartaria.AI.MudGolemHealth
+  MB: Tartaria.AI.MudGolemLootDrop
+
+--- Music layers ---
+  ambient_layer1: 60.0s
+  ambient_layer2: 60.0s
+  ambient_layer3: 60.0s
+  ambient_layer4: 60.0s
+
+--- HUD_Root.prefab ---
+HUD_Root.prefab: EXISTS children=11 path=Assets/_Project/Resources/Prefabs/UI/HUD_Root.prefab

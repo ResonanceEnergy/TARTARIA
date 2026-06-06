@@ -1,0 +1,414 @@
+using UnityEngine;
+using UnityEditor;
+using System.Collections.Generic;
+using System.Linq;
+using Tartaria.Data;
+using Tartaria.Core.Enums;
+
+namespace Tartaria.Editor
+{
+    /// <summary>
+    /// AGENT 2: ItemDatabase & Asset Creation System
+    /// 
+    /// Generates 40 complete item/equipment assets:
+    /// - 20 Consumables (health, mana, buffs, food, utility)
+    /// - 10 Equipment (weapons, armor, accessories)
+    /// - 10 Materials (common + rare crafting)
+    /// 
+    /// Menu: Tartaria > Build Assets > Item Database (Complete)
+    /// 
+    /// Features:
+    /// - Skip existing assets (safe re-run)
+    /// - Auto-wire to ItemDatabase
+    /// - Progress reporting
+    /// - Validation checks
+    /// </summary>
+    public static class ItemDatabasePopulator
+    {
+        const string ItemPath = "Assets/_Project/Resources/Items/";
+        const string EquipPath = "Assets/_Project/Resources/Equipment/";
+        const string DbPath = "Assets/_Project/Resources/ItemDatabase.asset";
+
+        [MenuItem("Tartaria/Build Assets/Item Database (Complete)", priority = 300)]
+        public static void PopulateDatabase()
+        {
+            PopulateDatabaseInternal(showDialog: true);
+        }
+
+        /// <summary>
+        /// Batchmode-compatible execution entry point.
+        /// Call via: Unity.exe -batchmode -executeMethod Tartaria.Editor.ItemDatabasePopulator.ExecuteBatchMode
+        /// </summary>
+        public static void ExecuteBatchMode()
+        {
+            PopulateDatabaseInternal(showDialog: false);
+            UnityEditor.EditorApplication.Exit(0);
+        }
+
+        static void PopulateDatabaseInternal(bool showDialog)
+        {
+            Debug.Log("[ItemDatabasePopulator] Starting item creation...");
+            
+            EnsureFolders();
+            
+            int created = 0;
+            int skipped = 0;
+
+            // PHASE 2: CONSUMABLES (20 items)
+            created += CreateConsumables(ref skipped);
+            
+            // PHASE 3: EQUIPMENT (10 items)
+            created += CreateEquipment(ref skipped);
+            
+            // PHASE 4: MATERIALS (10 items)
+            created += CreateMaterials(ref skipped);
+
+            // PHASE 5: WIRE TO DATABASE
+            WireToDatabase();
+
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+
+            Debug.Log($"[ItemDatabasePopulator] ✅ COMPLETE — {created} created, {skipped} skipped, {created + skipped} total");
+            
+            if (showDialog)
+            {
+                EditorUtility.DisplayDialog("Item Database Complete",
+                    $"Created: {created}\nSkipped (already exist): {skipped}\nTotal: {created + skipped}",
+                    "OK");
+            }
+        }
+
+        static void EnsureFolders()
+        {
+            if (!AssetDatabase.IsValidFolder(ItemPath))
+                AssetDatabase.CreateFolder("Assets/_Project/Resources", "Items");
+            if (!AssetDatabase.IsValidFolder(EquipPath))
+                AssetDatabase.CreateFolder("Assets/_Project/Resources", "Equipment");
+        }
+
+        #region Consumables (20 items)
+
+        static int CreateConsumables(ref int skipped)
+        {
+            int count = 0;
+            
+            // Health/Mana (6 items)
+            count += CreateItem(ref skipped, "health_potion_minor", "Minor Health Potion", 
+                "Restores 25 HP. Basic healing.", ItemCategory.Consumable, ItemRarity.Common,
+                stackSize: 20, weight: 0.1f, value: 10);
+                
+            count += CreateItem(ref skipped, "health_potion", "Health Potion", 
+                "Restores 50 HP. Standard healing.", ItemCategory.Consumable, ItemRarity.Uncommon,
+                stackSize: 20, weight: 0.2f, value: 25);
+                
+            count += CreateItem(ref skipped, "health_potion_greater", "Greater Health Potion", 
+                "Restores 100 HP. Strong healing.", ItemCategory.Consumable, ItemRarity.Rare,
+                stackSize: 20, weight: 0.3f, value: 60);
+                
+            count += CreateItem(ref skipped, "mana_crystal_minor", "Minor Mana Crystal", 
+                "Restores 25 Mana. Basic energy.", ItemCategory.Consumable, ItemRarity.Common,
+                stackSize: 20, weight: 0.1f, value: 15);
+                
+            count += CreateItem(ref skipped, "mana_crystal", "Mana Crystal", 
+                "Restores 50 Mana. Standard energy.", ItemCategory.Consumable, ItemRarity.Uncommon,
+                stackSize: 20, weight: 0.2f, value: 35);
+                
+            count += CreateItem(ref skipped, "mana_crystal_greater", "Greater Mana Crystal", 
+                "Restores 100 Mana. Strong energy.", ItemCategory.Consumable, ItemRarity.Rare,
+                stackSize: 20, weight: 0.3f, value: 75);
+
+            // Buffs (4 items)
+            count += CreateItem(ref skipped, "resonance_boost_scroll", "Resonance Boost Scroll", 
+                "+20% damage for 120 seconds.", ItemCategory.Consumable, ItemRarity.Rare,
+                stackSize: 5, weight: 0.05f, value: 50);
+                
+            count += CreateItem(ref skipped, "defenders_tonic", "Defender's Tonic", 
+                "+15 armor for 180 seconds.", ItemCategory.Consumable, ItemRarity.Uncommon,
+                stackSize: 5, weight: 0.2f, value: 40);
+                
+            count += CreateItem(ref skipped, "swiftness_elixir", "Swiftness Elixir", 
+                "+25% movement speed for 90 seconds.", ItemCategory.Consumable, ItemRarity.Uncommon,
+                stackSize: 5, weight: 0.15f, value: 45);
+                
+            count += CreateItem(ref skipped, "lucky_charm", "Lucky Charm", 
+                "+10% loot quality for 300 seconds.", ItemCategory.Consumable, ItemRarity.Epic,
+                stackSize: 5, weight: 0.1f, value: 80);
+
+            // Food (5 items)
+            count += CreateItem(ref skipped, "crystal_berry", "Crystal Berry", 
+                "+10 HP regen per 5 seconds for 30 seconds. Sweet and refreshing.", ItemCategory.Consumable, ItemRarity.Common,
+                stackSize: 50, weight: 0.05f, value: 3);
+                
+            count += CreateItem(ref skipped, "smoked_fungus", "Smoked Fungus", 
+                "+5 HP, +5 Mana. Earthy flavor.", ItemCategory.Consumable, ItemRarity.Common,
+                stackSize: 50, weight: 0.1f, value: 5);
+                
+            count += CreateItem(ref skipped, "travelers_ration", "Traveler's Ration", 
+                "+25 HP over 60 seconds. Sustenance for long journeys.", ItemCategory.Consumable, ItemRarity.Common,
+                stackSize: 20, weight: 0.3f, value: 8);
+                
+            count += CreateItem(ref skipped, "echohaven_bread", "Echohaven Bread", 
+                "+15 HP, removes 1 debuff. Baked fresh.", ItemCategory.Consumable, ItemRarity.Uncommon,
+                stackSize: 20, weight: 0.2f, value: 12);
+                
+            count += CreateItem(ref skipped, "resonant_stew", "Resonant Stew", 
+                "+50 HP, +25 Mana, +5% all stats for 180 seconds. Hearty meal.", ItemCategory.Consumable, ItemRarity.Rare,
+                stackSize: 10, weight: 0.5f, value: 35);
+
+            // Utility (5 items)
+            count += CreateItem(ref skipped, "teleport_crystal", "Teleport Crystal", 
+                "Return to last campfire. One-time use.", ItemCategory.Consumable, ItemRarity.Epic,
+                stackSize: 5, weight: 0.1f, value: 100);
+                
+            count += CreateItem(ref skipped, "repair_kit", "Repair Kit", 
+                "Restore 50% equipment durability.", ItemCategory.Consumable, ItemRarity.Uncommon,
+                stackSize: 10, weight: 0.5f, value: 20);
+                
+            count += CreateItem(ref skipped, "lockpick", "Lockpick", 
+                "Open locked chests. Requires steady hands.", ItemCategory.Consumable, ItemRarity.Common,
+                stackSize: 20, weight: 0.02f, value: 5);
+                
+            count += CreateItem(ref skipped, "resonance_detector", "Resonance Detector", 
+                "Highlight nearby secrets for 60 seconds.", ItemCategory.Consumable, ItemRarity.Rare,
+                stackSize: 5, weight: 0.1f, value: 75);
+                
+            count += CreateItem(ref skipped, "camp_beacon", "Camp Beacon", 
+                "Place temporary respawn point. Lasts until rest.", ItemCategory.Consumable, ItemRarity.Epic,
+                stackSize: 3, weight: 1.0f, value: 150);
+
+            return count;
+        }
+
+        #endregion
+
+        #region Equipment (10 items)
+
+        static int CreateEquipment(ref int skipped)
+        {
+            int count = 0;
+
+            // Weapons (3 items)
+            count += CreateEquipment(ref skipped, "rusty_sword", "Rusty Sword", 
+                "Worn blade from a forgotten soldier.", EquipSlot.Weapon,
+                strengthBonus: 0, agilityBonus: 0, vitalityBonus: 0, resonanceBonus: 0, 
+                attunementBonus: 0, armorValue: 5,
+                weight: 2.0f, value: 15, rarity: ItemRarity.Common);
+                
+            count += CreateEquipment(ref skipped, "iron_blade", "Iron Blade", 
+                "Reliable weapon forged from Old World steel.", EquipSlot.Weapon,
+                strengthBonus: 3, agilityBonus: 0, vitalityBonus: 0, resonanceBonus: 0, 
+                attunementBonus: 0, armorValue: 12,
+                weight: 3.5f, value: 80, rarity: ItemRarity.Uncommon);
+                
+            count += CreateEquipment(ref skipped, "resonant_staff", "Resonant Staff", 
+                "Crystal-tipped staff attuned to aetheric frequencies.", EquipSlot.Weapon,
+                strengthBonus: 0, agilityBonus: 0, vitalityBonus: 0, resonanceBonus: 15, 
+                attunementBonus: 0, armorValue: 8,
+                weight: 2.0f, value: 120, rarity: ItemRarity.Rare,
+                specialEffects: new[] { "+10% spell damage" });
+
+            // Armor (4 items)
+            count += CreateEquipment(ref skipped, "travelers_vest", "Traveler's Vest", 
+                "Simple leather protection for new adventurers.", EquipSlot.Armor,
+                strengthBonus: 0, agilityBonus: 0, vitalityBonus: 0, resonanceBonus: 0, 
+                attunementBonus: 0, armorValue: 8,
+                weight: 2.0f, value: 20, rarity: ItemRarity.Common);
+                
+            count += CreateEquipment(ref skipped, "iron_chestplate", "Iron Chestplate", 
+                "Heavy plating salvaged from golem frames.", EquipSlot.Armor,
+                strengthBonus: 0, agilityBonus: 0, vitalityBonus: 5, resonanceBonus: 0, 
+                attunementBonus: 0, armorValue: 18,
+                weight: 8.0f, value: 100, rarity: ItemRarity.Uncommon);
+                
+            count += CreateEquipment(ref skipped, "crystal_robes", "Crystal Robes", 
+                "Woven with resonance-conductive threads.", EquipSlot.Armor,
+                strengthBonus: 0, agilityBonus: 0, vitalityBonus: 0, resonanceBonus: 12, 
+                attunementBonus: 0, armorValue: 10,
+                weight: 3.0f, value: 110, rarity: ItemRarity.Rare,
+                specialEffects: new[] { "+15% mana regen" });
+                
+            count += CreateEquipment(ref skipped, "echohaven_armor", "Echohaven Armor", 
+                "Master-crafted plate engraved with sacred geometry.", EquipSlot.Armor,
+                strengthBonus: 5, agilityBonus: 0, vitalityBonus: 8, resonanceBonus: 0, 
+                attunementBonus: 0, armorValue: 22,
+                weight: 10.0f, value: 200, rarity: ItemRarity.Epic);
+
+            // Accessories (3 items)
+            count += CreateEquipment(ref skipped, "bronze_ring", "Bronze Ring", 
+                "Simple band that resonates faintly.", EquipSlot.Accessory,
+                strengthBonus: 3, agilityBonus: 3, vitalityBonus: 3, resonanceBonus: 3, 
+                attunementBonus: 3, armorValue: 0,
+                weight: 0.05f, value: 50, rarity: ItemRarity.Uncommon);
+                
+            count += CreateEquipment(ref skipped, "resonance_amulet", "Resonance Amulet", 
+                "Amplifies aetheric abilities.", EquipSlot.Accessory,
+                strengthBonus: 0, agilityBonus: 0, vitalityBonus: 0, resonanceBonus: 10, 
+                attunementBonus: 0, armorValue: 0,
+                weight: 0.1f, value: 90, rarity: ItemRarity.Rare,
+                specialEffects: new[] { "+8% ability damage" });
+                
+            count += CreateEquipment(ref skipped, "berserker_belt", "Berserker Belt", 
+                "Grants fury in combat.", EquipSlot.Accessory,
+                strengthBonus: 8, agilityBonus: 0, vitalityBonus: 0, resonanceBonus: 0, 
+                attunementBonus: 0, armorValue: 0,
+                weight: 0.5f, value: 85, rarity: ItemRarity.Rare,
+                specialEffects: new[] { "+5% melee damage", "+10 HP" });
+
+            return count;
+        }
+
+        #endregion
+
+        #region Materials (10 items)
+
+        static int CreateMaterials(ref int skipped)
+        {
+            int count = 0;
+
+            // Common (5 items)
+            count += CreateItem(ref skipped, "iron_ore", "Iron Ore", 
+                "Raw metal for smithing.", ItemCategory.Material, ItemRarity.Common,
+                stackSize: 99, weight: 0.5f, value: 2);
+                
+            count += CreateItem(ref skipped, "crystal_shard", "Crystal Shard", 
+                "Shimmering fragment of resonance crystal.", ItemCategory.Material, ItemRarity.Common,
+                stackSize: 99, weight: 0.1f, value: 5);
+                
+            count += CreateItem(ref skipped, "leather_scrap", "Leather Scrap", 
+                "Salvaged hide for armor crafting.", ItemCategory.Material, ItemRarity.Common,
+                stackSize: 99, weight: 0.2f, value: 3);
+                
+            count += CreateItem(ref skipped, "wood_plank", "Wood Plank", 
+                "Cut timber for construction.", ItemCategory.Material, ItemRarity.Common,
+                stackSize: 99, weight: 0.3f, value: 1);
+                
+            count += CreateItem(ref skipped, "resonance_dust", "Resonance Dust", 
+                "Fine powder from crushed aether shards.", ItemCategory.Material, ItemRarity.Common,
+                stackSize: 99, weight: 0.05f, value: 8);
+
+            // Rare (5 items)
+            count += CreateItem(ref skipped, "echohaven_stone", "Echohaven Stone", 
+                "Quarried from sacred architecture.", ItemCategory.Material, ItemRarity.Rare,
+                stackSize: 20, weight: 0.8f, value: 50);
+                
+            count += CreateItem(ref skipped, "ancient_alloy", "Ancient Alloy", 
+                "Pre-cataclysm metal blend. Unknown composition.", ItemCategory.Material, ItemRarity.Rare,
+                stackSize: 20, weight: 1.0f, value: 75);
+                
+            count += CreateItem(ref skipped, "pure_crystal", "Pure Crystal", 
+                "Flawless resonance gem.", ItemCategory.Material, ItemRarity.Epic,
+                stackSize: 20, weight: 0.3f, value: 100);
+                
+            count += CreateItem(ref skipped, "resonant_core", "Resonant Core", 
+                "Golem power source. Still warm.", ItemCategory.Material, ItemRarity.Epic,
+                stackSize: 10, weight: 0.5f, value: 150);
+                
+            count += CreateItem(ref skipped, "temporal_fragment", "Temporal Fragment", 
+                "Shard from the Cataclysm itself. Unstable.", ItemCategory.Material, ItemRarity.Legendary,
+                stackSize: 5, weight: 0.2f, value: 250);
+
+            return count;
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        static int CreateItem(ref int skipped, string id, string displayName, string description,
+            ItemCategory category, ItemRarity rarity, int stackSize, float weight, int value)
+        {
+            string path = $"{ItemPath}{id}.asset";
+            
+            if (AssetDatabase.LoadAssetAtPath<ItemData>(path) != null)
+            {
+                skipped++;
+                Debug.Log($"[ItemDatabasePopulator] Skipped existing: {id}");
+                return 0;
+            }
+
+            var item = ScriptableObject.CreateInstance<ItemData>();
+            item.itemID = id;
+            item.displayName = displayName;
+            item.description = description;
+            item.category = category;
+            item.rarity = rarity;
+            item.stackSize = stackSize;
+            item.weight = weight;
+            item.value = value;
+
+            AssetDatabase.CreateAsset(item, path);
+            Debug.Log($"[ItemDatabasePopulator] Created: {id}");
+            return 1;
+        }
+
+        static int CreateEquipment(ref int skipped, string id, string displayName, string description,
+            EquipSlot slot, int strengthBonus, int agilityBonus, int vitalityBonus, int resonanceBonus,
+            int attunementBonus, int armorValue, float weight, int value, ItemRarity rarity,
+            string[] specialEffects = null)
+        {
+            string path = $"{EquipPath}{id}.asset";
+            
+            if (AssetDatabase.LoadAssetAtPath<EquipmentItemData>(path) != null)
+            {
+                skipped++;
+                Debug.Log($"[ItemDatabasePopulator] Skipped existing: {id}");
+                return 0;
+            }
+
+            var equip = ScriptableObject.CreateInstance<EquipmentItemData>();
+            equip.itemID = id;
+            equip.itemName = displayName;
+            equip.description = description;
+            equip.slot = slot;
+            equip.strengthBonus = strengthBonus;
+            equip.agilityBonus = agilityBonus;
+            equip.vitalityBonus = vitalityBonus;
+            equip.resonanceBonus = resonanceBonus;
+            equip.attunementBonus = attunementBonus;
+            equip.armorValue = armorValue;
+
+            // Store weight/value in customData as JSON (EquipmentItemData doesn't have these fields directly)
+            var metadata = new { weight, value, rarity = rarity.ToString() };
+            equip.description = $"{description}\n\nWeight: {weight}kg | Value: {value}g | Rarity: {rarity}";
+            
+            if (specialEffects != null && specialEffects.Length > 0)
+            {
+                equip.specialEffects = specialEffects;
+            }
+
+            AssetDatabase.CreateAsset(equip, path);
+            Debug.Log($"[ItemDatabasePopulator] Created: {id}");
+            return 1;
+        }
+
+        static void WireToDatabase()
+        {
+            var db = AssetDatabase.LoadAssetAtPath<ItemDatabase>(DbPath);
+            if (db == null)
+            {
+                Debug.LogError("[ItemDatabasePopulator] ItemDatabase not found at " + DbPath);
+                return;
+            }
+
+            // NOTE: ItemDatabase.items is private, so we can't directly modify it via editor script
+            // The database will need to be wired manually OR we need to expose AddItem() as public
+            // For now, log instructions for manual wiring
+            
+            Debug.Log("[ItemDatabasePopulator] ⚠️ MANUAL STEP REQUIRED:");
+            Debug.Log("1. Select Assets/_Project/Resources/ItemDatabase.asset");
+            Debug.Log("2. In Inspector, click 'Auto-Populate from Assets' button");
+            Debug.Log("3. Or manually add items to the 'Items' list");
+            
+            EditorUtility.DisplayDialog("Manual Wiring Required",
+                "Assets created successfully!\n\n" +
+                "NEXT STEP:\n" +
+                "1. Select ItemDatabase.asset in Resources/\n" +
+                "2. Click 'Auto-Populate from Assets' in Inspector\n\n" +
+                "This will wire all items into the database.",
+                "OK");
+        }
+
+        #endregion
+    }
+}

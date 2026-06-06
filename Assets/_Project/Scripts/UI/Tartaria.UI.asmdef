@@ -1,0 +1,28 @@
+{
+    "name": "Tartaria.UI",
+    "rootNamespace": "Tartaria.UI",
+    "references": [
+        "Tartaria.Core",
+        "Tartaria.Data",
+        "Tartaria.Gameplay",
+        "Tartaria.Input",
+        "Tartaria.Audio",
+        "Tartaria.Camera",
+        "Tartaria.Save",
+        "Tartaria.Localization",
+        "LeanTween",
+        "Unity.TextMeshPro",
+        "Unity.RenderPipelines.Universal.Runtime",
+        "Unity.RenderPipelines.Core.Runtime",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

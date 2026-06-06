@@ -1,0 +1,32 @@
+=== MOON 1 SHIP-VERIFY 2026-06-04 ===
+Project: C:/dev/TARTARIA_new/Assets
+Scene: Assets/_Project/Scenes/Echohaven_VerticalSlice.unity
+Time: 6/5/2026 12:07:18 AM
+
+✅ A1.1 ColorSpace = Linear  (Linear)
+✅ A1.2 Default RP = TartariaURP  (TartariaURP)
+✅ A1.3 PlayerSettings.runInBackground = true  (True)
+✅ A1.4 Input System alive  (Keyboard.current = True)
+✅ A1.6 Build scenes count >= 15  (count = 15)
+✅ A1.7 NavMesh baked (triangles > 0)  (170 triangles)
+✅ A1.8 Required tags present (6)  (6/6 found)
+✅ A1.9 Required layers present  (4/4 matched)
+✅ A1.10 Time.fixedDeltaTime = 0.02  (0.02000)
+✅ A2.1 Player.prefab has CharacterController + PIH  (loaded: True)
+✅ A2.2 Player.Animator has AC_KayKit_Medium  (AC_KayKit_Medium)
+✅ A2.3 Player.Animator.avatar = CassianCarterAvatar  (CassianCarterAvatar)
+✅ A2.5 Player visual: _CharacterVisual + PlayerVisual_Cassian present  (yes)
+✅ A2.6 All 4 NPC FBXs have valid Humanoid Avatars  (4/4)
+✅ A3.1 Exactly 1 active Main Camera in scene  (count = 1)
+✅ A3.2 _SpawnPlatform BoxCollider isTrigger = true  (isTrigger = True)
+✅ A3.9 PlayerSpawner present  (at (0.00, 2.00, 15.00))
+✅ A5.1 4 adaptive music layers each >=30s in Resources  (4/4)
+✅ A1.12 AudioListener wired (scene + Player.prefab)  (scene = 0, player.prefab = True)
+✅ A6.1 MudGolem.prefab (Resources) tag=Enemy + AI wired  (tag=Enemy AI=True)
+✅ A7.1 Editor not compiling  (clean)
+✅ C Animator states >= 6 (Locomotion + Idle/Attack/Hit/Die/Talk)  (states = 6, params = 7)
+
+TOTAL: 22 pass, 0 fail (of 22)
+
+🎉 ALL §A1–A7 ROWS GREEN — disk-side lockdown 100% verified.
+   §B runtime artifacts (NATRIX-driven playtest) is the only thing between this state and Moon 1 GATE 1 done.
