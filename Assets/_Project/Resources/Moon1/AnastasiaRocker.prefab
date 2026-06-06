@@ -63,7 +63,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5644302017889477615}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 9e03e5efda52b6d4bbdcd567204fed0d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.Moon1AnastasiaProximityListener
   parent: {fileID: 0}
@@ -385,7 +385,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7207436299173447095}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: 622b9079f3117284ab7e8d0b051cae97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.Moon1ChairRockAnimator
   amplitudeDeg: 6

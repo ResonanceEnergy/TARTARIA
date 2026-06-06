@@ -102,39 +102,8 @@ namespace Tartaria.Integration
         }
     }
 
-    /// <summary>
-    /// Gentle back-and-forth rock animation for a rocking-chair GameObject.
-    /// Authored onto the chair root inside AnastasiaRocker.prefab by Moon1AnastasiaRockerBake.
-    /// </summary>
-    public class Moon1ChairRockAnimator : MonoBehaviour
-    {
-        public float amplitudeDeg = 6f;
-        public float speed = 1.2f;
-        float _phase;
-
-        void Awake() { _phase = Random.Range(0f, Mathf.PI * 2f); }
-
-        void Update()
-        {
-            float angle = Mathf.Sin(Time.time * speed + _phase) * amplitudeDeg;
-            var e = transform.localEulerAngles;
-            transform.localEulerAngles = new Vector3(angle, e.y, e.z);
-        }
-    }
-
-    /// <summary>
-    /// Listens for player proximity and notifies the rocker parent.
-    /// Authored onto the trigger child inside AnastasiaRocker.prefab; the parent ref
-    /// is wired up by Moon1AnastasiaRocker at runtime (prefab-safe).
-    /// </summary>
-    public class Moon1AnastasiaProximityListener : MonoBehaviour
-    {
-        public Moon1AnastasiaRocker parent;
-        void OnTriggerEnter(Collider other)
-        {
-            if (parent == null) return;
-            if (!other.CompareTag("Player") && other.GetComponentInParent<CharacterController>() == null) return;
-            parent.NotifyPlayerNearby();
-        }
-    }
+    // Moon1ChairRockAnimator and Moon1AnastasiaProximityListener were split into their
+    // own files (2026-06-06): MonoBehaviours sharing a file get no MonoScript asset and
+    // can never be serialized into prefabs — the cause of the m_Script {fileID: 0} bug
+    // in AnastasiaRocker.prefab.
 }
