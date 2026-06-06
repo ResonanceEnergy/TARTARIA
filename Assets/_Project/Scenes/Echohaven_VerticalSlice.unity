@@ -1588,7 +1588,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 350220300}
+    m_TransformParent: {fileID: 1004374908}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 4a6a8884afce9a146938aad290870dd0, type: 3}
       propertyPath: m_LocalScale.x
@@ -1612,7 +1612,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4a6a8884afce9a146938aad290870dd0, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -33
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4a6a8884afce9a146938aad290870dd0, type: 3}
       propertyPath: m_LocalRotation.w
@@ -2953,10 +2953,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2110151823}
   - {fileID: 1187866888}
-  - {fileID: 196473408}
-  - {fileID: 1261479512}
   - {fileID: 1754953038}
   - {fileID: 1015949154}
   - {fileID: 1233201303}
@@ -11312,6 +11309,40 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 919693052481794079, guid: c0c4b4564c5dc6c48adb4a681a426c5b, type: 3}
   m_PrefabInstance: {fileID: 1004060938}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1004374907
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1004374908}
+  m_Layer: 0
+  m_Name: Echohaven_Cathedral
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1004374908
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1004374907}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 33}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1261479512}
+  - {fileID: 2110151823}
+  - {fileID: 196473408}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1005371992
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -12802,6 +12833,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 5942663867549528569, guid: 650f4f776bd628640a8bd71bad9f22d1, type: 3}
   m_PrefabInstance: {fileID: 1121582876}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1123149173
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1123149175}
+  - component: {fileID: 1123149174}
+  m_Layer: 0
+  m_Name: SaveManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1123149174
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123149173}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6c5ca6dc6f0b4b419645792486651e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Save::Tartaria.Save.SaveManager
+  autoSaveIntervalSeconds: 10
+  enableEncryption: 1
+  enableCompression: 1
+--- !u!4 &1123149175
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1123149173}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1136529744
 GameObject:
   m_ObjectHideFlags: 0
@@ -14204,7 +14282,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 350220300}
+    m_TransformParent: {fileID: 1004374908}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 6fdd321596e64374192581bfe22bf2ef, type: 3}
       propertyPath: m_LocalScale.x
@@ -14228,7 +14306,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6fdd321596e64374192581bfe22bf2ef, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 33
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 6fdd321596e64374192581bfe22bf2ef, type: 3}
       propertyPath: m_LocalRotation.w
@@ -21553,6 +21631,53 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 4921416668348704204, guid: e5352ee226c627b43a94c0815636e00d, type: 3}
   m_PrefabInstance: {fileID: 1892437078}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1901531546
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1901531548}
+  - component: {fileID: 1901531547}
+  m_Layer: 0
+  m_Name: AdaptiveMusicController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1901531547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901531546}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cb7b645e1e8efb478ad67a2050961c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Audio::Tartaria.Audio.AdaptiveMusicController
+  masterVolume: 0.6
+  combatVolumeBoost: 1.2
+  crossfadeSpeed: 0.8
+--- !u!4 &1901531548
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1901531546}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1902766419
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -24578,7 +24703,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 350220300}
+    m_TransformParent: {fileID: 1004374908}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 44ce7f90da578584592c0307265bc153, type: 3}
       propertyPath: m_LocalScale.x
@@ -24602,7 +24727,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 44ce7f90da578584592c0307265bc153, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 28
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 44ce7f90da578584592c0307265bc153, type: 3}
       propertyPath: m_LocalRotation.w
@@ -25080,3 +25205,6 @@ SceneRoots:
   - {fileID: 1287864570}
   - {fileID: 2057084461}
   - {fileID: 784965145}
+  - {fileID: 1004374908}
+  - {fileID: 1123149175}
+  - {fileID: 1901531548}
