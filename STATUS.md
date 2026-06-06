@@ -2,6 +2,25 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 AUTONOMOUS R32 — Save/load + variant routing verified
+
+**Save/load roundtrip — WORKS:**
+- `SaveManager.Save()` → wrote `save_slot_0.dat` (14,880 bytes) + 3 rolling backups + cloud upload pending
+- `QuickSave()` → OK
+- `QuickLoad()` → OK, no exception
+- Building state preservation verified: fountain stays `Revealed` after roundtrip
+- `PauseAndGameOverMenu` GameObject present in scene (F5/F9 hotkey UI target)
+- 33 public SaveManager methods including SwitchToSlot, GetAvailableSlots, CompressPayloadForCloud — Steam Cloud integration alive
+
+**Variant routing — design-correct (lazy-add):**
+- 3 hero buildings (spire, fountain, dome) each have `TuningMiniGame` (Variant A)
+- `TuningVariantB_Waveform` + `TuningVariantC_Pattern` components are NOT pre-attached — per C.L5 (`519d0c52`) `DispatchToBuildingVariant` switch lazily adds them when the building reaches node 2/3
+- 0 `TuningPedestalLink` instances active — pedestals dispatch via `DispatchTuningByVariant` only after first restoration node lights
+
+**No new gaps found** — the Moon 1 core loop (Discover → Interact → Tune → Save) is functional end-to-end via the programmatic smoke test.
+
+---
+
 ## 2026-06-06 AUTONOMOUS R30-R31 — Audit false-positives debunked + Real 8-step smoke test GREEN
 
 **R30 — Audit false-positives debunked:**
