@@ -1,13 +1,31 @@
 ﻿<Solution>
+  <Project Path="Tartaria.Integration.csproj" />
   <Project Path="Tartaria.Editor.csproj" />
+  <Project Path="Tartaria.Data.csproj" />
+  <Project Path="Tartaria.Gameplay.csproj" />
+  <Project Path="Tartaria.Core.csproj" />
+  <Project Path="Tartaria.Scripts.Editor.csproj" />
+  <Project Path="Tartaria.UI.csproj" />
   <Project Path="PrimeTween.Demo.csproj" />
+  <Project Path="Tartaria.Camera.csproj" />
+  <Project Path="LeanTween.csproj" />
+  <Project Path="Tartaria.Save.csproj" />
   <Project Path="Tartaria.Vendor.csproj" />
+  <Project Path="Tartaria.Audio.csproj" />
+  <Project Path="Tartaria.Save.Serialization.csproj" />
   <Project Path="sc.fae.runtime.csproj" />
+  <Project Path="Tartaria.AI.csproj" />
   <Project Path="sc.fae.editor.csproj" />
   <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Tartaria.Input.csproj" />
   <Project Path="IngameDebugConsole.Runtime.csproj" />
   <Project Path="PrimeTween.Debug.csproj" />
+  <Project Path="Tartaria.Security.csproj" />
+  <Project Path="Tartaria.Combat.csproj" />
   <Project Path="PrimeTween.Installer.csproj" />
+  <Project Path="Tartaria.Localization.csproj" />
   <Project Path="IngameDebugConsole.Editor.csproj" />
+  <Project Path="Tartaria.World.csproj" />
+  <Project Path="Tartaria.Save.Editor.csproj" />
   <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>
