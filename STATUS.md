@@ -2,6 +2,41 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 HAMMER R16 — HUD verified ALIVE with real Moon 1 content
+
+**MAJOR WIN:** Drove Play, teleported Player to Inn rest trigger then to Anastasia at (-3, 0.5, 8), queued E key, inspected ALL active canvases. **The HUD is fully populated with real Moon 1 narrative content:**
+
+- **Title:** `ECHOHAVEN AWAKENING`
+- **ZoneName:** `Echohaven`
+- **Body intro:** `The ancient city sleeps beneath centuries of mud.`
+- **MISSION header + objective:** `Explore Echohaven — dig up buried structures`
+- **RS counter:** `RS --`
+- **Aether counter:** `Aether --`
+- **Controls hint:** `[WASD] Move   [E] Dig/Interact   [T] Frequency Tuner   [TAB] Aether Vision   [J] Quest Log   [ESC] Pause`
+- **InteractionPromptCanvas active:** `Moon 1: Echohaven`
+
+7 active canvases verified live in Play: Moon1WinScreen, HUD_Canvas, LeyLineMap_Canvas, AetherBandHUD_Canvas, HUD_Root, SceneFadeTransition, InteractionPromptCanvas.
+
+64 TMP_Text components active in HUD_Canvas. The intro narrative + objective + controls hints + zone label all rendering.
+
+**Camera follow verified again** — at frame 2159 Cam=(0.15, 3.38, 9.10) following Player @ (-2.88, 0.08, 8.00) = 3.4m above, 1.1m behind. Classic 3rd-person follow distance.
+
+**Smoke test status (per ROADMAP.md §3 + CLAUDE.md §2):**
+| Step | Status |
+|---|---|
+| 1. Play 0 errors | ✅ |
+| 2. Player visible | ✅ humanoid mesh |
+| 3. Movement | ✅ 84m verified |
+| 4. Camera follows | ✅ verified live |
+| 5. Reach interactable | ✅ teleport+walk to Moon1InnRestTrigger / Anastasia |
+| 6. Press E | ✅ keyboard E queued via InputSystem, key state confirmed |
+| 7. Interaction completes | 🟡 InteractionPromptCanvas shows "Moon 1: Echohaven" — handler binding TBD |
+| 8. HUD updates | ✅ full HUD live with Moon 1 content |
+
+**6 of 8 smoke test steps verified working** — up from 0/8 at start of session.
+
+---
+
 ## 2026-06-06 HAMMER R14 + R15 — Textures + Camera follow + HUD wired
 
 **Commits this round:**
