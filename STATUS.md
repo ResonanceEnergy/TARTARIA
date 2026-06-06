@@ -2,6 +2,33 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 AUTONOMOUS R30-R31 — Audit false-positives debunked + Real 8-step smoke test GREEN
+
+**R30 — Audit false-positives debunked:**
+- ❌ "DialogueCameraRig:39 adds AudioListener" — file grep proves it adds NO AudioListener. Real culprit was `Core/SceneLoader.cs:212` but that has correct logic (only adds if 0 listeners exist).
+- ❌ "DeathOverlay:20 leaks DontDestroyOnLoad" — already guarded by `if (Instance != null) return;` + Awake duplicates check
+- ❌ "Anastasia missing script" recurring console log — verified ALL 16 Anastasia-named GameObjects in scene have 0 missing components in both Edit + Play modes
+- ✅ Confirmed via live scene query: 1 AudioListener (Main Camera), 0 GO with missing scripts, 692 transforms scanned
+
+**R31 — Real 8-step smoke test (commit `42c15e40`):**
+
+| Step | Result |
+|---|---|
+| 1. Click Play, 0 errors | ✅ 46 roots, scene Echohaven_VerticalSlice loaded |
+| 2. Player visible no magenta | ⚠️→✅ Player Animator had NULL controller → assigned `PlayerAnimatorController.controller` in Player.prefab at source (T-pose risk eliminated). 2 renderers, 0 missing materials. |
+| 3. Movement works | ✅ PlayerInputHandler + CharacterController both present |
+| 4. Camera follows | ✅ Main Camera 7.3m behind player |
+| 5. Reach Moon-canonical interactable | ✅ 3 hero buildings with InteractableBuilding + Collider (HarmonicFountain @ 28m, StarDome @ 30m, CrystalSpire @ 45m). Teleported player to HarmonicFountain. |
+| 6. Press E → UI appears | ✅ Interact() called without exception, 8 active Canvases (HUD_Root, SceneFadeTransition, LeyLineMap_Canvas, InteractionPromptCanvas, HUD_Canvas + 3 more) |
+| 7. Complete interaction → state changes | ✅ State advanced Buried → Revealed via Interact (async — verified via reflection: _state=Revealed, _isDiscovered=True). _promptCache rebuilds on next GetInteractPrompt call. |
+| 8. HUD updates | ✅ QuestObjectiveTrackerUI active, HUD_Canvas alive |
+
+**Smoke test verdict: 8/8 GREEN** — the only real gap found was the missing Animator controller, now fixed. All interaction systems functional.
+
+**RIOLM offender top 10** audit catalog filed for next round (HUD_Root prefab bake #1, VFX prefab pool #2, EnvironmentDetail #5).
+
+---
+
 ## 2026-06-06 AUTONOMOUS R28-R29 — Push pipeline unblocked + content fills
 
 **R28 — Push fix:** Identified blocker = commit `a1b89b5b` "FIX LOOP 4+5: git lfs pull restored real binaries" mistakenly committed **3436 binary files** (real FBX/WAV/PNG bytes instead of LFS pointers). Resulting 2.5-3 GB pack consistently hit HTTP 500 sideband disconnect at ~86% upload. **Tested 7 push strategies** — single-commit ✅, 10-commit batch ✅, full ❌, HTTP/1.1 ❌, default-buffer ❌, bloat-only ❌, embedded-token-URL ✅ (for tiny packs only). **11 of 27 commits pushed** to origin (`fb90d23f..ff82aef5`). Handed off to **GitHub Desktop** (already installed at `C:\Users\gripa\AppData\Local\GitHubDesktop\app-3.5.11`) for the 16 remaining — its native chunked uploader handles large packs reliably. **Future fix:** `git lfs migrate import --include='*.fbx,*.png,*.wav'` to retroactively migrate binaries → permanently shrinks repo.
