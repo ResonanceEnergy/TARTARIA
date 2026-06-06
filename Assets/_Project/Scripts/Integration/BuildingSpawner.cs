@@ -321,7 +321,9 @@ namespace Tartaria.Integration
                 var rock = Instantiate(prefab, pos, Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f));
                 rock.name = $"Rock_{i}";
                 rock.transform.SetParent(root.transform);
-                rock.transform.localScale *= 0.7f + (float)rng.NextDouble() * 0.8f;
+                // R20 FIX: replace, not multiply — prefab FBX bounds were already 100m+ via stale Blender export.
+                // Was: rock.transform.localScale *= 0.7f + (float)rng.NextDouble() * 0.8f; (compounded ×100)
+                rock.transform.localScale = Vector3.one * (0.7f + (float)rng.NextDouble() * 0.8f);
             }
 
             // Scatter bushes
@@ -337,7 +339,8 @@ namespace Tartaria.Integration
                     var bush = Instantiate(prefab, pos, Quaternion.Euler(0f, (float)rng.NextDouble() * 360f, 0f));
                     bush.name = $"Bush_{i}";
                     bush.transform.SetParent(root.transform);
-                    bush.transform.localScale *= 0.8f + (float)rng.NextDouble() * 0.6f;
+                    // R20 FIX: replace, not multiply — Blender bush prefab is ~100m. Use absolute target scale.
+                    bush.transform.localScale = Vector3.one * (0.8f + (float)rng.NextDouble() * 0.6f);
                 }
             }
 
@@ -354,7 +357,8 @@ namespace Tartaria.Integration
                     var tree = Instantiate(prefab, pos, Quaternion.identity);
                     tree.name = $"Tree_{i}";
                     tree.transform.SetParent(root.transform);
-                    tree.transform.localScale *= 0.9f + (float)rng.NextDouble() * 0.4f;
+                    // R20 FIX: replace, not multiply — Blender tree prefab is ~100m. Use absolute target scale.
+                    tree.transform.localScale = Vector3.one * (0.9f + (float)rng.NextDouble() * 0.4f);
                 }
             }
 
