@@ -32,9 +32,9 @@ namespace Tartaria.Integration
         bool  _isFading   = false;
         Coroutine _active = null;
 
-        // ── bootstrap ──────────────────────────────────────────────────────────
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        static void Bootstrap()
+        // ── bootstrap (R26 DEDUP: Tartaria.UI.SceneFadeTransition is canonical, this one disabled) ──
+        // [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)] // R26 disabled — duplicate of UI.SceneFadeTransition.Bootstrap
+        static void Bootstrap_R26_DISABLED()
         {
             if (_instance != null) return;
             var go = new GameObject("SceneFadeTransition");
