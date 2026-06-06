@@ -2,35 +2,35 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
-**Last supervisor check-in:** 2026-06-05 23:48 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:33; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST). **NEW P1: .git/index is CORRUPT (`bad signature 0x00000000` — index file corrupt). All git ops + supervisor Gates A/C/F are blocked. Sandbox cannot repair (`.git/index` rm = permission denied). NATRIX must run locally: `del .git\index && git reset` (working tree is safe). Then restart run_loop.ps1 + re-roll 23-26.**
+**Last supervisor check-in:** 2026-06-05 18:33 — v2.0 gates run. reconciled=0 reverted=3 flagged=0 queue=0 done=21 failed=7
 **Prior check-in:** 2026-06-05 23:33 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. loop DEAD (run_loop.log frozen at 14:50), git was clean.
 **Prior check-in:** 2026-06-05 23:18 — NO-OP, queue unchanged. done=21 failed=5 queued=2 smoke=none. No new _done/_failed since 23:03; loop still DEAD (run_loop.log frozen at 14:50 on _MANIFEST).
 
 <!-- DASHBOARD:BEGIN -->
-### Loop dashboard — last 24 h (refreshed 16:56:59)
+### Loop dashboard — last 24 h (refreshed 18:33:52)
 
 | Metric | Value |
 |---|---|
-| Tickets processed | **26** |
+| Tickets processed | **28** |
 | Applied | 21 |
-| Failed | 5 |
-| Success rate | **80.8%** |
-| Avg gen time | 13680 ms |
-| Avg apply time | 240 ms |
-| Avg output size | 2859 chars |
-| Total compute | 356s |
-| Auto-branches on origin | 3 |
+| Failed | 7 |
+| Success rate | **75%** |
+| Avg gen time | 13280 ms |
+| Avg apply time | 260 ms |
+| Avg output size | 2695 chars |
+| Total compute | 372s |
+| Auto-branches on origin | 5 |
 **By model:**
 
 | model | count | applied |
 |---|---|---|
-| qwen-tartaria | 26 | 21 |
+| qwen-tartaria | 28 | 21 |
 
 **Top errors:**
 
 | count | error |
 |---|---|
-| 5 | apply_outputs.py exit 1 |
+| 7 | apply_outputs.py exit 1 |
 
 <!-- DASHBOARD:END -->
 **Last updated:** 2026-06-05 13:28 (DEEP HAMMER R435 — 6 new Blender prefabs (Fountain/Cart/MarketStall/Fence/Lantern/Bell) + Windmill + 17th-hour music + AnastasiaRocker = 9 new content prefabs, 41 placements in scene. v22 shows real village.)
