@@ -193,4 +193,17 @@ namespace Tartaria.Editor
             string[] categories = { "Architecture", "Audio", "NPCs", "Plates", "Props", "VFX" };
             foreach (var cat in categories)
             {
-                string subPath = prefabDir + "/" + c
+                string subPath = prefabDir + "/" + cat + "/" + baseName + ".prefab";
+                if (File.Exists(subPath)) return;
+            }
+
+            // Instantiate the FBX and save it as a prefab variant for direct scene use.
+            var instance = (GameObject)PrefabUtility.InstantiatePrefab(fbx);
+            if (instance == null) return;
+            PrefabUtility.SaveAsPrefabAsset(instance, prefabPath);
+            Object.DestroyImmediate(instance);
+            Debug.Log($"[BlenderImport] Generated prefab variant: {prefabPath}");
+        }
+    }
+}
+#endif
