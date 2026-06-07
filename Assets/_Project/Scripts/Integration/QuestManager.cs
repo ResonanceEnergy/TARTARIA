@@ -197,12 +197,14 @@ namespace Tartaria.Integration
             {
                 LoadFromQuestDatabase();
             }
-            // Fallback to legacy quest array
-            else if (questDatabase != null)
+            // Fallback to legacy quest array (must have entries — Unity initializes SerializeField
+            // arrays as Length=0 empty arrays, not null, so the original `!= null` check was always true
+            // on a freshly-added QuestManager and starved the builder fallback. R38 bugfix.)
+            else if (questDatabase != null && questDatabase.Length > 0)
             {
                 LoadFromLegacyArray();
             }
-            // Last resort: auto-populate from builder
+            // Last resort: auto-populate from builder (Moons 1-13)
             else
             {
                 LoadFromBuilder();
