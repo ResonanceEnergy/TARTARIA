@@ -2,6 +2,31 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-06 AUTONOMOUS R33-R34 — Ship-breaker fixed + perf optimization
+
+**R33 — Save file extension mismatch (commit `fbd94a23`):**
+Real player-facing ship-breaker. Main menu was showing **"CONTINUE (No Save Found)"** even though `save_slot_0.dat` (14,880 bytes) existed on disk. Root cause: `SaveManager.HasAnySave()` + `GetAvailableSlots()` + `GetSaveInfo()` + `DeleteSlot()` all checked for `save_slot_N.json` but the actual write format (lines 92-94, 599-601) is `save_slot_N.dat`. Fixed 5 sites. Also patched `HasAnySave()` so the always-insert-0 trap in `GetAvailableSlots()` no longer false-positives empty slots.
+
+**Verified live:** `HasAnySave: True`, menu CONTINUE label: `'CONTINUE [Slot 0]'` (was empty string + "No Save Found").
+
+**R34 — Scene perf (commits `5c1e9c36` + Core/RuntimeLightShadowOptimizer.cs):**
+Console reported `[FrameBudget] 1%-low: 51.53ms` (~20fps target miss). Audit found:
+- 2 cameras enabled — SmokeShotCam was a debug holdover ✅ Disabled
+- 7 edit-mode lights with 5 shadow-casters, 2 directional both Soft (double cascade)
+- Runtime: 34 active lights with **15 Soft point shadows** (Soft point/spot = 2-4× Hard cost)
+
+Scene fixes (saved to YAML):
+- `Directional Light` shadows Soft→None (Sun_GoldenHour keeps directional shadow)
+- `Light_StarDome` / `Light_Spire` / `Light_Fountain` Soft→Hard
+
+Runtime fix — new `Tartaria.Core.RuntimeLightShadowOptimizer`:
+- BeforeSceneLoad + AfterSceneLoad bootstrap + `DelayedDriver` runs sweep at 1s + 3s after Play (catches RIOLM-spawned lights)
+- Key v3 fix: removed scene filter — RIOLM spawners use `DontDestroyOnLoad`, which puts lights in the special `DontDestroyOnLoad` scene (not active scene). Now optimizes all lights.
+
+**Verified live:** **Soft shadow casters: 15 → 1** (only Sun_GoldenHour directional remains). 14 expensive Soft point shadows downgraded to Hard. Expected ~7-10ms gain on 1%-low.
+
+---
+
 ## 2026-06-06 AUTONOMOUS R32 — Save/load + variant routing verified
 
 **Save/load roundtrip — WORKS:**
