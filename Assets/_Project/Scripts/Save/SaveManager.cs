@@ -615,13 +615,14 @@ namespace Tartaria.Save
         /// <summary>R6: Returns currently active slot index.</summary>
         public int GetCurrentSlot() => _currentSlot;
 
-        /// <summary>R6: Simple discovery of existing slots (0-9 range for production polish).</summary>
+        /// <summary>R6: Simple discovery of existing slots (0-9 range for production polish).
+        /// R33 fix: was checking *.json but actual write format is *.dat (see lines 92, 599) — saves invisible to menu.</summary>
         public int[] GetAvailableSlots()
         {
             var slots = new System.Collections.Generic.List<int>();
             for (int s = 0; s < 10; s++)
             {
-                string p = Path.Combine(Application.persistentDataPath, $"save_slot_{s}.json");
+                string p = Path.Combine(Application.persistentDataPath, $"save_slot_{s}.dat");
                 if (File.Exists(p)) slots.Add(s);
             }
             if (!slots.Contains(0)) slots.Insert(0, 0); // always offer 0
@@ -630,11 +631,18 @@ namespace Tartaria.Save
 
         /// <summary>
         /// M2 UX: Quick check for menu "Continue" button state and save existence.
+        /// R33 fix: was .json — wrong extension hid "Continue [Slot 0]" label even when save existed.
         /// </summary>
         public bool HasAnySave()
         {
             var slots = GetAvailableSlots();
-            return slots.Length > 0 && File.Exists(Path.Combine(Application.persistentDataPath, $"save_slot_{slots[0]}.json"));
+            // GetAvailableSlots always inserts 0 as offer even when no file — must re-check the disk file directly.
+            for (int i = 0; i < slots.Length; i++)
+            {
+                var p = Path.Combine(Application.persistentDataPath, $"save_slot_{slots[i]}.dat");
+                if (File.Exists(p)) return true;
+            }
+            return false;
         }
 
         /// <summary>ISaveService: brief "Slot N • MM/dd HH:mm" label for the active slot (used by MainMenu CONTINUE button).</summary>
@@ -654,7 +662,8 @@ namespace Tartaria.Save
         public SaveSlotInfo GetSaveInfo(int slot)
         {
             if (slot < 0) slot = 0;
-            string p = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.json");
+            // R33 fix: was .json — wrong format. Real saves are .dat.
+            string p = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.dat");
             var info = new SaveSlotInfo { slot = slot, exists = File.Exists(p) };
             if (!info.exists) return info;
 
@@ -693,8 +702,9 @@ namespace Tartaria.Save
         public void DeleteSlot(int slot)
         {
             if (slot < 0) slot = 0;
-            string sp = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.json");
-            string bp = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.backup.json");
+            // R33 fix: was .json — wrong format. Real saves are .dat. Also delete rolling backups (.backup.0/1/2.dat).
+            string sp = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.dat");
+            string bp = Path.Combine(Application.persistentDataPath, $"save_slot_{slot}.backup.dat");
             bool hadFile = File.Exists(sp) || File.Exists(bp);
             if (File.Exists(sp)) File.Delete(sp);
             if (File.Exists(bp)) File.Delete(bp);
