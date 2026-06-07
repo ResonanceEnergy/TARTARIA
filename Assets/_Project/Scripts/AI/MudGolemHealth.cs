@@ -145,6 +145,14 @@ namespace Tartaria.AI
             OnDeath?.Invoke();
             OnAnyGolemDied?.Invoke(this);
 
+            // R42 — also call the visible LootDrop spawner (cubes + RS coin pickup)
+            // so the player sees physical loot pop out, not just an invisible inventory grant.
+            if (_dropLootOnDeath)
+            {
+                var lootDrop = GetComponent<MudGolemLootDrop>();
+                if (lootDrop != null) lootDrop.DropLoot(killer);
+            }
+
             // Drop loot (random aether shards or moon-specific materials)
             int lootCount = 0;
             string lootItem = "aether_shard";
