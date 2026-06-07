@@ -73,7 +73,15 @@ rsCoin.GetComponentsInChildren<Renderer>()) r.sharedMaterial = mat;
             }
 
             rsCoin.AddComponent<Rigidbody>().mass = 0.3f;
-            rsCoin.AddComponent<SphereCollider>().radius = 0.6f;
+            // R44 — mutate the SphereCollider that CreatePrimitive(Sphere) added so it's a trigger.
+            // _LootRSCoin.OnTriggerEnter requires isTrigger=true to fire the +8 RS grant.
+            // Adding a second collider + destroying the first led to deferred-Destroy ordering bugs.
+            var primCollider = rsCoin.GetComponent<SphereCollider>();
+            if (primCollider != null)
+            {
+                primCollider.radius = 0.6f;
+                primCollider.isTrigger = true;
+            }
         }
     }
 
