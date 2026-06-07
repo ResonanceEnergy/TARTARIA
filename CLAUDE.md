@@ -4,6 +4,40 @@
 
 ---
 
+## ✅ 2026-06-07 R124 — LFS PULL ROOT CAUSE FIXED + NO PURCHASE NEEDED
+
+Per NATRIX: *"SEARCH ALL VISUAL ASSETS IN REPO BEFORE WE BUY ANYTHING DONT BE LAZY ALSO RUN THE POWERSHILL FIGURE IT OUT"*
+
+**Diagnosed + fixed the LFS pull problem in this session.** Three things were wrong simultaneously:
+
+1. **`.git/config` had `lfs.skipsmudge=true` + `lfs.fetchexclude=*` + `lfs.pushexclude=*`** — someone deliberately disabled LFS at clone time. `git config --unset` cleared them.
+2. **`.git/config` had `filter.lfs.required=false`** overriding the `true` value, with duplicate filter entries. `git lfs install --local --force` rewrote the section.
+3. **`.gitattributes` had the section HEADERS but no LFS filter rules** — someone deleted lines like `*.fbx filter=lfs diff=lfs merge=lfs -text`. So even when smudge ran, git had nothing to apply. The rules are now restored in the file.
+
+After the 3 fixes + `git lfs pull` + `git checkout HEAD --` on a sample file: **church FBX 130 B → 63,628 B verified**. Then `git lfs pull` repo-wide: **0 stubs remain, 1289 real FBX, 373 real PNG, 477 WAV, 53 EXR/HDR, total 4.4 GB**.
+
+**KEY RESULT — `Assets/_Project/Resources/Models/Buildings/KayKit_Hexagon/` IS A COMPLETE MEDIEVAL VILLAGE KIT ALREADY ON DISK** (18 FBX, 40–179 KB each):
+- `building_church_blue.fbx` (63 KB) → **Cathedral substitute**
+- `building_castle_blue.fbx` (179 KB) → **StarDome alt / hero building**
+- `building_tavern_blue.fbx` (111 KB) → **Inn**
+- `building_blacksmith_blue.fbx` (93 KB) → **Smithy**
+- `building_home_A/B_blue.fbx` (47/59 KB) → **Cottages A/B/C** variants
+- `building_market_blue.fbx` (111 KB) → **Bakery / TownHall**
+- `building_watermill_blue.fbx` (74 KB) / `building_windmill_blue.fbx` (103 KB) → **Mill**
+- `building_tower_A/B/base/catapult_blue.fbx` → **Watchtower** + variants
+- `building_barracks_blue.fbx` (133 KB) → **Apothecary / TownHall**
+- `building_well_blue.fbx` (40 KB), `building_lumbermill_blue.fbx` (117 KB), `building_mine_blue.fbx` (52 KB), `building_archeryrange_blue.fbx` (134 KB)
+
+**Plus**: `Assets/_Project/Resources/Models/Buildings/FantasyRuins/` 12 .DAE for buried/ruined state. `ModularDungeon2/` 90 modular mesh files. `Assets/Fantasy Adventure Environment/` 35 FBX + 77 prefabs for vegetation/rocks/trees. `Assets/Hovl Studio/` 76 VFX prefabs. `Assets/Free Low Poly Modular Character Pack - Fantasy Dream/` 22 FBX + 217 character prefabs.
+
+**Phase 5 of FOUNDATIONS plan revised — no Synty / Kenney / Quixel purchase needed.** Existing vendor kit covers all 12 Moon 1 buildings + ruined-state cathedral + vegetation + VFX + character variants.
+
+### What Phase 6 will look like
+
+For each spec'd building, write Prefab Variants of the matching KayKit_Hexagon FBX (or directly drop into scene YAML). Stop relying on `EchohavenContentSpawner.cs` building-spawn methods.
+
+---
+
 ## 🏗️🏗️🏗️ 2026-06-07 FOUNDATIONS FIRST MANDATE (supersedes content-volume framing)
 
 Per NATRIX, end of audit session: *"UPDATE ALL SYSTEM .MD FILES GET ALIGNED KEEP HAMMERING BUILD THIS PROPERLY MAKE A REALISTIC PLAN AND IMPLEMENTATION PROTOCOL"*

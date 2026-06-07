@@ -66,9 +66,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d552ad047d075444d8342caa3ce942fa, type: 3}
       insertIndex: -1
       addedObject: {fileID: 8234651612641585243}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d552ad047d075444d8342caa3ce942fa, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 2453325571369683831}
   m_SourcePrefab: {fileID: 100100000, guid: d552ad047d075444d8342caa3ce942fa, type: 3}
 --- !u!1 &2013630315831097239 stripped
 GameObject:
@@ -120,32 +117,3 @@ NavMeshAgent:
   m_BaseOffset: 1.1874999
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
---- !u!114 &2453325571369683831
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2013630315831097239}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e38d7f6e90252844bb63fc525063cb1c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.AnastasiaController
-  dialogueDatabase: {fileID: 0}
-  whisperCooldown: 45
-  sessionLineCap: 8
-  moonLineCap: 12
-  silentDistance: 6.5
-  whisperDistance: 4
-  conversationDistance: 2.5
-  followSpeed: 2
-  hoverHeight: 0.03
-  conversationIdleThreshold: 30
-  whisperExitDelay: 30
-  manifestDuration: 4
-  silentOpacity: 0.3
-  whisperOpacity: 0.5
-  conversationalOpacity: 0.7
-  opacityLerpSpeed: 2
-  totalMotes: 13

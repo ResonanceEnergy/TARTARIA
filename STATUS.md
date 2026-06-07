@@ -41,12 +41,12 @@ Ran 4 parallel project audits + 5 parallel Unity 6 manual research angles. **Ful
 
 | Phase | Status | Session | Screenshot | Quarantine delta |
 |---|---|---|---|---|
-| 0 — Pull LFS + restore Anastasia | pending — needs PowerShell | — | — | — |
+| 0 — Pull LFS + restore Anastasia | ✅ **DONE 2026-06-07** (R124) | this | PowerShell file-size verify: 0 stubs / 1289 FBX / 373 PNG / 477 WAV / 53 EXR-HDR / 4.4 GB | n/a |
 | 1 — Delete 5 banned mutators | pending | — | — | target −5 |
 | 2 — 4 critical URP settings | **partial 3/4** 2026-06-07 | this | NOT captured — see notes | 0 |
 | 3 — APV + lightmaps + NavMesh | partial prep | this | — | 0 |
 | 4 — Real Unity Terrain | pending | — | — | 0 |
-| 5 — Medieval architecture pack | pending — NATRIX selection | — | — | target −1 Blender bake |
+| 5 — Medieval architecture pack | ✅ **NO PURCHASE NEEDED** (R124) — KayKit_Hexagon 18 FBX village kit + FantasyRuins 12 .DAE + ModularDungeon2 90 mesh + FAE 35 FBX vegetation all on disk | this | n/a | target −all Blender architecture bakes |
 | 6 — Hero + village Prefab Variants | pending | — | — | target large EchohavenContentSpawner reduction |
 | 7 — Mecanim humanoid NPCs | pending | — | — | 0 |
 | 8 — 8-step smoke test VIDEO | pending | — | — | 0 |
