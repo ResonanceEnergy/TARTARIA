@@ -653,6 +653,7 @@ GameObject:
   m_Component:
   - component: {fileID: 62176283}
   - component: {fileID: 62176284}
+  - component: {fileID: 62176285}
   m_Layer: 0
   m_Name: HarmonicPattern_Pedestal
   m_TagString: Untagged
@@ -695,8 +696,23 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.5
+  m_Radius: 2.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &62176285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 62176282}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d154e4b2907eeab4eba0bb857f9d3044, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.TuningPedestalLink
+  buildingId: harmonic_trainer
+  nodeIndex: 0
+  assignedVariant: 4
 --- !u!1001 &65997484
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -8437,6 +8453,7 @@ GameObject:
   m_Component:
   - component: {fileID: 775302912}
   - component: {fileID: 775302913}
+  - component: {fileID: 775302914}
   m_Layer: 0
   m_Name: WaveformTrace_Pedestal
   m_TagString: Untagged
@@ -8479,8 +8496,23 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 1.5
+  m_Radius: 2.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &775302914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 775302911}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d154e4b2907eeab4eba0bb857f9d3044, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.TuningPedestalLink
+  buildingId: waveform_trainer
+  nodeIndex: 0
+  assignedVariant: 3
 --- !u!1001 &784965145
 PrefabInstance:
   m_ObjectHideFlags: 0
