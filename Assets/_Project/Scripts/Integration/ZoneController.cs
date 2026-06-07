@@ -62,6 +62,28 @@ namespace Tartaria.Integration
             Instance = this;
         }
 
+        void OnEnable()
+        {
+            // R45 — subscribe to GameEvents.OnRSChanged so the atmosphere (fog, ambient, sun)
+            // actually updates as RS rises. The original wiring went through legacy GameLoopController
+            // which is now archived (Integration/_archived_legacy_2026_05_31/GameLoopController.cs.disabled),
+            // so without this hookup the visual zone-shift at RS=75 per docs/15 §1 13:00 never fired.
+            try { Tartaria.Core.GameEvents.OnRSChanged += HandleRSDelta; }
+            catch (System.Exception ex) { Debug.LogWarning($"[ZoneController] OnRSChanged subscribe failed: {ex.Message}"); }
+        }
+
+        void OnDisable()
+        {
+            try { Tartaria.Core.GameEvents.OnRSChanged -= HandleRSDelta; }
+            catch (System.Exception ex) { Debug.LogWarning($"[ZoneController] OnRSChanged unsubscribe failed: {ex.Message}"); }
+        }
+
+        void HandleRSDelta(float delta)
+        {
+            // Apply delta against current accumulator; UpdateAtmosphere() interpolates fog/ambient/sun.
+            UpdateRS(_currentRS + delta);
+        }
+
         void OnDestroy()
         {
             if (Instance == this) Instance = null;
