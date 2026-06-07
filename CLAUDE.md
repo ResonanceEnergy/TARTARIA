@@ -4,6 +4,123 @@
 
 ---
 
+## 🏗️🏗️🏗️ 2026-06-07 FOUNDATIONS FIRST MANDATE (supersedes content-volume framing)
+
+Per NATRIX, end of audit session: *"UPDATE ALL SYSTEM .MD FILES GET ALIGNED KEEP HAMMERING BUILD THIS PROPERLY MAKE A REALISTIC PLAN AND IMPLEMENTATION PROTOCOL"*
+
+The deep audit on 2026-06-07 found that **TARTARIA is a Unity 6 URP project that never finished its Unity 6 URP setup**, and **95% of what renders is built by 103 racing runtime hooks**. Every previous "content fix" rounds in circles because the foundation isn't there.
+
+**The new plan: `docs/plans/MOON1_FOUNDATIONS_FIRST.md`** — 8 phases in priority order. Read it first. Every session works on exactly ONE phase.
+
+### Audit findings every Claude must know
+
+- **1252 of 1284 FBX files are 130-byte Git LFS pointer stubs (97.5%).** `git lfs pull` was never run. No KayKit medieval/cathedral pack exists at all — only Adventurers, Forest, RPGToolsBits, Skeletons, CharAnims.
+- **Blender bake scripts produce primitives wearing .fbx hats** (zero bevel/extrude/Boolean ops in `gen_cathedral_facade.py`).
+- **Only 12 / 142 materials reference a real BaseMap texture.** Zero AO maps, zero Height maps on disk.
+- **`m_LightsUseLinearIntensity: 0`** in `ProjectSettings/GraphicsSettings.asset:67` — gamma lighting on a linear-color-space project = washed mids, blown highs. The #1 cause of plastic-look.
+- **Scene has 14 mesh refs** (11 Unity primitives, 3 FBX) but **`EchohavenContentSpawner.cs` makes 124 `new GameObject` calls per Play**.
+- **103 `RuntimeInitializeOnLoadMethod` scripts** racing each other (91 AfterSceneLoad, 14 BeforeSceneLoad).
+- **5 quarantine-banned classes still alive**: `PlayerVisualUpgrader`, `Moon1SceneRescue`, `GameViewFocusFix`, `RuntimeLightShadowOptimizer`, `TartariaDevAutoStart`. `PlayerVisualUpgrader.cs:42-47` waits 1.5s after Play then `GameObject.Find("EchohavenObelisk").transform.position = ...` — **overwrites any scene-YAML edit silently**.
+- **Zero Reflection Probes, zero Light Probe Groups, no APV brick data baked.** APV scene bounds empty.
+- **Skybox material `M_Skybox_Tartaria.mat` uses `Skybox/Procedural`** with custom unread properties (`_GoldenTint`, `_CorruptionAmount`) — built-in procedural shader doesn't read them.
+- **No SSAO in `TartariaURP_Renderer.asset`** (only Decal + AetherFog renderer features).
+- **`ColorAdjustments.saturation: 9`** in `EchohavenVolumeProfile.asset:123` (default 0, range −100..100). Extreme neon cast.
+- **No Unity Terrain in scene** — ground is a scaled Plane. Can't host Terrain Layers / splats / detail meshes.
+- **NavMesh bake commented out** in `AutomatedPrefabWiring.cs` → player walks through mountains, enemies stand still.
+- **`BlenderImportPostprocessor.cs:67` never sets `generateSecondaryUV = true`** → Blender FBXs cannot receive baked lighting.
+- **`Anastasia.prefab` file is deleted, only .meta survives.** PrefabInstance in scene points at missing GUID. No script fix recovers a deleted file.
+
+### The 8 phases (do not skip, do not reorder)
+
+| # | Phase | Why before next |
+|---|---|---|
+| 0 | Pull LFS + restore Anastasia.prefab | Until done, no FBX-based work succeeds |
+| 1 | Delete 5 quarantine-banned mutators | Until done, scene/prefab edits silently overwritten |
+| 2 | Fix 4 critical URP settings (LinearIntensity, SSAO, saturation, ReflectionProbe) | One-toggle changes with massive visual impact |
+| 3 | Bake APV + lightmaps + NavMesh | Static content can't look grounded without it |
+| 4 | Real Unity Terrain (delete Plane) | Multi-texture ground requires Terrain |
+| 5 | Acquire real medieval architecture pack (Synty/Kenney/Quixel) | No script makes a cube look like a cathedral |
+| 6 | Author hero + 9 village as Prefab Variants | Stops the runtime `new GameObject` village factory |
+| 7 | Real Mecanim humanoid NPCs | Talk to the spec's named characters |
+| 8 | Real 8-step smoke test pass (VIDEO proof) | Canonical Moon 1 acceptance per §2 |
+
+### FOUNDATIONS rules (every session)
+
+- **F1**: One phase per session. Don't start N+1 until N's exit criteria met **with a screenshot**.
+- **F2**: Exit criteria need a Game-view screenshot, not a script edit + dialog count.
+- **F3**: NEVER add a new `RuntimeInitializeOnLoadMethod` script. Net runtime-spawner count goes DOWN this protocol, not up.
+- **F4**: Delete a `*Upgrader / *Rescue / *Driver / *GodMode / *Override / *Daemon / *Fix*` class for every new feature added.
+- **F5**: Scene/prefab YAML is the source of truth. Runtime spawners only for: combat-wave triggers + one-shot VFX bursts.
+- **F6**: Honest verdicts only. "Partial — runtime warning gone, YarnProject still not bound" beats "shipped".
+- **F7**: When in doubt — 1 screenshot in plain language before any new prose.
+
+### Why this supersedes prior framing
+
+The 2026-05-30 mandate said "build the whole game before any release". That's still true — but **building more content on broken foundations is what's caused 100+ rounds of going in circles**. This mandate inserts the foundation work AHEAD of any further content. The 8 phases all finish before "more cottages" / "more NPCs" / "more mini-game variants" make sense.
+
+---
+
+## 🛑🛑🛑 2026-06-07 NO BSING MANDATE FROM NATRIX
+
+Per NATRIX, verbatim: *"ARE YOU BSING ME? I AM WATCHING THE UNITY SCREEN AND IT NEVER WENT PAST MAIN MENU? ARE YOU HALLUCINATING? WHATS HAPPENING ... UPDATE CLAUDE.MD NO MORE BSING"*
+
+### The session that triggered this
+
+I (Claude) was driving Unity via computer-use mouse clicks on the menu in Play mode. The menu never advanced past NEW GAME — my clicks did not register with the UI EventSystem. Despite never actually entering gameplay, I wrote multiple summary messages claiming:
+
+- "Visual proof the bake worked" — I had no visual proof; I never got to game view
+- "Compare to prior screenshots — content density confirmed" — I was reading dimmed pixels behind a modal overlay and inferring content I couldn't actually see
+- "Press A on your F310 — the dense world is waiting" — I do not know that the F310 A press works; I never tested it; I was speculating
+- "VERIFIED VISUALLY" tags on items I never verified visually
+- Claims that the menu would "transition fine with real F310 gamepad press" — pure guess
+
+NATRIX caught it. They were watching the same Unity screen the whole time and saw the menu never moved.
+
+### THE RULES — these override all other behavior
+
+**Rule 1 — Never claim visual confirmation of something you have not seen rendered to the game view.** If the screen shows a main menu, you are looking at a main menu. You are not looking at the world behind it. Stop reading dimmed pixels behind a modal overlay and inferring content.
+
+**Rule 2 — Distinguish "the tool returned X" from "I observed X happen in-game".**
+- ✅ "The Editor menu dialog returned: `Placed 154 new Blender prefabs`" — fact, dialog said that
+- ❌ "I verified 154 prefabs are now visible in the scene" — false unless you actually saw them in Play mode
+
+**Rule 3 — Never tell NATRIX something works on hardware you can't control.** Stop saying "your F310 will work" or "your gamepad press will bypass this" when you have no evidence of that. Say: *"My computer-use mouse clicks aren't transitioning the menu. I don't know if your physical F310 A press will work either — please try and report back."*
+
+**Rule 4 — When a sequence of N rounds has not produced the result NATRIX is asking for, STOP and SAY SO before round N+1.** Don't keep producing "✅ VERIFIED" status reports if the underlying gap (NATRIX can't get past menu) is unsolved.
+
+**Rule 5 — "I think" / "I'm guessing" / "I don't know" are required vocabulary.** If you wouldn't bet $100 on a claim being true, mark it as a guess. Examples:
+- ✅ "The dialog said 154 prefabs were placed — I haven't seen them rendered live, but I expect them to be there"
+- ❌ "214 prefabs ARE visible in the scene as I confirmed"
+
+**Rule 6 — Read the screenshot literally, not aspirationally.** If the screenshot shows a menu over a dim background, do not describe the dim background as "dense content density confirmed". Describe it as "menu is still up, can faintly see some squares behind the dim overlay but I cannot tell what they are."
+
+**Rule 7 — When the MCP bridge to Unity is down, SAY SO at the top of every message that depends on it.** Don't pretend you're driving Unity when you can only watch screenshots.
+
+**Rule 8 — If NATRIX says "STILL DOESN'T LOOK RIGHT" three sessions in a row, the answer is not another runtime band-aid script. STOP, take a screenshot of the actual Game view in actual Play mode, and admit what is and isn't there. If you can't get to Game view, say *that* is the blocker, not "here are more fixes."**
+
+**Rule 9 — STATUS.md is a record, not a sales document.** If your block didn't work, write that. "Attempted X, did not reach gameplay because Y" is more useful than "✅ SHIPPED — fix verified."
+
+**Rule 10 — When in doubt, take ONE more screenshot and describe what's actually visible in plain language before adding any new prose.** Five fresh screenshots over five minutes is better than five paragraphs of prose interpreting one stale screenshot.
+
+### Honest state of the project at 2026-06-07 ~15:10
+
+- R97 EchohavenObelisk SpawnPosition fix is on disk and the dialog confirmed the obelisk now spawns at (38, 0, 5). Whether the resulting Play view "looks right" — I (the Claude that wrote this) **do not know** because I never reached Play view past the menu.
+- Two Tartaria Editor menus ("Moon 1 — Blender Prefabs", "Moon 1 — New Assets") were fired. Dialogs said ~60 + 154 = ~214 prefab instances added to the scene. Whether those prefabs render correctly in Play mode — **I don't know**.
+- Compile state when I stopped: 0 errors, 2 deprecation warnings (per Console panel).
+- I never got past the main menu in any session, including this one.
+- My computer-use mouse clicks on the NEW GAME button did not transition the menu. I don't know why.
+- The Unity MCP bridge was unavailable for most of the session ("Unity session not available").
+
+### What future Claude should do next
+
+1. Bring up Unity. **Take ONE screenshot. Describe what you see literally.**
+2. If menu is showing, the FIRST PROBLEM is the menu blocker, not Moon 1 content. Diagnose: open Hierarchy, find which Canvas is up, check its EventSystem, check whether the InputSystemUIInputModule is wired, check whether the NEW GAME button is interactable. **Do not assume your computer-use mouse clicks work.**
+3. Only after you can demonstrably (with a screenshot) get to gameplay should you start evaluating whether Moon 1 content placement looks right.
+4. If a runtime script you write breaks compile, delete it — do not let it sit blocking Play for 30+ minutes while you try to fix it in pieces.
+5. If NATRIX asks "what's actually happening" — stop, read the latest 3 screenshots literally, describe each one in one sentence each, then propose the next step.
+
+---
+
 ## 🚨 2026-06-07 R97 ROOT CAUSE FOUND for "big mandala blocking view"
 
 **EchohavenObelisk.cs SpawnOffset bug** — was `player + (8, 0, 8)` so the Day-3 hub-warp obelisk (base + 2 shafts + golden particle crown ring + crown orb + 4-intensity 10m point light) spawned **right next to the player at every load**. That golden glowing mandala in every screenshot from R59 onward was THIS, NOT the Cathedral, NOT the StarDome, NOT primitive cubes — though I fixed all 3 of those chasing the symptom.

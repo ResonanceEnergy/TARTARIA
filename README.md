@@ -8,12 +8,15 @@ A session-based, open-world restoration RPG / light city-builder / harmonic puzz
 
 ## Status
 
-**Phase:** Alpha 0.4 — Moon 1 shell playable, Moon-1-specific content still being built.
+**Phase:** Alpha 0.4 — Moon 1 shell playable, **on a FOUNDATIONS FIRST implementation pause** while the Unity 6 URP setup is brought up to spec. (See plan below.)
 **Target:** All 13 Moons content-complete before any distribution decision (per 2026-05-30 + 2026-06-03 owner mandates). No release framing of any kind. No Win64 build pipeline. No beta program.
 **Build:** No public build yet — in development. No public build is planned for any Moon individually.
 **Engine:** Unity 6 LTS (6000.3.6f1) with URP Forward+.
 
+> **2026-06-07 audit:** the project has been going in circles because 1252 of 1284 FBX are Git-LFS pointer stubs (`git lfs pull` was never run), no real medieval architecture pack exists on disk, 103 `RuntimeInitializeOnLoadMethod` scripts race to build the scene every Play, and 8 critical Unity 6 URP fundamentals are unconfigured. The path forward is documented as 8 phases in **[docs/plans/MOON1_FOUNDATIONS_FIRST.md](docs/plans/MOON1_FOUNDATIONS_FIRST.md)** — read that before any Moon-1-content work.
+
 For the honest current-state snapshot, see **[STATUS.md](STATUS.md)**.
+For the realistic implementation plan, see **[docs/plans/MOON1_FOUNDATIONS_FIRST.md](docs/plans/MOON1_FOUNDATIONS_FIRST.md)**.
 For the build order across all 13 Moons, see **[ROADMAP.md](ROADMAP.md)**.
 For guidance future Claude sessions need on the codebase, see **[CLAUDE.md](CLAUDE.md)**.
 For the full campaign design, see **[docs/03_CAMPAIGN_13_MOONS.md](docs/03_CAMPAIGN_13_MOONS.md)**.

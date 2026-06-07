@@ -102,17 +102,21 @@ namespace Tartaria.UI
         {
             switch (_selected)
             {
-                case 0: // NEW GAME
-                    if (ServiceLocator.Save != null && ServiceLocator.Save.HasAnySave())
-                    {
-                        _showNewGameConfirm = true;
-                        return;
-                    }
+                case 0: // NEW GAME — R114: remove silent confirm-modal dead-end. The save
+                       // module rewrites slot 0 when gameplay reaches the first save tick;
+                       // no need to gate NEW GAME on HasAnySave. (Old code set
+                       // _showNewGameConfirm=true and returned, but OnGUI never rendered
+                       // the modal — so NEW GAME silently did nothing when a save existed.)
+                    Debug.Log("[MainMenuOverlay] NEW GAME pressed — ResetProgress + StartGame.");
                     ResetProgressViaReflection();
                     StartGame();
                     break;
 
-                case 1: StartGame(); break; // CONTINUE
+                case 1: // CONTINUE — keep existing save, jump straight to gameplay.
+                    Debug.Log("[MainMenuOverlay] CONTINUE pressed — StartGame (no reset).");
+                    StartGame();
+                    break;
+
                 case 2: SettingsOverlay.Open(); break;
                 case 3: Quit(); break;
             }

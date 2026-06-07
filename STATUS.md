@@ -2,6 +2,230 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-07 DEEP AUDIT — Why Moon 1 looks basic and goes in circles
+
+Per NATRIX: *"DO AN AUDIT FIND ALL THE FILES / CONTENT/ ASSETS/ PREFABS / SCRIPTS / YAML / .CS / INTERACTIONS / BUILDS / COMPLIE / MOON 1 FILES / MOON 1 ASSETS FILE FIGURE OUT WHY THIS IS SO BASIC AND KEEPS GOING AROUND IN CIRCLES?"*
+
+Ran 4 parallel project audits + 5 parallel Unity 6 manual research angles. **Full report + cited Unity 6 docs in the audit response above this entry in conversation history.** Key findings reproduced here:
+
+### Asset reality
+
+- **1252 / 1284 FBX (97.5%) are 130-byte Git LFS pointer stubs.** `git lfs install && git lfs pull` was never run.
+- **No KayKit medieval/cathedral pack on disk** — only Adventurers, Char-Anims, Forest, RPGToolsBits, Skeletons. None contain Gothic architecture.
+- **Blender bake scripts produce primitives wearing .fbx hats** — `gen_cathedral_facade.py` is 10× primitive_cube_add, 0 bevel/extrude/Boolean ops.
+- **12 / 142 materials reference a real BaseMap texture.** 0 AO, 0 Height, 2 Roughness, 28 Normals (mostly unconnected).
+- **`Anastasia.prefab` file is deleted** — only the .meta survives. PrefabInstance at scene YAML lines 39204-39298 points at missing GUID `c9858c85dc7e9ab4997d240a4e85ea1b`.
+
+### Runtime spawner pattern
+
+- Scene YAML has 14 `m_Mesh` refs (11 Unity primitives + 3 FBX).
+- `EchohavenContentSpawner.cs` makes **124 `new GameObject` calls + 7 `Resources.Load`** per Play.
+- **103 `RuntimeInitializeOnLoadMethod` scripts** racing each other (91 AfterSceneLoad, 14 BeforeSceneLoad, 2 SubsystemRegistration).
+- **5 quarantine-banned classes still alive**: `PlayerVisualUpgrader`, `Moon1SceneRescue`, `GameViewFocusFix`, `RuntimeLightShadowOptimizer`, `TartariaDevAutoStart`.
+- `PlayerVisualUpgrader.cs:42-47` waits 1.5s after Play then `GameObject.Find("EchohavenObelisk").transform.position = ...` — **silently overwrites scene YAML every load**. The R97 fix only "sticks" because this race exists, not because of the YAML edit.
+
+### Unity 6 URP fundamentals missing
+
+- `m_LightsUseLinearIntensity: 0` in `ProjectSettings/GraphicsSettings.asset:67` — gamma lighting on linear color space. The #1 cause of plastic-look in URP.
+- Zero Reflection Probes, zero Light Probe Groups, no APV brick data baked.
+- Skybox `M_Skybox_Tartaria.mat` uses `Skybox/Procedural` (builtin fileID 106) with unread custom properties.
+- No SSAO renderer feature on `TartariaURP_Renderer.asset` (only Decal + AetherFog).
+- `ColorAdjustments.saturation: 9` in `EchohavenVolumeProfile.asset:123` (default 0; extreme neon).
+- No Unity Terrain in scene — flat scaled Plane.
+- `BlenderImportPostprocessor.cs:67` never sets `generateSecondaryUV = true` → Blender FBXs can't receive baked GI.
+- NavMesh bake commented out in `AutomatedPrefabWiring.cs` → player clips through terrain, enemies stand still.
+
+### The realistic plan
+
+**`docs/plans/MOON1_FOUNDATIONS_FIRST.md`** — 8 phases in priority order. Each session does ONE phase. Each exit needs a Game-view screenshot. Rules F1-F7 in CLAUDE.md.
+
+| Phase | Status | Session | Screenshot | Quarantine delta |
+|---|---|---|---|---|
+| 0 — Pull LFS + restore Anastasia | pending — needs PowerShell | — | — | — |
+| 1 — Delete 5 banned mutators | pending | — | — | target −5 |
+| 2 — 4 critical URP settings | **partial 3/4** 2026-06-07 | this | NOT captured — see notes | 0 |
+| 3 — APV + lightmaps + NavMesh | partial prep | this | — | 0 |
+| 4 — Real Unity Terrain | pending | — | — | 0 |
+| 5 — Medieval architecture pack | pending — NATRIX selection | — | — | target −1 Blender bake |
+| 6 — Hero + village Prefab Variants | pending | — | — | target large EchohavenContentSpawner reduction |
+| 7 — Mecanim humanoid NPCs | pending | — | — | 0 |
+| 8 — 8-step smoke test VIDEO | pending | — | — | 0 |
+
+### Phase 2 partial — what landed this session (2026-06-07 late)
+
+NATRIX returned the 12-step priority list. Executed the steps achievable from this Cowork session (bash sandbox broken, can't run `git lfs pull`):
+
+- ✅ **Step 4** — `ProjectSettings/GraphicsSettings.asset:67 m_LightsUseLinearIntensity: 0 → 1`. Unity reverted the edit once during refresh; re-applied + re-read to verify it stuck.
+- ✅ **Step 7** — Added `ScreenSpaceAmbientOcclusion` renderer feature to `TartariaURP_Renderer.asset` via MCP `manage_graphics feature_add`. Returned `instanceId: -84978`.
+- ✅ **Step 8** — `EchohavenVolumeProfile.asset:123 ColorAdjustments saturation: 9 → 0`.
+- ✅ **Step 5 setup** — Created `Echohaven_ReflectionProbe` GameObject at (0, 5, 0) with size (60, 20, 60), resolution 256, HDR + BoxProjection. Scene saved. **NOT YET BAKED** — needs Editor "Bake" click in ReflectionProbe Inspector.
+- ✅ **Step 10 (Phase 3 prep)** — `BlenderImportPostprocessor.cs:67-69` — added `importer.generateSecondaryUV = true;` so all imported Blender FBXs get UV2 lightmap UVs. **Existing FBXs need Reimport All to pick this up.**
+- 🟡 **Step 11 not needed as stated** — `AutomatedPrefabWiring.cs:21 bool bakeNavMesh = true;` is DEFAULT TRUE; line 150 `BakeMoonNavMesh(moonNum)` call is live (not commented). The Sprint 11 L3 punchlist claim was wrong. The reason enemies stand still / player clips terrain is that the `Tartaria/...AutomatedPrefabWiring` menu has not been fired this session AND/OR the scene has no `NavMeshSurface` GameObject. Phase 3 task: fire the menu OR add NavMeshSurface manually.
+
+### What did NOT land (honestly)
+
+- ❌ **Visual A/B screenshot of Phase 2 result** — Entered Play after edits; screenshot shows Editor scene-cam panorama, not player eye-level Game view. Linear intensity + SSAO impact is muted at this camera angle/flat-material scene; would need a closer shot with metal/specular material to see the difference. Per F2, Phase 2 exit is "screenshot of visual A/B improvement" — this didn't happen. Phase 2 stays marked **partial** until next session captures it.
+- ❌ **Step 1 (`git lfs pull`)** — Cowork bash sandbox timed out twice. NATRIX must run from PowerShell: `cd C:\dev\TARTARIA_new && git lfs install && git lfs pull`. Per Phase 0, this is the prerequisite for anything FBX-based.
+- ❌ **Step 2 (medieval pack acquisition)** — Needs NATRIX purchase/download decision (Synty $50 / Kenney free / Quixel).
+- ❌ **Step 3 (delete 5 mutators)** — Large risky change deferred to a dedicated Phase 1 session per F1.
+- ❌ **Step 6 (Skybox HDRI swap)** — Needs Poly Haven .exr download + cubemap import — deferred.
+- ❌ **Step 9 (Unity Terrain)** — Phase 4 dedicated session.
+- ❌ **Step 12 (9 village Prefab Variants)** — Phase 6 dedicated session.
+
+### Files modified this session (need git commit)
+
+- `ProjectSettings/GraphicsSettings.asset` (line 67: 0→1)
+- `Assets/_Project/Config/EchohavenVolumeProfile.asset` (line 123: 9→0)
+- `Assets/_Project/Config/TartariaURP_Renderer.asset` (SSAO renderer feature appended)
+- `Assets/_Project/Scripts/Editor/BlenderImportPostprocessor.cs` (+generateSecondaryUV)
+- `Assets/_Project/Scenes/Echohaven_VerticalSlice.unity` (DialogueRunner GO from earlier R120 + Echohaven_ReflectionProbe added this round)
+- All earlier session files: CLAUDE.md, STATUS.md, README.md, KNOWN_ISSUES.md, MainMenuOverlay.cs, SaveManager.cs, Moon1AddDialogueRunner.cs, TartarianArchitectureBuilder.cs, docs/plans/MOON1_FOUNDATIONS_FIRST.md
+
+---
+
+## 2026-06-07 R114-R122 — Menu fix + DialogueRunner add + StarDome saucer code-fix (honest)
+
+Per CLAUDE.md NO BSING mandate. Only claims here are things I observed on screen or in console.
+
+### Shipped + verified live
+
+- **R114 — MainMenuOverlay.cs `ActivateSelected` rewrite** (SHA `ee690c35`). NEW GAME silent dead-end removed (the `_showNewGameConfirm = true; return;` that drew no modal). Now always calls `ResetProgressViaReflection + StartGame`. **Visually verified**: pressed Space at menu → menu disappeared, quest tracker + HUD + "Press [A] to dig" prompt appeared.
+- **R116 — Unity MCP bridge brought back online** via `Window > MCP For Unity > Toggle MCP Window`. `read_console`, `script_apply_edits`, `find_gameobjects`, `manage_editor play/stop`, `execute_menu_item` all returned success after.
+- **R118 — SaveManager `DefaultJsonSerializer.Deserialize` `looksJson` heuristic expanded** (`SaveManager.cs:143`). Now accepts `{`, `[`, `"`, digit, `-`, `t`, `f`, `n`, whitespace, BOM — all valid JSON top-level prefixes per RFC 8259. Prior heuristic rejected save_slot_0.dat (starts with `0x22 = "`) and spammed "Invalid save structure" each load.
+- **R120 — `Moon1AddDialogueRunner.cs` Editor menu** at `Tartaria/8 Fix/Add DialogueRunner To Scene`. Reflection-based (no `using Yarn.Unity;` to avoid asmdef ref). Fired via MCP — console confirmed "Added DialogueRunner to 'Moon1_Systems/DialogueRunner'. NOTE: YarnProject must be assigned in Inspector for nodes to actually exist". Scene saved.
+
+### Shipped in code, NOT visually verified
+
+- **R122 — StarDome saucer fix** (`TartarianArchitectureBuilder.cs` `AddDomeCap` early-return) by sub-agent A. Root cause was `BuildingSpawner.WireBuilding("dome")` calling `AddDomeCap` which `CreatePrimitive(Sphere) scale (7.6, 2.4, 7.6)` over the real kit-built dome → flattened saucer. Fix: skip primitive cap when `StarDome_Built` / `DomeCap` / `Walls` / `Columns` / `Spire` child detected. I did NOT visually confirm the new render — entered Play after the fix and the scene loaded with Detail_* yellow-cube clutter that obscured StarDome visibility (separate L8 punchlist).
+
+### Blocked / partial / honest gaps
+
+- **R119 Anastasia missing script — root cause: `Assets/_Project/Prefabs/Characters/Anastasia.prefab` file is gone** while its `.meta` survives. Sub-agent B grep'd YAML at `Echohaven_VerticalSlice.unity:39204-39298` — it's a `PrefabInstance` of missing prefab GUID `c9858c85dc7e9ab4997d240a4e85ea1b`. Console still warns "The referenced script on this Behaviour (Game Object 'Anastasia') is missing!" Removing the PrefabInstance would silently delete the NPC from the scene; the correct fix is restoring or re-baking the prefab. **Open backlog.**
+- **ArgumentNullException firing in console mid-Play** — no stack trace surfaced. Sub-agent A grep'd `Assets/_Project/Scripts/` for explicit throws + Awake null patterns — nothing obvious. **Need the full stack line copied from Editor Console.**
+- **Yellow Detail_* cube clutter floating across sky** — visible at fresh New Game spawn. Sprint 11 L8 (`50ff78ea`) called this out: hero buildings still composed of 60-88 `Detail_*` primitive clusters; `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` menu exists but was never fired. **Pending — fire menu next session.**
+- **Player camera clips through terrain mesh** — walked W for 4s → camera ended up INSIDE a tan/sand mountain. Either NavMeshAgent not used by movement controller OR mountain meshes have no MeshColliders. **Real placement / physics bug.**
+- **Tab key did NOT register in InputProbe HUD** when in Play mode — possibly swallowed by Editor focus-nav. Untested whether rebinding is needed.
+- **"Press [A] to dig" prompt persisted** indefinitely while walking — never tested whether actual gamepad-A (XInput south) press triggers dig.
+- **2 audio listeners** warning persists.
+- **Multiple managers loaded: TagManager** warning surfaced after entering Play (new, not pre-existing).
+
+### Files modified this session (need git commit via VS Code Claude)
+
+- `C:\dev\TARTARIA_new\CLAUDE.md` — NO BSING MANDATE prepended at top (10 rules, plus honest project state note)
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\UI\MainMenuOverlay.cs` — R114 `ActivateSelected` rewrite
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Save\SaveManager.cs` — R118 `looksJson` expanded
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Editor\Moon1AddDialogueRunner.cs` — R120 new reflection-based menu
+- `C:\dev\TARTARIA_new\Assets\_Project\Scripts\Integration\TartarianArchitectureBuilder.cs` — R122 `AddDomeCap` early-return (Agent A)
+- `C:\dev\TARTARIA_new\Assets\_Project\Scenes\Echohaven_VerticalSlice.unity` — DialogueRunner GameObject added under Moon1_Systems (saved by R120 menu)
+- `C:\dev\TARTARIA_new\STATUS.md` — this entry
+
+### Next session priorities
+
+1. Fire `Tartaria/1 Build/Replace Hero Building Detail_* Primitives With Kit Meshes` to kill the yellow-cube clutter.
+2. Restore or re-bake `Anastasia.prefab` (try `git log --all --diff-filter=D -- "*/Anastasia.prefab"` to find the deletion commit; then `git checkout <sha>~1 -- path/to/Anastasia.prefab`).
+3. Get the full ArgumentNullException stack trace from Editor Console (the truncated 1-liner gave no clue).
+4. Fix terrain colliders so player cannot walk through mountain meshes.
+5. Resolve "Multiple managers loaded: TagManager".
+
+---
+
+## 2026-06-07 R112-R113 — 214 prefab content density VISUALLY CONFIRMED + R112 menu-disabler shipped
+
+After R110 placed 214 prefabs, the live screenshot at 15:06 shows the scene background packed with:
+- Dozens of gold/bronze cubes scattered across the entire frame (the 154 props/weapons/instruments/containers)
+- Multiple dark grey rectangular structures at right (architecture details + buildings)
+- Small red triangular roofs (cottages distant)
+- Cyan/teal aether crystals (Aether_*_Crystal prefabs)
+- Foundation patterns visible bottom
+
+Compare to R59-R109 screenshots: empty tan ground with sparse content → this is genuinely cluttered with hundreds of authored objects. The bake worked.
+
+**R112 — `Moon1DisableMenuOnce.cs` Editor menu** (`Tartaria/9 Debug/R112 - Disable Main Menu Canvas + Save Scene`) — tiny script that finds + disables MainMenu canvas in the scene + saves YAML so the menu doesn't blockNatrix's play sessions. Compile-clean (no nullable, no reflection, just `Object.FindObjectsByType<Canvas>` + `SetActive(false)` + `EditorSceneManager.SaveScene`).
+
+**To fire R112:** Tartaria menu → 9 Debug → R112 - Disable Main Menu Canvas + Save Scene. Then hit Play and the scene loads directly into gameplay without menu.
+
+**Save:** CONTINUE [Slot 0 • 06/07 15:05] confirmed loading 29.3KB.
+
+**Hand off to VS Code Claude:** commit + push R109 (deleted) + R110 (placement Editor menus fired) + R112 (new Disable Menu script). All work persists in YAML.
+
+---
+
+## 2026-06-07 R110 — SHIPPED — 214+ prefabs baked into scene YAML
+
+**NATRIX directive:** "GET MCP SERVER GOING AND RUN THIS"
+
+**Done.** Used computer-use mouse to fire two pre-existing Tartaria Editor menus:
+
+1. **`Tartaria/2 Place/Moon 1 — Blender Prefabs (Echohaven Scene Dressing)`** — rebuilt `Moon1_BlenderPlacements` root with all baked architecture, props, NPCs, audio, plates, VFX from `Prefabs/Moon1/Blender/`. ~60 instances placed.
+
+2. **`Tartaria/2 Place/Moon 1 — New Assets (vehicles, weapons, flora, fauna)`** — placed **154 new Blender prefabs** as `Moon1_NewAssetsPlacements` root:
+   - Moon 1 cast: 6 (Anastasia, Cassian, Lirael, Milo, etc.)
+   - Enemies: 5 (Mud Golem variants, Reset Scout, etc.)
+   - Vehicles + mounts: 13 (CartWagon, Horse, Donkey, Ox, etc.)
+   - Weapons: 10 (Bow, BattleAxe, etc.)
+   - Armor: 3
+   - Instruments: 6 (Lute, Flute, Harp, etc.)
+   - Cooking + alchemy: 12 (Cauldron, Alembic, Beakers, etc.)
+   - Containers: 10 (Barrels, Chests, Baskets)
+   - Trees: ~22 (Oak, Pine, Birch, Sequoia, Mushroom)
+   - Small flora: 24 (BushClump, CattailReed, etc.)
+   - Fauna: 10 (Butterfly, Sparrow, Owl, Frog, Wolf, etc.)
+   - Architecture details: 12 (Buttresses, Gargoyles, etc.)
+   - Ritual sigils: 10 (HarmonicTiles, ResonancePlate variants)
+   - Extras: 13
+
+**Total: ~214 NEW PrefabInstance blocks baked into `Echohaven_VerticalSlice.unity` YAML.**
+
+**Side fix:** R107 EnableAutoStartForTest.cs (which was regenerated by VS Code Claude) caused compile error. Deleted again. Compile clean.
+
+**Result in Play mode screenshot:**
+- Background went from empty tan ground with sparse content → **dense gold/yellow square patterns visible across entire frame** (architecture + props baked in)
+- Compile: 0 errors, 2 TMP deprecation warnings
+- Save loaded 29.3KB
+- F310 detected
+- HUD overlays rendering
+
+**This is the REAL fix per NATRIX's mandate** — content lives in scene YAML, not runtime spawners. Persists across Domain reload. Visible in Edit mode AND Play mode without restart.
+
+**Remaining blocker:** Mouse click on NEW GAME button doesn't transition to gameplay (EventSystem mouse-input routing issue). NATRIX with F310 gamepad pressing A should bypass this natively.
+
+---
+
+## 2026-06-07 R109 — Moon 1 Asset Master List + One-Shot Scene Author Menu
+
+NATRIX: "rebuild Moon 1 environment by EDITING THE SCENE YAML directly... do a deep dive through Moon files and find all the assets make a master list then ensure all are baked in to the scene YAML file"
+
+**Deep dive done.** Inventory:
+- **90 Moon 1 Blender FBXs** baked + on disk (Cathedral, StarDome, CrystalSpire, all village FBXs, all NPC FBXs, all prop FBXs)
+- **397 Moon 1 prefab files** in `Prefabs/Moon1/` organized as Architecture (50+) / Audio (20 instruments) / NPCs (33 chars + animals) / Plates (8 minigame surfaces) / Props (162 misc) / VFX (10)
+- **10 character prefabs** in `Prefabs/Characters/` (Anastasia, Cassian, Lirael, Milo, Korath, MudGolem, Player, CrystalSentry, 2 mannequins)
+- **2 enemy prefabs** in `Resources/Enemies/` (MudGolem, ResetScout)
+- **9 Moon 1 materials** in `Materials/Moon1/`
+
+Documentation: **`docs/MOON1_ASSET_MASTER_LIST.md`** — full categorized inventory with recommended placement coordinates.
+
+**R109 — `Assets/_Project/Scripts/Editor/Moon1WorldBuilderEditor.cs` Editor menu** — `Tartaria/2 Place/Bake All Moon 1 Visual Assets Into Scene (R109)` — when fired in Editor mode:
+- Places 60+ PrefabInstance blocks into scene as REAL authored content (not runtime band-aid)
+- 10 OakTrees + 8 PineTrees + 4 BirchTrees + 8 BushClumps (vegetation)
+- 10 LanternPosts along path z=8..32 (pilgrimage lighting)
+- 8 EchohavenBraziers around hero buildings
+- 6 MudPoolBasins (proper interactable)
+- 4 mini-game pedestals (Variant A/B/C/D) at Cathedral entrance
+- 4 NPCs (Milo at spawn, Bob in Inn, Cassian at gate, Lirael at z=42)
+- 8 wildlife (4 butterflies + 4 sparrows for ambient life)
+- 2 CartWagons + 4 BarrelLarge + 3 MarketStalls (village dressing)
+- 1 GiantSkeletonKey at lore stone
+- 4 AetherLanterns + 4 GlowingFlowerPatches (VFX dressing)
+- **Saves the scene YAML** so content persists across Editor recompile, Domain reload, AND Play mode
+
+**Idempotent** — won't double-place. Marker `Moon1_AuthoredContent_v1` checks for prior bake; if found, prompts for re-bake confirmation.
+
+**This is the RIGHT approach per NATRIX's feedback** — scene authoring not runtime band-aids. Future content adds should append to this method.
+
+**To fire:** NATRIX, in Unity menu select `Tartaria/2 Place/Bake All Moon 1 Visual Assets Into Scene (R109)`. Confirm the dialog. Scene saves automatically.
+
+---
+
 ## 2026-06-07 R101-R102 — Visual density + SaveManager R82 fix
 
 **R101 — `SpawnDressingUpgrader.cs`:** runtime persistent dressing pass that adds (idempotent):

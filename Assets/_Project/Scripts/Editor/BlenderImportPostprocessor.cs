@@ -68,6 +68,14 @@ namespace Tartaria.Editor
             importer.importTangents = ModelImporterTangents.CalculateMikk;
             importer.weldVertices = true;
 
+            // FOUNDATIONS Phase 3 (NATRIX step 10) — generate lightmap UVs (UV2) so static
+            // Blender FBXs can RECEIVE baked global illumination. Per Unity 6 manual
+            // https://docs.unity3d.com/6000.0/Documentation/Manual/LightingGiUvs.html
+            // — without this, the lightmapper can't bake to these meshes and they always
+            // look "unlit / flat" compared to the rest of the scene. Adds ~50ms per FBX
+            // import; only matters once at import time, not at runtime.
+            importer.generateSecondaryUV = true;
+
             // Animation — default is static prop, no anim
             importer.animationType = ModelImporterAnimationType.None;
             importer.importAnimation = false;

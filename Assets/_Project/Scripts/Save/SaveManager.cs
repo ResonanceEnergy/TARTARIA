@@ -138,9 +138,16 @@ namespace Tartaria.Save
                     Debug.LogWarning("[DefaultJsonSerializer] Deserialize called with empty data");
                     return default;
                 }
-                // Detect non-JSON payload by header. Valid JSON saves start with '{' (0x7B), whitespace, or UTF-8 BOM (0xEF).
+                // R118: Detect non-JSON payload by header. Accept ALL valid JSON top-level value prefixes per RFC 8259:
+                //   '{' (object 0x7B), '[' (array 0x5B), '"' (string 0x22),
+                //   digits 0-9 (number 0x30-0x39), '-' (negative number 0x2D),
+                //   't' (true 0x74), 'f' (false 0x66), 'n' (null 0x6E),
+                //   plus whitespace (0x09 tab, 0x0A LF, 0x0D CR, 0x20 space) and UTF-8 BOM (0xEF).
                 byte first = data[0];
-                bool looksJson = first == 0x7B || first == 0x20 || first == 0x09 || first == 0x0A || first == 0x0D || first == 0xEF;
+                bool looksJson = first == 0x7B || first == 0x5B || first == 0x22
+                    || first == 0x20 || first == 0x09 || first == 0x0A || first == 0x0D || first == 0xEF
+                    || (first >= 0x30 && first <= 0x39) || first == 0x2D
+                    || first == 0x74 || first == 0x66 || first == 0x6E;
                 if (!looksJson)
                 {
                     // Probably a binary/encrypted/compressed save mis-routed to this serializer.

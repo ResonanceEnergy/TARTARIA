@@ -29,12 +29,51 @@ namespace Tartaria.Integration
 
         static void AddDomeCap(GameObject root, Vector3 scale)
         {
+            // 2026-06-07 bug fix: when the scene already places the authored
+            // Echohaven_StarDome_Built kit prefab (which composes Cathedral kit
+            // pieces under children named Walls/Columns/DomeCap/Spire), the
+            // primitive-sphere "cap" we'd add below renders as a flattened
+            // brown saucer on top of the real architecture. Detect that case
+            // and skip — the kit prefab IS the dome.
+            if (root == null) return;
+            if (HasKitBuiltVariant(root))
+            {
+                Debug.Log("[TartarianArchitectureBuilder] AddDomeCap skipped — kit-built variant detected on '" + root.name + "'.");
+                return;
+            }
             var dome = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             dome.name = "DomeCap";
             dome.transform.SetParent(root.transform, false);
             dome.transform.localPosition = new Vector3(0f, scale.y * 0.55f, 0f);
             dome.transform.localScale = new Vector3(scale.x * 0.95f, scale.y * 0.4f, scale.z * 0.95f);
             var col = dome.GetComponent<Collider>(); if (col != null) Object.Destroy(col);
+        }
+
+        // Detect Echohaven_StarDome_Built kit prefab presence. Looks at the
+        // root name + immediate children for canonical kit child names
+        // (Walls/Columns/DomeCap/Spire produced by StarDomeBuiltVariantBaker).
+        static bool HasKitBuiltVariant(GameObject root)
+        {
+            if (root.name.Contains("StarDome_Built") || root.name.Contains("StarDome_ModularComposite"))
+                return true;
+            var t = root.transform;
+            for (int i = 0; i < t.childCount; i++)
+            {
+                var c = t.GetChild(i);
+                if (c.name.Contains("StarDome_Built")) return true;
+                if (c.name == "DomeCap" || c.name == "Walls" || c.name == "Columns" || c.name == "Spire")
+                    return true;
+                // One level deeper — handles BuildingSpawner wrapping the
+                // prefab under StarDome_ModularComposite/Echohaven_StarDome_Built/...
+                for (int j = 0; j < c.childCount; j++)
+                {
+                    var gc = c.GetChild(j);
+                    if (gc.name.Contains("StarDome_Built")) return true;
+                    if (gc.name == "DomeCap" || gc.name == "Walls" || gc.name == "Columns" || gc.name == "Spire")
+                        return true;
+                }
+            }
+            return false;
         }
 
         static void AddFountainBasin(GameObject root, Vector3 scale)

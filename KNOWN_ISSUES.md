@@ -1,4 +1,10 @@
-> **⚠ HISTORICAL — QUARANTINED 2026-06-04.** This file dates from the dormant Win64/itch.io release agenda quarantined by the 2026-06-03 NATRIX mandate. Do NOT use this file as the canonical issues tracker. See `docs/MOON1_GAP_REPORT_2026-06-04.md` for the current punch list. Preserved for historical context only.
+> **⚠ HISTORICAL — QUARANTINED 2026-06-04, re-quarantined 2026-06-07.**
+> This file dates from the dormant Win64/itch.io release agenda quarantined by the 2026-06-03 NATRIX mandate.
+>
+> **Current canonical punch list (2026-06-07):** see `docs/plans/MOON1_FOUNDATIONS_FIRST.md` — 8 implementation phases in priority order, with audit findings, exit criteria, and rules F1-F7.
+> The 2026-06-04 `docs/MOON1_GAP_REPORT_2026-06-04.md` is superseded by the deep audit in STATUS.md 2026-06-07 entry.
+>
+> Preserved for historical context only. Do NOT use this file as the canonical issues tracker.
 
 ---
 
