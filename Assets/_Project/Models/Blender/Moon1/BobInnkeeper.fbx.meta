@@ -86,9 +86,9 @@ ModelImporter:
     skeleton:
     - name: BobInnkeeper(Clone)
       parentName: 
-      position: {x: 13, y: -5.5, z: 6}
-      rotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071067}
-      scale: {x: 10, y: 16, z: 6}
+      position: {x: 0, y: 0, z: 0}
+      rotation: {x: 0, y: 0, z: 0, w: 1}
+      scale: {x: 1, y: 1, z: 1}
     armTwist: 0.5
     foreArmTwist: 0.5
     upperLegTwist: 0.5
