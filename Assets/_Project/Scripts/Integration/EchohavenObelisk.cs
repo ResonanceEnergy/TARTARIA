@@ -13,7 +13,10 @@ namespace Tartaria.Integration
     public class EchohavenObelisk : MonoBehaviour
     {
         const string EchohavenScene = "Echohaven_VerticalSlice";
-        static readonly Vector3 SpawnOffset = new Vector3(8f, 0f, 8f);
+        // R97 — was player + (8, 0, 8) which placed obelisk smack in front of player at spawn,
+        // blocking view of Cathedral + StarDome. Now: fixed canonical position east of village,
+        // off the main pilgrimage path between spawn (z=5) and Cathedral (z=33).
+        static readonly Vector3 SpawnPosition = new Vector3(38f, 0f, 5f);
 
         Transform _player;
         bool _playerNear;
@@ -29,10 +32,8 @@ namespace Tartaria.Integration
 
         static void SpawnAtPlayer()
         {
-            var playerGO = GameObject.FindGameObjectWithTag("Player");
-            Vector3 pos = playerGO != null
-                ? playerGO.transform.position + SpawnOffset
-                : SpawnOffset;
+            // R97 — Fixed canonical position (was player+offset which moved every save load).
+            Vector3 pos = SpawnPosition;
             pos.y = 0f;
 
             var go = new GameObject("EchohavenObelisk");

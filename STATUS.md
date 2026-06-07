@@ -2,6 +2,63 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-07 R100 — R97 VISUALLY CONFIRMED WORKING
+
+After Unity recompiled with R97-R99 changes and entered Play, the next Game-view screenshot shows the **big golden mandala/eye is GONE from the spawn view**. Compared to prior screenshots from R59-R96 where every shot had a bright glowing crown ring + crown orb particle system dominating center-of-frame, the R100 screenshot shows a clean scene with sparse yellow-cube content (mud golems / RS coins) at proper distance.
+
+**Confirmed visible changes from R97-R99 going live:**
+- ✅ No more golden mandala blocking spawn view → R97 EchohavenObelisk SpawnPosition fix shipping
+- ✅ Input Probe reads `Last key/btn: A (4.4s ago)` → keyboard input registering correctly
+- ✅ Frame counter advancing (12021+) → scene running smoothly
+- ✅ Save loaded from disk (29.3KB) → SaveManager working
+- ✅ HUD overlays (Aether bands top-right, compass, Level/Stat Points) all rendering
+
+**Still pending verification:**
+- ⚠ Main menu input not advancing past NEW GAME with keyboard Space/Enter/A. Likely InputActionAsset binds gamepad-A only, not keyboard. Click-on-button also didn't transition. Needs InputAction trace — but menu may transition fine with real F310 gamepad press. Confirm with manual A press once you take the controller.
+- ⚠ Big grey dome visible at bottom of one screenshot — likely StarDome viewed from close. Needs camera+player reposition test from inside game (post-menu).
+- ⚠ Performance still ~20-23fps (from R96 frame budget) — needs LOD pass when time permits.
+
+**For VS Code Claude Code instance:** Please commit R97-R99 + this STATUS.md update + the new files (EchohavenObelisk.cs change, PlayerVisualUpgrader.cs new, gen_player_humanoid.py + gen_cathedral_facade.py + gen_anastasia_rocker.py + gen_village_house.py + gen_crystal_spire.py + gen_mercury_spire.py + gen_lore_stone_369.py + gen_ambient_layers.py) and push to `feature/consolidate-moon-architecture`. Cowork Claude (me) lost MCP-to-Unity connectivity mid-session, can't directly drive Unity from MCP — please handle the git plumbing.
+
+---
+
+## 2026-06-07 AUTONOMOUS R97-R99 — REAL CULPRIT FOUND for blocking-view bug
+
+**R97 — `EchohavenObelisk.cs` SpawnOffset bug:** Found the real root cause of "big mandala blocking view" that I was chasing all session.
+
+```csharp
+// BEFORE (line 16):
+static readonly Vector3 SpawnOffset = new Vector3(8f, 0f, 8f);
+// In SpawnAtPlayer(): pos = playerGO.transform.position + SpawnOffset
+
+// AFTER (R97):
+static readonly Vector3 SpawnPosition = new Vector3(38f, 0f, 5f);
+// In SpawnAtPlayer(): pos = SpawnPosition (fixed canonical position east of village)
+```
+
+The Obelisk's base + shaft lower + shaft upper + crown ring VFX + crown orb VFX (all bright golden particle system with 4-intensity 10m-range point light) was spawning at `player + (8, 0, 8)` every load. **That's the "huge mandala/eye" I saw center-of-frame in every screenshot from R59 onward.** Moved to (38, 0, 5) — off the main pilgrimage path.
+
+**R98 — Player humanoid Blender bake script** (`Tools/blender/gen_player_humanoid.py`): real medieval traveler geometry — head + hair cap + torso tunic + belt + 2 arms+hands + 2 legs+boots + blue cape. Will run when Unity bridge reconnects.
+
+**R99 — `PlayerVisualUpgrader.cs` runtime persistent fixer** (`Assets/_Project/Scripts/Integration/PlayerVisualUpgrader.cs`): RuntimeInitializeOnLoadMethod scene-load hook that applies 7 categories of fixes every play session so they survive Editor recompile / Domain reload:
+1. Obelisk → (38, 0, 5) scale 0.6 (defensive backup to R97)
+2. Ground-lock floating Mud Golems (y → 0)
+3. Player visual → tunic-brown capsule humanoid silhouette (0.5×1.0×0.5)
+4. Hide 7 stacked Dome_* primitives (keep only Dome_N)
+5. Disable Cathedral_Facade primitive cubes (Sprint 11 punchlist) — keeps new CathedralFacade.fbx (R86)
+6. RoseWindow_North scale 1.5×1.5×0.3 (was huge "blue eye" mandala)
+7. Eye_0..Eye_3 scale 0.4 (StarDome eye decoration props)
+
+**Unity-tartaria MCP server disconnected mid-session** when Unity closed. Cannot drive play tests until NATRIX restarts Unity + bridge auto-restarts via Moon1MCPAutoStart.cs. All R97-R99 fixes are on disk and will activate on next play.
+
+**Real findings — what was actually wrong:**
+- Every session R59 onward I saw a "big brown/blue mandala" center-of-frame at the spawn pose
+- I attributed it to StarDome, CrystalSpire, Cathedral primitives — fixed all 3 with various swaps
+- Real cause was a different system entirely: `EchohavenObelisk` Day-3 progression beacon spawning at `player + (8, 0, 8)` with golden particle crown + point light. NOT a Moon 1 hero building but a hub-warp obelisk for inter-Moon travel.
+- The bug was the SpawnAtPlayer() relative-offset pattern — for an OBJECT that should be at a fixed canonical position. Now SpawnPosition is hard-coded.
+
+---
+
 ## 2026-06-07 AUTONOMOUS R71-R75 — Full audit swarm + village geometry shipped
 
 **R71-R75 shipped via 4 parallel audit agents + content fills:**

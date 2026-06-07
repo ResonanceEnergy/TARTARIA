@@ -4,6 +4,16 @@
 
 ---
 
+## 🚨 2026-06-07 R97 ROOT CAUSE FOUND for "big mandala blocking view"
+
+**EchohavenObelisk.cs SpawnOffset bug** — was `player + (8, 0, 8)` so the Day-3 hub-warp obelisk (base + 2 shafts + golden particle crown ring + crown orb + 4-intensity 10m point light) spawned **right next to the player at every load**. That golden glowing mandala in every screenshot from R59 onward was THIS, NOT the Cathedral, NOT the StarDome, NOT primitive cubes — though I fixed all 3 of those chasing the symptom.
+
+**Fix:** `static readonly Vector3 SpawnPosition = new Vector3(38f, 0f, 5f);` — fixed canonical position east of village, off the main pilgrimage path. Plus `PlayerVisualUpgrader.cs` runtime defensive fix that re-applies it every play. See `STATUS.md` 2026-06-07 R97-R99 block.
+
+**Lesson:** when chasing a visual gap, grep for `new GameObject\(` and `Vector3.*player\.transform\.position` patterns in spawners FIRST. Position-relative-to-player + RuntimeInitializeOnLoadMethod is a foot-gun.
+
+---
+
 ## 🎯 2026-06-07 LATEST PROGRESS (R71-R75)
 
 **Moon 1 visual density shipping fast.** Real walk-throughs + 24 screenshots inline this session.
