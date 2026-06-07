@@ -2,6 +2,44 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-07 R101-R102 — Visual density + SaveManager R82 fix
+
+**R101 — `SpawnDressingUpgrader.cs`:** runtime persistent dressing pass that adds (idempotent):
+- **14 lanterns** along the path z=8..32 in steps of 4 on x=±3 (wooden post + emissive golden bulb + point light range 5m intensity 1.5)
+- **Welcome stone** at (0, 0, 6) — slate base + golden engraved emissive plate facing camera
+- **9 path tiles** at z=7..31 in steps of 3 — flat 2.4×2.4 with subtle warm emissive
+- **Spawn brazier** at (0, 0, 4.5) — metallic bowl + orange emissive flame + point light intensity 3.5 range 8m
+
+Was previously empty tan ground at spawn → now medieval pilgrimage entrance with lit path. Triggers via `RuntimeInitializeOnLoadMethod` so it persists across Editor recompile.
+
+**R102 — `SaveManager.cs` DefaultJsonSerializer.Deserialize bug fix:** the silent ship-breaker from R82 was caused by the JSON serializer blindly UTF8-decoding any byte array + calling JsonUtility.FromJson. When given a binary/encrypted/compressed save file, this threw `JSON parse error: Invalid value`.
+
+```csharp
+// Now guards by first byte: returns default if not JSON, so caller falls through to backup recovery
+if (data == null || data.Length == 0) return default;
+byte first = data[0];
+bool looksJson = first == 0x7B || ...;
+if (!looksJson) {
+    Debug.LogWarning(...);
+    return default;  // graceful fallback
+}
+```
+
+**Cowork Claude (me) status:** MCP-to-Unity still disconnected — verified via `Unity session not available; please retry` on every tool call this session. Have been writing to disk + directing VS Code Claude.
+
+**For VS Code Claude Code instance — please pick up and commit these files:**
+1. `Assets/_Project/Scripts/Integration/EchohavenObelisk.cs` (R97 obelisk SpawnPosition fix)
+2. `Assets/_Project/Scripts/Integration/PlayerVisualUpgrader.cs` (R99 runtime persistent 7-cat fixer — NEW)
+3. `Assets/_Project/Scripts/Integration/SpawnDressingUpgrader.cs` (R101 spawn dressing — NEW)
+4. `Assets/_Project/Scripts/Editor/TartariaDevAutoStart.cs` (R100 menu bypass — NEW)
+5. `Assets/_Project/Scripts/Save/SaveManager.cs` (R102 JSON parse guard)
+6. `Tools/blender/gen_player_humanoid.py` (R98 — NEW)
+7. `STATUS.md` + `CLAUDE.md` updates
+
+Then push to `feature/consolidate-moon-architecture`. Optionally enable `Tartaria/9 Debug/Auto-Start Game (Skip Menu)` + hit Play to verify R97 obelisk position + R101 dressing visible + R99 player humanoid + R102 save load roundtrip.
+
+---
+
 ## 2026-06-07 R100 — R97 VISUALLY CONFIRMED WORKING
 
 After Unity recompiled with R97-R99 changes and entered Play, the next Game-view screenshot shows the **big golden mandala/eye is GONE from the spawn view**. Compared to prior screenshots from R59-R96 where every shot had a bright glowing crown ring + crown orb particle system dominating center-of-frame, the R100 screenshot shows a clean scene with sparse yellow-cube content (mud golems / RS coins) at proper distance.

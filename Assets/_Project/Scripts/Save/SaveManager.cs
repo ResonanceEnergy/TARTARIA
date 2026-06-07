@@ -130,8 +130,34 @@ namespace Tartaria.Save
 
             public T Deserialize<T>(byte[] data)
             {
-                string json = Encoding.UTF8.GetString(data);
-                return JsonUtility.FromJson<T>(json);
+                // R82 — Guard against non-JSON binary input.
+                // The previous version blindly UTF8-decoded any bytes and called JsonUtility.FromJson,
+                // throwing "JSON parse error: Invalid value" when given encrypted or compressed saves.
+                if (data == null || data.Length == 0)
+                {
+                    Debug.LogWarning("[DefaultJsonSerializer] Deserialize called with empty data");
+                    return default;
+                }
+                // Detect non-JSON payload by header. Valid JSON saves start with '{' (0x7B), whitespace, or UTF-8 BOM (0xEF).
+                byte first = data[0];
+                bool looksJson = first == 0x7B || first == 0x20 || first == 0x09 || first == 0x0A || first == 0x0D || first == 0xEF;
+                if (!looksJson)
+                {
+                    // Probably a binary/encrypted/compressed save mis-routed to this serializer.
+                    // Return default so the caller falls through to backup recovery instead of throwing.
+                    Debug.LogWarning($"[DefaultJsonSerializer] Skipping non-JSON payload (first byte 0x{first:X2}); save likely binary — caller should use a binary serializer.");
+                    return default;
+                }
+                try
+                {
+                    string json = Encoding.UTF8.GetString(data);
+                    return JsonUtility.FromJson<T>(json);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogError($"[DefaultJsonSerializer] JSON parse failed cleanly: {ex.Message}");
+                    return default;
+                }
             }
         }
 
