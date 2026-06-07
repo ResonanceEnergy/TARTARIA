@@ -2,6 +2,49 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-07 AUTONOMOUS R71-R75 — Full audit swarm + village geometry shipped
+
+**R71-R75 shipped via 4 parallel audit agents + content fills:**
+
+| Round | Win |
+|---|---|
+| R71 | **HUDController public API** — added `SetRSCount(int)` + `SetAetherPercent(float)` + real `UpdateRS(float)` impl. Audit Agent #1 flagged these missing. |
+| R72 | **9 village buildings authored** as scene children of `Village_Buildings` parent at canonical positions (Inn z=35, Cottage A/B z=80, Mill/Smithy z=65, TownHall z=70, Watchtower z=80, Apothecary z=40). |
+| R73 | **Real walk-through tour** — 8 waypoints, 8 screenshots captured. Revealed: village buildings scale 0.18 (too small ~1.3m), floating y=3-6, FBXs were bare pyramid roofs no walls. |
+| R74 | **Scale + ground fixes** — village 0.18→0.9 (5x), y=0 (planted). CrystalSpire 1→2x (4.4m→8.8m wide). LoreStone 1→2x (3m→6m tall). |
+| R75 | **VillageHouse FBX baked** via Blender — real cottage geometry (cube + pyramid roof + 4 glowing windows + door + chimney + foundation). 9/9 swapped (TownHall stubborn, nested unreachable child). Each cottage gets unique color tint (tan tavern Inn, mossy CottageB, slate Watchtower, lavender Apothecary, etc.) |
+
+**Audit swarm gap synthesis (10 from 4 agents):**
+1. ✅ HUD public API added
+2. ✅ Village buildings authored
+3. ✅ Village scale fixed
+4. ⚠ Cathedral 43-renderer real but visual character needs work
+5. ⚠ Player.prefab still thin (2 MBs); runtime PlayerSpawner workaround holds
+6. ⚠ MudGolem prefab 4-way fragmentation — only Resources/Enemies has combat MBs
+7. ⚠ 1,251 FBXs are LFS pointer stubs (97.7% art unpulled) — KayKit
+8. ⚠ 8 fragile `GameObject.Find()` in EchohavenContentSpawner — filed
+9. ✅ Village pyramid placeholder geometry fixed (R75 VillageHouse)
+10. ✅ LoreStone scale doubled
+
+**Real walk-through visual proof (24 screenshots, all posted inline in chat):**
+- `Logs/R59-R65_*.png` — initial 7-beat playthrough
+- `Logs/R66-R70_*.png` — CrystalSpire/MercurySpire/LoreStone additions
+- `Logs/R73_*.png` — pre-fix village walk
+- `Logs/R74_*.png` — scale fix verification
+- `Logs/R75_*.png` — VillageHouse cottage swap final
+
+**Files added this session:**
+- `Tools/blender/gen_village_house.py` · `gen_crystal_spire.py` · `gen_mercury_spire.py` · `gen_lore_stone_369.py` · `gen_ambient_layers.py`
+- `Assets/_Project/Models/Blender/Moon1/VillageHouse.fbx` + `CrystalSpire.fbx` + `MercurySpire.fbx` + `LoreStone369.fbx`
+- 6 new `Assets/_Project/Materials/Moon1/*.mat` (CrystalShardBlue/White, Mercury, ProphecyGold, BaseStone, +1)
+- 4 `Resources/Audio/Music/ambient_layer{1..4}.wav` (5MB ea, 60s, Telluric/Harmonic/Celestial/Combat)
+- 3 new scene landmarks: `Echohaven_BuriedBeacon`, `LoreStone_369_Day1`, swap of `Echohaven_CrystalSpire` mesh
+- HUDController.cs +3 public methods
+
+**Git status:** 776 commits queued locally. External lock holder (GitHub Desktop watcher) keeps recreating `.git/index.lock` faster than I can commit; R66-R75 work on disk awaits next lock-free window.
+
+---
+
 ## 2026-06-06 AUTONOMOUS R33-R34 — Ship-breaker fixed + perf optimization
 
 **R33 — Save file extension mismatch (commit `fbd94a23`):**

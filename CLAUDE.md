@@ -4,6 +4,36 @@
 
 ---
 
+## 🎯 2026-06-07 LATEST PROGRESS (R71-R75)
+
+**Moon 1 visual density shipping fast.** Real walk-throughs + 24 screenshots inline this session.
+
+| Round | Win |
+|---|---|
+| R66 | CrystalSpire Blender FBX baked (cube+shards), scene mesh swap, 8 renderers + blue emissive |
+| R67 | Mercury-Ball Spire landmark (Day 19-24 Buried Beacon) placed @ (45, 0, 25), obsidian + mercury orb + 3 satellites |
+| R68 | 3-6-9 Lore Stone (Day 1-5 prophecy fragment) menhir with carved golden glyph rings near spawn |
+| R71 | HUDController public API — added `SetRSCount(int)` + `SetAetherPercent(float)` + real `UpdateRS()` impl |
+| R72 | 9 village buildings authored as scene children (Inn, Bakery, Cottage A/B/C, Mill, Smithy, TownHall, Watchtower, Apothecary) |
+| R74 | Scale + ground fixes — village 0.18→0.9, CrystalSpire 2x, LoreStone 2x. All Y=0 ground-locked. |
+| R75 | Real **VillageHouse FBX** — cube body + pyramid roof + glowing windows + door + chimney + foundation. 9/9 cottage swap. Unique color per building. |
+
+**Audit swarm carry-forward gaps (still pending fill):**
+- 1,251 KayKit FBXs are LFS pointer stubs (97.7% unpulled) — `git lfs pull` required
+- 8 fragile `GameObject.Find()` calls in `EchohavenContentSpawner.cs` — replace with cached refs
+- MudGolem prefab 4-way duplicate — only `Resources/Enemies/MudGolem.prefab` has combat MBs
+- TownHall stubborn pyramid placeholder (DestroyImmediate edge case, nested unreachable child)
+- AnastasiaRocker.prefab missing — bake menu unfired
+- 105 `.cs.disabled` Editor scripts cleanup
+- 11 silent catches outside Moon 1 happy path (top 5 fixed C.L2)
+
+**Doc references:**
+- `STATUS.md` — full R71-R75 session log
+- `Logs/R59*-R75*.png` — 24 visual proof screenshots
+- `Tools/blender/gen_*.py` — 5 new Blender bake scripts this session
+
+---
+
 ## 1. PROJECT IDENTITY
 
 - **Project:** TARTARIA WORLD OF WONDER — Aether Awakening

@@ -803,7 +803,23 @@ namespace Tartaria.UI
         }
 
         // Existing methods (UpdateRS, ShowInteractionPrompt, etc.) remain unchanged for compatibility.
-        public void UpdateRS(float normalized) { /* existing impl */ }
+        public void UpdateRS(float normalized)
+        {
+            // R71 — real impl: route normalized 0..1 into the RS bar + count display.
+            float clamped = Mathf.Clamp01(normalized);
+            if (rsFillImage != null) rsFillImage.fillAmount = clamped;
+            if (rsValueText != null) rsValueText.text = Mathf.RoundToInt(clamped * 100f).ToString();
+        }
+        // R71 — public count + percent API the Audit Agent #1 flagged missing.
+        public void SetRSCount(int count)
+        {
+            if (rsValueText != null) rsValueText.text = "RS " + count;
+            if (rsFillImage != null) rsFillImage.fillAmount = Mathf.Clamp01(count / 100f);
+        }
+        public void SetAetherPercent(float percent01)
+        {
+            UpdateAetherCharge(Mathf.Clamp01(percent01) * 100f);
+        }
         public void ShowInteractionPrompt(string text) { if (interactionText != null) interactionText.text = text; }
         public void HideInteractionPrompt() { if (interactionText != null) interactionText.text = string.Empty; }
 
