@@ -71,7 +71,7 @@ Read it before any Unity-side decision.
 | **Strip Unused Post-Processing Variants** | Enable in URP Graphics settings. Cuts build size + shader compile time. R216 task — not yet on. |
 | **Occlusion Culling** | **Skip for outdoor Moons**. Only bake interior Dome chamber. R218 task. |
 | **Addressables for Moons** | Each Moon scene = own Addressables group. Modular kit + character meshes = shared "Core" group. Prevents duplicate-bake bug. R212 task — 0 groups currently. |
-| **Static flags + lightmap UVs** | StaticEditorFlags Batching+Navigation+ContributeGI+Occluder+Occludee on every static piece. ModelImporter `generateSecondaryUV=true` for baked lighting. R215 task — not in `BlenderImportPostprocessor.cs:67`. |
+| **Static flags + lightmap UVs** | StaticEditorFlags Batching+Navigation+ContributeGI+Occluder+Occludee on every static piece applied in R151+ instance code. ModelImporter `generateSecondaryUV=true` ALREADY set at `BlenderImportPostprocessor.cs:77` (FOUNDATIONS Phase 3 work — earlier audit was wrong). |
 | **Vegetation density** | 1 plant per 1-2m² near plaza (Lonely Mountains pattern). R201 hit 800+. Compliant. |
 | **Camera presentation** | Player POV y=1.7 + pitch 2-5°. Hero shots y=3-5 + yaw 25-35°. **AVOID y=10+ panoramas — they compress everything and make a dense level read as sparse.** Lesson from R200 vs R204. |
 
