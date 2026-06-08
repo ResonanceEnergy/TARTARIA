@@ -4,6 +4,104 @@
 
 ---
 
+## 🎯 2026-06-08 R171 — STYLE LOCK + UNIFY MANDATE (supersedes Art Bible Aetherial-Glow direction)
+
+Per NATRIX, post deep-research synthesis (`docs/research/UNITY_RPG_LEVEL_BUILDING_DEEP_DIVE_2026-06-08.md`, 60+ cited sources):
+
+### THE LOCKED STYLE — Stylized PBR Realism
+
+Touchstones: **A Plague Tale: Innocence + Outer Wilds + Hellblade**. NOT Hollow Knight cartoon, NOT Tunic flat-shaded, NOT Synty cel.
+
+| Rule | Spec |
+|---|---|
+| **Material** | Full PBR but **roughness biased matte (0.6-0.9)**; desaturated painterly albedo; **metals reserved for narrative props only** |
+| **Lighting** | Real-time GI or baked lightmaps; **high-contrast directional key + soft ambient fill (~3:1 ratio)**; **SSAO mandatory** |
+| **Silhouette** | **Mid-poly** (~600-3000 verts/character, ~200-1500/prop); carefully blocked hero shapes; **readability via contour** not surface noise |
+| **Color** | **3-5 hue palette per scene**, complementary anchors, **neutrals dominant**; saturation reserved for Aether-band accents |
+
+This **supersedes** the Aetherial-Glow direction in `docs/32_ART_BIBLE.md`. The Art Bible's locked palette (`#FFD973` Aether-Gold / `#8CD9FF` Cyan / `#D98CFF` Violet / `#C03030` Corruption-Crimson / warm `#FFE9A0` key) **stays canonical** — it now overlays Stylized PBR Realism, not the old matte-non-PBR-Aetherial style.
+
+### THE UNIFY MANDATE — share authoring across all 13 Moons (100% BLENDER, NO PURCHASES)
+
+**Per NATRIX directive 2026-06-08:** *"NO KAYKIT, NO PURCHASES, BUILD EVERYTHING WITH BLENDER."* The asset-store base layer recommended by the deep-research is **REJECTED**. All assets authored in Blender. The unify mandate still applies — build ONCE in Blender, palette-swap across 13 Moons.
+
+| Asset class | Author count | Authoring source | Reuse strategy across 13 Moons |
+|---|---|---|---|
+| **Modular wall/roof/floor kit** | **12 pieces ONCE** (24 hr highest-leverage authoring) | **Blender — `Tools/blender/gen_canon/Kit_*.py`** | Palette-swap per-Moon (warm stone Moon 1 / cold stone Moon 7 / glass Moon 5 / metal Moon 8) |
+| Hero buildings | 3 per Moon × 13 = 39 (assembled from kit, not bespoke) | **Blender — already shipped Dome/Fountain/Spire for Moon 1** | Bespoke silhouettes, kit-piece bodies |
+| Generic villager NPCs | 6-8 archetypes ONCE | **Blender — `Tools/blender/gen_canon/Char_Villager_*.py`** | Material variation + Mecanim retarget |
+| Named NPCs | 2 per Moon × 13 = 26 | **Blender — already shipped 4 for Moon 1** | Custom mesh + Mecanim rig |
+| **Mud Golem (enemy)** | **1 mesh** | **Blender — already shipped** | **Reuse across ALL 13 Moons with color/scale variants** |
+| ResetScout (enemy alt) | 1 mesh | **Blender — already shipped** | Same — reuse all 13 |
+| Vegetation | **15-25 plant/tree variants in Blender** | **Blender — `Tools/blender/gen_canon/Veg_*.py`** | Recolor per biome via material variants |
+| Props | 28 already shipped for Moon 1 | **Blender** | **STOP authoring uniques. Density via instance scattering** |
+| **3 VFX shaders** | **Aether-Gold seam pulse + mud bubble + restoration burst** (24 hr) | **Unity Shader Graph or HLSL custom** | Used by every Moon |
+
+### The 4 highest-leverage R171+ actions
+
+1. **Author 12-piece modular kit in Blender** (~24 hr) — wall_straight / wall_corner / wall_window / wall_door / floor_square / floor_edge / roof_flat / roof_slope / column / arch / stair / capstone. 1m snap. Unlocks all 13 Moons' architecture.
+2. **Author Player_Elara_Voss in Blender + Mecanim rig** (~24 hr) — kills the capsule placeholder.
+3. **Build 3 VFX particle shaders in Unity Shader Graph** (~24 hr) — Aether-Gold seam pulse + mud bubble + restoration burst.
+4. **Author 6-8 villager archetypes + 15-25 vegetation variants in Blender** (~32 hr) — replaces the would-have-been Mixamo + Quaternius asset-store layer.
+
+### The 3 highest-leverage R171+ actions
+
+1. **Author modular wall/roof/floor kit ONCE** (12 pieces, ~24 hr) — this kit unlocks all 13 Moons' architecture
+2. **Author Player_Elara_Voss in Blender + Mixamo retarget** (~24 hr) — kills the capsule placeholder, enables all 13 Moons of gameplay screenshots
+3. **Build 3 VFX particle shaders** (Aether-Gold seam pulse + mud bubble + restoration burst, ~24 hr) — currently 0 particle systems; Brazier flame is just a glowing orb
+
+After these 3, Moon 1 is *visually complete enough to ship a screenshot anyone can read*. Moons 2-13 are then content-driven (palette + spawn-list), not authoring-driven.
+
+### Unity 6 / URP Patterns (baked in per deep-research report)
+
+| Pattern | Canonical for TARTARIA |
+|---|---|
+| **APV (Adaptive Probe Volumes)** | Unity 6 production GI default for URP. Set lights Mixed/Baked, GameObjects "Contribute GI", MeshRenderers "Receive GI: Light Probes". Reflection Probes enable "Probe Volumes" in BOTH Realtime + Baked. |
+| **Prefab Variants** | "Most scenes should be constructed from Prefabs with minimal overrides." Base prefab + variants for the 12 hero buildings + 26 NPCs. Variants in SAME Addressables group as base. |
+| **Multi-scene additive** | `Boot + UI + Echohaven + Moon1_Systems` already in use. Continue. |
+| **Unity Terrain** | Already in use for 1km² Moon 1. Use mesh-based only for underground/caves. |
+| **ProBuilder** | Graybox iteration ONLY. Replace with Blender hero meshes once layout locks. Don't ship ProBuilder geo. |
+| **Snap grid** | **1m standard** (matches KayKit Medieval + Synty POLYGON + Quaternius). Authored modular kit MUST snap to 1m. |
+| **URP Bloom + Tonemap** | Volume profile `EchohavenVolumeProfile.asset` already wired R152. Threshold 1.1, Neutral tonemap. Keep. |
+| **SSAO** | Renderer Feature (NOT volume override). Already in renderer R152. |
+| **Decal Renderer Feature** | Minimize use per Unity guidance. OK for blood/cracks on hero pieces. |
+| **Strip Unused Post-Processing Variants** | Enable in URP Graphics settings. Cuts build size + shader compile time. |
+| **Occlusion Culling** | **Skip for outdoor Moons**. Only bake interior Dome chamber. |
+| **Addressables for Moons** | Each Moon scene = own Addressables group. Modular kit + character meshes = shared "Core" group. Prevents duplicate-bake bug. |
+
+### What R146 canon stays
+
+- 3 hero buildings per Moon spec (Dome+Fountain+Spire for Moon 1)
+- 4 named NPCs per Moon (Milo+Anastasia+Lirael+Cassian for Moon 1)
+- 1 enemy type per Moon (Mud Golem for Moon 1) — now confirmed REUSED across all 13
+- All R146 quarantine of drift content stays
+- **The 13 Moons stays** — no scope-cut to 6-8 per NATRIX directive ("KEEP 13 MOONS UNIFY BUILD PATTERN")
+- Locked palette + locked lighting from `docs/32` stay canonical
+
+### What R171 changes
+
+- Style direction: Aetherial-Glow stylized → **Stylized PBR Realism**
+- Authoring philosophy: per-Moon uniques → **kit-share + palette-swap**
+- **Asset-store layer: REJECTED per NATRIX directive.** 100% Blender authoring. No Mixamo, no KayKit, no Quaternius, no Poly Haven. (HDRIs allowed only as procedural skybox shader references, not imported.)
+- Stop adding unique Blender props per Moon — 28 is enough for Moon 1; future density = instance scattering
+- Enemy authoring: 1 mesh × 13 Moons (color/scale variants), not 13 new bakes
+
+### R172+ plan (100% Blender, NO PURCHASES)
+
+| Round | Action |
+|---|---|
+| R172 | Author 12-piece modular kit in Blender (wall_straight / wall_corner / wall_window / wall_door / floor_square / floor_edge / roof_flat / roof_slope / column / arch / stair / capstone) at 1m snap |
+| R173 | 3 VFX shaders via Unity Shader Graph + particle systems (Aether-Gold seam pulse + mud bubble + restoration burst) |
+| R174 | Player Elara Voss in Blender + custom Mecanim humanoid rig (NO Mixamo) |
+| R175 | Author Mecanim animation clips in Blender for 6 existing characters (idle / walk / talk / hit / die) |
+| R176 | Re-shade existing Blender meshes to Stylized PBR Realism (roughness 0.6-0.9, desaturate albedo) |
+| R177 | Author 15-25 vegetation variants in Blender (`Tools/blender/gen_canon/Veg_*.py`) — replaces would-have-been Quaternius |
+| R178 | Yarn dialogue runner wiring per NPC |
+| R179 | Moon 2 scene shell — first palette-swap test of the unified pipeline |
+| R180 | Sprint B close — 8-step smoke test attempt 2 |
+
+---
+
 ## 🔒 2026-06-08 R146 — CANON LOCK (supersedes ALL drift below)
 
 Per NATRIX, end of 17-round drift hammer: *"WAS THIS NOT ALL WRITTEN IN THE MOON 1-13 FILES? HOW DID WE DRIFT SO HARD UPDATE CLAUDE.MD AND ALL RELEVANT .MD FILES"*

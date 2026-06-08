@@ -70,27 +70,40 @@ Per-Moon spec docs (one file each) live at `docs/moons/moon_NN_<name>.md`. Curre
 
 ---
 
-## Sprint cadence (after R146-R150)
+## Sprint cadence (R171 UNIFY MANDATE rev)
 
-| Sprint | Scope |
-|---|---|
-| Sprint A (R151-R170) | Author the 3 hero buildings PROPERLY in Blender per Art Bible (matte stone, gold seam emissive, sacred geometry). Replace primitive blockouts. |
-| Sprint B (R171-R180) | Tuning mini-game variants A/B/C fully wired + RS economy + Day 1-28 progression |
-| Sprint C (R181-R190) | 4 NPCs with dialogue trees + Anastasia rocker beat + Lirael Day 25 lullaby + Cassian intro |
-| Sprint D (R191-R200) | 17th-hour cinematic + Dome Awakening climax + Moon 2 portal seed |
-| GATE 1 ship | Moon 1 8-step smoke test passes with video proof. Then Moon 2 sprint cycle begins. |
+Per CLAUDE.md §R171 — sprints reordered around the "build ONCE share across 13 Moons" mandate.
+
+| Sprint | Rounds | Scope |
+|---|---|---|
+| Sprint A | R151-R170 | ✅ DONE — 3 canon hero buildings + 28 props + 6 NPCs in Blender + scene populated + lighting + audio + NavMesh + HUD |
+| **Sprint B** | **R171-R180** | **R171 STYLE LOCK + UNIFY MANDATE + NO-PURCHASES DIRECTIVE**. R172 modular kit (12 wall/roof/floor pieces ONCE) in Blender. R173 3 VFX shaders via Unity Shader Graph. R174 Player Elara Voss + custom Mecanim rig in Blender (NO Mixamo). R175 Mecanim animation clips in Blender for 6 existing characters. R176 re-shade meshes to Stylized PBR Realism (Roughness 0.6-0.9, desat albedo). R177 author 15-25 vegetation variants in Blender (NO Quaternius). R178 Yarn dialogue runner wiring. R179 Moon 2 scene shell as palette-swap test. R180 sprint close + 8-step smoke test attempt 2. |
+| Sprint C | R181-R190 | Tuning mini-game variants A/B/C fully wired + RS economy + Day 1-28 progression. 4 NPCs with dialogue trees + Anastasia rocker beat + Lirael Day 25 lullaby + Cassian intro |
+| Sprint D | R191-R200 | 17th-hour cinematic + Dome Awakening climax + Moon 2 portal seed. GATE 1 ship — Moon 1 8-step smoke test passes with video proof. |
+| Sprint E+ | R201-R260 | Moons 2-13 each = 5 rounds (palette-swap modular kit + spawn NPCs + scene shell + smoke test + commit). 12 Moons × 5 rounds = 60 rounds — vs. ~200 rounds at per-Moon-unique pace. |
+
+### Why R171 unify mandate cuts dev time
+
+Per deep-research report (`docs/research/UNITY_RPG_LEVEL_BUILDING_DEEP_DIVE_2026-06-08.md`):
+
+- Per-Moon authoring at original spec: ~80-110 unique meshes/Moon × 13 = 1,000-1,200 total + ~3,840 hr = **5-7 year timeline**
+- R171 unified 100%-Blender pipeline: 12-piece modular kit + 1 enemy + 26 named NPCs + 6-8 villager archetypes + 15-25 vegetation + 28 props (already done) = **~650 unique meshes total** + ~2,200 hr = **3-4 year timeline**
+
+Net: cuts ~1,600 authoring hr by sharing modular kit + enemy across all 13 Moons + reusing the existing 28 props as instance-scattered density. Per NATRIX 2026-06-08 directive, all 650 meshes authored in Blender (no asset-store base layer).
 
 ---
 
-## Rules of engagement (every sprint)
+## Rules of engagement (every sprint) — R171 amendment
 
-1. **Read `docs/15` (Moon 1) and `docs/32` (Art Bible) before any work.** They override CLAUDE.md.
+1. **Read `CLAUDE.md §R171`** + **`docs/15` (Moon 1)** + **`docs/32` (Art Bible)** before any work. They override anything else.
 2. **Screenshot every claim.** No `tool returned success → ✅ shipped`.
-3. **One Moon at a time.** Don't sprint Moon 2 content while Moon 1 isn't GATE 1.
+3. **One Moon at a time.** Don't sprint Moon 2 content while Moon 1 isn't GATE 1. **Exception:** R179 Moon 2 scene shell as palette-swap PROOF of the unified pipeline (not content).
 4. **3-hue discipline per shot.** If a screenshot has 4+ primary colors, it's wrong.
-5. **No purchases without Art Bible amendment.** Synty / asset packs not on the whitelist need spec-side approval first.
+5. **NO ASSET STORE.** Per NATRIX 2026-06-08 directive: "NO KAYKIT, NO PURCHASES, BUILD EVERYTHING WITH BLENDER." All meshes, characters, vegetation, animations authored in Blender. VFX shaders via Unity Shader Graph or HLSL. The pre-R171 asset-pack whitelist (KayKit/Quaternius/Mixamo/Synty/Poly Haven) is **REJECTED**.
 6. **Per-Moon spec doc OR don't ship.** Moons 3-13 each need a `docs/moons/moon_NN_*.md` before scope authoring begins.
+7. **NEW R171 — Unify rule.** Before authoring a new mesh, check: can this be a palette-variant of an existing mesh? If yes, palette-variant. No new bake unless silhouette is truly new.
+8. **NEW R171 — Stop unique-prop creep.** Moon 1 has 28 unique props. Sufficient. Density beyond this = instance scattering of existing meshes.
 
 ---
 
-*v1.0 · 2026-06-08 · LOCKED. Amend in-place when a Moon ships. Authority over any older planning doc including the FOUNDATIONS_FIRST plan.*
+*v1.1 · 2026-06-08 · R171 STYLE LOCK + UNIFY MANDATE applied. Authority over any older planning doc including FOUNDATIONS_FIRST and pre-R171 sprint plans.*

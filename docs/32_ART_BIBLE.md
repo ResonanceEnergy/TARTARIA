@@ -1,28 +1,97 @@
 # 32 — Art Bible (TARTARIA)
 
 **Status**: LOCKED — change only via committee of one (you).
-**Last update**: 2026-04-29.
+**Last update**: 2026-06-08 (R171 STYLE LOCK — Stylized PBR Realism).
 **Purpose**: Single source of truth for visual direction. Every asset must defer to this doc.
 
 ---
 
-## 1. North Star
+## 0. R171 STYLE LOCK (2026-06-08, supersedes "Aetherial-Glow" direction)
+
+Per NATRIX, post deep-research synthesis (`docs/research/UNITY_RPG_LEVEL_BUILDING_DEEP_DIVE_2026-06-08.md`, 60+ cited sources, 14-family art-style taxonomy):
+
+**The locked style is *Stylized PBR Realism* — taxonomy family #1.** Touchstones: **A Plague Tale: Innocence + Outer Wilds + Hellblade**. NOT cartoon, NOT flat-shaded, NOT Synty cel, NOT the previous "Aetherial-Glow" framing.
+
+### The four locked rules
+
+| Rule | Spec |
+|---|---|
+| **Material** | Full PBR but **roughness biased matte (0.6-0.9)**; **desaturated painterly albedo**; **metals reserved for narrative props only** (Aether resonators, weapons, prophecy stones — not everyday wood/stone) |
+| **Lighting** | Real-time GI or baked lightmaps; **high-contrast directional key + soft ambient fill (~3:1 ratio)**; **SSAO mandatory** |
+| **Silhouette** | **Mid-poly** (~600-3000 verts/character, ~200-1500/prop); **carefully blocked hero shapes**; readability via **contour**, not surface noise |
+| **Color** | **3-5 hue palette per scene**, complementary anchors, **neutrals dominant**; saturation reserved for Aether-band accents |
+
+### What this changes from prior Art Bible
+
+- **The four palette colors (Aether-Gold/Cyan/Violet/Corruption-Crimson) STAY canonical.** They become **emissive accents on PBR matte bodies** — not the dominant body color.
+- **Stone is now PBR matte** (Roughness 0.85+, Metallic 0), not unlit non-PBR. Substance/hand-painted normal maps for cracks. Roughness map allowed.
+- **Wood is PBR matte** (Roughness 0.75-0.95, Metallic 0).
+- **Metal is reserved.** Only narrative props (Aether resonator orbs, weapon blades, prophecy ring inlays) use Metallic > 0. **No metallic floors, no metallic body armor on villagers.**
+- **Hellblade's stone language is the touchstone:** weathered, matte, layered. NOT toon. NOT vertex-color-only.
+- **A Plague Tale's lighting is the touchstone:** real-time GI on indoor scenes, baked lightmaps on outdoor heroes, SSAO grounding everything.
+
+### Examples to study (do NOT copy)
+
+- *A Plague Tale: Innocence* — **R171 primary touchstone.** Ruined architecture with PBR matte materials + bioluminescent drama. Closest shipped match.
+- *Outer Wilds* — **R171 secondary touchstone.** Naive PBR low-poly with confident lighting; mid-poly characters; 3-hue palette per scene.
+- *Hellblade: Senua's Sacrifice* — **R171 tertiary touchstone.** Stylized PBR character authoring, contour-readable silhouettes, restrained color.
+- *Death Stranding* — sense of vast emptiness, sparse iconic structures (composition + palette reference, not material reference).
+- *Outer Wilds* (again, for lighting) — confident PBR sun + bounce light.
+
+### Anti-references (avoid)
+
+- *Generic Unity URP demo* — no committed direction.
+- *Photoreal AAA* (Skyrim, Witcher 3 PBR density) — out of solo budget, wrong material density.
+- *Voxel/Minecraft* — wrong tone for sacred mystery.
+- *Synty POLYGON / cartoon* — explicitly rejected.
+- *Cel-shading / toon shaders* — explicitly rejected.
+- *Wet/glossy PBR for stone* — sacred = matte. Roughness 0.85+.
+- *Anime kits* (Genshin, HSR NPR) — wrong material model.
+- *Hollow Knight cartoon* — silhouette reference only; we are 3D PBR, they are 2D non-PBR.
+- *Tunic flat-shaded* — chunky sacred motif reference only; we are NOT flat-shaded.
+
+### Reuse mandate (unified across all 13 Moons, 100% BLENDER)
+
+Per NATRIX directive 2026-06-08: *"NO KAYKIT, NO PURCHASES, BUILD EVERYTHING WITH BLENDER."* All asset-store dependencies REJECTED. Per `CLAUDE.md §R171 UNIFY MANDATE`:
+
+- **One modular wall/roof/floor kit, 12 pieces, authored ONCE in Blender.** Palette-swap per-Moon (warm stone Moon 1, cold stone Moon 7, glass Moon 5, metal Moon 8).
+- **One Mud Golem mesh.** Reuse all 13 Moons with color/scale variants.
+- **Vegetation: 15-25 plant/tree variants authored in Blender** (`Tools/blender/gen_canon/Veg_*.py`). Recolor per biome via material variants. NOT Quaternius / asset store.
+- **Generic villagers: 6-8 archetypes authored in Blender** (`Tools/blender/gen_canon/Char_Villager_*.py`). NOT Mixamo / KayKit. Material variation + Mecanim retarget. Named NPCs (already 4 shipped) stay custom.
+- **3 VFX shaders authored ONCE in Unity Shader Graph** (Aether-Gold seam pulse + mud bubble + restoration burst). Reused all 13 Moons.
+- **Player Elara Voss authored in Blender** + custom Mecanim humanoid rig.
+- **Animation clips authored in Blender** for all 6 existing characters (idle / walk / talk / hit / die). NOT Mixamo.
+
+### Original North Star (preserved, recontextualized)
+
+> *"Sacred geometry made flesh in the ruins of forgotten empire."*
+
+If a screenshot doesn't read as **Gothic + Aether + Resonance** in 2 seconds, it's wrong. The R171 Stylized PBR Realism rules are HOW we achieve this North Star — not a replacement of it.
+
+---
+
+## 1. North Star (legacy framing, preserved)
 
 > *"Sacred geometry made flesh in the ruins of forgotten empire."*
 
 If a screenshot doesn't read as **Gothic + Aether + Resonance** in 2 seconds, it's wrong.
 
-**Reference touchstones** (study these, do NOT copy):
-- *Hollow Knight* — silhouette discipline, 2-3 colour focus per screen.
-- *Tunic* — flat shading + chunky sacred motifs + warm-cool hue split.
-- *Death Stranding* — sense of vast emptiness, sparse but iconic structures.
-- *A Plague Tale* — ruined architecture with bioluminescent drama.
-- *Outer Wilds* — naive low-poly with confident lighting.
+**Reference touchstones** (R171-updated):
+- *A Plague Tale: Innocence* — **R171 primary touchstone** — ruined PBR architecture with bioluminescent drama.
+- *Outer Wilds* — **R171 secondary** — naive PBR low-poly with confident lighting.
+- *Hellblade* — **R171 tertiary** — Stylized PBR character authoring.
+- *Hollow Knight* — silhouette discipline, 2-3 colour focus per screen (silhouette reference only; material model DIFFERENT — they're 2D, we're PBR).
+- *Tunic* — chunky sacred motifs + warm-cool hue split (motif reference; flat-shading EXPLICITLY NOT our style).
+- *Death Stranding* — sense of vast emptiness, sparse iconic structures (composition + palette).
 
 **Anti-references** (avoid):
 - *Generic Unity URP demo* — no committed direction.
 - *Photoreal AAA* — out of solo budget.
 - *Voxel/Minecraft* — wrong tone for sacred mystery.
+- *Synty POLYGON / cartoon* — explicitly rejected (also at line 177).
+- *Cel/toon shaders* — explicitly rejected (also at line 82).
+- *Wet/glossy PBR for stone* — sacred = matte.
+- *Anime kits* — wrong material model.
 
 ---
 
