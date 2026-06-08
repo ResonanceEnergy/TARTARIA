@@ -884,6 +884,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: CrystalSpire_Hero
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d8b7e42b37cd9bf40b93b0a9d1e6db3a, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -12312,6 +12316,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cottage_B_Test
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 26da24b0e69e78d48a4bc2f14d99f791, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -19066,6 +19074,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3fec5df74898b244db2a08ab42040ae4, type: 3}
       propertyPath: m_Name
       value: Cathedral_Hero
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3fec5df74898b244db2a08ab42040ae4, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -26973,8 +26985,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1324087093}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08715574, y: 0, z: 0, w: 0.9961947}
-  m_LocalPosition: {x: 0, y: 8, z: -35}
+  m_LocalRotation: {x: 0.02617695, y: 0, z: 0, w: 0.99965733}
+  m_LocalPosition: {x: 0, y: 1.7, z: -25}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -27626,7 +27638,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 2147483647
+  m_StaticEditorFlags: 13
   m_IsActive: 1
 --- !u!154 &1366965790
 TerrainCollider:
@@ -28076,6 +28088,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3088b21d5a57c1e4c9b6a5452b91ffea, type: 3}
       propertyPath: m_Name
       value: Watchtower_Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3088b21d5a57c1e4c9b6a5452b91ffea, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -28959,6 +28975,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 3ebbeee1f1b9bc948965fa1f786961e2, type: 3}
       propertyPath: m_Name
       value: StarDome_Hero
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3ebbeee1f1b9bc948965fa1f786961e2, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -31536,6 +31556,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 78353c815b32e2146859d38802a28d0e, type: 3}
       propertyPath: m_Name
       value: Cottage_A_Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 78353c815b32e2146859d38802a28d0e, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -34522,6 +34546,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Apothecary_Test
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 10a0777d48b53cf4e8a80b4b48bd24c3, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -35667,6 +35695,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: ffb025ea0fc318643838cc26ad8cded6, type: 3}
       propertyPath: m_Name
       value: Inn_Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: ffb025ea0fc318643838cc26ad8cded6, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -40570,6 +40602,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Cottage_C_Test
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e604ec3a0f69569499767cc58aaa7a18, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -44466,6 +44502,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Mill_Test
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 7f301d96ed6950541ac5ea5c09b8177e, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -46158,6 +46198,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 508a2e4d0de416141aea614fd31a26f9, type: 3}
       propertyPath: m_Name
       value: TownHall_Test
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 508a2e4d0de416141aea614fd31a26f9, type: 3}
+      propertyPath: m_StaticEditorFlags
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
