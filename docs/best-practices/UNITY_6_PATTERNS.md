@@ -1,5 +1,170 @@
 # UNITY 6 PATTERNS — Best-Practice Distillation for TARTARIA
 
+> **R205 UPDATE (2026-06-08):** Per NATRIX directive after deep-research synthesis. Sections 1-12 below were rewritten to reflect the 60+ cited sources from `docs/research/UNITY_RPG_LEVEL_BUILDING_DEEP_DIVE_2026-06-08.md`. The original Sprint-11 content is preserved under section 13 (legacy).
+> **Status:** AUTHORITY. Overrides any older patterns scattered across CLAUDE.md or per-feature docs.
+
+Every Unity-side decision in TARTARIA defers to this file. If something isn't here, default to Unity 6 manual + the deep-research report.
+
+---
+
+## R205 SECTION — Distilled Unity 6 Patterns (2026-06-08)
+
+### 1. Scene composition — multi-scene additive
+
+**Canonical pattern:** Split into ≥4 additive scenes loaded with `LoadSceneMode.Additive`:
+
+| Scene | Lifetime | What lives here |
+|---|---|---|
+| `Boot.unity` | Whole session | EventSystem, GameManager, SaveManager, persistent singletons |
+| `UI_Overlay.unity` | Whole session | HUD canvas, dialogue UI, pause menu |
+| `Managers_Moon1.unity` | While in Moon 1 | Moon1NarrativeBeats, EchohavenContentSpawner, AnastasiaController, LiraelController, ZoneController, TartarianHourCycle |
+| `Echohaven_VerticalSlice.unity` | While in Moon 1 | Static environment (Terrain, hero buildings, prop instances, lighting, NavMesh) |
+
+**Cross-scene wiring:** ScriptableObject event channels per Unity's official "Create modular game architecture with ScriptableObjects (Unity 6 edition)" guide. NO direct cross-scene `GameObject.Find` calls.
+
+**TARTARIA status:** Multi-scene already in use (`Boot` + `UI_Overlay` + `Echohaven_VerticalSlice` + `Moon1_Systems`). Honest gap: Moon1_Systems is currently a prefab inside Echohaven_VerticalSlice, not an additive scene. R210+ task: split out.
+
+### 2. Prefab Variants — base + override discipline
+
+**Unity blog rule:** *"Most scenes should be constructed from Prefabs with minimal overrides."*
+
+**Canonical pattern:**
+- Author 1 base prefab per archetype (Wall, Cottage, NPC, Enemy)
+- Author N variants for visual swaps (warm-stone Wall vs cold-stone Wall)
+- Variants override mesh refs / materials only — NOT logic components
+- Base + variants in SAME Addressables group (prevents duplicate-bake bug)
+
+**TARTARIA application:**
+- R172 12-piece modular kit = 12 base prefabs. Each Moon's stone palette = a variant set.
+- 1 Mud Golem mesh × 13 Moon biome variants = 13 prefab variants of one base.
+- R181 6 villager archetypes = base prefabs; each Moon's villager NPCs = material variants.
+
+**Honest gap:** R172-R200 used direct `Instantiate(FBX)` not Prefab Variants. R220+ refactor.
+
+### 3. Addressables — Moon as group
+
+| Addressables group | Contents |
+|---|---|
+| `Core` | Modular kit + 6 villager archetypes + 1 Mud Golem mesh + Player Elara + UI canvas |
+| `Moon1` | Moon 1 scene + Moon 1 palette materials + Moon 1 specific props (Anastasia Rocker, Pipe Organ, Giant Skeleton) |
+| `MoonN` | One group per Moon (palette materials + specific props + scene shell) |
+
+**Loading:** `Addressables.LoadSceneAsync("Moon1", LoadSceneMode.Additive)`.
+
+**Honest gap:** 0 Addressables groups today. R210+ task.
+
+### 4. Lighting — APV (Adaptive Probe Volumes) is Unity 6 default
+
+**Setup:**
+- Lights → **Mixed** or **Baked**
+- GameObjects → **"Contribute Global Illumination"**
+- MeshRenderers → **"Receive GI: Light Probes"**
+- Reflection Probes → enable **"Probe Volumes"** in BOTH "Realtime" and "Baked"
+- Bake: `Window → Rendering → Adaptive Probe Volumes → Bake`
+
+**Unity 6 APV killer features:**
+- **Lighting Scenario Blending** for day-night cycle (Day 1 dawn → Day 17 17th-hour eruption blend)
+- **Sky Occlusion** for outdoor Moons
+- **Disk Streaming** for large worlds (1km² Echohaven)
+
+**Hybrid:** Lightmap hero buildings (Dome, Fountain, Spire) for crisp shadows. APV handles everything else.
+
+**TARTARIA status:** R152 added URP Volume + Bloom. APV not wired. R213 task.
+
+### 5. Terrain — Unity Terrain outdoor, mesh for caves
+
+**Use Unity Terrain when:** splat-mapped texture layers + detail mesh / grass billboards + tree instancing + NavMesh bake.
+
+**Use mesh-based:** Underground Dome chamber (overhangs/cliffs require negative Y), Mud Pool depressions.
+
+**Splat layers per R171 rules:** Matte stone, low normal density, Roughness 0.85+. NOT Polyhaven 4K (explicitly rejected). Hand-authored stylized.
+
+**TARTARIA status:** Unity Terrain in use for 1km² Echohaven (R132). Splat textures still stock. R214 task.
+
+### 6. ProBuilder — graybox ONLY, never ship
+
+**Rule:** ProBuilder is in-Editor blockout iteration. Replace with Blender hero meshes once layout locks. Don't ship ProBuilder geo.
+
+**TARTARIA application:** ProBuilder NOT used this session — went straight from primitive blockouts (R148) to Blender FBX (R151+).
+
+### 7. Snap grid — 1m standard
+
+**Rule:** Modular kit MUST snap to 1m. Matches Synty POLYGON, KayKit Medieval, Quaternius defaults.
+
+**TARTARIA application:** R172 12-piece kit authored at 1m. Bounds verified — wall 1m × 3m × 0.3m, floor 1m × 0.2m × 1m, column 0.5m × 3m. Compliant.
+
+### 8. URP renderer — performance rules
+
+| Setting | Value | Why |
+|---|---|---|
+| **Strip Unused Post-Processing Variants** | Enabled | Build size + shader compile |
+| **SSAO** | Renderer Feature (NOT Volume override) | Independent of post-process stack |
+| **Decal Renderer Feature** | Minimize use | Unity guidance — extra render pass cost |
+| **Volume Update Mode** | Via Scripting | Manual `UpdateVolumeStack` on transitions |
+| **Bloom** | Threshold 1.2, Intensity 0.5 (R203 tuned) | Aether-Gold reads without washout |
+| **Tonemap** | Neutral | Per Art Bible R171 |
+| **Color Adjustments** | Post-exposure -0.3, Contrast 5, Saturation 0 (R203) | Matte stone visibility |
+| **Camera POV target** | y=1.7 player, y=3-5 hero shots | Avoid panorama compression |
+
+**TARTARIA status:** SSAO wired R152. Bloom + tonemap + color adjustments wired R152 + R203. Strip Unused Variants: R216 task.
+
+### 9. Occlusion Culling — skip outdoor, bake interior
+
+**Rule:** Bake only for distinct enclosed zones (Dome interior). Skip outdoor.
+
+**TARTARIA status:** Not yet baked. R218 task (interior Dome).
+
+### 10. Static flags + lightmap UVs
+
+**Per import:**
+- StaticEditorFlags: **BatchingStatic + NavigationStatic + ContributeGI + OccluderStatic + OccludeeStatic**
+- ModelImporter → **Generate Secondary UV** = true (baked lighting)
+- ModelImporter → **Material Search** = Local
+- ModelImporter → **Material Location** = External
+
+**TARTARIA status:** Static flags applied in R151+ instance code. Generate Secondary UV: NOT set in `BlenderImportPostprocessor.cs:67`. R215 task.
+
+### 11. Vegetation density — Lonely Mountains pattern
+
+**Per deep-research:** Lonely Mountains hand-placed *hundreds of thousands of instances* from small library (EST 30-50 foliage types). Small library + dense placement.
+
+**Density target near plaza:** 1 plant per 1-2m² (so 30m radius zone = ~700 plants).
+
+**TARTARIA status:** R177 placed 110, R201 increased to 800+. Compliant.
+
+### 12. Camera presentation rules
+
+**For non-panorama screenshots:**
+- Player POV: y=1.7 (human eye), pitch 2-5°
+- Hero shots: y=3-5, yaw 25-35°
+- Avoid y=10+ panoramas — they compress everything, make level read sparse even when dense
+
+**TARTARIA application:** R201-R204 ground shots show good density. Future hero shots default to y≤5 + small angle.
+
+---
+
+## R210+ Sprint E task list (carrying forward)
+
+| Round | Task | Per pattern |
+|---|---|---|
+| R210 | Split Moon1_Systems into additive scene `Managers_Moon1.unity` | §1 multi-scene |
+| R211 | Convert hero buildings + characters to Prefab Variants | §2 prefab variants |
+| R212 | Create Addressables groups: Core + Moon1...Moon13 | §3 addressables |
+| R213 | Bake APV + lightmaps on hero buildings | §4 APV |
+| R214 | Re-author terrain splats to stylized matte | §5 terrain |
+| R215 | Set `generateSecondaryUV = true` in BlenderImportPostprocessor | §10 static UVs |
+| R216 | Enable Strip Unused Post-Processing Variants | §8 URP perf |
+| R217 | Add ScriptableObject event channels for cross-scene wiring | §1 SO glue |
+| R218 | Bake occlusion on Dome interior chamber | §9 occlusion |
+| R219 | Verify static flags applied on all 600+ scene placements | §10 static |
+| R220 | Full pass smoke test — verify nothing broken | gauntlet |
+
+R210-R220 are CODE/SCENE WIRING tasks. Distinct from R171-R200's content-authoring sprint.
+
+---
+
+## 13. Legacy Sprint-11 patterns (2026-06-02, preserved)
+
 > Unity 6 (6000.x) manual best practices for the patterns we use heavily. Sourced from the official Unity Manual + Scripting Reference at https://docs.unity3d.com/6000.3/Documentation/Manual/ and verified against our codebase. 2026-06-02.
 >
 > When in doubt, the manual is the source of truth. Cite specific manual section when a debate arises.

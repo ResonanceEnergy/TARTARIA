@@ -54,20 +54,26 @@ After these 3, Moon 1 is *visually complete enough to ship a screenshot anyone c
 
 ### Unity 6 / URP Patterns (baked in per deep-research report)
 
+**Single source of truth:** `docs/best-practices/UNITY_6_PATTERNS.md` §1-12 (R205 update).
+Read it before any Unity-side decision.
+
 | Pattern | Canonical for TARTARIA |
 |---|---|
 | **APV (Adaptive Probe Volumes)** | Unity 6 production GI default for URP. Set lights Mixed/Baked, GameObjects "Contribute GI", MeshRenderers "Receive GI: Light Probes". Reflection Probes enable "Probe Volumes" in BOTH Realtime + Baked. |
 | **Prefab Variants** | "Most scenes should be constructed from Prefabs with minimal overrides." Base prefab + variants for the 12 hero buildings + 26 NPCs. Variants in SAME Addressables group as base. |
-| **Multi-scene additive** | `Boot + UI + Echohaven + Moon1_Systems` already in use. Continue. |
+| **Multi-scene additive** | `Boot + UI + Echohaven + Moon1_Systems` already in use. Continue. Pre-R210 honest gap: `Moon1_Systems` is still a prefab inside the main scene, not an additive scene. R210 task. |
 | **Unity Terrain** | Already in use for 1km² Moon 1. Use mesh-based only for underground/caves. |
 | **ProBuilder** | Graybox iteration ONLY. Replace with Blender hero meshes once layout locks. Don't ship ProBuilder geo. |
 | **Snap grid** | **1m standard** (matches KayKit Medieval + Synty POLYGON + Quaternius). Authored modular kit MUST snap to 1m. |
-| **URP Bloom + Tonemap** | Volume profile `EchohavenVolumeProfile.asset` already wired R152. Threshold 1.1, Neutral tonemap. Keep. |
+| **URP Bloom + Tonemap** | Volume profile `EchohavenVolumeProfile.asset` wired R152, tuned R203 (Threshold 1.2, Intensity 0.5, post-exposure -0.3). Neutral tonemap. Keep. |
 | **SSAO** | Renderer Feature (NOT volume override). Already in renderer R152. |
 | **Decal Renderer Feature** | Minimize use per Unity guidance. OK for blood/cracks on hero pieces. |
-| **Strip Unused Post-Processing Variants** | Enable in URP Graphics settings. Cuts build size + shader compile time. |
-| **Occlusion Culling** | **Skip for outdoor Moons**. Only bake interior Dome chamber. |
-| **Addressables for Moons** | Each Moon scene = own Addressables group. Modular kit + character meshes = shared "Core" group. Prevents duplicate-bake bug. |
+| **Strip Unused Post-Processing Variants** | Enable in URP Graphics settings. Cuts build size + shader compile time. R216 task — not yet on. |
+| **Occlusion Culling** | **Skip for outdoor Moons**. Only bake interior Dome chamber. R218 task. |
+| **Addressables for Moons** | Each Moon scene = own Addressables group. Modular kit + character meshes = shared "Core" group. Prevents duplicate-bake bug. R212 task — 0 groups currently. |
+| **Static flags + lightmap UVs** | StaticEditorFlags Batching+Navigation+ContributeGI+Occluder+Occludee on every static piece. ModelImporter `generateSecondaryUV=true` for baked lighting. R215 task — not in `BlenderImportPostprocessor.cs:67`. |
+| **Vegetation density** | 1 plant per 1-2m² near plaza (Lonely Mountains pattern). R201 hit 800+. Compliant. |
+| **Camera presentation** | Player POV y=1.7 + pitch 2-5°. Hero shots y=3-5 + yaw 25-35°. **AVOID y=10+ panoramas — they compress everything and make a dense level read as sparse.** Lesson from R200 vs R204. |
 
 ### What R146 canon stays
 
