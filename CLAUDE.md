@@ -4,6 +4,69 @@
 
 ---
 
+## 🔒 2026-06-08 R146 — CANON LOCK (supersedes ALL drift below)
+
+Per NATRIX, end of 17-round drift hammer: *"WAS THIS NOT ALL WRITTEN IN THE MOON 1-13 FILES? HOW DID WE DRIFT SO HARD UPDATE CLAUDE.MD AND ALL RELEVANT .MD FILES"*
+
+**3 parallel deep-dive agents found the root cause.** The canonical specs were ALREADY WRITTEN — I just kept editing CLAUDE.md to drift away from them across sessions. This R146 section **resets all spec disagreements to the canonical docs**.
+
+### CANONICAL Moon 1 SPEC (verbatim from `docs/15_MVP_BUILD_SPEC.md` §1 + §7 — file IS real, 37 KB)
+
+| Aspect | CANONICAL value | Source |
+|---|---|---|
+| Project name | TARTARIA WORLD OF WONDER — Aether Awakening | `00_MASTER_GDD.md:1` |
+| Player | **Elara Voss**, silent female, Harmonic Human with latent giant blood | `01_LORE_BIBLE.md:80` + `appendices/G_NPC_INDEX.md:30` |
+| World | alternate-history Earth, present-day, hidden Tartarian ruins beneath modern cities | `03_CAMPAIGN_13_MOONS.md:106` |
+| Moon 1 zone name | **Echohaven** (player-facing) / "New Chicago underground" (narrative) | `15_MVP §7` + `03_CAMPAIGN:106,137` |
+| Moon 1 zone size | 500m radius, 1000m × 1000m terrain, 1025² heightmap, 4 splat layers | `15_MVP §7` lines 372-417 |
+| Moon 1 HERO buildings | **EXACTLY 3**: Dome (Listeners' Hall 25m × 18m, 80% buried) + Fountain (Thread of Memory 8m × 5m basin, 95% buried) + Spire (First Note 3m × 15m, 60% buried) | `15_MVP §7` lines 379-398 |
+| Moon 1 named NPCs | **EXACTLY 4**: Milo (fox spirit) + Anastasia (Archive Echo, post-dome reveal) + Lirael (spectral child, Day 25) + Cassian (apparent ally) | `15_MVP §1` "What's In" lines 54-57 |
+| Moon 1 enemy types | **EXACTLY 1**: Mud Golem (harmonic combat) | `15_MVP §1` line 58 |
+| Moon 1 POIs | **EXACTLY 4**: 3 Mud Pools + Carved Stone + Overlook + Root Chamber | `15_MVP §7` lines 400-406 |
+| Moon 1 tuning variants | **EXACTLY 3** for the slice (A Slider + B Waveform + C Harmonic) | `15_MVP §1` line 53 |
+| Aether bands | Telluric **7.83 Hz** / Harmonic **432 Hz** / Celestial **528 Hz** | `02_AETHER_ENERGY_SYSTEM.md:80,94,108` |
+| Currency | Aether (sole) — RS = `(GA × 0.40) + (FT × 0.30) + (MP × 0.15) + (GB × 0.15)`, golden-ratio φ=1.618 | `02_AETHER:130` + `15_MVP §6` |
+| Day length | 17 hours (NOT 13) | `01_LORE:230` |
+| Calendar | 13 Moons × 28-day months + Day Out of Time | `01_LORE:204` |
+| Apparent villain | The Dissonant One = Zereth (Korath's brother giant) | `01_LORE:407` |
+| TRUE villain | Parasite Cabal (hijacked Zereth's transcendence experiment as the Mud Flood weapon) | `03_CAMPAIGN:683-687` |
+| Theme | *"The empire never fell. It was only buried. The song never stopped. It was only waiting for someone to remember how to listen."* | `01_LORE:446` |
+
+### LOCKED Art Bible (`docs/32_ART_BIBLE.md` — read it BEFORE any art decision)
+
+- **Style:** "Aether-stylized realism" = **Hollow Knight + Tunic + Outer Wilds + A Plague Tale + Death Stranding**
+- **Palette:** max 3 hues per shot from {Aether-Gold `#FFD973`, Aether-Cyan `#8CD9FF`, Aether-Violet `#D98CFF`, Corruption-Crimson `#C03030`} + neutrals
+- **Lighting:** warm key `#FFE9A0` intensity 1.5, cool fill `#9FB8D4` intensity 0.4, Neutral tonemap, bloom threshold 1.1
+- **Sky gradient:** `#E8C39A → #9FB8D4` (top→bottom)
+- **EXPLICITLY REJECTED:** photoreal AAA, voxel/Minecraft, **Synty POLYGON** (line 177), **toon shaders** (line 82), **wet/glossy PBR for stone** (sacred = matte), anime kits
+- **WHITELIST:** Quaternius Modular Ruins, KayKit Medieval Builder (Legacy, NOT Hexagon), Mixamo, Poly Haven puresky HDRIs
+
+### DRIFT ROOT CAUSE — the lie I kept telling myself
+
+> R124's CLAUDE.md update (line 90, preserved below): *"Phase 5 of FOUNDATIONS plan revised — no Synty / Kenney / Quixel purchase needed. Existing vendor kit covers **all 12 Moon 1 buildings**…"*
+
+**That sentence was wrong.** I misread `KayKit_Hexagon/` having 18 medieval-named FBXs as evidence Moon 1 spec "needs 12 buildings". The actual canonical spec (`15_MVP §7`) calls for **3 buildings only**. Every subsequent CLAUDE.md punchlist + R126-R142 hammer doubled down on the wrong reading. The 12-buildings-+-9-cottages content I shipped across R126-R142 (`Cathedral`, `StarDome`, `CrystalSpire`, `Cottage_A/B/C`, `Inn`, `Bakery`, `Smithy`, `Mill`, `Watchtower`, `TownHall`, `Apothecary`) — **none of those building names appear in the canonical spec.** They are scope creep, period.
+
+### R146 OPERATING RULES (override every layered mandate below)
+
+1. **3 hero buildings only** for Moon 1: Dome + Fountain + Spire per `15_MVP §7` dimensions. Anything else = scope creep, reject.
+2. **The Art Bible (`docs/32_ART_BIBLE.md`) is law.** Read it before any visual decision. No 4K Polyhaven PBR on stone. No HDRI photoreal church behind low-poly cubes. No Synty cartoon. The locked palette + locked lighting are not suggestions.
+3. **Asset whitelist is the whitelist.** Quaternius Modular Ruins + KayKit Medieval Builder (Legacy) + Mixamo + Poly Haven *puresky only*. Buying / authoring outside it requires updating `docs/32` first.
+4. **The 12-building scope-creep content is QUARANTINED.** Specifically: the 19 FBXs at `Assets/_Project/Models/Buildings/Blender_v2/*.fbx` (~2.7 GB of Boolean-cut Polyhaven cubes), the 45 prop placements (`Moon1_Props` parent), 50 vegetation (`Moon1_Vegetation`), and 12 named building scene refs. They stay on disk for archeology but are NOT placed in Moon 1.
+5. **One screenshot per claim.** No `tool returned success → ✅ shipped`. Only Game-view screenshots that show the actual artifact count as proof.
+6. **One spec file per topic.** When a new doc claims canon, it must be linked from `docs/15` (Moon 1), `docs/03_CAMPAIGN_13_MOONS.md` (Moons 2-13 narrative), `docs/MOON_BLUEPRINT.md` (per-Moon template), `docs/01_LORE_BIBLE.md` (lore), or `docs/32_ART_BIBLE.md` (style). Anything else = unofficial.
+7. **Don't edit CLAUDE.md to widen scope.** Spec changes go in the spec docs, then CLAUDE.md references them. CLAUDE.md is an operating manual, not a design doc.
+
+### Plan ahead (R146 → R200)
+
+- **R146-R150:** scene cleanup — quarantine the 19 gen_v2 + 45 props + 50 vegetation. Keep terrain + HDRI + KayKit NPCs (placeholders). Drop in 3 spec'd buildings as primitive blockouts at canonical dimensions. Wire combat to Mud Golem placeholder. Smoke test playthrough.
+- **R150-R170:** author the 3 hero buildings properly in Blender per Art Bible — matte stone, gold seam emissive, sacred geometry, 3-hue palette. Replace primitive blockouts.
+- **R170-R200:** Moons 2-13 — use `docs/MOON_BLUEPRINT.md` template + `docs/03_CAMPAIGN_13_MOONS.md` per-Moon beats. ONE Moon per sprint. Same canonical discipline.
+
+The Moon 1-13 master plan lives at `docs/MASTER_PLAN_MOON_1_13.md` (created R146). Update it, don't re-author CLAUDE.md.
+
+---
+
 ## ⚠️ 2026-06-07 R125 — CORRECTION: KayKit_Hexagon is the WRONG art pack (NO PURCHASE was wrong)
 
 Per NATRIX: *"I WAS WATCHING THE SCREEN YOU ARE BULSHITTING ME.. THE SCALE PROPORTIONS ARE WAY OFF THE WHOLE THING IS A DISASTER"*
