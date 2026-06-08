@@ -9,6 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7354895375208561145}
+  - component: {fileID: 8062820791863641842}
+  - component: {fileID: 7844620144790397263}
   m_Layer: 0
   m_Name: AnastasiaRocker
   m_TagString: Untagged
@@ -24,73 +26,81 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7741769253340177362}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0.25881907, z: 0, w: 0.9659259}
-  m_LocalPosition: {x: -12, y: 0, z: 42}
+  m_LocalRotation: {x: -0, y: -0.38268346, z: -0, w: 0.9238795}
+  m_LocalPosition: {x: 33, y: 0, z: 19}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 305947208166353151}
+  m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1001 &266917580608524052
-PrefabInstance:
+--- !u!33 &8062820791863641842
+MeshFilter:
   m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 7354895375208561145}
-    m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 0.7071067
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0.7071068
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-      propertyPath: m_Name
-      value: AnastasiaRocker
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
---- !u!4 &305947208166353151 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 6a8f7bcecb062b844985bc447282c414, type: 3}
-  m_PrefabInstance: {fileID: 266917580608524052}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7741769253340177362}
+  m_Mesh: {fileID: 6978275125736500115, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+--- !u!23 &7844620144790397263
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7741769253340177362}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 8982880143260657111, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: 6406770053481623446, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: -371369872013308916, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: -3548487304485947770, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: 7824885532724388096, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: 5250587265981117255, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: -936125840517999517, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: 1838984612827905854, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: 3053934468561217832, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: -5863489080562123070, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: -1722318627859729154, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: 964291796644795267, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: -7035774996211479973, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: 5462094521838570116, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  - {fileID: -1577738670626054709, guid: ee75850777894324ebb1cc5d5887e2d1, type: 3}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
