@@ -2,6 +2,72 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-07 R126-R136 HAMMER — Moon 1 village now REAL (12 buildings + 45 props + 6 NPCs + Polyhaven terrain + HDRI)
+
+Per NATRIX *"KEEP HAMMERING"* across 11 rounds. **The Moon 1 village now exists as a real walkable atmospheric place.** 13 commits on `feature/consolidate-moon-architecture` from `68ab5b0c` to `d5c53227`.
+
+### What shipped this session
+
+**Phase 5 + Phase 6 (Buildings):** 12 of 12 spec-aligned buildings authored via NEW `tools/blender/gen_v2/` pipeline with `_lib.py` shared helpers:
+- Hero (3): StarDome (2237v hemisphere on drum), CrystalSpire (624v hex tower + emissive crystal), Cathedral (1870v Gothic w/ twin towers + spires + buttresses + rose window)
+- Village (10): Cottage A/B/C (variants), Inn (2-story), Bakery, Smithy, Mill (windmill), Watchtower (crenels+slits), TownHall (steeple+columns), Apothecary
+- All real Blender modeling: Boolean cuts + bevel + solidify + smart UV (NOT primitive cube stacks)
+- All embed Polyhaven 4K PBR (medieval_blocks_06 + roof_slates_03 + black_painted_planks + painted_plaster_wall + plaster_stone_wall_02 + green_metal_rust + marble_cliff_01)
+- All bottom-center pivots (R125 fix — no more half-buried)
+
+**Phase 5 (Props — R135):** 6 new gen_v2 props: Brazier (282v basin+tripod+flame), VillageLantern (100v emissive lamp), Fountain (923v 8m spec basin+5m column+4 water bowls per docs/15 §7), AnastasiaRocker (152v — **closes R119** missing prefab, saved as `Assets/_Project/Prefabs/Moon1/AnastasiaRocker.prefab`), MarketStall (96v wooden frame+roof+table), PathStone (36v hex flagstone). 45 prop placements: 1 fountain plaza + 1 brazier spawn beacon + 1 rocker + 8 lanterns perimeter + 4 market stalls + 30 path stones spawn→Cathedral.
+
+**Phase 4 (Terrain — R132):** Unity Terrain 200×200m, 257² Perlin heightmap, 4 Polyhaven splat layers (brown_mud_leaves primary + gray_rocks secondary + coast_sand_rocks diagonal path + painted_plaster_wall Tartarian-tile center). HDRI cubemap from `abandoned_church_4k.exr` (23 MB) → `M_Skybox_HDRI.mat`. Volume restored postExposure=-0.5, sat+5, contrast+8. Golden-hour Sun_GoldenHour (12° elev, warm 1.0/0.75/0.5, intensity 3.0, shadow 0.9). Ambient from Skybox 1.2.
+
+**Phase 7 (NPCs — R134):** 4 KayKit Adventurer Mecanim humanoids placed: Milo_KayKit (Rogue at spawn), Anastasia_KayKit (Mage seated on rocker, parented in R136), Lirael_KayKit (Rogue_Hooded at observatory), Cassian_KayKit (Knight patrolling). 2 Skeleton enemies (Warrior + Minion) for combat training.
+
+**Phase 1 (Quarantine — R133c):** All 5 banned mutators deleted: PlayerVisualUpgrader, Moon1SceneRescue, GameViewFocusFix, RuntimeLightShadowOptimizer (final stub), TartariaDevAutoStart. Scene YAML edits no longer silently overwritten.
+
+**R128 root cause:** Deleted `Moon1_BlenderPlacements` + `Moon1_NewAssetsPlacements` parent containers — 200+ props at scale=100 including 3× 910m MudPool cubes enveloping player. The "overblown lighting" since R125 was actually being inside 910m boxes. Once gone, blue sky + Polyhaven 4K textures finally rendered.
+
+### Vegetation + scattered detail
+
+50 FAE vegetation instances (Pine_A, Tree_A/B/C, RockCluster_A-D) at radius 35-95m from village center, polar-coord distribution, random rotation+scale, auto-normalize FBX scale=100 bug.
+
+### FOUNDATIONS phase ledger after this session
+
+| Phase | Status |
+|---|---|
+| 0 LFS pull | ✅ COMPLETE (R124) |
+| 1 Quarantine | ✅ COMPLETE (R133c) |
+| 2 URP settings | ✅ COMPLETE (R124) |
+| 3 APV/lightmap/NavMesh | ⚙️ NavMesh triggered, lightmap pending manual bake |
+| 4 Unity Terrain | ✅ COMPLETE (R132) |
+| 5 Art pack | ✅ COMPLETE (Blender pipeline, NO PURCHASE) |
+| 6 Buildings | ✅ COMPLETE (12/12 via gen_v2/_lib.py) |
+| 7 NPCs | ✅ COMPLETE (4 KayKit + 2 Skeletons) |
+| 8 Smoke test | ⚙️ 5 programmatic walkthrough screenshots done; controller-input 8-step pending manual Play session |
+
+### Walkthrough screenshots (5 angles proving the village is real)
+
+1. **South spawn approach** `(0, 1.7, -20)` — village panorama with golden hour sun + Cassian Knight visible
+2. **Stone wall closeup** `(2, 1.7, -2)` — Polyhaven medieval_blocks_06 4K PBR brick + mortar pattern CONFIRMED rendering
+3. **Plaza overview** `(8, 2.5, 12)` — HDRI Cathedral backdrop visible behind buildings
+4. **Anastasia+Cathedral** `(28, 1.7, 18)` — KayKit Mage character clearly visible + Tuscan church HDRI + marble Fountain base
+5. **Cathedral approach** `(0, 2.5, 40)` — Fountain dominant + village behind + path stones
+
+### Commits this session
+
+`68ab5b0c` Cottage_A_v2 + nuke 910m envelope · `b639274a` Cottage_B+C+Inn · `f6662506` 6 buildings via _lib.py · `d411a541` 12/12 hero trio · `9effbe8d` Terrain+HDRI · `fee221ec` 50 vegetation · `40e93cba` NavMesh+static · `213d8f77` Phase 1 close · `e8d9fbe3` 6 NPCs · `b0677e87` 6 props+R119 · `0d39df02` character panorama · `d5c53227` golden hour+walkthrough
+
+### Honest gaps remaining
+
+- Phase 3 lightmap/APV manual bake (visual polish — AO, indirect bounces)
+- Phase 8 8-step smoke test with controller input + video recording
+- Player.prefab still incomplete (PlayerSpawner adds CharacterController+PlayerInputHandler at runtime per Sprint 11 L4)
+- 11 silent-catch blocks outside Moon 1 happy path
+- RuntimeHUDBuilder.cs still spawns 64 GameObjects at runtime (H.L2 deferral)
+- Real play-through with controller still pending NATRIX manual session
+
+The pipeline is validated. Future sessions can mass-produce more content at ~30 min/asset using `gen_v2/_lib.py`.
+
+---
+
 ## 2026-06-07 DEEP AUDIT — Why Moon 1 looks basic and goes in circles
 
 Per NATRIX: *"DO AN AUDIT FIND ALL THE FILES / CONTENT/ ASSETS/ PREFABS / SCRIPTS / YAML / .CS / INTERACTIONS / BUILDS / COMPLIE / MOON 1 FILES / MOON 1 ASSETS FILE FIGURE OUT WHY THIS IS SO BASIC AND KEEPS GOING AROUND IN CIRCLES?"*
