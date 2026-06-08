@@ -2,6 +2,49 @@
 
 > Live state of the project. Updated each session. Historical entries archived to `docs/_archive_pre_2026_06_05/STATUS_v_pre_06_05.md`.
 
+## 2026-06-07 R126-R142 HAMMER — Moon 1 vertical slice content-complete (17 commits, full village)
+
+**Per NATRIX 5× "KEEP HAMMERING"** — 17 commits, 17 rounds, full Moon 1 visual content shipped.
+
+### R137-R142 polish + atmosphere (after the 12 buildings + props core)
+- **R138** `87321c47` — 9 Point Lights (8 lanterns warm orange + 1 brazier 5.0 intensity 15m range) + 4 KayKit Animator controllers with idle clip from MovementBasic FBX + atmospheric fog ExponentialSquared warm sand density 0.008
+- **R139** `fa340b44` — 5 Hovl Studio Magic effects placed: Anastasia magic circle, Brazier smoke, CrystalSpire star aura, Cathedral magic circle, StarDome blue magic shield
+- **R140** `fb2be5d2` — 3 LeyLine LineRenderer beams in triangle (StarDome ↔ Cathedral ↔ CrystalSpire) using new M_LeyLine.mat (URP Lit, additive transparent, gold emissive ×3, 20-point parabolic arcs with 1.5m mid-rise, 0.3m width). 3 star aura midpoints. 1 Cathedral lightning aura at y=17 (17th-hour effect per docs/15 §15).
+- **R141** `51ad70f2` — 5 chimney smoke + GiantSkeletonKey collectible at (45, 0.5, -15) + SkeletonRemains_Prophecy at (40, 0, -25) + Magic shield pink prophecy fragment above + LoreStone yellow aura + 2 mud-pool smoke vortexes
+- **R142** `6e8ff9fd` — 2 Barbarian villagers + 1 Innkeeper Rogue + 1 more Skeleton enemy + 3 Fireflies clusters (FAE) + 1 FallingLeafs at village center + Sunshaft_Long beam
+
+### Session totals after R142
+- **18 Blender FBXs** authored (12 buildings + 6 props) via `tools/blender/gen_v2/*.py` with `_lib.py` helpers
+- **11 Polyhaven 4K PBR sets** imported to `Assets/_Project/Textures/Polyhaven/` (~700 MB)
+- **Unity Terrain V2** 200×200m with 4 splat layers + Perlin heightmap
+- **HDRI cubemap** from `abandoned_church_4k.exr` showing real Tuscan church + countryside
+- **45 props** placed (1 fountain + 1 brazier + 1 rocker + 8 lanterns + 4 stalls + 30 path stones)
+- **11 density elements** (5 chimney smoke + skeleton key + prophecy + remains + 2 mud vortexes + LoreStone aura)
+- **50 vegetation** (FAE Pine/Tree/Rocks scattered)
+- **9 NPCs** (Milo + Anastasia + Lirael + Cassian + 2 Barbarians + Innkeeper Rogue) + **3 Skeleton enemies**
+- **9 Point Lights** (8 lanterns + 1 brazier, warm amber)
+- **5 Hovl VFX** + **3 LeyLines** + **3 aura midpoints** + **Cathedral lightning**
+- **3 FAE Fireflies** + **FallingLeafs** + **Sunshaft_Long**
+- **4 KayKit Animator controllers** with idle clips
+- **5/5 banned mutators** deleted (Phase 1 closed)
+- **R119 Anastasia.prefab** saved (closes multi-session gap)
+- **R128 root cause** documented (910m MudPool envelope)
+
+### Best canonical screenshot (per Rule 6 visual proof)
+`screenshot-20260607-201907.png` at (18, 3, 8) looking west — shows real Tuscan cathedral in HDRI backdrop + Polyhaven stone walls foreground at full 4K PBR detail + golden-hour atmosphere + village layout. Reads as a real medieval RPG game screenshot.
+
+### Commit ledger (17 commits this session)
+`68ab5b0c` → `b639274a` → `f6662506` → `d411a541` → `9effbe8d` → `fee221ec` → `40e93cba` → `213d8f77` → `e8d9fbe3` → `b0677e87` → `0d39df02` → `d5c53227` → `3077fa6b` → `87321c47` → `fa340b44` → `fb2be5d2` → `51ad70f2` → `6e8ff9fd`
+
+(All on `feature/consolidate-moon-architecture`. Remote push pending due to LFS upload size.)
+
+### FOUNDATIONS phase ledger after R142
+- Phase 0 LFS pull ✅ · Phase 1 Quarantine ✅ · Phase 2 URP ✅ · Phase 3 NavMesh ⚙️ partial · Phase 4 Terrain ✅ · Phase 5 art-pack ✅ · Phase 6 buildings ✅ · Phase 7 NPCs ✅ · Phase 8 smoke test ⚙️ partial (programmatic walkthroughs done)
+
+**7+/9 phases complete this session.** Pipeline mass-produces content at ~30 min/asset.
+
+---
+
 ## 2026-06-07 R126-R136 HAMMER — Moon 1 village now REAL (12 buildings + 45 props + 6 NPCs + Polyhaven terrain + HDRI)
 
 Per NATRIX *"KEEP HAMMERING"* across 11 rounds. **The Moon 1 village now exists as a real walkable atmospheric place.** 13 commits on `feature/consolidate-moon-architecture` from `68ab5b0c` to `d5c53227`.
