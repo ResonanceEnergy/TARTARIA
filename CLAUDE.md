@@ -92,6 +92,29 @@ Read it before any Unity-side decision.
 - Stop adding unique Blender props per Moon — 28 is enough for Moon 1; future density = instance scattering
 - Enemy authoring: 1 mesh × 13 Moons (color/scale variants), not 13 new bakes
 
+### R206-R208 Texture compliance (2026-06-08, post-NATRIX audit)
+
+**Honest audit found major violations.** Fixed:
+
+| Violation | Pre-R208 | Post-R208 |
+|---|---|---|
+| Terrain splats | 4× Polyhaven 4K (`brown_mud_leaves_01_diff_4k`, `gray_rocks_diff_4k`, `coast_sand_rocks_02_diff_4k`, `painted_plaster_wall_diff_4k`) — **EXPLICITLY REJECTED** by R171 + Art Bible §0 | 4× stylized matte solid-color terrain layers in `Assets/_Project/Textures/Stylized/` (Warm_Stone_Plaza / Cool_Stone_Path / Mud_Dark / Grass_Worn) at 256×256 with subtle painterly noise. 8m tile size |
+| Stone Roughness <0.6 | 35 materials glossy | 0 — all bumped to Roughness 0.90 + Metallic 0 |
+| Non-narrative Metallic >0.1 | 14 materials | 0 — all set to Metallic 0 |
+| Skybox | Procedural (compliant) | Unchanged |
+| **Texture detail on materials** | 839 / 978 are flat-color only | ⚠️ open — R225+ task to author painterly base maps + subtle normal/roughness maps on hero buildings |
+
+### R225+ Texture polish backlog (Sprint F)
+
+| Round | Task |
+|---|---|
+| R225 | Hand-painted base maps on 3 hero buildings (Dome / Fountain / Spire) — Substance Designer or Blender Texture Paint |
+| R226 | Subtle normal maps on stone surfaces (matte-compliant) |
+| R227 | Roughness maps for variation (still biased 0.85+) |
+| R228 | Custom skybox shader with Art Bible gradient `#E8C39A → #9FB8D4` |
+| R229 | Procedural noise on terrain layers for organic feel |
+| R230 | Final texture audit re-run + 0 violations target |
+
 ### R172+ plan (100% Blender, NO PURCHASES)
 
 | Round | Action |

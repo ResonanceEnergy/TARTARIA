@@ -50,6 +50,24 @@ Per NATRIX, post deep-research synthesis (`docs/research/UNITY_RPG_LEVEL_BUILDIN
 - *Hollow Knight cartoon* — silhouette reference only; we are 3D PBR, they are 2D non-PBR.
 - *Tunic flat-shaded* — chunky sacred motif reference only; we are NOT flat-shaded.
 
+### Texture mandate (R206-R208 honest audit findings, 2026-06-08)
+
+**HONEST AUDIT** (978 materials scanned) found these R171 violations and fixed them:
+
+- **4 terrain splats were Polyhaven 4K** (`brown_mud_leaves_01_diff_4k`, `gray_rocks_diff_4k`, `coast_sand_rocks_02_diff_4k`, `painted_plaster_wall_diff_4k`) — these are EXPLICITLY REJECTED by §0 R171 STYLE LOCK + the anti-references list. **REMOVED.** Replaced with 4 stylized matte solid-color terrain layers in `Assets/_Project/Textures/Stylized/` (256×256, 8m tile, subtle painterly noise per layer):
+  - `Layer_Warm_Stone_Plaza` (#9F8566) — plaza floor warmth
+  - `Layer_Cool_Stone_Path` (#7A736A) — path/walkway
+  - `Layer_Mud_Dark` (#523D2E) — Mud Pool zones
+  - `Layer_Grass_Worn` (#6B734D) — outer grass
+- **35 stone materials had Roughness <0.6** (glossy stone — sacred is matte). FIXED to Roughness 0.90.
+- **14 non-narrative materials had Metallic >0.1** (R171 reserves metals for narrative props only). FIXED to Metallic 0. Narrative props (gold pendants, buckles, orbs, chains, brass, smith hammer) preserved.
+
+### Open texture work (Sprint F R225+)
+
+- ⚠️ 839 of 978 materials are flat-color only. R171 spec says "painterly desaturated albedo" which implies textured. Future task: hand-paint base maps for 3 hero buildings + key NPCs.
+- ⚠️ Stone surfaces have no normal maps yet. Per R171 "matte stone with subtle normal detail" is allowed (not glossy).
+- ⚠️ Skybox is Procedural — R228 task to author custom skybox shader with Art Bible gradient.
+
 ### Reuse mandate (unified across all 13 Moons, 100% BLENDER)
 
 Per NATRIX directive 2026-06-08: *"NO KAYKIT, NO PURCHASES, BUILD EVERYTHING WITH BLENDER."* All asset-store dependencies REJECTED. Per `CLAUDE.md §R171 UNIFY MANDATE`:
