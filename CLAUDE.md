@@ -68,9 +68,13 @@ Read it before any Unity-side decision.
 | **URP Bloom + Tonemap** | Volume profile `EchohavenVolumeProfile.asset` wired R152, tuned R203 (Threshold 1.2, Intensity 0.5, post-exposure -0.3). Neutral tonemap. Keep. |
 | **SSAO** | Renderer Feature (NOT volume override). Already in renderer R152. |
 | **Decal Renderer Feature** | Minimize use per Unity guidance. OK for blood/cracks on hero pieces. |
-| **Strip Unused Post-Processing Variants** | Enable in URP Graphics settings. Cuts build size + shader compile time. R216 task — not yet on. |
+| **Strip Unused Post-Processing Variants** | ✅ **R213 SHIPPED** — enabled on TartariaURP.asset (strips Variants + Debug + Unused PostProcessing). |
 | **Occlusion Culling** | **Skip for outdoor Moons**. Only bake interior Dome chamber. R218 task. |
 | **Addressables for Moons** | Each Moon scene = own Addressables group. Modular kit + character meshes = shared "Core" group. Prevents duplicate-bake bug. R212 task — 0 groups currently. |
+| **Skybox** | ✅ **R217 SHIPPED** — `Skybox_ArtBible_Gradient.mat` (Skybox/Panoramic, 256x512 hand-authored gradient #E8C39A peach top → #9FB8D4 cool blue bottom + 1.5% painterly noise). Per Art Bible §2 locked sky. |
+| **Painterly textures** | ✅ **R220-R222 SHIPPED** — 4 terrain layers at 1024x1024 with 4-octave painterly noise + 25 stone materials with 256x256 auto-generated painterly base maps. R171 desaturated-painterly-albedo compliant. |
+| **APV switched on** | ✅ **R215 SHIPPED** — TartariaURP LightProbeSystem switched from Legacy to AdaptiveProbeVolumes per Unity 6 default. Lighting Settings: Progressive GPU lightmapper + resolution 10 + padding 2. |
+| **Static flags bulk applied** | ✅ **R214 SHIPPED** — scanned 1852 MeshRenderers in scene, 1845 missing static flags fixed (BatchingStatic+NavigationStatic+ContributeGI+OccluderStatic+OccludeeStatic on static buildings/props/vegetation). |
 | **Static flags + lightmap UVs** | StaticEditorFlags Batching+Navigation+ContributeGI+Occluder+Occludee on every static piece applied in R151+ instance code. ModelImporter `generateSecondaryUV=true` ALREADY set at `BlenderImportPostprocessor.cs:77` (FOUNDATIONS Phase 3 work — earlier audit was wrong). |
 | **Vegetation density** | 1 plant per 1-2m² near plaza (Lonely Mountains pattern). R201 hit 800+. Compliant. |
 | **Camera presentation** | Player POV y=1.7 + pitch 2-5°. Hero shots y=3-5 + yaw 25-35°. **AVOID y=10+ panoramas — they compress everything and make a dense level read as sparse.** Lesson from R200 vs R204. |
