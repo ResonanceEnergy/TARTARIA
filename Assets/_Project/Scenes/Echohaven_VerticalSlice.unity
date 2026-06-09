@@ -5784,8 +5784,8 @@ MonoBehaviour:
   yarnProject: {fileID: 7545569452688597077, guid: 4a081bf975daeac46bcb55d35723d89a, type: 3}
   _variableStorage: {fileID: 8629582}
   dialogueViews: []
-  startNode: Start
-  startAutomatically: 1
+  startNode: milo_intro
+  startAutomatically: 0
   runSelectedOptionAsLine: 0
   lineProvider: {fileID: 0}
   verboseLogging: 1
@@ -297602,8 +297602,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1324087093}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.02617695, y: 0, z: 0, w: 0.99965733}
-  m_LocalPosition: {x: 8, y: 2.5, z: -5}
+  m_LocalRotation: {x: 0.050552662, y: 0.25846437, z: -0.013545545, w: 0.9646021}
+  m_LocalPosition: {x: -16, y: 4, z: -16}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -343290,6 +343290,7 @@ GameObject:
   - component: {fileID: 1505120411}
   - component: {fileID: 1505120410}
   - component: {fileID: 1505120409}
+  - component: {fileID: 1505120421}
   m_Layer: 0
   m_Name: Moon1_Systems
   m_TagString: Untagged
@@ -343567,6 +343568,18 @@ MonoBehaviour:
   miloQuestId: moon1_meet_milo
   excavationQuestId: moon1_restore_first
   shardQuestId: moon1_collect_shards
+--- !u!114 &1505120421
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1505120383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fefe11daa47798141a70b8a7fedcf126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Tartaria.Integration::Tartaria.Integration.Moon1CinematicMoments
 --- !u!1 &1505641677
 GameObject:
   m_ObjectHideFlags: 0
