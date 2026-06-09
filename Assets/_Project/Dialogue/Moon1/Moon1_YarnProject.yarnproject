@@ -1,7 +1,9 @@
 {
   "projectFileVersion": 2,
   "sourceFiles": [
-    "**/*.yarn"
+    "**/*.yarn",
+    "../Echohaven/**/*.yarn",
+    "../../Data/Dialogue/**/*.yarn"
   ],
   "excludeFiles": [],
   "localisation": {},
