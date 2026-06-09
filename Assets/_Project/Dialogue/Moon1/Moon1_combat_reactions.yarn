@@ -1,0 +1,52 @@
+title: combat_mud_golem_spawn
+---
+Milo: *(ears flat, growling)*
+Milo: Something's coming through the mud. The dissonance noticed us.
+Milo: Use Resonance Pulse to stagger it — then Harmonic Strike.
+===
+
+title: combat_mud_golem_player_hit
+---
+Milo: Watch your footing! Frequency Shield up — hold the left trigger!
+===
+
+title: combat_mud_golem_victory
+---
+Milo: *(panting, then laughing)*
+Milo: You retuned it. Look — it's dissolving back to purified mud.
+Milo: That mud is yours now. Crafting material for later, I think.
+===
+
+title: combat_reset_scout_warning
+---
+Milo: *(whisper)*
+Milo: That's not a golem. That's a Reset Scout.
+Milo: They're smart. They study you. Don't let it walk away or it will report what you can do.
+===
+
+title: combat_reset_scout_victory
+---
+Milo: *(quietly)*
+Milo: It dropped a fragment of itself. We'll learn from this.
+Milo: But they will send more. Be ready.
+===
+
+title: rs_threshold_25_first_hit
+---
+Milo: Resonance Score twenty-five! That's the first threshold.
+Milo: The Aether field will get clearer now. Use Aether Vision — press Y — and watch.
+===
+
+title: rs_threshold_50_growing
+---
+Milo: Fifty. Halfway to the zone shift.
+Milo: Listen to the music — it's deeper now. The hum is layered.
+===
+
+title: rs_threshold_75_zone_shift
+---
+Milo: *(exhaling slowly)*
+Milo: Seventy-five. *Feel that?*
+Milo: The valley just exhaled for the first time in a hundred years.
+Milo: This is what restoration *means*.
+===
