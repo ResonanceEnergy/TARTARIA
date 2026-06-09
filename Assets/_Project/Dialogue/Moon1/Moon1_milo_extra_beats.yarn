@@ -1,24 +1,24 @@
-title: milo_post_first_restoration
+title: moon1_milo_post_first_restoration
 ---
 Milo: Look at that. *Look at it.* That building was born again. You did that.
 Milo: *(spinning)* I can feel the hum upgrading. It's stronger now. The whole valley felt it.
 ===
 
-title: milo_react_overlook
+title: moon1_milo_react_overlook
 ---
 Milo: Oh. *Oh.* Come stand here, traveler.
 Milo: That ridge looks down on the whole valley. From here you can see all the way to where the next zone begins.
 Milo: That's where we're going next. Eventually.
 ===
 
-title: milo_react_root_chamber
+title: moon1_milo_react_root_chamber
 ---
 Milo: Sniffsniff. Something's down there. Below this floor.
 Milo: It feels like an old well — but older than wells. A *root chamber*. The Tartarians put one under every major dome.
 Milo: When the hum gets strong enough, this room will glow. Cyan, like Lirael.
 ===
 
-title: milo_react_seventeenth_hour
+title: moon1_milo_react_seventeenth_hour
 ---
 Milo: *(ears flat)*
 Milo: The Tartarian day is seventeen hours, traveler. We are almost at hour seventeen.
@@ -26,7 +26,7 @@ Milo: Things happen at hour seventeen. Old things.
 Milo: Stay close to the dome. The light will eat the shadow for a moment, and you should not blink.
 ===
 
-title: milo_react_giant_skeleton
+title: moon1_milo_react_giant_skeleton
 ---
 Milo: *(reverent whisper)*
 Milo: There. The buried hand. A giant's bones holding a mercury-ball spire.
@@ -34,7 +34,7 @@ Milo: They were real. The giants. They were the first architects. They could lif
 Milo: This one — Korath, I think, by the proportions — fell trying to slow the Mud Flood.
 ===
 
-title: milo_react_75_rs
+title: moon1_milo_react_75_rs
 ---
 Milo: I can feel it. The zone is shifting.
 Milo: *(the colors around you brighten, the music swells)*
