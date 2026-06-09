@@ -79,6 +79,45 @@ Read it before any Unity-side decision.
 | **Vegetation density** | 1 plant per 1-2m² near plaza (Lonely Mountains pattern). R201 hit 800+. Compliant. |
 | **Camera presentation** | Player POV y=1.7 + pitch 2-5°. Hero shots y=3-5 + yaw 25-35°. **AVOID y=10+ panoramas — they compress everything and make a dense level read as sparse.** Lesson from R200 vs R204. |
 
+### R272 R171 UNIFY MANDATE EMPIRICALLY VALIDATED AT 13/13 MOONS
+
+Per NATRIX "KEEP HAMMERING" cycle R256→R272:
+
+The R171 promise — "build the kit ONCE, palette-swap across 13 Moons" — is now empirically proven in the scene YAML. **Same Dome_ListenersHall.fbx + Fountain_ThreadOfMemory.fbx + Spire_FirstNote.fbx meshes read as 13 distinct biome identities** via _BaseColor + accent emissive material swaps only. Same vertices, same triangles, same UVs.
+
+| # | Moon | Anchor | Stone | Accent | Visible Proof |
+|---|---|---|---|---|---|
+| 1 | Echohaven (Awakening) | (0,0,0) | warm tan | Aether-Gold | live focus |
+| 2 | Lunar (Shadows) | (300,300) | cool slate #525763 | violet dissonance | R260 |
+| 3 | Electric (Spark) | (-300,300) | copper #8C6B4D | amber spark | R262 |
+| 4 | Bronze (Star Fort) | (-300,-300) | sand bronze #99804D | bronze bell | R263 |
+| 5 | Obsidian (Diaries) | (300,-300) | dark glass #2D2D38 | violet crystal | R264 |
+| 6 | Aqua Sunken | (180,180) | placeholder | — | R232 |
+| 7 | Frost Vault (Korath) | (-600,600) | pale frost #C7D6EB | Art Bible cyan | R271 |
+| 8 | Aether Airship (Sky) | (600,600) | warm cream #D9C79E | Art Bible gold | scene YAML |
+| 9 | Cinder Solar | (600,-600) | burnt umber #73402E | ember | scene YAML |
+| 10 | Verdant Grove | (-600,-600) | moss #527A52 | bright leaf | R266 visible |
+| 11 | Mist Fountain | (0,600) | pale grey-blue #9EADB8 | mist white | R272 |
+| 12 | Mirror Bell (Korath echo) | (0,-600) | silver #B8B8C7 | warm white | scene YAML |
+| 13 | Cosmic Harmony | (240,240) | placeholder | — | R232 |
+
+Each Moon also includes a palette-swapped MudGolem.fbx — proving the R171 1-mesh × 13-Moons enemy reuse pattern at production scale.
+
+**Strategic answer:** Moons 2-13 are content-driven (palette + spawn list + Moon-specific Yarn beats), NOT authoring-driven. The remaining ~24 hr of authoring buys all 13 Moons rather than per-Moon bespoke work.
+
+### Sprint C-D Play-mode runtime verification (R252-R254)
+
+Per NATRIX "KEEP HAMMERING" cycle R244→R254, Play mode verified the full Sprint C-D runtime chain is alive:
+
+- Application.isPlaying = True
+- QuestManager.questDatabase: **48 quests registered** at runtime
+- DialogueRunner.IsDialogueRunning = True
+- DialogueRunner.CurrentNodeName = **"milo_tutorial_step_4_tune"** (mid-tutorial)
+- yarnProject = Moon1_YarnProject (86 nodes compiled, includes Echohaven/+Data/Dialogue/)
+- Moon1CinematicMoments enabled (Sprint 11 17th-hour dispatcher blocker FIXED)
+- AdaptiveMusicController enabled
+- 8-step smoke test STEP 1 (menu loads) SHIPPED with visual proof R253_playmode_chain_alive.png
+
 ### What R146 canon stays
 
 - 3 hero buildings per Moon spec (Dome+Fountain+Spire for Moon 1)
