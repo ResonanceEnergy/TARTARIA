@@ -5746,6 +5746,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8629580}
   - component: {fileID: 8629581}
+  - component: {fileID: 8629582}
   m_Layer: 0
   m_Name: DialogueRunner
   m_TagString: Untagged
@@ -5780,8 +5781,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4bec29c0a230741bdac901dba8da47ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: YarnSpinner.Unity::Yarn.Unity.DialogueRunner
-  yarnProject: {fileID: 0}
-  _variableStorage: {fileID: 0}
+  yarnProject: {fileID: 7545569452688597077, guid: 4a081bf975daeac46bcb55d35723d89a, type: 3}
+  _variableStorage: {fileID: 8629582}
   dialogueViews: []
   startNode: Start
   startAutomatically: 1
@@ -5803,6 +5804,20 @@ MonoBehaviour:
   onCommand:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &8629582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8629579}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 610c541718d694070a21327d1ae62e75, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YarnSpinner.Unity::Yarn.Unity.InMemoryVariableStorage
+  showDebug: 0
+  debugTextView: {fileID: 0}
 --- !u!1 &8903657
 GameObject:
   m_ObjectHideFlags: 0
@@ -44595,6 +44610,7 @@ GameObject:
   - component: {fileID: 194319418}
   - component: {fileID: 194319417}
   - component: {fileID: 194319419}
+  - component: {fileID: 194319420}
   m_Layer: 0
   m_Name: Villager_Farmer
   m_TagString: Untagged
@@ -44774,6 +44790,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &194319420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 194319415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &194650981
 GameObject:
   m_ObjectHideFlags: 0
@@ -142141,6 +142174,7 @@ GameObject:
   - component: {fileID: 628651540}
   - component: {fileID: 628651542}
   - component: {fileID: 628651541}
+  - component: {fileID: 628651543}
   m_Layer: 0
   m_Name: Cassian
   m_TagString: Untagged
@@ -142407,6 +142441,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &628651543
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 628651536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &629373326
 GameObject:
   m_ObjectHideFlags: 0
@@ -239460,6 +239511,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1030091398}
+  - component: {fileID: 1030091399}
   m_Layer: 0
   m_Name: Anastasia_RockerSeat
   m_TagString: Untagged
@@ -239483,6 +239535,23 @@ Transform:
   - {fileID: 984622368}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1030091399
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1030091397}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1001 &1030228964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -245656,6 +245725,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1037467248}
+  - component: {fileID: 1037467249}
   m_Layer: 0
   m_Name: Moon1_Villagers_R182
   m_TagString: Untagged
@@ -245684,6 +245754,23 @@ Transform:
   - {fileID: 1128070527}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1037467249
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1037467247}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1038049341
 GameObject:
   m_ObjectHideFlags: 0
@@ -246494,6 +246581,7 @@ GameObject:
   - component: {fileID: 1050245764}
   - component: {fileID: 1050245766}
   - component: {fileID: 1050245765}
+  - component: {fileID: 1050245767}
   m_Layer: 0
   m_Name: Milo
   m_TagString: Untagged
@@ -246758,6 +246846,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1050245767
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1050245760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1050372717
 GameObject:
   m_ObjectHideFlags: 0
@@ -252723,6 +252828,7 @@ GameObject:
   - component: {fileID: 1112111372}
   - component: {fileID: 1112111371}
   - component: {fileID: 1112111373}
+  - component: {fileID: 1112111374}
   m_Layer: 0
   m_Name: Villager_Merchant
   m_TagString: Untagged
@@ -252904,6 +253010,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1112111374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112111369}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1114040762
 GameObject:
   m_ObjectHideFlags: 0
@@ -259441,6 +259564,7 @@ GameObject:
   - component: {fileID: 1128070529}
   - component: {fileID: 1128070528}
   - component: {fileID: 1128070530}
+  - component: {fileID: 1128070531}
   m_Layer: 0
   m_Name: Villager_Elder
   m_TagString: Untagged
@@ -259622,6 +259746,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1128070531
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1128070526}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1128661201
 GameObject:
   m_ObjectHideFlags: 0
@@ -297461,8 +297602,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1324087093}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.06737958, y: 0.25818858, z: -0.018054303, w: 0.9635729}
-  m_LocalPosition: {x: -18, y: 5, z: -18}
+  m_LocalRotation: {x: 0.02617695, y: 0, z: 0, w: 0.99965733}
+  m_LocalPosition: {x: 8, y: 2.5, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -315611,6 +315752,7 @@ GameObject:
   - component: {fileID: 1408337265}
   - component: {fileID: 1408337267}
   - component: {fileID: 1408337266}
+  - component: {fileID: 1408337268}
   m_Layer: 0
   m_Name: Lirael
   m_TagString: Untagged
@@ -315875,6 +316017,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1408337268
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1408337261}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1001 &1408709044
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -348642,6 +348801,7 @@ GameObject:
   - component: {fileID: 1563540829}
   - component: {fileID: 1563540831}
   - component: {fileID: 1563540830}
+  - component: {fileID: 1563540832}
   m_Layer: 0
   m_Name: Anastasia
   m_TagString: Untagged
@@ -348911,6 +349071,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1563540832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1563540825}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1569951351
 GameObject:
   m_ObjectHideFlags: 0
@@ -367766,6 +367943,7 @@ GameObject:
   - component: {fileID: 1666533384}
   - component: {fileID: 1666533386}
   - component: {fileID: 1666533385}
+  - component: {fileID: 1666533387}
   m_Layer: 0
   m_Name: Villager_Child
   m_TagString: Untagged
@@ -367847,6 +368025,23 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1666533383}
   m_Mesh: {fileID: 3459078674460346725, guid: ee57e2adb9219fd449182fc789a1edad, type: 3}
+--- !u!114 &1666533387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1666533383}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1666859475
 GameObject:
   m_ObjectHideFlags: 0
@@ -378108,6 +378303,7 @@ GameObject:
   - component: {fileID: 1723510704}
   - component: {fileID: 1723510703}
   - component: {fileID: 1723510705}
+  - component: {fileID: 1723510706}
   m_Layer: 0
   m_Name: Villager_Blacksmith
   m_TagString: Untagged
@@ -378287,6 +378483,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1723510706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1723510701}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1724581403
 GameObject:
   m_ObjectHideFlags: 0
@@ -395645,6 +395858,7 @@ GameObject:
   - component: {fileID: 1745981897}
   - component: {fileID: 1745981896}
   - component: {fileID: 1745981898}
+  - component: {fileID: 1745981899}
   m_Layer: 0
   m_Name: Villager_Healer
   m_TagString: Untagged
@@ -395824,6 +396038,23 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &1745981899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1745981894}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd81c3310e86e7409ed45d2d5a5dec8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Tartaria.NPCs.NPCIdleSway
+  bobAmplitude: 0.025
+  bobFrequency: 0.6
+  yawAmplitude: 4
+  yawFrequency: 0.18
+  randomizePhase: 1
 --- !u!1 &1747243810
 GameObject:
   m_ObjectHideFlags: 0
