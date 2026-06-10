@@ -15,16 +15,16 @@ RenderSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 10
   m_Fog: 1
-  m_FogColor: {r: 0.78, g: 0.74, b: 0.68, a: 1}
-  m_FogMode: 3
+  m_FogColor: {r: 0.62, g: 0.72, b: 0.83, a: 1}
+  m_FogMode: 1
   m_FogDensity: 0.0004
-  m_LinearFogStart: 60
-  m_LinearFogEnd: 150
+  m_LinearFogStart: 80
+  m_LinearFogEnd: 350
   m_AmbientSkyColor: {r: 0.624, g: 0.722, b: 0.831, a: 1}
   m_AmbientEquatorColor: {r: 0.91, g: 0.765, b: 0.604, a: 1}
   m_AmbientGroundColor: {r: 0.32, g: 0.28, b: 0.24, a: 1}
-  m_AmbientIntensity: 1
-  m_AmbientMode: 0
+  m_AmbientIntensity: 0.4
+  m_AmbientMode: 3
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
   m_SkyboxMaterial: {fileID: 2100000, guid: e250a2d83e314b04588840bdb490c0c1, type: 2}
   m_HaloStrength: 0.5
@@ -37199,7 +37199,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 765909d2ebf58084cb2e9c44938b68ba, type: 2}
+  - {fileID: 2100000, guid: 9960c28e4c6a06e4bbbeeb78f28a78d6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -503987,8 +503987,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 12
   m_Type: 1
-  m_Color: {r: 1, g: 0.75, b: 0.5, a: 1}
-  m_Intensity: 3
+  m_Color: {r: 1, g: 0.913, b: 0.627, a: 1}
+  m_Intensity: 1.5
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -622082,7 +622082,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2020577745
 Transform:
   m_ObjectHideFlags: 0
