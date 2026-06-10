@@ -58,9 +58,35 @@ namespace Tartaria.Gameplay
             CurrentAccuracy = 0f;
 
             if (_panel != null) _panel.SetActive(true);
-            if (_statusText != null) _statusText.text = "Trace the wave";
+            if (_statusText != null) _statusText.text = "Trace the wave — keep cursor on the gold line";
+            // R418: add control hint glyphs
+            ShowControlsHint(Tartaria.Input.InputPromptHelper.Localize("[W/S] or [L-Stick Y] - Move cursor"));
             RedrawWave();
             Debug.Log("[TuningVariantB] Started (waveform trace).");
+        }
+
+        void ShowControlsHint(string controls)
+        {
+            if (_panel == null) return;
+            var existing = _panel.transform.Find("ControlsHint");
+            UnityEngine.UI.Text t;
+            if (existing == null) {
+                var go = new GameObject("ControlsHint");
+                go.transform.SetParent(_panel.transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 0f);
+                rt.anchorMax = new Vector2(1f, 0f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.sizeDelta = new Vector2(0f, 24f);
+                rt.anchoredPosition = new Vector2(0f, -8f);
+                t = go.AddComponent<UnityEngine.UI.Text>();
+                t.font = UnityEngine.Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                t.fontSize = 14;
+                t.alignment = TextAnchor.MiddleCenter;
+                t.color = new Color(0.8f, 0.7f, 0.5f);
+                t.raycastTarget = false;
+            } else t = existing.GetComponent<UnityEngine.UI.Text>();
+            t.text = controls;
         }
 
         /// <summary>

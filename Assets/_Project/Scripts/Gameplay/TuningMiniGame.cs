@@ -66,7 +66,9 @@ namespace Tartaria.Gameplay
 
         void Start()
         {
-            if (tuningUI != null) tuningUI.SetActive(false);
+            // R418 bug fix: only hide if NOT mid-tuning. The old version hid the
+            // panel even when StartTuning() had already been called in Awake-phase.
+            if (tuningUI != null && !isPlaying) tuningUI.SetActive(false);
         }
 
         /// <summary>
@@ -255,7 +257,55 @@ namespace Tartaria.Gameplay
             if (targetFrequencyText != null)
                 targetFrequencyText.text = $"Target: {targetFrequency:F0} Hz";
 
+            // R418: instruction overlay + control hint
+            ShowInstructionOverlay($"Move slider to match {targetFrequency:F0} Hz",
+                Tartaria.Input.InputPromptHelper.Localize("[A/D] or [L-Stick] - Adjust  •  [E] - Confirm"));
             Debug.Log($"[TuningMiniGame] Started! Target: {targetFrequency} Hz (move slider to match)");
+        }
+
+        void ShowInstructionOverlay(string instruction, string controls)
+        {
+            if (tuningUI == null) return;
+            // Find or create instruction Text
+            var existing = tuningUI.transform.Find("InstructionText");
+            UnityEngine.UI.Text instrText;
+            if (existing == null) {
+                var go = new GameObject("InstructionText");
+                go.transform.SetParent(tuningUI.transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 1f);
+                rt.anchorMax = new Vector2(1f, 1f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.sizeDelta = new Vector2(0f, 28f);
+                rt.anchoredPosition = new Vector2(0f, 28f);
+                instrText = go.AddComponent<UnityEngine.UI.Text>();
+                instrText.font = UnityEngine.Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                instrText.fontSize = 18;
+                instrText.alignment = TextAnchor.MiddleCenter;
+                instrText.color = new Color(1f, 0.95f, 0.8f);
+                instrText.raycastTarget = false;
+            } else instrText = existing.GetComponent<UnityEngine.UI.Text>();
+            instrText.text = instruction;
+            // Same for controls hint
+            var ctrlExisting = tuningUI.transform.Find("ControlsHint");
+            UnityEngine.UI.Text ctrlText;
+            if (ctrlExisting == null) {
+                var go = new GameObject("ControlsHint");
+                go.transform.SetParent(tuningUI.transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 0f);
+                rt.anchorMax = new Vector2(1f, 0f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.sizeDelta = new Vector2(0f, 24f);
+                rt.anchoredPosition = new Vector2(0f, -8f);
+                ctrlText = go.AddComponent<UnityEngine.UI.Text>();
+                ctrlText.font = UnityEngine.Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                ctrlText.fontSize = 14;
+                ctrlText.alignment = TextAnchor.MiddleCenter;
+                ctrlText.color = new Color(0.8f, 0.7f, 0.5f);
+                ctrlText.raycastTarget = false;
+            } else ctrlText = ctrlExisting.GetComponent<UnityEngine.UI.Text>();
+            ctrlText.text = controls;
         }
 
         /// <summary>

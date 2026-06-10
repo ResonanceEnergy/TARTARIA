@@ -56,13 +56,38 @@ namespace Tartaria.Gameplay
             for (int i = 0; i < beatCount; i++) _pressTimes.Add(-1f);
 
             if (_panel != null) _panel.SetActive(true);
-            if (_statusText != null) _statusText.text = "Tap to the rhythm";
-            // Reset circle visuals
+            if (_statusText != null) _statusText.text = "Tap to the rhythm — match each glowing beat";
+            // R418: brighten reset color so circles are VISIBLE, add controls hint
             for (int i = 0; i < _circles.Count; i++)
             {
-                if (_circles[i] != null) _circles[i].color = new Color(0.4f, 0.3f, 0.2f, 0.5f);
+                if (_circles[i] != null) _circles[i].color = new Color(0.55f, 0.45f, 0.30f, 0.85f);
             }
+            ShowControlsHint(Tartaria.Input.InputPromptHelper.Localize("[Space] or [A] - Tap on each lit beat"));
             Debug.Log("[TuningVariantC] Started (harmonic pattern).");
+        }
+
+        void ShowControlsHint(string controls)
+        {
+            if (_panel == null) return;
+            var existing = _panel.transform.Find("ControlsHint");
+            UnityEngine.UI.Text t;
+            if (existing == null) {
+                var go = new GameObject("ControlsHint");
+                go.transform.SetParent(_panel.transform, false);
+                var rt = go.AddComponent<RectTransform>();
+                rt.anchorMin = new Vector2(0f, 0f);
+                rt.anchorMax = new Vector2(1f, 0f);
+                rt.pivot = new Vector2(0.5f, 1f);
+                rt.sizeDelta = new Vector2(0f, 24f);
+                rt.anchoredPosition = new Vector2(0f, -8f);
+                t = go.AddComponent<UnityEngine.UI.Text>();
+                t.font = UnityEngine.Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+                t.fontSize = 14;
+                t.alignment = TextAnchor.MiddleCenter;
+                t.color = new Color(0.85f, 0.75f, 0.55f);
+                t.raycastTarget = false;
+            } else t = existing.GetComponent<UnityEngine.UI.Text>();
+            t.text = controls;
         }
 
         /// <summary>
