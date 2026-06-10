@@ -45,7 +45,8 @@ namespace Tartaria.Integration
 
         public string GetInteractPrompt()
         {
-            return $"[E] Pick up {displayName}";
+            // R412: F310 controller shows [A] when gamepad active
+            return Tartaria.Input.InputPromptHelper.Localize($"[E] Pick up {displayName}");
         }
 
         public void Interact(GameObject interactor)

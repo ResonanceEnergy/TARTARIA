@@ -309,7 +309,8 @@ namespace Tartaria.Integration
             bg.raycastTarget = false;
 
             var txt = CreateChild(rt, "HintText").AddComponent<TextMeshProUGUI>();
-            txt.text = "[WASD] Move   [E] Dig/Interact   [T] Frequency Tuner   [TAB] Aether Vision   [J] Quest Log   [ESC] Pause";
+            // R412: localize so F310 controller shows [A]/[Y]/[Back]/[Start] etc. when gamepad active
+            txt.text = Tartaria.Input.InputPromptHelper.Localize("[WASD] Move   [E] Dig/Interact   [T] Frequency Tuner   [TAB] Aether Vision   [J] Quest Log   [ESC] Pause");
             txt.fontSize = 14;
             txt.color = new Color(0.85f, 0.85f, 0.7f, 0.9f);
             txt.alignment = TextAlignmentOptions.Left;
@@ -487,14 +488,15 @@ namespace Tartaria.Integration
             // Body
             var bodyGO = CreateChild(rt, "Body");
             var body = bodyGO.AddComponent<TextMeshProUGUI>();
-            body.text =
+            // R412: localize per-key glyphs for F310 controller
+            body.text = Tartaria.Input.InputPromptHelper.Localize(
                 "The ancient city sleeps beneath centuries of mud.\n\n" +
                 "<color=#80FF90>•</color>  Walk toward the <color=#80FF90>green beacon lights</color> — those are buried structures.\n" +
                 "<color=#80FF90>•</color>  Press <color=#FFE050>[E]</color> near a beacon to begin excavating.\n" +
                 "<color=#80FF90>•</color>  Restore all 3 buildings to raise your <color=#FFE050>Resonance Score</color>.\n" +
                 "<color=#FF8888>•</color>  Mud Golems will attack — fight or evade them.\n" +
                 "<color=#88AAFF>•</color>  Press <color=#FFE050>[T]</color> to open the Frequency Tuner.\n" +
-                "<color=#88AAFF>•</color>  A presence watches from the shadows...";
+                "<color=#88AAFF>•</color>  A presence watches from the shadows...");
             body.fontSize = 18;
             body.alignment = TextAlignmentOptions.Left;
             body.color = new Color(0.88f, 0.88f, 0.88f);

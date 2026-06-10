@@ -218,7 +218,8 @@ namespace Tartaria.Integration
 
             _promptState = _state;
             _promptNodes = _nodesCompleted;
-            _promptCache = _state switch
+            // R412: wrap all prompts in Localize so [E] -> [A] on F310 gamepad
+            _promptCache = Tartaria.Input.InputPromptHelper.Localize(_state switch
             {
                 BuildingRestorationState.Buried => _isDiscovered
                     ? $"[E] Excavate {GetDisplayName()}"
@@ -228,7 +229,7 @@ namespace Tartaria.Integration
                 BuildingRestorationState.Emerging => "Restoration in progress...",
                 BuildingRestorationState.Active => $"[E] Examine {GetDisplayName()}",
                 _ => ""
-            };
+            });
             return _promptCache;
         }
 
@@ -250,7 +251,7 @@ namespace Tartaria.Integration
             if (_state == BuildingRestorationState.Buried && IsExcavationComplete())
                 RevealBuriedStructure();
             else if (_state == BuildingRestorationState.Buried)
-                GameEvents.RaiseHUDShowInteractionPrompt($"{GetDisplayName()} site identified. Press [E] to dig.");
+                GameEvents.RaiseHUDShowInteractionPrompt(Tartaria.Input.InputPromptHelper.Localize($"{GetDisplayName()} site identified. Press [E] to dig."));
 
             // SUPERSEDED 2026-05-31 — missing symbol: GameLoopController.Instance?.OnBuildingDiscovered(
             //     GetDisplayName(), transform.position);
