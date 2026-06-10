@@ -181,7 +181,10 @@ namespace Tartaria.Integration
         public void TriggerCalendarCompanionEvent(string companionId, int tier)
         {
             // 17th Hour echoes that change companion state (R7)
-            bool is17th = (System.DateTime.UtcNow.Hour == 17); // sim
+            // R393: Use TartarianHourCycle game-time, not real-world UTC clock.
+            // Game day = 17 in-game hours. Real DateTime.Hour 17 only fires once per RL day.
+            var hourCycle = UnityEngine.Object.FindFirstObjectByType<Tartaria.Integration.TartarianHourCycle>();
+            bool is17th = hourCycle != null && hourCycle.CurrentHour == 17;
             if (is17th || tier % 25 == 0)
             {
                 int cid = CompanionIdFromString(companionId);

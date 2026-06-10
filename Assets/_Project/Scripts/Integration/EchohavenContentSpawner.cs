@@ -1158,7 +1158,8 @@ namespace Tartaria.Integration
             {
                 cassianGO = Instantiate(kayKitCassianPrefab, cassianPosition, Quaternion.identity);
                 cassianGO.name = "Cassian";
-                cassianGO.transform.localScale = Vector3.one * 1.1f;
+                // R393: Cassian is adult-sized (1.7-1.8m per docs/15 §1 + appendices/G_NPC_INDEX.md)
+                cassianGO.transform.localScale = Vector3.one * 1.75f;
                 EnsureNPCAnimator(cassianGO);
                 Debug.Log("[EchohavenContentSpawner] Cassian spawned from KayKit prefab.");
             }
@@ -1170,7 +1171,8 @@ namespace Tartaria.Integration
                 {
                     cassianGO = Instantiate(cassianPrefab, cassianPosition, Quaternion.identity);
                     cassianGO.name = "Cassian";
-                    cassianGO.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+                    // R393: Cassian is adult-sized (1.7-1.8m per docs/15 §1)
+                    cassianGO.transform.localScale = new Vector3(1.75f, 1.75f, 1.75f);
                 }
                 else
                 {
