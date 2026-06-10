@@ -609,8 +609,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -707,7 +709,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.27647826, g: 0.31103802, b: 0.3801576, a: 0.6911956}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.27647826, g: 0.31103802, b: 0.3801576, a: 0.6911956}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -7716,6 +7718,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_MossRock_Lunar_1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: dddc342a9c72a1d46b4eac3a7e4c88c4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -8104,8 +8110,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -8202,7 +8210,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.2, g: 0.2, b: 0.3, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.2, g: 0.2, b: 0.3, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -8562,6 +8570,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_Name
       value: Moon10_Verdant_Grove_Fountain
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -13995,6 +14007,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_MossRock_Lunar_0
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: dddc342a9c72a1d46b4eac3a7e4c88c4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -15419,8 +15435,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -15517,7 +15535,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.2762122, g: 0.31073868, b: 0.37979174, a: 0.6905304}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.2762122, g: 0.31073868, b: 0.37979174, a: 0.6905304}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -25450,6 +25468,10 @@ PrefabInstance:
       value: Moon3_Electric_Spire_PaletteSwap
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -31885,8 +31907,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -31983,7 +32007,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -38850,15 +38874,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2694138033918882140, guid: 11ee5dabff8521947b71fe1954aac29d, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.9230145
+      value: 0.0863433
       objectReference: {fileID: 0}
     - target: {fileID: 2694138033918882140, guid: 11ee5dabff8521947b71fe1954aac29d, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.9230145
+      value: 0.0863433
       objectReference: {fileID: 0}
     - target: {fileID: 2694138033918882140, guid: 11ee5dabff8521947b71fe1954aac29d, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.9230145
+      value: 0.0863433
       objectReference: {fileID: 0}
     - target: {fileID: 2694138033918882140, guid: 11ee5dabff8521947b71fe1954aac29d, type: 3}
       propertyPath: m_LocalPosition.x
@@ -41219,6 +41243,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 1683689782}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -41269,6 +41305,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_Name
       value: Moon9_Cinder_Solar_Dome
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -41771,8 +41811,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -41869,7 +41911,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.85, g: 0.5, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.85, g: 0.5, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -42486,8 +42528,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -42584,7 +42628,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -51491,8 +51535,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -51589,7 +51635,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -53258,8 +53304,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -53356,7 +53404,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -56581,7 +56629,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &167734017
 Transform:
   m_ObjectHideFlags: 0
@@ -57001,6 +57049,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: dddc342a9c72a1d46b4eac3a7e4c88c4, type: 3}
       propertyPath: m_Name
       value: Moon2_Veg_MossRock_Lunar_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: dddc342a9c72a1d46b4eac3a7e4c88c4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -57850,6 +57902,10 @@ PrefabInstance:
       value: Moon10_Verdant_Grove_Spire
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -57880,8 +57936,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -57978,7 +58036,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3020951, g: 0.33985695, b: 0.41538075, a: 0.7552377}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3020951, g: 0.33985695, b: 0.41538075, a: 0.7552377}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -61536,7 +61594,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &193662358
 Transform:
   m_ObjectHideFlags: 0
@@ -64820,15 +64878,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.80984294
+      value: 0.08013028
       objectReference: {fileID: 0}
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.80984294
+      value: 0.08013028
       objectReference: {fileID: 0}
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.80984294
+      value: 0.08013028
       objectReference: {fileID: 0}
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -65303,6 +65361,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_CrystalPillar_Lunar_2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 896f5289bd76ffb438b82834a5dc8b85, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -65760,8 +65822,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -65858,7 +65922,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -78243,8 +78307,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -78341,7 +78407,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -78439,7 +78505,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &238871263
 Transform:
   m_ObjectHideFlags: 0
@@ -78736,8 +78802,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -78834,7 +78902,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.2642238, g: 0.2972518, b: 0.36330774, a: 0.66055954}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.2642238, g: 0.2972518, b: 0.36330774, a: 0.66055954}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -80341,6 +80409,10 @@ PrefabInstance:
       value: Moon2_LunarDome_PaletteSwap
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -80660,15 +80732,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.0074258
+      value: 0.08927565
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.0074258
+      value: 0.08927565
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.0074258
+      value: 0.08927565
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -97761,6 +97833,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_CrystalShrub_Lunar_3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 33397a793feb64c4284b6373df3e6927, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -104844,6 +104920,10 @@ PrefabInstance:
       value: Moon5_Obsidian_Spire_PaletteSwap
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -105972,8 +106052,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -106070,7 +106152,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.31710145, g: 0.35673913, b: 0.4360145, a: 0.79275364}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.31710145, g: 0.35673913, b: 0.4360145, a: 0.79275364}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -107870,8 +107952,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -107968,7 +108052,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -110176,8 +110260,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -110274,7 +110360,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -110297,7 +110383,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &308547818
 Transform:
   m_ObjectHideFlags: 0
@@ -127114,7 +127200,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &321595899
 Transform:
   m_ObjectHideFlags: 0
@@ -128329,7 +128415,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &328192045
 Transform:
   m_ObjectHideFlags: 0
@@ -129334,7 +129420,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &332172267
 Transform:
   m_ObjectHideFlags: 0
@@ -131084,6 +131170,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_CrystalShrub_Lunar_2
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 33397a793feb64c4284b6373df3e6927, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -131112,7 +131202,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &339971758
 Transform:
   m_ObjectHideFlags: 0
@@ -133249,6 +133339,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_Name
       value: Moon12_Mirror_Bell_Spire
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -147208,8 +147302,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -147306,7 +147402,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -159660,7 +159756,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &392062880
 Transform:
   m_ObjectHideFlags: 0
@@ -170937,7 +171033,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &424848139
 Transform:
   m_ObjectHideFlags: 0
@@ -171141,6 +171237,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0ce8eea6384d8d9489116cb53ef243e2, type: 3}
       propertyPath: m_Name
       value: Moon2_Veg_DeadTartarianTree_Lunar_0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0ce8eea6384d8d9489116cb53ef243e2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -184780,7 +184880,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &444105794
 Transform:
   m_ObjectHideFlags: 0
@@ -185411,8 +185511,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -185509,7 +185611,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -186876,7 +186978,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &461635792
 Transform:
   m_ObjectHideFlags: 0
@@ -187621,8 +187723,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -187719,7 +187823,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.65, g: 0.25, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.65, g: 0.25, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -188954,8 +189058,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -189052,7 +189158,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.85, g: 0.5, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.85, g: 0.5, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -192242,8 +192348,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -192340,7 +192448,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -192447,7 +192555,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.10438521, y: -0.0054705977, z: -0.052049257, w: 0.99315894}
   m_LocalPosition: {x: 25, y: 8, z: 5}
-  m_LocalScale: {x: 0.6, y: 12, z: 0.6}
+  m_LocalScale: {x: 0.050992154, y: 1.019843, z: 0.050992154}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1346031800}
@@ -192727,15 +192835,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2141644717628592097, guid: 7c9061bb6d44e2a4d804e18c932332c2, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.07018947
       objectReference: {fileID: 0}
     - target: {fileID: 2141644717628592097, guid: 7c9061bb6d44e2a4d804e18c932332c2, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.07018947
       objectReference: {fileID: 0}
     - target: {fileID: 2141644717628592097, guid: 7c9061bb6d44e2a4d804e18c932332c2, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.07018947
       objectReference: {fileID: 0}
     - target: {fileID: 2141644717628592097, guid: 7c9061bb6d44e2a4d804e18c932332c2, type: 3}
       propertyPath: m_LocalPosition.x
@@ -198671,7 +198779,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &504698760
 Transform:
   m_ObjectHideFlags: 0
@@ -210077,6 +210185,10 @@ PrefabInstance:
       value: Moon9_Cinder_Solar_Fountain
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -210468,15 +210580,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.091717765
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.091717765
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.091717765
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -211184,7 +211296,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: 0.85065085, z: -0, w: 0.5257311}
   m_LocalPosition: {x: 10, y: 0.05, z: 10}
-  m_LocalScale: {x: 0.2, y: 0.05, z: 22.36068}
+  m_LocalScale: {x: 0.019910956, y: 0.004977739, z: 2.2261124}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1153129309}
@@ -211872,8 +211984,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -211970,7 +212084,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -211990,7 +212104,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &557089135
 Transform:
   m_ObjectHideFlags: 0
@@ -212726,8 +212840,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -212824,7 +212940,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -216525,7 +216641,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &588777850
 Transform:
   m_ObjectHideFlags: 0
@@ -236382,8 +236498,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -236480,7 +236598,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.65, g: 0.25, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.65, g: 0.25, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -240682,6 +240800,10 @@ PrefabInstance:
       value: Moon2_LunarBellTower_PaletteSwap
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -242004,8 +242126,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -242102,7 +242226,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -244418,8 +244542,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -244516,7 +244642,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -250550,7 +250676,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &671769662
 Transform:
   m_ObjectHideFlags: 0
@@ -250774,7 +250900,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &672677188
 Transform:
   m_ObjectHideFlags: 0
@@ -253066,7 +253192,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &681957950
 Transform:
   m_ObjectHideFlags: 0
@@ -253871,8 +253997,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -253969,7 +254097,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -265938,8 +266066,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -266036,7 +266166,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.55, g: 0.45, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.55, g: 0.45, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -266435,7 +266565,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.10438521, y: -0.0054705977, z: -0.052049257, w: 0.99315894}
   m_LocalPosition: {x: -25, y: 8, z: 4.9999976}
-  m_LocalScale: {x: 0.6, y: 12, z: 0.6}
+  m_LocalScale: {x: 0.050992154, y: 1.019843, z: 0.050992154}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1346031800}
@@ -274105,6 +274235,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_CrystalPillar_Lunar_0
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 896f5289bd76ffb438b82834a5dc8b85, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -278027,6 +278161,10 @@ PrefabInstance:
       value: Moon11_Mist_Fountain_Dome
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -279313,6 +279451,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_Name
       value: Moon4_Bronze_Spire_PaletteSwap
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -281357,7 +281499,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &746440834
 Transform:
   m_ObjectHideFlags: 0
@@ -282580,6 +282722,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_Name
       value: Moon11_Mist_Fountain_Spire
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -283943,7 +284089,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &765338719
 Transform:
   m_ObjectHideFlags: 0
@@ -289983,8 +290129,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -290081,7 +290229,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -297148,8 +297296,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -297246,7 +297396,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.85, g: 0.5, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.85, g: 0.5, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -304601,8 +304751,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -304699,7 +304851,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -313460,8 +313612,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -313558,7 +313712,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -317127,8 +317281,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -317225,7 +317381,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -318164,8 +318320,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -318262,7 +318420,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -323982,6 +324140,10 @@ PrefabInstance:
       value: Moon5_Obsidian_Dome_PaletteSwap
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -325162,7 +325324,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &893094595
 Transform:
   m_ObjectHideFlags: 0
@@ -326077,8 +326239,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -326175,7 +326339,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -330139,8 +330303,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -330237,7 +330403,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -336218,6 +336384,10 @@ PrefabInstance:
       value: Moon2_LunarSpire_PaletteSwap
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -336248,8 +336418,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -336346,7 +336518,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -357479,8 +357651,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -357577,7 +357751,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -358660,6 +358834,10 @@ PrefabInstance:
       value: Moon4_Bronze_Dome_PaletteSwap
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -359526,6 +359704,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_Name
       value: Moon8_Aether_Airship_Spire
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -365508,8 +365690,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -365606,7 +365790,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -367702,7 +367886,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1001312655
 Transform:
   m_ObjectHideFlags: 0
@@ -374455,8 +374639,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -374553,7 +374739,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.2581405, g: 0.29040805, b: 0.3549432, a: 0.64535123}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.2581405, g: 0.29040805, b: 0.3549432, a: 0.64535123}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -380273,8 +380459,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -380371,7 +380559,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -380485,7 +380673,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1015422984
 Transform:
   m_ObjectHideFlags: 0
@@ -381491,6 +381679,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 2056941410}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -381543,6 +381743,10 @@ PrefabInstance:
       value: Moon7_Frost_Vault_Dome
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -381573,8 +381777,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -381671,7 +381877,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -382678,7 +382884,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1026850688
 Transform:
   m_ObjectHideFlags: 0
@@ -383705,8 +383911,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -383803,7 +384011,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -392100,7 +392308,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1050121867
 Transform:
   m_ObjectHideFlags: 0
@@ -396739,8 +396947,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -396837,7 +397047,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -399039,7 +399249,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1084193200
 Transform:
   m_ObjectHideFlags: 0
@@ -414592,7 +414802,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1135661181
 Transform:
   m_ObjectHideFlags: 0
@@ -419496,6 +419706,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_Name
       value: Moon7_Frost_Vault_Fountain
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -429821,8 +430035,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -429919,7 +430135,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -433476,8 +433692,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -433574,7 +433792,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -441912,15 +442130,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.09036211
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.09036211
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.09036211
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -443170,6 +443388,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_Name
       value: Moon3_Electric_Fountain_PaletteSwap
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -451330,8 +451552,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -451428,7 +451652,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -454430,8 +454654,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -454528,7 +454754,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -460574,7 +460800,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1259297057
 Transform:
   m_ObjectHideFlags: 0
@@ -461396,8 +461622,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -461494,7 +461722,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.24467854, g: 0.27526337, b: 0.336433, a: 0.61169636}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.24467854, g: 0.27526337, b: 0.336433, a: 0.61169636}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -474487,8 +474715,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -474585,7 +474815,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -478139,6 +478369,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_CrystalShrub_Lunar_1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 33397a793feb64c4284b6373df3e6927, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -479353,8 +479587,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -479451,7 +479687,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -479564,7 +479800,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1331800825
 Transform:
   m_ObjectHideFlags: 0
@@ -480442,8 +480678,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -480540,7 +480778,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -490994,8 +491232,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -491092,7 +491332,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -500271,7 +500511,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1389762064
 Transform:
   m_ObjectHideFlags: 0
@@ -501190,8 +501430,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -501288,7 +501530,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.2, g: 0.2, b: 0.3, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.2, g: 0.2, b: 0.3, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -501311,15 +501553,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.09020929
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.09020929
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.09020929
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -501490,7 +501732,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.10438521, y: -0.0054705977, z: -0.052049257, w: 0.99315894}
   m_LocalPosition: {x: 12.499999, y: 8, z: 26.650637}
-  m_LocalScale: {x: 0.6, y: 12, z: 0.6}
+  m_LocalScale: {x: 0.050992154, y: 1.019843, z: 0.050992154}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1346031800}
@@ -507034,8 +507276,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -507132,7 +507376,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.65, g: 0.25, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.65, g: 0.25, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -510763,8 +511007,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -510861,7 +511107,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.15, g: 0.3, b: 0.15, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.15, g: 0.3, b: 0.15, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -511392,8 +511638,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -511490,7 +511738,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.2841465, g: 0.31966478, b: 0.3907014, a: 0.7103662}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.2841465, g: 0.31966478, b: 0.3907014, a: 0.7103662}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -519992,15 +520240,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.86692107
+      value: 0.08303624
       objectReference: {fileID: 0}
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalScale.y
-      value: 0.86692107
+      value: 0.08303624
       objectReference: {fileID: 0}
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalScale.z
-      value: 0.86692107
+      value: 0.08303624
       objectReference: {fileID: 0}
     - target: {fileID: 2469731067007306316, guid: db1897ced8b8a7a4cbd50e186d68665b, type: 3}
       propertyPath: m_LocalPosition.x
@@ -521622,6 +521870,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0ce8eea6384d8d9489116cb53ef243e2, type: 3}
       propertyPath: m_Name
       value: Moon2_Veg_DeadTartarianTree_Lunar_2
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0ce8eea6384d8d9489116cb53ef243e2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -525116,7 +525368,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1469186538
 Transform:
   m_ObjectHideFlags: 0
@@ -531172,7 +531424,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.10438521, y: -0.0054705977, z: -0.052049257, w: 0.99315894}
   m_LocalPosition: {x: 12.499998, y: 8, z: -16.650637}
-  m_LocalScale: {x: 0.6, y: 12, z: 0.6}
+  m_LocalScale: {x: 0.050992154, y: 1.019843, z: 0.050992154}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1346031800}
@@ -536905,6 +537157,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_Name
       value: Moon3_Electric_Dome_PaletteSwap
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -547995,7 +548251,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.RenderPipelines.Core.Runtime::UnityEngine.Rendering.ProbeVolume
   mode: 0
-  size: {x: 1237.2933, y: 45.26211, z: 1230.38}
+  size: {x: 203.01, y: 31.843575, z: 203.01}
   overrideRendererFilters: 0
   minRendererVolumeSize: 0.1
   objectLayerMask:
@@ -548035,7 +548291,7 @@ Transform:
   m_GameObject: {fileID: 1491725328}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.7833252, y: 0.7729473, z: -3.6900024}
+  m_LocalPosition: {x: 0, y: 7.482216, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -548745,8 +549001,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -548843,7 +549101,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.28810367, g: 0.3241166, b: 0.39614254, a: 0.72025913}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.28810367, g: 0.3241166, b: 0.39614254, a: 0.72025913}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -548890,6 +549148,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1625703570}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.07304602
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -548941,6 +549211,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_Name
       value: Moon8_Aether_Airship_Dome
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -549616,7 +549890,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1499598278
 Transform:
   m_ObjectHideFlags: 0
@@ -558074,7 +558348,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1517971933
 Transform:
   m_ObjectHideFlags: 0
@@ -565200,8 +565474,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -565298,7 +565574,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -567131,7 +567407,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1544037533
 Transform:
   m_ObjectHideFlags: 0
@@ -570205,6 +570481,10 @@ PrefabInstance:
       value: Moon11_Mist_Fountain_Fountain
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -572072,8 +572352,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -572170,7 +572452,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -572791,8 +573073,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -572889,7 +573173,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -573374,7 +573658,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.10438521, y: -0.0054705977, z: -0.052049257, w: 0.99315894}
   m_LocalPosition: {x: -12.500002, y: 8, z: 26.650635}
-  m_LocalScale: {x: 0.6, y: 12, z: 0.6}
+  m_LocalScale: {x: 0.050992154, y: 1.019843, z: 0.050992154}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1346031800}
@@ -576363,6 +576647,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_DeadTartarianTree_Lunar_1
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0ce8eea6384d8d9489116cb53ef243e2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -578104,6 +578392,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 896f5289bd76ffb438b82834a5dc8b85, type: 3}
       propertyPath: m_Name
       value: Moon2_Veg_CrystalPillar_Lunar_3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 896f5289bd76ffb438b82834a5dc8b85, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -580994,7 +581286,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1625703570
 Transform:
   m_ObjectHideFlags: 0
@@ -581658,6 +581950,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1680200916}
     m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 7a73a3113a76c0c49a3a7ea09f8f3c89, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.1094225
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7a73a3113a76c0c49a3a7ea09f8f3c89, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.175076
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 7a73a3113a76c0c49a3a7ea09f8f3c89, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.065653495
+      objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 7a73a3113a76c0c49a3a7ea09f8f3c89, type: 3}
       propertyPath: m_LocalPosition.x
       value: 3
@@ -582460,8 +582764,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -582558,7 +582864,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -589115,8 +589421,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -589213,7 +589521,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -594843,7 +595151,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1648899113
 Transform:
   m_ObjectHideFlags: 0
@@ -595970,7 +596278,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1658245010
 Transform:
   m_ObjectHideFlags: 0
@@ -597316,8 +597624,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -597414,7 +597724,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -608575,7 +608885,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1674968289
 Transform:
   m_ObjectHideFlags: 0
@@ -615192,7 +615502,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1683689782
 Transform:
   m_ObjectHideFlags: 0
@@ -617816,7 +618126,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1699066869
 Transform:
   m_ObjectHideFlags: 0
@@ -618949,7 +619259,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1702833267
 Transform:
   m_ObjectHideFlags: 0
@@ -628534,8 +628844,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -628632,7 +628944,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.29867396, g: 0.33600816, b: 0.4106767, a: 0.74668485}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.29867396, g: 0.33600816, b: 0.4106767, a: 0.74668485}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -628978,8 +629290,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -629076,7 +629390,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.28079924, g: 0.3158991, b: 0.38609895, a: 0.70199805}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.28079924, g: 0.3158991, b: 0.38609895, a: 0.70199805}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -643642,6 +643956,10 @@ PrefabInstance:
       value: Moon12_Mirror_Bell_Fountain
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -643889,8 +644207,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -643987,7 +644307,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -644830,8 +645150,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -644928,7 +645250,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -645735,8 +646057,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -645833,7 +646157,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.28551275, g: 0.32120183, b: 0.39258, a: 0.71378183}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.28551275, g: 0.32120183, b: 0.39258, a: 0.71378183}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -645866,7 +646190,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0.10438521, y: -0.0054705977, z: -0.052049257, w: 0.99315894}
   m_LocalPosition: {x: -12.499998, y: 8, z: -16.650637}
-  m_LocalScale: {x: 0.6, y: 12, z: 0.6}
+  m_LocalScale: {x: 0.050992154, y: 1.019843, z: 0.050992154}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1346031800}
@@ -658293,6 +658617,10 @@ PrefabInstance:
       value: Moon7_Frost_Vault_Spire
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -659238,7 +659566,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1811106527
 Transform:
   m_ObjectHideFlags: 0
@@ -661486,7 +661814,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1823207853
 Transform:
   m_ObjectHideFlags: 0
@@ -663132,15 +663460,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1
+      value: 0.075195186
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1
+      value: 0.075195186
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1
+      value: 0.075195186
       objectReference: {fileID: 0}
     - target: {fileID: 1083819259212720001, guid: 856a71b58919fa140aa7c1c436910bb1, type: 3}
       propertyPath: m_LocalPosition.x
@@ -663481,8 +663809,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -663579,7 +663909,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.15, g: 0.3, b: 0.15, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.15, g: 0.3, b: 0.15, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -663815,6 +664145,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_Name
       value: Moon8_Aether_Airship_Fountain
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -665697,8 +666031,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -665795,7 +666131,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -668416,6 +668752,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_DeadTartarianTree_Lunar_3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0ce8eea6384d8d9489116cb53ef243e2, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -668696,7 +669036,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1855775073
 Transform:
   m_ObjectHideFlags: 0
@@ -677083,7 +677423,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1874939408
 Transform:
   m_ObjectHideFlags: 0
@@ -678193,6 +678533,10 @@ PrefabInstance:
       value: Moon9_Cinder_Solar_Spire
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: a3313bd11f6cc89418e0d1f638f2db2d, type: 3}
       propertyPath: m_StaticEditorFlags
       value: 31
       objectReference: {fileID: 0}
@@ -678482,6 +678826,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_Name
       value: Moon4_Bronze_Fountain_PaletteSwap
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -688753,6 +689101,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_CrystalShrub_Lunar_0
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 33397a793feb64c4284b6373df3e6927, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -689419,7 +689771,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1893465079
 Transform:
   m_ObjectHideFlags: 0
@@ -690134,15 +690486,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalScale.x
-      value: 1.011288
+      value: 0.093808636
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalScale.y
-      value: 1.011288
+      value: 0.093808636
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalScale.z
-      value: 1.011288
+      value: 0.093808636
       objectReference: {fileID: 0}
     - target: {fileID: 5567374454452894591, guid: 730ba419e2afc9d44a3cb6461213641e, type: 3}
       propertyPath: m_LocalPosition.x
@@ -690209,7 +690561,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1897657858
 Transform:
   m_ObjectHideFlags: 0
@@ -703606,8 +703958,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -703704,7 +704058,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -708007,6 +708361,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 238871263}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -708057,6 +708423,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_Name
       value: Moon12_Mirror_Bell_Dome
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -711405,7 +711775,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2006056494
 Transform:
   m_ObjectHideFlags: 0
@@ -712460,6 +712830,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 896f5289bd76ffb438b82834a5dc8b85, type: 3}
       propertyPath: m_Name
       value: Moon2_Veg_CrystalPillar_Lunar_1
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 896f5289bd76ffb438b82834a5dc8b85, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -714075,8 +714449,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -714173,7 +714549,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.55, g: 0.45, b: 0.2, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.55, g: 0.45, b: 0.2, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -714422,6 +714798,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_Name
       value: Moon5_Obsidian_Fountain_PaletteSwap
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4815c4c4f5fbcab4980ed21182daae5a, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -724384,7 +724764,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2024125417
 Transform:
   m_ObjectHideFlags: 0
@@ -724518,8 +724898,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -724616,7 +724998,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.28892884, g: 0.3250449, b: 0.39727715, a: 0.72232205}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.28892884, g: 0.3250449, b: 0.39727715, a: 0.72232205}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -731583,8 +731965,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -731681,7 +732065,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.26193652, g: 0.29467857, b: 0.36016273, a: 0.6548413}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.26193652, g: 0.29467857, b: 0.36016273, a: 0.6548413}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -737560,6 +737944,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Moon2_Veg_MossRock_Lunar_3
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: dddc342a9c72a1d46b4eac3a7e4c88c4, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -738638,8 +739026,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -738736,7 +739126,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.25, g: 0.32, b: 0.18, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.25, g: 0.32, b: 0.18, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -740609,7 +740999,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2056941410
 Transform:
   m_ObjectHideFlags: 0
@@ -748229,6 +748619,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 1674968289}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.07304602
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -748279,6 +748681,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_Name
       value: Moon10_Verdant_Grove_Dome
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 133b9c62e51afb54f8f2e77a61134087, type: 3}
       propertyPath: m_StaticEditorFlags
@@ -752212,7 +752618,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2096370268
 Transform:
   m_ObjectHideFlags: 0
@@ -764995,7 +765401,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2118682800
 Transform:
   m_ObjectHideFlags: 0
@@ -765700,8 +766106,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -765798,7 +766206,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.3, g: 0.2, b: 0.12, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.3, g: 0.2, b: 0.12, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
@@ -767782,8 +768190,10 @@ Material:
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
+  stringTagMap:
+    RenderType: Opaque
+  disabledShaderPasses:
+  - MOTIONVECTORS
   m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
@@ -767880,7 +768290,7 @@ Material:
     - _ZWrite: 1
     m_Colors:
     - _BaseColor: {r: 0.08, g: 0.05, b: 0.04, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.08, g: 0.05, b: 0.04, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
   m_BuildTextureStacks: []
