@@ -380,20 +380,20 @@ public static class GoldenRatioValidator
 
 **The Dome — "Listeners' Hall"**
 - Size: 25m diameter, 18m height (golden ratio: 25/18 ≈ 1.389 — close to √φ)
-- Buried: 80% below mud, only apex visible at start
+- Buried: **20% below mud** (per NATRIX 2026-06-09 R299 — mostly exposed silhouette stands above the plain; the structure visibly *survived* the Mud Flood instead of being hidden under it)
 - Interior: acoustic chamber with central fountain, rose-window style openings
 - Function: Primary Aether generator (+1.0 source strength)
 - Narrative: The building where Tartarians gathered to "listen to the Earth"
 
 **The Fountain — "Thread of Memory"**
 - Size: 8m diameter basin, 5m central column (8/5 = φ exactly)
-- Buried: 95% — completely hidden until dome restoration reveals it
+- Buried: **20% below mud** (per NATRIX 2026-06-09 R299 — basin reads at a distance, no longer hidden until dome restoration)
 - Function: Purifies local corruption, small Aether source
 - Special: When active, water carries harmonic sound — the first hint of 432 Hz
 
 **The Spire — "The First Note"**
 - Size: 3m base diameter, 15m height (base-to-height ratio approaches φ²)
-- Buried: 60% — tip visible as a "strange rock formation"
+- Buried: **20% below mud** (per NATRIX 2026-06-09 R299 — reads as a Tartarian-era pillar from the moment you walk into the valley, not a "strange rock formation")
 - Function: Long-range Aether beacon, extends Aether visibility to zone edge
 - Narrative: A tuning spire — the Tartarian equivalent of a radio tower
 
